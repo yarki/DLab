@@ -1,1 +1,1 @@
-Data Lab is project for automated Data Science environment provisioning.
+DLAB is data science automated environment provision framework developed by EPAM Systems Inc.
