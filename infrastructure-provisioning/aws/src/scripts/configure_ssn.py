@@ -72,12 +72,12 @@ def ensure_mongo():
         sudo('touch /tmp/mongo_ensured')
 
 
-def configure_mongo(config):
+def configure_mongo():
     if not exists("/lib/systemd/system/mongod.service"):
-        put(config['mongo_template_dir'] + 'mongod.service_template', '/tmp/mongod.service')
-        sudo('\cp /tmp/mongod.service /lib/systemd/system/mongod.service')
-        put(config['mongo_template_dir'] + 'configure_mongo.py', '/tmp/configure_mongo.py')
-        sudo('/tmp/configure_mongo.py')
+        local('scp -i {} /usr/share/notebook_automation/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
+        sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
+    local('scp -i {} /usr/share/notebook_automation/templates/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
+    sudo('python /tmp/configure_mongo.py')
 
 
 def place_notebook_automation_scripts():
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     ensure_mongo()
 
     print "Configuring MongoDB"
-    configure_mongo(deeper_config)
+    configure_mongo()
 
     print "Installing jenkins."
     ensure_jenkins()
