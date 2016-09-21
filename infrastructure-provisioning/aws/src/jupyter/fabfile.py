@@ -61,7 +61,7 @@ def get_configuration(configuration_dir):
             merged_config.set(section, option, value)
 
     notebook_config = SafeConfigParser()
-    notebook_config.read(configuration_dir + 'notebook.ini')
+    notebook_config.read(configuration_dir + 'jupyter.ini')
     section = 'notebook'
     for option, value in notebook_config.items(section):
         if not merged_config.has_section(section):

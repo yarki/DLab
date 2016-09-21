@@ -19,32 +19,27 @@ FROM ubuntu:16.04
 MAINTAINER Victor Andreev (victor_andreev@epam.com)
 
 # Install any .deb dependecies
-RUN	apt-get update && apt-get -y upgrade
-RUN	apt-get -y install python-pip python-dev groff vim less git wget nano
+RUN	apt-get update && \
+    apt-get -y upgrade && \
+    apt-get -y install python-pip python-dev groff vim less git wget nano && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install any python dependencies
 RUN pip install boto3 fabric awscli boto argparse ujson jupyter
 
-# Minimizing disk usage: will be usefull only with image flatteinig
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Configuring user
-ARG SSH_CONFIG_DIR="/root/.ssh"
-ARG SSH_CONFIG="${SSH_CONFIG_DIR}/config"
-
-RUN mkdir -p ${SSH_CONFIG_DIR}
-RUN echo "Host *" > ${SSH_CONFIG}
-RUN echo "StrictHostKeyChecking no" >>  ${SSH_CONFIG}
-RUN echo "UserKnownHostsFile=/dev/null" >> ${SSH_CONFIG}
-RUN echo "GlobalKnownHostsFile=/dev/null" >> ${SSH_CONFIG}
-RUN echo "ConnectTimeout=30" >> ${SSH_CONFIG}
+# Configuring ssh for user
+RUN mkdir -p /root/.ssh; echo "Host *" > /root/.ssh/config \
+    echo "StrictHostKeyChecking no" >>  /root/.ssh/config; \
+    echo "UserKnownHostsFile=/dev/null" >> /root/.ssh/config \
+    echo "GlobalKnownHostsFile=/dev/null" >> /root/.ssh/config \
+    echo "ConnectTimeout=30" >> /root/.ssh/config
 
 # Configuring entrypoint script
 ENV PROVISION_CONFIG_DIR /root/conf/
 ENV KEYFILE_DIR /root/keys/
 RUN mkdir -p /root/conf
-COPY src/entrypoint.sh /bin/entrypoint.sh
-RUN chmod a+x /bin/entrypoint.sh
+COPY . /root
+RUN chmod a+x /root/entrypoint.py
 
 # Entrypoint
-ENTRYPOINT ["/bin/entrypoint.sh"]
+ENTRYPOINT ["/root/entrypoint.py"]

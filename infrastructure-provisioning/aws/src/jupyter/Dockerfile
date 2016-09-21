@@ -14,16 +14,17 @@
 # limitations under the License.
 # ============================================================================
 
-FROM docker.epmc-bdcc.projects.epam.com/data-lab-base:stable
+FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:stable
 
 MAINTAINER Victor Andreev (victor_andreev@epam.com)
 
-COPY src/ /root/
-RUN chmod -R a+rx /root
-RUN chmod 400 /root/keys/*
-RUN chmod 755 /root/scripts/*
-RUN ln -s /root /usr/share/notebook_automation
+COPY . /root/
+RUN chmod 755 /root/fabfile.py; \
+    chmod 400 /root/keys/*; \
+    chmod 755 /root/scripts/*; \
+    ln -s /root /usr/share/notebook_automation; \
+    chmod a+x /root/entrypoint.py; \
+    chmod a+x /root/api/*; \
+    mv /root/api/*.py /bin/; \
+    mv /root/entrypoint.py /bin/entrypoint.py
 
-COPY src/provision_ssn.py /bin/provision_ssn.py
-RUN chmod a+x /bin/provision_ssn.py
-RUN ln -s /bin/provision_ssn.py /bin/provision_ssn

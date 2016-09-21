@@ -14,11 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-from fabric.api import *
 from ConfigParser import SafeConfigParser
 import os
-import argparse
-from fabric.api import *
+from fabric.api import local, hide
 
 
 def create_shadow_config():
@@ -40,4 +38,6 @@ def create_shadow_config():
 
 if __name__ == "__main__":
     create_shadow_config()
-    local("cd /root; fab run")
+#    with hide('stderr', 'running'):
+#        local("cd /root; fab run")
+    print '{"message": "justatest"}'
