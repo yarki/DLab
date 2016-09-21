@@ -2,7 +2,7 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.api.LDAPUser;
 import com.epam.dlab.backendapi.api.User;
-import com.epam.dlab.backendapi.core.RESTClient;
+import com.epam.dlab.backendapi.core.RESTService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,15 +23,15 @@ import javax.ws.rs.core.MediaType;
 public class LoginResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginResource.class);
 
-    private RESTClient securityService;
+    private RESTService securityService;
 
-    public LoginResource(RESTClient securityService) {
+    public LoginResource(RESTService securityService) {
         this.securityService = securityService;
     }
 
     @POST
     public LDAPUser login(@FormParam("login") String login, @FormParam("password") String password) {
         LOGGER.info("Try login user = {}", login);
-        return securityService.post("http://localhost:8082", "login", new User(login, password), LDAPUser.class);
+        return securityService.post("login", new User(login, password), LDAPUser.class);
     }
 }

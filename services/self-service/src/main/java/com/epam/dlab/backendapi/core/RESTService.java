@@ -7,15 +7,17 @@ import javax.ws.rs.core.MediaType;
 /**
  * Created by Alexey_Suprun on 21-Sep-16.
  */
-public class RESTClient {
+public class RESTService {
     private Client client;
+    private String url;
 
-    public RESTClient(Client client) {
+    RESTService(Client client, String url) {
         this.client = client;
+        this.url = url;
     }
 
-    public <T> T post(String target, String path, Object parameter, Class<T> clazz) {
-        return client.target(target)
+    public <T> T post(String path, Object parameter, Class<T> clazz) {
+        return client.target(url)
                 .path(path)
                 .request(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
