@@ -34,6 +34,8 @@ RUN mkdir -p /root/.ssh; echo "Host *" > /root/.ssh/config; \
     echo "GlobalKnownHostsFile=/dev/null" >> /root/.ssh/config; \
     echo "ConnectTimeout=30" >> /root/.ssh/config
 
+RUN mkdir -p /response; chmod a+rwx /response
+
 # Configuring entrypoint script
 ENV PROVISION_CONFIG_DIR /root/conf/
 ENV KEYFILE_DIR /root/keys/

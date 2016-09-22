@@ -233,8 +233,8 @@ if __name__ == "__main__":
     notebook_instance_name = config.get('conf', 'service_base_name') + '-notebook-' + args.notebook_name
     expected_ami_name = config.get('conf', 'service_base_name') + '-notebook-image'
 
-    local_log_filename = "%s.log" % notebook_instance_name
-    local_log_filepath = "%s/%s" % (os.environ['PWD'], local_log_filename)
+    local_log_filename = "runlog.log"
+    local_log_filepath = "/root/runlog.log"
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -261,19 +261,30 @@ if __name__ == "__main__":
 
     run(config)
 
-    with open("/tmp/" + notebook_instance_name + "passwd.file") as f:
-        ip_address = get_ip_address(notebook_instance_name)
-        dns_name = get_hostname(notebook_instance_name)
-        print "Notebook access url: http://%s/%s" % \
-              (get_hostname(config.get('conf', 'service_base_name') + '-ssn-instance'), notebook_instance_name)
-        print "Notebook access password: " + f.read()
-        print 'SSH access (from Edge node, via IP address): ssh -i keyfile.pem ubuntu@' + ip_address
-        print 'SSH access (from Edge node, via FQDN): ssh -i keyfile.pem ubuntu@' + dns_name
-
     if ami_id == '' and os.path.isfile("/tmp/" + notebook_instance_name + "passwd.file"):
         print "Looks like it's first time we configure notebook server. Creating image."
         image_id = create_image_from_instance(instance_name=notebook_instance_name,
                                               image_name=expected_ami_name)
         if image_id != '':
             print "Image succesfully created. It's ID is " + image_id
+
+    with open("/tmp/" + notebook_instance_name + "passwd.file") as f:
+        ip_address = get_ip_address(notebook_instance_name)
+        dns_name = get_hostname(notebook_instance_name)
+        access_password = f.read()
+        print "Notebook access url: http://%s/%s" % \
+              (get_hostname(config.get('conf', 'service_base_name') + '-ssn-instance'), notebook_instance_name)
+        print "Notebook access password: " + access_password
+        print 'SSH access (from Edge node, via IP address): ssh -i keyfile.pem ubuntu@' + ip_address
+        print 'SSH access (from Edge node, via FQDN): ssh -i keyfile.pem ubuntu@' + dns_name
+
+        with open("/root/result.json", 'w') as result:
+            res = {"hostname": get_hostname(notebook_instance_name),
+                   "ip": get_hostname(notebook_instance_name),
+                   "access_url": "http://%s/%s" %
+                                 (get_hostname(config.get('conf', 'service_base_name') + '-ssn-instance'),
+                                  notebook_instance_name),
+                   "access_password": access_password,
+                   "master_keyname": config.get('creds', 'key_name')}
+            result.write(json.dumps(res))
 

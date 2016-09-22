@@ -107,8 +107,8 @@ def run_routine(routine_name, params):
 def run():
     config = get_configuration(os.environ['PROVISION_CONFIG_DIR'])
 
-    local_log_filename = "self_service_node_creation.log"
-    local_log_filepath = "%s/%s" % (config.get('conf', 'local_log_dir'), local_log_filename)
+    local_log_filename = "runlog.log"
+    local_log_filepath = "/root/runlog.log"
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -198,8 +198,15 @@ def run():
 
     jenkins_url = "http://%s/jenkins" % get_hostname(instance_name)
     print "Jenkins URL: " + jenkins_url
-    with open('jenkins_crids.txt') as f:
-        print f.read()
+    try:
+        with open('jenkins_crids.txt') as f:
+            print f.read()
+    except:
+        print "Jenkins is either configured already or have issues in configuration routine."
+
+    with open("/root/result.json", 'w') as f:
+        res = {"hostname": get_hostname(instance_name), "master_keyname": config.get('creds', 'key_name')}
+        f.write(json.dumps(res))
 
     logging.info('[FINALIZE]')
     print('[FINALIZE]')
