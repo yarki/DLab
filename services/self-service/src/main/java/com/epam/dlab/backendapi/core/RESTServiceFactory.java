@@ -15,6 +15,10 @@ import javax.ws.rs.client.Client;
 public class RESTServiceFactory {
     @NotEmpty
     @JsonProperty
+    private String protocol;
+
+    @NotEmpty
+    @JsonProperty
     private String host;
 
     @Min(1)
@@ -28,6 +32,6 @@ public class RESTServiceFactory {
     }
 
     private String getURL() {
-        return String.format("http://%s:%d", host, port);
+        return String.format("%s://%s:%d", protocol, host, port);
     }
 }
