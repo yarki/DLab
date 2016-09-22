@@ -95,62 +95,9 @@ def create_aws_config_files():
     logging.info(local("chmod 550 " + aws_user_dir+" 2>&1", capture=True))
 
 
-def create_buckets(params):
-    logging.info("~/scripts/create_bucket.py " + params)
-    shell_out = local("~/scripts/create_bucket.py " + params)
-    print shell_out
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def create_roles(params):
-    logging.info("~/scripts/create_role_policy.py " + params)
-    shell_out = local("~/scripts/create_role_policy.py " + params)
-    print shell_out
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def create_instance(params):
-    logging.info("~/scripts/create_instance.py " + params)
-    shell_out = local("~/scripts/create_instance.py " + params)
-    print shell_out
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def install_prerequisites(params):
-    logging.info("~/scripts/install_prerequisites.py " + params)
-    shell_out = local("~/scripts/install_prerequisites.py " + params)
-    print shell_out
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def configure_ssn(params):
-    logging.info("~/scripts/configure_ssn.py " + params)
-    shell_out = local("~/scripts/configure_ssn.py " + params)
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def report(params):
-    logging.info("~/scripts/put_to_bucket.py " + params)
-    shell_out = local("~/scripts/put_to_bucket.py " + params)
-    print shell_out
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def finalize(params):
-    logging.info("~/scripts/finalize.py " + params)
-    shell_out = local("~/scripts/finalize.py " + params)
+def run_routine(routine_name, params):
+    logging.info("~/scripts/%s.py %s" % (routine_name, params))
+    shell_out = local("~/scripts/%s.py %s" % (routine_name, params))
     print shell_out
     logging.info(shell_out)
     print shell_out.stderr
@@ -169,8 +116,7 @@ def run():
 
     logging.info('[CREATE AWS CONFIG FILE]')
     print '[CREATE AWS CONFIG FILE]'
-    with hide('stderr', 'running'):
-        create_aws_config_files()
+    create_aws_config_files()
 
     logging.info('[DERIVING NAMES]')
     print '[DERIVING NAMES]'
@@ -186,15 +132,13 @@ def run():
     print('[CREATE ROLES]')
     params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
              (role_name, role_profile_name, policy_name, config.get('conf', 'policy_arn'))
-    with hide('stderr', 'running'):
-        create_roles(params)
+    run_routine('create_role_policy', params)
 
     logging.info('[CREATE BUCKETS]')
     print('[CREATE BUCKETS]')
     params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \
              (user_bucket_name, tag_name, "bucket")
-    with hide('stderr', 'running'):
-        create_buckets(params)
+    run_routine('create_bucket', params)
 
     logging.info('[CREATE SSN INSTANCE]')
     print('[CREATE SSN INSTANCE]')
@@ -203,17 +147,17 @@ def run():
              (instance_name, config.get('ssn', 'ami_id'), config.get('ssn', 'instance_type'),
               config.get('creds', 'key_name'), config.get('creds', 'security_groups_ids'),
               config.get('creds', 'subnet_id'), role_profile_name, tag_name, 'ssn')
-    with hide('stderr', 'running'):
-        create_instance(params)
+    run_routine('create_instance', params)
 
     instance_hostname = get_hostname(instance_name)
 
     logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
     print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
-    params = "--hostname %s --keyfile %s " % \
+    params = "--hostname %s --keyfile %s " \
+             "--pip_packages 'boto3 boto argparse fabric jupyter awscli'" % \
              (instance_hostname, "/root/keys/%s.pem" % config.get('creds', 'key_name'))
-    with hide('stderr', 'running'):
-        install_prerequisites(params)
+    run_routine('install_prerequisites', params)
+
 
     logging.info('[CONFIGURE SSN INSTANCE]')
     print('[CONFIGURE SSN INSTANCE]')
@@ -223,15 +167,27 @@ def run():
                          "proxy_subnet": config.get("ssn", "proxy_subnet")}
     params = "--hostname %s --keyfile %s --additional_config '%s'" % \
              (instance_hostname, "/root/keys/%s.pem" % config.get('creds', 'key_name'), json.dumps(additional_config))
-    with hide('stderr', 'running'):
-        configure_ssn(params)
+    run_routine('configure_ssn', params)
+
+    logging.info('[CONFIGURE SSN INSTANCE UI]')
+    print('[CONFIGURE SSN INSTANCE UI]')
+
+    params = "--hostname %s --keyfile %s " \
+             "--pip_packages 'pymongo'" % \
+             (instance_hostname, "/root/keys/%s.pem" % config.get('creds', 'key_name'))
+    run_routine('install_prerequisites', params)
+
+    params = "--hostname %s --keyfile %s" % \
+             (instance_hostname, "/root/keys/%s.pem" % config.get('creds', 'key_name'))
+    run_routine('configure_ui', params)
+
 
     logging.info('[REPORT TO BUCKET]')
     print('[REPORT TO BUCKET]')
     params = "--bucket_name %s --local_file %s --destination_file %s" % \
              (user_bucket_name, local_log_filepath, local_log_filename)
-    with hide('stderr', 'running'):
-        report(params)
+    run_routine('put_to_bucket', params)
+
 
     jenkins_url = "http://%s/jenkins" % get_hostname(instance_name)
     print "Jenkins URL: " + jenkins_url
@@ -243,4 +199,4 @@ def run():
     params = ""
     if config.get('ops', 'lifecycle_stage') == 'prod':
         params += "--key_id %s" % config.get('creds', 'access_key')
-        finalize(params)
+        run_routine('finalize', params)

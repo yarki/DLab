@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # ============================================================================
 # Copyright (c) 2016 EPAM Systems Inc.
 #
@@ -13,17 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+from fabric.api import *
+import argparse
+import os
 
-FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
+parser = argparse.ArgumentParser()
+parser.add_argument('--target', type=str, default='everything')
+parser.add_argument('--tag', type=str, default='')
+parser.add_argument('--builddir', action='')
+parser.add_argument('--push', action='store_true')
+args = parser.parse_args()
 
-MAINTAINER Victor Andreev (victor_andreev@epam.com)
 
-COPY . /root/
-RUN chmod 755 /root/fabfile.py; \
-    chmod 400 /root/keys/*; \
-    chmod 755 /root/scripts/*; \
-    ln -s /root /usr/share/notebook_automation; \
-    chmod a+x /root/entrypoint.py; \
-    chmod a+x /root/api/*; \
-    mv /root/api/*.py /bin/
+if args.builddir == '':
+    args.builddir = os.path.dirname(os.path.realpath(__file__))
 

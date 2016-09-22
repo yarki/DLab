@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:stable
+FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
 MAINTAINER Victor Andreev (victor_andreev@epam.com)
 
@@ -25,5 +25,4 @@ RUN chmod 755 /root/fabfile.py; \
     ln -s /root /usr/share/notebook_automation; \
     chmod a+x /root/entrypoint.py; \
     chmod a+x /root/api/*; \
-    mv /root/api/*.py /bin/; \
-    mv /root/entrypoint.py /bin/entrypoint.py
+    mv /root/api/*.py /bin/

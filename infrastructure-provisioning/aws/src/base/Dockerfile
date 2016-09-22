@@ -28,10 +28,10 @@ RUN	apt-get update && \
 RUN pip install boto3 fabric awscli boto argparse ujson jupyter
 
 # Configuring ssh for user
-RUN mkdir -p /root/.ssh; echo "Host *" > /root/.ssh/config \
+RUN mkdir -p /root/.ssh; echo "Host *" > /root/.ssh/config; \
     echo "StrictHostKeyChecking no" >>  /root/.ssh/config; \
-    echo "UserKnownHostsFile=/dev/null" >> /root/.ssh/config \
-    echo "GlobalKnownHostsFile=/dev/null" >> /root/.ssh/config \
+    echo "UserKnownHostsFile=/dev/null" >> /root/.ssh/config; \
+    echo "GlobalKnownHostsFile=/dev/null" >> /root/.ssh/config; \
     echo "ConnectTimeout=30" >> /root/.ssh/config
 
 # Configuring entrypoint script

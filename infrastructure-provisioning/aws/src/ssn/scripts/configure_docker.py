@@ -14,25 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-import boto3
+from fabric.api import *
+from fabric.contrib.files import exists
 import argparse
+import json
+import random
+import string
+import crypt
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--key_id', type=str, default='')
+parser.add_argument('--hostname', type=str, default='edge')
+parser.add_argument('--keyfile', type=str, default='')
+parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
-
-def cleanup(key_id):
-    iam = boto3.resource('iam')
-    current_user = iam.CurrentUser()
-    for user_key in current_user.access_keys.all():
-        if user_key.id == key_id:
-            print "Deleted key " + user_key.id
-            user_key.delete()
 
 ##############
 # Run script #
 ##############
-
 if __name__ == "__main__":
-    cleanup(args.key_id)
+    print "Configure connections"
+    env['connection_attempts'] = 100
+    env.key_filename = [args.keyfile]
+    env.host_string = 'ubuntu@' + args.hostname
+    deeper_config = json.loads(args.additional_config)

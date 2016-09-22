@@ -62,22 +62,7 @@ def configure_nginx(config):
         with open('jenkins_crids.txt', 'w+') as f:
             f.write("Jenkins credentials: engineer  / " + nginx_password)
 
-
-def ensure_mongo():
-    if not exists('/tmp/mongo_ensured'):
-        sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927')
-        sudo('ver=`lsb_release -cs`; echo "deb http://repo.mongodb.org/apt/ubuntu $ver/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list; apt-get update')
-        sudo('apt-get -y install mongodb-org')
-        sudo('sysv-rc-conf mongod on')
-        sudo('touch /tmp/mongo_ensured')
-
-
-def configure_mongo():
-    if not exists("/lib/systemd/system/mongod.service"):
-        local('scp -i {} /usr/share/notebook_automation/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
-        sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
-    local('scp -i {} /usr/share/notebook_automation/templates/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
-    sudo('python /tmp/configure_mongo.py')
+    sudo('service nginx reload')
 
 
 def place_notebook_automation_scripts():
@@ -112,7 +97,7 @@ def configure_jenkins():
         sudo('rm -rf /var/lib/jenkins/*')
         sudo('mkdir -p /var/lib/jenkins/jobs/')
         sudo('chown -R ubuntu /var/lib/jenkins/jobs/')
-        put('/usr/share/notebook_automation/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
+        put('/usr/share/notebook_automation/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
         sudo('chown -R jenkins:jenkins /var/lib/jenkins/jobs')
         with settings(warn_only=True):
             sudo('/etc/init.d/jenkins start; sleep 5; /etc/init.d/jenkins restart; sleep 10')
@@ -159,12 +144,6 @@ if __name__ == "__main__":
 
     print "Installing proxy for notebooks."
     configure_proxy_server(deeper_config)
-
-    print "Installing MongoDB"
-    ensure_mongo()
-
-    print "Configuring MongoDB"
-    configure_mongo()
 
     print "Installing jenkins."
     ensure_jenkins()

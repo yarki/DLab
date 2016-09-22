@@ -16,7 +16,7 @@
 # ============================================================================
 import os
 import argparse
-from fabric.api import local
+from fabric.api import local, hide
 import json
 
 parser = argparse.ArgumentParser()
@@ -31,14 +31,16 @@ if __name__ == "__main__":
         pass
 
     if args.action == 'create':
-        out = local("/bin/create.py", capture=True)
+        with hide('stderr', 'running', 'warnings'):
+            out = local("/bin/create.py")
         response = json.loads(out)
         response['request_id'] = request_id
         with open('/tmp/%s.json', 'w') as response_file:
             response_file.write(json.dumps(response))
 
     elif args.action == 'status':
-        out = local("/bin/status.py", capture=True)
+        with hide('stderr', 'running', 'warnings'):
+            out = local("/bin/status.py")
         response = json.loads(out)
         response['request_id'] = request_id
         with open('/tmp/%s.json', 'w') as response_file:
@@ -48,19 +50,24 @@ if __name__ == "__main__":
         with open('/root/description.json') as json_file:
             description = json.load(json_file)
             description['request_id'] = request_id
-            with open('/tmp/%s.json', 'w') as response_file:
+            with open("/tmp/%s.json" % request_id, 'w') as response_file:
                 response_file.write(json.dumps(description))
 
     elif args.action == 'stop':
-        out = local("/bin/stop.py", capture=True)
+        with hide('stderr', 'running', 'warnings'):
+            out = local("/bin/stop.py")
         response = json.loads(out)
         response['request_id'] = request_id
         with open('/tmp/%s.json', 'w') as response_file:
             response_file.write(json.dumps(response))
 
     elif args.action == 'start':
-        out = local("/bin/start.py", capture=True)
+        with hide('stderr', 'running', 'warnings'):
+            out = local("/bin/start.py")
         response = json.loads(out)
         response['request_id'] = request_id
         with open('/tmp/%s.json', 'w') as response_file:
             response_file.write(json.dumps(response))
+
+    elif args.action == 'debug':
+        local("/bin/bash", pty=True)
