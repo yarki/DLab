@@ -1,13 +1,13 @@
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.backendapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.client.JerseyClientBuilder;
+import com.mongodb.MongoClient;
+import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Environment;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.ws.rs.client.Client;
 
 /**
  * Copyright 2016 EPAM Systems, Inc.
@@ -24,11 +24,7 @@ import javax.ws.rs.client.Client;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class RESTServiceFactory {
-    @NotEmpty
-    @JsonProperty
-    private String protocol;
-
+public class MongoServiceFactory {
     @NotEmpty
     @JsonProperty
     private String host;
@@ -38,12 +34,22 @@ public class RESTServiceFactory {
     @JsonProperty
     private int port;
 
-    public RESTService build(Environment environment, String name) {
-        Client client = new JerseyClientBuilder(environment).build(name);
-        return new RESTService(client, getURL());
-    }
+    @NotEmpty
+    @JsonProperty
+    private String database;
 
-    private String getURL() {
-        return String.format("%s://%s:%d", protocol, host, port);
+    public MongoService build(Environment environment) {
+        MongoClient client = new MongoClient(host, port);
+        environment.lifecycle().manage(new Managed() {
+            @Override
+            public void start() {
+            }
+
+            @Override
+            public void stop() {
+                client.close();
+            }
+        });
+        return new MongoService(client, database);
     }
 }

@@ -1,8 +1,8 @@
-package com.epam.dlab.backendapi;
+package com.epam.dlab.backendapi.dao;
 
-import com.epam.dlab.backendapi.resources.LoginResource;
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 
 /**
  * Copyright 2016 EPAM Systems, Inc.
@@ -19,13 +19,16 @@ import io.dropwizard.setup.Environment;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class SecurityServiceApplication extends Application<SecurityServiceApplicationConfiguration> {
-    public static void main(String... args) throws Exception {
-        new SecurityServiceApplication().run(args);
+public class MongoService {
+    private MongoClient client;
+    private String database;
+
+    public MongoService(MongoClient client, String database) {
+        this.client = client;
+        this.database = database;
     }
 
-    @Override
-    public void run(SecurityServiceApplicationConfiguration securityServiceApplicationConfiguration, Environment environment) throws Exception {
-        environment.jersey().register(new LoginResource());
+    public MongoCollection<Document> getCollection(String name) {
+        return client.getDatabase(database).getCollection(name, Document.class);
     }
 }

@@ -6,6 +6,11 @@ server:
     - type: http
       port: 8081
 
+mongo:
+  host: localhost
+  port: 27017
+  database: dlab
+
 security-service:
   protocol: http
   host: localhost
