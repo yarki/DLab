@@ -86,16 +86,17 @@ def configure_notebook_server(notebook_name):
 
 
 def configure_nginx(config, instnace_name):
+    random_file_part = id_generator(size=20)
     template_file = config['nginx_template_dir'] + 'proxy_location_notebook_template.conf'
     backend_hostname = config['backend_hostname']
     backend_port = config['backend_port']
     notebook_uri = "_".join(instnace_name.split())
-    with open("/tmp/tmpproxy_location_notebook_template.conf", 'w') as out:
+    with open("/tmp/%s-proxy_location_notebook_template.conf" % random_file_part, 'w') as out:
         with open(template_file) as tpl:
             for line in tpl:
                 out.write(line.replace('BACKEND_HOSTNAME', backend_hostname)
                           .replace('BACKEND_PORT', backend_port).replace('NOTEBOOK', notebook_uri))
-            put('/tmp/tmpproxy_location_notebook_template.conf',
+            put("/tmp/%s-proxy_location_notebook_template.conf" % random_file_part,
                 '/tmp/proxy_location_notebook_' + "".join(instnace_name.split()) + '.conf')
             sudo('\cp /tmp/proxy_location_notebook_' + "".join(instnace_name.split()) + '.conf /etc/nginx/locations/')
     sudo('service nginx restart')

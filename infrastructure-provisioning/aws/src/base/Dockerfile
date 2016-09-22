@@ -38,7 +38,7 @@ RUN mkdir -p /root/.ssh; echo "Host *" > /root/.ssh/config; \
 ENV PROVISION_CONFIG_DIR /root/conf/
 ENV KEYFILE_DIR /root/keys/
 RUN mkdir -p /root/conf
-COPY . /root
+COPY base/ /root
 RUN chmod a+x /root/entrypoint.py
 
 # Entrypoint

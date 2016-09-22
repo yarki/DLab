@@ -169,11 +169,18 @@ def run():
              (instance_hostname, "/root/keys/%s.pem" % config.get('creds', 'key_name'), json.dumps(additional_config))
     run_routine('configure_ssn', params)
 
+    logging.info('[CONFIGURING DOCKER AT SSN INSTANCE]')
+    print('[CONFIGURING DOCKER AT SSN INSTANCE]')
+    additional_config = [{"name": "base", "tag": "latest"},
+                         {"name": "jupyter", "tag": "latest"}]
+    params = "--hostname %s --keyfile %s --additional_config '%s'" % \
+             (instance_hostname, "/root/keys/%s.pem" % config.get('creds', 'key_name'), json.dumps(additional_config))
+    run_routine('configure_docker', params)
+
     logging.info('[CONFIGURE SSN INSTANCE UI]')
     print('[CONFIGURE SSN INSTANCE UI]')
-
     params = "--hostname %s --keyfile %s " \
-             "--pip_packages 'pymongo'" % \
+             "--pip_packages 'pymongo pyyaml'" % \
              (instance_hostname, "/root/keys/%s.pem" % config.get('creds', 'key_name'))
     run_routine('install_prerequisites', params)
 

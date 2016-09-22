@@ -16,7 +16,9 @@
 # ============================================================================
 from ConfigParser import SafeConfigParser
 import os
-from fabric.api import local, hide
+import base64
+import json
+from fabric.api import local
 
 
 def create_shadow_config():
@@ -38,6 +40,16 @@ def create_shadow_config():
 
 if __name__ == "__main__":
     create_shadow_config()
-    with hide('stderr', 'running'):
-        local("cd /root; fab run")
-    print '{"message": "justatest"}'
+    log = local("cd /root; fab run")
+
+    reply = dict()
+    reply['request_id'] = os.environ['request_id']
+    reply['status'] = 'ok'
+    if len(log.stderr) > 0:
+        reply['status'] = 'fail'
+    reply['response'] = dict()
+    reply['response']['log_out'] = base64.b64encode(log)
+    reply['response']['log_err'] = base64.b64encode(log.stderr)
+    with open("/tmp/%s.json" % os.environ['request_id'], 'w') as responce_file:
+        responce_file(json.dumps(reply))
+

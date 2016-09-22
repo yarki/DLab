@@ -42,6 +42,7 @@ def ensure_nginx():
 
 
 def configure_nginx(config):
+    random_file_part = id_generator(size=20)
     if not exists("/etc/nginx/conf.d/nginx_proxy.conf"):
         sudo('rm -f /etc/nginx/conf.d/*')
         put(config['nginx_template_dir'] + 'nginx_proxy.conf', '/tmp/nginx_proxy.conf')
@@ -52,11 +53,11 @@ def configure_nginx(config):
     if not exists("/etc/nginx/locations/proxy_location_jenkins.conf"):
         nginx_password = id_generator()
         template_file = config['nginx_template_dir'] + 'proxy_location_jenkins_template.conf'
-        with open("/tmp/tmpproxy_location_jenkins_template.conf", 'w') as out:
+        with open("/tmp/%s-tmpproxy_location_jenkins_template.conf" % random_file_part, 'w') as out:
             with open(template_file) as tpl:
                 for line in tpl:
                     out.write(line)
-        put('/tmp/tmpproxy_location_jenkins_template.conf', '/tmp/proxy_location_jenkins.conf')
+        put("/tmp/%s-tmpproxy_location_jenkins_template.conf" % random_file_part, '/tmp/proxy_location_jenkins.conf')
         sudo('\cp /tmp/proxy_location_jenkins.conf /etc/nginx/locations/')
         sudo("echo 'engineer:" + crypt.crypt(nginx_password, id_generator()) + "' > /etc/nginx/htpasswd")
         with open('jenkins_crids.txt', 'w+') as f:
