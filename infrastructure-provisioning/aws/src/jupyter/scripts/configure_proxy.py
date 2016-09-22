@@ -18,32 +18,25 @@ from fabric.api import *
 from fabric.contrib.files import exists
 import argparse
 import json
+from notebook.auth import passwd as jupyter_passwd
 import random
 import string
-import crypt
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--hostname', type=str, default='edge')
+parser.add_argument('--hostname', type=str, default='')
+parser.add_argument('--instance_name', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
 
-def ensure_mongo():
-    if not exists('/tmp/mongo_ensured'):
-        sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927')
-        sudo('ver=`lsb_release -cs`; echo "deb http://repo.mongodb.org/apt/ubuntu $ver/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list; apt-get update')
-        sudo('apt-get -y install mongodb-org')
-        sudo('sysv-rc-conf mongod on')
-        sudo('touch /tmp/mongo_ensured')
-
-
-def configure_mongo():
-    if not exists("/lib/systemd/system/mongod.service"):
-        local('scp -i {} /usr/share/notebook_automation/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
-        sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
-    local('scp -i {} /usr/share/notebook_automation/templates/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
-    sudo('python /tmp/configure_mongo.py')
+def enable_proxy(proxy_host, proxy_port):
+    if not exists('/tmp/proxy_enabled'):
+        proxy_string = "http://%s:%s" % (proxy_host, proxy_port)
+        sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
+        sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
+        sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
+        sudo('touch /tmp/proxy_enabled ')
 
 
 ##############
@@ -56,8 +49,5 @@ if __name__ == "__main__":
     env.host_string = 'ubuntu@' + args.hostname
     deeper_config = json.loads(args.additional_config)
 
-    print "Installing MongoDB"
-    ensure_mongo()
-
-    print "Configuring MongoDB"
-    configure_mongo()
+    print "Enabling proxy for notebook server for repositories access."
+    enable_proxy(deeper_config['proxy_host'], deeper_config['proxy_port'])

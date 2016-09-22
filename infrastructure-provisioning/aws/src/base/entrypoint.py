@@ -69,5 +69,14 @@ if __name__ == "__main__":
         with open('/tmp/%s.json', 'w') as response_file:
             response_file.write(json.dumps(response))
 
+    elif args.action == 'terminate':
+        with hide('stderr', 'running', 'warnings'):
+            out = local("/bin/terminate.py")
+        response = json.loads(out)
+        response['request_id'] = request_id
+        with open('/tmp/%s.json', 'w') as response_file:
+            response_file.write(json.dumps(response))
+
+
     elif args.action == 'debug':
         local("/bin/bash", pty=True)

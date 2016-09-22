@@ -27,7 +27,7 @@ import sys
 parser = argparse.ArgumentParser()
 parser.add_argument('--notebook_name', type=str, default='')
 parser.add_argument('--subnet_cidr', type=str, default='')
-parser.add_argument('--config_dir', type=str, default='/usr/share/notebook_automation/conf/')
+parser.add_argument('--config_dir', type=str, default='/root/conf/')
 args = parser.parse_args()
 
 
@@ -43,22 +43,6 @@ def get_ami_id_by_name(ami_name):
 
 def get_configuration(configuration_dir):
     merged_config = SafeConfigParser()
-
-    crid_config = SafeConfigParser()
-    crid_config.read(configuration_dir + 'aws_crids.ini')
-    for section in ['creds', 'ops']:
-        for option, value in crid_config.items(section):
-            if not merged_config.has_section(section):
-                merged_config.add_section(section)
-            merged_config.set(section, option, value)
-
-    base_infra_config = SafeConfigParser()
-    base_infra_config.read(configuration_dir + 'self_service_node.ini')
-    for section in ['conf', 'ssn']:
-        for option, value in base_infra_config.items(section):
-            if not merged_config.has_section(section):
-                merged_config.add_section(section)
-            merged_config.set(section, option, value)
 
     notebook_config = SafeConfigParser()
     notebook_config.read(configuration_dir + 'jupyter.ini')
@@ -160,52 +144,10 @@ def get_security_group_by_name(security_group_name):
     return ''
 
 
-def create_security_group(params):
-    shell_out = local("/usr/share/notebook_automation/scripts/create_security_group.py " + params)
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def create_subnet(params):
-    shell_out = local("/usr/share/notebook_automation/scripts/create_subnet.py " + params)
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def create_roles(params):
-    shell_out = local("/usr/share/notebook_automation/scripts/create_role_policy.py " + params)
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def create_instance(params):
-    shell_out = local("/usr/share/notebook_automation/scripts/create_instance.py " + params)
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def install_prerequisites(params):
-    logging.info("~/scripts/install_prerequisites.py " + params)
-    shell_out = local("~/scripts/install_prerequisites.py " + params)
+def run_routine(routine_name, params):
+    logging.info("~/scripts/%s.py %s" % (routine_name, params))
+    shell_out = local("~/scripts/%s.py %s" % (routine_name, params))
     print shell_out
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def configure_notebook_instance(params):
-    shell_out = local("/usr/share/notebook_automation/scripts/configure_jupyter_node.py " + params)
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
-
-
-def install_additions(params):
-    shell_out = local("/usr/share/notebook_automation/scripts/install_jupyter_additions.py " + params)
     logging.info(shell_out)
     print shell_out.stderr
     logging.error(shell_out.stderr)
@@ -219,28 +161,24 @@ def run(config):
     params = "--vpc_id '%s' --subnet '%s' --region %s --infra_tag_name %s --infra_tag_value %s" % \
              (nb_config['vpc_id'], nb_config['subnet'], nb_config['region'],
               config.get('conf', 'service_base_name'), nb_config['instance_name'])
-    with hide('stderr', 'running', 'warnings'):
-        create_subnet(params)
+    run_routine('create_subnet', params)
 
     logging.info('[CREATE ROLES]')
     print '[CREATE ROLES]'
     params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
              (nb_config['role_name'], nb_config['role_profile_name'],
               nb_config['policy_name'], nb_config['policy_arn'])
-    with hide('stderr', 'running', 'warnings'):
-        create_roles(params)
+    run_routine('create_role_policy', params)
 
     logging.info('[CREATE SECURITY GROUPS]')
     print '[CREATE SECURITY GROUPS]'
     params = "--name %s --subnet %s --security_group_rules %s --infra_tag_name %s --infra_tag_value %s" % \
              (nb_config['security_group_name'], nb_config['subnet'], nb_config['security_group_rules'],
               config.get('conf', 'service_base_name'), nb_config['instance_name'])
-    with hide('stderr', 'running', 'warnings'):
-        create_security_group(params)
+    run_routine('create_security_group', params)
 
     with hide('stderr', 'running', 'warnings'):
-        local("echo Waitning for changes to propagate; sleep 20")
-
+        local("echo Waitning for changes to propagate; sleep 10")
 
     logging.info('[CREATE JUPYTER NOTEBOOK INSTANCE]')
     print '[CREATE JUPYTER NOTEBOOK INSTANCE]'
@@ -250,49 +188,39 @@ def run(config):
               get_security_group_by_name(nb_config['security_group_name']),
               get_subnet_by_cidr(nb_config['subnet']), nb_config['role_profile_name'],
               config.get('conf', 'service_base_name'), nb_config['instance_name'])
-    with hide('stderr', 'running', 'warnings'):
-        create_instance(params)
+    run_routine('create_instance', params)
 
     instance_hostname = get_hostname(nb_config['instance_name'])
+    ssn_instance_name = config.get('conf', 'service_base_name') + '-ssn-instance'
+    ssn_instance_hostname = get_hostname(ssn_instance_name)
+    keyfile_name = "/root/keys/%s.pem" % config.get('creds', "key_name")
+
+    logging.info('[CONFIGURE PROXY ON JUPYTER INSTANCE]')
+    print '[CONFIGURE PROXY ON JUPYTER INSTANCE]'
+    additional_config = {"proxy_host": ssn_instance_hostname, "proxy_port": "3128"}
+    params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" % \
+             (instance_hostname, nb_config['instance_name'], keyfile_name, json.dumps(additional_config))
+    run_routine('configure_proxy', params)
 
     logging.info('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
     print('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
-    params = "--hostname %s --keyfile %s " % \
-             (instance_hostname, "/root/keys/%s.pem" % config.get('creds', 'key_name'))
-    with hide('stderr', 'running'):
-        install_prerequisites(params)
+    params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
+    run_routine('install_prerequisites', params)
 
     logging.info('[CONFIGURE JUPYTER NOTEBOOK INSTANCE]')
     print '[CONFIGURE JUPYTER NOTEBOOK INSTANCE]'
-    ssn_instance_name = config.get('conf', 'service_base_name') + '-ssn-instance'
-    additional_config = {"frontend_hostname": get_hostname(config.get('conf', 'service_base_name') + '-ssn-instance'),
+    additional_config = {"frontend_hostname": ssn_instance_hostname,
                          "backend_hostname": get_hostname(nb_config['instance_name']),
                          "backend_port": "8888",
-                         "nginx_template_dir": "/usr/share/notebook_automation/templates/",
-                         "proxy_host": get_hostname(ssn_instance_name),
-                         "proxy_port": config.get('ssn', 'proxy_port')}
-    params = "--node_type notebook --instance_name %s --keyfile %s --additional_config '%s'" %  \
-             (nb_config['instance_name'],
-             "/usr/share/notebook_automation/keys/%s.pem" % config.get('creds', "key_name"),
-              json.dumps(additional_config))
-    with hide('stderr', 'running'):
-        configure_notebook_instance(params)
+                         "nginx_template_dir": "/usr/share/notebook_automation/templates/"}
+    params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" %  \
+             (instance_hostname, nb_config['instance_name'], keyfile_name, json.dumps(additional_config))
+    run_routine('configure_jupyter_node', params)
 
     logging.info('[CONFIGURE JUPYTER ADDITIONS]')
     print '[CONFIGURE JUPYTER ADDITIONS]'
-    ssn_instance_name = config.get('conf', 'service_base_name') + '-ssn-instance'
-    additional_config = {"frontend_hostname": get_hostname(config.get('conf', 'service_base_name') + '-ssn-instance'),
-                         "backend_hostname": get_hostname(nb_config['instance_name']),
-                         "backend_port": "8888",
-                         "nginx_template_dir": "/usr/share/notebook_automation/templates/",
-                         "proxy_host": get_hostname(ssn_instance_name),
-                         "proxy_port": config.get('ssn', 'proxy_port')}
-    params = "--node_type notebook --instance_name %s --instance_keyfile %s --additional_config '%s'" %  \
-             (nb_config['instance_name'],
-             "/usr/share/notebook_automation/keys/%s.pem" % config.get('creds', "key_name"),
-              json.dumps(additional_config))
-    with hide('stderr', 'running'):
-        install_additions(params)
+    params = "--hostname %s --keyfile %s" % (instance_hostname, keyfile_name)
+    run_routine('install_jupyter_additions', params)
 
 
 if __name__ == "__main__":
@@ -329,7 +257,7 @@ if __name__ == "__main__":
         print 'Preconfigured image found. Using: ' + ami_id
         config.set('notebook', 'ami_id', ami_id)
     else:
-        print 'No preconfigured image found. Using default one: '+ config.get('notebook', 'ami_id')
+        print 'No preconfigured image found. Using default one: ' + config.get('notebook', 'ami_id')
 
     run(config)
 

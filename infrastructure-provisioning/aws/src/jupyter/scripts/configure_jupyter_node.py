@@ -47,10 +47,10 @@ def ensure_spark_scala():
         sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
         sudo('mkdir -p /home/ubuntu/.local/share/jupyter/kernels/pyspark_local')
         sudo('touch /home/ubuntu/.local/share/jupyter/kernels/pyspark_local/kernel.json')
-        local('cp /usr/share/notebook_automation/templates/pyspark_emr_template.json /tmp/pyspark_emr_template.json')
-        local('cp /usr/share/notebook_automation/templates/spark-defaults_template.conf /tmp/spark-defaults_template.conf')
-        local('cp /usr/share/notebook_automation/templates/pyspark_local_template.json /tmp/pyspark_local_template.json')
-        local('cp /usr/share/notebook_automation/templates/create_configs.py /tmp/create_configs.py')
+        local('cp /root/templates/pyspark_emr_template.json /tmp/pyspark_emr_template.json')
+        local('cp /root/templates/spark-defaults_template.conf /tmp/spark-defaults_template.conf')
+        local('cp /root/templates/pyspark_local_template.json /tmp/pyspark_local_template.json')
+        local('cp /root/templates/create_configs.py /tmp/create_configs.py')
         put('/tmp/pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
         put('/tmp/spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
         put('/tmp/pyspark_local_template.json', '/tmp/pyspark_local_template.json')
@@ -102,15 +102,6 @@ def configure_nginx(config, instnace_name):
     sudo('service nginx restart')
 
 
-def enable_proxy(proxy_host, proxy_port):
-    if not exists('/tmp/proxy_enabled'):
-        proxy_string = "http://%s:%s" % (proxy_host, proxy_port)
-        sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
-        sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
-        sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
-        sudo('touch /tmp/proxy_enabled ')
-
-
 ##############
 # Run script #
 ##############
@@ -120,9 +111,6 @@ if __name__ == "__main__":
     env.key_filename = [args.keyfile]
     env.host_string = 'ubuntu@' + args.hostname
     deeper_config = json.loads(args.additional_config)
-
-    print "Enabling proxy for notebook server for repositories access."
-    enable_proxy(deeper_config['proxy_host'], deeper_config['proxy_port'])
 
     print "Configuring notebook server."
     configure_notebook_server("_".join(args.instance_name.split()))
