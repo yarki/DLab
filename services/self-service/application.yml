@@ -9,6 +9,8 @@ server:
 mongo:
   host: localhost
   port: 27017
+  username: dlab
+  password: dlab
   database: dlab
 
 security-service:

@@ -3,6 +3,8 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.backendapi.api.LDAPUser;
 import com.epam.dlab.backendapi.api.User;
 import com.epam.dlab.backendapi.core.RESTService;
+import com.epam.dlab.backendapi.core.SecurityAPI;
+import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.MongoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +35,7 @@ import javax.ws.rs.core.MediaType;
 @Path("/login")
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 @Produces(MediaType.APPLICATION_JSON)
-public class LoginResource {
+public class LoginResource implements MongoCollections, SecurityAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginResource.class);
 
     private MongoService mongoService;
@@ -48,7 +50,7 @@ public class LoginResource {
     public LDAPUser login(@FormParam("login") String login, @FormParam("password") String password) {
         LOGGER.info("Try login user = {}", login);
         User user = new User(login, password);
-        mongoService.getCollection("loginTrys").insertOne(user.getDocument());
-        return securityService.post("login", user, LDAPUser.class);
+        mongoService.getCollection(LOGIN_ATTEMPT).insertOne(user.getDocument());
+        return securityService.post(LOGIN, user, LDAPUser.class);
     }
 }
