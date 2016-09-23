@@ -22,11 +22,7 @@ if __name__ == "__main__":
     except:
         pass
 
-    try:
-        with open("/root/runlog.log") as f:
-            reply['response']['log'] = base64.b64encode(f.read())
-    except:
-        pass
+    reply['response']['log'] = "/response/%s.log" % os.environ['request_id']
 
     with open("/response/%s.json" % os.environ['request_id'], 'w') as response_file:
         response_file.write(json.dumps(reply))

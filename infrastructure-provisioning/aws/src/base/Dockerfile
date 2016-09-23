@@ -24,7 +24,9 @@ RUN mkdir -p /response; chmod a+rwx /response
 ENV PROVISION_CONFIG_DIR /root/conf/
 ENV KEYFILE_DIR /root/keys/
 RUN mkdir -p /root/conf
-COPY base/ /root
+RUN mkdir -p /root/templates
+RUN mkdir -p /root/keys
+COPY . /root
 RUN chmod a+x /root/entrypoint.py
 
 # Entrypoint

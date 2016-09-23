@@ -218,8 +218,8 @@ if __name__ == "__main__":
     notebook_instance_name = config.get('conf', 'service_base_name') + '-notebook-' + args.notebook_name
     expected_ami_name = config.get('conf', 'service_base_name') + '-notebook-image'
 
-    local_log_filename = "runlog.log"
-    local_log_filepath = "/root/runlog.log"
+    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)

@@ -1,14 +1,12 @@
 #!/usr/bin/python
 import os
-import base64
 import json
 from fabric.api import local
 
 
 if __name__ == "__main__":
-    notebook_name = os.environ['notebook_name']
-    network_cidr = os.environ['network_cidr']
-    log = local("/root/fabfile.py --notebook_name %s --subnet_cidr %s " % (notebook_name, network_cidr))
+    RUN_SCRIPT = ''
+    log = local(RUN_SCRIPT)
 
     reply = dict()
     reply['request_id'] = os.environ['request_id']

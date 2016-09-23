@@ -11,7 +11,7 @@ args = parser.parse_args()
 
 
 def create_shadow_config():
-    sections = ['creds', 'conf', 'ssn', 'notebook']
+    sections = ['creds', 'conf', 'ssn', 'notebook', 'system']
     shadow_overwrite_config = SafeConfigParser()
     shadow_config_file = os.environ['PROVISION_CONFIG_DIR'] + 'shadow_overwrite.ini'
     for key in os.environ:
