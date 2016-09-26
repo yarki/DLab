@@ -12,7 +12,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-defaultRedirectFromAuthentication: http://localhost:9000/best
+defaultRedirectFromAuthentication: http://localhost:8080/test
 inactiveUserTimeoutMillSec: 3600000
 users:
   - username: johnd

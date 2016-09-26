@@ -13,33 +13,31 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.epam.datalab.auth;
+package com.epam.datalab.auth.api;
 
-import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-@Path("/")
+import com.epam.datalab.auth.DataLabAuthenticationConfig;
+import com.epam.datalab.auth.core.AuthorizedUsers;
+
+@Path("/logout")
 @Produces(MediaType.TEXT_HTML)
-public class Login extends ConfigurableResource<DataLabAuthenticationConfig>{
+public class Logout extends ConfigurableResource<DataLabAuthenticationConfig> {
 	
-	private final String defaultRedirect;
-	
-	public Login(DataLabAuthenticationConfig config) {
+	public Logout(DataLabAuthenticationConfig config) {
 		super(config);
-		this.defaultRedirect = config.getDefaultRedirectFromAuthentication();
 	}
-	
+
 	@GET
-	public LoginView loginPage( @Context HttpServletRequest request ) {
-		String nextPageUrl = request.getHeader("referer"); 
-		if( nextPageUrl == null) {
-			nextPageUrl = defaultRedirect;
-		}
-		log.debug("Login next page URL {}",nextPageUrl);
-		return new LoginView(nextPageUrl);
+	public Response loginPage(@QueryParam(value = "access_token") String token) {
+		AuthorizedUsers.getInstance().removeUserInfo(token);
+		return Response.seeOther(URI.create("/")).build();
 	}
 }
