@@ -18,8 +18,8 @@ package com.epam.datalab.auth.test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.datalab.auth.AuthenticationService;
-import com.epam.datalab.auth.UserInfo;
+import com.epam.datalab.auth.core.AuthenticationService;
+import com.epam.datalab.auth.core.UserInfo;
 
 import io.dropwizard.views.View;
 

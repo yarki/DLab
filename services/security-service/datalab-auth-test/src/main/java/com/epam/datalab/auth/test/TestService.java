@@ -22,8 +22,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import com.epam.datalab.auth.ConfigurableResource;
-import com.epam.datalab.auth.UserInfo;
+import com.epam.datalab.auth.api.ConfigurableResource;
+import com.epam.datalab.auth.core.UserInfo;
 
 import io.dropwizard.auth.Auth;
 

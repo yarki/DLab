@@ -28,10 +28,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import com.codahale.metrics.annotation.Timed;
-import com.epam.datalab.auth.AuthorizedUsers;
-import com.epam.datalab.auth.ConfigurableResource;
 import com.epam.datalab.auth.DataLabAuthenticationConfig;
-import com.epam.datalab.auth.UserInfo;
+import com.epam.datalab.auth.api.ConfigurableResource;
+import com.epam.datalab.auth.core.AuthorizedUsers;
+import com.epam.datalab.auth.core.UserInfo;
 
 @Path("/login")
 @Produces(MediaType.TEXT_HTML)
