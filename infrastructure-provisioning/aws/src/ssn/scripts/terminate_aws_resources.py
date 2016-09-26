@@ -177,6 +177,31 @@ def remove_emr(emr_name):
             print "The EMR cluster " + cluster_name + " has been deleted successfully"
 
 
+# remove all function
+def remove_all():
+    remove_emr(args.emr_name)
+    remove_ec2(args.ssn_tag_value, args.notebook_tag_value)
+    remove_sgroups()
+    remove_subnets()
+    remove_s3()
+    remove_vpc()
+
+
+# Switch-case function
+def run_case(resource_name):
+    switcher = {
+        "EC2": remove_ec2(args.ssn_tag_value, args.notebook_tag_value),
+        "SG": remove_sgroups(),
+        "SUBNET": remove_subnets(),
+        "VPC": remove_vpc(),
+        "S3": remove_s3(),
+        "ROLE": remove_role(args.notebook_name, args.instance_type),
+        "EMR": remove_emr(args.emr_name),
+        "all": remove_all()
+    }
+    return switcher.get(resource_name, "\nPlease type correct resource name to delete")
+
+
 ##############
 # Run script #
 ##############
@@ -185,28 +210,4 @@ if __name__ == "__main__":
     if args.dry_run == 'true':
         parser.print_help()
     else:
-        if args.resource_name == "EC2":
-            remove_ec2(args.ssn_tag_value, args.notebook_tag_value)
-        elif args.resource_name == "SG":
-            remove_sgroups()
-        elif args.resource_name == "SUBNET":
-            remove_subnets()
-        elif args.resource_name == "S3":
-            remove_s3()
-        elif args.resource_name == "VPC":
-            remove_vpc()
-        elif args.resource_name == "ROLE":
-            remove_role(args.notebook_name, args.instance_type)
-        elif args.resource_name == "EMR":
-            remove_emr(args.emr_name)
-        elif args.resource_name == "all":
-            remove_emr(args.emr_name)
-            remove_ec2(args.ssn_tag_value, args.notebook_tag_value)
-            remove_sgroups()
-            remove_subnets()
-            remove_s3()
-            remove_vpc()
-        else:
-            print """
-            Please type correct resource name to delete
-            """
+        run_case(args.resource_name)
