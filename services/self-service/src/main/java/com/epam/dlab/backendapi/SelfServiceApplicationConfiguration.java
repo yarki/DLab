@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 public class SelfServiceApplicationConfiguration extends Configuration {
     public static final String MONGO = "mongo";
     public static final String SECURITY_SERVICE = "security-service";
+    public static final String PROVISIONING_SERVICE = "provisioning-service";
 
     @Valid
     @NotNull
@@ -25,11 +26,20 @@ public class SelfServiceApplicationConfiguration extends Configuration {
     @JsonProperty(SECURITY_SERVICE)
     private RESTServiceFactory securityFactory = new RESTServiceFactory();
 
+    @Valid
+    @NotNull
+    @JsonProperty(PROVISIONING_SERVICE)
+    private RESTServiceFactory provisioningFactory = new RESTServiceFactory();
+
     public MongoServiceFactory getMongoFactory() {
         return mongoFactory;
     }
 
     public RESTServiceFactory getSecurityFactory() {
         return securityFactory;
+    }
+
+    public RESTServiceFactory getProvisioningFactory() {
+        return provisioningFactory;
     }
 }

@@ -17,3 +17,8 @@ security-service:
   protocol: http
   host: localhost
   port: 8082
+
+provisioning-service:
+  protocol: http
+  host: localhost
+  port: 8084
