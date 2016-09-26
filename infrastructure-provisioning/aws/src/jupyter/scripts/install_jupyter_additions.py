@@ -79,6 +79,20 @@ def configure_scala_wisp():
         sudo('touch /tmp/scala_wisp_configured')
 
 
+def ensure_libraries_py2():
+    if not exists('/tmp/ensure_libraries_py2_installed'):
+        sudo('export LC_ALL=C')
+        sudo('pip install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
+        sudo('touch /tmp/ensure_libraries_py2_installed')
+
+
+def ensure_libraries_py3():
+    if not exists('/tmp/ensure_libraries_py3_installed'):
+        sudo('apt-get install python3-setuptools')
+        sudo('easy_install3 pip')
+        sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
+    sudo('touch /tmp/ensure_libraries_py3_installed')
+
 ##############
 # Run script #
 ##############
@@ -88,6 +102,12 @@ if __name__ == "__main__":
     env.key_filename = [args.keyfile]
     env.host_string = 'ubuntu@' + args.hostname
     deeper_config = json.loads(args.additional_config)
+
+    print "Installing required libraries for Python 2.7"
+    ensure_libraries_py2()
+
+    print "Installing required libraries for Python 3"
+    ensure_libraries_py3()
 
     print "Installing notebook additions: matplotlib."
     ensure_matplot()
