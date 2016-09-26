@@ -6,8 +6,13 @@
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
-          <name>tag_value_name</name>
-          <description>value of the special tag of the notebook servers</description>
+          <name>notebook_name</name>
+          <description>value of the "NAME" tag of the notebook servers</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>notebook_tag_value_name</name>
+          <description>value of the "special tag" of the notebook servers</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -22,7 +27,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>/usr/bin/python /usr/local/bin/terminate_aws_resources.py --resource_name=EC2 --tag_value_name=$tag_value_name</command>
+      <command>/usr/bin/python /usr/local/bin/terminate_ notebook.py --resource_name=EC2 --notebook_name=$notebook_name --notebook_tag_value_name=$notebook_tag_value_name</command>
     </hudson.tasks.Shell>
   </builders>
 </project>

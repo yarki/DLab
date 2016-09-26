@@ -2,6 +2,8 @@ package com.epam.dlab.backendapi.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 /**
  * Created by Alexey Suprun
  */
@@ -11,11 +13,11 @@ public class LDAPUser {
     @JsonProperty
     private String lastName;
     @JsonProperty
-    private String group;
+    private List<String> groups;
 
-    public LDAPUser(String firstName, String lastName, String group) {
+    public LDAPUser(String firstName, String lastName, List<String> groups) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.group = group;
+        this.groups = groups;
     }
 }
