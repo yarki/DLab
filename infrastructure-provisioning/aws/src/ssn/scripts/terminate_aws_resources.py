@@ -9,10 +9,11 @@ from ConfigParser import SafeConfigParser
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dry_run', type=str, default='false')
-parser.add_argument('--tag_value_name', type=str)
-parser.add_argument('--notebook_tag_value_name', type=str)
-parser.add_argument('--notebook_name', type=str)
 parser.add_argument('--resource_name', type=str)
+parser.add_argument('--ssn_tag_value_name', type=str)
+parser.add_argument('--notebook_tag_value', type=str)
+parser.add_argument('--notebook_name', type=str)
+parser.add_argument('--instance_type', type=str)
 parser.add_argument('--emr_name', type=str)
 args = parser.parse_args()
 
@@ -74,8 +75,50 @@ def determine_service_base_name():
     return service_base_name
 
 
+# Function for terminating IAM roles
+def remove_role(notebook_name, instance_type):
+    print "========= Role =========="
+    client = boto3.client('iam')
+    if instance_type == "ssn":
+        role_name = determine_service_base_name() + '-role'
+        role_profile_name = determine_service_base_name() + '-role-profile'
+    elif instance_type == "notebook":
+        role_name = determine_service_base_name() + '-' + "{}".format(notebook_name) + '-role'
+        role_profile_name = determine_service_base_name() + '-' + "{}".format(notebook_name) + '-role-profile'
+    try:
+        role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
+    except:
+        print "Wasn't able to get role!"
+    print "Name: ", role
+    policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
+    for i in policy_list:
+        policy_arn = i.get('PolicyArn')
+        print policy_arn
+        client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
+    print "===== Role_profile ======"
+    try:
+        profile = client.get_instance_profile(InstanceProfileName="{}".format(role_profile_name)).get(
+            "InstanceProfile").get("InstanceProfileName")
+    except:
+        print "Wasn't able to get instance profile!"
+    print "Name: ", profile
+    try:
+        client.remove_role_from_instance_profile(InstanceProfileName=profile, RoleName=role)
+    except:
+        print "\nWasn't able to remove role from instance profile!"
+    try:
+        client.delete_instance_profile(InstanceProfileName=profile)
+    except:
+        print "\nWasn't able to remove instance profile!"
+    try:
+        client.delete_role(RoleName=role)
+    except:
+        print "\nWasn't able to remove role!"
+    print "The IAM role " + role + " has been deleted successfully"
+
+
 # Function for terminating any EC2 instances inc notebook servers
-def remove_ec2(tag_value_name, notebook_tag_value_name):
+def remove_ec2(ssn_tag_value, notebook_tag_value):
     print "========== EC2 =========="
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
@@ -83,21 +126,26 @@ def remove_ec2(tag_value_name, notebook_tag_value_name):
     notebook_tag_name = determine_service_base_name()
     ssn_instances = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
-                 {'Name': 'tag:{}'.format(ssn_tag_name), 'Values': ['{}'.format(tag_value_name)]}])
+                 {'Name': 'tag:{}'.format(ssn_tag_name), 'Values': ['{}'.format(ssn_tag_value)]}])
     for instance in ssn_instances:
         print("ID: ", instance.id)
         client.terminate_instances(InstanceIds=[instance.id])
         waiter = client.get_waiter('instance_terminated')
         waiter.wait(InstanceIds=[instance.id])
+        remove_role("", "ssn")
         print "The ssn instance " + instance.id + " has been deleted successfully"
     notebook_instances = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
-                 {'Name': 'tag:{}'.format(notebook_tag_name), 'Values': ['{}'.format(notebook_tag_value_name)]}])
+                 {'Name': 'tag:{}'.format(notebook_tag_name), 'Values': ['{}'.format(notebook_tag_value)]}])
     for instance in notebook_instances:
         print("ID: ", instance.id)
+        for i in instance.tags:
+            if i.get("Key") == "Name":
+                notebook_name = i.get("Value")
         client.terminate_instances(InstanceIds=[instance.id])
         waiter = client.get_waiter('instance_terminated')
         waiter.wait(InstanceIds=[instance.id])
+        remove_role(notebook_name, "notebook")
         print "The notebook instance " + instance.id + " has been deleted successfully"
 
 
@@ -172,48 +220,6 @@ def remove_s3():
     print "The S3 bucket " + bucket.name + " has been deleted successfully"
 
 
-# Function for terminating IAM roles
-def remove_role(notebook_name, instance_type):
-    print "========= Role =========="
-    client = boto3.client('iam')
-    if instance_type == "ssn":
-        role_name = determine_service_base_name() + '-role'
-        role_profile_name = determine_service_base_name() + '-role-profile'
-    elif instance_type == "notebook":
-        role_name = determine_service_base_name() + '-' + "{}".format(notebook_name) + '-role'
-        role_profile_name = determine_service_base_name() + '-' + "{}".format(notebook_name) + '-role-profile'
-    try:
-        role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
-    except:
-        print "Wasn't able to get role!"
-    print "Name: ", role
-    policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
-    for i in policy_list:
-        policy_arn = i.get('PolicyArn')
-        print policy_arn
-        client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
-    print "===== Role_profile ======"
-    try:
-        profile = client.get_instance_profile(InstanceProfileName="{}".format(role_profile_name)).get(
-            "InstanceProfile").get("InstanceProfileName")
-    except:
-        print "Wasn't able to get instance profile!"
-    print "Name: ", profile
-    try:
-        client.remove_role_from_instance_profile(InstanceProfileName=profile, RoleName=role)
-    except:
-        print "\nWasn't able to remove role from instance profile!"
-    try:
-        client.delete_instance_profile(InstanceProfileName=profile)
-    except:
-        print "\nWasn't able to remove instance profile!"
-    try:
-        client.delete_role(RoleName=role)
-    except:
-        print "\nWasn't able to remove role!"
-    print "The IAM role " + role + " has been deleted successfully"
-
-
 # Function for terminating EMR clusters, cleaning buckets and removing notebook's local kernels
 def remove_emr(emr_name):
     print "========= EMR =========="
@@ -238,7 +244,7 @@ if __name__ == "__main__":
         parser.print_help()
     else:
         if args.resource_name == "EC2":
-            remove_ec2(args.tag_value_name, args.notebook_tag_value_name)
+            remove_ec2(args.ssn_tag_value, args.notebook_tag_value)
         elif args.resource_name == "SG":
             remove_sgroups()
         elif args.resource_name == "SUBNET":
@@ -248,18 +254,16 @@ if __name__ == "__main__":
         elif args.resource_name == "VPC":
             remove_vpc()
         elif args.resource_name == "ROLE":
-            remove_role(args.notebook_name, "ssn")
+            remove_role(args.notebook_name, args.instance_type)
         elif args.resource_name == "EMR":
             remove_emr(args.emr_name)
         elif args.resource_name == "all":
             remove_emr(args.emr_name)
-            remove_ec2(args.tag_value_name, args.notebook_tag_value_name)
+            remove_ec2(args.ssn_tag_value, args.notebook_tag_value)
             remove_sgroups()
             remove_subnets()
             remove_s3()
             remove_vpc()
-            remove_role(args.notebook_name, "ssn")
-            remove_role(args.notebook_name, "notebook")
         else:
             print """
             Please type correct resource name to delete
