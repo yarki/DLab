@@ -24,6 +24,6 @@ public class CommandExecuter {
     }
 
     private static String[] createCommand(String command) {
-        return new String[]{"/bin/sh", "-c", command};
+        return new String[]{"bash", "-c", command};
     }
 }

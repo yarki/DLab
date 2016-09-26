@@ -21,15 +21,8 @@ import java.util.UUID;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class DockerResource implements DockerCommands {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DockerResource.class);
-
     @GET
     public String getDcokerImages() throws IOException, InterruptedException {
-        LOGGER.info("Docker status asked");
-        List<String> images = CommandExecuter.execute(GET_IMAGES);
-        for (String image : images) {
-            CommandExecuter.execute(String.format(GET_IMAGE_METADATA, "123", image));
-        }
         return "200 OK";
     }
 }

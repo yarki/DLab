@@ -1,5 +1,6 @@
 package com.epam.dlab.backendapi;
 
+import com.epam.dlab.backendapi.core.DockerWarmuper;
 import com.epam.dlab.backendapi.resources.DockerResource;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
@@ -14,6 +15,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
 
     @Override
     public void run(ProvisioningServiceApplicationConfiguration provisioningServiceApplicationConfiguration, Environment environment) throws Exception {
+        environment.lifecycle().manage(new DockerWarmuper());
         environment.jersey().register(new DockerResource());
     }
 }
