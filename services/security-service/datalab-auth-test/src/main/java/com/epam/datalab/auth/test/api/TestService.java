@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.epam.datalab.auth.test;
+package com.epam.datalab.auth.test.api;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
@@ -24,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.epam.datalab.auth.api.ConfigurableResource;
 import com.epam.datalab.auth.core.UserInfo;
+import com.epam.datalab.auth.test.TestConfiguration;
 
 import io.dropwizard.auth.Auth;
 

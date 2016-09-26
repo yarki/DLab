@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.epam.datalab.auth.core.RestAuthFailureHandler;
 import com.epam.datalab.auth.core.RestAuthenticator;
 import com.epam.datalab.auth.core.UserInfo;
+import com.epam.datalab.auth.test.api.TestService;
 
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
