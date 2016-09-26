@@ -28,13 +28,14 @@ def create_shadow_config():
 
 
 if __name__ == "__main__":
+    local('/root/prepare_environment.py')
     create_shadow_config()
 
     request_id = 'generic'
     try:
         request_id = os.environ['request_id']
     except:
-        pass
+        os.environ['request_id'] = 'generic'
 
     if args.action == 'create':
         with hide('running'):

@@ -1,31 +1,15 @@
 #!/usr/bin/python
-import boto3
 import argparse
 import json
-import sys
+from dlab.aws_actions import *
+from dlab.aws_meta import *
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket_name', type=str, default='dsa-test-bucket')
 parser.add_argument('--infra_tag_name', type=str, default='BDCC-DSA-test-infra')
 parser.add_argument('--infra_tag_value', type=str, default='tmp')
 args = parser.parse_args()
-
-
-def get_bucket_by_name(bucket_name):
-    s3 = boto3.resource('s3')
-    for bucket in s3.buckets.all():
-        if bucket.name == bucket_name:
-            return bucket.name
-    return ''
-
-
-def create_s3_bucket(bucket_name, tag):
-    s3 = boto3.resource('s3')
-    bucket = s3.create_bucket(Bucket=bucket_name)
-    tagging = bucket.Tagging()
-    tagging.put(Tagging={'TagSet': [tag]})
-    tagging.reload()
-    return bucket.name
 
 
 if __name__ == "__main__":

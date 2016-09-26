@@ -1,8 +1,9 @@
 #!/usr/bin/python
-import boto3
 import argparse
 import json
-import sys
+from dlab.aws_actions import *
+from dlab.aws_meta import *
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--node_name', type=str, default='DSS-POC-TEST-instance')
@@ -17,68 +18,6 @@ parser.add_argument('--infra_tag_value', type=str, default='tmp')
 parser.add_argument('--user_data_file', type=str, default='')
 args = parser.parse_args()
 
-
-def get_instance_by_name(instance_name):
-    ec2 = boto3.resource('ec2')
-    instances = ec2.instances.filter(
-        Filters=[{'Name': 'tag:Name', 'Values': [instance_name]},
-                 {'Name': 'instance-state-name', 'Values': ['running']}])
-    for instance in instances:
-        return instance.id
-    return ''
-
-
-def get_instance_attr(instance_id, attribute_name):
-    ec2 = boto3.resource('ec2')
-    instances = ec2.instances.filter(
-        Filters=[{'Name': 'instance-id', 'Values': [instance_id]},
-                 {'Name': 'instance-state-name', 'Values': ['running']}])
-    for instance in instances:
-        return getattr(instance, attribute_name)
-    return ''
-
-
-def create_instance(params, instance_tag):
-    ec2 = boto3.resource('ec2')
-    role_profile_name = params.iam_profile
-    key_name = params.key_name
-    ami_id = params.ami_id
-    instance_type = params.instance_type
-    subnet_id = params.subnet_id
-    security_groups_ids = []
-    for chunk in params.security_group_ids.split(','):
-        security_groups_ids.append(chunk.strip())
-    user_data_file = params.user_data_file
-    
-    ''' loading user_data_file ''' 
-    user_data = ''
-    if user_data_file != '':
-        try:
-            with open(user_data_file, 'r') as f: 
-                for line in f:
-                    user_data = user_data + line
-            f.close()
-        except:
-            print("Error reading user-data file")
-        
-    instances = ec2.create_instances(ImageId=ami_id, MinCount=1, MaxCount=1,
-                                     KeyName=key_name,
-                                     SecurityGroupIds=security_groups_ids,
-                                     InstanceType=instance_type,
-                                     SubnetId=subnet_id,
-                                     IamInstanceProfile={'Name': role_profile_name},
-                                     UserData=user_data)
-    for instance in instances:
-        print "Waiting for instance " + instance.id + " become running."
-        instance.wait_until_running()
-        instance.create_tags(Tags=[{'Key': 'Name', 'Value': params.node_name}, instance_tag])
-        return instance.id
-    return ''
-
-
-##############
-# Run script #
-##############
 
 if __name__ == "__main__":
     instance_tag = {"Key": args.infra_tag_name, "Value": args.infra_tag_value}

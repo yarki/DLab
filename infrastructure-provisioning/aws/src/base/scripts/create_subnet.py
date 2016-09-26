@@ -1,8 +1,9 @@
 #!/usr/bin/python
-import boto3
-import sys
 import argparse
 import json
+from dlab.aws_actions import *
+from dlab.aws_meta import *
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--vpc_id', type=str, default='')
@@ -11,20 +12,6 @@ parser.add_argument('--region', type=str, default='us-west-2')
 parser.add_argument('--infra_tag_name', type=str, default='BDCC-DSA-test-infra')
 parser.add_argument('--infra_tag_value', type=str, default='tmp')
 args = parser.parse_args()
-
-
-def get_subnet_by_cidr(cidr):
-    ec2 = boto3.resource('ec2')
-    for subnet in ec2.subnets.filter(Filters=[{'Name': 'cidrBlock', 'Values': [cidr]}]):
-        return subnet.id
-    return ''
-
-
-def create_subnet(vpc_id, subnet, tag):
-    ec2 = boto3.resource('ec2')
-    subnet = ec2.create_subnet(VpcId=vpc_id, CidrBlock=subnet)
-    subnet.create_tags(Tags=[tag])
-    return subnet.id
 
 
 if __name__ == "__main__":
