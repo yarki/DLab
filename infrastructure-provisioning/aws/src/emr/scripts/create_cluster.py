@@ -1,9 +1,13 @@
 #!/usr/bin/python
+
+# v1.1 for 1.0 from 26/09/2016
 import boto3
 import argparse
 import re
 import time
+import os
 from fabric.api import *
+from ConfigParser import SafeConfigParser
 
 parser = argparse.ArgumentParser()
 # parser.add_argument('--id', type=str, default='')
@@ -33,10 +37,63 @@ parser.add_argument('--nbs_user', type=str, default='ubuntu',
 parser.add_argument('--s3_bucket', type=str, default='dsa-poc-test-bucket', help='S3 bucket name to work with')
 args = parser.parse_args()
 
-cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{}/config/{}/hive-site.xml, ActionOnFailure=CONTINUE,Jar=command-runner.jar; Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{}/config/{} --recursive, ActionOnFailure=CONTINUE, Jar=command-runner.jar; Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{}, ActionOnFailure=CONTINUE,Jar=command-runner.jar; Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {}:{} /user/{}, ActionOnFailure=CONTINUE,Jar=command-runner.jar".format(
-    args.s3_bucket, args.name, args.s3_bucket, args.name, args.nbs_user, args.nbs_user, args.nbs_user, args.nbs_user)
-cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{}/jars/{}/aws --recursive, ActionOnFailure=CONTINUE,Jar=command-runner.jar; Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{}/jars/{}/lib --recursive,ActionOnFailure=CONTINUE,Jar=command-runner.jar".format(
-    args.s3_bucket, args.release_label, args.s3_bucket, args.release_label)
+cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/config/{1}/hive-site.xml, ActionOnFailure=CONTINUE,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/config/{1} --recursive, ActionOnFailure=CONTINUE, Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=CONTINUE,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=CONTINUE,Jar=command-runner.jar".format(
+    args.s3_bucket, args.name, args.nbs_user)
+
+cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{0}/jars/{1}/aws --recursive, ActionOnFailure=CONTINUE,Jar=command-runner.jar; " \
+          "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{0}/jars/{1}/lib --recursive,ActionOnFailure=CONTINUE,Jar=command-runner.jar".format(
+    args.s3_bucket, args.release_label)
+
+
+# Function for parsing config files for parameters
+def get_configuration(configuration_dir):
+    merged_config = SafeConfigParser()
+
+    crid_config = SafeConfigParser()
+    crid_config.read(configuration_dir + 'aws_crids.ini')
+    for section in ['creds', 'ops']:
+        for option, value in crid_config.items(section):
+            if not merged_config.has_section(section):
+                merged_config.add_section(section)
+            merged_config.set(section, option, value)
+
+    base_infra_config = SafeConfigParser()
+    base_infra_config.read(configuration_dir + 'self_service_node.ini')
+    for section in ['conf', 'ssn']:
+        for option, value in base_infra_config.items(section):
+            if not merged_config.has_section(section):
+                merged_config.add_section(section)
+            merged_config.set(section, option, value)
+
+    notebook_config = SafeConfigParser()
+    notebook_config.read(configuration_dir + 'notebook.ini')
+    section = 'notebook'
+    for option, value in notebook_config.items(section):
+        if not merged_config.has_section(section):
+            merged_config.add_section(section)
+        merged_config.set(section, option, value)
+
+    overwrite_config = SafeConfigParser()
+    overwrite_config.read(configuration_dir + 'overwrite.ini')
+    for section in ['creds', 'conf', 'ssn', 'notebook']:
+        if overwrite_config.has_section(section):
+            if not merged_config.has_section(section):
+                merged_config.add_section(section)
+            for option, value in overwrite_config.items(section):
+                merged_config.set(section, option, value)
+
+    shadow_overwrite_config = SafeConfigParser()
+    shadow_overwrite_config.read(configuration_dir + 'shadow_overwrite.ini')
+    for section in ['creds', 'conf', 'ssn', 'notebook']:
+        if shadow_overwrite_config.has_section(section):
+            if not merged_config.has_section(section):
+                merged_config.add_section(section)
+            for option, value in shadow_overwrite_config.items(section):
+                merged_config.set(section, option, value)
+    return merged_config
 
 
 def get_object_count(bucket, prefix):
@@ -142,7 +199,7 @@ def action_validate(id):
     elif state in ("RUNNING", "WAITING"):
         return ["True", state]
     else:
-        print "Cluster is still being built. Please increase timeout period and try again. Now terminating the cluster..."
+        print "Cluster is still being built."
         return ["True", state]
 
 
@@ -226,6 +283,13 @@ def build_emr_cluster(args):
 ##############
 
 if __name__ == "__main__":
+    # Get info from configs and redefine defaults in argparse
+    config = get_configuration(os.environ['PROVISION_CONFIG_DIR'])
+    args.tags = "Name=" + config.get('conf','service_base_name')
+    args.ssh_key = config.get('creds','key_name')
+    args.s3_bucket = config.get('conf','service_base_name') + "-bucket"
+    args.nbs_user = config.get('notebook','ssh_user')
+
     if args.name == '':
         parser.print_help()
     elif args.dry_run:
@@ -253,8 +317,9 @@ if __name__ == "__main__":
             else:
                 print "Notebook server IP and/or user are not defined ! Terminatig the cluster..."
                 terminate_emr(cluster_id)
-            #                s3_cleanup(args.name, args.s3_bucket)
+                #                s3_cleanup(args.name, args.s3_bucket)
         else:
             if action_validate(id)[0] == "True":
+                print "Timeout reached. Please increase timeout period and try again. Now terminating the cluster...""
                 terminate_emr(cluster_id)
                 #               s3_cleanup(args.name, args.s3_bucket)
