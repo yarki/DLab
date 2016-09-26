@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.epam.datalab.auth;
+package com.epam.datalab.auth.ldap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import com.epam.datalab.auth.DataLabAuthenticationConfig;
 import com.epam.datalab.auth.api.Login;
 import com.epam.datalab.auth.api.Logout;
+import com.epam.datalab.auth.ldap.api.Authenticate;
+import com.epam.datalab.auth.ldap.api.Authorize;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
