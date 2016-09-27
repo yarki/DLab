@@ -72,6 +72,7 @@ def create_instance(definitions, instance_tag):
         return instance.id
     return ''
 
+
 def create_iam_role(role_name, role_profile):
     conn = boto.connect_iam()
     conn.create_role(role_name)

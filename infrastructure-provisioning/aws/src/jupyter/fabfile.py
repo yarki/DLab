@@ -120,6 +120,7 @@ if __name__ == "__main__":
     notebook_config['vpc_id'] = os.environ['notebook_vpc_id']
     notebook_config['region'] = os.environ['notebook_region']
     notebook_config['instance_name'] = notebook_instance_name
+    notebook_config['instance_type'] = os.environ['notebook_instance_type']
     notebook_config['role_name'] = notebook_instance_name + "-Role"
     notebook_config['role_profile_name'] = notebook_instance_name + "-Role-Profile"
     notebook_config['policy_name'] = notebook_instance_name + "-Role-Policy"
