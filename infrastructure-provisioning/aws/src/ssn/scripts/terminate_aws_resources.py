@@ -141,7 +141,10 @@ def remove_s3():
     bucket_name = (os.environ['conf_service_base_name'] + '-bucket').lower().replace('_', '-')
     bucket = s3.Bucket("{}".format(bucket_name))
     print bucket.name
-    list_obj = client.list_objects(Bucket=bucket.name)
+    try:
+        list_obj = client.list_objects(Bucket=bucket.name)
+    except:
+        print "Wasn't able to get S3!"
     try:
         list_obj = list_obj.get('Contents')
     except:
