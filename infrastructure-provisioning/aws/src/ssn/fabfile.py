@@ -29,7 +29,7 @@ def run():
 
     logging.info('[CREATE ROLES]')
     print('[CREATE ROLES]')
-    params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn '%s'" % \
+    params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
              (role_name, role_profile_name, policy_name, os.environ['conf_policy_arn'])
     run_routine('create_role_policy', params)
 

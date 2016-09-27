@@ -47,28 +47,28 @@ def create_security_group(security_group_name, subnet_cidr, security_group_rules
 def create_instance(definitions, instance_tag):
     ec2 = boto3.resource('ec2')
     security_groups_ids = []
-    for chunk in definitions['security_group_ids'].split(','):
+    for chunk in definitions.security_group_ids.split(','):
         security_groups_ids.append(chunk.strip())
     user_data = ''
-    if definitions['user_data_file'] != '':
+    if definitions.user_data_file != '':
         try:
-            with open(definitions['user_data_file'], 'r') as f:
+            with open(definitions.user_data_file, 'r') as f:
                 for line in f:
                     user_data = user_data + line
             f.close()
         except:
             print("Error reading user-data file")
-    instances = ec2.create_instances(ImageId=definitions['ami_id'], MinCount=1, MaxCount=1,
-                                     KeyName=definitions['key_name'],
+    instances = ec2.create_instances(ImageId=definitions.ami_id, MinCount=1, MaxCount=1,
+                                     KeyName=definitions.key_name,
                                      SecurityGroupIds=security_groups_ids,
-                                     InstanceType=definitions['instance_type'],
-                                     SubnetId=definitions['subnet_id'],
-                                     IamInstanceProfile={'Name': definitions['iam_profile']},
+                                     InstanceType=definitions.instance_type,
+                                     SubnetId=definitions.subnet_id,
+                                     IamInstanceProfile={'Name': definitions.iam_profile},
                                      UserData=user_data)
     for instance in instances:
         print "Waiting for instance " + instance.id + " become running."
         instance.wait_until_running()
-        instance.create_tags(Tags=[{'Key': 'Name', 'Value': definitions['node_name']}, instance_tag])
+        instance.create_tags(Tags=[{'Key': 'Name', 'Value': definitions.node_name}, instance_tag])
         return instance.id
     return ''
 

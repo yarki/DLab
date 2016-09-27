@@ -1,35 +1,34 @@
 #!/usr/bin/python
 import os
-import argparse
-from fabric.api import local, hide
-import json
 from ConfigParser import SafeConfigParser
+import argparse
+from fabric.api import *
+import json
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--action', type=str, default='describe')
 args = parser.parse_args()
 
-
-def create_shadow_config():
-    sections = ['creds', 'conf', 'ssn', 'notebook', 'system']
-    shadow_overwrite_config = SafeConfigParser()
-    shadow_config_file = os.environ['PROVISION_CONFIG_DIR'] + 'shadow_overwrite.ini'
-    for key in os.environ:
-        transitional_key = key.lower()
-        for section in sections:
-            if transitional_key.startswith(section):
-                if not shadow_overwrite_config.has_section(section):
-                    shadow_overwrite_config.add_section(section)
-                shadow_overwrite_config.set(section, transitional_key[len(section) + 1:], os.environ[key])
-
-                print transitional_key[len(section) + 1:] + ' : ' + os.environ[key]
-    with open(shadow_config_file, 'w') as shadow_config:
-        shadow_overwrite_config.write(shadow_config)
-
-
 if __name__ == "__main__":
-    local('/root/prepare_environment.py')
-    create_shadow_config()
+    for filename in os.listdir('/root/conf'):
+        if filename.endswith('.ini'):
+            config = SafeConfigParser()
+            config.read(os.path.join('/root/conf', filename))
+            for section in config.sections():
+                for option in config.options(section):
+                    varname = "%s_%s" % (section, option)
+                    if varname not in os.environ:
+                        os.environ[varname] = config.get(section, option)
+
+    # Enforcing overwrite
+    for filename in os.listdir('/root/conf'):
+        if filename.endswith('overwrite.ini'):
+            config = SafeConfigParser()
+            config.read(os.path.join('/root/conf', filename))
+            for section in config.sections():
+                for option in config.options(section):
+                    varname = "%s_%s" % (section, option)
+                    os.environ[varname] = config.get(section, option)
 
     request_id = 'generic'
     try:
@@ -37,7 +36,19 @@ if __name__ == "__main__":
     except:
         os.environ['request_id'] = 'generic'
 
-    if args.action == 'create':
+    dry_run = False
+    try:
+        if os.environ['dry_run'] == 'true':
+            dry_run = True
+    except:
+        pass
+
+    if dry_run:
+        with open("/response/%s.json" % request_id, 'w') as response_file:
+            response = {"request_id": request_id, "action": args.action, "dry_run": "true"}
+            response_file.write(json.dumps(response))
+
+    elif args.action == 'create':
         with hide('running'):
             local("/bin/create.py")
 
