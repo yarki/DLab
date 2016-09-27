@@ -10,9 +10,6 @@ import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,26 +46,26 @@ public class DockerWarmuper implements Managed, MetadataHolder {
             String command = String.format(GET_IMAGE_METADATA, configuration.getResponseDirectory(), uuid, image);
             commandExecuter.execute(command);
         }
-
     }
 
-    private FileHandler getMetadataHandler() {
-        return fileName -> {
-            if (uuids.containsKey(fileName.replace(JSON_EXTENTION, ""))) {
+    FileHandler getMetadataHandler() {
+        return (fileName, bytes) -> {
+            String uuid = fileName.replace(JSON_EXTENTION, "");
+            if (uuids.containsKey(uuid)) {
                 LOGGER.debug("hadle file {}", fileName);
-                ImageMetadata metadata = MAPPER.readValue(readBytes(fileName), ImageMetadata.class);
-                metadata.setImage(uuids.get(metadata.getRequestId()));
+                ImageMetadata metadata = MAPPER.readValue(bytes, ImageMetadata.class);
+                metadata.setImage(uuids.get(uuid));
                 metadatas.add(metadata);
             }
         };
     }
 
-    private byte[] readBytes(String fileName) throws IOException {
-        return Files.readAllBytes(Paths.get(configuration.getResponseDirectory(), fileName));
-    }
-
     @Override
     public void stop() throws Exception {
+    }
+
+    public Map<String, String> getUuids() {
+        return Collections.unmodifiableMap(uuids);
     }
 
     public Set<ImageMetadata> getMetadatas() {

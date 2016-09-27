@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,9 +44,14 @@ public class FolderListener extends Thread {
         if (watckKey != null) {
             List<WatchEvent<?>> events = watckKey.pollEvents();
             for (WatchEvent event : events) {
-                fileHandler.handle(event.context().toString());
+                String fileName = event.context().toString();
+                fileHandler.handle(fileName, readBytes(fileName));
                 pollFile();
             }
         }
+    }
+
+    private byte[] readBytes(String fileName) throws IOException {
+        return Files.readAllBytes(Paths.get(configuration.getResponseDirectory(), fileName));
     }
 }

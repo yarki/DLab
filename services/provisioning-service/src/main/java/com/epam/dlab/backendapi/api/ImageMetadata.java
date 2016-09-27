@@ -15,6 +15,13 @@ public class ImageMetadata {
     @JsonProperty(value = "request_id")
     private String requestId;
 
+    public ImageMetadata() {
+    }
+
+    public ImageMetadata(String image) {
+        this.image = image;
+    }
+
     public String getImage() {
         return image;
     }
@@ -45,5 +52,21 @@ public class ImageMetadata {
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ImageMetadata metadata = (ImageMetadata) o;
+
+        return image != null ? image.equals(metadata.image) : metadata.image == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return image != null ? image.hashCode() : 0;
     }
 }
