@@ -5,4 +5,5 @@ package com.epam.dlab.backendapi.dao;
  */
 public interface MongoCollections {
     String LOGIN_ATTEMPT = "loginAttempt";
+    String DOCKER_ATTEMPT = "dockerAttempt";
 }

@@ -30,7 +30,7 @@ public class LoginResource {
 
     @POST
     public Optional<LDAPUser> login(User user) {
-        LOGGER.info("Try login user {}", user);
+        LOGGER.debug("Try login user {}", user);
         return Optional.ofNullable(USERS.get(getKey(user.getLogin(), user.getPassword())));
     }
 

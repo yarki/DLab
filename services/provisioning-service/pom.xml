@@ -7,25 +7,7 @@
         <version>1.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>self-service</artifactId>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>${org.mongodb.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard</groupId>
-            <artifactId>dropwizard-client</artifactId>
-            <version>${io.dropwizard.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard</groupId>
-            <artifactId>dropwizard-assets</artifactId>
-            <version>${io.dropwizard.version}</version>
-        </dependency>
-    </dependencies>
+    <artifactId>provisioning-service</artifactId>
 
     <build>
         <plugins>
@@ -45,7 +27,7 @@
                                         implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.epam.dlab.backendapi.SelfServiceApplication</mainClass>
+                                    <mainClass>com.epam.dlab.backendapi.ProvisioningServiceApplication</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
