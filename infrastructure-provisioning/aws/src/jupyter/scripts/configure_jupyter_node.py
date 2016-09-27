@@ -21,6 +21,8 @@ hadoop_version = "2.6"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
 templates_dir = '/root/templates/'
 scripts_dir = '/root/scripts/'
+
+
 def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
