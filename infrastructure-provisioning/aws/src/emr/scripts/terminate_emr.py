@@ -33,7 +33,10 @@ def remove_emr(emr_name, notebook_tag_value_name):
 
     print "======= clean S3 ======="
     client = boto3.client('s3')
-    list_obj = client.list_objects(Bucket=bucket_name)
+    try:
+        list_obj = client.list_objects(Bucket=bucket_name)
+    except:
+        print "Wasn't able to get S3!"
     try:
         list_obj = list_obj.get('Contents')
     except:
