@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.Date;
 import java.util.Set;
 
-import static com.epam.dlab.backendapi.core.RESTServiceFactory.DOCKER_SERVICE;
+import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
 /**
  * Created by Alexey Suprun
@@ -30,13 +30,8 @@ public class DockerResource implements MongoCollections, ProvisioningAPI {
     @Inject
     private MongoService mongoService;
     @Inject
-    @Named(DOCKER_SERVICE)
+    @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
-
-//    public DockerResource(MongoService mongoService, RESTService provisioningService) {
-//        this.mongoService = mongoService;
-//        this.provisioningService = provisioningService;
-//    }
 
     @GET
     public Set<ImageMetadata> getDockerImages() {

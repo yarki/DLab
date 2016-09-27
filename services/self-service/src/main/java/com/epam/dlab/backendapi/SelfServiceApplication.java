@@ -15,7 +15,6 @@ import io.dropwizard.setup.Environment;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SECURITY_SERVICE;
-import static com.epam.dlab.backendapi.core.RESTServiceFactory.DOCKER_SERVICE;
 
 /**
  * Created by Alexey Suprun
@@ -47,7 +46,7 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
                 RESTService provisioningService = configuration.getProvisioningFactory().build(environment, PROVISIONING_SERVICE);
                 bind(MongoService.class).toInstance(mongoService);
                 bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE)).toInstance(securityService);
-                bind(RESTService.class).annotatedWith(Names.named(DOCKER_SERVICE)).toInstance(provisioningService);
+                bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE)).toInstance(provisioningService);
             }
         });
     }

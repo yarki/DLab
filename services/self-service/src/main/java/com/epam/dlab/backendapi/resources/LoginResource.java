@@ -14,8 +14,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-import static com.epam.dlab.backendapi.core.RESTServiceFactory.SECURITY_SERVICE;
-
+import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SECURITY_SERVICE;
 
 /**
  * Created by Alexey Suprun
