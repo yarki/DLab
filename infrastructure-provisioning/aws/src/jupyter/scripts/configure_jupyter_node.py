@@ -44,6 +44,9 @@ def ensure_spark_scala():
         put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
         sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
         sudo('chmod 755 /usr/local/bin/create_configs.py')
+        sudo('pip install --pre toree')
+        sudo('ln -s /opt/spark/ /usr/local/spark')
+        sudo('jupyter toree install')
         sudo('touch /tmp/spark_scala_ensured')
 
 
