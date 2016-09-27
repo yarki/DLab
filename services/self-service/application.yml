@@ -1,11 +1,3 @@
-server:
-  applicationConnectors:
-    - type: http
-      port: 8080
-  adminConnectors:
-    - type: http
-      port: 8081
-
 mongo:
   host: localhost
   port: 27017
@@ -17,3 +9,29 @@ security-service:
   protocol: http
   host: localhost
   port: 8082
+  jerseyClient:
+    timeout: 3s
+    connectionTimeout: 3s
+
+provisioning-service:
+  protocol: http
+  host: localhost
+  port: 8084
+  jerseyClient:
+    timeout: 3s
+    connectionTimeout: 3s
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+  adminConnectors:
+    - type: http
+      port: 8081
+
+logging:
+  level: INFO
+  loggers:
+    com.epam: DEBUG
+  appenders:
+    - type: console
