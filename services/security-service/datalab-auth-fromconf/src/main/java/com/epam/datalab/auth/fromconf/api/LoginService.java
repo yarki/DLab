@@ -29,11 +29,11 @@ import com.epam.dlab.auth.client.DataLabAuthenticationConfig;
 
 @Path("/")
 @Produces(MediaType.TEXT_HTML)
-public class Login extends ConfigurableResource<DataLabAuthenticationConfig>{
+public class LoginService extends ConfigurableResource<DataLabAuthenticationConfig>{
 	
 	private final String defaultRedirect;
 	
-	public Login(DataLabAuthenticationConfig config) {
+	public LoginService(DataLabAuthenticationConfig config) {
 		super(config);
 		this.defaultRedirect = config.getDefaultRedirectFromAuthentication();
 	}

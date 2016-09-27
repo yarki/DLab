@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.datalab.auth.fromconf.api.ConfigAuthenticationService;
-import com.epam.datalab.auth.fromconf.api.Login;
+import com.epam.datalab.auth.fromconf.api.LoginService;
 import com.epam.dlab.auth.client.DataLabAuthenticationConfig;
 
 import io.dropwizard.Application;
@@ -52,7 +52,7 @@ public class ConfigAuthenticationApp extends Application<DataLabAuthenticationCo
 
 	@Override
 	public void run(DataLabAuthenticationConfig conf, Environment env) throws Exception {
-		env.jersey().register( new Login(conf) );
+		env.jersey().register( new LoginService(conf) );
 		env.jersey().register( new ConfigAuthenticationService(conf) );
 	}
 
