@@ -12,6 +12,9 @@ public class RESTService {
     private Client client;
     private String url;
 
+    public RESTService() {
+    }
+
     RESTService(Client client, String url) {
         this.client = client;
         this.url = url;

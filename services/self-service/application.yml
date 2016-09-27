@@ -1,3 +1,5 @@
+mocked: true
+
 mongo:
   host: localhost
   port: 27017

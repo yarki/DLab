@@ -17,6 +17,10 @@ public class SelfServiceApplicationConfiguration extends Configuration {
     public static final String PROVISIONING_SERVICE = "provisioning-service";
 
     @Valid
+    @JsonProperty
+    private boolean mocked;
+
+    @Valid
     @NotNull
     @JsonProperty(MONGO)
     private MongoServiceFactory mongoFactory = new MongoServiceFactory();
@@ -30,6 +34,10 @@ public class SelfServiceApplicationConfiguration extends Configuration {
     @NotNull
     @JsonProperty(PROVISIONING_SERVICE)
     private RESTServiceFactory provisioningFactory = new RESTServiceFactory();
+
+    public boolean isMocked() {
+        return mocked;
+    }
 
     public MongoServiceFactory getMongoFactory() {
         return mongoFactory;

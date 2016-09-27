@@ -14,4 +14,13 @@ public class LDAPUser {
     private String lastName;
     @JsonProperty
     private List<String> groups;
+
+    public LDAPUser() {
+    }
+
+    public LDAPUser(String firstName, String lastName, List<String> groups) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.groups = groups;
+    }
 }
