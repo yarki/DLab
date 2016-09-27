@@ -5,6 +5,8 @@ import com.epam.dlab.backendapi.core.ProvisioningAPI;
 import com.epam.dlab.backendapi.core.RESTService;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.MongoService;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Date;
 import java.util.Set;
+
+import static com.epam.dlab.backendapi.core.RESTServiceFactory.DOCKER_SERVICE;
 
 /**
  * Created by Alexey Suprun
@@ -23,13 +27,16 @@ import java.util.Set;
 public class DockerResource implements MongoCollections, ProvisioningAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerResource.class);
 
+    @Inject
     private MongoService mongoService;
+    @Inject
+    @Named(DOCKER_SERVICE)
     private RESTService provisioningService;
 
-    public DockerResource(MongoService mongoService, RESTService provisioningService) {
-        this.mongoService = mongoService;
-        this.provisioningService = provisioningService;
-    }
+//    public DockerResource(MongoService mongoService, RESTService provisioningService) {
+//        this.mongoService = mongoService;
+//        this.provisioningService = provisioningService;
+//    }
 
     @GET
     public Set<ImageMetadata> getDockerImages() {

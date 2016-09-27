@@ -16,6 +16,9 @@ import javax.ws.rs.client.Client;
  * Created by Alexey Suprun
  */
 public class RESTServiceFactory {
+    public static final String SECURITY_SERVICE = "security-service";
+    public static final String DOCKER_SERVICE = "docker-service";
+
     @NotEmpty
     @JsonProperty
     private String protocol;

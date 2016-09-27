@@ -1,5 +1,8 @@
 package com.epam.dlab.backendapi.core;
 
+import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,17 +13,16 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Alexey Suprun
  */
+@Singleton
 public class FolderListener extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
 
-    private String responseDirectory;
-    private int pollTimeout;
-    private FileHandler metadataHandler;
+    @Inject
+    private ProvisioningServiceApplicationConfiguration configuration;
+    private FileHandler fileHandler;
 
-    public FolderListener(String responseDirectory, int pollTimeout, FileHandler metadataHandler) {
-        this.responseDirectory = responseDirectory;
-        this.pollTimeout = pollTimeout;
-        this.metadataHandler = metadataHandler;
+    public void start(FileHandler fileHandler) {
+        this.fileHandler = fileHandler;
         start();
     }
 
@@ -34,14 +36,14 @@ public class FolderListener extends Thread {
     }
 
     private void pollFile() throws Exception {
-        Path directory = Paths.get(responseDirectory);
+        Path directory = Paths.get(configuration.getResponseDirectory());
         WatchService watcher = directory.getFileSystem().newWatchService();
         directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
-        WatchKey watckKey = watcher.poll(pollTimeout, TimeUnit.SECONDS);
+        WatchKey watckKey = watcher.poll(configuration.getPollTimeout(), TimeUnit.SECONDS);
         if (watckKey != null) {
             List<WatchEvent<?>> events = watckKey.pollEvents();
             for (WatchEvent event : events) {
-                metadataHandler.handle(event.context().toString());
+                fileHandler.handle(event.context().toString());
                 pollFile();
             }
         }

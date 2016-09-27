@@ -1,5 +1,7 @@
 package com.epam.dlab.backendapi.core;
 
+import com.google.inject.Singleton;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,8 +11,9 @@ import java.util.List;
 /**
  * Created by Alexey Suprun
  */
+@Singleton
 public class CommandExecuter {
-    public static List<String> execute(String command) throws IOException, InterruptedException {
+    public List<String> execute(String command) throws IOException, InterruptedException {
         Process process = Runtime.getRuntime().exec(createCommand(command));
         process.waitFor();
         List<String> result = new ArrayList<>();
@@ -23,7 +26,7 @@ public class CommandExecuter {
         return result;
     }
 
-    private static String[] createCommand(String command) {
+    private String[] createCommand(String command) {
         return new String[]{"bash", "-c", command};
     }
 }

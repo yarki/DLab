@@ -6,11 +6,15 @@ import com.epam.dlab.backendapi.core.RESTService;
 import com.epam.dlab.backendapi.core.SecurityAPI;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.MongoService;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+
+import static com.epam.dlab.backendapi.core.RESTServiceFactory.SECURITY_SERVICE;
 
 
 /**
@@ -22,13 +26,11 @@ import javax.ws.rs.core.MediaType;
 public class LoginResource implements MongoCollections, SecurityAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginResource.class);
 
+    @Inject
     private MongoService mongoService;
+    @Inject
+    @Named(SECURITY_SERVICE)
     private RESTService securityService;
-
-    public LoginResource(MongoService mongoService, RESTService securityService) {
-        this.mongoService = mongoService;
-        this.securityService = securityService;
-    }
 
     @POST
     public LDAPUser login(@FormParam("login") String login, @FormParam("password") String password) {

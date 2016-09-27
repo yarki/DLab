@@ -1,7 +1,10 @@
 package com.epam.dlab.backendapi.core;
 
+import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.api.ImageMetadata;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.dropwizard.lifecycle.Managed;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.slf4j.Logger;
@@ -19,32 +22,32 @@ import static com.epam.dlab.backendapi.core.DockerCommands.GET_IMAGE_METADATA;
 /**
  * Created by Alexey Suprun
  */
+@Singleton
 public class DockerWarmuper implements Managed, MetadataHolder {
     private static final String JSON_EXTENTION = ".json";
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private String responseDirectory;
-    private int pollTimeout;
+    @Inject
+    private ProvisioningServiceApplicationConfiguration configuration;
+    @Inject
+    private FolderListener folderListener;
+    @Inject
+    private CommandExecuter commandExecuter;
     private Map<String, String> uuids = new ConcurrentHashMap<>();
     private Set<ImageMetadata> metadatas = new ConcurrentHashSet<>();
-
-    public DockerWarmuper(String responseDirectory, int pollTimeout) {
-        this.responseDirectory = responseDirectory;
-        this.pollTimeout = pollTimeout;
-    }
 
     @Override
     public void start() throws Exception {
         LOGGER.debug("Docker warm up start");
-        new FolderListener(responseDirectory, pollTimeout, getMetadataHandler());
-        List<String> images = CommandExecuter.execute(GET_IMAGES);
+        folderListener.start(getMetadataHandler());
+        List<String> images = commandExecuter.execute(GET_IMAGES);
         for (String image : images) {
             LOGGER.debug("Image: {}", image);
             String uuid = UUID.randomUUID().toString();
             uuids.put(uuid, image);
-            String command = String.format(GET_IMAGE_METADATA, responseDirectory, uuid, image);
-            CommandExecuter.execute(command);
+            String command = String.format(GET_IMAGE_METADATA, configuration.getResponseDirectory(), uuid, image);
+            commandExecuter.execute(command);
         }
 
     }
@@ -61,7 +64,7 @@ public class DockerWarmuper implements Managed, MetadataHolder {
     }
 
     private byte[] readBytes(String fileName) throws IOException {
-        return Files.readAllBytes(Paths.get(responseDirectory, fileName));
+        return Files.readAllBytes(Paths.get(configuration.getResponseDirectory(), fileName));
     }
 
     @Override
