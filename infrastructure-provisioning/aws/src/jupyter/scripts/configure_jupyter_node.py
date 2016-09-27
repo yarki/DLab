@@ -14,7 +14,13 @@ parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
-
+scala_link = "http://www.scala-lang.org/files/archive/scala-2.11.8.deb"
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
+spark_version = "1.6.2"
+hadoop_version = "2.6"
+pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
+templates_dir = '/root/templates/'
+scripts_dir = '/root/scripts/'
 def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
@@ -23,22 +29,19 @@ def ensure_spark_scala():
     if not exists('/tmp/spark_scala_ensured'):
         sudo('apt-get install -y default-jre')
         sudo('apt-get install -y default-jdk')
-        sudo('wget http://www.scala-lang.org/files/archive/scala-2.11.8.deb -O /tmp/scala-2.11.8.deb')
-        sudo('dpkg -i /tmp/scala-2.11.8.deb')
-        spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
-        spark_version = "1.6.2"
-        hadoop_version = "2.6"
+        sudo('wget ' + scala_link + ' -O /tmp/scala.deb')
+        sudo('dpkg -i /tmp/scala.deb')
         sudo('wget ' + spark_link + ' -O /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
         sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
         sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
-        sudo('mkdir -p /home/ubuntu/.local/share/jupyter/kernels/pyspark_local')
-        sudo('touch /home/ubuntu/.local/share/jupyter/kernels/pyspark_local/kernel.json')
-        put('/root/templates/pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
-        put('/root/templates/spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
-        put('/root/templates/pyspark_local_template.json', '/tmp/pyspark_local_template.json')
-        put('/root/templates/toree_emr_template.json','/tmp/toree_emr_template.json')
-        sudo('\cp /tmp/pyspark_local_template.json /home/ubuntu/.local/share/jupyter/kernels/pyspark_local/kernel.json')
-        put('/root/scripts/create_configs.py', '/tmp/create_configs.py')
+        sudo('mkdir -p ' + pyspark_local_path_dir)
+        sudo('touch ' + pyspark_local_path_dir + 'kernel.json')
+        put(templates_dir + 'pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
+        put(templates_dir + 'spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
+        put(templates_dir + 'pyspark_local_template.json', '/tmp/pyspark_local_template.json')
+        put(templates_dir + 'toree_emr_template.json','/tmp/toree_emr_template.json')
+        sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
+        put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
         sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
         sudo('chmod 755 /usr/local/bin/create_configs.py')
         sudo('touch /tmp/spark_scala_ensured')

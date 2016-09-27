@@ -10,11 +10,15 @@ parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--dry_run', type=str, default='false')
 args = parser.parse_args()
 
+emr_dir = '/opt/jars/'
+kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
+yarn_dir = '/srv/hadoopconf/'
+
 def prepare():
     local('rm -rf /srv/*')
-    local('mkdir -p /srv/hadoopconf/')
-    local('mkdir -p /opt/jars/')
-    result = os.path.exists("/opt/jars/emr-4.3.0/aws")
+    local('mkdir -p ' + yarn_dir)
+    local('mkdir -p ' + emr_dir)
+    result = os.path.exists(emr_dir + "emr-4.3.0/aws")
     return result
 
 def jars(args):
@@ -27,12 +31,12 @@ def yarn(args):
     print "Downloading yarn configuration..."
     s3client = boto3.client('s3')
     s3resource = boto3.resource('s3')
-    get_files(s3client, s3resource, 'config/', args.bucket, '/srv/hadoopconf/')
-    local('mv /srv/hadoopconf/config/* /srv/hadoopconf/')
+    get_files(s3client, s3resource, 'config/', args.bucket, yarn_dir)
+    local('mv ' + yarn_dir + 'config/* ' + yarn_dir)
 
 def pyspark_kernel(args):
-    local('mkdir -p /home/ubuntu/.local/share/jupyter/kernels/pyspark_' + args.cluster_name + '/')
-    kernel_path = "/home/ubuntu/.local/share/jupyter/kernels/pyspark_" + args.cluster_name + "/kernel.json"
+    local('mkdir -p ' + kernels_dir + 'pyspark_' + args.cluster_name + '/')
+    kernel_path = kernels_dir + "pyspark_" + args.cluster_name + "/kernel.json"
     template_file = "/tmp/pyspark_emr_template.json"
     with open(kernel_path, 'w') as out:
         with open(template_file) as tpl:
@@ -40,8 +44,8 @@ def pyspark_kernel(args):
                 out.write(line.replace('CLUSTER', args.cluster_name))
 
 def toree_kernel(args):
-    local('mkdir -p /home/ubuntu/.local/share/jupyter/kernels/toree_' + args.cluster_name + '/')
-    kernel_path = "/home/ubuntu/.local/share/jupyter/kernels/toree_" + args.cluster_name + "/kernel.json"
+    local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
+    kernel_path = kernels_dir + "toree_" + args.cluster_name + "/kernel.json"
     template_file = "/tmp/toree_emr_template.json"
     with open(kernel_path, 'w') as out:
         with open(template_file) as tpl:
