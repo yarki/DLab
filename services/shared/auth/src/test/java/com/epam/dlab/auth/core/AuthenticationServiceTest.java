@@ -1,4 +1,4 @@
-package com.epam.dlab.auth;
+package com.epam.dlab.auth.core;
 
 import static org.junit.Assert.*;
 
