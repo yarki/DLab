@@ -24,14 +24,14 @@ limitations under the License.
 	<url>http://maven.apache.org</url>
 	<dependencies>
 		<dependency>
-			<groupId>com.epam.datalab.auth</groupId>
-			<artifactId>datalab-auth</artifactId>
+			<groupId>com.epam.dlab.auth</groupId>
+			<artifactId>auth</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>io.dropwizard</groupId>
 			<artifactId>dropwizard-core</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
