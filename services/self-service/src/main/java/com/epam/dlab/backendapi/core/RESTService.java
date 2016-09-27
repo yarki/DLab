@@ -30,6 +30,5 @@ public class RESTService {
                 .path(path)
                 .request(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
-
     }
 }
