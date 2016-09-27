@@ -1,10 +1,10 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.api.ImageMetadata;
-import com.epam.dlab.backendapi.core.ProvisioningAPI;
-import com.epam.dlab.backendapi.core.RESTService;
+import com.epam.dlab.backendapi.client.rest.ProvisioningAPI;
+import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.dao.MongoCollections;
-import com.epam.dlab.backendapi.dao.MongoService;
+import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.bson.Document;

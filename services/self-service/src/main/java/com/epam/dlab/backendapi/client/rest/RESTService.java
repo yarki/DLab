@@ -1,4 +1,4 @@
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.backendapi.client.rest;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;

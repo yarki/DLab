@@ -1,4 +1,4 @@
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.backendapi.client.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.client.JerseyClientBuilder;

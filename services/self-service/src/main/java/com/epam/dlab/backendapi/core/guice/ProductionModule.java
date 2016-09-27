@@ -1,8 +1,8 @@
 package com.epam.dlab.backendapi.core.guice;
 
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.RESTService;
-import com.epam.dlab.backendapi.dao.MongoService;
+import com.epam.dlab.backendapi.client.rest.RESTService;
+import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import io.dropwizard.setup.Environment;
