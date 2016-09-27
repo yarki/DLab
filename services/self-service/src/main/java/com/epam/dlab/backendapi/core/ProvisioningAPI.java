@@ -5,4 +5,5 @@ package com.epam.dlab.backendapi.core;
  */
 public interface ProvisioningAPI {
     String DOCKER = "docker";
+    String DOCKER_RUN = DOCKER + "/run";
 }

@@ -17,6 +17,6 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
     public void run(ProvisioningServiceApplicationConfiguration configuration, Environment environment) throws Exception {
         DockerWarmuper warmuper = new DockerWarmuper(configuration.getResponseDirectory(), configuration.getPollTimeout());
         environment.lifecycle().manage(warmuper);
-        environment.jersey().register(new DockerResource(warmuper));
+        environment.jersey().register(new DockerResource(configuration.getResponseDirectory(), warmuper));
     }
 }

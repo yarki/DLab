@@ -29,8 +29,8 @@ public class DockerWarmuper implements Managed, MetadataHolder {
     private Map<String, String> uuids = new ConcurrentHashMap<>();
     private Set<ImageMetadata> metadatas = new ConcurrentHashSet<>();
 
-    public DockerWarmuper(String responseDirrectory, int pollTimeout) {
-        this.responseDirectory = responseDirrectory;
+    public DockerWarmuper(String responseDirectory, int pollTimeout) {
+        this.responseDirectory = responseDirectory;
         this.pollTimeout = pollTimeout;
     }
 

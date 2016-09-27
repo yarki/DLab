@@ -1,3 +1,26 @@
+mongo:
+  host: localhost
+  port: 27017
+  username: dlab
+  password: dlab
+  database: dlab
+
+security-service:
+  protocol: http
+  host: localhost
+  port: 8082
+  jerseyClient:
+    timeout: 3s
+    connectionTimeout: 3s
+
+provisioning-service:
+  protocol: http
+  host: localhost
+  port: 8084
+  jerseyClient:
+    timeout: 3s
+    connectionTimeout: 3s
+
 server:
   applicationConnectors:
     - type: http
@@ -12,20 +35,3 @@ logging:
     com.epam: DEBUG
   appenders:
     - type: console
-
-mongo:
-  host: localhost
-  port: 27017
-  username: dlab
-  password: dlab
-  database: dlab
-
-security-service:
-  protocol: http
-  host: localhost
-  port: 8082
-
-provisioning-service:
-  protocol: http
-  host: localhost
-  port: 8084

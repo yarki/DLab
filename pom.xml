@@ -16,6 +16,7 @@
 
     <properties>
         <io.dropwizard.version>1.0.0</io.dropwizard.version>
+        <com.google.inject.version>4.1.0</com.google.inject.version>
         <org.mongodb.version>3.3.0</org.mongodb.version>
         <junit.version>4.12</junit.version>
         <org.mockito.version>1.10.19</org.mockito.version>
@@ -30,6 +31,11 @@
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
             <version>${io.dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${com.google.inject.version}</version>
         </dependency>
 
         <dependency>
