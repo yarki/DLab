@@ -1,5 +1,6 @@
 package com.epam.dlab.backendapi.resources;
 
+import com.epam.dlab.backendapi.api.ImageMetadata;
 import com.epam.dlab.backendapi.core.ProvisioningAPI;
 import com.epam.dlab.backendapi.core.RESTService;
 import com.epam.dlab.backendapi.dao.MongoCollections;
@@ -14,6 +15,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by Alexey Suprun
@@ -33,9 +35,9 @@ public class DockerResource implements MongoCollections, ProvisioningAPI {
     }
 
     @GET
-    public String getDcokerImages() {
-        LOGGER.info("Docker status asked");
+    public Set<ImageMetadata> getDockerImages() {
+        LOGGER.debug("docker statuses asked");
         mongoService.getCollection(DOCKER_ATTEMPT).insertOne(new Document("action", "getImages").append("date", new Date()));
-        return provisioningService.get(DOCKER, String.class);
+        return provisioningService.get(DOCKER, Set.class);
     }
 }

@@ -1,3 +1,6 @@
+responseDirrectory: /tmp/dlab
+pollTimeout: 5
+
 server:
   applicationConnectors:
     - type: http
@@ -5,3 +8,10 @@ server:
   adminConnectors:
     - type: http
       port: 8085
+
+logging:
+  level: INFO
+  loggers:
+    com.epam: DEBUG
+  appenders:
+    - type: console

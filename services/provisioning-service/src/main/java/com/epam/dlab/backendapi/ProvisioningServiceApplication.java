@@ -14,8 +14,9 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
     }
 
     @Override
-    public void run(ProvisioningServiceApplicationConfiguration provisioningServiceApplicationConfiguration, Environment environment) throws Exception {
-        environment.lifecycle().manage(new DockerWarmuper());
-        environment.jersey().register(new DockerResource());
+    public void run(ProvisioningServiceApplicationConfiguration configuration, Environment environment) throws Exception {
+        DockerWarmuper warmuper = new DockerWarmuper(configuration.getResponseDirectory(), configuration.getPollTimeout());
+        environment.lifecycle().manage(warmuper);
+        environment.jersey().register(new DockerResource(warmuper));
     }
 }

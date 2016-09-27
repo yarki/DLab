@@ -6,6 +6,13 @@ server:
     - type: http
       port: 8081
 
+logging:
+  level: INFO
+  loggers:
+    com.epam: DEBUG
+  appenders:
+    - type: console
+
 mongo:
   host: localhost
   port: 27017
