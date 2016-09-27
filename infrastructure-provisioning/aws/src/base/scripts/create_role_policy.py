@@ -1,8 +1,8 @@
 #!/usr/bin/python
-import boto
-import boto3
-import sys
 import argparse
+from dlab.aws_actions import *
+from dlab.aws_meta import *
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--role_name', type=str, default='dsa-test-role')
@@ -13,33 +13,6 @@ parser.add_argument('--policy_arn', type=str, default='"arn:aws:iam::aws:policy/
                                                       '"arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceRole"')
 parser.add_argument('--policy_file_name', type=str, default='')
 args = parser.parse_args()
-
-
-def get_role_by_name(role_name):
-    iam = boto3.resource('iam')
-    for role in iam.roles.all():
-        if role.name == role_name:
-            return role.name
-    return ''
-
-
-def create_iam_role(role_name, role_profile):
-    conn = boto.connect_iam()
-    conn.create_role(role_name)
-    conn.create_instance_profile(role_profile)
-    conn.add_role_to_instance_profile(role_profile, role_name)
-
-
-def attach_policy(policy_arn, role_name):
-    conn = boto.connect_iam()
-    conn.attach_role_policy(policy_arn, role_name)
-
-
-def create_attach_policy(policy_name, role_name, file_path):
-    conn = boto.connect_iam()
-    with open(file_path, 'r') as myfile:
-        json = myfile.read()
-    conn.put_role_policy(role_name, policy_name, json)
 
 
 if __name__ == "__main__":

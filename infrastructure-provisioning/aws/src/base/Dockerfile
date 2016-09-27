@@ -23,11 +23,13 @@ RUN mkdir -p /response; chmod a+rwx /response
 # Configuring entrypoint script
 ENV PROVISION_CONFIG_DIR /root/conf/
 ENV KEYFILE_DIR /root/keys/
+ENV AWS_DIR /root/.aws
 RUN mkdir -p /root/conf
 RUN mkdir -p /root/templates
 RUN mkdir -p /root/keys
 COPY . /root
-RUN chmod a+x /root/entrypoint.py
+COPY dlab /usr/lib/python2.7/dlab
+RUN chmod a+x /root/*.py
 
 # Entrypoint
 ENTRYPOINT ["/root/entrypoint.py"]

@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.epam.datalab.auth.fromconf;
+package com.epam.datalab.auth.ldap.api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,10 +28,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import com.codahale.metrics.annotation.Timed;
-import com.epam.datalab.auth.AuthorizedUsers;
-import com.epam.datalab.auth.ConfigurableResource;
 import com.epam.datalab.auth.DataLabAuthenticationConfig;
-import com.epam.datalab.auth.UserInfo;
+import com.epam.datalab.auth.api.ConfigurableResource;
+import com.epam.datalab.auth.core.AuthorizedUsers;
+import com.epam.datalab.auth.core.UserInfo;
 
 @Path("/login")
 @Produces(MediaType.TEXT_HTML)

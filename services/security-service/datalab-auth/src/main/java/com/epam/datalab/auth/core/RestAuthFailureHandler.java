@@ -13,40 +13,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.epam.datalab.auth.test;
+package com.epam.datalab.auth.core;
+
+import java.net.URI;
+
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.datalab.auth.AuthenticationService;
-import com.epam.datalab.auth.UserInfo;
+import io.dropwizard.auth.UnauthorizedHandler;
 
-import io.dropwizard.views.View;
+public class RestAuthFailureHandler implements UnauthorizedHandler {
+	
+	private final static Logger LOG = LoggerFactory.getLogger(RestAuthFailureHandler.class);
 
-public class TestView extends View {
-	
-	private final static Logger LOG = LoggerFactory.getLogger(TestView.class);
-	
-	private final UserInfo user ;
-	private final String accessToken;
 	private final AuthenticationService authenticationService;
 	
-	public TestView(UserInfo user, String token,AuthenticationService as) {
-		super("testauth.mustache");
-		this.user = user;
-		this.accessToken = token;
+	public RestAuthFailureHandler(AuthenticationService as) {
 		this.authenticationService = as;
 	}
 	
-	public String getName() {
-		return user.getName();
+	@Override
+	public Response buildResponse(String prefix, String realm) {
+		String redirect = authenticationService.getLoginUrl();
+		LOG.debug("Authentication failure redirect to {}",redirect);
+		return Response.seeOther(URI.create(redirect)).build();
 	}
-	
-	public String getLogoutUrl() {
-		return authenticationService.getLogoutUrl();
-	}
-	
-	public String getAccessToken() {
-		return accessToken;
-	}
+
 }

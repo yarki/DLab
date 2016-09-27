@@ -36,8 +36,7 @@ def build_docker_images(image_list):
     for image in image_list:
         name = image['name']
         tag = image['tag']
-        sudo("cd /project_images; "
-             "docker build --file %s/Dockerfile "
+        sudo("cd /project_images/%s; docker build "
              "-t docker.epmc-bdcc.projects.epam.com/dlab-aws-%s:%s ." % (name, name, tag))
 
 

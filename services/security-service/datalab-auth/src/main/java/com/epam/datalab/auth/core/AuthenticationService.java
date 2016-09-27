@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.epam.datalab.auth;
+package com.epam.datalab.auth.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

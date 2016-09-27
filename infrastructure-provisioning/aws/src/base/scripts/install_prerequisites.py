@@ -1,8 +1,9 @@
 #!/usr/bin/python
 from fabric.api import *
-from fabric.contrib.files import exists
 import argparse
 import json
+from dlab.fab import *
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='edge')
@@ -13,26 +14,6 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 args = parser.parse_args()
 
 
-def ensure_apt(requisites):
-    if not exists('/tmp/apt_upgraded'):
-        sudo('apt-get update')
-        sudo('apt-get -y upgrade')
-        sudo('touch /tmp/apt_upgraded')
-    sudo('apt-get -y install ' + requisites)
-
-
-def ensure_pip(requisites):
-    if not exists('/tmp/pip_path_added'):
-        sudo('echo PATH=$PATH:/usr/local/bin/:/opt/spark/bin/ >> /etc/profile')
-        sudo('echo export PATH >> /etc/profile')
-        sudo('touch /tmp/pip_path_added')
-    sudo('pip install -U ' + requisites)
-
-
-
-##############
-# Run script #
-##############
 if __name__ == "__main__":
     print "Configure connections"
     env['connection_attempts'] = 100

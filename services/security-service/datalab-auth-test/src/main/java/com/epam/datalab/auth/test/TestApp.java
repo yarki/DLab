@@ -21,9 +21,10 @@ import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.datalab.auth.RestAuthFailureHandler;
-import com.epam.datalab.auth.RestAuthenticator;
-import com.epam.datalab.auth.UserInfo;
+import com.epam.datalab.auth.core.RestAuthFailureHandler;
+import com.epam.datalab.auth.core.RestAuthenticator;
+import com.epam.datalab.auth.core.UserInfo;
+import com.epam.datalab.auth.test.api.TestService;
 
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;

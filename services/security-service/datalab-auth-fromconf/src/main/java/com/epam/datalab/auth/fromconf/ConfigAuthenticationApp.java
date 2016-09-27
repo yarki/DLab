@@ -19,8 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.datalab.auth.DataLabAuthenticationConfig;
-import com.epam.datalab.auth.Login;
-import com.epam.datalab.auth.Logout;
+import com.epam.datalab.auth.api.Login;
+import com.epam.datalab.auth.api.Logout;
+import com.epam.datalab.auth.fromconf.api.Authenticate;
+import com.epam.datalab.auth.fromconf.api.Authorize;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;

@@ -19,14 +19,18 @@ package com.epam.datalab.auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.epam.datalab.auth.api.Login;
+import com.epam.datalab.auth.api.Logout;
+import com.epam.datalab.auth.core.AuthorizedUsers;
+
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 
-public class LoginService extends Application<DataLabAuthenticationConfig> {
+public class SimpleAuthenticationApp extends Application<DataLabAuthenticationConfig> {
 	
-	private final static Logger LOG = LoggerFactory.getLogger(LoginService.class);
+	private final static Logger LOG = LoggerFactory.getLogger(SimpleAuthenticationApp.class);
 
 	public static void main(String[] args) throws Exception {
 		String[] params = null;
@@ -37,7 +41,7 @@ public class LoginService extends Application<DataLabAuthenticationConfig> {
 			params = new String[] { "server", "config.yml" };
 		}
 		LOG.debug("Starting Login Service with params: {}",String.join(",", params));
-		new LoginService().run(params);
+		new SimpleAuthenticationApp().run(params);
 	}
 	
 	@Override

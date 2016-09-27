@@ -6,7 +6,6 @@ import boto3
 from fabric.api import *
 import os
 import argparse
-from ConfigParser import SafeConfigParser
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dry_run', type=str, default='false')
@@ -16,69 +15,12 @@ parser.add_argument('--emr_name', type=str)
 args = parser.parse_args()
 
 
-# Function for parsing config files for parameters
-def get_configuration(configuration_dir):
-    merged_config = SafeConfigParser()
-
-    crid_config = SafeConfigParser()
-    crid_config.read(configuration_dir + 'aws_crids.ini')
-    for section in ['creds', 'ops']:
-        for option, value in crid_config.items(section):
-            if not merged_config.has_section(section):
-                merged_config.add_section(section)
-            merged_config.set(section, option, value)
-
-    base_infra_config = SafeConfigParser()
-    base_infra_config.read(configuration_dir + 'self_service_node.ini')
-    for section in ['conf', 'ssn']:
-        for option, value in base_infra_config.items(section):
-            if not merged_config.has_section(section):
-                merged_config.add_section(section)
-            merged_config.set(section, option, value)
-
-    notebook_config = SafeConfigParser()
-    notebook_config.read(configuration_dir + 'notebook.ini')
-    section = 'notebook'
-    for option, value in notebook_config.items(section):
-        if not merged_config.has_section(section):
-            merged_config.add_section(section)
-        merged_config.set(section, option, value)
-
-    overwrite_config = SafeConfigParser()
-    overwrite_config.read(configuration_dir + 'overwrite.ini')
-    for section in ['creds', 'conf', 'ssn', 'notebook']:
-        if overwrite_config.has_section(section):
-            if not merged_config.has_section(section):
-                merged_config.add_section(section)
-            for option, value in overwrite_config.items(section):
-                merged_config.set(section, option, value)
-
-    shadow_overwrite_config = SafeConfigParser()
-    shadow_overwrite_config.read(configuration_dir + 'shadow_overwrite.ini')
-    for section in ['creds', 'conf', 'ssn', 'notebook']:
-        if shadow_overwrite_config.has_section(section):
-            if not merged_config.has_section(section):
-                merged_config.add_section(section)
-            for option, value in shadow_overwrite_config.items(section):
-                merged_config.set(section, option, value)
-
-    return merged_config
-
-
-# Function for determining service_base_name from config
-def determine_service_base_name():
-    config = get_configuration(os.environ['PROVISION_CONFIG_DIR'])
-    service_base_name = config.get('conf', 'service_base_name')
-
-    return service_base_name
-
-
 # Function for terminating EMR clusters, cleaning buckets and removing notebook's local kernels
 def remove_emr(emr_name, notebook_tag_value_name):
     print "========= EMR =========="
     client = boto3.client('emr')
-    bucket_name = (determine_service_base_name() + '-bucket').lower().replace('_', '-')
-    tag_name = determine_service_base_name()
+    bucket_name = (os.environ['conf_service_base_name'] + '-bucket').lower().replace('_', '-')
+    tag_name = os.environ['conf_service_base_name']
     clusters = client.list_clusters(ClusterStates=['STARTING', 'BOOTSTRAPPING', 'RUNNING', 'WAITING'])
     clusters = clusters.get("Clusters")
     for c in clusters:
@@ -109,10 +51,10 @@ def remove_emr(emr_name, notebook_tag_value_name):
 
     print "==== remove kernels ===="
     ec2 = boto3.resource('ec2')
-    config = get_configuration(os.environ['PROVISION_CONFIG_DIR'])
-    key_name = config.get('creds', 'key_name')
-    user_name = config.get('notebook', 'ssh_user')
-    path_to_key = '/root/keys/' + key_name + '.pem'
+    key_name = os.environ['creds_key_name']
+    user_name = os.environ['notebook_ssh_user']
+    key_dir = os.environ['SYSTEM_KEYFILE_DIR']
+    path_to_key = key_dir + key_name + '.pem'
     instances = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['running']},
                  {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(notebook_tag_value_name)]}])

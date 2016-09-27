@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import os
-import base64
 import json
 from fabric.api import local
 

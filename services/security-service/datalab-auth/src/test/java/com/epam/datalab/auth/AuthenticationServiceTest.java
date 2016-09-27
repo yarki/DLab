@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.epam.datalab.auth.core.AuthenticationService;
+
 public class AuthenticationServiceTest {
 
 	@BeforeClass

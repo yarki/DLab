@@ -13,28 +13,34 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.epam.datalab.auth;
+package com.epam.datalab.auth.test.api;
 
-import java.net.URI;
-
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-@Path("/logout")
+import com.epam.datalab.auth.api.ConfigurableResource;
+import com.epam.datalab.auth.core.UserInfo;
+import com.epam.datalab.auth.test.TestConfiguration;
+
+import io.dropwizard.auth.Auth;
+
+@Path("/{SUB}")
 @Produces(MediaType.TEXT_HTML)
-public class Logout extends ConfigurableResource<DataLabAuthenticationConfig> {
-	
-	public Logout(DataLabAuthenticationConfig config) {
+@RolesAllowed("TestService")
+public class TestService extends ConfigurableResource<TestConfiguration>{
+	public TestService(TestConfiguration config) {
 		super(config);
 	}
 
 	@GET
-	public Response loginPage(@QueryParam(value = "access_token") String token) {
-		AuthorizedUsers.getInstance().removeUserInfo(token);
-		return Response.seeOther(URI.create("/")).build();
+	public TestView testView(@Auth UserInfo user, @QueryParam("access_token") String token) {
+		return new TestView(user,token,config.getAuthenticationService());
 	}
+	
+
+	
 }
