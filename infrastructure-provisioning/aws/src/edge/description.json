@@ -1,4 +1,4 @@
 {
-  "template_name": "SKELETON TEMPLATE",
-  "description": "SKELETON DESCRIPTION"
+  "template_name": "Crete exploratory environment.",
+  "description": "Create user subnet, bucket and edge node for access."
 }
