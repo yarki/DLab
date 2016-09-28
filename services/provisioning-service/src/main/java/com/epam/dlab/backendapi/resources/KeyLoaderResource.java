@@ -18,7 +18,7 @@ import javax.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class KeyLoaderResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DockerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyLoaderResource.class);
 
     @Inject
     private KeyLoader keyLoader;

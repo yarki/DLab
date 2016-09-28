@@ -19,16 +19,17 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class KeyLoaderResource implements KeyLoaderAPI {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DockerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyLoaderResource.class);
 
     @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
     @GET
-    public void loadKey() {
+    public String loadKey() {
         LOGGER.debug("load key");
         provisioningService.get(KEY_LOADER, String.class);
+        return "200 OK";
     }
 
     @POST
