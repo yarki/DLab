@@ -33,7 +33,7 @@ import io.dropwizard.Configuration;
 
 public class DataLabAuthenticationConfig extends Configuration {
 	
-	private final static Logger LOG = LoggerFactory.getLogger(DataLabAuthenticationConfig.class);
+	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 	
 	@JsonProperty
 	private long inactiveUserTimeoutMillSec = 600000;
