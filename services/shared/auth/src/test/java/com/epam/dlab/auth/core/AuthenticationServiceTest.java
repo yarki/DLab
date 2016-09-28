@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.epam.dlab.auth.core.AuthenticationService;
+import com.epam.dlab.auth.core.AuthenticationServiceConfig;
 
 public class AuthenticationServiceTest {
 
@@ -30,24 +30,25 @@ public class AuthenticationServiceTest {
 
 	@Test
 	public void test1() {
-		AuthenticationService as = new AuthenticationService();
-		System.out.println(as.getAuthenticationUrl());
-		assertEquals("http://localhost/login?",as.getAuthenticationUrl());
+		AuthenticationServiceConfig as = new AuthenticationServiceConfig();
+		System.out.println(as.getAuthenticateAndRedirectUrl());
+		assertEquals("http://localhost/login?",as.getAuthenticateAndRedirectUrl());
 		as.setType("http");
 		as.setPort(8080);
 		as.setHost("localhost");
-		System.out.println(as.getAuthenticationUrl());
-		assertEquals("http://localhost:8080/login?",as.getAuthenticationUrl());
+		System.out.println(as.getAuthenticateAndRedirectUrl());
+		assertEquals("http://localhost:8080/login?",as.getAuthenticateAndRedirectUrl());
 		as.setType(null);
-		System.out.println(as.getAuthenticationUrl());
-		assertEquals("//localhost:8080/login?",as.getAuthenticationUrl());
+		System.out.println(as.getAuthenticateAndRedirectUrl());
+		assertEquals("//localhost:8080/login?",as.getAuthenticateAndRedirectUrl());
 		as.setType("http");
 		as.setUsername("user");
 		as.setPassword("secret");
-		System.out.println(as.getAuthorizationUrl());
-		assertEquals("http://user:secret@localhost:8080/authorize?",as.getAuthorizationUrl());
+		System.out.println(as.getUserInfoUrl());
+		assertEquals("http://user:secret@localhost:8080/user_info?",as.getUserInfoUrl());
 		assertEquals("http://user:secret@localhost:8080/logout?",as.getLogoutUrl());
 		assertEquals("http://user:secret@localhost:8080/?",as.getLoginUrl());
+		assertEquals("http://user:secret@localhost:8080/validate_access?",as.getAccessTokenUrl());
 	}
 
 }

@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.auth.core.AuthenticationService;
+import com.epam.dlab.auth.core.AuthenticationServiceConfig;
 import com.epam.dlab.auth.core.UserInfo;
 
 import io.dropwizard.auth.AuthenticationException;
@@ -37,10 +37,10 @@ public class RestAuthenticator implements Authenticator<String, UserInfo> {
 
 	private final static Logger LOG = LoggerFactory.getLogger(RestAuthenticator.class);
 	
-	private final AuthenticationService authenticationService;
+	private final AuthenticationServiceConfig authenticationService;
 	private final Client client;
 
-	public RestAuthenticator(AuthenticationService as, Client client) {
+	public RestAuthenticator(AuthenticationServiceConfig as, Client client) {
 		this.authenticationService = as;
 		this.client = client;
 	}
@@ -48,7 +48,7 @@ public class RestAuthenticator implements Authenticator<String, UserInfo> {
 	@Override
 	public Optional<UserInfo> authenticate(String credentials) throws AuthenticationException {
 		LOG.debug("Authenticate token {}",credentials);
-		WebTarget target = client.target(authenticationService.getAuthorizationUrl()).queryParam("access_token", credentials);	
+		WebTarget target = client.target(authenticationService.getUserInfoUrl()).queryParam("access_token", credentials);	
 		UserInfo bean =
 				target.request(MediaType.APPLICATION_JSON_TYPE).get(UserInfo.class);
 		Optional<UserInfo> result = Optional.ofNullable(bean);

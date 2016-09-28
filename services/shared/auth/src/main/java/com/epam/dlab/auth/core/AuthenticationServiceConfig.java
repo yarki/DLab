@@ -17,8 +17,7 @@ package com.epam.dlab.auth.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AuthenticationService {
-	// http://username:password@example.com/
+public class AuthenticationServiceConfig {
 	@JsonProperty
 	private String host = "localhost";
 	@JsonProperty
@@ -78,13 +77,15 @@ public class AuthenticationService {
 			sb.append(":").append(port);
 		}
 		return sb.toString();	}
-	// http://username:password@example.com/
 	
-	public String getAuthenticationUrl() {
+	public String getAccessTokenUrl() {
+		return toString()+"/validate_access?";
+	}
+	public String getAuthenticateAndRedirectUrl() {
 		return toString()+"/login?";
 	}
-	public String getAuthorizationUrl() {
-		return toString()+"/authorize?";
+	public String getUserInfoUrl() {
+		return toString()+"/user_info?";
 	}
 	public String getLogoutUrl() {
 		return toString()+"/logout?";

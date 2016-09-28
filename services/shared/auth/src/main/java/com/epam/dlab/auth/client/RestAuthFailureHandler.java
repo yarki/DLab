@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.auth.core.AuthenticationService;
+import com.epam.dlab.auth.core.AuthenticationServiceConfig;
 
 import io.dropwizard.auth.UnauthorizedHandler;
 
@@ -30,9 +30,9 @@ public class RestAuthFailureHandler implements UnauthorizedHandler {
 	
 	private final static Logger LOG = LoggerFactory.getLogger(RestAuthFailureHandler.class);
 
-	private final AuthenticationService authenticationService;
+	private final AuthenticationServiceConfig authenticationService;
 	
-	public RestAuthFailureHandler(AuthenticationService as) {
+	public RestAuthFailureHandler(AuthenticationServiceConfig as) {
 		this.authenticationService = as;
 	}
 	
