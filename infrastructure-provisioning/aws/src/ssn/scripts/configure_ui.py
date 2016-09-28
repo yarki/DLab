@@ -25,9 +25,9 @@ def ensure_mongo():
 
 def configure_mongo():
     if not exists("/lib/systemd/system/mongod.service"):
-        local('scp -i {} /usr/share/notebook_automation/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
+        local('scp -i {} /root/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
         sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
-    local('scp -i {} /usr/share/notebook_automation/templates/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
+    local('scp -i {} /root/scripts/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
     sudo('python /tmp/configure_mongo.py')
 
 
