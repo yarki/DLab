@@ -1,4 +1,4 @@
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.backendapi.core.response;
 
 /**
  * Created by Alexey Suprun

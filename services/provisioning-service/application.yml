@@ -1,5 +1,6 @@
-responseDirrectory: /tmp/dlab
-pollTimeout: 5
+responseDirectory: /tmp/dlab
+warmupPollTimeout: 5s
+keyLoaderPollTimeout: 2m
 
 server:
   applicationConnectors:

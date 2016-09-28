@@ -1,8 +1,9 @@
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.backendapi.core.response;
 
-import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.google.inject.Inject;
+import com.epam.dlab.backendapi.core.response.FileHandler;
+import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
 import com.google.inject.Singleton;
+import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +19,13 @@ import java.util.concurrent.TimeUnit;
 public class FolderListener extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
 
-    @Inject
-    private ProvisioningServiceApplicationConfiguration configuration;
+    private String directory;
+    private Duration timeout;
     private FileHandler fileHandler;
 
-    public void start(FileHandler fileHandler) {
+    public void start(String directory, Duration timeout, FileHandler fileHandler) {
+        this.directory = directory;
+        this.timeout = timeout;
         this.fileHandler = fileHandler;
         start();
     }
@@ -37,10 +40,10 @@ public class FolderListener extends Thread {
     }
 
     private void pollFile() throws Exception {
-        Path directory = Paths.get(configuration.getResponseDirectory());
-        WatchService watcher = directory.getFileSystem().newWatchService();
-        directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
-        WatchKey watckKey = watcher.poll(configuration.getPollTimeout(), TimeUnit.SECONDS);
+        Path directoryPath = Paths.get(directory);
+        WatchService watcher = directoryPath.getFileSystem().newWatchService();
+        directoryPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
+        WatchKey watckKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
         if (watckKey != null) {
             List<WatchEvent<?>> events = watckKey.pollEvents();
             for (WatchEvent event : events) {
@@ -52,6 +55,6 @@ public class FolderListener extends Thread {
     }
 
     private byte[] readBytes(String fileName) throws IOException {
-        return Files.readAllBytes(Paths.get(configuration.getResponseDirectory(), fileName));
+        return Files.readAllBytes(Paths.get(directory, fileName));
     }
 }
