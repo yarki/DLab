@@ -5,21 +5,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.epam.dlab.auth.client.DataLabAuthenticationConfig;
+import com.epam.dlab.auth.core.AuthorizedUsers;
 import com.epam.dlab.auth.core.UserInfo;
 import com.epam.dlab.auth.rest_api.AbstractAuthenticationService;
 
+@Path("/")
 public class ConfigAuthenticationService extends AbstractAuthenticationService<DataLabAuthenticationConfig> {
 
 	private final Map<String, UserInfo> usersMap;
@@ -34,13 +34,6 @@ public class ConfigAuthenticationService extends AbstractAuthenticationService<D
 		}
 	}
 	
-	@GET
-	@Path("/")
-	@Produces(MediaType.TEXT_HTML)
-	public String root(@Context HttpServletRequest request) {
-		return "";
-	}
-
 	@Override
 	@GET
 	@Path("/validate")
@@ -49,6 +42,7 @@ public class ConfigAuthenticationService extends AbstractAuthenticationService<D
 			@QueryParam("username") String username, 
 			@QueryParam("password") String password,
 			@QueryParam("access_token") String accessToken) {
+		log.debug("validating username:{} password:{} token:{}",username,password,accessToken);
 		if( this.isAccessTokenAvailable(accessToken) ) {
 			return accessToken;
 		} else {
@@ -101,7 +95,7 @@ public class ConfigAuthenticationService extends AbstractAuthenticationService<D
 	@Path("/user_info")
 	@Produces(MediaType.APPLICATION_JSON)
 	public UserInfo getUserInfo(@QueryParam("access_token") String access_token) {
-		UserInfo ui = this.getUserInfo(access_token);
+		UserInfo ui = AuthorizedUsers.getInstance().getUserInfo(access_token);
 		log.debug("Authorized {} {}", access_token, ui);
 		return ui;
 	}
