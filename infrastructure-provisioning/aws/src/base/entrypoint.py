@@ -43,6 +43,8 @@ if __name__ == "__main__":
     except:
         pass
 
+    local('chmod 600 /root/keys/*.pem')
+
     if dry_run:
         with open("/response/%s.json" % request_id, 'w') as response_file:
             response = {"request_id": request_id, "action": args.action, "dry_run": "true"}

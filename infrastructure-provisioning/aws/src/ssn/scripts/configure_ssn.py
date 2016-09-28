@@ -137,5 +137,5 @@ if __name__ == "__main__":
     print "Configuring jenkins."
     configure_jenkins()
 
-    print "Uploading notebook creation and configuration core."
-    place_notebook_automation_scripts()
+    # print "Uploading notebook creation and configuration core."
+    # place_notebook_automation_scripts()
