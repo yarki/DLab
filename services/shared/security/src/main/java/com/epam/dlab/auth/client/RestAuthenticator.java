@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.core.AuthenticationServiceConfig;
 import com.epam.dlab.auth.core.UserInfo;
+import com.google.inject.Inject;
 
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
@@ -36,10 +38,11 @@ import io.dropwizard.auth.Authenticator;
 public class RestAuthenticator implements Authenticator<String, UserInfo> {
 
 	private final static Logger LOG = LoggerFactory.getLogger(RestAuthenticator.class);
-	
+
 	private final AuthenticationServiceConfig authenticationService;
 	private final Client client;
 
+	@Inject
 	public RestAuthenticator(AuthenticationServiceConfig as, Client client) {
 		this.authenticationService = as;
 		this.client = client;
@@ -47,13 +50,13 @@ public class RestAuthenticator implements Authenticator<String, UserInfo> {
 
 	@Override
 	public Optional<UserInfo> authenticate(String credentials) throws AuthenticationException {
-		LOG.debug("Authenticate token {}",credentials);
-		WebTarget target = client.target(authenticationService.getUserInfoUrl()).queryParam("access_token", credentials);	
-		UserInfo bean =
-				target.request(MediaType.APPLICATION_JSON_TYPE).get(UserInfo.class);
+		LOG.debug("Authenticate token {}", credentials);
+		WebTarget target = client.target(authenticationService.getUserInfoUrl()).queryParam("access_token",credentials);
+		Builder builder = target.request(MediaType.APPLICATION_JSON_TYPE);
+		UserInfo bean = target.request(MediaType.APPLICATION_JSON_TYPE).get(UserInfo.class);
 		Optional<UserInfo> result = Optional.ofNullable(bean);
-		result.orElseThrow(
-				()->new WebApplicationException( Response.seeOther(URI.create(authenticationService.getLoginUrl())).build() ));
+		result.orElseThrow(() -> new WebApplicationException(
+				Response.seeOther(URI.create(authenticationService.getLoginUrl())).build()));
 		return result;
 	}
 

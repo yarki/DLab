@@ -28,6 +28,10 @@ public class AuthenticationServiceConfig {
 	private String username = "";
 	@JsonProperty
 	private String password = "";
+
+	@JsonProperty
+	private String loginFormUrl = "/?";
+
 	public String getHost() {
 		return host;
 	}
@@ -79,7 +83,7 @@ public class AuthenticationServiceConfig {
 		return sb.toString();	}
 	
 	public String getAccessTokenUrl() {
-		return toString()+"/validate_access?";
+		return toString()+"/validate?";
 	}
 	public String getAuthenticateAndRedirectUrl() {
 		return toString()+"/login?";
@@ -91,7 +95,15 @@ public class AuthenticationServiceConfig {
 		return toString()+"/logout?";
 	}
 	public String getLoginUrl() {
-		return toString()+"/?";
+		if("/?".equals(loginFormUrl)) {
+			return toString()+"/?";
+		} else {
+			return loginFormUrl;
+		}
+	}
+	
+	public void setLoginUrl(String loginFormUrl) {
+		this.loginFormUrl = loginFormUrl;
 	}
 
 }
