@@ -16,6 +16,9 @@ authenticationService:
   type: http
   host: localhost
   port: 8090
+#  defaultAfterLoginDestination: http://localhost:8080/best
+#  defaultAfterLogoutDestination: /
+#  inactiveUserTimeoutMillSec: 3600000
 server:
   applicationConnectors:
   - type: http

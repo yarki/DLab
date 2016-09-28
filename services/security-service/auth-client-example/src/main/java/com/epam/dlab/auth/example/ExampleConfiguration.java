@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.auth.core.AuthenticationService;
+import com.epam.dlab.auth.core.AuthenticationServiceConfig;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.Configuration;
@@ -45,8 +45,8 @@ public class ExampleConfiguration extends Configuration {
     }
 	
 	@JsonProperty
-	private AuthenticationService authenticationService;
-	public AuthenticationService getAuthenticationService() {
+	private AuthenticationServiceConfig authenticationService;
+	public AuthenticationServiceConfig getAuthenticationService() {
 		return authenticationService;
 	}
 	

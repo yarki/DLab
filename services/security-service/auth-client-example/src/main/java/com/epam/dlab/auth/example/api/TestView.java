@@ -18,7 +18,7 @@ package com.epam.dlab.auth.example.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.auth.core.AuthenticationService;
+import com.epam.dlab.auth.core.AuthenticationServiceConfig;
 import com.epam.dlab.auth.core.UserInfo;
 
 import io.dropwizard.views.View;
@@ -29,9 +29,9 @@ public class TestView extends View {
 	
 	private final UserInfo user ;
 	private final String accessToken;
-	private final AuthenticationService authenticationService;
+	private final AuthenticationServiceConfig authenticationService;
 	
-	public TestView(UserInfo user, String token,AuthenticationService as) {
+	public TestView(UserInfo user, String token,AuthenticationServiceConfig as) {
 		super("testauth.mustache");
 		this.user = user;
 		this.accessToken = token;
