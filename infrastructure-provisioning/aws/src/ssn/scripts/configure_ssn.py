@@ -83,7 +83,7 @@ def configure_jenkins():
         sudo('rm -rf /var/lib/jenkins/*')
         sudo('mkdir -p /var/lib/jenkins/jobs/')
         sudo('chown -R ubuntu /var/lib/jenkins/jobs/')
-        put('/usr/share/notebook_automation/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
+        put('/root/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
         sudo('chown -R jenkins:jenkins /var/lib/jenkins/jobs')
         with settings(warn_only=True):
             sudo('/etc/init.d/jenkins start; sleep 5; /etc/init.d/jenkins restart; sleep 10')
