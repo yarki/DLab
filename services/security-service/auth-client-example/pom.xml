@@ -31,17 +31,17 @@ limitations under the License.
 		<dependency>
 			<groupId>io.dropwizard</groupId>
 			<artifactId>dropwizard-client</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>io.dropwizard</groupId>
 			<artifactId>dropwizard-core</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>io.dropwizard</groupId>
 			<artifactId>dropwizard-auth</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
