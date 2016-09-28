@@ -82,12 +82,14 @@ def configure_jenkins():
         sudo('echo \'JENKINS_ARGS="--prefix=/jenkins"\' >> /etc/default/jenkins')
         sudo('rm -rf /var/lib/jenkins/*')
         sudo('mkdir -p /var/lib/jenkins/jobs/')
-        sudo('chown -R ubuntu /var/lib/jenkins/jobs/')
-        put('/root/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
-        sudo('chown -R jenkins:jenkins /var/lib/jenkins/jobs')
+        sudo('chown -R ubuntu:ubuntu /var/lib/jenkins/')
+        #put('/root/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
+        local('scp -r -q -i {} /root/templates/jenkins_jobs/* {}:/var/lib/jenkins/jobs/'.format(args.keyfile, env.host_string))
+        sudo('chown -R jenkins:jenkins /var/lib/jenkins')
         with settings(warn_only=True):
-            sudo('/etc/init.d/jenkins start; sleep 5; /etc/init.d/jenkins restart; sleep 10')
+            sudo('/etc/init.d/jenkins stop; sleep 5')
             sudo('sysv-rc-conf jenkins on')
+            sudo('service jenkins start')
         sudo('touch /tmp/jenkins_configured')
 
 
