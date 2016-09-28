@@ -1,6 +1,14 @@
 responseDirectory: /tmp/dlab
-warmupPollTimeout: 5s
-keyLoaderPollTimeout: 2m
+warmupPollTimeout: 10s
+keyLoaderPollTimeout: 5m
+
+self-service:
+  protocol: http
+  host: EPRUPETW1232.PETERSBURG.epam.com
+  port: 8080
+  jerseyClient:
+    timeout: 3s
+    connectionTimeout: 3s
 
 server:
   applicationConnectors:

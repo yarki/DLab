@@ -1,8 +1,6 @@
 package com.epam.dlab.backendapi.core.response;
 
-import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
-import com.google.inject.Singleton;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +13,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Alexey Suprun
  */
-@Singleton
-public class FolderListener extends Thread {
+public class FolderListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
 
     private String directory;
@@ -27,16 +24,13 @@ public class FolderListener extends Thread {
         this.directory = directory;
         this.timeout = timeout;
         this.fileHandler = fileHandler;
-        start();
-    }
-
-    @Override
-    public void run() {
-        try {
-            pollFile();
-        } catch (Exception e) {
-            LOGGER.error("FolderListener exception", e);
-        }
+        new Thread(() -> {
+            try {
+                pollFile();
+            } catch (Exception e) {
+                LOGGER.error("FolderListener exception", e);
+            }
+        }).start();
     }
 
     private void pollFile() throws Exception {

@@ -2,6 +2,7 @@ package com.epam.dlab.backendapi.core.response;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.dropwizard.lifecycle.Managed;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import java.io.File;
 /**
  * Created by Alexey Suprun
  */
+@Singleton
 public class ResponseDirectoriesCreator implements Managed {
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;

@@ -1,14 +1,18 @@
 package com.epam.dlab.backendapi;
 
+import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.core.response.ResponseDirectoriesCreator;
 import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
 import com.epam.dlab.backendapi.resources.DockerResource;
+import com.epam.dlab.backendapi.resources.KeyLoaderResource;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
+
+import static com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration.SELF_SERVICE;
 
 /**
  * Created by Alexey Suprun
@@ -20,18 +24,20 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
 
     @Override
     public void run(ProvisioningServiceApplicationConfiguration configuration, Environment environment) throws Exception {
-        Injector injector = createInjector(configuration);
+        Injector injector = createInjector(configuration, environment);
         environment.lifecycle().manage(injector.getInstance(ResponseDirectoriesCreator.class));
         environment.lifecycle().manage(injector.getInstance(DockerWarmuper.class));
         environment.jersey().register(injector.getInstance(DockerResource.class));
+        environment.jersey().register(injector.getInstance(KeyLoaderResource.class));
     }
 
-    private Injector createInjector(ProvisioningServiceApplicationConfiguration configuration) {
+    private Injector createInjector(ProvisioningServiceApplicationConfiguration configuration, Environment environment) {
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(configuration);
                 bind(MetadataHolder.class).to(DockerWarmuper.class);
+                bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, SELF_SERVICE));
             }
         });
     }

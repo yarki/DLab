@@ -1,15 +1,21 @@
 package com.epam.dlab.backendapi;
 
+import com.epam.dlab.backendapi.client.rest.RESTServiceFactory;
 import com.epam.dlab.backendapi.core.response.ResponseDirectories;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by Alexey Suprun
  */
 public class ProvisioningServiceApplicationConfiguration extends Configuration implements ResponseDirectories {
+    public static final String SELF_SERVICE = "self-service";
+
     @NotEmpty
     @JsonProperty
     private String responseDirectory;
@@ -19,6 +25,11 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
 
     @JsonProperty
     private Duration keyLoaderPollTimeout = Duration.minutes(2);
+
+    @Valid
+    @NotNull
+    @JsonProperty(SELF_SERVICE)
+    private RESTServiceFactory selfFactory = new RESTServiceFactory();
 
     public Duration getWarmupPollTimeout() {
         return warmupPollTimeout;
@@ -38,5 +49,9 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
 
     public String getKeyLoaderDirectory() {
         return responseDirectory + KEY_LOADER;
+    }
+
+    public RESTServiceFactory getSelfFactory() {
+        return selfFactory;
     }
 }

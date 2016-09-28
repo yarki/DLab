@@ -2,10 +2,10 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.api.LDAPUser;
 import com.epam.dlab.backendapi.api.User;
+import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.client.rest.SecurityAPI;
 import com.epam.dlab.backendapi.dao.MongoCollections;
-import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;

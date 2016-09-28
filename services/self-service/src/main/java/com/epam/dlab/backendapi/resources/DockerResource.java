@@ -1,10 +1,10 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.api.ImageMetadata;
-import com.epam.dlab.backendapi.client.rest.ProvisioningAPI;
+import com.epam.dlab.backendapi.client.mongo.MongoService;
+import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.dao.MongoCollections;
-import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.bson.Document;
@@ -24,7 +24,7 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
 @Path("/docker")
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 @Produces(MediaType.APPLICATION_JSON)
-public class DockerResource implements MongoCollections, ProvisioningAPI {
+public class DockerResource implements MongoCollections, DockerAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerResource.class);
 
     @Inject

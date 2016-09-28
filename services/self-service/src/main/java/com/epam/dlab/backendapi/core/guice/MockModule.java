@@ -2,10 +2,10 @@ package com.epam.dlab.backendapi.core.guice;
 
 import com.epam.dlab.backendapi.api.ImageMetadata;
 import com.epam.dlab.backendapi.api.LDAPUser;
-import com.epam.dlab.backendapi.client.rest.ProvisioningAPI;
+import com.epam.dlab.backendapi.client.mongo.MongoService;
+import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.client.rest.SecurityAPI;
-import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import com.mongodb.client.MongoCollection;
@@ -16,16 +16,14 @@ import java.util.HashSet;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SECURITY_SERVICE;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Created by Alexey Suprun
  */
-public class MockModule extends AbstractModule implements SecurityAPI, ProvisioningAPI {
+public class MockModule extends AbstractModule implements SecurityAPI, DockerAPI {
     @Override
     protected void configure() {
         bind(MongoService.class).toInstance(createMongoService());

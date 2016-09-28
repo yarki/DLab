@@ -2,6 +2,7 @@ package com.epam.dlab.backendapi;
 
 import com.epam.dlab.backendapi.core.guice.ModuleFactory;
 import com.epam.dlab.backendapi.resources.DockerResource;
+import com.epam.dlab.backendapi.resources.KeyLoaderResource;
 import com.epam.dlab.backendapi.resources.LoginResource;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -29,5 +30,6 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
         Injector injector = Guice.createInjector(ModuleFactory.getModule(configuration, environment));
         environment.jersey().register(injector.getInstance(LoginResource.class));
         environment.jersey().register(injector.getInstance(DockerResource.class));
+        environment.jersey().register(injector.getInstance(KeyLoaderResource.class));
     }
 }
