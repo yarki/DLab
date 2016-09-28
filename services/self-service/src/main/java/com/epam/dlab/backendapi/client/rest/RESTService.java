@@ -1,4 +1,4 @@
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.backendapi.client.rest;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -11,6 +11,9 @@ import javax.ws.rs.core.MediaType;
 public class RESTService {
     private Client client;
     private String url;
+
+    public RESTService() {
+    }
 
     RESTService(Client client, String url) {
         this.client = client;

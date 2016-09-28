@@ -14,4 +14,14 @@ public class ImageMetadata {
     private String description;
     @JsonProperty(value = "request_id")
     private String requestId;
+
+    public ImageMetadata() {
+    }
+
+    public ImageMetadata(String image, String templateName, String description, String requestId) {
+        this.image = image;
+        this.templateName = templateName;
+        this.description = description;
+        this.requestId = requestId;
+    }
 }

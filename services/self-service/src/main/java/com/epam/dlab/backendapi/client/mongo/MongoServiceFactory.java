@@ -1,4 +1,4 @@
-package com.epam.dlab.backendapi.dao;
+package com.epam.dlab.backendapi.client.mongo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mongodb.MongoClient;
