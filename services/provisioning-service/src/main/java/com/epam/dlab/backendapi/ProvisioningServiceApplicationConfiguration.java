@@ -18,6 +18,10 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
 
     @NotEmpty
     @JsonProperty
+    private String keyDirectory;
+
+    @NotEmpty
+    @JsonProperty
     private String responseDirectory;
 
     @JsonProperty
@@ -30,6 +34,10 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     @NotNull
     @JsonProperty(SELF_SERVICE)
     private RESTServiceFactory selfFactory = new RESTServiceFactory();
+
+    public String getKeyDirectory() {
+        return keyDirectory;
+    }
 
     public Duration getWarmupPollTimeout() {
         return warmupPollTimeout;

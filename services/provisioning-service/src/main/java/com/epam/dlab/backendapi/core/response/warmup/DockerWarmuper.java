@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Singleton
 public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
-    private static final String JSON_EXTENTION = ".json";
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -37,14 +36,15 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
 
     @Override
     public void start() throws Exception {
-        LOGGER.debug("Docker warm up start");
+        LOGGER.debug("docker warm up start");
         folderListener.start(configuration.getWarmupDirectory(), configuration.getWarmupPollTimeout(), getMetadataHandler());
         List<String> images = commandExecuter.execute(GET_IMAGES);
         for (String image : images) {
-            LOGGER.debug("Image: {}", image);
+            LOGGER.debug("image: {}", image);
             String uuid = UUID.randomUUID().toString();
             uuids.put(uuid, image);
-            String command = String.format(GET_IMAGE_METADATA, configuration.getWarmupDirectory(), uuid, image);
+            String command = String.format(GET_IMAGE_METADATA, configuration.getKeyDirectory(),
+                    configuration.getWarmupDirectory(), uuid, image);
             commandExecuter.execute(command);
         }
     }
