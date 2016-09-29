@@ -45,7 +45,7 @@ def ensure_scala_breeze():
         sudo('echo \'resolvers ++= Seq( \' >> ' + working_root + '/breeze/build.sbt')
         sudo('echo \'  "Sonatype Releases" at "' + releases + '" , \' >> ' + working_root + '/breeze/build.sbt')
         sudo('echo \'  "Sonatype Snapshots" at "' + snapshots + '" ) \' >> ' + working_root + '/breeze/build.sbt')
-        # sudo('echo \'scalaVersion := "' + scala_version + '" \' >> /tmp/breeze/build.sbt')
+        sudo('echo \'scalaVersion := "' + scala_version + '" \' >> ' + working_root + '/breeze/build.sbt')
         sudo('cd ' + working_root + '/breeze ; sbt package publish-local')
         sudo('touch /tmp/scala_breeze_ensured')
 
@@ -116,11 +116,11 @@ if __name__ == "__main__":
     print "Installing notebook additions: sbt."
     ensure_sbt()
 
-    print "Installing notebook additions: breeze."
-    ensure_scala_breeze()
-    configure_scala_breeze()
+    # print "Installing notebook additions: breeze."
+    # ensure_scala_breeze()
+    # configure_scala_breeze()
 
-    print "Installing notebook additions: wisp."
-    ensure_scala_wisp()
-    configure_scala_wisp()
+    # print "Installing notebook additions: wisp."
+    # ensure_scala_wisp()
+    # configure_scala_wisp()
 

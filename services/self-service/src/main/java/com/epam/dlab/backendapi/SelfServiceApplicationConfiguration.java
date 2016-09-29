@@ -1,7 +1,7 @@
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.client.rest.RESTServiceFactory;
 import com.epam.dlab.backendapi.client.mongo.MongoServiceFactory;
+import com.epam.dlab.backendapi.client.rest.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 
