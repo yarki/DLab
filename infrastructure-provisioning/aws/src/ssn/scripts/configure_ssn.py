@@ -20,6 +20,7 @@ def id_generator(size=10, chars=string.digits + string.ascii_letters):
 
 def cp_key():
     key_name=args.keyfile.split("/")
+    sudo('mkdir /project_images; chown ubuntu:ubuntu /project_images')
     local('scp -r -q -i {0} {0} {1}:/project_images/{2}'.format(args.keyfile, env.host_string, key_name[-1]))
     sudo('chmod 600 /project_images/*.pem')
 

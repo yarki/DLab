@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by Alexey Suprun
  */
-public class LDAPUser {
+public class User {
     @JsonProperty
     private String firstName;
     @JsonProperty
@@ -15,10 +15,7 @@ public class LDAPUser {
     @JsonProperty
     private List<String> groups;
 
-    public LDAPUser() {
-    }
-
-    public LDAPUser(String firstName, String lastName, List<String> groups) {
+    public User(String firstName, String lastName, List<String> groups) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.groups = groups;

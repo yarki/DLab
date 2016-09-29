@@ -1,6 +1,9 @@
 package com.epam.dlab.backendapi.core.guice;
 
 import com.epam.dlab.backendapi.api.ImageMetadata;
+import com.epam.dlab.backendapi.api.User;
+import com.epam.dlab.backendapi.client.mongo.MongoService;
+import com.epam.dlab.backendapi.client.rest.ProvisioningAPI;
 import com.epam.dlab.backendapi.api.LDAPUser;
 import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
@@ -13,6 +16,7 @@ import com.mongodb.client.MongoCollection;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SECURITY_SERVICE;
@@ -42,7 +46,7 @@ public class MockModule extends AbstractModule implements SecurityAPI, DockerAPI
 
     private RESTService createSecurityService() {
         RESTService result = mock(RESTService.class);
-        when(result.post(eq(LOGIN), any(), any())).thenReturn(new LDAPUser("Test", "Testov", Collections.singletonList("test")));
+        when(result.post(eq(LOGIN), any(), any())).thenReturn(Optional.of(new User("Test", "Testov", Collections.singletonList("test"))));
         return result;
     }
 
