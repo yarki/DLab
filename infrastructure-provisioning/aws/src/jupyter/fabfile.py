@@ -45,8 +45,8 @@ def run(nb_config):
 
     logging.info('[CREATE SECURITY GROUPS]')
     print '[CREATE SECURITY GROUPS]'
-    params = "--name %s --subnet %s --security_group_rules %s --infra_tag_name %s --infra_tag_value %s" % \
-             (nb_config['security_group_name'], nb_config['subnet'], nb_config['security_group_rules'],
+    params = "--name %s --vpc_id %s --security_group_rules %s --infra_tag_name %s --infra_tag_value %s" % \
+             (nb_config['security_group_name'], nb_config['vpc_id'], nb_config['security_group_rules'],
               os.environ['conf_service_base_name'], nb_config['instance_name'])
     run_routine('create_security_group', params)
 

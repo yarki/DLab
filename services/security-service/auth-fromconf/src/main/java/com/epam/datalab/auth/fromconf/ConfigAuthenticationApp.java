@@ -48,12 +48,13 @@ public class ConfigAuthenticationApp extends Application<DataLabAuthenticationCo
 	@Override
 	public void initialize(Bootstrap<DataLabAuthenticationConfig> bootstrap) {
 		bootstrap.addBundle(new ViewBundle<DataLabAuthenticationConfig>());
+		//bootstrap.addBundle(new AssetsBundle("/"));
 	}
 
 	@Override
 	public void run(DataLabAuthenticationConfig conf, Environment env) throws Exception {
-		env.jersey().register( new LoginService(conf) );
 		env.jersey().register( new ConfigAuthenticationService(conf) );
+		env.jersey().register( new LoginService(conf) );
 	}
 
 }

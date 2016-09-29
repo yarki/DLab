@@ -42,6 +42,8 @@ if __name__ == "__main__":
             dry_run = True
     except:
         pass
+    with hide('running'):
+        local('chmod 600 /root/keys/*.pem')
 
     if dry_run:
         with open("/response/%s.json" % request_id, 'w') as response_file:

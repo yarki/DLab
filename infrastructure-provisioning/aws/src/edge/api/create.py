@@ -5,14 +5,12 @@ from fabric.api import local
 
 
 if __name__ == "__main__":
-    log = local('cd /root; fab run')
+    local('cd /root; fab run')
 
     reply = dict()
     reply['request_id'] = os.environ['request_id']
     reply['status'] = 'ok'
 
-    if len(log.stderr) > 0:
-        reply['status'] = 'fail'
     reply['response'] = dict()
 
     try:

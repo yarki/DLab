@@ -18,6 +18,12 @@ def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
+def cp_key():
+    key_name=args.keyfile.split("/")
+    local('scp -r -q -i {0} {0} {1}:/project_images/{2}'.format(args.keyfile, env.host_string, key_name[-1]))
+    sudo('chmod 600 /project_images/*.pem')
+
+
 def ensure_nginx():
     if not exists('/tmp/nginx_ensured'):
         sudo('apt-get -y install nginx')
@@ -82,12 +88,14 @@ def configure_jenkins():
         sudo('echo \'JENKINS_ARGS="--prefix=/jenkins"\' >> /etc/default/jenkins')
         sudo('rm -rf /var/lib/jenkins/*')
         sudo('mkdir -p /var/lib/jenkins/jobs/')
-        sudo('chown -R ubuntu /var/lib/jenkins/jobs/')
-        put('/usr/share/notebook_automation/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
-        sudo('chown -R jenkins:jenkins /var/lib/jenkins/jobs')
+        sudo('chown -R ubuntu:ubuntu /var/lib/jenkins/')
+        put('/root/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
+        #local('scp -r -q -i {} /root/templates/jenkins_jobs/* {}:/var/lib/jenkins/jobs/'.format(args.keyfile, env.host_string))
+        sudo('chown -R jenkins:jenkins /var/lib/jenkins')
         with settings(warn_only=True):
-            sudo('/etc/init.d/jenkins start; sleep 5; /etc/init.d/jenkins restart; sleep 10')
+            sudo('/etc/init.d/jenkins stop; sleep 5')
             sudo('sysv-rc-conf jenkins on')
+            sudo('service jenkins start')
         sudo('touch /tmp/jenkins_configured')
 
 
@@ -137,5 +145,8 @@ if __name__ == "__main__":
     print "Configuring jenkins."
     configure_jenkins()
 
-    print "Uploading notebook creation and configuration core."
-    place_notebook_automation_scripts()
+    print "Copying key"
+    cp_key()
+
+    # print "Uploading notebook creation and configuration core."
+    # place_notebook_automation_scripts()

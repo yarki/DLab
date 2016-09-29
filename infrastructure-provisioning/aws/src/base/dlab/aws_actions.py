@@ -31,11 +31,8 @@ def create_subnet(vpc_id, subnet, tag):
     return subnet.id
 
 
-def create_security_group(security_group_name, subnet_cidr, security_group_rules, tag):
+def create_security_group(security_group_name, vpc_id, security_group_rules, tag):
     ec2 = boto3.resource('ec2')
-    vpc_id = ''
-    for subnet in ec2.subnets.filter(Filters=[{'Name': 'cidrBlock', 'Values': [subnet_cidr]}]):
-        vpc_id = subnet.vpc_id
     group = ec2.create_security_group(GroupName=security_group_name, Description='security_group_name', VpcId=vpc_id)
     time.sleep(10)
     group.create_tags(Tags=[tag])
@@ -78,6 +75,7 @@ def create_iam_role(role_name, role_profile):
     conn.create_role(role_name)
     conn.create_instance_profile(role_profile)
     conn.add_role_to_instance_profile(role_profile, role_name)
+    time.sleep(10)
 
 
 def attach_policy(policy_arn, role_name):

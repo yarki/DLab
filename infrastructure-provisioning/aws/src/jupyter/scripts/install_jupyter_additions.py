@@ -82,16 +82,17 @@ def configure_scala_wisp():
 def ensure_libraries_py2():
     if not exists('/tmp/ensure_libraries_py2_installed'):
         sudo('export LC_ALL=C')
-        sudo('pip install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
+        sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
         sudo('touch /tmp/ensure_libraries_py2_installed')
 
 
 def ensure_libraries_py3():
     if not exists('/tmp/ensure_libraries_py3_installed'):
         sudo('apt-get install python3-setuptools')
-        sudo('easy_install3 pip')
+        # sudo('easy_install3 pip')
+        sudo('apt install -y python3-pip')
         sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
-    sudo('touch /tmp/ensure_libraries_py3_installed')
+        sudo('touch /tmp/ensure_libraries_py3_installed')
 
 ##############
 # Run script #

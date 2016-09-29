@@ -30,6 +30,11 @@ public class UserInfo implements Principal {
 	private final String accessToken;
 	private final Set<String> roles = new HashSet<>();
 	
+	@JsonProperty
+	private String firstName;
+	@JsonProperty
+	private String lastName;
+	
 	@JsonCreator
 	public UserInfo( @JsonProperty("username") String username,@JsonProperty("access_token") String accessToken ) {
 		this.username    = username;
@@ -61,9 +66,29 @@ public class UserInfo implements Principal {
 		roles.add(role);
 	}
 
-	@Override
-	public String toString() {
-		return "UserInfo [username=" + username + ", accessToken=" + accessToken + ", roles=" + roles + "]";
+	
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public UserInfo withToken(String token) {
+		UserInfo newInfo = new UserInfo(username,token);
+		roles.forEach(role->newInfo.addRole(role));
+		newInfo.firstName = this.firstName;
+		newInfo.lastName  = this.lastName;
+		return newInfo;
 	}
 
 	@Override
@@ -71,6 +96,8 @@ public class UserInfo implements Principal {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((accessToken == null) ? 0 : accessToken.hashCode());
+		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
+		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
 		result = prime * result + ((roles == null) ? 0 : roles.hashCode());
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
@@ -90,6 +117,16 @@ public class UserInfo implements Principal {
 				return false;
 		} else if (!accessToken.equals(other.accessToken))
 			return false;
+		if (firstName == null) {
+			if (other.firstName != null)
+				return false;
+		} else if (!firstName.equals(other.firstName))
+			return false;
+		if (lastName == null) {
+			if (other.lastName != null)
+				return false;
+		} else if (!lastName.equals(other.lastName))
+			return false;
 		if (roles == null) {
 			if (other.roles != null)
 				return false;
@@ -103,10 +140,11 @@ public class UserInfo implements Principal {
 		return true;
 	}
 
-	public UserInfo withToken(String token) {
-		UserInfo newInfo = new UserInfo(username,token);
-		roles.forEach(role->newInfo.addRole(role));
-		return newInfo;
+	@Override
+	public String toString() {
+		return "UserInfo [username=" + username + ", firstName=" + firstName + ", lastName=" + lastName + ", roles="
+				+ roles + ", accessToken=" + accessToken + "]";
 	}
+	
 	
 }
