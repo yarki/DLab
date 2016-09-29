@@ -82,14 +82,16 @@ def configure_nginx(config, instnace_name):
     backend_hostname = config['backend_hostname']
     backend_port = config['backend_port']
     notebook_uri = "_".join(instnace_name.split())
+    with open(template_file, 'r') as tpl:
+        contents = tpl.read()
+    contents = contents.replace('BACKEND_HOSTNAME', backend_hostname)
+    contents = contents.replace('BACKEND_PORT', backend_port)
+    contents = contents.replace('NOTEBOOK', notebook_uri)
+
     with open("/tmp/%s-proxy_location_notebook_template.conf" % random_file_part, 'w') as out:
-        with open(template_file) as tpl:
-            for line in tpl:
-                out.write(line.replace('BACKEND_HOSTNAME', backend_hostname)
-                          .replace('BACKEND_PORT', backend_port).replace('NOTEBOOK', notebook_uri))
-            put("/tmp/%s-proxy_location_notebook_template.conf" % random_file_part,
-                '/tmp/proxy_location_notebook_' + "".join(instnace_name.split()) + '.conf')
-            sudo('\cp /tmp/proxy_location_notebook_' + "".join(instnace_name.split()) + '.conf /etc/nginx/locations/')
+        out.write(contents)
+    put("/tmp/%s-proxy_location_notebook_template.conf" % random_file_part, '/tmp/proxy_location_notebook_' + "".join(instnace_name.split()) + '.conf')
+    sudo('\cp /tmp/proxy_location_notebook_' + "".join(instnace_name.split()) + '.conf /etc/nginx/locations/')
     sudo('service nginx restart')
 
 
