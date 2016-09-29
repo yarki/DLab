@@ -75,6 +75,7 @@ def create_iam_role(role_name, role_profile):
     conn.create_role(role_name)
     conn.create_instance_profile(role_profile)
     conn.add_role_to_instance_profile(role_profile, role_name)
+    time.sleep(10)
 
 
 def attach_policy(policy_arn, role_name):
