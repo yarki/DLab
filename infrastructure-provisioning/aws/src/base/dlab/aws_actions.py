@@ -28,7 +28,6 @@ def create_subnet(vpc_id, subnet, tag):
     ec2 = boto3.resource('ec2')
     subnet = ec2.create_subnet(VpcId=vpc_id, CidrBlock=subnet)
     subnet.create_tags(Tags=[tag])
-    subnet.map_public_ip_on_launch = False
     subnet.reload()
     return subnet.id
 
