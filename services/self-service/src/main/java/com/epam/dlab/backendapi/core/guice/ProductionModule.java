@@ -1,14 +1,20 @@
 package com.epam.dlab.backendapi.core.guice;
 
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.epam.dlab.backendapi.client.rest.RESTService;
+import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
+
+import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Environment;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SECURITY_SERVICE;
+
+import javax.ws.rs.client.Client;
+
+import com.epam.dlab.auth.core.AuthenticationServiceConfig;
 
 /**
  * Created by Alexey Suprun
@@ -29,5 +35,8 @@ public class ProductionModule extends AbstractModule {
                 .toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE));
         bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
                 .toInstance(configuration.getProvisioningFactory().build(environment, PROVISIONING_SERVICE));
+        bind(AuthenticationServiceConfig.class).toInstance(configuration.getAuthenticationServiceConfiguration());
+        bind(Client.class).toInstance(new JerseyClientBuilder(environment).using(configuration.getJerseyClientConfiguration())
+                .build("self-service"));
     }
 }
