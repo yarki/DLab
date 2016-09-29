@@ -1,29 +1,38 @@
 package com.epam.dlab.backendapi.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.bson.Document;
 
-import java.util.Date;
+import javax.security.auth.Subject;
+import java.security.Principal;
+import java.util.List;
 
 /**
  * Created by Alexey Suprun
  */
-public class User {
+public class User implements Principal {
     @JsonProperty
-    private String login;
+    private String firstName;
     @JsonProperty
-    private String password;
-    private Date date = new Date();
+    private String lastName;
+    @JsonProperty
+    private List<String> groups;
 
-    public User(String login, String password) {
-        this.login = login;
-        this.password = password;
+    public User() {
     }
 
-    @JsonIgnore
-    public Document getDocument() {
-        return new Document("login", login)
-                .append("timestamp", date);
+    public User(String firstName, String lastName, List<String> groups) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.groups = groups;
+    }
+
+    @Override
+    public String getName() {
+        return firstName;
+    }
+
+    @Override
+    public boolean implies(Subject subject) {
+        return false;
     }
 }

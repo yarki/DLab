@@ -1,11 +1,11 @@
 package com.epam.dlab.backendapi.core.guice;
 
 import com.epam.dlab.backendapi.api.ImageMetadata;
-import com.epam.dlab.backendapi.api.LDAPUser;
+import com.epam.dlab.backendapi.api.User;
+import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.epam.dlab.backendapi.client.rest.ProvisioningAPI;
 import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.client.rest.SecurityAPI;
-import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import com.mongodb.client.MongoCollection;
@@ -16,9 +16,7 @@ import java.util.HashSet;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SECURITY_SERVICE;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +42,7 @@ public class MockModule extends AbstractModule implements SecurityAPI, Provision
 
     private RESTService createSecurityService() {
         RESTService result = mock(RESTService.class);
-        when(result.post(eq(LOGIN), any(), any())).thenReturn(new LDAPUser("Test", "Testov", Collections.singletonList("test")));
+        when(result.post(eq(LOGIN), any(), any())).thenReturn(new User("Test", "Testov", Collections.singletonList("test")));
         return result;
     }
 
