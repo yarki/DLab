@@ -85,7 +85,7 @@ def run(nb_config):
     additional_config = {"frontend_hostname": ssn_instance_hostname,
                          "backend_hostname": get_instance_hostname(nb_config['instance_name']),
                          "backend_port": "8888",
-                         "nginx_template_dir": "/usr/share/notebook_automation/templates/"}
+                         "nginx_template_dir": "/root/templates/"}
     params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" %  \
              (instance_hostname, nb_config['instance_name'], keyfile_name, json.dumps(additional_config))
     run_routine('configure_jupyter_node', params)
