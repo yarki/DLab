@@ -33,7 +33,7 @@ public class SelfServiceAuthenticator implements Authenticator<BasicCredentials,
     @Override
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
         LOGGER.debug("Try login user = {}", credentials.getUsername());
-        dao.loginAttempt(credentials);
+        dao.writeLoginAttempt(credentials);
         return securityService.post(LOGIN, credentials, Optional.class);
     }
 }

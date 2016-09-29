@@ -6,10 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
 /**
  * Created by Alexey Suprun
@@ -23,10 +24,10 @@ public class KeyLoaderResource {
     @Inject
     private KeyLoader keyLoader;
 
-    @GET
-    public String loadKey() {
+    @POST
+    public String loadKey(String content) throws IOException {
         LOGGER.debug("load key");
-        keyLoader.loadKey();
+        keyLoader.uploadKey(content);
         return "200 OK";
     }
 }

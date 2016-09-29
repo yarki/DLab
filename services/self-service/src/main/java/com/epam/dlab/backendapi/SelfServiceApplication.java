@@ -5,8 +5,7 @@ import com.epam.dlab.backendapi.auth.SelfServiceAuthenticator;
 import com.epam.dlab.backendapi.auth.SelfServiceAuthorizer;
 import com.epam.dlab.backendapi.core.guice.ModuleFactory;
 import com.epam.dlab.backendapi.resources.DockerResource;
-import com.epam.dlab.backendapi.resources.KeyLoaderResource;
-import com.epam.dlab.backendapi.resources.LoginResource;
+import com.epam.dlab.backendapi.resources.KeyUploaderResource;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
@@ -15,6 +14,7 @@ import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 /**
  * Created by Alexey Suprun
@@ -34,8 +34,9 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
     public void run(SelfServiceApplicationConfiguration configuration, Environment environment) throws Exception {
         Injector injector = Guice.createInjector(ModuleFactory.getModule(configuration, environment));
         environment.jersey().register(createAuth(injector));
+        environment.jersey().register(MultiPartFeature.class);
         environment.jersey().register(injector.getInstance(DockerResource.class));
-        environment.jersey().register(injector.getInstance(KeyLoaderResource.class));
+        environment.jersey().register(injector.getInstance(KeyUploaderResource.class));
     }
 
     private AuthDynamicFeature createAuth(Injector injector) {
