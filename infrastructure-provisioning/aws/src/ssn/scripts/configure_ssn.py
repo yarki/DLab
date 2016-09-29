@@ -18,6 +18,11 @@ def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
+def cp_key():
+    local('scp -r -q -i {0} {0} {1}:/project_images/'.format(args.keyfile, env.host_string))
+    sudo('chmod 600 {/project_images/*.pem}')
+
+
 def ensure_nginx():
     if not exists('/tmp/nginx_ensured'):
         sudo('apt-get -y install nginx')
