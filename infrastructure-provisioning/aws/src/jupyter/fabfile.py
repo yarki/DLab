@@ -140,10 +140,10 @@ if __name__ == "__main__":
 
     if ami_id == '' and os.path.isfile("/tmp/" + notebook_instance_name + "passwd.file"):
         print "Looks like it's first time we configure notebook server. Creating image."
-        image_id = create_image_from_instance(instance_name=notebook_instance_name,
-                                              image_name=expected_ami_name)
-        if image_id != '':
-            print "Image succesfully created. It's ID is " + image_id
+        # image_id = create_image_from_instance(instance_name=notebook_instance_name,
+                                              # image_name=expected_ami_name)
+        # if image_id != '':
+            # print "Image succesfully created. It's ID is " + image_id
 
     with open("/tmp/" + notebook_instance_name + "passwd.file") as f:
         ip_address = get_instance_ip_address(notebook_instance_name)
