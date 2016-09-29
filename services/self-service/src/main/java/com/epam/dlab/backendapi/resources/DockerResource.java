@@ -36,7 +36,6 @@ public class DockerResource implements MongoCollections, ProvisioningAPI {
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
-    @RolesAllowed("ADMIN")
     @GET
     public Set<ImageMetadata> getDockerImages(@Auth User user) {
         LOGGER.debug("docker statuses asked");

@@ -1,8 +1,8 @@
 package com.epam.dlab.backendapi.auth;
 
 import com.epam.dlab.backendapi.api.User;
-import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.epam.dlab.backendapi.client.rest.RESTService;
+import com.epam.dlab.backendapi.dao.LoginDAO;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.resources.DockerResource;
 import com.google.inject.Inject;
@@ -25,7 +25,7 @@ public class SelfServiceAuthenticator implements Authenticator<BasicCredentials,
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerResource.class);
 
     @Inject
-    private MongoService mongoService;
+    private LoginDAO dao;
     @Inject
     @Named(SECURITY_SERVICE)
     private RESTService securityService;
@@ -33,7 +33,7 @@ public class SelfServiceAuthenticator implements Authenticator<BasicCredentials,
     @Override
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
         LOGGER.debug("Try login user = {}", credentials.getUsername());
-//        mongoService.getCollection(LOGIN_ATTEMPT).insertOne(credentials);
+        dao.loginAttempt(credentials);
         return securityService.post(LOGIN, credentials, Optional.class);
     }
 }
