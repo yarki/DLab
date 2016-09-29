@@ -4,6 +4,7 @@ import random
 import string
 import yaml
 import subprocess
+import time
 
 path = "/etc/mongod.conf"
 outfile = "/etc/mongo_params.yml"
@@ -51,6 +52,9 @@ if __name__ == "__main__":
     client = MongoClient(mongo_ip + ':' + str(mongo_port))
     pass_upd = True
     try:
+        command = ['service', 'mongod', 'start']
+        subprocess.call(command, shell=False)
+        time.sleep(5)
         client.testdb.add_user('admin', mongo_passwd, roles=[{'role':'userAdminAnyDatabase','db':'admin'}])
         if add_2_yml_config(path,'security','authorization','enabled'):
             command = ['service', 'mongod', 'restart']
