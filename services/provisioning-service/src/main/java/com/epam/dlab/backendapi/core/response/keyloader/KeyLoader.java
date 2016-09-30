@@ -10,6 +10,7 @@ import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.FolderListener;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
@@ -55,11 +56,11 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     }
 
     private FileHandler getResultHandler(final String user, final String uuid) {
-        return (fileName, bytes) -> {
+        return (fileName, content) -> {
             LOGGER.debug("get file {}", fileName);
             if (uuid.equals(DockerCommands.extractUUID(fileName))) {
-                JsonNode node = MAPPER.readTree(bytes).get(RESPONSE_NODE).get(RESULT_NODE);
-                UserAWSCredential result = MAPPER.readValue(node.asText(), UserAWSCredential.class);
+                JsonNode node = MAPPER.readTree(content).get(RESPONSE_NODE).get(RESULT_NODE);
+                UserAWSCredential result = MAPPER.readValue(node.toString(), UserAWSCredential.class);
                 result.setUser(user);
                 selfService.post(KEY_LOADER, result, UserAWSCredential.class);
             }

@@ -6,6 +6,7 @@ import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.FolderListener;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.dropwizard.lifecycle.Managed;
@@ -48,11 +49,11 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     }
 
     FileHandler getMetadataHandler() {
-        return (fileName, bytes) -> {
+        return (fileName, content) -> {
             String uuid = DockerCommands.extractUUID(fileName);
             if (uuids.containsKey(uuid)) {
                 LOGGER.debug("hadle file {}", fileName);
-                ImageMetadata metadata = MAPPER.readValue(bytes, ImageMetadata.class);
+                ImageMetadata metadata = MAPPER.readValue(content, ImageMetadata.class);
                 metadata.setImage(uuids.get(uuid));
                 metadatas.add(metadata);
             }

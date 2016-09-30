@@ -51,7 +51,7 @@ public class FolderListener {
         }
     }
 
-    private byte[] readBytes(String fileName) throws IOException {
+    private byte[] readBytes(String fileName) throws IOException, InterruptedException {
         return Files.readAllBytes(Paths.get(directory, fileName));
     }
 }
