@@ -3,9 +3,13 @@ import time
 
 
 def put_to_bucket(bucket_name, local_file, destination_file):
-    s3 = boto3.client('s3')
-    with open(local_file, 'rb') as data:
-        s3.upload_fileobj(data, bucket_name, destination_file)
+    try:
+        s3 = boto3.client('s3')
+        with open(local_file, 'rb') as data:
+            s3.upload_fileobj(data, bucket_name, destination_file)
+        return True
+    except:
+        return False
 
 
 def create_s3_bucket(bucket_name, tag):

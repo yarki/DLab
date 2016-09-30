@@ -3,6 +3,7 @@ import argparse
 import json
 from dlab.aws_actions import *
 from dlab.aws_meta import *
+import sys
 
 
 parser = argparse.ArgumentParser()
@@ -22,15 +23,20 @@ args = parser.parse_args()
 if __name__ == "__main__":
     instance_tag = {"Key": args.infra_tag_name, "Value": args.infra_tag_value}
     if args.node_name != '':
-        instance_id = get_instance_by_name(args.node_name)
-        if instance_id == '':
-            print "Creating instance %s of type %s in subnet %s with tag %s." % \
+        try:
+            instance_id = get_instance_by_name(args.node_name)
+            if instance_id == '':
+                print "Creating instance %s of type %s in subnet %s with tag %s." % \
                       (args.node_name, args.instance_type, args.subnet_id, json.dumps(instance_tag))
-            instance_id = create_instance(args, instance_tag)
-        else:
-            print "REQUESTED INSTANCE ALREADY EXISTS AND RUNNING"
-        print "Instance_id " + instance_id
-        print "Public_hostname " + get_instance_attr(instance_id, 'public_dns_name')
-        print "Private_hostname " + get_instance_attr(instance_id, 'private_dns_name')
+                instance_id = create_instance(args, instance_tag)
+            else:
+                print "REQUESTED INSTANCE ALREADY EXISTS AND RUNNING"
+            print "Instance_id " + instance_id
+            print "Public_hostname " + get_instance_attr(instance_id, 'public_dns_name')
+            print "Private_hostname " + get_instance_attr(instance_id, 'private_dns_name')
+            sys.exit(0)
+        except:
+            sys.exit(1)
     else:
         parser.print_help()
+        sys.exit(2)

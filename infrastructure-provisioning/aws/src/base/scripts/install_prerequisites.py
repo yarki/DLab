@@ -3,6 +3,7 @@ from fabric.api import *
 import argparse
 import json
 from dlab.fab import *
+import sys
 
 
 parser = argparse.ArgumentParser()
@@ -22,7 +23,12 @@ if __name__ == "__main__":
     deeper_config = json.loads(args.additional_config)
 
     print "Updating repositories and installing requested tools: " + args.apt_packages
-    ensure_apt(args.apt_packages)
+    if not ensure_apt(args.apt_packages):
+        sys.exit(1)
 
     print "Installing python packages: " + args.pip_packages
-    ensure_pip(args.pip_packages)
+    if not ensure_pip(args.pip_packages):
+        sys.exit(1)
+
+    sys.exit(0)
+

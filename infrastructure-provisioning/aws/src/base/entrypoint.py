@@ -36,12 +36,17 @@ if __name__ == "__main__":
     except:
         os.environ['request_id'] = 'generic'
 
+    print "[FULL DOCKER CONFIGURATION OPTIONS]"
+    for item in os.environ:
+        print "%s  =  %s\n" % (item, os.environ[item])
+
     dry_run = False
     try:
         if os.environ['dry_run'] == 'true':
             dry_run = True
     except:
         pass
+
     with hide('running'):
         local('chmod 600 /root/keys/*.pem')
 

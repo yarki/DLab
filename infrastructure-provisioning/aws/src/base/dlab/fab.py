@@ -5,28 +5,41 @@ import os
 
 
 def ensure_apt(requisites):
-    if not exists('/tmp/apt_upgraded'):
-        sudo('apt-get update')
-        sudo('apt-get -y upgrade')
-        sudo('touch /tmp/apt_upgraded')
-    sudo('apt-get -y install ' + requisites)
+    try:
+        if not exists('/tmp/apt_upgraded'):
+            sudo('apt-get update')
+            sudo('apt-get -y upgrade')
+            sudo('touch /tmp/apt_upgraded')
+        sudo('apt-get -y install ' + requisites)
+        return True
+    except:
+        return False
 
 
 def ensure_pip(requisites):
-    if not exists('/tmp/pip_path_added'):
-        sudo('echo PATH=$PATH:/usr/local/bin/:/opt/spark/bin/ >> /etc/profile')
-        sudo('echo export PATH >> /etc/profile')
-        sudo('touch /tmp/pip_path_added')
-    sudo('pip install -U ' + requisites)
+    try:
+        if not exists('/tmp/pip_path_added'):
+            sudo('echo PATH=$PATH:/usr/local/bin/:/opt/spark/bin/ >> /etc/profile')
+            sudo('echo export PATH >> /etc/profile')
+            sudo('touch /tmp/pip_path_added')
+        sudo('pip install -U ' + requisites)
+        return True
+    except:
+        return False
 
 
 def run_routine(routine_name, params):
-    logging.info("~/scripts/%s.py %s" % (routine_name, params))
-    shell_out = local("~/scripts/%s.py %s" % (routine_name, params))
-    print shell_out
-    logging.info(shell_out)
-    print shell_out.stderr
-    logging.error(shell_out.stderr)
+    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filepath = "/response/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG,
+                        filename=local_log_filepath)
+    try:
+        logging.info("~/scripts/%s.py %s" % (routine_name, params))
+        local("~/scripts/%s.py %s" % (routine_name, params))
+        return True
+    except:
+        return False
 
 
 def create_aws_config_files(generate_full_config=False):

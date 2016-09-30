@@ -2,6 +2,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
+import sys
 
 
 def run():
@@ -46,16 +47,28 @@ def run():
     params = "--vpc_id '%s' --subnet '%s' --region %s --infra_tag_name %s --infra_tag_value %s" % \
              (edge_conf['vpc_id'], edge_conf['private_subnet_cidr'], edge_conf['region'],
               edge_conf['instance_name'], edge_conf['instance_name'])
-    run_routine('create_subnet', params)
+    if not run_routine('create_subnet', params):
+        logging.info('Failed creating subnet')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed to create subnet", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
 
     logging.info('[CREATE ROLES]')
     print '[CREATE ROLES]'
     params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
              (edge_conf['role_name'], edge_conf['role_profile_name'],
               edge_conf['policy_name'], edge_conf['policy_arn'])
-    run_routine('create_role_policy', params)
+    if not run_routine('create_role_policy', params):
+        logging.info('Failed creating roles')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed to creating roles", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
 
-    logging.info('[CREATE SECURITY GROUP FOR EDGE]')
+    logging.info('[CREATE SECURITY GROUP FOR EDGE NODE]')
     print '[CREATE SECURITY GROUPS FOR EDGE]'
     sg_rules_template = [
         {
@@ -73,9 +86,15 @@ def run():
     params = "--name %s --vpc_id %s --security_group_rules '%s' --infra_tag_name %s --infra_tag_value %s" % \
              (edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),
               edge_conf['service_base_name'], edge_conf['instance_name'])
-    run_routine('create_security_group', params)
+    if not run_routine('create_security_group', params):
+        logging.info('Failed creating security group for edge node')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed creating security group for edge node", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
 
-    logging.info('[CREATE SECURITY GROUP FOR EDGE]')
+    logging.info('[CREATE SECURITY GROUP FOR PRIVATE SUBNET]')
     print '[CREATE SECURITY GROUPS FOR EDGE]'
     edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
     ingress_sg_rules_template = [{"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}]
@@ -84,7 +103,13 @@ def run():
              (edge_conf['isolated_security_group_name'], edge_conf['vpc_id'],
               json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template),
               edge_conf['service_base_name'], edge_conf['instance_name'])
-    run_routine('create_security_group', params)
+    if not run_routine('create_security_group', params):
+        logging.info('Failed creating security group for private subnet')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed creating security group for private subnet", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
 
     with hide('stderr', 'running', 'warnings'):
         local("echo Waitning for changes to propagate; sleep 10")
@@ -93,7 +118,13 @@ def run():
     print('[CREATE BUCKETS]')
     params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \
              (edge_conf['bucket_name'], edge_conf['service_base_name'], edge_conf['instance_name'] + "bucket")
-    run_routine('create_bucket', params)
+    if not run_routine('create_bucket', params):
+        logging.info('Failed creating bucket')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed to create bucket", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
 
     logging.info('[CREATE EDGE INSTANCE]')
     print '[CREATE EDGE INSTANCE]'
@@ -102,7 +133,13 @@ def run():
              (edge_conf['instance_name'], edge_conf['ami_id'], edge_conf['instance_size'], edge_conf['key_name'],
               edge_group_id, edge_conf['public_subnet_id'], edge_conf['role_profile_name'],
               edge_conf['service_base_name'], edge_conf['instance_name'])
-    run_routine('create_instance', params)
+    if not run_routine('create_instance', params):
+        logging.info('Failed creating instance')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed to create instance", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
 
     instance_hostname = get_instance_hostname(edge_conf['instance_name'])
     ip_address = get_instance_ip_address(edge_conf['instance_name'])
@@ -111,7 +148,13 @@ def run():
     print '[INSTALLING PREREQUISITES]'
     logging.info('[INSTALLING PREREQUISITES]')
     params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
-    run_routine('install_prerequisites', params)
+    if not run_routine('install_prerequisites', params):
+        logging.info('Failed installing apps: apt & pip')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed installing apps: apt & pip", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
 
     print '[INSTALLING HTTP PROXY]'
     logging.info('[INSTALLING HTTP PROXY]')
@@ -119,7 +162,13 @@ def run():
                          "template_file": "/root/templates/squid.conf"}
     params = "--hostname %s --keyfile %s --additional_config '%s'" % \
              (instance_hostname, keyfile_name, json.dumps(additional_config))
-    run_routine('configure_http_proxy', params)
+    if not run_routine('configure_http_proxy', params):
+        logging.info('Failed installing http proxy')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed installing http proxy", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
 
     print '[INSTALLING SOCKS PROXY]'
     logging.info('[INSTALLING SOCKS PROXY]')
@@ -127,7 +176,13 @@ def run():
                          "template_file": "/root/templates/danted.conf"}
     params = "--hostname %s --keyfile %s --additional_config '%s'" % \
              (instance_hostname, keyfile_name, json.dumps(additional_config))
-    run_routine('configure_socks_proxy', params)
+    if not run_routine('configure_socks_proxy', params):
+        logging.info('Failed installing socks proxy')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed installing socks proxy", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
 
     with open("/root/result.json", 'w') as result:
         res = {"hostname": instance_hostname,
@@ -140,3 +195,5 @@ def run():
                "edge_sg": edge_conf['edge_security_group_name']}
         print json.dumps(res)
         result.write(json.dumps(res))
+
+    sys.exit(0)

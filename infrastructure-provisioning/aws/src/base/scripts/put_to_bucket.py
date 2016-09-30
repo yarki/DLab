@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import argparse
 from dlab.aws_actions import *
-
+import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket_name', type=str, default='dsa-test-bucket')
@@ -11,4 +11,7 @@ args = parser.parse_args()
 
 
 if __name__ == "__main__":
-    put_to_bucket(args.bucket_name, args.local_file, args.destination_file)
+    if put_to_bucket(args.bucket_name, args.local_file, args.destination_file):
+        sys.exit(0)
+    else:
+        sys.exit(1)

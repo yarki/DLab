@@ -3,6 +3,7 @@ import argparse
 import json
 from dlab.aws_actions import *
 from dlab.aws_meta import *
+import sys
 
 
 parser = argparse.ArgumentParser()
@@ -15,12 +16,17 @@ args = parser.parse_args()
 if __name__ == "__main__":
     tag = {"Key": args.infra_tag_name, "Value": args.infra_tag_value}
     if args.bucket_name != '':
-        bucket = get_bucket_by_name(args.bucket_name)
-        if bucket == '':
-            print "Creating bucket %s with tag %s." % (args.bucket_name, json.dumps(tag))
-            bucket = create_s3_bucket(args.bucket_name, tag)
-        else:
-            print "REQUESTED BUCKET ALREADY EXISTS"
-        print "BUCKET_NAME " + bucket
+        try:
+            bucket = get_bucket_by_name(args.bucket_name)
+            if bucket == '':
+                print "Creating bucket %s with tag %s." % (args.bucket_name, json.dumps(tag))
+                bucket = create_s3_bucket(args.bucket_name, tag)
+            else:
+                print "REQUESTED BUCKET ALREADY EXISTS"
+            print "BUCKET_NAME " + bucket
+            sys.exit(0)
+        except:
+            sys.exit(1)
     else:
         parser.print_help()
+        sys.exit(2)
