@@ -23,6 +23,4 @@ public interface DockerCommands {
     static String extractUUID(String fileName) {
         return fileName.replace(JSON_EXTENTION, "");
     }
-
-
 }
