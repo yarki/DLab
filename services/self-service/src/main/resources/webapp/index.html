@@ -6,8 +6,9 @@
 </head>
 <body>
 <form action="/login" method="POST">
-    <p>login</p><input type="text" name="login"/><br>
+    <p>login</p><input type="text" name="username"/><br>
     <p>password</p><input type="password" name="password"/><br>
+    <input type="hidden" name="next" value="/afterlogin">
     <input type="submit"/>
 </form>
 </body>

@@ -28,17 +28,8 @@ def create_subnet(vpc_id, subnet, tag):
     ec2 = boto3.resource('ec2')
     subnet = ec2.create_subnet(VpcId=vpc_id, CidrBlock=subnet)
     subnet.create_tags(Tags=[tag])
+    subnet.reload()
     return subnet.id
-
-
-def create_security_group(security_group_name, vpc_id, security_group_rules, tag):
-    ec2 = boto3.resource('ec2')
-    group = ec2.create_security_group(GroupName=security_group_name, Description='security_group_name', VpcId=vpc_id)
-    time.sleep(10)
-    group.create_tags(Tags=[tag])
-    for rule in security_group_rules:
-        group.authorize_ingress(IpPermissions=[rule])
-    return group.id
 
 
 def create_instance(definitions, instance_tag):

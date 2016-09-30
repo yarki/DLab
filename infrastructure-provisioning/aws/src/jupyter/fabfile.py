@@ -85,7 +85,7 @@ def run(nb_config):
     additional_config = {"frontend_hostname": ssn_instance_hostname,
                          "backend_hostname": get_instance_hostname(nb_config['instance_name']),
                          "backend_port": "8888",
-                         "nginx_template_dir": "/usr/share/notebook_automation/templates/"}
+                         "nginx_template_dir": "/root/templates/"}
     params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" %  \
              (instance_hostname, nb_config['instance_name'], keyfile_name, json.dumps(additional_config))
     run_routine('configure_jupyter_node', params)
@@ -140,10 +140,10 @@ if __name__ == "__main__":
 
     if ami_id == '' and os.path.isfile("/tmp/" + notebook_instance_name + "passwd.file"):
         print "Looks like it's first time we configure notebook server. Creating image."
-        # image_id = create_image_from_instance(instance_name=notebook_instance_name,
-                                              # image_name=expected_ami_name)
-        # if image_id != '':
-            # print "Image succesfully created. It's ID is " + image_id
+        image_id = create_image_from_instance(instance_name=notebook_instance_name,
+                                              image_name=expected_ami_name)
+        if image_id != '':
+            print "Image succesfully created. It's ID is " + image_id
 
     with open("/tmp/" + notebook_instance_name + "passwd.file") as f:
         ip_address = get_instance_ip_address(notebook_instance_name)

@@ -98,6 +98,7 @@ def configure_jenkins():
             sudo('sysv-rc-conf jenkins on')
             sudo('service jenkins start')
         sudo('touch /tmp/jenkins_configured')
+        sudo('echo "jenkins ALL = NOPASSWD:ALL" >> /etc/sudoers')
 
 
 def configure_proxy_server(config):
