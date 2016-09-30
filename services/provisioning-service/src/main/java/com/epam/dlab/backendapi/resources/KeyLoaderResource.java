@@ -27,8 +27,7 @@ public class KeyLoaderResource {
 
     @POST
     public String loadKey(UploadFileDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("load key");
-        keyLoader.uploadKey(dto);
-        return "200 OK";
+        LOGGER.debug("load key for user {}", dto.getUser());
+        return keyLoader.uploadKey(dto);
     }
 }

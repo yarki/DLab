@@ -13,7 +13,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Created by Alexey Suprun
@@ -42,7 +41,7 @@ public class DockerResource implements DockerCommands {
     public String run(String image) throws IOException, InterruptedException {
         LOGGER.debug("run docker image {}", image);
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.execute(String.format(RUN_IMAGE, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid, image));
+        commandExecuter.executeAsync(String.format(RUN_IMAGE, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid, image));
         return uuid;
     }
 }

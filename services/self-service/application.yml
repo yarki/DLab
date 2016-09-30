@@ -20,8 +20,8 @@ provisioning-service:
   host: localhost
   port: 8084
   jerseyClient:
-    timeout: 1m
-    connectionTimeout: 1m
+    timeout: 3s
+    connectionTimeout: 3s
 
 server:
   applicationConnectors:

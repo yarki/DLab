@@ -1,6 +1,7 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.api.UploadFileDTO;
+import com.epam.dlab.backendapi.api.UserAWSCredential;
 import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.dao.KeyDAO;
@@ -11,8 +12,12 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,21 +45,22 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String post(@FormDataParam("name") String name,
+    public String post(@FormDataParam("name") String user,
                        @FormDataParam("file") InputStream uploadedInputStream,
                        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
         LOGGER.debug("upload key");
+        String content = "";
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {
-            String content = buffer.lines().collect(Collectors.joining("\n"));
-            dao.uploadKey(content);
-            provisioningService.post(KEY_LOADER, new UploadFileDTO(name, content), String.class);
+            content = buffer.lines().collect(Collectors.joining("\n"));
         }
-        return "200 OK";
+        dao.uploadKey(user, content);
+        return provisioningService.post(KEY_LOADER, new UploadFileDTO(user, content), String.class);
     }
 
     @POST
-    public String loadKeyResponse(String fileName) {
-        LOGGER.debug("key loaded, result file {}", fileName);
-        return "200 OK";
+    public Response loadKeyResponse(UserAWSCredential credential) {
+        LOGGER.debug("credential loaded for user {}", credential.getUser());
+        dao.saveCredential(credential);
+        return Response.ok().build();
     }
 }

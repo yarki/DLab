@@ -7,12 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class UploadFileDTO {
     @JsonProperty
-    private String name;
+    private String user;
     @JsonProperty
     private String content;
 
-    public String getName() {
-        return name;
+    public String getUser() {
+        return user;
     }
 
     public String getContent() {

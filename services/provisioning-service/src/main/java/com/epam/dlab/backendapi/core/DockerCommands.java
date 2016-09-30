@@ -1,5 +1,7 @@
 package com.epam.dlab.backendapi.core;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.UUID;
 
 /**
@@ -15,6 +17,7 @@ public interface DockerCommands {
             "-e \"edge_user_name=%s\" " +
             "%s --action create";
     String RUN_IMAGE = DOCKER_BASE + "-e \"dry_run=true\" %s --action run";
+    ObjectMapper MAPPER = new ObjectMapper();
 
     static String generateUUID() {
         return UUID.randomUUID().toString();

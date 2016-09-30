@@ -17,14 +17,8 @@ import java.util.List;
 public class CommandExecuter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecuter.class);
 
-    public List<String> execute(String command) throws IOException, InterruptedException {
-        return execute(command, false);
-    }
-
-    public List<String> execute(String command, boolean showOutput) throws IOException, InterruptedException {
-        LOGGER.debug("Execute command: {}", command);
-        Process process = Runtime.getRuntime().exec(createCommand(command));
-        process.waitFor();
+    public List<String> executeSync(String command) throws IOException {
+        Process process = execute(command);
         List<String> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             String line;
@@ -32,18 +26,27 @@ public class CommandExecuter {
                 result.add(line);
             }
         }
-        if (showOutput) {
-            logCommandExecute(result);
-        }
         return result;
+    }
+
+    public void executeAsync(final String command) {
+        new Thread(() -> execute(command)).start();
+    }
+
+    private Process execute(String command) {
+        Process process = null;
+        try {
+            LOGGER.debug("Execute command: {}", command);
+            process = Runtime.getRuntime().exec(createCommand(command));
+            process.waitFor();
+
+        } catch (Exception e) {
+            LOGGER.error("execute command:", e);
+        }
+        return process;
     }
 
     private String[] createCommand(String command) {
         return new String[]{"bash", "-c", command};
-    }
-
-    private void logCommandExecute(List<String> result) {
-        result.forEach(LOGGER::debug);
-        LOGGER.debug("-----------------------------");
     }
 }
