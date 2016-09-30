@@ -25,11 +25,11 @@ def run():
     edge_conf['ami_id'] = os.environ['edge_ami_id']
     edge_conf['instance_size'] = os.environ['edge_instance_size']
 
-    edge_conf['instance_name'] = edge_conf['service_base_name'] + '-' + os.environ['edge_user_name']
+    edge_conf['instance_name'] = edge_conf['service_base_name'] + '-edge-' + os.environ['edge_user_name']
     edge_conf['bucket_name'] = (edge_conf['instance_name'] + '-bucket').lower().replace('_', '-')
     edge_conf['role_name'] = edge_conf['instance_name'] + '-Role'
-    edge_conf['role_profile_name'] = edge_conf['instance_name'] + '-Role-Profile'
-    edge_conf['policy_name'] = edge_conf['instance_name'] + '-Role-Policy'
+    edge_conf['role_profile_name'] = edge_conf['instance_name'] + '-Profile'
+    edge_conf['policy_name'] = edge_conf['instance_name'] + '-Policy'
     edge_conf['edge_security_group_name'] = edge_conf['instance_name'] + '-SG'
     edge_conf['isolated_security_group_name'] = edge_conf['instance_name'] + '-isolated-SG'
     edge_conf['security_group_rules'] = [{"IpProtocol": "-1",
@@ -37,7 +37,8 @@ def run():
                                           "UserIdGroupPairs": [],
                                           "PrefixListIds": []}]
 
-    print "Will create exploratory environment with edge node as access point as following: " + json.dumps(edge_conf)
+    print "Will create exploratory environment with edge node as access point as following: " + \
+          json.dumps(edge_conf, sort_keys=True, indent=4, separators=(',', ': '))
     logging.info(json.dumps(edge_conf))
 
     logging.info('[CREATE SUBNET]')
