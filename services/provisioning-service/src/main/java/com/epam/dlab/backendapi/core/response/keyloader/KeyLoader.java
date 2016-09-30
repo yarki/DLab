@@ -40,7 +40,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         folderListener.start(configuration.getKeyLoaderDirectory(), configuration.getKeyLoaderPollTimeout(), getResultHandler(uuid));
         commandExecuter.execute(String.format(CREATE_EDGE_METADATA, configuration.getKeyDirectory(),
                 configuration.getKeyLoaderDirectory(), uuid, configuration.getAdminKey(),
-                dto.getName(), dto.getName(), configuration.getEdgeImage()));
+                dto.getName(), dto.getName(), configuration.getEdgeImage()), true);
     }
 
     private void saveKeyToFile(UploadFileDTO dto) throws IOException {

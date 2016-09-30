@@ -18,6 +18,11 @@ public class CommandExecuter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecuter.class);
 
     public List<String> execute(String command) throws IOException, InterruptedException {
+        return execute(command, false);
+    }
+
+    public List<String> execute(String command, boolean showOutput) throws IOException, InterruptedException {
+        LOGGER.debug("Execute command: {}", command);
         Process process = Runtime.getRuntime().exec(createCommand(command));
         process.waitFor();
         List<String> result = new ArrayList<>();
@@ -27,7 +32,9 @@ public class CommandExecuter {
                 result.add(line);
             }
         }
-        logCommandExecute(command, result);
+        if (showOutput) {
+            logCommandExecute(result);
+        }
         return result;
     }
 
@@ -35,8 +42,7 @@ public class CommandExecuter {
         return new String[]{"bash", "-c", command};
     }
 
-    private void logCommandExecute(String command, List<String> result) {
-        LOGGER.debug("Execute command: {}", command);
+    private void logCommandExecute(List<String> result) {
         result.forEach(LOGGER::debug);
         LOGGER.debug("-----------------------------");
     }
