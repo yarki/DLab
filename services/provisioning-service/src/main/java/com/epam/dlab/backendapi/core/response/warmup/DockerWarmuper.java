@@ -51,7 +51,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
 
     FileHandler getMetadataHandler() {
         return (fileName, bytes) -> {
-            String uuid = FolderListener.getUUID(fileName);
+            String uuid = DockerCommands.extractUUID(fileName);
             if (uuids.containsKey(uuid)) {
                 LOGGER.debug("hadle file {}", fileName);
                 ImageMetadata metadata = MAPPER.readValue(bytes, ImageMetadata.class);

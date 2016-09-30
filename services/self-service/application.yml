@@ -17,11 +17,11 @@ security-service:
 
 provisioning-service:
   protocol: http
-  host: savdocker.PETERSBURG.epam.com
+  host: localhost
   port: 8084
   jerseyClient:
-    timeout: 3s
-    connectionTimeout: 3s
+    timeout: 1m
+    connectionTimeout: 1m
 
 server:
   applicationConnectors:

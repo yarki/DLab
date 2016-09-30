@@ -30,6 +30,14 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     @JsonProperty
     private Duration keyLoaderPollTimeout = Duration.minutes(2);
 
+    @NotEmpty
+    @JsonProperty
+    private String adminKey;
+
+    @NotEmpty
+    @JsonProperty
+    private String edgeImage;
+
     @Valid
     @NotNull
     @JsonProperty(SELF_SERVICE)
@@ -47,6 +55,18 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
         return keyLoaderPollTimeout;
     }
 
+    public String getAdminKey() {
+        return adminKey;
+    }
+
+    public String getEdgeImage() {
+        return edgeImage;
+    }
+
+    public RESTServiceFactory getSelfFactory() {
+        return selfFactory;
+    }
+
     public String getWarmupDirectory() {
         return responseDirectory + WARMUP;
     }
@@ -59,7 +79,5 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
         return responseDirectory + KEY_LOADER;
     }
 
-    public RESTServiceFactory getSelfFactory() {
-        return selfFactory;
-    }
+
 }

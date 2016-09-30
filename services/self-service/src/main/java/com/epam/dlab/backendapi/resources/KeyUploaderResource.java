@@ -1,5 +1,6 @@
 package com.epam.dlab.backendapi.resources;
 
+import com.epam.dlab.backendapi.api.UploadFileDTO;
 import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.dao.KeyDAO;
@@ -10,10 +11,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,13 +40,14 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String post(@FormDataParam("file") InputStream uploadedInputStream,
+    public String post(@FormDataParam("name") String name,
+                       @FormDataParam("file") InputStream uploadedInputStream,
                        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
         LOGGER.debug("upload key");
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {
             String content = buffer.lines().collect(Collectors.joining("\n"));
             dao.uploadKey(content);
-            provisioningService.post(KEY_LOADER, content, String.class);
+            provisioningService.post(KEY_LOADER, new UploadFileDTO(name, content), String.class);
         }
         return "200 OK";
     }

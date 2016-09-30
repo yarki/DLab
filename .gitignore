@@ -1,3 +1,9 @@
+#idea stuff
 *.iml
 .idea
-**/target
+target
+
+#eclipse stuff
+.classpath
+.project
+.settings

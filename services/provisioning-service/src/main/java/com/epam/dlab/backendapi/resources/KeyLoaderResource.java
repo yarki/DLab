@@ -1,5 +1,6 @@
 package com.epam.dlab.backendapi.resources;
 
+import com.epam.dlab.backendapi.api.UploadFileDTO;
 import com.epam.dlab.backendapi.core.response.keyloader.KeyLoader;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
@@ -25,9 +26,9 @@ public class KeyLoaderResource {
     private KeyLoader keyLoader;
 
     @POST
-    public String loadKey(String content) throws IOException {
+    public String loadKey(UploadFileDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("load key");
-        keyLoader.uploadKey(content);
+        keyLoader.uploadKey(dto);
         return "200 OK";
     }
 }

@@ -1,5 +1,6 @@
 package com.epam.dlab.backendapi.core.response;
 
+import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
@@ -14,16 +15,11 @@ import java.util.concurrent.TimeUnit;
  * Created by Alexey Suprun
  */
 public class FolderListener {
-    private static final String JSON_EXTENTION = ".json";
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
 
     private String directory;
     private Duration timeout;
     private FileHandler fileHandler;
-
-    public static String getUUID(String fileName) {
-        return fileName.replace(JSON_EXTENTION, "");
-    }
 
     public void start(String directory, Duration timeout, FileHandler fileHandler) {
         this.directory = directory;
@@ -47,7 +43,7 @@ public class FolderListener {
             List<WatchEvent<?>> events = watckKey.pollEvents();
             for (WatchEvent event : events) {
                 String fileName = event.context().toString();
-                if (fileName.endsWith(JSON_EXTENTION)) {
+                if (fileName.endsWith(DockerCommands.JSON_EXTENTION)) {
                     fileHandler.handle(fileName, readBytes(fileName));
                 }
                 pollFile();

@@ -41,7 +41,7 @@ public class DockerResource implements DockerCommands {
     @POST
     public String run(String image) throws IOException, InterruptedException {
         LOGGER.debug("run docker image {}", image);
-        String uuid = UUID.randomUUID().toString();
+        String uuid = DockerCommands.generateUUID();
         commandExecuter.execute(String.format(RUN_IMAGE, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid, image));
         return uuid;
     }
