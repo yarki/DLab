@@ -8,6 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--bucket', type=str, default='')
 parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--dry_run', type=str, default='false')
+parser.add_argument('--emr_version', type=str, default='emr-4.8.0')
 args = parser.parse_args()
 
 emr_dir = '/opt/jars/'
@@ -18,7 +19,7 @@ def prepare():
     local('rm -rf /srv/*')
     local('mkdir -p ' + yarn_dir)
     local('mkdir -p ' + emr_dir)
-    result = os.path.exists(emr_dir + "emr-4.3.0/aws")
+    result = os.path.exists(emr_dir + args.emr_version + "/aws")
     return result
 
 def jars(args):
@@ -65,7 +66,13 @@ def get_files(s3client, s3resource, dist, bucket, local):
                 s3resource.meta.client.download_file(bucket, file.get('Key'), local + os.sep + file.get('Key'))
 
 def spark_defaults():
-    local('cp /tmp/spark-defaults_template.conf /opt/spark/conf/spark-defaults.conf')
+    #local('cp /tmp/spark-defaults_template.conf /opt/spark/conf/spark-defaults.conf')
+    spark_def_path = '/opt/spark/conf/spark-defaults.conf'
+    template_file = "/tmp/spark-defaults_template.conf"
+    with open(spark_def_path, 'w') as out:
+        with open(template_file) as tpl:
+            for line in tpl:
+                out.write(line.replace('EMRVERSION', args.emr_version))
 
 if __name__ == "__main__":
     if args.dry_run == 'true':

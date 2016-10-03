@@ -7,7 +7,7 @@
   "{connection_file}"
  ],
  "language": "python",
- "display_name": "PySpark (Python-2.7 / Spark-1.6.0) [CLUSTER]",
+ "display_name": "PySpark (Python-2.7 / Spark ) [CLUSTER]",
  "env": {
   "HADOOP_CONF_DIR" : "/srv/hadoopconf/CLUSTER",
   "YARN_CONF_DIR": "/srv/hadoopconf/CLUSTER",
