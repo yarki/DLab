@@ -27,6 +27,15 @@ ldapSearch:
     timeLimit: 0
     base: dc=example,dc=com
     filter: "(&(objectClass=inetOrgPerson)(uid=${username}))"
+    searchResultProcessor:
+      language: python
+      code: |
+        def enrichUserInfo(ui,context):
+          print ui['username']
+          ui['firstName'] = 'John'
+          ui['lastName'] = 'Doe'
+          print context
+          return ui
     #and more
       
 #openLdapConfig: 

@@ -8,6 +8,8 @@ import org.apache.directory.api.ldap.model.message.SearchRequestImpl;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
 
+import com.epam.dlab.auth.ldap.core.filter.SearchResultProcessor;
+
 public class Request {
 /*  
 -   request: 
@@ -24,6 +26,7 @@ public class Request {
 	private int timeLimit = 0;
 	private String base;
 	private String filter = "";
+	private SearchResultProcessor searchResultProcessor;
 	public String getScope() {
 		return scope;
 	}
@@ -40,6 +43,12 @@ public class Request {
 		return filter;
 	}
 	
+	public SearchResultProcessor getSearchResultProcessor() {
+		return searchResultProcessor;
+	}
+	public void setSearchResultProcessor(SearchResultProcessor searchResultProcessor) {
+		this.searchResultProcessor = searchResultProcessor;
+	}
 	public SearchRequest buildSearchRequest(Map<String,Object> replace) {
 		SearchRequest sr = new SearchRequestImpl();
 		try {

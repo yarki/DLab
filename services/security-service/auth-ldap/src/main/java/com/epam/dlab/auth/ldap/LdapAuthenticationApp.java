@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.directory.api.ldap.model.message.SearchRequest;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,7 @@ public class LdapAuthenticationApp extends Application<LdapAuthenticationConfig>
 			params = new String[] { "server", "config.yml" };
 		}
 		LOG.debug("Starting Config Authentication Service with params: {}",String.join(",", params));
+		PythonInterpreter.initialize(System.getProperties(),System.getProperties(), new String[0]);
 		new LdapAuthenticationApp().run(params);
 	}
 
