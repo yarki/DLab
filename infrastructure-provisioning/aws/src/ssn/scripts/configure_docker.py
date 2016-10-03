@@ -29,11 +29,11 @@ def ensure_docker_daemon():
 
 
 def configure_docker_daemon():
-    pass
+    return True
 
 
 def pull_docker_images(image_list):
-    pass
+    return True
 
 
 def build_docker_images(image_list):
