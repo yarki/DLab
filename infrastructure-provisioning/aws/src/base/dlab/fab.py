@@ -40,7 +40,7 @@ def run_routine(routine_name, params):
                         level=logging.DEBUG,
                         filename=local_log_filepath)
     try:
-        with settings(abort_exception=RoutineException, warn_only=True):
+        with settings(abort_exception=RoutineException):
             logging.info("~/scripts/%s.py %s" % (routine_name, params))
             local("~/scripts/%s.py %s" % (routine_name, params))
             success = True

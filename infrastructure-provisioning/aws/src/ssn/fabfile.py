@@ -12,7 +12,6 @@ def run():
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
-    env.warn_only = True
 
     logging.info('[CREATE AWS CONFIG FILE]')
     print '[CREATE AWS CONFIG FILE]'
