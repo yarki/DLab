@@ -48,7 +48,7 @@ public class AuthenticationServiceTest {
 		assertEquals("http://user:secret@localhost:8080/user_info?",as.getUserInfoUrl());
 		assertEquals("http://user:secret@localhost:8080/logout?",as.getLogoutUrl());
 		assertEquals("http://user:secret@localhost:8080/?",as.getLoginUrl());
-		assertEquals("http://user:secret@localhost:8080/validate_access?",as.getAccessTokenUrl());
+		assertEquals("http://user:secret@localhost:8080/validate?",as.getAccessTokenUrl());
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.epam.dlab.auth.rest_api;
 
+import java.util.UUID;
+
 import javax.ws.rs.core.Response;
 
 import com.epam.dlab.auth.client.ConfigurableResource;
@@ -53,6 +55,11 @@ public abstract class AbstractAuthenticationService<C extends Configuration> ext
 		} else {
 			return false;
 		}
+	}
+	
+	public static String getRandomToken() {
+		UUID uuid = UUID.randomUUID();
+		return uuid.toString();
 	}
 	
 }
