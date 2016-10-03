@@ -217,6 +217,16 @@ def s3_cleanup(bucket, cluster_name):
     for i in resource.objects.filter(Prefix=prefix):
         s3_res.Object(resource.name, i.key).delete()
 
+def configure_notebook():
+    templates_dir = '/root/templates/'
+    scripts_dir = '/root/scripts/'
+    put(templates_dir + 'pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
+    put(templates_dir + 'spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
+    put(templates_dir + 'toree_emr_template.json','/tmp/toree_emr_template.json')
+    put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
+    sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
+    sudo('chmod 755 /usr/local/bin/create_configs.py')
+
 
 def build_emr_cluster(args):
     # Parse applications
@@ -304,8 +314,10 @@ if __name__ == "__main__":
                 env.host_string = env.user + "@" + env.hosts
                 env.key_filename = "/usr/share/notebook_automation/keys/BDCC-DSS-POC.pem"
                 #env.key_filename = "/usr/share/notebook_automation/conf/keyfile.pem"
+                print "Copying templates of kernel for EMR to notebook server"
+                configure_notebook()
                 sudo(
-                    '/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.s3_bucket + ' --cluster_name ' + args.name)
+                    '/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.s3_bucket + ' --cluster_name ' + args.name + ' --emr_version ' + args.release_label)
                 nbs_id = get_instance_by_ip(args.nbs_ip)
                 current_sg = nbs_id.security_groups
                 sg_list=[]
