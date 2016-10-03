@@ -1,108 +1,11 @@
 #!/usr/bin/python
 import json
-import argparse
-import sys
 from dlab.fab import *
 from dlab.aws_meta import *
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--notebook_name', type=str, default='')
-parser.add_argument('--subnet_cidr', type=str, default='')
-args = parser.parse_args()
+import sys
 
 
-def create_image_from_instance(instance_name='', image_name=''):
-    ec2 = boto3.resource('ec2')
-    instances = ec2.instances.filter(
-        Filters=[{'Name': 'tag:Name', 'Values': [instance_name]},
-                 {'Name': 'instance-state-name', 'Values': ['running']}])
-    for instance in instances:
-        image = instance.create_image(Name=image_name,
-                                      Description='Automatically created image for notebook server',
-                                      NoReboot=True)
-        image.load()
-        while image.state != 'available':
-            local("echo Waiting for image creation; sleep 20")
-            image.load()
-        return image.id
-    return ''
-
-
-def run(nb_config):
-    logging.info('[CREATE SUBNET]')
-    print '[CREATE SUBNET]'
-    params = "--vpc_id '%s' --subnet '%s' --region %s --infra_tag_name %s --infra_tag_value %s" % \
-             (nb_config['vpc_id'], nb_config['subnet'], nb_config['region'],
-              os.environ['conf_service_base_name'], nb_config['instance_name'])
-    run_routine('create_subnet', params)
-
-    logging.info('[CREATE ROLES]')
-    print '[CREATE ROLES]'
-    params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
-             (nb_config['role_name'], nb_config['role_profile_name'],
-              nb_config['policy_name'], nb_config['policy_arn'])
-    run_routine('create_role_policy', params)
-
-    logging.info('[CREATE SECURITY GROUPS]')
-    print '[CREATE SECURITY GROUPS]'
-    params = "--name %s --vpc_id %s --security_group_rules %s --infra_tag_name %s --infra_tag_value %s" % \
-             (nb_config['security_group_name'], nb_config['vpc_id'], nb_config['security_group_rules'],
-              os.environ['conf_service_base_name'], nb_config['instance_name'])
-    run_routine('create_security_group', params)
-
-    with hide('stderr', 'running', 'warnings'):
-        local("echo Waitning for changes to propagate; sleep 10")
-
-    logging.info('[CREATE JUPYTER NOTEBOOK INSTANCE]')
-    print '[CREATE JUPYTER NOTEBOOK INSTANCE]'
-    params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
-             "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s" % \
-             (nb_config['instance_name'], nb_config['ami_id'], nb_config['instance_type'], nb_config['key_name'],
-              get_security_group_by_name(nb_config['security_group_name']),
-              get_subnet_by_cidr(nb_config['subnet']), nb_config['role_profile_name'],
-              os.environ['conf_service_base_name'], nb_config['instance_name'])
-    run_routine('create_instance', params)
-
-    instance_hostname = get_instance_hostname(nb_config['instance_name'])
-    ssn_instance_name = os.environ['conf_service_base_name'] + '-ssn-instance'
-    ssn_instance_hostname = get_instance_hostname(ssn_instance_name)
-    keyfile_name = "/root/keys/%s.pem" % os.environ['creds_key_name']
-
-    logging.info('[CONFIGURE PROXY ON JUPYTER INSTANCE]')
-    print '[CONFIGURE PROXY ON JUPYTER INSTANCE]'
-    additional_config = {"proxy_host": ssn_instance_hostname, "proxy_port": "3128"}
-    params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" % \
-             (instance_hostname, nb_config['instance_name'], keyfile_name, json.dumps(additional_config))
-    run_routine('configure_proxy', params)
-
-    logging.info('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
-    print('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
-    params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
-    run_routine('install_prerequisites', params)
-
-    logging.info('[CONFIGURE JUPYTER NOTEBOOK INSTANCE]')
-    print '[CONFIGURE JUPYTER NOTEBOOK INSTANCE]'
-    additional_config = {"frontend_hostname": ssn_instance_hostname,
-                         "backend_hostname": get_instance_hostname(nb_config['instance_name']),
-                         "backend_port": "8888",
-                         "nginx_template_dir": "/root/templates/"}
-    params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" %  \
-             (instance_hostname, nb_config['instance_name'], keyfile_name, json.dumps(additional_config))
-    run_routine('configure_jupyter_node', params)
-
-    logging.info('[CONFIGURE JUPYTER ADDITIONS]')
-    print '[CONFIGURE JUPYTER ADDITIONS]'
-    params = "--hostname %s --keyfile %s" % (instance_hostname, keyfile_name)
-    run_routine('install_jupyter_additions', params)
-
-
-if __name__ == "__main__":
-    if args.notebook_name == '' or args.subnet_cidr == '':
-        parser.print_help()
-        sys.exit(2)
-
-    notebook_instance_name = os.environ['conf_service_base_name'] + '-notebook-' + args.notebook_name
-    expected_ami_name = os.environ['conf_service_base_name'] + '-notebook-image'
+def run():
 
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename
@@ -110,58 +13,187 @@ if __name__ == "__main__":
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
-    env.warn_only = True
-    with hide('stderr', 'running'):
-        create_aws_config_files(generate_full_config=False)
+    create_aws_config_files()
+    print 'Generating infrastructure names and tags'
+    edge_conf = dict()
+    edge_conf['service_base_name'] = os.environ['conf_service_base_name']
+    edge_conf['key_name'] = os.environ['creds_key_name']
+    edge_conf['policy_arn'] = os.environ['conf_policy_arn']
+    edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
+    edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
+    edge_conf['vpc_id'] = os.environ['edge_vpc_id']
+    edge_conf['region'] = os.environ['edge_region']
+    edge_conf['ami_id'] = os.environ['edge_ami_id']
+    edge_conf['instance_size'] = os.environ['edge_instance_size']
 
-    print 'Searching preconfigured images'
-    ami_id = get_ami_id_by_name(expected_ami_name)
-    notebook_config = dict()
-    notebook_config['vpc_id'] = os.environ['notebook_vpc_id']
-    notebook_config['region'] = os.environ['notebook_region']
-    notebook_config['instance_name'] = notebook_instance_name
-    notebook_config['instance_type'] = os.environ['notebook_instance_type']
-    notebook_config['role_name'] = notebook_instance_name + "-Role"
-    notebook_config['role_profile_name'] = notebook_instance_name + "-Role-Profile"
-    notebook_config['policy_name'] = notebook_instance_name + "-Role-Policy"
-    notebook_config['policy_arn'] = os.environ['notebook_policy_arn']
-    notebook_config['security_group_name'] = notebook_instance_name + "-SG"
-    notebook_config['security_group_rules'] = os.environ['notebook_security_group_rules']
-    notebook_config['subnet'] = args.subnet_cidr
-    notebook_config['key_name'] = os.environ['creds_key_name']
-    if ami_id != '':
-        print 'Preconfigured image found. Using: ' + ami_id
-        notebook_config['ami_id'] = ami_id
-    else:
-        print 'No preconfigured image found. Using default one: ' + os.environ['notebook_ami_id']
-        notebook_config['ami_id'] = os.environ['notebook_ami_id']
+    edge_conf['instance_name'] = edge_conf['service_base_name'] + '-edge-' + os.environ['edge_user_name']
+    edge_conf['bucket_name'] = (edge_conf['instance_name'] + '-bucket').lower().replace('_', '-')
+    edge_conf['role_name'] = edge_conf['instance_name'] + '-Role'
+    edge_conf['role_profile_name'] = edge_conf['instance_name'] + '-Profile'
+    edge_conf['policy_name'] = edge_conf['instance_name'] + '-Policy'
+    edge_conf['edge_security_group_name'] = edge_conf['instance_name'] + '-SG'
+    edge_conf['isolated_security_group_name'] = edge_conf['instance_name'] + '-isolated-SG'
+    edge_conf['security_group_rules'] = [{"IpProtocol": "-1",
+                                          "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                                          "UserIdGroupPairs": [],
+                                          "PrefixListIds": []}]
 
-    run(notebook_config)
+    print "Will create exploratory environment with edge node as access point as following: " + \
+          json.dumps(edge_conf, sort_keys=True, indent=4, separators=(',', ': '))
+    logging.info(json.dumps(edge_conf))
 
-    if ami_id == '' and os.path.isfile("/tmp/" + notebook_instance_name + "passwd.file"):
-        print "Looks like it's first time we configure notebook server. Creating image."
-        image_id = create_image_from_instance(instance_name=notebook_instance_name,
-                                              image_name=expected_ami_name)
-        if image_id != '':
-            print "Image succesfully created. It's ID is " + image_id
-
-    with open("/tmp/" + notebook_instance_name + "passwd.file") as f:
-        ip_address = get_instance_ip_address(notebook_instance_name)
-        dns_name = get_instance_hostname(notebook_instance_name)
-        ssn_dns_name = get_instance_hostname(os.environ['conf_service_base_name'] + '-ssn-instance')
-        access_password = f.read()
-        print "Notebook access url: http://%s/%s" % (ssn_dns_name, notebook_instance_name)
-        print "Notebook access password: " + access_password
-        print 'SSH access (from Edge node, via IP address): ssh -i keyfile.pem ubuntu@' + ip_address
-        print 'SSH access (from Edge node, via FQDN): ssh -i keyfile.pem ubuntu@' + dns_name
-
+    logging.info('[CREATE SUBNET]')
+    print '[CREATE SUBNET]'
+    params = "--vpc_id '%s' --subnet '%s' --region %s --infra_tag_name %s --infra_tag_value %s" % \
+             (edge_conf['vpc_id'], edge_conf['private_subnet_cidr'], edge_conf['region'],
+              edge_conf['instance_name'], edge_conf['instance_name'])
+    if not run_routine('create_subnet', params):
+        logging.info('Failed creating subnet')
         with open("/root/result.json", 'w') as result:
-            res = {"hostname": dns_name,
-                   "ip": ip_address,
-                   "access_url": "http://%s/%s" %
-                                 (ssn_dns_name,
-                                  notebook_instance_name),
-                   "access_password": access_password,
-                   "master_keyname": os.environ['creds_key_name']}
+            res = {"error": "Failed to create subnet", "conf": edge_conf}
+            print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
+    logging.info('[CREATE ROLES]')
+    print '[CREATE ROLES]'
+    params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
+             (edge_conf['role_name'], edge_conf['role_profile_name'],
+              edge_conf['policy_name'], edge_conf['policy_arn'])
+    if not run_routine('create_role_policy', params):
+        logging.info('Failed creating roles')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed to creating roles", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+    logging.info('[CREATE SECURITY GROUP FOR EDGE NODE]')
+    print '[CREATE SECURITY GROUPS FOR EDGE]'
+    sg_rules_template = [
+        {
+            "IpProtocol": "-1",
+            "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}],
+            "UserIdGroupPairs": [], "PrefixListIds": []
+        },
+        {
+            "PrefixListIds": [],
+            "FromPort": 22,
+            "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+            "ToPort": 22, "IpProtocol": "tcp", "UserIdGroupPairs": []
+        }
+    ]
+    params = "--name %s --vpc_id %s --security_group_rules '%s' --infra_tag_name %s --infra_tag_value %s" % \
+             (edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),
+              edge_conf['service_base_name'], edge_conf['instance_name'])
+    if not run_routine('create_security_group', params):
+        logging.info('Failed creating security group for edge node')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed creating security group for edge node", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+    logging.info('[CREATE SECURITY GROUP FOR PRIVATE SUBNET]')
+    print '[CREATE SECURITY GROUPS FOR EDGE]'
+    edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
+    ingress_sg_rules_template = [{"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}]
+    egress_sg_rules_template = [{"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}]
+    params = "--name %s --vpc_id %s --security_group_rules '%s' --egress '%s' --infra_tag_name %s --infra_tag_value %s" % \
+             (edge_conf['isolated_security_group_name'], edge_conf['vpc_id'],
+              json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template),
+              edge_conf['service_base_name'], edge_conf['instance_name'])
+    if not run_routine('create_security_group', params):
+        logging.info('Failed creating security group for private subnet')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed creating security group for private subnet", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+    with hide('stderr', 'running', 'warnings'):
+        local("echo Waitning for changes to propagate; sleep 10")
+
+    logging.info('[CREATE BUCKETS]')
+    print('[CREATE BUCKETS]')
+    params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \
+             (edge_conf['bucket_name'], edge_conf['service_base_name'], edge_conf['instance_name'] + "bucket")
+    if not run_routine('create_bucket', params):
+        logging.info('Failed creating bucket')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed to create bucket", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+    logging.info('[CREATE EDGE INSTANCE]')
+    print '[CREATE EDGE INSTANCE]'
+    params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
+             "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s" % \
+             (edge_conf['instance_name'], edge_conf['ami_id'], edge_conf['instance_size'], edge_conf['key_name'],
+              edge_group_id, edge_conf['public_subnet_id'], edge_conf['role_profile_name'],
+              edge_conf['service_base_name'], edge_conf['instance_name'])
+    if not run_routine('create_instance', params):
+        logging.info('Failed creating instance')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed to create instance", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+    instance_hostname = get_instance_hostname(edge_conf['instance_name'])
+    ip_address = get_instance_ip_address(edge_conf['instance_name'])
+    keyfile_name = "/root/keys/%s.pem" % edge_conf['key_name']
+
+    print '[INSTALLING PREREQUISITES]'
+    logging.info('[INSTALLING PREREQUISITES]')
+    params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
+    if not run_routine('install_prerequisites', params):
+        logging.info('Failed installing apps: apt & pip')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed installing apps: apt & pip", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+    print '[INSTALLING HTTP PROXY]'
+    logging.info('[INSTALLING HTTP PROXY]')
+    additional_config = {"exploratory_subnet": edge_conf['private_subnet_cidr'],
+                         "template_file": "/root/templates/squid.conf"}
+    params = "--hostname %s --keyfile %s --additional_config '%s'" % \
+             (instance_hostname, keyfile_name, json.dumps(additional_config))
+    if not run_routine('configure_http_proxy', params):
+        logging.info('Failed installing http proxy')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed installing http proxy", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+    print '[INSTALLING SOCKS PROXY]'
+    logging.info('[INSTALLING SOCKS PROXY]')
+    additional_config = {"exploratory_subnet": edge_conf['private_subnet_cidr'],
+                         "template_file": "/root/templates/danted.conf"}
+    params = "--hostname %s --keyfile %s --additional_config '%s'" % \
+             (instance_hostname, keyfile_name, json.dumps(additional_config))
+    if not run_routine('configure_socks_proxy', params):
+        logging.info('Failed installing socks proxy')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed installing socks proxy", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+    with open("/root/result.json", 'w') as result:
+        res = {"hostname": instance_hostname,
+               "ip": ip_address,
+               "key_name": edge_conf['key_name'],
+               "user_own_bicket_name": edge_conf['bucket_name'],
+               "tunnel_port": "22",
+               "socks_port": "1080",
+               "isolated_sg": edge_conf['isolated_security_group_name'],
+               "edge_sg": edge_conf['edge_security_group_name']}
+        print json.dumps(res)
+        result.write(json.dumps(res))
+
+    sys.exit(0)

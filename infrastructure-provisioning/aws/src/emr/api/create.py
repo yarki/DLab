@@ -1,26 +1,30 @@
 #!/usr/bin/python
 import os
-import base64
 import json
 from fabric.api import local
 
 
 if __name__ == "__main__":
-    notebook_name = os.environ['notebook_name']
-    network_cidr = os.environ['network_cidr']
-    log = local("/root/fabfile.py --notebook_name %s --subnet_cidr %s " % (notebook_name, network_cidr))
+    success = True
+    try:
+        local('cd /root; fab run')
+    except:
+        success = False
 
     reply = dict()
     reply['request_id'] = os.environ['request_id']
-    reply['status'] = 'ok'
-    if len(log.stderr) > 0:
-        reply['status'] = 'fail'
+    if success:
+        reply['status'] = 'ok'
+    else:
+        reply['status'] = 'err'
+
     reply['response'] = dict()
 
     try:
         with open("/root/result.json") as f:
             reply['response']['result'] = json.loads(f.read())
     except:
+        reply['response']['result'] = {"error": "Failed to open result itself. Bad sign."}
         pass
 
     reply['response']['log'] = "/response/%s.log" % os.environ['request_id']
