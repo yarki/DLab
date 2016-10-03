@@ -4,6 +4,10 @@ import logging
 import os
 
 
+class RoutineException(Exception):
+    pass
+
+
 def ensure_apt(requisites):
     try:
         if not exists('/tmp/apt_upgraded'):
@@ -35,27 +39,36 @@ def run_routine(routine_name, params):
                         level=logging.DEBUG,
                         filename=local_log_filepath)
     try:
-        logging.info("~/scripts/%s.py %s" % (routine_name, params))
-        local("~/scripts/%s.py %s" % (routine_name, params))
-        return True
-    except:
+        with settings(abort_exception=RoutineException, warn_only=True):
+            logging.info("~/scripts/%s.py %s" % (routine_name, params))
+            res = local("~/scripts/%s.py %s" % (routine_name, params))
+        if res:
+            return True
+        else:
+            return False
+    except RoutineException:
         return False
 
 
 def create_aws_config_files(generate_full_config=False):
-    aws_user_dir = os.environ['AWS_DIR']
-    logging.info(local("rm -rf " + aws_user_dir+" 2>&1", capture=True))
-    logging.info(local("mkdir -p " + aws_user_dir+" 2>&1", capture=True))
+    try:
+        aws_user_dir = os.environ['AWS_DIR']
+        logging.info(local("rm -rf " + aws_user_dir+" 2>&1", capture=True))
+        logging.info(local("mkdir -p " + aws_user_dir+" 2>&1", capture=True))
 
-    with open(aws_user_dir + '/config', 'w') as aws_file:
-        aws_file.write("[default]\n")
-        aws_file.write("region = %s\n" % os.environ['creds_region'])
-
-    if generate_full_config:
-        with open(aws_user_dir + '/credentials', 'w') as aws_file:
+        with open(aws_user_dir + '/config', 'w') as aws_file:
             aws_file.write("[default]\n")
-            aws_file.write("aws_access_key_id = %s\n" % os.environ['creds_access_key'])
-            aws_file.write("aws_secret_access_key = %s\n" % os.environ['creds_secret_access_key'])
+            aws_file.write("region = %s\n" % os.environ['creds_region'])
 
-    logging.info(local("chmod 600 " + aws_user_dir + "/*"+" 2>&1", capture=True))
-    logging.info(local("chmod 550 " + aws_user_dir+" 2>&1", capture=True))
+        if generate_full_config:
+            with open(aws_user_dir + '/credentials', 'w') as aws_file:
+                aws_file.write("[default]\n")
+                aws_file.write("aws_access_key_id = %s\n" % os.environ['creds_access_key'])
+                aws_file.write("aws_secret_access_key = %s\n" % os.environ['creds_secret_access_key'])
+
+        logging.info(local("chmod 600 " + aws_user_dir + "/*"+" 2>&1", capture=True))
+        logging.info(local("chmod 550 " + aws_user_dir+" 2>&1", capture=True))
+
+        return True
+    except:
+        return False

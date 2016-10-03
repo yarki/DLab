@@ -4,6 +4,7 @@ from dlab.fab import *
 from dlab.aws_meta import *
 import sys
 
+
 def run():
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename

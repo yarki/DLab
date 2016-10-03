@@ -28,6 +28,7 @@ def create_security_group(security_group_name, vpc_id, security_group_rules, egr
     return group.id
 
 if __name__ == "__main__":
+    success = False
     try:
         rules = json.loads(args.security_group_rules)
         egress = json.loads(args.egress)
@@ -43,9 +44,14 @@ if __name__ == "__main__":
             else:
                 print "REQUESTED SECURITY GROUP WITH NAME %s ALREADY EXISTS" % args.name
             print "SECURITY_GROUP_ID " + security_group_id
-            sys.exit(0)
+            success = True
         except:
-            sys.exit(1)
+            success = False
     else:
         parser.print_help()
         sys.exit(2)
+
+    if success:
+        sys.exit(0)
+    else:
+        sys.exit(1)
