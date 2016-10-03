@@ -11,9 +11,21 @@
 	<groupId>com.epam.dlab.auth</groupId>
 	<artifactId>security</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<name>security</name>
 	<url>http://maven.apache.org</url>
+	<distributionManagement>
+		<repository>
+			<id>epmc-bdcc</id>
+			<name>artifactory.epam.com-releases</name>
+			<url>https://artifactory.epmc-bdcc.projects.epam.com/libs-release-local/</url>
+		</repository>
+		<snapshotRepository>
+			<id>epmc-bdcc</id>
+			<name>artifactory.epam.com-snapshots</name>
+			<url>https://artifactory.epmc-bdcc.projects.epam.com/libs-snapshot-local/</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<properties>
 		<dropwizard.version>1.0.2</dropwizard.version>
 		<junit.version>4.12</junit.version>
