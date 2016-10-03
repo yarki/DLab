@@ -1,8 +1,5 @@
-package com.epam.datalab.auth.ldap;
+package com.epam.dlab.auth.ldap;
 
-import java.util.Scanner;
-
-import org.apache.directory.api.ldap.model.cursor.EntryCursor;
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.message.SearchRequest;
@@ -79,7 +76,7 @@ public class BasicTest {
 		
 		con.unBind();
 		
-		con.bind("uid=mike,ou=People,dc=example,dc=com","miket");
+		con.bind("uid=mike,ou=People,dc=example,dc=com","test");
 	    sr.setFilter("(uid=mike)");
 	    sr.setMessageId(2);
 	    cursor = con.search( sr );

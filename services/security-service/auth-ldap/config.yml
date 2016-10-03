@@ -12,33 +12,36 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-defaultRedirectFromAuthentication: http://localhost:8080/best
-inactiveUserTimeoutMillSec: 3600000
-openLdapConfig: 
-  host: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
-  port: 389
-  base: dc=example,dc=com
-  username: admin
-  password: ldap
+#defaultRedirectFromAuthentication: http://localhost:8080/best
+#inactiveUserTimeoutMillSec: 3600000
+ldapConnectionConfig:
+  ldapHost: localhost
+  ldapPort: 3890
+  name: cn=admin,dc=example,dc=com
+  credentials: ldap
+ldapBindTemplate: uid=%s,ou=People,dc=example,dc=com
+ldapSearch: 
+  - scope: SUBTREE
+    attributes: 
+      - cn
+    timeLimit: 0
+    base: dc=example,dc=com
+    filter: "(&(objectClass=inetOrgPerson)(uid=${username}))"
+    #and more
+      
+#openLdapConfig: 
+#  host: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
+#  port: 389
+#  base: dc=example,dc=com
+#  username: admin
+#  password: ldap
 server:
   applicationConnectors:
   - type: http
     port: 8090
   adminConnectors:
   - type: http
-    port: 8091
-users:
-  - username: johnd
-    name: John Doe
-    password: secr3t
-    roles:  
-      ? ADMIN
-      ? USER
-  - username: janed
-    name: Jane Doe
-    password: trust
-    roles:  
-      ? USER        
+    port: 8091  
 logging:
   level: INFO
   loggers:
