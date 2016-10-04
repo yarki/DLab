@@ -20,7 +20,7 @@ parser.add_argument('--instance_count', type=int, default='3',
                     help='Number of nodes the cluster will consist of (Default: 3)')
 parser.add_argument('--release_label', type=str, default='emr-4.8.0', help='EMR release version (Default: "emr-4.8.0")')
 parser.add_argument('--steps', type=str, default='')
-parser.add_argument('--tags', type=str, default='Name=DSA-POC-TEST, Project=DSA-POC')
+parser.add_argument('--tags', type=str, default='Name=DSA, Project=DSA')
 parser.add_argument('--auto_terminate', action='store_true')
 parser.add_argument('--service_role', type=str, default='EMR_DefaultRole',
                     help='Role name EMR cluster (Default: "EMR_DefaultRole")')
@@ -180,6 +180,7 @@ def build_emr_cluster(args):
     prefix = "jars/" + args.release_label + "/"
     jars_exist = get_object_count(args.s3_bucket, prefix)
 
+    # Parse steps
     if args.steps != '':
         global cp_config
         cp_config = cp_config + "; " + args.steps
