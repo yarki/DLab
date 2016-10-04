@@ -135,7 +135,7 @@ def run():
     with open("/root/result.json", 'w') as result:
         res = {"hostname": cluster_name,
                "key_name": emr_conf['key_name'],
-               "user_own_bucket_name": emr_conf['bucket_name'],
+               "user_own_bucket_name": emr_conf['bucket_name']}
         print json.dumps(res)
         result.write(json.dumps(res))
 

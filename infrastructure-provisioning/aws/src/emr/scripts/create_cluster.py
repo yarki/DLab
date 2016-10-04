@@ -5,7 +5,7 @@ import boto3
 import argparse
 import re
 import time
-import os
+import sys
 from fabric.api import *
 from ConfigParser import SafeConfigParser
 
@@ -46,54 +46,6 @@ cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{0}/jars/{1}/aws --recursive, ActionOnFailure=CONTINUE,Jar=command-runner.jar; " \
           "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{0}/jars/{1}/lib --recursive,ActionOnFailure=CONTINUE,Jar=command-runner.jar".format(
     args.s3_bucket, args.release_label)
-
-
-# Function for parsing config files for parameters
-def get_configuration(configuration_dir):
-    merged_config = SafeConfigParser()
-
-    crid_config = SafeConfigParser()
-    crid_config.read(configuration_dir + 'aws_crids.ini')
-    for section in ['creds', 'ops']:
-        for option, value in crid_config.items(section):
-            if not merged_config.has_section(section):
-                merged_config.add_section(section)
-            merged_config.set(section, option, value)
-
-    base_infra_config = SafeConfigParser()
-    base_infra_config.read(configuration_dir + 'self_service_node.ini')
-    for section in ['conf', 'ssn']:
-        for option, value in base_infra_config.items(section):
-            if not merged_config.has_section(section):
-                merged_config.add_section(section)
-            merged_config.set(section, option, value)
-
-    notebook_config = SafeConfigParser()
-    notebook_config.read(configuration_dir + 'notebook.ini')
-    section = 'notebook'
-    for option, value in notebook_config.items(section):
-        if not merged_config.has_section(section):
-            merged_config.add_section(section)
-        merged_config.set(section, option, value)
-
-    overwrite_config = SafeConfigParser()
-    overwrite_config.read(configuration_dir + 'overwrite.ini')
-    for section in ['creds', 'conf', 'ssn', 'notebook']:
-        if overwrite_config.has_section(section):
-            if not merged_config.has_section(section):
-                merged_config.add_section(section)
-            for option, value in overwrite_config.items(section):
-                merged_config.set(section, option, value)
-
-    shadow_overwrite_config = SafeConfigParser()
-    shadow_overwrite_config.read(configuration_dir + 'shadow_overwrite.ini')
-    for section in ['creds', 'conf', 'ssn', 'notebook']:
-        if shadow_overwrite_config.has_section(section):
-            if not merged_config.has_section(section):
-                merged_config.add_section(section)
-            for option, value in shadow_overwrite_config.items(section):
-                merged_config.set(section, option, value)
-    return merged_config
 
 
 def get_object_count(bucket, prefix):
@@ -145,6 +97,8 @@ def wait_emr(bucket, cluster_name, timeout=1200, delay=20):
         state = action_validate(cluster_id)
         if get_object_count(bucket, prefix) > 20 and state[1] == "WAITING":
             return True
+        elif state[0] == "False":
+            sys.exit(1)
         time.sleep(delay)
     return False
 
@@ -293,12 +247,6 @@ def build_emr_cluster(args):
 ##############
 
 if __name__ == "__main__":
-    # Get info from configs and redefine defaults in argparse
-    config = get_configuration(os.environ['PROVISION_CONFIG_DIR'])
-    args.tags = "Name=" + config.get('conf','service_base_name')
-    args.ssh_key = config.get('creds','key_name')
-    args.s3_bucket = config.get('conf','service_base_name') + "-bucket"
-    args.nbs_user = config.get('notebook','ssh_user')
 
     if args.name == '':
         parser.print_help()
