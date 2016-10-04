@@ -12,24 +12,24 @@ args = parser.parse_args()
 
 
 def ensure_matplot():
-    if not exists('/tmp/matplot_ensured'):
+    if not exists('/home/ubuntu/matplot_ensured'):
         sudo('apt-get build-dep -y python-matplotlib')
         sudo('pip install matplotlib')
-        sudo('touch /tmp/matplot_ensured')
+        sudo('touch /home/ubuntu/matplot_ensured')
 
 
 def ensure_sbt():
-    if not exists('/tmp/sbt_ensured'):
+    if not exists('/home/ubuntu/sbt_ensured'):
         sudo('apt-get install -y apt-transport-https')
         sudo('echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list')
         sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 642AC823')
         sudo('apt-get update')
         sudo('apt-get install -y sbt')
-        sudo('touch /tmp/sbt_ensured')
+        sudo('touch /home/ubuntu/sbt_ensured')
 
 
 def ensure_scala_breeze():
-    if not exists('/tmp/scala_breeze_ensured'):
+    if not exists('/home/ubuntu/scala_breeze_ensured'):
         working_root = "/tmp"
         breeze_repo = "https://github.com/scalanlp/breeze.git"
         releases = 'https://oss.sonatype.org/content/repositories/releases/'
@@ -47,50 +47,50 @@ def ensure_scala_breeze():
         sudo('echo \'  "Sonatype Snapshots" at "' + snapshots + '" ) \' >> ' + working_root + '/breeze/build.sbt')
         sudo('echo \'scalaVersion := "' + scala_version + '" \' >> ' + working_root + '/breeze/build.sbt')
         sudo('cd ' + working_root + '/breeze ; sbt package publish-local')
-        sudo('touch /tmp/scala_breeze_ensured')
+        sudo('touch /home/ubuntu/scala_breeze_ensured')
 
 
 def configure_scala_breeze():
-    if not exists('/tmp/scala_breeze_configured'):
+    if not exists('/home/ubuntu/scala_breeze_configured'):
         source_root = "/tmp/breeze"
         target_dir = "/opt/spark/lib"
         scala_version = "2.11"
         sudo('cp ' + source_root + '/target/scala-' + scala_version + '/*.jar ' + target_dir)
         sudo('cp ' + source_root + '/math/target/scala-' + scala_version + '/*.jar ' + target_dir)
         sudo('cp ' + source_root + '/viz/target/scala-' + scala_version + '/*.jar ' + target_dir)
-        sudo('touch /tmp/scala_breeze_configured')
+        sudo('touch /home/ubuntu/scala_breeze_configured')
 
 
 def ensure_scala_wisp():
-    if not exists('/tmp/scala_wisp_ensured'):
+    if not exists('/home/ubuntu/scala_wisp_ensured'):
         wisp_repo = "https://github.com/quantifind/wisp.git"
         working_root = "/tmp"
         sudo('cd ' + working_root + ' ; git clone ' + wisp_repo)
         sudo('cd ' + working_root + '/wisp ; sbt package publish-local')
-        sudo('touch /tmp/scala_wisp_ensured')
+        sudo('touch /home/ubuntu/scala_wisp_ensured')
 
 
 def configure_scala_wisp():
-    if not exists('/tmp/scala_wisp_configured'):
+    if not exists('/home/ubuntu/scala_wisp_configured'):
         source_root = "/tmp/wisp"
         target_dir = "/opt/spark/lib"
         scala_version = "2.11"
         sudo('cp ' + source_root + '/core/target/scala-' + scala_version + '/*.jar ' + target_dir)
-        sudo('touch /tmp/scala_wisp_configured')
+        sudo('touch /home/ubuntu/scala_wisp_configured')
 
 
 def ensure_libraries_py2():
-    if not exists('/tmp/ensure_libraries_py2_installed'):
+    if not exists('/home/ubuntu/ensure_libraries_py2_installed'):
         sudo('export LC_ALL=C')
         sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
-        sudo('touch /tmp/ensure_libraries_py2_installed')
+        sudo('touch /home/ubuntu/ensure_libraries_py2_installed')
 
 
 def ensure_libraries_py3():
-    if not exists('/tmp/ensure_libraries_py3_installed'):
+    if not exists('/home/ubuntu/ensure_libraries_py3_installed'):
         sudo('apt-get install zlib1g-dev')
         sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
-        sudo('touch /tmp/ensure_libraries_py3_installed')
+        sudo('touch /home/ubuntu/ensure_libraries_py3_installed')
 
 ##############
 # Run script #

@@ -28,7 +28,7 @@ def id_generator(size=10, chars=string.digits + string.ascii_letters):
 
 
 def ensure_spark_scala():
-    if not exists('/tmp/spark_scala_ensured'):
+    if not exists('/home/ubuntu/spark_scala_ensured'):
         sudo('apt-get install -y default-jre')
         sudo('apt-get install -y default-jdk')
         sudo('wget ' + scala_link + ' -O /tmp/scala.deb')
@@ -49,16 +49,16 @@ def ensure_spark_scala():
         sudo('pip install --pre toree')
         sudo('ln -s /opt/spark/ /usr/local/spark')
         sudo('jupyter toree install')
-        sudo('touch /tmp/spark_scala_ensured')
+        sudo('touch /home/ubuntu/spark_scala_ensured')
 
 
 def ensure_python3_kernel():
-    if not exists('/tmp/python3_kernel_ensured'):
+    if not exists('/home/ubuntu/python3_kernel_ensured'):
         sudo('apt-get install python3-setuptools')
         sudo('apt install -y python3-pip')
         sudo('pip3 install ipython ipykernel')
         sudo('python3 -m ipykernel install')
-        sudo('touch /tmp/python3_kernel_ensured')
+        sudo('touch /home/ubuntu/python3_kernel_ensured')
 
 
 def configure_notebook_server(notebook_name):
