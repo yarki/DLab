@@ -99,10 +99,39 @@ def get_vpc_by_cidr(cidr):
     return ''
 
 
+def get_emr_list(tag_name):
+    emr = boto3.client('emr')
+    clusters = emr.list_clusters(
+        ClusterStates=['RUNNING', 'WAITING']
+    )
+    clusters = clusters.get('Clusters')
+    clusters_count = 0
+    for i in clusters:
+        response = emr.describe_cluster(ClusterId=i.get('Id'))
+        tag = response.get('Cluster').get('Tags')
+        for j in tag:
+            if j.get('Key') == tag_name:
+                clusters_count += 1
+    return clusters_count
+
+
+def get_ec2_list(tag_name):
+    ec2 = boto3.resource('ec2')
+    notebook_instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['*nb*']}])
+    return notebook_instances
+
+
 def resource_count(resource_type, tag_name):
     if resource_type == 'EC2':
-        print "EC2"
+        notebooks = get_ec2_list(tag_name)
+        count = 0
+        for i in notebooks:
+            count += 1
+        return count
     elif resource_type == 'EMR':
-        print 'EMR'
+        clusters = get_emr_list(tag_name)
+        return clusters
     else:
         print "Incorrect resource type!"
