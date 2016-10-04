@@ -15,7 +15,7 @@ def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def read_yml_conf(path,section,param):
+def read_yml_conf(path, section, param):
     try:
         with open(path, 'r') as config_yml:
             config = yaml.load(config_yml)
