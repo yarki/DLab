@@ -58,7 +58,7 @@ def ensure_python3_kernel():
         sudo('apt install -y python3-pip')
         sudo('pip3 install ipython ipykernel')
         sudo('python3 -m ipykernel install')
-        sudo('touch /tmp/python2_kernel_ensured')
+        sudo('touch /tmp/python3_kernel_ensured')
 
 
 def configure_notebook_server(notebook_name):

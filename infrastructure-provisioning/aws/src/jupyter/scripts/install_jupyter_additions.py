@@ -19,7 +19,7 @@ def ensure_matplot():
 
 
 def ensure_sbt():
-    if not exists('/tmp/sbt_ensure'):
+    if not exists('/tmp/sbt_ensured'):
         sudo('apt-get install -y apt-transport-https')
         sudo('echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list')
         sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 642AC823')
