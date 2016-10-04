@@ -88,10 +88,8 @@ def ensure_libraries_py2():
 
 def ensure_libraries_py3():
     if not exists('/tmp/ensure_libraries_py3_installed'):
-        sudo('apt-get install python3-setuptools')
-        sudo('apt install -y python3-pip')
-        sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn ipython ipykernel')
-        sudo('python3 -m ipykernel install')
+        sudo('apt-get install zlib1g-dev')
+        sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
         sudo('touch /tmp/ensure_libraries_py3_installed')
 
 ##############

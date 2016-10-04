@@ -52,6 +52,15 @@ def ensure_spark_scala():
         sudo('touch /tmp/spark_scala_ensured')
 
 
+def ensure_python3_kernel():
+    if not exists('/tmp/python3_kernel_ensured'):
+        sudo('apt-get install python3-setuptools')
+        sudo('apt install -y python3-pip')
+        sudo('pip3 install ipython ipykernel')
+        sudo('python3 -m ipykernel install')
+        sudo('touch /tmp/python2_kernel_ensured')
+
+
 def configure_notebook_server(notebook_name):
     jupyter_password = id_generator()
     sudo('pip install jupyter')
@@ -74,6 +83,8 @@ def configure_notebook_server(notebook_name):
     sudo("sleep 5; for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
     sudo("sleep 5; screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py; "
          "sleep 5;")
+
+    ensure_python3_kernel()
 
 
 def configure_nginx(config, instnace_name):
