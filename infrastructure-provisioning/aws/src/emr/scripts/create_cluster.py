@@ -332,6 +332,6 @@ if __name__ == "__main__":
                 #                s3_cleanup(args.name, args.s3_bucket)
         else:
             if action_validate(id)[0] == "True":
-                print "Timeout reached. Please increase timeout period and try again. Now terminating the cluster...""
+                print "Timeout reached. Please increase timeout period and try again. Now terminating the cluster..."
                 terminate_emr(cluster_id)
                 #               s3_cleanup(args.name, args.s3_bucket)
