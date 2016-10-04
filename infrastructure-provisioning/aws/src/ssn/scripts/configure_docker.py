@@ -25,7 +25,6 @@ def ensure_docker_daemon():
         return True
     except:
         return False
-    return True
 
 
 def configure_docker_daemon():
@@ -48,7 +47,6 @@ def build_docker_images(image_list):
         return True
     except:
         return False
-    return True
 
 
 ##############
