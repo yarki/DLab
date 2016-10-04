@@ -60,7 +60,7 @@ def run():
     print('[CREATE SSN INSTANCE]')
     params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
              "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s" % \
-             (instance_name, os.environ['ssn_ami_id'], os.environ['ssn_instance_type'],
+             (instance_name, os.environ['ssn_ami_id'], os.environ['ssn_instance_size'],
               os.environ['creds_key_name'], os.environ['creds_security_groups_ids'],
               os.environ['creds_subnet_id'], role_profile_name, tag_name, 'ssn')
     if not run_routine('create_instance', params):
