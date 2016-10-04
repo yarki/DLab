@@ -13,11 +13,6 @@ args = parser.parse_args()
 if __name__ == "__main__":
     success = False
     if put_to_bucket(args.bucket_name, args.local_file, args.destination_file):
-        success = True
-    else:
-        success = False
-
-    if success:
         sys.exit(0)
     else:
         sys.exit(1)
