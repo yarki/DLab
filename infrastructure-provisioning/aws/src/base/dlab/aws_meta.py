@@ -97,3 +97,12 @@ def get_vpc_by_cidr(cidr):
     for vpc in ec2.vpcs.filter(Filters=[{'Name': 'cidr', 'Values': [cidr]}]):
         return vpc.id
     return ''
+
+
+def resource_count(resource_type, tag_name):
+    if resource_type == 'EC2':
+        print "EC2"
+    elif resource_type == 'EMR':
+        print 'EMR'
+    else:
+        print "Incorrect resource type!"
