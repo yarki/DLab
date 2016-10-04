@@ -8,6 +8,7 @@ import com.epam.dlab.auth.core.UserInfo;
 import com.epam.dlab.backendapi.core.guice.ModuleFactory;
 import com.epam.dlab.backendapi.resources.AfterLoginResource;
 import com.epam.dlab.backendapi.resources.DockerResource;
+import com.epam.dlab.backendapi.resources.KeyUploaderResource;
 import com.epam.dlab.backendapi.resources.LoginResource;
 import com.epam.dlab.backendapi.resources.LogoutResource;
 import com.google.inject.Guice;
@@ -20,6 +21,7 @@ import io.dropwizard.auth.Authorizer;
 import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import io.dropwizard.views.ViewBundle;
 
 /**
@@ -40,12 +42,14 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
     @Override
     public void run(SelfServiceApplicationConfiguration configuration, Environment environment) throws Exception {
         Injector injector = Guice.createInjector(ModuleFactory.getModule(configuration, environment));
+        environment.jersey().register(createAuth(injector));
+        environment.jersey().register(MultiPartFeature.class);
         environment.jersey().register(injector.getInstance(DockerResource.class));
         environment.jersey().register(injector.getInstance(AfterLoginResource.class));
         environment.jersey().register(injector.getInstance(LoginResource.class));
         environment.jersey().register(injector.getInstance(LogoutResource.class));
         RestAuthenticator authenticator = injector.getInstance(RestAuthenticator.class);
-        
+
 	    environment.jersey().register(new AuthDynamicFeature(
 		        new OAuthCredentialAuthFilter.Builder<UserInfo>()
 		            .setAuthenticator( authenticator )
@@ -58,9 +62,11 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
 		            .setPrefix("Bearer")
 		            .setUnauthorizedHandler(new RestAuthFailureHandler(configuration.getAuthenticationServiceConfiguration()))
 		            .buildAuthFilter()));
+        environment.jersey().register(injector.getInstance(KeyUploaderResource.class));
+    }
 
 		environment.jersey().register(RolesAllowedDynamicFeature.class);
 		environment.jersey().register(new AuthValueFactoryProvider.Binder<>(UserInfo.class));
-        
+
     }
 }

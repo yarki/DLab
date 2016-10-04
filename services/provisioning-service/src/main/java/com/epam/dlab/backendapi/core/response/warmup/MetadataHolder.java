@@ -1,4 +1,4 @@
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.backendapi.core.response.warmup;
 
 import com.epam.dlab.backendapi.api.ImageMetadata;
 

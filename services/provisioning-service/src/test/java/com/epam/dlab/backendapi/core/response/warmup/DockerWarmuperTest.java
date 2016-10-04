@@ -1,11 +1,14 @@
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.backendapi.core.response.warmup;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.api.ImageMetadata;
+import com.epam.dlab.backendapi.core.CommandExecuter;
+import com.epam.dlab.backendapi.core.response.FolderListener;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import io.dropwizard.util.Duration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,15 +56,15 @@ public class DockerWarmuperTest {
 
     private ProvisioningServiceApplicationConfiguration createConfiguration() {
         ProvisioningServiceApplicationConfiguration result = mock(ProvisioningServiceApplicationConfiguration.class);
-        when(result.getResponseDirectory()).thenReturn("/tmp");
-        when(result.getPollTimeout()).thenReturn(3);
+        when(result.getWarmupDirectory()).thenReturn("/tmp");
+        when(result.getWarmupPollTimeout()).thenReturn(Duration.seconds(3));
         return result;
     }
 
     private CommandExecuter createCommandExecuter() {
         CommandExecuter result = mock(CommandExecuter.class);
         try {
-            when(result.execute(anyString())).thenReturn(Collections.singletonList("executeResult"));
+            when(result.executeSync(anyString())).thenReturn(Collections.singletonList("executeResult"));
         } catch (Exception e) {
             e.printStackTrace();
         }

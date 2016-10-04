@@ -30,6 +30,11 @@
 			<artifactId>mockito-core</artifactId>
 			<version>${org.mockito.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>${org.glassfish.jersey.media.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>com.epam.dlab.auth</groupId>
 			<artifactId>security</artifactId>

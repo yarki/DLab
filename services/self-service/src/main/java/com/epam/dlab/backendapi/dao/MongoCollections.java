@@ -4,6 +4,8 @@ package com.epam.dlab.backendapi.dao;
  * Created by Alexey Suprun
  */
 public interface MongoCollections {
-    String LOGIN_ATTEMPT = "loginAttempt";
-    String DOCKER_ATTEMPT = "dockerAttempt";
+    String LOGIN_ATTEMPTS = "loginAttempts";
+    String DOCKER_ATTEMPTS = "dockerAttempts";
+    String USER_KEYS = "userKeys";
+    String USER_AWS_CREDENTIAL = "userAWSCredentials";
 }

@@ -22,7 +22,7 @@ import com.epam.dlab.auth.core.AuthenticationServiceConfig;
 import com.epam.dlab.auth.core.UserInfo;
 import com.epam.dlab.backendapi.api.ImageMetadata;
 import com.epam.dlab.backendapi.client.mongo.MongoService;
-import com.epam.dlab.backendapi.client.rest.ProvisioningAPI;
+import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.client.rest.SecurityAPI;
 import com.google.inject.AbstractModule;
@@ -32,7 +32,7 @@ import com.mongodb.client.MongoCollection;
 /**
  * Created by Alexey Suprun
  */
-public class MockModule extends AbstractModule implements SecurityAPI, ProvisioningAPI {
+public class MockModule extends AbstractModule implements SecurityAPI, DockerAPI {
     @Override
     protected void configure() {
         bind(MongoService.class).toInstance(createMongoService());

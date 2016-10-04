@@ -1,5 +1,17 @@
-responseDirrectory: /tmp/dlab
-pollTimeout: 5
+keyDirectory: /home/ubuntu
+responseDirectory: /tmp/dlab
+warmupPollTimeout: 10s
+keyLoaderPollTimeout: 20m
+adminKey: BDCC-DSS-POC.pem
+edgeImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-edge
+
+self-service:
+  protocol: http
+  host: EPRUPETW1232.PETERSBURG.epam.com
+  port: 8080
+  jerseyClient:
+    timeout: 3s
+    connectionTimeout: 3s
 
 server:
   applicationConnectors:
