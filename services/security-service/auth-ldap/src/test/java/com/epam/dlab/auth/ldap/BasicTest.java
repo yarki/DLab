@@ -1,8 +1,6 @@
-package com.epam.datalab.auth.ldap;
+package com.epam.dlab.auth.ldap;
 
-import java.util.Scanner;
-
-import org.apache.directory.api.ldap.model.cursor.EntryCursor;
+import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.message.SearchRequest;
@@ -13,7 +11,8 @@ import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
-import org.apache.directory.ldap.client.api.PoolableLdapConnectionFactory;
+import org.apache.directory.ldap.client.api.ValidatingPoolableLdapConnectionFactory;
+//import org.apache.directory.ldap.client.api.PoolableLdapConnectionFactory;
 
 public class BasicTest {
 
@@ -24,8 +23,8 @@ public class BasicTest {
 		config.setLdapPort( 3890 );
 		config.setName( "cn=admin,dc=example,dc=com" );
 		config.setCredentials( "ldap" );
-		PoolableLdapConnectionFactory factory = new PoolableLdapConnectionFactory( config );
-		LdapConnectionPool pool = new LdapConnectionPool( factory );
+		PoolableObjectFactory<LdapConnection> poolFactory = new ValidatingPoolableLdapConnectionFactory( config );
+		LdapConnectionPool pool = new LdapConnectionPool( poolFactory );
 		pool.setTestOnBorrow( true );
 		LdapConnection con = pool.borrowObject();
 		
@@ -79,7 +78,7 @@ public class BasicTest {
 		
 		con.unBind();
 		
-		con.bind("uid=mike,ou=People,dc=example,dc=com","miket");
+		con.bind("uid=mike,ou=People,dc=example,dc=com","test");
 	    sr.setFilter("(uid=mike)");
 	    sr.setMessageId(2);
 	    cursor = con.search( sr );

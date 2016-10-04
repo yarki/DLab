@@ -5,6 +5,7 @@
 import boto3
 import os
 import argparse
+import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dry_run', type=str, default='false')

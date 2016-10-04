@@ -1,4 +1,4 @@
-package com.epam.datalab.auth.ldap;
+package com.epam.dlab.auth.ldap;
 
 public class AuthTest {
 

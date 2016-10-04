@@ -15,10 +15,17 @@ limitations under the License.
 */
 package com.epam.dlab.auth.ldap;
 
+import java.util.List;
+
+import org.apache.directory.api.ldap.model.message.SearchRequest;
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.client.DataLabAuthenticationConfig;
+import com.epam.dlab.auth.ldap.api.LdapAuthenticationService;
+import com.epam.dlab.auth.ldap.api.LoginService;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -26,7 +33,7 @@ import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 
 
-public class LdapAuthenticationApp extends Application<DataLabAuthenticationConfig> {
+public class LdapAuthenticationApp extends Application<LdapAuthenticationConfig> {
 
 	private final static Logger LOG = LoggerFactory.getLogger(LdapAuthenticationApp.class);
 	
@@ -40,18 +47,23 @@ public class LdapAuthenticationApp extends Application<DataLabAuthenticationConf
 			params = new String[] { "server", "config.yml" };
 		}
 		LOG.debug("Starting Config Authentication Service with params: {}",String.join(",", params));
+		PythonInterpreter.initialize(System.getProperties(),System.getProperties(), new String[0]);
 		new LdapAuthenticationApp().run(params);
 	}
 
 	@Override
-	public void initialize(Bootstrap<DataLabAuthenticationConfig> bootstrap) {
-		bootstrap.addBundle(new ViewBundle<DataLabAuthenticationConfig>());
+	public void initialize(Bootstrap<LdapAuthenticationConfig> bootstrap) {
+		bootstrap.addBundle(new ViewBundle<LdapAuthenticationConfig>());
 	}
 
 	@Override
-	public void run(DataLabAuthenticationConfig conf, Environment env) throws Exception {
-//		env.jersey().register( new Login(conf) );
-//		env.jersey().register( new Logout(conf) );
+	public void run(LdapAuthenticationConfig conf, Environment env) throws Exception {
+		
+		String ldapBindTemplate = conf.getLdapBindTemplate();
+		LOG.debug("ldapBindTemplate {}",ldapBindTemplate);
+		
+		env.jersey().register( new LoginService(conf) );
+		env.jersey().register( new LdapAuthenticationService(conf) );
 //		env.jersey().register( new Authenticate(conf) );
 //		env.jersey().register( new Authorize(conf) );
 	}
