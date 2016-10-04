@@ -35,6 +35,7 @@ parser.add_argument('--nbs_ip', type=str, default='', help='Notebook server IP c
 parser.add_argument('--nbs_user', type=str, default='ubuntu',
                     help='Username to be used for connection to Notebook server')
 parser.add_argument('--s3_bucket', type=str, default='dsa-poc-test-bucket', help='S3 bucket name to work with')
+parser.add_argument('--emr_timeout', type=int, default=1200)
 args = parser.parse_args()
 
 cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/config/{1}/hive-site.xml, ActionOnFailure=CONTINUE,Jar=command-runner.jar; " \
@@ -89,7 +90,7 @@ def get_subnet_from_cidr(cidr):
     return ''
 
 
-def wait_emr(bucket, cluster_name, timeout=1200, delay=20):
+def wait_emr(bucket, cluster_name, timeout, delay=20):
     deadline = time.time() + timeout
     prefix = "config/" + cluster_name + "/"
     global cluster_id
@@ -133,16 +134,6 @@ def get_emr_state(id):
     )
     state = data.get('Cluster').get('Status').get('State')
     return state
-
-
-def get_emr_stats(region):
-    emr = boto3.client('emr')
-    clusters = emr.list_clusters(
-        ClusterStates=['RUNNING', 'TERMINATED']
-    )
-    clusters = clusters.get('Clusters')
-    result = clusters[0]
-    return result
 
 
 def action_validate(id):
@@ -245,22 +236,19 @@ if __name__ == "__main__":
         build_emr_cluster(args)
     else:
         cluster_id = build_emr_cluster(args)
-        if wait_emr(args.s3_bucket, args.name):
-            if args.nbs_ip != '':
-                nbs_id = get_instance_by_ip(args.nbs_ip)
-                current_sg = nbs_id.security_groups
-                sg_list=[]
-                for i in current_sg:
-                    sg_list.append(i['GroupId'])
-                sg_master, sg_slave = emr_sg(cluster_id)
-                sg_list.extend([sg_master, sg_slave])
-                nbs_id.modify_attribute( Groups = sg_list)
-            else:
-                print "Notebook server IP and/or user are not defined ! Terminatig the cluster..."
-                terminate_emr(cluster_id)
-                #                s3_cleanup(args.name, args.s3_bucket)
+        if wait_emr(args.s3_bucket, args.name, args.emr_timeout):
+            # Append Cluster's SGs to the Notebook server to grant access
+            nbs_id = get_instance_by_ip(args.nbs_ip)
+            current_sg = nbs_id.security_groups
+            sg_list=[]
+            for i in current_sg:
+                sg_list.append(i['GroupId'])
+            sg_master, sg_slave = emr_sg(cluster_id)
+            sg_list.extend([sg_master, sg_slave])
+            nbs_id.modify_attribute( Groups = sg_list)
         else:
             if action_validate(id)[0] == "True":
                 print "Timeout reached. Please increase timeout period and try again. Now terminating the cluster..."
                 terminate_emr(cluster_id)
-                #               s3_cleanup(args.name, args.s3_bucket)
+                s3_cleanup(args.s3_bucket, args.name)
+    sys.exit(0)

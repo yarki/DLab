@@ -111,9 +111,9 @@ def run():
         emr_conf['cluster_name'], emr_conf['apps'], emr_conf['instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'],
         emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], os.environ['edge_user_name'], os.environ['bucket_name'])
     if not run_routine('create_cluster', params):
-        logging.info('Failed creating instance')
+        logging.info('Failed creating EMR Cluster')
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to create instance", "conf": emr_conf}
+            res = {"error": "Failed to create EMR Cluster", "conf": emr_conf}
             print json.dumps(res)
             result.write(json.dumps(res))
         sys.exit(1)
