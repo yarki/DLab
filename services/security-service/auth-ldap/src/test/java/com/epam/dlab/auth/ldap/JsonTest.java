@@ -33,7 +33,7 @@ public class JsonTest {
 	}
 
 	@Test
-	public void test() throws IOException {
+	public void test1() throws IOException {
 		ObjectMapper om = new ObjectMapper();
 		String jv = om.writeValueAsString(new UserInfo("user","info"));
 		assertNotNull(jv);
@@ -41,6 +41,26 @@ public class JsonTest {
 		UserInfo ui = om.readerFor(UserInfo.class).readValue(jv);
 		assertNotNull(ui);
 		System.out.println(ui);
+		//String js = "{\\\"username\\\":\"user\",\\\"access_token\\\":\"info\",\\\"firstName\\\":null,\\\"lastName\\\":null,\\\"roles\\\":[]}";
+		//System.out.println(js);
+		//UserInfo ui2 = om.readerFor(UserInfo.class).readValue(js);
+		
+		
+	}
+	@Test
+	public void test2() throws IOException {
+		ObjectMapper om = new ObjectMapper();
+		UserInfo ui = new UserInfo("user","info");
+		ui.setFirstName("first");
+		ui.setLastName("last");
+		ui.addRole("r1");
+		ui.addRole("r2");
+		String jv = om.writeValueAsString(ui);
+		assertNotNull(jv);
+		System.out.println(jv);
+		UserInfo ui2 = om.readerFor(UserInfo.class).readValue(jv);
+		assertNotNull(ui2);
+		System.out.println(ui2);
 		//String js = "{\\\"username\\\":\"user\",\\\"access_token\\\":\"info\",\\\"firstName\\\":null,\\\"lastName\\\":null,\\\"roles\\\":[]}";
 		//System.out.println(js);
 		//UserInfo ui2 = om.readerFor(UserInfo.class).readValue(js);

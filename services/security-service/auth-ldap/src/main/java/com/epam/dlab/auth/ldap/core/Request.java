@@ -21,12 +21,15 @@ public class Request {
     filter: 
  * */
 	
+	private String name;
 	private String scope;
 	private List<String> attributes;
 	private int timeLimit = 0;
 	private String base;
 	private String filter = "";
 	private SearchResultProcessor searchResultProcessor;
+	private boolean cache;
+	private long expirationTimeMsec;
 	public String getScope() {
 		return scope;
 	}
@@ -48,6 +51,24 @@ public class Request {
 	}
 	public void setSearchResultProcessor(SearchResultProcessor searchResultProcessor) {
 		this.searchResultProcessor = searchResultProcessor;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public boolean isCache() {
+		return cache;
+	}
+	public void setCache(boolean cache) {
+		this.cache = cache;
+	}
+	public long getExpirationTimeMsec() {
+		return expirationTimeMsec;
+	}
+	public void setExpirationTimeMsec(long expirationTimeMsec) {
+		this.expirationTimeMsec = expirationTimeMsec;
 	}
 	public SearchRequest buildSearchRequest(Map<String,Object> replace) {
 		SearchRequest sr = new SearchRequestImpl();

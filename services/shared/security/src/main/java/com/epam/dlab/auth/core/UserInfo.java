@@ -16,6 +16,7 @@ limitations under the License.
 package com.epam.dlab.auth.core;
 
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -57,11 +58,16 @@ public class UserInfo implements Principal {
 		return roles;
 	}
 
-	@JsonSetter("roles")
+	//@JsonSetter("roles")
 	public void addRoles(Collection<String> roles) {
 		roles.addAll(roles);
 	}
-	
+
+	@JsonSetter("roles")
+	public void addRoles(String[] r) {
+		roles.addAll(Arrays.asList(r));
+	}
+
 	public void addRole(String role) {
 		roles.add(role);
 	}
