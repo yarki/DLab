@@ -5,12 +5,15 @@ import string
 import yaml
 import subprocess
 import time
+import sys
 
 path = "/etc/mongod.conf"
 outfile = "/etc/mongo_params.yml"
 
+
 def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
+
 
 def read_yml_conf(path,section,param):
     try:
@@ -21,6 +24,7 @@ def read_yml_conf(path,section,param):
     except:
         print "File does not exist"
         return ''
+
 
 def add_2_yml_config(path,section,param,value):
     try:

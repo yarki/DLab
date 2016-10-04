@@ -16,6 +16,7 @@ args = parser.parse_args()
 
 
 if __name__ == "__main__":
+    success = False
     tag = {"Key": args.infra_tag_name, "Value": args.infra_tag_value}
     if args.subnet != '':
         try:
@@ -27,9 +28,14 @@ if __name__ == "__main__":
             else:
                 print "REQUESTED SUBNET ALREADY EXISTS"
             print "SUBNET_ID " + subnet_id
-            sys.exit(0)
+            success = True
         except:
-            sys.exit(1)
+            success = False
     else:
         parser.print_help()
         sys.exit(2)
+
+    if success:
+        sys.exit(0)
+    else:
+        sys.exit(1)

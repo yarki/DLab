@@ -5,21 +5,26 @@ from fabric.api import local
 
 
 if __name__ == "__main__":
-    log = local('cd /root; fab run')
+    success = True
+    try:
+        local('cd /root; fab run')
+    except:
+        success = False
 
     reply = dict()
     reply['request_id'] = os.environ['request_id']
-    reply['status'] = 'ok'
+    if success:
+        reply['status'] = 'ok'
+    else:
+        reply['status'] = 'err'
 
-    if len(log.stderr) > 0:
-        reply['status'] = 'fail'
     reply['response'] = dict()
 
     try:
         with open("/root/result.json") as f:
             reply['response']['result'] = json.loads(f.read())
     except:
-        pass
+        reply['response']['result'] = {"error": "Failed to open result itself. Bad sign."}
 
     reply['response']['log'] = "/response/%s.log" % os.environ['request_id']
 

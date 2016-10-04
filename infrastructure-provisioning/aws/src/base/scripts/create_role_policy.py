@@ -16,6 +16,7 @@ args = parser.parse_args()
 
 
 if __name__ == "__main__":
+    success = False
     if args.role_name != '':
         try:
             role_name = get_role_by_name(args.role_name)
@@ -34,9 +35,15 @@ if __name__ == "__main__":
                 for bit in policy_arn_bits:
                     attach_policy(bit, args.role_name)
             print "POLICY %s created " % args.policy_name
-            sys.exit(0)
+            success = True
         except:
-            sys.exit(1)
+            success = False
     else:
         parser.print_help()
         sys.exit(2)
+
+    if success:
+        sys.exit(0)
+    else:
+        sys.exit(1)
+
