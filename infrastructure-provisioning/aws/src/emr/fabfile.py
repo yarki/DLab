@@ -30,6 +30,7 @@ def run():
     emr_conf['role_service_name'] = os.environ['service_role']
     emr_conf['role_ec2_name'] = os.environ['ec2_role']
 
+    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + ', ' + emr_conf['service_base_name'] + '-Tag=EMR'
     emr_conf['cluster_name'] = emr_conf['service_base_name'] + os.environ['edge_user_name'] + emr_conf['cluster_tag']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-bucket').lower().replace('_', '-')
 
@@ -107,9 +108,9 @@ def run():
     logging.info('[CREATE EMR CLUSTER]')
     print '[CREATE EMR CLUSTER]'
     params = "--name {} --applications {} --instance_type {} --instance_count {} --ssh_key {} --release_label {} " \
-             "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user --s3_bucket {}".format(
+             "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user --s3_bucket {} --tags {}".format(
         emr_conf['cluster_name'], emr_conf['apps'], emr_conf['instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'],
-        emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], os.environ['edge_user_name'], os.environ['bucket_name'])
+        emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], os.environ['edge_user_name'], os.environ['bucket_name'], emr_conf['tags'])
     if not run_routine('create_cluster', params):
         logging.info('Failed creating EMR Cluster')
         with open("/root/result.json", 'w') as result:
