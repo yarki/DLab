@@ -1,14 +1,13 @@
 package com.epam.dlab.backendapi.resources;
 
-import com.epam.dlab.auth.core.UserInfo;
-import com.epam.dlab.backendapi.api.ImageMetadata;
-import com.epam.dlab.backendapi.api.User;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
-import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.dao.DockerDAO;
 import com.epam.dlab.backendapi.dao.MongoCollections;
+import com.epam.dlab.dto.UserInfo;
+import com.epam.dlab.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.sun.javafx.iio.ImageMetadata;
 import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

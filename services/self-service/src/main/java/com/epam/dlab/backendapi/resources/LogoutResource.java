@@ -1,19 +1,16 @@
 package com.epam.dlab.backendapi.resources;
 
-import com.epam.dlab.auth.core.AuthenticationServiceConfig;
-import com.epam.dlab.backendapi.client.rest.SecurityAPI;
+import com.epam.dlab.auth.AuthenticationConfiguration;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
-
-import static com.epam.dlab.auth.rest_api.AbstractAuthenticationService.POST_LOGIN_REDIRECT_HEAD;
 
 /**
  * Created by Alexey Suprun
@@ -21,11 +18,11 @@ import static com.epam.dlab.auth.rest_api.AbstractAuthenticationService.POST_LOG
 @Path("/logout")
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 @Produces(MediaType.TEXT_HTML)
-public class LogoutResource implements MongoCollections, SecurityAPI {
+public class LogoutResource implements MongoCollections {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginResource.class);
 
     @Inject
-    AuthenticationServiceConfig authenticationConfig;
+    AuthenticationConfiguration authenticationConfig;
 
     @Inject
     Client jerseyClient;

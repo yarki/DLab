@@ -1,16 +1,15 @@
 package com.epam.dlab.backendapi.core.response.keyloader;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.api.UploadFileDTO;
-import com.epam.dlab.backendapi.api.UserAWSCredential;
-import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.client.rest.SelfAPI;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.FolderListener;
+import com.epam.dlab.dto.UploadFileDTO;
+import com.epam.dlab.dto.UserAWSCredentialDTO;
+import com.epam.dlab.restclient.RESTService;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
@@ -60,9 +59,9 @@ public class KeyLoader implements DockerCommands, SelfAPI {
             LOGGER.debug("get file {}", fileName);
             if (uuid.equals(DockerCommands.extractUUID(fileName))) {
                 JsonNode node = MAPPER.readTree(content).get(RESPONSE_NODE).get(RESULT_NODE);
-                UserAWSCredential result = MAPPER.readValue(node.toString(), UserAWSCredential.class);
+                UserAWSCredentialDTO result = MAPPER.readValue(node.toString(), UserAWSCredentialDTO.class);
                 result.setUser(user);
-                selfService.post(KEY_LOADER, result, UserAWSCredential.class);
+                selfService.post(KEY_LOADER, result, UserAWSCredentialDTO.class);
             }
         };
     }

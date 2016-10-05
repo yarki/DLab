@@ -1,12 +1,11 @@
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.auth.client.RestAuthFailureHandler;
-import com.epam.dlab.auth.client.RestAuthenticator;
-import com.epam.dlab.auth.core.UserInfo;
+import com.epam.dlab.auth.RestAuthenticator;
+import com.epam.dlab.auth.RestAuthenticatorFailureHandler;
 import com.epam.dlab.backendapi.core.guice.ModuleFactory;
-import com.epam.dlab.backendapi.resources.AfterLoginResource;
 import com.epam.dlab.backendapi.resources.DockerResource;
 import com.epam.dlab.backendapi.resources.LoginResource;
+import com.epam.dlab.dto.UserInfo;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
@@ -39,16 +38,14 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
         Injector injector = Guice.createInjector(ModuleFactory.getModule(configuration, environment));
         createAuth(injector, configuration, environment);
         environment.jersey().register(injector.getInstance(LoginResource.class));
-        environment.jersey().register(injector.getInstance(AfterLoginResource.class));
         environment.jersey().register(MultiPartFeature.class);
         environment.jersey().register(injector.getInstance(DockerResource.class));
     }
 
     private void createAuth(Injector injector, SelfServiceApplicationConfiguration configuration, Environment environment) {
-        RestAuthenticator authenticator = injector.getInstance(RestAuthenticator.class);
         environment.jersey().register(new AuthDynamicFeature(
                 new OAuthCredentialAuthFilter.Builder<UserInfo>()
-                        .setAuthenticator(authenticator)
+                        .setAuthenticator(injector.getInstance(RestAuthenticator.class))
                         .setAuthorizer(new Authorizer<UserInfo>() {
                             @Override
                             public boolean authorize(UserInfo principal, String role) {
@@ -57,7 +54,6 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
                             }
                         })
                         .setPrefix("Bearer")
-                        .setUnauthorizedHandler(new RestAuthFailureHandler(configuration.getAuthenticationServiceConfiguration()))
                         .buildAuthFilter()));
 
         environment.jersey().register(RolesAllowedDynamicFeature.class);

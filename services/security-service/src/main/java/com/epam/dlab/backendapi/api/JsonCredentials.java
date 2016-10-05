@@ -1,7 +1,6 @@
 package com.epam.dlab.backendapi.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.auth.basic.BasicCredentials;
 
 /**
  * Created by Alexey Suprun

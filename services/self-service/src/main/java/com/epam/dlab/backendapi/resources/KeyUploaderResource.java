@@ -1,10 +1,10 @@
 package com.epam.dlab.backendapi.resources;
 
-import com.epam.dlab.backendapi.api.UploadFileDTO;
-import com.epam.dlab.backendapi.api.UserAWSCredential;
 import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
-import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.dao.KeyDAO;
+import com.epam.dlab.dto.UploadFileDTO;
+import com.epam.dlab.dto.UserAWSCredentialDTO;
+import com.epam.dlab.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -57,7 +57,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     }
 
     @POST
-    public Response loadKeyResponse(UserAWSCredential credential) {
+    public Response loadKeyResponse(UserAWSCredentialDTO credential) {
         LOGGER.debug("credential loaded for user {}", credential.getUser());
         dao.saveCredential(credential);
         return Response.ok().build();

@@ -16,8 +16,8 @@
     <dependencies>
         <dependency>
             <groupId>com.epam.dlab</groupId>
-            <artifactId>security</artifactId>
-            <version>1.0</version>
+            <artifactId>common</artifactId>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>

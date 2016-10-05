@@ -1,6 +1,5 @@
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.client.rest.RESTService;
 import com.epam.dlab.backendapi.core.response.ResponseDirectoriesCreator;
 import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
