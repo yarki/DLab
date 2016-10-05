@@ -34,8 +34,12 @@ def run():
     emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + ', ' + emr_conf['service_base_name'] + '-Tag=EMR'
     emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-' + str(index + 1)
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-bucket').lower().replace('_', '-')
+    try:
+        emr_conf['emr_timeout'] = os.environ['emr_timeout']
+    except:
+        emr_conf['emr_timeout'] = "1200"
 
-    # TBD
+        # TBD
 #    emr_conf['emr_security_group_name'] = emr_conf['instance_name'] + '-SG'
 #    emr_conf['isolated_security_group_name'] = emr_conf['instance_name'] + '-isolated-SG'
 #    emr_conf['security_group_rules'] = [{"IpProtocol": "-1",
@@ -108,9 +112,9 @@ def run():
 
     logging.info('[CREATE EMR CLUSTER]')
     print '[CREATE EMR CLUSTER]'
-    params = "--name {} --applications '{}' --instance_type {} --instance_count {} --ssh_key {} --release_label {} " \
+    params = "--name {} --applications '{}' --instance_type {} --instance_count {} --ssh_key {} --release_label {} --emr_timeout {} " \
              "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --tags '{}'".format(
-        emr_conf['cluster_name'], emr_conf['apps'], emr_conf['instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'],
+        emr_conf['cluster_name'], emr_conf['apps'], emr_conf['instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'], emr_conf['emr_timeout'],
         emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], os.environ['edge_user_name'], emr_conf['bucket_name'], emr_conf['tags'])
     if not run_routine('create_cluster', params):
         logging.info('Failed creating EMR Cluster')
