@@ -14,7 +14,7 @@ def run():
                         filename=local_log_filepath)
 
     create_aws_config_files()
-    index = resource_count('EMR', os.environ['conf_service_base_name']):
+    index = resource_count('EMR', os.environ['conf_service_base_name'])
     print 'Generating infrastructure names and tags'
     emr_conf = dict()
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
