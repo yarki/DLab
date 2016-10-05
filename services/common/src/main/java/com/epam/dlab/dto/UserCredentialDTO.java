@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Created by Alexey Suprun
  */
-public class UserCredential {
+public class UserCredentialDTO {
     @JsonProperty
     private String username;
 

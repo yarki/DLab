@@ -1,6 +1,5 @@
 package com.epam.dlab.auth;
 
-import com.epam.dlab.dto.UserInfo;
 import com.google.inject.Injector;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;

@@ -1,4 +1,4 @@
-package com.epam.dlab.dto;
+package com.epam.dlab.auth;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

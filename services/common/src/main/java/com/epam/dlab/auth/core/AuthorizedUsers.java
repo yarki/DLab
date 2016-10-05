@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.epam.dlab.auth.core;
 
-import com.epam.dlab.dto.UserInfo;
+import com.epam.dlab.auth.UserInfo;
 import jersey.repackaged.com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

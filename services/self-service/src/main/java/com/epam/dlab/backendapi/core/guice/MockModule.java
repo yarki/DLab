@@ -4,7 +4,7 @@ import com.epam.dlab.auth.SecurityAPI;
 import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.dto.ImageMetadataDTO;
-import com.epam.dlab.dto.UserInfo;
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.restclient.RESTService;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;

@@ -1,6 +1,5 @@
 package com.epam.dlab.auth;
 
-import com.epam.dlab.dto.UserInfo;
 import io.dropwizard.auth.Authorizer;
 
 /**

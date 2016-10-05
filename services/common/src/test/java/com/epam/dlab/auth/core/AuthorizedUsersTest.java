@@ -1,6 +1,6 @@
 package com.epam.dlab.auth.core;
 
-import com.epam.dlab.dto.UserInfo;
+import com.epam.dlab.auth.UserInfo;
 import org.junit.*;
 
 import static org.junit.Assert.assertNotNull;

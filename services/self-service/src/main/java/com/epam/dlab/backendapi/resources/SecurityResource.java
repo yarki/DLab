@@ -2,8 +2,8 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.SecurityAPI;
 import com.epam.dlab.backendapi.dao.MongoCollections;
-import com.epam.dlab.dto.UserCredential;
-import com.epam.dlab.dto.UserInfo;
+import com.epam.dlab.dto.UserCredentialDTO;
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -35,7 +35,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
 
     @Path("/login")
     @POST
-    public Optional<UserInfo> login(UserCredential credential) {
+    public Optional<UserInfo> login(UserCredentialDTO credential) {
         LOGGER.debug("Try login user = {}", credential.getUsername());
         return authenticationService.post(LOGIN, credential, Optional.class);
     }
