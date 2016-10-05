@@ -40,6 +40,18 @@ def configure_mongo():
         return False
 
 
+def start_ss():
+    try:
+        if not exists('/tmp/ss_started'):
+            sudo('mkdir /root/self-service')
+            local('scp -i {} /root/application.yml {}:/root/self-service/'.format(args.keyfile, env.host_string))
+            local('scp -i {} /root/self-service-1.0.jar {}:/root/self-service/'.format(args.keyfile, env.host_string))
+            sudo('screen -d -m java -jar /root/self-service/self-service-1.0.jar server /root/self-service/application.yml')
+            touch('/tmp/ss_started')
+        return True
+    except:
+        return False
+
 ##############
 # Run script #
 ##############
@@ -59,6 +71,10 @@ if __name__ == "__main__":
 
     print "Configuring MongoDB"
     if not configure_mongo():
+        sys.exit(1)
+
+    print "Starting Self-Service(UI)"
+    if not start_ss():
         sys.exit(1)
 
     sys.exit(0)

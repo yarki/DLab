@@ -1,7 +1,7 @@
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.client.rest.RESTServiceFactory;
 import com.epam.dlab.backendapi.core.response.ResponseDirectories;
+import com.epam.dlab.restclient.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;
@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
  * Created by Alexey Suprun
  */
 public class ProvisioningServiceApplicationConfiguration extends Configuration implements ResponseDirectories {
-    public static final String SELF_SERVICE = "self-service";
+    public static final String SELF_SERVICE = "selfService";
 
     @NotEmpty
     @JsonProperty

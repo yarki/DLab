@@ -1,12 +1,11 @@
 package com.epam.dlab.backendapi.core.response.warmup;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.api.ImageMetadata;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.FolderListener;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.epam.dlab.dto.ImageMetadataDTO;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.dropwizard.lifecycle.Managed;
@@ -31,7 +30,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     @Inject
     private CommandExecuter commandExecuter;
     private Map<String, String> uuids = new ConcurrentHashMap<>();
-    private Set<ImageMetadata> metadatas = new ConcurrentHashSet<>();
+    private Set<ImageMetadataDTO> metadatas = new ConcurrentHashSet<>();
 
     @Override
     public void start() throws Exception {
@@ -53,7 +52,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
             String uuid = DockerCommands.extractUUID(fileName);
             if (uuids.containsKey(uuid)) {
                 LOGGER.debug("hadle file {}", fileName);
-                ImageMetadata metadata = MAPPER.readValue(content, ImageMetadata.class);
+                ImageMetadataDTO metadata = MAPPER.readValue(content, ImageMetadataDTO.class);
                 metadata.setImage(uuids.get(uuid));
                 metadatas.add(metadata);
             }
@@ -68,7 +67,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
         return Collections.unmodifiableMap(uuids);
     }
 
-    public Set<ImageMetadata> getMetadatas() {
+    public Set<ImageMetadataDTO> getMetadatas() {
         return Collections.unmodifiableSet(metadatas);
     }
 }

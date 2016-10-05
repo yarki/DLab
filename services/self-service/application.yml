@@ -7,7 +7,7 @@ mongo:
   password: dlab
   database: dlab
 
-security-service:
+securityService:
   protocol: http
   host: localhost
   port: 8082
@@ -15,7 +15,7 @@ security-service:
     timeout: 3s
     connectionTimeout: 3s
 
-provisioning-service:
+provisioningService:
   protocol: http
   host: localhost
   port: 8084
@@ -37,10 +37,6 @@ logging:
     com.epam: DEBUG
   appenders:
     - type: console
-    
-#authenticationServiceConfiguration:
-#  type: http
-#  host: localhost
-#  port: 8090
-#  loginFormUrl: /webapp/index.html
+
+
  
