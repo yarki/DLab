@@ -3,6 +3,7 @@ package com.epam.dlab.restclient;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -29,9 +30,12 @@ public class RESTService {
     }
 
     public Invocation.Builder getBuilder(String path) {
-        return client.target(url)
-                .path(path)
+        return getWebTarget(path)
                 .request(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
+    }
+
+    public WebTarget getWebTarget(String path) {
+        return client.target(url).path(path);
     }
 }

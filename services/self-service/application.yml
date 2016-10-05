@@ -7,7 +7,7 @@ mongo:
   password: dlab
   database: dlab
 
-authenticationConfiguration:
+securityService:
   protocol: http
   host: localhost
   port: 8082

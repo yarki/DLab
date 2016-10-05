@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.HashSet;
 import java.util.Set;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
@@ -23,7 +22,7 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
  * Created by Alexey Suprun
  */
 @Path("/docker")
-@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class DockerResource implements MongoCollections, DockerAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerResource.class);
@@ -38,8 +37,7 @@ public class DockerResource implements MongoCollections, DockerAPI {
     public Set<ImageMetadata> getDockerImages(@Auth UserInfo userInfo) {
         LOGGER.debug("docker statuses asked");
         dao.writeDockerAttempt();
-//        return provisioningService.get(DOCKER, Set.class);
-        return new HashSet<>();
+        return provisioningService.get(DOCKER, Set.class);
     }
 
     @Path("/run")

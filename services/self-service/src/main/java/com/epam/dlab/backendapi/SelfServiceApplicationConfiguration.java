@@ -1,6 +1,5 @@
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.auth.AuthenticationConfiguration;
 import com.epam.dlab.backendapi.client.mongo.MongoServiceFactory;
 import com.epam.dlab.restclient.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,7 +8,7 @@ import io.dropwizard.Configuration;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import static com.epam.dlab.auth.RestAuthenticator.AUTHENTICATION_CONFIGURATION;
+import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 
 /**
  * Created by Alexey Suprun
@@ -30,14 +29,13 @@ public class SelfServiceApplicationConfiguration extends Configuration {
 
     @Valid
     @NotNull
-    @JsonProperty(AUTHENTICATION_CONFIGURATION)
+    @JsonProperty(SECURITY_SERVICE)
     private RESTServiceFactory authenticationFactory;
 
     @Valid
     @NotNull
     @JsonProperty(PROVISIONING_SERVICE)
     private RESTServiceFactory provisioningFactory = new RESTServiceFactory();
-
 
 
     public boolean isMocked() {

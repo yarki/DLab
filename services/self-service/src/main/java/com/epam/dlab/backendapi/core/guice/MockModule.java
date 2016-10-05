@@ -1,11 +1,11 @@
 package com.epam.dlab.backendapi.core.guice;
 
+import com.epam.dlab.auth.SecurityAPI;
 import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.dto.ImageMetadataDTO;
 import com.epam.dlab.dto.UserInfo;
 import com.epam.dlab.restclient.RESTService;
-import com.epam.dlab.restclient.SecurityAPI;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import com.mongodb.client.MongoCollection;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static com.epam.dlab.auth.RestAuthenticator.AUTHENTICATION_CONFIGURATION;
+import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
@@ -27,7 +27,7 @@ public class MockModule extends AbstractModule implements SecurityAPI, DockerAPI
     @Override
     protected void configure() {
         bind(MongoService.class).toInstance(createMongoService());
-        bind(RESTService.class).annotatedWith(Names.named(AUTHENTICATION_CONFIGURATION))
+        bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
                 .toInstance(createAuthenticationService());
         bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
                 .toInstance(createProvisioningService());

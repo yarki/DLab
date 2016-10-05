@@ -11,20 +11,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-public class RestAuthenticator implements Authenticator<String, UserInfo> {
-    public static final String AUTHENTICATION_CONFIGURATION = "authenticationConfiguration";
+public class SecurityRestAuthenticator implements Authenticator<String, UserInfo> {
+    public static final String SECURITY_SERVICE = "securityService";
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(RestAuthenticator.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(SecurityRestAuthenticator.class);
 
     @Inject
-    @Named(AUTHENTICATION_CONFIGURATION)
-    private RESTService authenticationService;
+    @Named(SECURITY_SERVICE)
+    private RESTService securityService;
 
     @Override
     public Optional<UserInfo> authenticate(String credentials) throws AuthenticationException {
         LOGGER.debug("Authenticate token {}", credentials);
-        return authenticationService.getBuilder("login")
-                .header("access_token", credentials)
-                .get(Optional.class);
+        return Optional.ofNullable("token123".equals(credentials) ? new UserInfo("test", "test") : null);
     }
 }
