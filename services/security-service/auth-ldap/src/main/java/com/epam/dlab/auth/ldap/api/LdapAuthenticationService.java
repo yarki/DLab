@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.FormParam;
@@ -20,35 +18,23 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
-import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.message.SearchRequest;
-import org.apache.directory.api.ldap.model.message.SearchRequestImpl;
-import org.apache.directory.api.ldap.model.message.SearchResultEntry;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
 import org.apache.directory.ldap.client.api.ValidatingPoolableLdapConnectionFactory;
-import org.python.core.PyCode;
 import org.python.core.PyDictionary;
-import org.python.core.PyInstance;
-import org.python.core.PyObject;
-import org.python.core.PyString;
-import org.python.util.PythonInterpreter;
 
-import com.epam.dlab.auth.core.AuthorizedUsers;
-import com.epam.dlab.auth.core.UserInfo;
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.ldap.LdapAuthenticationConfig;
 import com.epam.dlab.auth.ldap.core.Request;
-import com.epam.dlab.auth.ldap.core.UserInfoFields;
 import com.epam.dlab.auth.ldap.core.filter.SearchResultProcessor;
 import com.epam.dlab.auth.ldap.core.python.DeepDictionary;
 import com.epam.dlab.auth.ldap.core.python.PythonUserInfoEnrichment;
 import com.epam.dlab.auth.ldap.core.python.SearchResultToDictionaryMapper;
-import com.epam.dlab.auth.rest_api.AbstractAuthenticationService;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.epam.dlab.auth.rest.AbstractAuthenticationService;
+import com.epam.dlab.auth.rest.AuthorizedUsers;
 
 @Path("/")
 public class LdapAuthenticationService extends AbstractAuthenticationService<LdapAuthenticationConfig> {

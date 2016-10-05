@@ -15,15 +15,10 @@ limitations under the License.
 */
 package com.epam.dlab.auth.ldap;
 
-import java.util.List;
-
-import org.apache.directory.api.ldap.model.message.SearchRequest;
-import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.auth.client.DataLabAuthenticationConfig;
 import com.epam.dlab.auth.ldap.api.LdapAuthenticationService;
 import com.epam.dlab.auth.ldap.api.LoginService;
 
