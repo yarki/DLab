@@ -30,7 +30,6 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
  * Created by Alexey Suprun
  */
 @Path("/keyloader")
-
 @Produces(MediaType.APPLICATION_JSON)
 public class KeyUploaderResource implements KeyLoaderAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);

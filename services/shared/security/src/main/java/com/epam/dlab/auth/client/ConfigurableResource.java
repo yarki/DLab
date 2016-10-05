@@ -15,18 +15,18 @@ limitations under the License.
 */
 package com.epam.dlab.auth.client;
 
+import io.dropwizard.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.dropwizard.Configuration;
 
 public abstract class ConfigurableResource<C extends Configuration> {
 
-	protected final Logger log;
-	protected final C config;
-	
-	public ConfigurableResource(C config) {
-		this.log    = LoggerFactory.getLogger(getClass());
-		this.config = config;
-	}
-	
+    protected final Logger log;
+    protected final C config;
+
+    public ConfigurableResource(C config) {
+        this.log = LoggerFactory.getLogger(getClass());
+        this.config = config;
+    }
+
 }

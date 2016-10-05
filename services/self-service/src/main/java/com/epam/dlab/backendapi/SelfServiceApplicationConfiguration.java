@@ -1,5 +1,6 @@
 package com.epam.dlab.backendapi;
 
+import com.epam.dlab.auth.core.AuthenticationServiceConfig;
 import com.epam.dlab.backendapi.client.mongo.MongoServiceFactory;
 import com.epam.dlab.backendapi.client.rest.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -38,10 +39,10 @@ public class SelfServiceApplicationConfiguration extends Configuration {
     @JsonProperty(PROVISIONING_SERVICE)
     private RESTServiceFactory provisioningFactory = new RESTServiceFactory();
 
-//    @Valid
-//    @NotNull
-//	@JsonProperty(AUTHENTICATION_SERVICE_CONFIG)
-//	private AuthenticationServiceConfig authenticationServiceConfiguration;
+    @Valid
+    @NotNull
+    @JsonProperty(AUTHENTICATION_SERVICE_CONFIG)
+    private AuthenticationServiceConfig authenticationServiceConfiguration;
 
     @Valid
     @NotNull
@@ -63,9 +64,9 @@ public class SelfServiceApplicationConfiguration extends Configuration {
         return provisioningFactory;
     }
 
-//	public AuthenticationServiceConfig getAuthenticationServiceConfiguration() {
-//		return authenticationServiceConfiguration;
-//	}
+    public AuthenticationServiceConfig getAuthenticationServiceConfiguration() {
+        return authenticationServiceConfiguration;
+    }
 
     @JsonProperty("jerseyClient")
     public JerseyClientConfiguration getJerseyClientConfiguration() {

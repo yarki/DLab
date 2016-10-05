@@ -15,32 +15,29 @@ limitations under the License.
 */
 package com.epam.dlab.auth.client;
 
-import java.net.URI;
-
-import javax.ws.rs.core.Response;
-
+import com.epam.dlab.auth.core.AuthenticationServiceConfig;
+import io.dropwizard.auth.UnauthorizedHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.auth.core.AuthenticationServiceConfig;
-
-import io.dropwizard.auth.UnauthorizedHandler;
+import javax.ws.rs.core.Response;
+import java.net.URI;
 
 public class RestAuthFailureHandler implements UnauthorizedHandler {
-	
-	private final static Logger LOG = LoggerFactory.getLogger(RestAuthFailureHandler.class);
 
-	private final AuthenticationServiceConfig authenticationService;
-	
-	public RestAuthFailureHandler(AuthenticationServiceConfig as) {
-		this.authenticationService = as;
-	}
-	
-	@Override
-	public Response buildResponse(String prefix, String realm) {
-		String redirect = authenticationService.getLoginUrl();
-		LOG.debug("Authentication failure redirect to {}",redirect);
-		return Response.seeOther(URI.create(redirect)).build();
-	}
+    private final static Logger LOG = LoggerFactory.getLogger(RestAuthFailureHandler.class);
+
+    private final AuthenticationServiceConfig authenticationService;
+
+    public RestAuthFailureHandler(AuthenticationServiceConfig as) {
+        this.authenticationService = as;
+    }
+
+    @Override
+    public Response buildResponse(String prefix, String realm) {
+        String redirect = authenticationService.getLoginUrl();
+        LOG.debug("Authentication failure redirect to {}", redirect);
+        return Response.seeOther(URI.create(redirect)).build();
+    }
 
 }

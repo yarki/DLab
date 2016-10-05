@@ -38,9 +38,9 @@ logging:
   appenders:
     - type: console
     
-#authenticationServiceConfiguration:
-#  type: http
-#  host: localhost
-#  port: 8090
-#  loginFormUrl: /webapp/index.html
+authenticationServiceConfiguration:
+  type: http
+  host: localhost
+  port: 8090
+  loginFormUrl: /webapp/index.html
  
