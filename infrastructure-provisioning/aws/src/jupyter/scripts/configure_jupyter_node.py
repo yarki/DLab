@@ -3,7 +3,6 @@ from fabric.api import *
 from fabric.contrib.files import exists
 import argparse
 import json
-from notebook.auth import passwd as jupyter_passwd
 import random
 import string
 import sys
@@ -70,21 +69,21 @@ def ensure_python3_kernel():
 
 def configure_notebook_server(notebook_name):
     try:
-        jupyter_password = id_generator()
+        # jupyter_password = id_generator()
         sudo('pip install jupyter')
         sudo('rm -rf /root/.jupyter/jupyter_notebook_config.py')
         sudo("for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
         sudo('jupyter notebook --generate-config --config /root/.jupyter/jupyter_notebook_config.py')
-        sudo('echo "c.NotebookApp.password = \'' + jupyter_passwd(jupyter_password) +
-             '\'" >> /root/.jupyter/jupyter_notebook_config.py')
+        # sudo('echo "c.NotebookApp.password = \'' + jupyter_passwd(jupyter_password) +
+        #     '\'" >> /root/.jupyter/jupyter_notebook_config.py')
         sudo('echo "c.NotebookApp.ip = \'*\'" >> /root/.jupyter/jupyter_notebook_config.py')
         sudo('echo c.NotebookApp.open_browser = False >> /root/.jupyter/jupyter_notebook_config.py')
         sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name +
              '/\'" >> /root/.jupyter/jupyter_notebook_config.py')
         sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() +
              '"\' >> /root/.jupyter/jupyter_notebook_config.py')
-        with open("/tmp/" + notebook_name + "passwd.file", 'wb') as f:
-            f.write(jupyter_password)
+        # with open("/tmp/" + notebook_name + "passwd.file", 'wb') as f:
+        #    f.write(jupyter_password)
     except:
         sys.exit(1)
 
@@ -100,27 +99,6 @@ def configure_notebook_server(notebook_name):
     ensure_python3_kernel()
 
 
-def configure_nginx(config, instnace_name):
-    try:
-        random_file_part = id_generator(size=20)
-        template_file = config['nginx_template_dir'] + 'proxy_location_notebook_template.conf'
-        backend_hostname = config['backend_hostname']
-        backend_port = config['backend_port']
-        notebook_uri = "_".join(instnace_name.split())
-        with open(template_file, 'r') as tpl:
-            contents = tpl.read()
-        contents = contents.replace('BACKEND_HOSTNAME', backend_hostname)
-        contents = contents.replace('BACKEND_PORT', backend_port)
-        contents = contents.replace('NOTEBOOK', notebook_uri)
-
-        with open("/tmp/%s-proxy_location_notebook_template.conf" % random_file_part, 'w') as out:
-            out.write(contents)
-        put("/tmp/%s-proxy_location_notebook_template.conf" % random_file_part, '/tmp/proxy_location_notebook_' + "".join(instnace_name.split()) + '.conf')
-        sudo('\cp /tmp/proxy_location_notebook_' + "".join(instnace_name.split()) + '.conf /etc/nginx/locations/')
-        sudo('service nginx restart')
-    except:
-        sys.exit(1)
-
 ##############
 # Run script #
 ##############
@@ -133,7 +111,3 @@ if __name__ == "__main__":
 
     print "Configuring notebook server."
     configure_notebook_server("_".join(args.instance_name.split()))
-
-    env.host_string = 'ubuntu@' + deeper_config['frontend_hostname']
-    print "Preparing nginx proxy for notebook server."
-    configure_nginx(deeper_config, args.instance_name)
