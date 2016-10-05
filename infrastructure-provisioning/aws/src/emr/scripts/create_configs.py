@@ -43,6 +43,13 @@ def pyspark_kernel(args):
         with open(template_file) as tpl:
             for line in tpl:
                 out.write(line.replace('CLUSTER', args.cluster_name))
+    local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
+    kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
+    template_file = "/tmp/py3spark_emr_template.json"
+    with open(kernel_path, 'w') as out:
+        with open(template_file) as tpl:
+            for line in tpl:
+                out.write(line.replace('CLUSTER', args.cluster_name))
 
 def toree_kernel(args):
     local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
