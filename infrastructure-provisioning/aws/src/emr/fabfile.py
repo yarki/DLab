@@ -21,17 +21,17 @@ def run():
     emr_conf['key_name'] = os.environ['creds_key_name']
     emr_conf['cluster_tag'] = os.environ['cluster_tag']
     emr_conf['subnet_cidr'] = os.environ['edge_subnet_cidr']
-    emr_conf['vpc_id'] = os.environ['edge_vpc_id']
-    emr_conf['region'] = os.environ['edge_region']
+    emr_conf['region'] = os.environ['creds_region']
     emr_conf['release_label'] = os.environ['emr_version']
     emr_conf['instance_type'] = os.environ['emr_instance_type']
     emr_conf['instance_count'] = os.environ['emr_instance_count']
     emr_conf['notebook_ip'] = get_instance_ip_address(os.environ['notebook_name'])
+    emr_conf['notebook_user'] = os.environ['edge_user_name']
     emr_conf['role_service_name'] = os.environ['service_role']
     emr_conf['role_ec2_name'] = os.environ['ec2_role']
 
     emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + ', ' + emr_conf['service_base_name'] + '-Tag=EMR'
-    emr_conf['cluster_name'] = emr_conf['service_base_name'] + os.environ['edge_user_name'] + emr_conf['cluster_tag']
+    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-' + emr_conf['cluster_tag']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-bucket').lower().replace('_', '-')
 
     # TBD
@@ -107,10 +107,10 @@ def run():
 
     logging.info('[CREATE EMR CLUSTER]')
     print '[CREATE EMR CLUSTER]'
-    params = "--name {} --applications {} --instance_type {} --instance_count {} --ssh_key {} --release_label {} " \
-             "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user --s3_bucket {} --tags {}".format(
+    params = "--name {} --applications '{}' --instance_type {} --instance_count {} --ssh_key {} --release_label {} " \
+             "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --tags '{}'".format(
         emr_conf['cluster_name'], emr_conf['apps'], emr_conf['instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'],
-        emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], os.environ['edge_user_name'], os.environ['bucket_name'], emr_conf['tags'])
+        emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], os.environ['edge_user_name'], emr_conf['bucket_name'], emr_conf['tags'])
     if not run_routine('create_cluster', params):
         logging.info('Failed creating EMR Cluster')
         with open("/root/result.json", 'w') as result:

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# v1.1 for 1.0 from 26/09/2016
+# v1.2 from 04/10/2016
 import boto3
 import argparse
 import re
