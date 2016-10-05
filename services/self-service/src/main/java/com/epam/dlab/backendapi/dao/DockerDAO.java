@@ -10,15 +10,7 @@ import java.util.Date;
  * Created by Alexey Suprun
  */
 public class DockerDAO extends BaseDAO implements MongoCollections {
-    @Inject
-    private MongoService mongoService;
-
     public void writeDockerAttempt() {
-        mongoService.getCollection(DOCKER_ATTEMPTS).insertOne(createDockerAttempt());
+        insertOne(DOCKER_ATTEMPTS, () -> new Document("action", "getImages"));
     }
-
-    private Document createDockerAttempt() {
-        return new Document("action", "getImages").append(TIMESTAMP, new Date());
-    }
-
 }

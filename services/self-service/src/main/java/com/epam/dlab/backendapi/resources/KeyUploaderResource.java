@@ -36,7 +36,6 @@ public class KeyUploaderResource implements KeyLoaderAPI {
 
     @Inject
     private KeyDAO dao;
-
     @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;

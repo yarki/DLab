@@ -9,15 +9,11 @@ import java.util.Date;
  * Created by Alexey Suprun
  */
 public class KeyDAO extends BaseDAO implements MongoCollections {
-    public void uploadKey(String user, String content) {
-        mongoService.getCollection(USER_KEYS).insertOne(createUserKey(user, content));
+    public void uploadKey(final String user, String content) {
+        insertOne(USER_KEYS, () -> new Document("user", user).append("content", content).append("status", "new"));
     }
 
-    public void saveCredential(UserAWSCredentialDTO credential) {
-        mongoService.getCollection(USER_AWS_CREDENTIAL).insertOne(credential.getDocument().append(TIMESTAMP, new Date()));
-    }
-
-    private Document createUserKey(String user, String content) {
-        return new Document("user", user).append("content", content).append(TIMESTAMP, new Date());
+    public void saveCredential(final UserAWSCredentialDTO credential) {
+        insertOne(USER_AWS_CREDENTIAL, credential::getDocument);
     }
 }
