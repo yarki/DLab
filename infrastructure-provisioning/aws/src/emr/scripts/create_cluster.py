@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# v1.2 from 04/10/2016
+# v1.3 from 05/10/2016
 import boto3
 import argparse
 import re
@@ -100,7 +100,8 @@ def wait_emr(bucket, cluster_name, timeout, delay=20):
             return True
         elif state[0] == "False":
             sys.exit(1)
-        time.sleep(delay)
+        else:
+            time.sleep(delay)
     return False
 
 
@@ -177,7 +178,7 @@ def build_emr_cluster(args):
         key, value = i.split("=")
         tags.append({"Value": value, "Key": key})
 
-    prefix = "jars/" + args.release_label + "/"
+    prefix = "jars/" + args.release_label + "/lib/"
     jars_exist = get_object_count(args.s3_bucket, prefix)
 
     # Parse steps
