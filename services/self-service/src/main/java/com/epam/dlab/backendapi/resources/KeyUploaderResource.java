@@ -3,7 +3,7 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.dto.UploadFileDTO;
-import com.epam.dlab.dto.UserAWSCredentialDTO;
+import com.epam.dlab.dto.awscredential.UserAWSCredentialDTO;
 import com.epam.dlab.restclient.RESTService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;

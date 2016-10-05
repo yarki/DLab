@@ -1,12 +1,12 @@
-package com.epam.dlab.dto;
+package com.epam.dlab.dto.awscredential;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 /**
  * Created by Alexey Suprun
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserAWSCredentialDTO {
     @JsonProperty
     protected String user;
@@ -22,6 +22,8 @@ public class UserAWSCredentialDTO {
     protected String region;
     @JsonProperty("policy_arn")
     protected String policyArn;
+    @JsonProperty("security_group_rules")
+    protected List<SecurityGroupRule> securityGroupRules;
     @JsonProperty("policy_name")
     protected String policyName;
     @JsonProperty("isolated_security_group_name")
@@ -53,6 +55,4 @@ public class UserAWSCredentialDTO {
     public void setUser(String user) {
         this.user = user;
     }
-
-
 }

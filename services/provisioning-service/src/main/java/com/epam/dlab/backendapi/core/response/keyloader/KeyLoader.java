@@ -7,7 +7,7 @@ import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.FolderListener;
 import com.epam.dlab.dto.UploadFileDTO;
-import com.epam.dlab.dto.UserAWSCredentialDTO;
+import com.epam.dlab.dto.awscredential.UserAWSCredentialDTO;
 import com.epam.dlab.restclient.RESTService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;

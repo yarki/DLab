@@ -1,6 +1,6 @@
 package com.epam.dlab.backendapi.dao;
 
-import com.epam.dlab.dto.UserAWSCredentialDTO;
+import com.epam.dlab.dto.awscredential.UserAWSCredentialDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.bson.Document;
 
