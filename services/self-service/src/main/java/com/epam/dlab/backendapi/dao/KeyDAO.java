@@ -3,8 +3,6 @@ package com.epam.dlab.backendapi.dao;
 import com.epam.dlab.dto.UserAWSCredentialDTO;
 import org.bson.Document;
 
-import java.util.Date;
-
 /**
  * Created by Alexey Suprun
  */

@@ -5,8 +5,6 @@ import com.google.inject.Inject;
 import org.bson.Document;
 
 import java.util.Date;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
