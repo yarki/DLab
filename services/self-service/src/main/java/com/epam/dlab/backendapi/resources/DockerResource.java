@@ -4,10 +4,10 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.backendapi.dao.DockerDAO;
 import com.epam.dlab.backendapi.dao.MongoCollections;
+import com.epam.dlab.dto.ImageMetadataDTO;
 import com.epam.dlab.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.sun.javafx.iio.ImageMetadata;
 import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class DockerResource implements MongoCollections, DockerAPI {
 
     @GET
     @RolesAllowed("admin")
-    public Set<ImageMetadata> getDockerImages(@Auth UserInfo userInfo) {
+    public Set<ImageMetadataDTO> getDockerImages(@Auth UserInfo userInfo) {
         LOGGER.debug("docker statuses asked");
         dao.writeDockerAttempt();
         return provisioningService.get(DOCKER, Set.class);
