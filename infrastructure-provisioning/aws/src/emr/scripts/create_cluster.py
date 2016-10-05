@@ -100,7 +100,7 @@ def wait_emr(bucket, cluster_name, timeout, delay=20):
         if get_object_count(bucket, prefix) > 20 and state[1] == "WAITING":
             return True
         elif state[0] == "False":
-            sys.exit(1)
+            return False
         else:
             time.sleep(delay)
     return False
@@ -263,5 +263,6 @@ if __name__ == "__main__":
             if action_validate(id)[0] == "True":
                 print "Timeout reached. Please increase timeout period and try again. Now terminating the cluster..."
                 terminate_emr(cluster_id)
-                s3_cleanup(args.s3_bucket, args.name)
+            s3_cleanup(args.s3_bucket, args.name)
+            sys.exit(1)
     sys.exit(0)
