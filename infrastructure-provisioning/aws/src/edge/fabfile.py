@@ -119,12 +119,15 @@ def run():
         sys.exit(1)
 
     logging.info('[CREATE SECURITY GROUP FOR PRIVATE SUBNET]')
-    print '[CREATE SECURITY GROUPS FOR EDGE]'
+    print '[CREATE SECURITY GROUP FOR PRIVATE SUBNET]'
     edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
     ingress_sg_rules_template = [
-        {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}]
+        {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
+        {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": os.environ['creds_security_groups_ids']}], "PrefixListIds": []}
+    ]
     egress_sg_rules_template = [
-        {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}]
+        {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}
+    ]
     params = "--name %s --vpc_id %s --security_group_rules '%s' --egress '%s' --infra_tag_name %s --infra_tag_value %s" % \
              (edge_conf['notebook_security_group_name'], edge_conf['vpc_id'],
               json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template),
