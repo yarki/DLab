@@ -59,6 +59,9 @@ public class LdapAuthenticationConfig extends Configuration {
 	}
 	
 	List<SearchRequest> searchRequestList = null;
+
+	@JsonProperty
+	private String defaultRedirectFromAuthentication;
 	
 	private List<SearchRequest> getSearchRequests() {
 		if( searchRequestList == null ) {
@@ -86,6 +89,10 @@ public class LdapAuthenticationConfig extends Configuration {
 		searchRequestList = list;
 		}
 		return searchRequestList;
+	}
+
+	public String getDefaultRedirectFromAuthentication() {
+		return defaultRedirectFromAuthentication;
 	}
 
 }

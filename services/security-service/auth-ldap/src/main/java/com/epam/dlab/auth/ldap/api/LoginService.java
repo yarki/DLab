@@ -31,11 +31,12 @@ import com.epam.dlab.auth.rest.ConfigurableResource;
 @Produces(MediaType.TEXT_HTML)
 public class LoginService extends ConfigurableResource<LdapAuthenticationConfig>{
 	
-	private final String defaultRedirect = "";
+	private final String defaultRedirect;
 	
 	public LoginService(LdapAuthenticationConfig config) {
 		super(config);
-		//this.defaultRedirect = config.getDefaultRedirectFromAuthentication();
+		this.defaultRedirect = config.getDefaultRedirectFromAuthentication();
+		log.debug("Default redirect: {}",defaultRedirect);
 	}
 	
 	@GET
@@ -44,7 +45,7 @@ public class LoginService extends ConfigurableResource<LdapAuthenticationConfig>
 		if( nextPageUrl == null) {
 			nextPageUrl = defaultRedirect;
 		}
-		log.debug("Login next page URL {}",nextPageUrl);
+		log.debug("Login next page URL {}",defaultRedirect);
 		return new LoginView(nextPageUrl);
 	}
 }

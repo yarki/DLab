@@ -140,8 +140,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Lda
 	@POST
 	@Path("/login")
 	@Produces(MediaType.TEXT_HTML)
-	public String login(@FormParam("username") String username, @FormParam("username") String password,
-			@FormParam("username") String destination) {
+	public String login(@FormParam("username") String username, @FormParam("password") String password,
+			@FormParam("next") String destination) {
 
 		String token = validate(username, password, "");
 
