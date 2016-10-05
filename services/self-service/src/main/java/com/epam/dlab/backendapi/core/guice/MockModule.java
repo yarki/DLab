@@ -31,7 +31,6 @@ public class MockModule extends AbstractModule implements SecurityAPI, DockerAPI
                 .toInstance(createAuthenticationService());
         bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
                 .toInstance(createProvisioningService());
-
     }
 
     private MongoService createMongoService() {
