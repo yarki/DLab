@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
  * Created by Alexey Suprun
  */
 public class ProvisioningServiceApplicationConfiguration extends Configuration implements ResponseDirectories {
-    public static final String SELF_SERVICE = "self-service";
+    public static final String SELF_SERVICE = "selfService";
 
     @NotEmpty
     @JsonProperty
