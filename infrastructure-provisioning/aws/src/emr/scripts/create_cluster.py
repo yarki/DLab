@@ -7,7 +7,7 @@ import re
 import time
 import sys
 from fabric.api import *
-from ConfigParser import SafeConfigParser
+import json
 
 parser = argparse.ArgumentParser()
 # parser.add_argument('--id', type=str, default='')
@@ -36,6 +36,7 @@ parser.add_argument('--nbs_user', type=str, default='ubuntu',
                     help='Username to be used for connection to Notebook server')
 parser.add_argument('--s3_bucket', type=str, default='dsa-poc-test-bucket', help='S3 bucket name to work with')
 parser.add_argument('--emr_timeout', type=int, default=1200)
+parser.add_argument('--configurations', type=str, default='')
 args = parser.parse_args()
 
 cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/config/{1}/hive-site.xml, ActionOnFailure=CONTINUE,Jar=command-runner.jar; " \
@@ -164,6 +165,15 @@ def s3_cleanup(bucket, cluster_name):
         s3_res.Object(resource.name, i.key).delete()
 
 
+def read_json(path):
+    try:
+        with open(path) as json_data:
+            data = json.load(json_data)
+    except:
+        data=[]
+    return data
+
+
 def build_emr_cluster(args):
     # Parse applications
     apps = args.applications.split(" ")
@@ -220,7 +230,8 @@ def build_emr_cluster(args):
             Steps=steps,
             VisibleToAllUsers=not args.auto_terminate,
             JobFlowRole=args.ec2_role,
-            ServiceRole=args.service_role)
+            ServiceRole=args.service_role,
+            Configurations=read_json(args.configurations))
         print "Cluster_id " + result.get('JobFlowId')
         return result.get('JobFlowId')
 
