@@ -1,10 +1,10 @@
 package com.epam.dlab.backendapi.core.guice;
 
 import com.epam.dlab.auth.SecurityAPI;
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.mongo.MongoService;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.dto.ImageMetadataDTO;
-import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.restclient.RESTService;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
@@ -38,13 +38,13 @@ public class MockModule extends AbstractModule implements SecurityAPI, DockerAPI
         MongoService result = mock(MongoService.class);
         when(result.getCollection(anyString())).thenReturn(mock(MongoCollection.class));
         return result;
-
     }
 
     private RESTService createAuthenticationService() {
         RESTService result = mock(RESTService.class);
-        when(result.get(eq("login"), any()))
-                .thenReturn(Optional.of(new UserInfo("test", "test")));
+        Optional<UserInfo> userInfo = Optional.of(new UserInfo("test", "token123"));
+        when(result.get(eq(LOGIN), any())).thenReturn(userInfo);
+        when(result.post(eq(VALIDATE), eq("token123"), eq(Optional.class))).thenReturn(userInfo);
         return result;
     }
 

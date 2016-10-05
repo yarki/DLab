@@ -1,9 +1,9 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.SecurityAPI;
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.dto.UserCredentialDTO;
-import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;

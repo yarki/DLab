@@ -1,9 +1,9 @@
 package com.epam.dlab.backendapi.resources;
 
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.backendapi.dao.DockerDAO;
 import com.epam.dlab.backendapi.dao.MongoCollections;
-import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;

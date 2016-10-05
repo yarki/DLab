@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-public class SecurityRestAuthenticator implements Authenticator<String, UserInfo> {
+public class SecurityRestAuthenticator implements Authenticator<String, UserInfo>, SecurityAPI {
     public static final String SECURITY_SERVICE = "securityService";
     private final static Logger LOGGER = LoggerFactory.getLogger(SecurityRestAuthenticator.class);
 
@@ -21,6 +21,6 @@ public class SecurityRestAuthenticator implements Authenticator<String, UserInfo
     @Override
     public Optional<UserInfo> authenticate(String credentials) throws AuthenticationException {
         LOGGER.debug("authenticate token {}", credentials);
-        return Optional.ofNullable("token123".equals(credentials) ? new UserInfo("test", "test") : null);
+        return securityService.post(VALIDATE, credentials, Optional.class);
     }
 }
