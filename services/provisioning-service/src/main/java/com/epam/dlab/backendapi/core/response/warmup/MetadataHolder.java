@@ -1,6 +1,6 @@
 package com.epam.dlab.backendapi.core.response.warmup;
 
-import com.epam.dlab.backendapi.api.ImageMetadata;
+import com.epam.dlab.dto.ImageMetadataDTO;
 
 import java.util.Set;
 
@@ -8,5 +8,5 @@ import java.util.Set;
  * Created by Alexey Suprun
  */
 public interface MetadataHolder {
-    Set<ImageMetadata> getMetadatas();
+    Set<ImageMetadataDTO> getMetadatas();
 }

@@ -1,10 +1,10 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.api.ImageMetadata;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
+import com.epam.dlab.dto.ImageMetadataDTO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class DockerResource implements DockerCommands {
     private CommandExecuter commandExecuter;
 
     @GET
-    public Set<ImageMetadata> getDockerImages() throws IOException, InterruptedException {
+    public Set<ImageMetadataDTO> getDockerImages() throws IOException, InterruptedException {
         LOGGER.debug("docker statuses asked");
         return metadataHolder.getMetadatas();
     }

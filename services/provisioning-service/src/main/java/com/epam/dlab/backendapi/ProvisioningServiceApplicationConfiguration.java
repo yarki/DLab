@@ -1,7 +1,7 @@
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.client.rest.RESTServiceFactory;
 import com.epam.dlab.backendapi.core.response.ResponseDirectories;
+import com.epam.dlab.restclient.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;

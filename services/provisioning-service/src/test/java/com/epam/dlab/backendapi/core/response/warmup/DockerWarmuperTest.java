@@ -1,9 +1,9 @@
 package com.epam.dlab.backendapi.core.response.warmup;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.api.ImageMetadata;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.response.FolderListener;
+import com.epam.dlab.dto.ImageMetadataDTO;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 public class DockerWarmuperTest {
     @Inject
     private DockerWarmuper warmuper;
-    private ImageMetadata metadata = new ImageMetadata("executeResult");
+    private ImageMetadataDTO metadata = new ImageMetadataDTO("executeResult");
 
     @Before
     public void setup() {
@@ -36,7 +36,7 @@ public class DockerWarmuperTest {
     public void warmupSuccess() throws Exception {
         warmuper.start();
         warmuper.getMetadataHandler().handle(getFileName(), "{}".getBytes());
-        assertEquals(metadata, warmuper.getMetadatas().toArray(new ImageMetadata[1])[0]);
+        assertEquals(metadata, warmuper.getMetadatas().toArray(new ImageMetadataDTO[1])[0]);
     }
 
     private String getFileName() {
