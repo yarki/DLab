@@ -15,7 +15,6 @@ import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
  */
 public class SelfServiceApplicationConfiguration extends Configuration {
     public static final String MONGO = "mongo";
-
     public static final String PROVISIONING_SERVICE = "provisioningService";
 
     @Valid

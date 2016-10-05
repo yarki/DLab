@@ -12,7 +12,6 @@ import java.util.Optional;
 
 public class SecurityRestAuthenticator implements Authenticator<String, UserInfo> {
     public static final String SECURITY_SERVICE = "securityService";
-
     private final static Logger LOGGER = LoggerFactory.getLogger(SecurityRestAuthenticator.class);
 
     @Inject
@@ -21,7 +20,7 @@ public class SecurityRestAuthenticator implements Authenticator<String, UserInfo
 
     @Override
     public Optional<UserInfo> authenticate(String credentials) throws AuthenticationException {
-        LOGGER.debug("Authenticate token {}", credentials);
+        LOGGER.debug("authenticate token {}", credentials);
         return Optional.ofNullable("token123".equals(credentials) ? new UserInfo("test", "test") : null);
     }
 }

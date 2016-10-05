@@ -12,6 +12,7 @@ import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class DockerResource implements MongoCollections, DockerAPI {
     private RESTService provisioningService;
 
     @GET
+    @RolesAllowed("admin")
     public Set<ImageMetadata> getDockerImages(@Auth UserInfo userInfo) {
         LOGGER.debug("docker statuses asked");
         dao.writeDockerAttempt();
