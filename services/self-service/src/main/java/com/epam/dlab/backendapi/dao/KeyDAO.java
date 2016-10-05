@@ -1,6 +1,7 @@
 package com.epam.dlab.backendapi.dao;
 
 import com.epam.dlab.dto.UserAWSCredentialDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.bson.Document;
 
 /**
@@ -11,7 +12,7 @@ public class KeyDAO extends BaseDAO implements MongoCollections {
         insertOne(USER_KEYS, () -> new Document("user", user).append("content", content).append("status", "new"));
     }
 
-    public void saveCredential(final UserAWSCredentialDTO credential) {
-        insertOne(USER_AWS_CREDENTIAL, credential::getDocument);
+    public void saveCredential(UserAWSCredentialDTO credential) throws JsonProcessingException {
+        insertOne(USER_AWS_CREDENTIAL, credential);
     }
 }

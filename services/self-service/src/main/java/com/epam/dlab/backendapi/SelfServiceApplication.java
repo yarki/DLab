@@ -3,6 +3,7 @@ package com.epam.dlab.backendapi;
 import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.core.guice.ModuleFactory;
 import com.epam.dlab.backendapi.resources.DockerResource;
+import com.epam.dlab.backendapi.resources.KeyUploaderResource;
 import com.epam.dlab.backendapi.resources.SecurityResource;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -32,6 +33,7 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
         injector.getInstance(SecurityFactory.class).configure(injector, environment);
         environment.jersey().register(injector.getInstance(SecurityResource.class));
         environment.jersey().register(injector.getInstance(DockerResource.class));
+        environment.jersey().register(injector.getInstance(KeyUploaderResource.class));
         environment.jersey().register(MultiPartFeature.class);
 
     }

@@ -5,6 +5,7 @@ import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.dto.UploadFileDTO;
 import com.epam.dlab.dto.UserAWSCredentialDTO;
 import com.epam.dlab.restclient.RESTService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -56,7 +57,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     }
 
     @POST
-    public Response loadKeyResponse(UserAWSCredentialDTO credential) {
+    public Response loadKeyResponse(UserAWSCredentialDTO credential) throws JsonProcessingException {
         LOGGER.debug("credential loaded for user {}", credential.getUser());
         dao.saveCredential(credential);
         return Response.ok().build();

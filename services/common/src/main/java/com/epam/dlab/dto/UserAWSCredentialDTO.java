@@ -1,31 +1,50 @@
 package com.epam.dlab.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.bson.Document;
 
 /**
  * Created by Alexey Suprun
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserAWSCredentialDTO {
     @JsonProperty
-    private String user;
-    @JsonProperty("tunnel_port")
-    private String tunnelPort;
-    @JsonProperty("isolated_sg")
-    private String isolatedSG;
-    @JsonProperty("edge_sg")
-    private String edgeSG;
-    @JsonProperty
-    private String ip;
-    @JsonProperty
-    private String hostname;
-    @JsonProperty("user_own_bicket_name")
-    private String userOwnBicketName;
+    protected String user;
+    @JsonProperty("instance_name")
+    protected String instanceName;
+    @JsonProperty("ami_id")
+    protected String amiId;
+    @JsonProperty("edge_security_group_name")
+    protected String edgeSecurityGroupName;
     @JsonProperty("key_name")
-    private String keyName;
+    protected String keyName;
+    @JsonProperty
+    protected String region;
+    @JsonProperty("policy_arn")
+    protected String policyArn;
+    @JsonProperty("policy_name")
+    protected String policyName;
+    @JsonProperty("isolated_security_group_name")
+    protected String isolatedSecurityGroupName;
+    @JsonProperty("role_profile_name")
+    protected String roleProfileName;
+    @JsonProperty("bucket_name")
+    protected String bucketName;
+    @JsonProperty("public_subnet_id")
+    protected String publicSubnetId;
+    @JsonProperty("private_subnet_cidr")
+    protected String privateSubnetCidr;
+    @JsonProperty("vpc_id")
+    protected String vpcId;
+    @JsonProperty("service_base_name")
+    protected String serviceBaseName;
+    @JsonProperty("role_name")
+    protected String roleName;
+    @JsonProperty("instance_size")
+    protected String instanceSize;
+
     @JsonProperty("socks_port")
-    private String socksPort;
+    protected String socksPort;
 
     public String getUser() {
         return user;
@@ -35,10 +54,5 @@ public class UserAWSCredentialDTO {
         this.user = user;
     }
 
-    @JsonIgnore
-    public Document getDocument() {
-        return new Document("user", user).append("tunnelPort", tunnelPort).append("isolatedSG", isolatedSG)
-                .append("edgeSG", edgeSG).append("ip", ip).append("hostname", hostname).append("userOwnBicketName", userOwnBicketName)
-                .append("keyName", keyName).append("socksPort", socksPort);
-    }
+
 }

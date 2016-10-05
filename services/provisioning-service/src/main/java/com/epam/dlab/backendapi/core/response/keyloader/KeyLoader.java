@@ -28,6 +28,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     private static final String KEY_EXTENTION = ".pem";
     private static final String RESPONSE_NODE = "response";
     private static final String RESULT_NODE = "result";
+    private static final String CONF_NODE = "conf";
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
@@ -58,7 +59,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         return (fileName, content) -> {
             LOGGER.debug("get file {}", fileName);
             if (uuid.equals(DockerCommands.extractUUID(fileName))) {
-                JsonNode node = MAPPER.readTree(content).get(RESPONSE_NODE).get(RESULT_NODE);
+                JsonNode node = MAPPER.readTree(content).get(RESPONSE_NODE).get(RESULT_NODE).get(CONF_NODE);
                 UserAWSCredentialDTO result = MAPPER.readValue(node.toString(), UserAWSCredentialDTO.class);
                 result.setUser(user);
                 selfService.post(KEY_LOADER, result, UserAWSCredentialDTO.class);
