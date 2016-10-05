@@ -14,12 +14,13 @@ def run():
                         filename=local_log_filepath)
 
     create_aws_config_files()
+    index = resource_count('EMR', os.environ['conf_service_base_name']):
     print 'Generating infrastructure names and tags'
     emr_conf = dict()
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
     emr_conf['service_base_name'] = os.environ['conf_service_base_name']
     emr_conf['key_name'] = os.environ['creds_key_name']
-    emr_conf['cluster_tag'] = os.environ['cluster_tag']
+    #emr_conf['cluster_tag'] = os.environ['cluster_tag']
     emr_conf['subnet_cidr'] = os.environ['edge_subnet_cidr']
     emr_conf['region'] = os.environ['creds_region']
     emr_conf['release_label'] = os.environ['emr_version']
@@ -31,7 +32,7 @@ def run():
     emr_conf['role_ec2_name'] = os.environ['ec2_role']
 
     emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + ', ' + emr_conf['service_base_name'] + '-Tag=EMR'
-    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-' + emr_conf['cluster_tag']
+    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-' + str(index + 1)
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-bucket').lower().replace('_', '-')
 
     # TBD

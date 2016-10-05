@@ -131,7 +131,7 @@ def resource_count(resource_type, tag_name):
             count += 1
         return count
     elif resource_type == 'EMR':
-        clusters = get_emr_list(tag_name)
-        return clusters
+        count = get_emr_list(tag_name)
+        return count
     else:
         print "Incorrect resource type!"
