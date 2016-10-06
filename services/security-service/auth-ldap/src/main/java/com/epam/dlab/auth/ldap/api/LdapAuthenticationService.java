@@ -4,21 +4,18 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.epam.dlab.dto.UserCredentialDTO;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
 import org.apache.directory.api.ldap.model.exception.LdapException;
+import org.apache.directory.api.ldap.model.ldif.anonymizer.StringAnonymizer;
 import org.apache.directory.api.ldap.model.message.SearchRequest;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
@@ -37,6 +34,8 @@ import com.epam.dlab.auth.rest.AbstractAuthenticationService;
 import com.epam.dlab.auth.rest.AuthorizedUsers;
 
 @Path("/")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class LdapAuthenticationService extends AbstractAuthenticationService<LdapAuthenticationConfig> {
 
 	private final LdapConnectionConfig connConfig;
@@ -58,11 +57,12 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Lda
 	}
 
 	@Override
-	@GET
-	@Path("/validate")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String validate(@QueryParam("username") String username, @QueryParam("password") String password,
-			@QueryParam("access_token") String accessToken) {
+	@POST
+	@Path("/login")
+	public String login(UserCredentialDTO credential) {
+		String username = credential.getUsername();
+		String password = credential.getPassword();
+		String accessToken = credential.getAccessToken();
 		log.debug("validating username:{} password:{} token:{}", username, password, accessToken);
 		UserInfo ui;
 
@@ -138,41 +138,18 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Lda
 
 	@Override
 	@POST
-	@Path("/login")
-	@Produces(MediaType.TEXT_HTML)
-	public String login(@FormParam("username") String username, @FormParam("password") String password,
-			@FormParam("next") String destination) {
-
-		String token = validate(username, password, "");
-
-		if (!"".equals(token)) {
-			String redirectUrl = addAccessTokenToUrl(removeAccessTokenFromUrl(destination), token);
-			log.debug("Redirect {} to {}", username, redirectUrl);
-			return String.format(POST_LOGIN_REDIRECT_HEAD, redirectUrl);
-		} else {
-			log.debug("User not found. Redirect {} to login page", username, password);
-			return String.format(POST_LOGIN_REDIRECT_HEAD, "/");
-		}
-	}
-
-	@Override
-	@GET
-	@Path("/logout")
-	// @Produces(MediaType.TEXT_HTML)
-	public Response logout(String access_token) {
-		this.forgetAccessToken(access_token);
-		Response response = Response.seeOther(URI.create("/")).build();
-		return response;
-	}
-
-	@Override
-	@GET
-	@Path("/user_info")
-	@Produces(MediaType.APPLICATION_JSON)
-	public UserInfo getUserInfo(@QueryParam("access_token") String access_token) {
+	@Path("/getuserinfo")
+	public UserInfo getUserInfo(String access_token) {
 		UserInfo ui = AuthorizedUsers.getInstance().getUserInfo(access_token);
 		log.debug("Authorized {} {}", access_token, ui);
 		return ui;
 	}
 
+	@Override
+	@POST
+	@Path("/logout")
+	public Response logout(String access_token) {
+		this.forgetAccessToken(access_token);
+		return Response.ok().build();
+	}
 }

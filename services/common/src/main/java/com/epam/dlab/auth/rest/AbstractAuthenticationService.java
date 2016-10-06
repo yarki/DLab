@@ -1,11 +1,13 @@
 package com.epam.dlab.auth.rest;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
 import com.epam.dlab.auth.UserInfo;
 
+import com.epam.dlab.dto.UserCredentialDTO;
 import io.dropwizard.Configuration;
 
 public abstract class AbstractAuthenticationService<C extends Configuration> extends ConfigurableResource<C> {
@@ -33,11 +35,10 @@ public abstract class AbstractAuthenticationService<C extends Configuration> ext
 		super(config);
 	}
 
-	public abstract String validate(String username, String password, String access_token);
-	public abstract String login(String username, String password, String destination);
-	public abstract Response logout(String access_token);
+	public abstract String login(UserCredentialDTO credential);
 	public abstract UserInfo getUserInfo(String access_token);
-	
+	public abstract Response logout(String access_token);
+
 	public void forgetAccessToken(String token) {
 		AuthorizedUsers.getInstance().removeUserInfo(token);
 	}

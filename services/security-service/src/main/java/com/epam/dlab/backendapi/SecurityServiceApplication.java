@@ -1,6 +1,5 @@
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.resources.LoginResource;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
 
@@ -14,6 +13,5 @@ public class SecurityServiceApplication extends Application<SecurityServiceAppli
 
     @Override
     public void run(SecurityServiceApplicationConfiguration securityServiceApplicationConfiguration, Environment environment) throws Exception {
-        environment.jersey().register(new LoginResource());
     }
 }

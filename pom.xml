@@ -13,6 +13,7 @@
         <module>services/self-service</module>
         <module>services/security-service</module>
         <module>services/provisioning-service</module>
+        <module>services/security-service/auth-ldap</module>
     </modules>
 
     <properties>

@@ -1,4 +1,4 @@
-mocked: true
+mocked: false
 
 mongo:
   host: localhost
@@ -10,10 +10,10 @@ mongo:
 securityService:
   protocol: http
   host: localhost
-  port: 8082
+  port: 8090
   jerseyClient:
-    timeout: 3s
-    connectionTimeout: 3s
+    timeout: 10s
+    connectionTimeout: 10s
 
 provisioningService:
   protocol: http
@@ -24,7 +24,7 @@ provisioningService:
     connectionTimeout: 3s
 
 server:
-  rootPath: '/api/*'
+  rootPath: "/api"
   applicationConnectors:
     - type: http
       port: 8080

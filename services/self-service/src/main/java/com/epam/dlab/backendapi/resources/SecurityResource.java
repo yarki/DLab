@@ -18,7 +18,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Optional;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 
@@ -38,10 +37,10 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
 
     @Path("/login")
     @POST
-    public Optional<UserInfo> login(UserCredentialDTO credential) {
+    public String login(UserCredentialDTO credential) {
         LOGGER.debug("Try login user = {}", credential.getUsername());
         dao.writeLoginAttempt(credential);
-        return authenticationService.post(LOGIN, credential, Optional.class);
+        return authenticationService.post(LOGIN, credential, String.class);
     }
 
     @Path("/logout")
