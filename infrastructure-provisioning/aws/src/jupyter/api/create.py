@@ -5,8 +5,6 @@ from fabric.api import local
 
 
 if __name__ == "__main__":
-    notebook_name = os.environ['notebook_name']
-    network_cidr = os.environ['network_cidr']
     success = True
     try:
         local('cd /root; fab run')

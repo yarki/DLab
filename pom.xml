@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>services/common</module>
         <module>services/self-service</module>
         <module>services/security-service</module>
         <module>services/provisioning-service</module>

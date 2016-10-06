@@ -5,7 +5,7 @@ keyLoaderPollTimeout: 20m
 adminKey: BDCC-DSS-POC.pem
 edgeImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-edge
 
-self-service:
+selfService:
   protocol: http
   host: EPRUPETW1232.PETERSBURG.epam.com
   port: 8080

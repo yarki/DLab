@@ -1,7 +1,7 @@
 package com.epam.dlab.backendapi.resources;
 
-import com.epam.dlab.backendapi.api.UploadFileDTO;
 import com.epam.dlab.backendapi.core.response.keyloader.KeyLoader;
+import com.epam.dlab.dto.UploadFileDTO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

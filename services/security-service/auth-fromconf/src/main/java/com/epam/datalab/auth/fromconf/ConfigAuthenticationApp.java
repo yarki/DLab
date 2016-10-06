@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.datalab.auth.fromconf.api.ConfigAuthenticationService;
 import com.epam.datalab.auth.fromconf.api.LoginService;
-import com.epam.dlab.auth.client.DataLabAuthenticationConfig;
+import com.epam.dlab.auth.rest.DataLabAuthenticationConfig;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;

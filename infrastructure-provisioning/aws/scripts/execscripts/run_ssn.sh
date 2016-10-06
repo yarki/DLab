@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
+pushd `dirname $0` > /dev/null
+SCRIPTPATH=`pwd -P`
+popd > /dev/null
 
 ##################
 # Project common
 ##################
 PROJECT_PREFIX=docker.epmc-bdcc.projects.epam.com/dlab-aws
 DOCKER_IMAGE=ssn
-DOCKER_IMAGE_SOURCE_DIR=${0%/*}/../../src
+DOCKER_IMAGE_SOURCE_DIR=$SCRIPTPATH/../../src
 
 ##################
 # Docker Common
 ##################
-KEY_DIR=${0%/*}/keys
+ACTION="create"
+KEY_DIR=$SCRIPTPATH/keys
 KEY_NAME=BDCC-DSS-POC
-OVERWRITE_FILE=${0%/*}/overwrite.ini
+OVERWRITE_FILE=$SCRIPTPATH/overwrite.ini
 REQUEST_ID=$RANDOM
 LOG_DIR=$(pwd)
 
@@ -21,6 +25,7 @@ LOG_DIR=$(pwd)
 ##################
 REBUILD=false
 REQUEST_ID=$RANDOM
+RESPONSE_DIR=$SCRIPTPATH
 
 ##################
 # Routines
@@ -34,11 +39,16 @@ function update_images {
 }
 
 function run_docker {
+    echo docker run -it \
+        -v $KEY_DIR:/root/keys \
+        -v $OVERWRITE_FILE:/root/conf/overwrite.ini \
+        -v $RESPONSE_DIR:/response -e \
+        "request_id=$REQUEST_ID" $PROJECT_PREFIX-$DOCKER_IMAGE --action $ACTION
     docker run -it \
         -v $KEY_DIR:/root/keys \
         -v $OVERWRITE_FILE:/root/conf/overwrite.ini \
         -v $RESPONSE_DIR:/response -e \
-        "request_id=$REQUEST_ID" $PROJECT_PREFIX-$DOCKER_IMAGE --ACTION $1 | tee -a  $LOG_DIR/$REQUEST_ID_out.log
+        "request_id=$REQUEST_ID" $PROJECT_PREFIX-$DOCKER_IMAGE --action $ACTION | tee -a  $LOG_DIR/$REQUEST_ID_out.log
 }
 
 function print_help {
@@ -50,6 +60,7 @@ function print_help {
     echo "-d / --key-dir DIR: path to key dir"
     echo "-k / --key-name NAME: name of infra key. By default: BDCC-DSS-POC"
     echo "-s / --source-dir DIR: direcotry with dlab infrastucture provisioning sources"
+    echo "--response_dir DIR: direcotry where response json will be places"
     echo "--rebuild : if you need to refresh images before run"
 }
 
@@ -72,6 +83,10 @@ do
         ;;
         -l|--log-dir)
         LOG_DIR="$2"
+        shift # past argument
+        ;;
+        --response_dir)
+        RESPONSE_DIR="$2"
         shift # past argument
         ;;
         -d|--key-dir)

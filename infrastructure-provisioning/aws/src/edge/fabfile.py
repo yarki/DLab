@@ -6,7 +6,6 @@ import sys
 
 
 def run():
-
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
@@ -16,6 +15,7 @@ def run():
     create_aws_config_files()
     print 'Generating infrastructure names and tags'
     edge_conf = dict()
+    # Base config
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['key_name'] = os.environ['creds_key_name']
     edge_conf['policy_arn'] = os.environ['conf_policy_arn']
@@ -26,17 +26,28 @@ def run():
     edge_conf['ami_id'] = os.environ['edge_ami_id']
     edge_conf['instance_size'] = os.environ['edge_instance_size']
 
-    edge_conf['instance_name'] = edge_conf['service_base_name'] + '-edge-' + os.environ['edge_user_name']
+    # Edge config
+    edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
     edge_conf['bucket_name'] = (edge_conf['instance_name'] + '-bucket').lower().replace('_', '-')
     edge_conf['role_name'] = edge_conf['instance_name'] + '-Role'
     edge_conf['role_profile_name'] = edge_conf['instance_name'] + '-Profile'
     edge_conf['policy_name'] = edge_conf['instance_name'] + '-Policy'
     edge_conf['edge_security_group_name'] = edge_conf['instance_name'] + '-SG'
-    edge_conf['isolated_security_group_name'] = edge_conf['instance_name'] + '-isolated-SG'
     edge_conf['security_group_rules'] = [{"IpProtocol": "-1",
                                           "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
                                           "UserIdGroupPairs": [],
                                           "PrefixListIds": []}]
+
+    # Notebook \ EMR config
+    edge_conf['notebook_role_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Role'
+    edge_conf['notebook_policy_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Policy'
+    edge_conf['notebook_role_profile_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Profile'
+    edge_conf['notebook_policy_arn'] = os.environ['edge_notebook_policy_arn']
+    edge_conf['notebook_security_group_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-SG'
+    edge_conf['notebook_security_group_rules'] = [{"IpProtocol": "-1",
+                                                   "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                                                   "UserIdGroupPairs": [],
+                                                   "PrefixListIds": []}]
 
     print "Will create exploratory environment with edge node as access point as following: " + \
           json.dumps(edge_conf, sort_keys=True, indent=4, separators=(',', ': '))
@@ -55,11 +66,24 @@ def run():
             result.write(json.dumps(res))
         sys.exit(1)
 
-    logging.info('[CREATE ROLES]')
-    print '[CREATE ROLES]'
+    logging.info('[CREATE EDGE ROLES]')
+    print '[CREATE EDGE ROLES]'
     params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
              (edge_conf['role_name'], edge_conf['role_profile_name'],
               edge_conf['policy_name'], edge_conf['policy_arn'])
+    if not run_routine('create_role_policy', params):
+        logging.info('Failed creating roles')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed to creating roles", "conf": edge_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+    logging.info('[CREATE BACKEND (NOTEBOOK) ROLES]')
+    print '[CREATE BACKEND (NOTEBOOK) ROLES]'
+    params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
+             (edge_conf['notebook_role_name'], edge_conf['notebook_role_profile_name'],
+              edge_conf['notebook_policy_name'], edge_conf['notebook_policy_arn'])
     if not run_routine('create_role_policy', params):
         logging.info('Failed creating roles')
         with open("/root/result.json", 'w') as result:
@@ -95,12 +119,17 @@ def run():
         sys.exit(1)
 
     logging.info('[CREATE SECURITY GROUP FOR PRIVATE SUBNET]')
-    print '[CREATE SECURITY GROUPS FOR EDGE]'
+    print '[CREATE SECURITY GROUP FOR PRIVATE SUBNET]'
     edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
-    ingress_sg_rules_template = [{"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}]
-    egress_sg_rules_template = [{"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}]
+    ingress_sg_rules_template = [
+        {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
+        {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": os.environ['creds_security_groups_ids']}], "PrefixListIds": []}
+    ]
+    egress_sg_rules_template = [
+        {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}
+    ]
     params = "--name %s --vpc_id %s --security_group_rules '%s' --egress '%s' --infra_tag_name %s --infra_tag_value %s" % \
-             (edge_conf['isolated_security_group_name'], edge_conf['vpc_id'],
+             (edge_conf['notebook_security_group_name'], edge_conf['vpc_id'],
               json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template),
               edge_conf['service_base_name'], edge_conf['instance_name'])
     if not run_routine('create_security_group', params):
@@ -191,8 +220,11 @@ def run():
                "user_own_bicket_name": edge_conf['bucket_name'],
                "tunnel_port": "22",
                "socks_port": "1080",
-               "isolated_sg": edge_conf['isolated_security_group_name'],
-               "edge_sg": edge_conf['edge_security_group_name']}
+               "notebook_sg": edge_conf['notebook_security_group_name'],
+               "notebook_profile": edge_conf['notebook_role_profile_name'],
+               "edge_sg": edge_conf['edge_security_group_name'],
+               "notebook_subnet": edge_conf['private_subnet_cidr'],
+               "full_edge_conf": edge_conf}
         print json.dumps(res)
         result.write(json.dumps(res))
 
