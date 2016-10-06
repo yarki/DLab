@@ -1,17 +1,17 @@
 {
  "argv": [
-  "/usr/bin/python2.7",
+  "/usr/bin/python3.5",
   "-m",
   "ipykernel",
   "-f",
   "{connection_file}"
  ],
  "language": "python",
- "display_name": "PySpark (Python-2.7 / Spark-1.6.0) [CLUSTER]",
+ "display_name": "PySpark (Python-3.5 / Spark ) [CLUSTER]",
  "env": {
   "HADOOP_CONF_DIR" : "/srv/hadoopconf/CLUSTER",
   "YARN_CONF_DIR": "/srv/hadoopconf/CLUSTER",
-  "PYSPARK_PYTHON": "python2.7",
+  "PYSPARK_PYTHON": "python3.5",
   "SPARK_HOME": "/opt/spark/",
   "PYTHONPATH": "/opt/spark/python/lib/py4j-0.9-src.zip:/opt/spark/python/:",
   "PYTHONSTARTUP": "/opt/spark/python/pyspark/shell.py",
