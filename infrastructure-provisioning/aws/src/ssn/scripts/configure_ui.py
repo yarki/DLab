@@ -43,10 +43,10 @@ def configure_mongo():
 def start_ss():
     try:
         if not exists('/tmp/ss_started'):
-            sudo('mkdir /root/self-service')
-            local('scp -i {} /root/application.yml {}:/root/self-service/'.format(args.keyfile, env.host_string))
-            local('scp -i {} /root/self-service-1.0.jar {}:/root/self-service/'.format(args.keyfile, env.host_string))
-            sudo('screen -d -m java -jar /root/self-service/self-service-1.0.jar server /root/self-service/application.yml')
+            sudo('mkdir /tmp/self-service')
+            local('scp -i {} /root/application.yml {}:/tmp/self-service/'.format(args.keyfile, env.host_string))
+            local('scp -i {} /root/self-service-1.0.jar {}:/tmp/self-service/'.format(args.keyfile, env.host_string))
+            sudo('screen -d -m java -jar /tmp/self-service/self-service-1.0.jar server /tmp/self-service/application.yml')
             touch('/tmp/ss_started')
         return True
     except:
