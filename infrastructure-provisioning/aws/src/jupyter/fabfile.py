@@ -142,17 +142,14 @@ def run():
             print "Image was successfully created. It's ID is " + image_id
 
     # generating output information
-    notebook_instance_name = notebook_config['instance_name']
     ip_address = get_instance_ip_address(notebook_config['instance_name'])
     dns_name = get_instance_hostname(notebook_config['instance_name'])
-    print 'SSH access (from Edge node, via IP address): ssh -i keyfile.pem ubuntu@' + ip_address
-    print 'SSH access (from Edge node, via FQDN): ssh -i keyfile.pem ubuntu@' + dns_name
+    print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
+        'key_name'] + '.pem ubuntu@' + ip_address
+    print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ubuntu@' + dns_name
 
     with open("/root/result.json", 'w') as result:
         res = {"hostname": dns_name,
                "ip": ip_address,
-               "access_url": "http://%s/%s" %
-                             (edge_dns_name,
-                              notebook_instance_name),
                "master_keyname": os.environ['creds_key_name']}
         result.write(json.dumps(res))
