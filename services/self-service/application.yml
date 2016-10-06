@@ -24,6 +24,7 @@ provisioningService:
     connectionTimeout: 3s
 
 server:
+  rootPath: '/api/*'
   applicationConnectors:
     - type: http
       port: 8080
