@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.ldap.api.LdapAuthenticationService;
-import com.epam.dlab.auth.ldap.api.LoginService;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -39,7 +38,7 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 		if(args.length != 0 ) {
 			params = args;
 		} else {
-			params = new String[] { "server", "config.yml" };
+			params = new String[] { "server", "application.yml" };
 		}
 		LOG.debug("Starting Config Authentication Service with params: {}",String.join(",", params));
 		PythonInterpreter.initialize(System.getProperties(),System.getProperties(), new String[0]);
@@ -57,10 +56,7 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 		String ldapBindTemplate = conf.getLdapBindTemplate();
 		LOG.debug("ldapBindTemplate {}",ldapBindTemplate);
 		
-		env.jersey().register( new LoginService(conf) );
 		env.jersey().register( new LdapAuthenticationService(conf) );
-//		env.jersey().register( new Authenticate(conf) );
-//		env.jersey().register( new Authorize(conf) );
 	}
 
 }
