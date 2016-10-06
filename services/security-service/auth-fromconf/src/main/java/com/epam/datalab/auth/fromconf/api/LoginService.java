@@ -22,10 +22,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import com.epam.dlab.auth.client.ConfigurableResource;
-import com.epam.dlab.auth.client.DataLabAuthenticationConfig;
-
-
+import com.epam.dlab.auth.rest.ConfigurableResource;
+import com.epam.dlab.auth.rest.DataLabAuthenticationConfig;
 
 @Path("/")
 @Produces(MediaType.TEXT_HTML)

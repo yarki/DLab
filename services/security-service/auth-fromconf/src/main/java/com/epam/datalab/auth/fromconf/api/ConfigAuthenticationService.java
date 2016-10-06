@@ -14,10 +14,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.epam.dlab.auth.client.DataLabAuthenticationConfig;
-import com.epam.dlab.auth.core.AuthorizedUsers;
-import com.epam.dlab.auth.core.UserInfo;
-import com.epam.dlab.auth.rest_api.AbstractAuthenticationService;
+import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.auth.rest.AbstractAuthenticationService;
+import com.epam.dlab.auth.rest.AuthorizedUsers;
+import com.epam.dlab.auth.rest.DataLabAuthenticationConfig;
 
 @Path("/")
 public class ConfigAuthenticationService extends AbstractAuthenticationService<DataLabAuthenticationConfig> {
