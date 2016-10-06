@@ -41,7 +41,8 @@ def run():
     notebook_config['key_name'] = os.environ['creds_key_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-nb-' + str(int(resource_count('EC2', os.environ['conf_service_base_name']) + 1))
-    notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + '-notebook-image'
+    notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
+        'notebook_user_name'] + '-notebook-image'
     notebook_config['role_profile_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + "-nb-Profile"
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
