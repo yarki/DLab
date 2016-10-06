@@ -22,18 +22,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import com.epam.dlab.auth.ldap.LdapAuthenticationConfig;
+import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
 import com.epam.dlab.auth.rest.ConfigurableResource;
 
 
 
 @Path("/")
 @Produces(MediaType.TEXT_HTML)
-public class LoginService extends ConfigurableResource<LdapAuthenticationConfig>{
+public class LoginService extends ConfigurableResource<SecurityServiceConfiguration>{
 	
 	private final String defaultRedirect;
 	
-	public LoginService(LdapAuthenticationConfig config) {
+	public LoginService(SecurityServiceConfiguration config) {
 		super(config);
 		this.defaultRedirect = config.getDefaultRedirectFromAuthentication();
 		log.debug("Default redirect: {}",defaultRedirect);

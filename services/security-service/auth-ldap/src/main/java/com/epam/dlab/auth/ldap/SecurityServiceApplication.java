@@ -28,9 +28,9 @@ import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 
 
-public class LdapAuthenticationApp extends Application<LdapAuthenticationConfig> {
+public class SecurityServiceApplication extends Application<SecurityServiceConfiguration> {
 
-	private final static Logger LOG = LoggerFactory.getLogger(LdapAuthenticationApp.class);
+	private final static Logger LOG = LoggerFactory.getLogger(SecurityServiceApplication.class);
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -43,16 +43,16 @@ public class LdapAuthenticationApp extends Application<LdapAuthenticationConfig>
 		}
 		LOG.debug("Starting Config Authentication Service with params: {}",String.join(",", params));
 		PythonInterpreter.initialize(System.getProperties(),System.getProperties(), new String[0]);
-		new LdapAuthenticationApp().run(params);
+		new SecurityServiceApplication().run(params);
 	}
 
 	@Override
-	public void initialize(Bootstrap<LdapAuthenticationConfig> bootstrap) {
-		bootstrap.addBundle(new ViewBundle<LdapAuthenticationConfig>());
+	public void initialize(Bootstrap<SecurityServiceConfiguration> bootstrap) {
+		bootstrap.addBundle(new ViewBundle<SecurityServiceConfiguration>());
 	}
 
 	@Override
-	public void run(LdapAuthenticationConfig conf, Environment env) throws Exception {
+	public void run(SecurityServiceConfiguration conf, Environment env) throws Exception {
 		
 		String ldapBindTemplate = conf.getLdapBindTemplate();
 		LOG.debug("ldapBindTemplate {}",ldapBindTemplate);

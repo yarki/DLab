@@ -24,7 +24,7 @@ import org.apache.directory.ldap.client.api.ValidatingPoolableLdapConnectionFact
 import org.python.core.PyDictionary;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.auth.ldap.LdapAuthenticationConfig;
+import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
 import com.epam.dlab.auth.ldap.core.Request;
 import com.epam.dlab.auth.ldap.core.filter.SearchResultProcessor;
 import com.epam.dlab.auth.ldap.core.python.DeepDictionary;
@@ -36,7 +36,7 @@ import com.epam.dlab.auth.rest.AuthorizedUsers;
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class LdapAuthenticationService extends AbstractAuthenticationService<LdapAuthenticationConfig> {
+public class LdapAuthenticationService extends AbstractAuthenticationService<SecurityServiceConfiguration> {
 
 	private final LdapConnectionConfig connConfig;
 	private final List<Request> requests;
@@ -44,7 +44,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Lda
 	private final LdapConnectionPool usersPool;
 	private final LdapConnectionPool searchPool;
 
-	public LdapAuthenticationService(LdapAuthenticationConfig config) {
+	public LdapAuthenticationService(SecurityServiceConfiguration config) {
 		super(config);
 		this.connConfig = config.getLdapConnectionConfig();
 		this.requests = config.getLdapSearch();
