@@ -21,9 +21,9 @@ import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.auth.client.RestAuthFailureHandler;
-import com.epam.dlab.auth.client.RestAuthenticator;
-import com.epam.dlab.auth.core.UserInfo;
+import com.epam.dlab.auth.SecurityRestAuthenticator;
+import com.epam.dlab.auth.SecurityUnauthorizedHandler;
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.example.api.TestService;
 
 import io.dropwizard.Application;
@@ -64,7 +64,7 @@ public class ClientExampleApp extends Application<ExampleConfiguration> {
 		env.jersey().register(new TestService( conf ));
 		env.jersey().register(new AuthDynamicFeature(
 		        new OAuthCredentialAuthFilter.Builder<UserInfo>()
-		            .setAuthenticator(new RestAuthenticator(conf.getAuthenticationService(),client))
+		            .setAuthenticator(new SecurityRestAuthenticator())
 		            .setAuthorizer(new Authorizer<UserInfo>(){
 						@Override
 						public boolean authorize(UserInfo principal, String role) {
@@ -72,7 +72,7 @@ public class ClientExampleApp extends Application<ExampleConfiguration> {
 							return true;
 						}})
 		            .setPrefix("Bearer")
-		            .setUnauthorizedHandler(new RestAuthFailureHandler(conf.getAuthenticationService()))
+		            .setUnauthorizedHandler(new SecurityUnauthorizedHandler())
 		            .buildAuthFilter()));
 
 		env.jersey().register(RolesAllowedDynamicFeature.class);

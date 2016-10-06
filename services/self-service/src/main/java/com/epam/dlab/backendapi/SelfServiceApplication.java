@@ -24,7 +24,7 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
     @Override
     public void initialize(Bootstrap<SelfServiceApplicationConfiguration> bootstrap) {
         super.initialize(bootstrap);
-        bootstrap.addBundle(new AssetsBundle("/webapp/", "/webapp"));
+        bootstrap.addBundle(new AssetsBundle("/webapp/", "/", "index.html"));
     }
 
     @Override
@@ -35,6 +35,5 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
         environment.jersey().register(injector.getInstance(DockerResource.class));
         environment.jersey().register(injector.getInstance(KeyUploaderResource.class));
         environment.jersey().register(MultiPartFeature.class);
-
     }
 }

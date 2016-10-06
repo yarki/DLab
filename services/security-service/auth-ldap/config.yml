@@ -12,7 +12,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-#defaultRedirectFromAuthentication: http://localhost:8080/best
+defaultRedirectFromAuthentication: http://localhost:8080/after
 #inactiveUserTimeoutMillSec: 3600000
 ldapConnectionConfig:
   ldapHost: localhost

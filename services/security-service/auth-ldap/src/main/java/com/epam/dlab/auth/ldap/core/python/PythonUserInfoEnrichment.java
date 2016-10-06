@@ -9,9 +9,9 @@ import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.auth.core.UserInfo;
-import com.epam.dlab.auth.core.UserInfoTools;
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.ldap.core.filter.UserInfoEnrichment;
+import com.epam.dlab.auth.rest.UserInfoTools;
 
 public class PythonUserInfoEnrichment implements UserInfoEnrichment<PyDictionary> {
 	
