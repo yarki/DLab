@@ -21,6 +21,6 @@ public class SecurityRestAuthenticator implements Authenticator<String, UserInfo
     @Override
     public Optional<UserInfo> authenticate(String credentials) throws AuthenticationException {
         LOGGER.debug("authenticate token {}", credentials);
-        return securityService.post(VALIDATE, credentials, Optional.class);
+        return Optional.ofNullable(securityService.post(GET_USER_INFO, credentials, UserInfo.class));
     }
 }

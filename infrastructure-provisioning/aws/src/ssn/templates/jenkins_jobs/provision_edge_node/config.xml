@@ -12,15 +12,29 @@
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>EDGE_USERNAME</name>
-          <description>Additional extra parameter</description>
-          <defaultValue>scientist-name</defaultValue>
+          <name>Username</name>
+          <description>Name of the scientist</description>
+          <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
-          <description>Key name at AWS to be used for accessing Jupyter</description>
+          <description>Key name at AWS to be used for accessing Edge</description>
           <defaultValue>BDCC-DSS-POC</defaultValue>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>SSN_SG_ids</name>
+          <description>The ID of the SSN Security Group to be accessible</description>
+          <defaultValue>sg-e338c89a</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>Action</name>
+          <description></description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>create</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -34,7 +48,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>rand=`openssl rand -hex 10`;
-                sudo docker run -i -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e &quot;request_id=$rand&quot; -e &quot;conf_service_base_name=${Service_base_name}&quot; -e &quot;edge_user_name=${EDGE_USERNAME}&quot; -e &quot;creds_key_name=$SSH_Key_Name&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-edge --action create</command>
+                echo &apos;{}&apos; | sudo docker run -i -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e &quot;request_id=$rand&quot; -e &quot;conf_service_base_name=${Service_base_name}&quot; -e &quot;edge_user_name=${Username}&quot; -e &quot;creds_security_groups_ids=${SSN_SG_ids}&quot; -e &quot;creds_key_name=$SSH_Key_Name&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-edge --action $Action ;</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

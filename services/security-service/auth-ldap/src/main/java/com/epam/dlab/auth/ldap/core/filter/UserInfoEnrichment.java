@@ -4,6 +4,6 @@ import java.util.Map;
 
 import com.epam.dlab.auth.UserInfo;
 
-public interface UserInfoEnrichment<M extends Map<?,?>> {
-	public UserInfo enrichUserInfo(UserInfo ui, M context);
+public interface UserInfoEnrichment<PyDictionary> {
+	public UserInfo enrichUserInfo(UserInfo ui, PyDictionary context);
 }

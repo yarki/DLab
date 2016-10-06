@@ -5,6 +5,6 @@ import java.util.Map;
 
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
 
-public interface SearchResultMapper<M extends Map<?,?>> {
-	public M transformSearchResult(SearchCursor cursor) throws IOException;
+public interface SearchResultMapper<PyDictionary> {
+	public PyDictionary transformSearchResult(SearchCursor cursor) throws IOException;
 }
