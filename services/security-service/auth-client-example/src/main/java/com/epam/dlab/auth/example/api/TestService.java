@@ -22,9 +22,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import com.epam.dlab.auth.client.ConfigurableResource;
-import com.epam.dlab.auth.core.UserInfo;
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.example.ExampleConfiguration;
+import com.epam.dlab.auth.rest.ConfigurableResource;
 
 import io.dropwizard.auth.Auth;
 

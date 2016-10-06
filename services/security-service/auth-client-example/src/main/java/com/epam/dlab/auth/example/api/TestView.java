@@ -18,8 +18,8 @@ package com.epam.dlab.auth.example.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.auth.core.AuthenticationServiceConfig;
-import com.epam.dlab.auth.core.UserInfo;
+import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.auth.rest.AuthenticationServiceConfig;
 
 import io.dropwizard.views.View;
 
