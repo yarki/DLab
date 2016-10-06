@@ -38,12 +38,8 @@ ldapSearch:
       code: |
         def enrichUserInfo(ui,context):
           name = ui['username']
-          print name
-          print context
           userInfo=context['userInfo']
-          print userInfo
           uid= userInfo['uid='+name+',ou=People,dc=example,dc=com']
-          print uid
           cn = context['userInfo']['uid='+name+',ou=People,dc=example,dc=com']['cn'].split(' ')
           ui['firstName'] = cn[0]
           ui['lastName'] = cn[1]
@@ -63,19 +59,14 @@ ldapSearch:
       code: |
         def enrichUserInfo(ui,context):
           name = ui['username']
-          print name
-          print context
           userInfo=context['userInfo']
           uid= userInfo['uid='+name+',ou=People,dc=example,dc=com']
           userGid = uid['gidnumber']
-          print "Gid= "+userGid
           groupInfo=context['groupInfo']
           list = []
           for dn in groupInfo:
             group = groupInfo[dn]
-            print dn,"->",group
             if userGid == group['gidnumber']:
-              print "Member of " + group['cn']
               list = list + [group['cn']]
           ui['roles'] = list 
           return ui
