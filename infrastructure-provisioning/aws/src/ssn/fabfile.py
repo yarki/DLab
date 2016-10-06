@@ -106,7 +106,8 @@ def run():
     print('[CONFIGURING DOCKER AT SSN INSTANCE]')
     additional_config = [{"name": "base", "tag": "latest"},
                          {"name": "jupyter", "tag": "latest"},
-                         {"name": "edge", "tag": "latest"}]
+                         {"name": "edge", "tag": "latest"},
+                         {"name": "emr", "tag": "latest"},]
     params = "--hostname %s --keyfile %s --additional_config '%s'" % \
              (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
     if not run_routine('configure_docker', params):
