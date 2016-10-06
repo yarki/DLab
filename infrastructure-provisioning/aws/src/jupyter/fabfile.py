@@ -39,10 +39,13 @@ def run():
     notebook_config['instance_type'] = os.environ['notebook_instance_type']
     notebook_config['subnet_cidr'] = os.environ['notebook_subnet_cidr']
     notebook_config['key_name'] = os.environ['creds_key_name']
-    notebook_config['instance_name'] = os.environ['conf_service_base_name'] + os.environ['notebook_user_name'] + '-nb-' + str(int(resource_count('EC2',os.environ['conf_service_base_name'])+1))
+    notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
+        'notebook_user_name'] + '-nb-' + str(int(resource_count('EC2', os.environ['conf_service_base_name']) + 1))
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + '-notebook-image'
-    notebook_config['role_profile_name'] = notebook_config['instance_name'] + "-Profile"
-    notebook_config['security_group_name'] = notebook_config['instance_name'] + "-SG"
+    notebook_config['role_profile_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
+        'notebook_user_name'] + "-nb-Profile"
+    notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
+        'notebook_user_name'] + "-nb-SG"
     print 'Searching preconfigured images'
     ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
     if ami_id != '':
@@ -71,7 +74,7 @@ def run():
 
     # generating variables regarding EDGE proxy on Notebook instance
     instance_hostname = get_instance_hostname(notebook_config['instance_name'])
-    edge_instance_name = os.environ['conf_service_base_name'] + os.environ['notebook_user_name'] +'-edge'
+    edge_instance_name = os.environ['conf_service_base_name'] + "-" + os.environ['notebook_user_name'] + '-edge'
     edge_instance_hostname = get_instance_hostname(edge_instance_name)
     keyfile_name = "/root/keys/%s.pem" % os.environ['creds_key_name']
 
@@ -131,7 +134,7 @@ def run():
         sys.exit(1)
 
     # checking the need for image creation
-    if ami_id == '' and os.path.isfile("/tmp/" + notebook_config['instance_name'] + "passwd.file"):
+    if ami_id == '':
         print "Looks like it's first time we configure notebook server. Creating image."
         image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
                                               image_name=notebook_config['expected_ami_name'])
@@ -139,23 +142,17 @@ def run():
             print "Image was successfully created. It's ID is " + image_id
 
     # generating output information
-    with open("/tmp/" + notebook_config['instance_name'] + "passwd.file") as f:
-        notebook_instance_name = notebook_config['instance_name']
-        ip_address = get_instance_ip_address(notebook_config['instance_name'])
-        dns_name = get_instance_hostname(notebook_config['instance_name'])
-        edge_dns_name = get_instance_hostname(os.environ['conf_service_base_name'] + '-ssn-instance')
-        access_password = f.read()
-        print "Notebook access url: http://%s/%s" % (edge_dns_name, notebook_instance_name)
-        print "Notebook access password: " + access_password
-        print 'SSH access (from Edge node, via IP address): ssh -i keyfile.pem ubuntu@' + ip_address
-        print 'SSH access (from Edge node, via FQDN): ssh -i keyfile.pem ubuntu@' + dns_name
+    notebook_instance_name = notebook_config['instance_name']
+    ip_address = get_instance_ip_address(notebook_config['instance_name'])
+    dns_name = get_instance_hostname(notebook_config['instance_name'])
+    print 'SSH access (from Edge node, via IP address): ssh -i keyfile.pem ubuntu@' + ip_address
+    print 'SSH access (from Edge node, via FQDN): ssh -i keyfile.pem ubuntu@' + dns_name
 
-        with open("/root/result.json", 'w') as result:
-            res = {"hostname": dns_name,
-                   "ip": ip_address,
-                   "access_url": "http://%s/%s" %
-                                 (edge_dns_name,
-                                  notebook_instance_name),
-                   "access_password": access_password,
-                   "master_keyname": os.environ['creds_key_name']}
-            result.write(json.dumps(res))
+    with open("/root/result.json", 'w') as result:
+        res = {"hostname": dns_name,
+               "ip": ip_address,
+               "access_url": "http://%s/%s" %
+                             (edge_dns_name,
+                              notebook_instance_name),
+               "master_keyname": os.environ['creds_key_name']}
+        result.write(json.dumps(res))
