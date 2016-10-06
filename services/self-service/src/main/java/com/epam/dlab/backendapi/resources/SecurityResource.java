@@ -45,8 +45,8 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
 
     @Path("/logout")
     @POST
-    public Response login(@Auth UserInfo userInfo) {
-        LOGGER.debug("Try logout user = {}", userInfo.getName());
-        return Response.ok().build();
+    public Response logout(String accessToken) {
+        LOGGER.debug("Try logout accessToken {}", accessToken);
+        return authenticationService.post(LOGOUT, accessToken, Response.class);
     }
 }
