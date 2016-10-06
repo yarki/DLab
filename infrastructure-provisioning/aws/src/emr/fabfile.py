@@ -33,7 +33,7 @@ def run():
 
     emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + ', ' + emr_conf['service_base_name'] + '-Tag=EMR'
     emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-' + str(index + 1)
-    emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-bucket').lower().replace('_', '-')
+    emr_conf['bucket_name'] = (emr_conf['service_base_name'] + os.environ['edge_user_name'] + '-edge-bucket').lower().replace('_', '-')
     try:
         emr_conf['emr_timeout'] = os.environ['emr_timeout']
     except:
