@@ -55,7 +55,9 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
                 ImageMetadataDTO metadata = MAPPER.readValue(content, ImageMetadataDTO.class);
                 metadata.setImage(uuids.get(uuid));
                 metadatas.add(metadata);
+                return true;
             }
+            return false;
         };
     }
 

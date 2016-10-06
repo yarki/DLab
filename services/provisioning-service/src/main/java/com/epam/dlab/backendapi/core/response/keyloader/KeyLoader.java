@@ -63,7 +63,9 @@ public class KeyLoader implements DockerCommands, SelfAPI {
                 UserAWSCredentialDTO result = MAPPER.readValue(node.toString(), UserAWSCredentialDTO.class);
                 result.setUser(user);
                 selfService.post(KEY_LOADER, result, UserAWSCredentialDTO.class);
+                return true;
             }
+            return false;
         };
     }
 }
