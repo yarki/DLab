@@ -47,7 +47,6 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 
 	@Override
 	public void initialize(Bootstrap<SecurityServiceConfiguration> bootstrap) {
-		bootstrap.addBundle(new ViewBundle<SecurityServiceConfiguration>());
 	}
 
 	@Override
