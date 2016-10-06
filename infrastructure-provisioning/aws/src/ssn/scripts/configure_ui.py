@@ -45,7 +45,7 @@ def start_ss():
         if not exists('/tmp/ss_started'):
             local('scp -i {} /root/application.yml {}:/tmp/application.yml'.format(args.keyfile, env.host_string))
             local('scp -i {} /root/self-service-1.0.jar {}:/tmp/self-service-1.0.jar'.format(args.keyfile, env.host_string))
-            sudo('screen -d -m java -jar /tmp/self-service-1.0.jar server /tmp/application.yml')
+            sudo('nohup java -jar /tmp/self-service-1.0.jar server /tmp/application.yml > /dev/null 2>&1 &')
             sudo('touch /tmp/ss_started')
         return True
     except:
