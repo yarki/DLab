@@ -135,3 +135,30 @@ def resource_count(resource_type, tag_name):
         return count
     else:
         print "Incorrect resource type!"
+
+
+def provide_index(resource_type, tag_name):
+    ids = []
+    if resource_type == 'EMR':
+        list = get_emr_list(tag_name)
+        emr = boto3.client('emr')
+        for i in list:
+            response = emr.describe_cluster(ClusterId=i)
+            number = response.get('Cluster').get('Name').split('-')[-1]
+            if number not in ids:
+                ids.append(int(number))
+    elif resource_type == 'EC2':
+        list = get_ec2_list(tag_name)
+        for i in list:
+            for tag in i.tags:
+                if tag['Key'] == 'Name':
+                    ids.append(int(tag['Value'].split('-')[-1]))
+    else:
+        print "Incorrect resource type!"
+    index = 1
+    while True:
+        if index not in ids:
+            break
+        else:
+            index += 1
+    return index
