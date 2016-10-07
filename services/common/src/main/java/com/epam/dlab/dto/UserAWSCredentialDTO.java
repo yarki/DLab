@@ -1,4 +1,4 @@
-package com.epam.dlab.dto.awscredential;
+package com.epam.dlab.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
