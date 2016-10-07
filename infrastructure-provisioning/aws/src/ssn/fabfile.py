@@ -6,6 +6,7 @@ import sys
 
 
 def run():
+    success = True
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
@@ -14,13 +15,15 @@ def run():
 
     logging.info('[CREATE AWS CONFIG FILE]')
     print '[CREATE AWS CONFIG FILE]'
-    if not create_aws_config_files(generate_full_config=True):
-        logging.info('Unable to create configuration')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create configuration", "conf": os.environ.__dict__}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-        sys.exit(1)
+    if success:
+        if not create_aws_config_files(generate_full_config=True):
+            logging.info('Unable to create configuration')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to create configuration", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            success = False
+            sys.exit(1)
 
     logging.info('[DERIVING NAMES]')
     print '[DERIVING NAMES]'
@@ -36,25 +39,29 @@ def run():
     print('[CREATE ROLES]')
     params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
              (role_name, role_profile_name, policy_name, os.environ['conf_policy_arn'])
-    if not run_routine('create_role_policy', params):
-        logging.info('Unable to create roles')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-        sys.exit(1)
+    if success:
+        if not run_routine('create_role_policy', params):
+            logging.info('Unable to create roles')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            success = False
+            sys.exit(1)
 
     logging.info('[CREATE BUCKETS]')
     print('[CREATE BUCKETS]')
     params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \
              (user_bucket_name, tag_name, "bucket")
-    if not run_routine('create_bucket', params):
-        logging.info('Unable to create bucket')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-        sys.exit(1)
+    if success:
+        if not run_routine('create_bucket', params):
+            logging.info('Unable to create bucket')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            success = False
+            sys.exit(1)
 
     logging.info('[CREATE SSN INSTANCE]')
     print('[CREATE SSN INSTANCE]')
@@ -63,13 +70,15 @@ def run():
              (instance_name, os.environ['ssn_ami_id'], os.environ['ssn_instance_size'],
               os.environ['creds_key_name'], os.environ['creds_security_groups_ids'],
               os.environ['creds_subnet_id'], role_profile_name, tag_name, 'ssn')
-    if not run_routine('create_instance', params):
-        logging.info('Unable to create ssn instance')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create ssn instance", "conf": os.environ.__dict__}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-        sys.exit(1)
+    if success:
+        if not run_routine('create_instance', params):
+            logging.info('Unable to create ssn instance')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to create ssn instance", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            success = False
+            sys.exit(1)
 
     instance_hostname = get_instance_hostname(instance_name)
 
@@ -78,13 +87,15 @@ def run():
     params = "--hostname %s --keyfile %s " \
              "--pip_packages 'boto3 boto argparse fabric jupyter awscli'" % \
              (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
-    if not run_routine('install_prerequisites', params):
-        logging.info('Failed installing software: pip, apt')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed installing software: pip, apt", "conf": os.environ.__dict__}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-        sys.exit(1)
+    if success:
+        if not run_routine('install_prerequisites', params):
+            logging.info('Failed installing software: pip, apt')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed installing software: pip, apt", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            success = False
+            sys.exit(1)
 
     logging.info('[CONFIGURE SSN INSTANCE]')
     print('[CONFIGURE SSN INSTANCE]')
@@ -94,13 +105,15 @@ def run():
                          "proxy_subnet": os.environ["ssn_proxy_subnet"]}
     params = "--hostname %s --keyfile %s --additional_config '%s'" % \
              (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
-    if not run_routine('configure_ssn', params):
-        logging.info('Failed configuring ssn')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed configuring ssn", "conf": os.environ.__dict__}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-        sys.exit(1)
+    if success:
+        if not run_routine('configure_ssn', params):
+            logging.info('Failed configuring ssn')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed configuring ssn", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            success = False
+            sys.exit(1)
 
     logging.info('[CONFIGURING DOCKER AT SSN INSTANCE]')
     print('[CONFIGURING DOCKER AT SSN INSTANCE]')
@@ -110,36 +123,42 @@ def run():
                          {"name": "emr", "tag": "latest"},]
     params = "--hostname %s --keyfile %s --additional_config '%s'" % \
              (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
-    if not run_routine('configure_docker', params):
-        logging.info('Unable to configure docker')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to configure docker", "conf": os.environ.__dict__}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-        sys.exit(1)
+    if success:
+        if not run_routine('configure_docker', params):
+            logging.info('Unable to configure docker')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to configure docker", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            success = False
+            sys.exit(1)
 
     logging.info('[CONFIGURE SSN INSTANCE UI]')
     print('[CONFIGURE SSN INSTANCE UI]')
     params = "--hostname %s --keyfile %s " \
              "--pip_packages 'pymongo pyyaml'" % \
              (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
-    if not run_routine('install_prerequisites', params):
-        logging.info('Unable to preconfigure ui')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-        sys.exit(1)
+    if success:
+        if not run_routine('install_prerequisites', params):
+            logging.info('Unable to preconfigure ui')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            success = False
+            sys.exit(1)
 
     params = "--hostname %s --keyfile %s" % \
              (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
-    if not run_routine('configure_ui', params):
-        logging.info('Unable to upload UI')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to upload UI", "conf": os.environ.__dict__}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-        sys.exit(1)
+    if success:
+        if not run_routine('configure_ui', params):
+            logging.info('Unable to upload UI')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to upload UI", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            success = False
+            sys.exit(1)
 
     jenkins_url = "http://%s/jenkins" % get_instance_hostname(instance_name)
     print "Jenkins URL: " + jenkins_url
