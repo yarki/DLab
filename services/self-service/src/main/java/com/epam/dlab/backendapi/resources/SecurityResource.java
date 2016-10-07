@@ -1,14 +1,12 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.SecurityAPI;
-import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.SecurityDAO;
 import com.epam.dlab.dto.UserCredentialDTO;
 import com.epam.dlab.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,20 +32,20 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
     private SecurityDAO dao;
     @Inject
     @Named(SECURITY_SERVICE)
-    RESTService authenticationService;
+    RESTService securityService;
 
     @Path("/login")
     @POST
     public String login(UserCredentialDTO credential) {
         LOGGER.debug("Try login user = {}", credential.getUsername());
         dao.writeLoginAttempt(credential);
-        return authenticationService.post(LOGIN, credential, String.class);
+        return securityService.post(LOGIN, credential, String.class);
     }
 
     @Path("/logout")
     @POST
     public Response logout(String accessToken) {
         LOGGER.debug("Try logout accessToken {}", accessToken);
-        return authenticationService.post(LOGOUT, accessToken, Response.class);
+        return securityService.post(LOGOUT, accessToken, Response.class);
     }
 }
