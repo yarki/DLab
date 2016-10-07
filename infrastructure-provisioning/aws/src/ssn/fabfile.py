@@ -36,7 +36,7 @@ def run():
         instance_name = service_base_name + '-ssn-instance'
 
         logging.info('[CREATE ROLES]')
-        print('[CREATE ROLES]')
+        print('[CREATE ROLESSSSSSSS]')
         params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
                  (role_name, role_profile_name, policy_name, os.environ['conf_policy_arn'])
 
