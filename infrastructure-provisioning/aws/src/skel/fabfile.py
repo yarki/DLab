@@ -18,12 +18,15 @@ def run():
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
-    if not run_routine('install_prerequisites', "--aaa --bbb"):
-        logging.info('Failed')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed", "conf": "failconf"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+    try:
+        if not run_routine('install_prerequisites', "--aaa --bbb"):
+            logging.info('Failed')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed", "conf": "failconf"}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
         sys.exit(1)
 
     with open("/root/result.json", 'w') as result:
