@@ -196,3 +196,4 @@ def run():
             run_routine('finalize', params)
     except:
         sys.exit(1)
+    sys.exit(1)
