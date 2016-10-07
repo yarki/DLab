@@ -105,14 +105,14 @@ def get_emr_list(tag_name):
         ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING']
     )
     clusters = clusters.get('Clusters')
-    clusters_count = 0
+    clusters_list = []
     for i in clusters:
         response = emr.describe_cluster(ClusterId=i.get('Id'))
         tag = response.get('Cluster').get('Tags')
         for j in tag:
             if j.get('Key') == tag_name:
-                clusters_count += 1
-    return clusters_count
+                clusters_list.append(i.get('Id'))
+    return clusters_list
 
 
 def get_ec2_list(tag_name):
@@ -131,7 +131,7 @@ def resource_count(resource_type, tag_name):
             count += 1
         return count
     elif resource_type == 'EMR':
-        count = get_emr_list(tag_name)
+        count = len(get_emr_list(tag_name))
         return count
     else:
         print "Incorrect resource type!"
