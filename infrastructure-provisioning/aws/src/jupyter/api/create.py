@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os
 import json
+import sys
 from fabric.api import local
 
 
@@ -31,3 +32,5 @@ if __name__ == "__main__":
     with open("/response/%s.json" % os.environ['request_id'], 'w') as response_file:
         response_file.write(json.dumps(reply))
 
+    if not success:
+        sys.exit(1)
