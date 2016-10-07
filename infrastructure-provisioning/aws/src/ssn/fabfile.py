@@ -179,4 +179,7 @@ def run():
         params += "--key_id %s" % os.environ['creds_access_key']
         run_routine('finalize', params)
 
-    sys.exit(0)
+    if success:
+        sys.exit(1)
+    else:
+        sys.exit(0)
