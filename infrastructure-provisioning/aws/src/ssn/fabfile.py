@@ -6,13 +6,12 @@ import sys
 
 
 def run():
-    success = True
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
-    if success is True:
+    try:
         logging.info('[CREATE AWS CONFIG FILE]')
         print '[CREATE AWS CONFIG FILE]'
         if not create_aws_config_files(generate_full_config=True):
@@ -21,10 +20,11 @@ def run():
                 res = {"error": "Unable to create configuration", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            success = False
             sys.exit(1)
+    except:
+        sys.exit(1)
 
-    if success is True:
+    try:
         logging.info('[DERIVING NAMES]')
         print '[DERIVING NAMES]'
         service_base_name = os.environ['conf_service_base_name']
@@ -46,10 +46,11 @@ def run():
                 res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            success = False
             sys.exit(1)
+    except:
+        sys.exit(1)
 
-    if success is True:
+    try:
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
         params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \
@@ -61,10 +62,11 @@ def run():
                 res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            success = False
             sys.exit(1)
+    except:
+        sys.exit(1)
 
-    if success is True:
+    try:
         logging.info('[CREATE SSN INSTANCE]')
         print('[CREATE SSN INSTANCE]')
         params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
@@ -79,10 +81,11 @@ def run():
                 res = {"error": "Unable to create ssn instance", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            success = False
             sys.exit(1)
+    except:
+        sys.exit(1)
 
-    if success is True:
+    try:
         instance_hostname = get_instance_hostname(instance_name)
 
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
@@ -97,10 +100,11 @@ def run():
                 res = {"error": "Failed installing software: pip, apt", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            success = False
             sys.exit(1)
+    except:
+        sys.exit(1)
 
-    if success is True:
+    try:
         logging.info('[CONFIGURE SSN INSTANCE]')
         print('[CONFIGURE SSN INSTANCE]')
         additional_config = {"nginx_template_dir": "/root/templates/",
@@ -116,10 +120,11 @@ def run():
                 res = {"error": "Failed configuring ssn", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            success = False
             sys.exit(1)
+    except:
+        sys.exit(1)
 
-    if success is True:
+    try:
         logging.info('[CONFIGURING DOCKER AT SSN INSTANCE]')
         print('[CONFIGURING DOCKER AT SSN INSTANCE]')
         additional_config = [{"name": "base", "tag": "latest"},
@@ -135,10 +140,11 @@ def run():
                 res = {"error": "Unable to configure docker", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            success = False
             sys.exit(1)
+    except:
+        sys.exit(1)
 
-    if success is True:
+    try:
         logging.info('[CONFIGURE SSN INSTANCE UI]')
         print('[CONFIGURE SSN INSTANCE UI]')
         params = "--hostname %s --keyfile %s " \
@@ -151,10 +157,11 @@ def run():
                 res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            success = False
             sys.exit(1)
+    except:
+        sys.exit(1)
 
-    if success is True:
+    try:
         params = "--hostname %s --keyfile %s" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
@@ -164,10 +171,11 @@ def run():
                 res = {"error": "Unable to upload UI", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            success = False
             sys.exit(1)
+    except:
+        sys.exit(1)
 
-    if success is True:
+    try:
         jenkins_url = "http://%s/jenkins" % get_instance_hostname(instance_name)
         print "Jenkins URL: " + jenkins_url
         try:
@@ -183,11 +191,8 @@ def run():
         logging.info('[FINALIZE]')
         print('[FINALIZE]')
         params = ""
-        if os.environ['ops_lifecycle_stage'] == 'prod' and success:
+        if os.environ['ops_lifecycle_stage'] == 'prod':
             params += "--key_id %s" % os.environ['creds_access_key']
             run_routine('finalize', params)
-
-    if success is True:
-        sys.exit(0)
-    else:
+    except:
         sys.exit(1)
