@@ -175,11 +175,11 @@ def run():
     logging.info('[FINALIZE]')
     print('[FINALIZE]')
     params = ""
-    if os.environ['ops_lifecycle_stage'] == 'prod':
+    if os.environ['ops_lifecycle_stage'] == 'prod' and success:
         params += "--key_id %s" % os.environ['creds_access_key']
         run_routine('finalize', params)
 
     if success:
-        sys.exit(1)
-    else:
         sys.exit(0)
+    else:
+        sys.exit(1)
