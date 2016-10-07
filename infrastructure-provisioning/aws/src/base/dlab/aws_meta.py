@@ -144,7 +144,7 @@ def provide_index(resource_type, tag_name):
         emr = boto3.client('emr')
         for i in list:
             response = emr.describe_cluster(ClusterId=i)
-            number = response.get('Cluster').get('Name').split('-')[2]
+            number = response.get('Cluster').get('Name').split('-')[-1]
             if number not in ids:
                 ids.append(int(number))
     elif resource_type == 'EC2':
@@ -152,7 +152,7 @@ def provide_index(resource_type, tag_name):
         for i in list:
             for tag in i.tags:
                 if tag['Key'] == 'Name':
-                    ids.append(int(tag['Value'].split('-')[3]))
+                    ids.append(int(tag['Value'].split('-')[-1]))
     else:
         print "Incorrect resource type!"
     index = 1
