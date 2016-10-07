@@ -109,33 +109,39 @@ def run():
     with hide('stderr', 'running', 'warnings'):
         local("echo Waitning for changes to propagate; sleep 10")
 
-    logging.info('[CREATE EMR CLUSTER]')
-    print '[CREATE EMR CLUSTER]'
-    params = "--name {} --applications '{}' --instance_type {} --instance_count {} --ssh_key {} --release_label {} --emr_timeout {} " \
-             "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --tags '{}'".format(
-        emr_conf['cluster_name'], emr_conf['apps'], emr_conf['instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'], emr_conf['emr_timeout'],
-        emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], os.environ['edge_user_name'], emr_conf['bucket_name'], emr_conf['tags'])
-    if not run_routine('create_cluster', params):
-        logging.info('Failed creating EMR Cluster')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to create EMR Cluster", "conf": emr_conf}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+    try:
+        logging.info('[CREATE EMR CLUSTER]')
+        print '[CREATE EMR CLUSTER]'
+        params = "--name {} --applications '{}' --instance_type {} --instance_count {} --ssh_key {} --release_label {} --emr_timeout {} " \
+                 "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --tags '{}'".format(
+            emr_conf['cluster_name'], emr_conf['apps'], emr_conf['instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'], emr_conf['emr_timeout'],
+            emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], os.environ['edge_user_name'], emr_conf['bucket_name'], emr_conf['tags'])
+        if not run_routine('create_cluster', params):
+            logging.info('Failed creating EMR Cluster')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to create EMR Cluster", "conf": emr_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+
+        cluster_name = emr_conf['cluster_name']
+        keyfile_name = "/root/keys/%s.pem" % emr_conf['key_name']
+    except:
         sys.exit(1)
 
-    cluster_name = emr_conf['cluster_name']
-    keyfile_name = "/root/keys/%s.pem" % emr_conf['key_name']
-
-    logging.info('[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]')
-    print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
-    params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {}".format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'], keyfile_name, emr_conf['notebook_ip'])
-    #params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
-    if not run_routine('install_emr_kernels', params):
-        logging.info('Failed installing EMR kernels')
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed installing EMR kernels", "conf": emr_conf}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+    try:
+        logging.info('[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]')
+        print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
+        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {}".format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'], keyfile_name, emr_conf['notebook_ip'])
+        #params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
+        if not run_routine('install_emr_kernels', params):
+            logging.info('Failed installing EMR kernels')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed installing EMR kernels", "conf": emr_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
         sys.exit(1)
 
     with open("/root/result.json", 'w') as result:
