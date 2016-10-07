@@ -24,6 +24,7 @@ import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 /**
  * Created by Alexey Suprun
  */
+@Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class SecurityResource implements MongoCollections, SecurityAPI {
