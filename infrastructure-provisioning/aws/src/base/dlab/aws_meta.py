@@ -146,13 +146,13 @@ def provide_index(resource_type, tag_name):
             response = emr.describe_cluster(ClusterId=i)
             number = response.get('Cluster').get('Name').split('-')[2]
             if number not in ids:
-                ids.append(number)
+                ids.append(int(number))
     elif resource_type == 'EC2':
         list = get_ec2_list(tag_name)
         for i in list:
             for tag in i.tags:
                 if tag['Key'] == 'Name':
-                    ids.append(tag['Value'].split('-')[3])
+                    ids.append(int(tag['Value'].split('-')[3]))
     else:
         print "Incorrect resource type!"
     index = 1
