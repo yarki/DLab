@@ -9,44 +9,29 @@ import java.util.List;
  */
 public class UserAWSCredentialDTO {
     @JsonProperty
-    protected String user;
-    @JsonProperty("instance_name")
-    protected String instanceName;
-    @JsonProperty("ami_id")
-    protected String amiId;
-    @JsonProperty("edge_security_group_name")
-    protected String edgeSecurityGroupName;
-    @JsonProperty("key_name")
-    protected String keyName;
+    private String user;
     @JsonProperty
-    protected String region;
-    @JsonProperty("policy_arn")
-    protected String policyArn;
-    @JsonProperty("security_group_rules")
-    protected List<SecurityGroupRule> securityGroupRules;
-    @JsonProperty("policy_name")
-    protected String policyName;
-    @JsonProperty("isolated_security_group_name")
-    protected String isolatedSecurityGroupName;
-    @JsonProperty("role_profile_name")
-    protected String roleProfileName;
-    @JsonProperty("bucket_name")
-    protected String bucketName;
-    @JsonProperty("public_subnet_id")
-    protected String publicSubnetId;
-    @JsonProperty("private_subnet_cidr")
-    protected String privateSubnetCidr;
-    @JsonProperty("vpc_id")
-    protected String vpcId;
-    @JsonProperty("service_base_name")
-    protected String serviceBaseName;
-    @JsonProperty("role_name")
-    protected String roleName;
-    @JsonProperty("instance_size")
-    protected String instanceSize;
-
+    private String hostname;
+    @JsonProperty
+    private String ip;
+    @JsonProperty("key_name")
+    private String keyName;
+    @JsonProperty("user_own_bicket_name")
+    private String userOwnBicketName;
+    @JsonProperty("tunnel_port")
+    private String tunnelPort;
     @JsonProperty("socks_port")
-    protected String socksPort;
+    private String socksPort;
+    @JsonProperty("notebook_sg")
+    private String notebookSg;
+    @JsonProperty("notebook_profile")
+    private String notebookProfile;
+    @JsonProperty("notebook_subnet")
+    private String notebookSubnet;
+    @JsonProperty("edge_sg")
+    private String edgeSG;
+    @JsonProperty("full_edge_conf")
+    private String fullEdgeConf;
 
     public String getUser() {
         return user;
