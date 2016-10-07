@@ -39,14 +39,14 @@ parser.add_argument('--emr_timeout', type=int, default=1200)
 parser.add_argument('--configurations', type=str, default='')
 args = parser.parse_args()
 
-cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/config/{1}/hive-site.xml, ActionOnFailure=CONTINUE,Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/config/{1} --recursive, ActionOnFailure=CONTINUE, Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=CONTINUE,Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=CONTINUE,Jar=command-runner.jar".format(
+cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/config/{1}/hive-site.xml, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/config/{1} --recursive, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
     args.s3_bucket, args.name, args.nbs_user)
 
-cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{0}/jars/{1}/aws --recursive, ActionOnFailure=CONTINUE,Jar=command-runner.jar; " \
-          "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{0}/jars/{1}/lib --recursive,ActionOnFailure=CONTINUE,Jar=command-runner.jar".format(
+cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{0}/jars/{1}/aws --recursive, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+          "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{0}/jars/{1}/lib --recursive,ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
     args.s3_bucket, args.release_label)
 
 
