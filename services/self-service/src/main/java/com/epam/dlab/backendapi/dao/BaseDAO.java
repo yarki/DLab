@@ -15,6 +15,7 @@ import java.util.function.Supplier;
  */
 class BaseDAO {
     private static final ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+    public static final String USER = "user";
     public static final String TIMESTAMP = "timestamp";
 
     @Inject
@@ -26,5 +27,9 @@ class BaseDAO {
 
     protected void insertOne(String collection, Object object) throws JsonProcessingException {
         mongoService.getCollection(collection).insertOne(Document.parse(MAPPER.writeValueAsString(object)).append(TIMESTAMP, new Date()));
+    }
+
+    protected Document getUpdater(Document value) {
+        return new Document("$set", value);
     }
 }

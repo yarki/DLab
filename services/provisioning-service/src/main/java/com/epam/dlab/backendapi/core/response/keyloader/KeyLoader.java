@@ -6,8 +6,10 @@ import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.FolderListener;
-import com.epam.dlab.dto.UploadFileDTO;
-import com.epam.dlab.dto.UserAWSCredentialDTO;
+import com.epam.dlab.dto.keyload.KeyLoadStatus;
+import com.epam.dlab.dto.keyload.UploadFileResultDTO;
+import com.epam.dlab.dto.keyload.UploadFileDTO;
+import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.restclient.RESTService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
@@ -26,6 +28,7 @@ import java.nio.file.Paths;
 public class KeyLoader implements DockerCommands, SelfAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyLoader.class);
     private static final String KEY_EXTENTION = ".pem";
+    private static final String STATUS_FIELD = "status";
     private static final String RESPONSE_NODE = "response";
     private static final String RESULT_NODE = "result";
     private static final String CONF_NODE = "conf";
@@ -59,13 +62,20 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         return (fileName, content) -> {
             LOGGER.debug("get file {}", fileName);
             if (uuid.equals(DockerCommands.extractUUID(fileName))) {
-                JsonNode node = MAPPER.readTree(content).get(RESPONSE_NODE).get(RESULT_NODE).get(CONF_NODE);
-                UserAWSCredentialDTO result = MAPPER.readValue(node.toString(), UserAWSCredentialDTO.class);
-                result.setUser(user);
-                selfService.post(KEY_LOADER, result, UserAWSCredentialDTO.class);
+                JsonNode document = MAPPER.readTree(content);
+                UploadFileResultDTO result = new UploadFileResultDTO(user);
+                if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
+                    result.setSuccessAndCredential(extractCredential(document));
+                }
+                selfService.post(KEY_LOADER, result, UploadFileResultDTO.class);
                 return true;
             }
             return false;
         };
+    }
+
+    private UserAWSCredentialDTO extractCredential(JsonNode document) throws IOException {
+        JsonNode node = document.get(RESPONSE_NODE).get(RESULT_NODE).get(CONF_NODE);
+        return MAPPER.readValue(node.toString(), UserAWSCredentialDTO.class);
     }
 }

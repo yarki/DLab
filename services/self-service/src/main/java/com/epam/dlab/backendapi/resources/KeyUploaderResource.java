@@ -2,8 +2,9 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
-import com.epam.dlab.dto.UploadFileDTO;
-import com.epam.dlab.dto.UserAWSCredentialDTO;
+import com.epam.dlab.dto.keyload.KeyLoadStatus;
+import com.epam.dlab.dto.keyload.UploadFileResultDTO;
+import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.restclient.RESTService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
@@ -57,9 +58,12 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     }
 
     @POST
-    public Response loadKeyResponse(UserAWSCredentialDTO credential) throws JsonProcessingException {
-        LOGGER.debug("credential loaded for user {}", credential.getUser());
-        dao.saveCredential(credential);
+    public Response loadKeyResponse(UploadFileResultDTO result) throws JsonProcessingException {
+        LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
+        dao.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
+        if (result.isSuccess()) {
+            dao.saveCredential(result.getCredential());
+        }
         return Response.ok().build();
     }
 }

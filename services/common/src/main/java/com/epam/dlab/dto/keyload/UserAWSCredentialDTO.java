@@ -1,4 +1,4 @@
-package com.epam.dlab.dto;
+package com.epam.dlab.dto.keyload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -8,8 +8,6 @@ import java.util.List;
  * Created by Alexey Suprun
  */
 public class UserAWSCredentialDTO {
-    @JsonProperty
-    private String user;
     @JsonProperty
     private String hostname;
     @JsonProperty
@@ -32,12 +30,4 @@ public class UserAWSCredentialDTO {
     private String edgeSG;
     @JsonProperty("full_edge_conf")
     private String fullEdgeConf;
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
 }
