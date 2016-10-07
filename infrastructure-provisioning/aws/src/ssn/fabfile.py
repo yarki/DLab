@@ -12,7 +12,7 @@ def run():
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
-    if success:
+    if success is True:
         logging.info('[CREATE AWS CONFIG FILE]')
         print '[CREATE AWS CONFIG FILE]'
         if not create_aws_config_files(generate_full_config=True):
@@ -24,7 +24,7 @@ def run():
             success = False
             sys.exit(1)
 
-    if success:
+    if success is True:
         logging.info('[DERIVING NAMES]')
         print '[DERIVING NAMES]'
         service_base_name = os.environ['conf_service_base_name']
@@ -49,7 +49,7 @@ def run():
             success = False
             sys.exit(1)
 
-    if success:
+    if success is True:
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
         params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \
@@ -64,7 +64,7 @@ def run():
             success = False
             sys.exit(1)
 
-    if success:
+    if success is True:
         logging.info('[CREATE SSN INSTANCE]')
         print('[CREATE SSN INSTANCE]')
         params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
@@ -82,7 +82,7 @@ def run():
             success = False
             sys.exit(1)
 
-    if success:
+    if success is True:
         instance_hostname = get_instance_hostname(instance_name)
 
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
@@ -100,7 +100,7 @@ def run():
             success = False
             sys.exit(1)
 
-    if success:
+    if success is True:
         logging.info('[CONFIGURE SSN INSTANCE]')
         print('[CONFIGURE SSN INSTANCE]')
         additional_config = {"nginx_template_dir": "/root/templates/",
@@ -119,7 +119,7 @@ def run():
             success = False
             sys.exit(1)
 
-    if success:
+    if success is True:
         logging.info('[CONFIGURING DOCKER AT SSN INSTANCE]')
         print('[CONFIGURING DOCKER AT SSN INSTANCE]')
         additional_config = [{"name": "base", "tag": "latest"},
@@ -138,7 +138,7 @@ def run():
             success = False
             sys.exit(1)
 
-    if success:
+    if success is True:
         logging.info('[CONFIGURE SSN INSTANCE UI]')
         print('[CONFIGURE SSN INSTANCE UI]')
         params = "--hostname %s --keyfile %s " \
@@ -154,7 +154,7 @@ def run():
             success = False
             sys.exit(1)
 
-    if success:
+    if success is True:
         params = "--hostname %s --keyfile %s" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
@@ -167,7 +167,7 @@ def run():
             success = False
             sys.exit(1)
 
-    if success:
+    if success is True:
         jenkins_url = "http://%s/jenkins" % get_instance_hostname(instance_name)
         print "Jenkins URL: " + jenkins_url
         try:
@@ -187,7 +187,7 @@ def run():
             params += "--key_id %s" % os.environ['creds_access_key']
             run_routine('finalize', params)
 
-    if success:
+    if success is True:
         sys.exit(0)
     else:
         sys.exit(1)
