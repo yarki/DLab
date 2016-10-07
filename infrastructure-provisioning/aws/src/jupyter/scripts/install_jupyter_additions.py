@@ -76,4 +76,3 @@ if __name__ == "__main__":
     print "Installing notebook additions: sbt."
     ensure_sbt()
 
-    sudo('touch /home/ubuntu/all_ensured')

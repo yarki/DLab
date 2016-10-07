@@ -26,12 +26,11 @@ def enable_proxy(proxy_host, proxy_port):
 
 
 def renew_gpg_key():
-    if exists('/home/ubuntu/all_ensured'):
-        try:
-            sudo('mv /etc/apt/trusted.gpg /etc/apt/trusted.bkp')
-            sudo('apt-key update')
-        except:
-            sys.exit(1)
+    try:
+        sudo('mv /etc/apt/trusted.gpg /etc/apt/trusted.bkp')
+        sudo('apt-key update')
+    except:
+        sys.exit(1)
 
 ##############
 # Run script #
@@ -46,5 +45,5 @@ if __name__ == "__main__":
     print "Enabling proxy for notebook server for repositories access."
     enable_proxy(deeper_config['proxy_host'], deeper_config['proxy_port'])
 
-    print "Renewing gpg keys if needed."
+    print "Renewing gpg key"
     renew_gpg_key()
