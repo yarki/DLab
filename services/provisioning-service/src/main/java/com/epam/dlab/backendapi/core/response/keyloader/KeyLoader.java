@@ -31,7 +31,6 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     private static final String STATUS_FIELD = "status";
     private static final String RESPONSE_NODE = "response";
     private static final String RESULT_NODE = "result";
-    private static final String CONF_NODE = "conf";
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
@@ -75,7 +74,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     }
 
     private UserAWSCredentialDTO extractCredential(JsonNode document) throws IOException {
-        JsonNode node = document.get(RESPONSE_NODE).get(RESULT_NODE).get(CONF_NODE);
+        JsonNode node = document.get(RESPONSE_NODE).get(RESULT_NODE);
         return MAPPER.readValue(node.toString(), UserAWSCredentialDTO.class);
     }
 }
