@@ -29,7 +29,7 @@ public class SelfServiceApplicationConfiguration extends Configuration {
     @Valid
     @NotNull
     @JsonProperty(SECURITY_SERVICE)
-    private RESTServiceFactory authenticationFactory;
+    private RESTServiceFactory securityFactory;
 
     @Valid
     @NotNull
@@ -45,8 +45,8 @@ public class SelfServiceApplicationConfiguration extends Configuration {
         return mongoFactory;
     }
 
-    public RESTServiceFactory getAuthenticationFactory() {
-        return authenticationFactory;
+    public RESTServiceFactory getSecurityFactory() {
+        return securityFactory;
     }
 
     public RESTServiceFactory getProvisioningFactory() {
