@@ -35,69 +35,6 @@ def ensure_sbt():
             sys.exit(1)
 
 
-def ensure_scala_breeze():
-    if not exists('/home/ubuntu/scala_breeze_ensured'):
-        try:
-            working_root = "/tmp"
-            breeze_repo = "https://github.com/scalanlp/breeze.git"
-            releases = 'https://oss.sonatype.org/content/repositories/releases/'
-            snapshots = 'https://oss.sonatype.org/content/repositories/snapshots/'
-            scalanlp = 'org.scalanlp'
-            scala_version = "2.11"
-            sudo('cd ' + working_root + ' ; git clone ' + breeze_repo)
-            sudo('echo \'libraryDependencies  ++= Seq(\' >> ' + working_root + '/breeze/build.sbt')
-            sudo(
-                'echo \'   "' + scalanlp + '" %% "breeze" % "latest.integration", \' >> ' + working_root + '/breeze/build.sbt ')
-            sudo('echo \'   "' + scalanlp + '" %% "breeze-natives" % "0.12" , \' >> ' + working_root + '/breeze/build.sbt')
-            sudo('echo \'   "' + scalanlp + '" %% "breeze-viz" % "0.12" ) \' >> ' + working_root + '/breeze/build.sbt ')
-            sudo('echo \'resolvers ++= Seq( \' >> ' + working_root + '/breeze/build.sbt')
-            sudo('echo \'  "Sonatype Releases" at "' + releases + '" , \' >> ' + working_root + '/breeze/build.sbt')
-            sudo('echo \'  "Sonatype Snapshots" at "' + snapshots + '" ) \' >> ' + working_root + '/breeze/build.sbt')
-            sudo('echo \'scalaVersion := "' + scala_version + '" \' >> ' + working_root + '/breeze/build.sbt')
-            sudo('cd ' + working_root + '/breeze ; sbt package publish-local')
-            sudo('touch /home/ubuntu/scala_breeze_ensured')
-        except:
-            sys.exit(1)
-
-
-def configure_scala_breeze():
-    if not exists('/home/ubuntu/scala_breeze_configured'):
-        try:
-            source_root = "/tmp/breeze"
-            target_dir = "/opt/spark/lib"
-            scala_version = "2.11"
-            sudo('cp ' + source_root + '/target/scala-' + scala_version + '/*.jar ' + target_dir)
-            sudo('cp ' + source_root + '/math/target/scala-' + scala_version + '/*.jar ' + target_dir)
-            sudo('cp ' + source_root + '/viz/target/scala-' + scala_version + '/*.jar ' + target_dir)
-            sudo('touch /home/ubuntu/scala_breeze_configured')
-        except:
-            sys.exit(1)
-
-
-def ensure_scala_wisp():
-    if not exists('/home/ubuntu/scala_wisp_ensured'):
-        try:
-            wisp_repo = "https://github.com/quantifind/wisp.git"
-            working_root = "/tmp"
-            sudo('cd ' + working_root + ' ; git clone ' + wisp_repo)
-            sudo('cd ' + working_root + '/wisp ; sbt package publish-local')
-            sudo('touch /home/ubuntu/scala_wisp_ensured')
-        except:
-            sys.exit(1)
-
-
-def configure_scala_wisp():
-    if not exists('/home/ubuntu/scala_wisp_configured'):
-        try:
-            source_root = "/tmp/wisp"
-            target_dir = "/opt/spark/lib"
-            scala_version = "2.11"
-            sudo('cp ' + source_root + '/core/target/scala-' + scala_version + '/*.jar ' + target_dir)
-            sudo('touch /home/ubuntu/scala_wisp_configured')
-        except:
-            sys.exit(1)
-
-
 def ensure_libraries_py2():
     if not exists('/home/ubuntu/ensure_libraries_py2_installed'):
         try:
@@ -138,12 +75,4 @@ if __name__ == "__main__":
 
     print "Installing notebook additions: sbt."
     ensure_sbt()
-
-    # print "Installing notebook additions: breeze."
-    # ensure_scala_breeze()
-    # configure_scala_breeze()
-
-    # print "Installing notebook additions: wisp."
-    # ensure_scala_wisp()
-    # configure_scala_wisp()
 

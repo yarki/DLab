@@ -41,9 +41,8 @@ public class MockModule extends AbstractModule implements SecurityAPI, DockerAPI
 
     private RESTService createAuthenticationService() {
         RESTService result = mock(RESTService.class);
-        Optional<UserInfo> userInfo = Optional.of(new UserInfo("test", "token123"));
-        when(result.get(eq(LOGIN), any())).thenReturn(userInfo);
-        when(result.post(eq(GET_USER_INFO), eq("token123"), eq(Optional.class))).thenReturn(userInfo);
+        when(result.post(eq(LOGIN), any(), any())).thenReturn("token123");
+        when(result.post(eq(GET_USER_INFO), eq("token123"), eq(UserInfo.class))).thenReturn(new UserInfo("test", "token123"));
         return result;
     }
 

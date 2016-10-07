@@ -13,9 +13,7 @@ DOCKER_IMAGE_SOURCE_DIR=$SCRIPTPATH/../../src
 ##################
 # Docker Common
 ##################
-ACTION="create"
 KEY_DIR=$SCRIPTPATH/keys
-KEY_NAME=BDCC-DSS-POC
 OVERWRITE_FILE=$SCRIPTPATH/overwrite.ini
 REQUEST_ID=$RANDOM
 LOG_DIR=$(pwd)
@@ -32,10 +30,10 @@ RESPONSE_DIR=$SCRIPTPATH
 ##################
 function update_images {
     echo "Updating base image"
-    docker build --file $DOCKER_IMAGE_SOURCE_DIR/base/Dockerfile $PROJECT_PREFIX-base $DOCKER_IMAGE_SOURCE_DIR/base
+    docker build --file $DOCKER_IMAGE_SOURCE_DIR/base/Dockerfile -t $PROJECT_PREFIX-base $DOCKER_IMAGE_SOURCE_DIR/base
 
     echo "Updating working image"
-    docker build --file $DOCKER_IMAGE_SOURCE_DIR/$DOCKER_IMAGE/Dockerfile $PROJECT_PREFIX-$DOCKER_IMAGE $DOCKER_IMAGE_SOURCE_DIR
+    docker build --file $DOCKER_IMAGE_SOURCE_DIR/$DOCKER_IMAGE/Dockerfile -t $PROJECT_PREFIX-$DOCKER_IMAGE $DOCKER_IMAGE_SOURCE_DIR
 }
 
 function run_docker {
@@ -52,16 +50,15 @@ function run_docker {
 }
 
 function print_help {
-    echo "REUIRED:"
-    echo "-a / --action ACTION: pass command to container"
+    echo "REQUIRED:"
+    echo "-a / --action ACTION: pass command to container. E.g.: create/start/status/stop"
     echo "OPTIONAL:"
     echo "-l / --log-dir DIR: response and log directory. Default: current dir (pwd)"
     echo "-o / --overwrite-file PATH_TO_FILE: path to overwrite conf file"
     echo "-d / --key-dir DIR: path to key dir"
-    echo "-k / --key-name NAME: name of infra key. By default: BDCC-DSS-POC"
-    echo "-s / --source-dir DIR: direcotry with dlab infrastucture provisioning sources"
-    echo "--response_dir DIR: direcotry where response json will be places"
-    echo "--rebuild : if you need to refresh images before run"
+    echo "-s / --source-dir DIR: directory with dlab infrastructure provisioning sources"
+    echo "--response_dir DIR: directory where response json will be places"
+    echo "-r / --rebuild : if you need to refresh images before run"
 }
 
 while [[ $# -gt 1 ]]
@@ -77,16 +74,16 @@ do
         DOCKER_IMAGE_SOURCE_DIR="$2"
         shift # past argument
         ;;
-        -k|--key-name)
-        KEY_NAME="$2"
-        shift # past argument
-        ;;
         -l|--log-dir)
         LOG_DIR="$2"
         shift # past argument
         ;;
         --response_dir)
         RESPONSE_DIR="$2"
+        shift # past argument
+        ;;
+        -o|--overwrite-file)
+        OVERWRITE_FILE="$2/overwrite.ini"
         shift # past argument
         ;;
         -d|--key-dir)
@@ -101,7 +98,7 @@ do
         exit
         ;;
         *)
-        echo "Unkonown option $1."
+        echo "Unknown option $1."
         print_help
         exit
         ;;
