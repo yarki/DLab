@@ -18,11 +18,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.Configuration;
 
-public class LdapAuthenticationConfig extends Configuration {
+public class SecurityServiceConfiguration extends Configuration {
 
 	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 	
-	public LdapAuthenticationConfig() {
+	public SecurityServiceConfiguration() {
 		super();
 	}
 	

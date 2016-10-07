@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.ldap.api.LdapAuthenticationService;
-import com.epam.dlab.auth.ldap.api.LoginService;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -28,9 +27,9 @@ import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 
 
-public class LdapAuthenticationApp extends Application<LdapAuthenticationConfig> {
+public class SecurityServiceApplication extends Application<SecurityServiceConfiguration> {
 
-	private final static Logger LOG = LoggerFactory.getLogger(LdapAuthenticationApp.class);
+	private final static Logger LOG = LoggerFactory.getLogger(SecurityServiceApplication.class);
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -39,28 +38,24 @@ public class LdapAuthenticationApp extends Application<LdapAuthenticationConfig>
 		if(args.length != 0 ) {
 			params = args;
 		} else {
-			params = new String[] { "server", "config.yml" };
+			params = new String[] { "server", "application.yml" };
 		}
 		LOG.debug("Starting Config Authentication Service with params: {}",String.join(",", params));
 		PythonInterpreter.initialize(System.getProperties(),System.getProperties(), new String[0]);
-		new LdapAuthenticationApp().run(params);
+		new SecurityServiceApplication().run(params);
 	}
 
 	@Override
-	public void initialize(Bootstrap<LdapAuthenticationConfig> bootstrap) {
-		bootstrap.addBundle(new ViewBundle<LdapAuthenticationConfig>());
+	public void initialize(Bootstrap<SecurityServiceConfiguration> bootstrap) {
 	}
 
 	@Override
-	public void run(LdapAuthenticationConfig conf, Environment env) throws Exception {
+	public void run(SecurityServiceConfiguration conf, Environment env) throws Exception {
 		
 		String ldapBindTemplate = conf.getLdapBindTemplate();
 		LOG.debug("ldapBindTemplate {}",ldapBindTemplate);
 		
-		env.jersey().register( new LoginService(conf) );
 		env.jersey().register( new LdapAuthenticationService(conf) );
-//		env.jersey().register( new Authenticate(conf) );
-//		env.jersey().register( new Authorize(conf) );
 	}
 
 }

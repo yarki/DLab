@@ -1,21 +1,21 @@
 package com.epam.dlab.auth.ldap.api;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.epam.dlab.dto.UserCredentialDTO;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
 import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.api.ldap.model.ldif.anonymizer.StringAnonymizer;
 import org.apache.directory.api.ldap.model.message.SearchRequest;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
@@ -24,7 +24,7 @@ import org.apache.directory.ldap.client.api.ValidatingPoolableLdapConnectionFact
 import org.python.core.PyDictionary;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.auth.ldap.LdapAuthenticationConfig;
+import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
 import com.epam.dlab.auth.ldap.core.Request;
 import com.epam.dlab.auth.ldap.core.filter.SearchResultProcessor;
 import com.epam.dlab.auth.ldap.core.python.DeepDictionary;
@@ -32,11 +32,12 @@ import com.epam.dlab.auth.ldap.core.python.PythonUserInfoEnrichment;
 import com.epam.dlab.auth.ldap.core.python.SearchResultToDictionaryMapper;
 import com.epam.dlab.auth.rest.AbstractAuthenticationService;
 import com.epam.dlab.auth.rest.AuthorizedUsers;
+import com.epam.dlab.dto.UserCredentialDTO;
 
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class LdapAuthenticationService extends AbstractAuthenticationService<LdapAuthenticationConfig> {
+public class LdapAuthenticationService extends AbstractAuthenticationService<SecurityServiceConfiguration> {
 
 	private final LdapConnectionConfig connConfig;
 	private final List<Request> requests;
@@ -44,7 +45,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Lda
 	private final LdapConnectionPool usersPool;
 	private final LdapConnectionPool searchPool;
 
-	public LdapAuthenticationService(LdapAuthenticationConfig config) {
+	public LdapAuthenticationService(SecurityServiceConfiguration config) {
 		super(config);
 		this.connConfig = config.getLdapConnectionConfig();
 		this.requests = config.getLdapSearch();
