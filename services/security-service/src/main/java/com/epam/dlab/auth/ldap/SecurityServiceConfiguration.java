@@ -62,34 +62,6 @@ public class SecurityServiceConfiguration extends Configuration {
 
 	@JsonProperty
 	private String defaultRedirectFromAuthentication;
-	
-	private List<SearchRequest> getSearchRequests() {
-		if( searchRequestList == null ) {
-		final List<SearchRequest> list = new ArrayList<>();
-		ldapSearch.forEach(req->{
-			LOG.debug("request {}",req);
-			if(req == null) {
-				return;
-			}
-			SearchRequest sr = new SearchRequestImpl();
-			try {
-				sr.setBase(new Dn(req.getBase()));
-				sr.addAttributes(req.getAttributes());
-				if(req.getFilter() != null && ! "".equals(req.getFilter() ) ){
-					sr.setFilter(req.getFilter());				
-				}
-				sr.setScope(SearchScope.valueOf(req.getScope()));
-				sr.setTimeLimit(req.getTimeLimit());
-				list.add(sr);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			
-		});
-		searchRequestList = list;
-		}
-		return searchRequestList;
-	}
 
 	public String getDefaultRedirectFromAuthentication() {
 		return defaultRedirectFromAuthentication;

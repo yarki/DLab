@@ -35,6 +35,7 @@ ldapSearch:
     filter: "(&(objectClass=inetOrgPerson)(uid=${username}))"
     searchResultProcessor:
       language: python
+#      path: c:\tmp\enrich.py
       code: |
         def enrichUserInfo(ui,context):
           name = ui.getName()
@@ -56,6 +57,7 @@ ldapSearch:
     filter: "(&(objectClass=posixGroup))"
     searchResultProcessor:
       language: javascript
+#      path: c:\tmp\enrich.js
       code: |
         var enrichUserInfo = function(ui,context) {
           name = ui.getName();
