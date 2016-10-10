@@ -1,0 +1,170 @@
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+        <li><a href="#">Action</a></li>
+        <li><a href="#">Another action</a></li>
+        <li><a href="#">Something else here</a></li>
+        <li><a href="#">Separated link</a></li>
+      </ul>
+      <a class="navbar-logo" href="#">
+        <img src="assets/img/logo-nav.png" alt="">
+      </a>
+    </div>
+    <button class="btn btn-logout">Log out</button>
+  </div>
+</nav>
+
+<div class="sub_nav">
+  <div class="container-fluid">
+    <button class="btn btn_create" data-toggle="modal" data-target=".create_computational">
+      <span class="glyphicon glyphicon glyphicon-plus"></span> Create new
+    </button>
+    <button class="btn btn_refresh pull-right">
+      <span class="glyphicon glyphicon-refresh"></span> Refresh
+    </button>
+  </div>
+</div>
+
+<table class="dashboard_table">
+  <tr>
+    <th class="th_name">ENVIRONMENT NAME</th>
+    <th class="th_status">STATUS</th>
+    <th class="th_shape">SHAPE</th>
+    <th class="th_resources">Computational resources</th>
+    <th class="th_actions">ACTIONS</th>
+  </tr>
+  <tr>
+    <td>Jupiter box</td>
+    <td>
+      <span class="running">Running</span>
+    </td>
+    <td>M4.xlarge</td>
+    <td>
+      <span class="no_details">no details</span>
+    </td>
+    <td>
+      <div class="dropdown">
+        <span  data-toggle="dropdown" class="glyphicon glyphicon-cog"></span>
+        <div class="dropdown-menu">
+          <ul class=list-unstyled>
+            <li>Stop</li>
+            <li>Terminate</li>
+            <li>Deploy EMR</li>
+          </ul>
+        </div>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td>Jupiter + Spark lib box</td>
+    <td>
+      <span class="stopped">Stopped</span>
+    </td>
+    <td>R3.xlarge</td>
+    <td>EMR cluster 5 nodes <span class="glyphicon glyphicon-remove"></span></td>
+    <td>
+      <div class="dropdown">
+        <span  data-toggle="dropdown" class="glyphicon glyphicon-cog"></span>
+        <div class="dropdown-menu">
+          <ul class=list-unstyled>
+            <li>Stop</li>
+            <li>Terminate</li>
+            <li>Deploy EMR</li>
+          </ul>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
+
+
+<div class="modal fade create_computational">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Create computational resource</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+          <div  class="col-xs-4">
+            <label class="control-label">Select template</label>
+            <div>
+              <small>Template discription .. <br/>EMR 5.0 Spark 2.0</small>
+            </div>
+          </div>
+          <div class="col-xs-8">
+            <select class="form-control">
+              <option>EMR + Spark</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div  class="col-xs-4">
+            <label class="control-label">Cluster Alias</label>
+          </div>
+          <div class="col-xs-8">
+            <input type="text" class="form-control" placeholder="Enter Cluster Alias">
+          </div>
+        </div>
+        <div class="form-group row">
+          <div  class="col-xs-4">
+            <label class="control-label">Master Instance shape</label>
+          </div>
+          <div class="col-xs-8">
+            <select class="form-control">
+              <option>M4.large</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div  class="col-xs-4">
+            <label class="control-label">Slave Instance number</label>
+          </div>
+          <div class="col-xs-8">
+            <select class="form-control">
+              <option>2</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div  class="col-xs-4">
+            <label class="control-label">Slave Instance shape</label>
+          </div>
+          <div class="col-xs-8">
+            <select class="form-control">
+              <option>M4.large</option>
+            </select>
+          </div>
+        </div>
+        <div class="text-right">
+          <button type="button" class="btn btn-default">Cancel</button>
+          <button type="button" class="btn btn-success">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- <p>
+    Howdy! Here's a list of awesome computer scientists. Do you know any others? Add to the list yourself.
+  </p>
+  
+  <form (submit)="addName()">
+    <input [(ngModel)]="newName" name="newName" placeholder="Awesome Computer Scientist">
+    <button type="submit">Add</button>
+  </form>
+  
+  <ul>
+    <li *ngFor="let name of names">{{name}}</li>
+  </ul> -->
