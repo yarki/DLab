@@ -47,6 +47,7 @@ def run():
         'notebook_user_name'] + "-nb-Profile"
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + "-nb-SG"
+    notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
     print 'Searching preconfigured images'
     ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
     if ami_id != '':
@@ -65,7 +66,7 @@ def run():
                  (notebook_config['instance_name'], notebook_config['ami_id'], notebook_config['instance_type'],
                   notebook_config['key_name'], get_security_group_by_name(notebook_config['security_group_name']),
                   get_subnet_by_cidr(notebook_config['subnet_cidr']), notebook_config['role_profile_name'],
-                  notebook_config['service_base_name'], notebook_config['instance_name'])
+                  notebook_config['tag_name'], notebook_config['instance_name'])
         if not run_routine('create_instance', params):
             logging.info('Failed to create instance')
             with open("/root/result.json", 'w') as result:

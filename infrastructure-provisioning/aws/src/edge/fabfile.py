@@ -28,6 +28,7 @@ def run():
 
     # Edge config
     edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
+    edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
     edge_conf['bucket_name'] = (edge_conf['instance_name'] + '-bucket').lower().replace('_', '-')
     edge_conf['role_name'] = edge_conf['instance_name'] + '-Role'
     edge_conf['role_profile_name'] = edge_conf['instance_name'] + '-Profile'
@@ -180,7 +181,7 @@ def run():
                  "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s" % \
                  (edge_conf['instance_name'], edge_conf['ami_id'], edge_conf['instance_size'], edge_conf['key_name'],
                   edge_group_id, edge_conf['public_subnet_id'], edge_conf['role_profile_name'],
-                  edge_conf['service_base_name'], edge_conf['instance_name'])
+                  edge_conf['tag_name'], edge_conf['instance_name'])
         if not run_routine('create_instance', params):
             logging.info('Failed creating instance')
             with open("/root/result.json", 'w') as result:

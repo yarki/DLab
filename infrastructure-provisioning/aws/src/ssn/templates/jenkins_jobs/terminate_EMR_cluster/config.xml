@@ -3,22 +3,41 @@
   <actions/>
   <description>This job:&#xd;
 - terminates emr cluster&#xd;
-- cleans up s3 buckets&#xd;
-- removes notebook's kernels</description>
+- cleans up s3 bucket&#xd;
+- removes notebook&apos;s kernels</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>Service_base_name</name>
+          <description>Base name of your services</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>Username</name>
+          <description>name of the data scientist user</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>emr_name</name>
           <description>name of the EMR cluster</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>notebook_tag_value_name</name>
-          <description>value of the special tag of the notebook servers</description>
-          <defaultValue></defaultValue>
+          <name>SSH_Key_Name</name>
+          <description>Key name at AWS to be used for accessing Jupyter</description>
+          <defaultValue>BDCC-DSS-POC</defaultValue>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>Action</name>
+          <description></description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>terminate</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -31,7 +50,10 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>/usr/bin/python /usr/local/bin/terminate_emr.py --resource_name=EMR --emr_name=$emr_name --notebook_tag_value_name=$notebook_tag_value_name</command>
+      <command>rand=`openssl rand -hex 10`;
+                echo &apos;{}&apos;| sudo docker run -i -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e &quot;request_id=$rand&quot;-e &quot;conf_service_base_name=${Service_base_name}&quot; -e &quot;edge_user_name=$Username&quot;  -e &quot;emr_cluster_name=$emr_name&quot; -e &quot;creds_key_name=$SSH_Key_Name&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-emr --action $Action</command>
     </hudson.tasks.Shell>
   </builders>
+  <publishers/>
+  <buildWrappers/>
 </project>
