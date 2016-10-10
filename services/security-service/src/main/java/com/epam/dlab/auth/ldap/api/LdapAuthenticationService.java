@@ -22,18 +22,16 @@ import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
 import org.apache.directory.ldap.client.api.ValidatingPoolableLdapConnectionFactory;
-import org.python.core.PyDictionary;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
 import com.epam.dlab.auth.ldap.core.Request;
 import com.epam.dlab.auth.ldap.core.filter.SearchResultProcessor;
-import com.epam.dlab.auth.ldap.core.filter.UserInfoEnrichment;
-import com.epam.dlab.auth.ldap.core.python.PythonUserInfoEnrichment;
-import com.epam.dlab.auth.ldap.core.python.SearchResultToDictionaryMapper;
 import com.epam.dlab.auth.rest.AbstractAuthenticationService;
 import com.epam.dlab.auth.rest.AuthorizedUsers;
 import com.epam.dlab.auth.rest.ExpirableContainer;
+import com.epam.dlab.auth.script.ScriptHolder;
+import com.epam.dlab.auth.script.SearchResultToDictionaryMapper;
 import com.epam.dlab.dto.UserCredentialDTO;
 
 @Path("/")
@@ -46,7 +44,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	private final String bindTemplate;
 	private final LdapConnectionPool usersPool;
 	private final LdapConnectionPool searchPool;
-	private final ExpirableContainer<Map> filteredDictionaries = new ExpirableContainer<>();
+	private final ExpirableContainer<Map<String,Object>> filteredDictionaries = new ExpirableContainer<>();
+	private final ScriptHolder script = new ScriptHolder();
 	
 	public LdapAuthenticationService(SecurityServiceConfiguration config) {
 		super(config);
@@ -83,22 +82,23 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				ui = new UserInfo(username, "******");
 				log.debug("user '{}' identified. fetching data...", username);
 				LdapConnection searchCon = searchPool.borrowObject();
-				PyDictionary conextDictionary = new PyDictionary();
+				Map<String,Object> conextTree = new HashMap<>();
 				for(Request req: requests) {
 					SearchCursor cursor = null;
 					try {
 						if (req == null) {
 							continue;
 						}
-						SearchResultToDictionaryMapper mapper = new SearchResultToDictionaryMapper(req.getName(),conextDictionary);
 						SearchResultProcessor proc = req.getSearchResultProcessor();
 						SearchRequest sr = req.buildSearchRequest(new HashMap<String, Object>() {
+							private static final long serialVersionUID = 1L;
 							{
 								put(Pattern.quote("${username}"), username);
 							}
 						});
 						String filter = sr.getFilter().toString();
-						Map contextMap = filteredDictionaries.get(filter);
+						Map<String,Object> contextMap = filteredDictionaries.get(filter);
+						SearchResultToDictionaryMapper mapper = new SearchResultToDictionaryMapper(req.getName(),conextTree);
 						if( contextMap == null ) {
 							log.debug("Retrieving new branch {} for {}",req.getName(),filter);
 							cursor = searchCon.search(sr);							
@@ -112,15 +112,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 						}
 						if (proc != null) {
 							log.debug("Executing: {}", proc.getLanguage());
-							switch(proc.getLanguage().toLowerCase()) {
-							case "python":
-								UserInfoEnrichment uie = new PythonUserInfoEnrichment(proc.getCode());
-								ui = uie.enrichUserInfo(ui, conextDictionary);
-								log.debug("Enriched UserInfo {}", ui);
-								break;
-							default:
-								throw new RuntimeException("Unsupported processing language: "+proc.getLanguage());
-							}
+							ui = script.evalOnce(req.getName(), proc.getLanguage(), proc.getCode()).apply(ui,conextTree);
 						}
 					} catch (IOException | LdapException e) {
 						log.error("LDAP SEARCH error", e);
