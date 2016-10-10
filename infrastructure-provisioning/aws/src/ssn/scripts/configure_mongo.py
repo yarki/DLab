@@ -59,8 +59,9 @@ if __name__ == "__main__":
         command = ['service', 'mongod', 'start']
         subprocess.call(command, shell=False)
         time.sleep(5)
-        client.dlab-db.add_user('admin', mongo_passwd, roles=[{'role':'userAdminAnyDatabase','db':'admin'}])
-        client.dlab-db.grantRolesToUser("admin",["readWrite"])
+        client.dlabdb.add_user('admin', mongo_passwd, roles=[{'role':'userAdminAnyDatabase','db':'admin'}])
+        client.dlabdb.command('grantRolesToUser', "admin", roles=["readWrite"])
+        #client.dlabdb.grantRolesToUser("admin",["readWrite"])
         if add_2_yml_config(path,'security','authorization','enabled'):
             command = ['service', 'mongod', 'restart']
             subprocess.call(command, shell=False)
