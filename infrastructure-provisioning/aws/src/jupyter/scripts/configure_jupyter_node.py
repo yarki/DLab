@@ -19,6 +19,7 @@ spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz
 spark_version = "1.6.2"
 hadoop_version = "2.6"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
+py3spark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/py3spark_local/'
 templates_dir = '/root/templates/'
 
 
@@ -37,9 +38,13 @@ def ensure_spark_scala():
             sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
             sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
             sudo('mkdir -p ' + pyspark_local_path_dir)
+            sudo('mkdir -p ' + py3spark_local_path_dir)
             sudo('touch ' + pyspark_local_path_dir + 'kernel.json')
+            sudo('touch ' + py3spark_local_path_dir + 'kernel.json')
             put(templates_dir + 'pyspark_local_template.json', '/tmp/pyspark_local_template.json')
+            put(templates_dir + 'py3spark_local_template.json', '/tmp/py3spark_local_template.json')
             sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
+            sudo('\cp /tmp/py3spark_local_template.json ' + py3spark_local_path_dir + 'kernel.json')
             sudo('pip install --pre toree')
             sudo('ln -s /opt/spark/ /usr/local/spark')
             sudo('jupyter toree install')
