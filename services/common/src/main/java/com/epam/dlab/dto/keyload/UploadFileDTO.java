@@ -1,4 +1,4 @@
-package com.epam.dlab.dto;
+package com.epam.dlab.dto.keyload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
