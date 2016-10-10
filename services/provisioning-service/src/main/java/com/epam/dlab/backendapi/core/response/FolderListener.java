@@ -1,7 +1,9 @@
 package com.epam.dlab.backendapi.core.response;
 
+import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
+import com.google.inject.Inject;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +19,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class FolderListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
-    private static final int FILE_LENGTH_DELAY = 500;
 
+    @Inject
+    private ProvisioningServiceApplicationConfiguration configuration;
     private String directory;
     private Duration timeout;
     private FileHandler fileHandler;
@@ -73,7 +76,7 @@ public class FolderListener {
     }
 
     private void waitFileCompliteWrited(File file, long before) throws InterruptedException {
-        Thread.sleep(FILE_LENGTH_DELAY);
+        Thread.sleep(configuration.getFileLengthCheckDelay().toMilliseconds());
         long after = file.length();
         if (before != after) {
             waitFileCompliteWrited(file, after);

@@ -38,6 +38,9 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     @JsonProperty
     private String edgeImage;
 
+    @JsonProperty
+    private Duration fileLengthCheckDelay = Duration.seconds(3);
+
     @Valid
     @NotNull
     @JsonProperty(SELF_SERVICE)
@@ -61,6 +64,10 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
 
     public String getEdgeImage() {
         return edgeImage;
+    }
+
+    public Duration getFileLengthCheckDelay() {
+        return fileLengthCheckDelay;
     }
 
     public RESTServiceFactory getSelfFactory() {
