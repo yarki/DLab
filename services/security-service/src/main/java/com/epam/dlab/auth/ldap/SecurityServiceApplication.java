@@ -24,7 +24,6 @@ import com.epam.dlab.auth.ldap.api.LdapAuthenticationService;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import io.dropwizard.views.ViewBundle;
 
 
 public class SecurityServiceApplication extends Application<SecurityServiceConfiguration> {

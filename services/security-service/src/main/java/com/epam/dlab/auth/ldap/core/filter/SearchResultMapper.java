@@ -7,4 +7,5 @@ import java.util.Map;
 
 public interface SearchResultMapper<M extends Map> {
     public M transformSearchResult(SearchCursor cursor) throws IOException;
+    public M getBranch();
 }

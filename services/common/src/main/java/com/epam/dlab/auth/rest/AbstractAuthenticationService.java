@@ -1,13 +1,12 @@
 package com.epam.dlab.auth.rest;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
 import com.epam.dlab.auth.UserInfo;
-
 import com.epam.dlab.dto.UserCredentialDTO;
+
 import io.dropwizard.Configuration;
 
 public abstract class AbstractAuthenticationService<C extends Configuration> extends ConfigurableResource<C> {

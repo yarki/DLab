@@ -48,12 +48,17 @@ public class SearchResultToDictionaryMapper implements SearchResultMapper<PyDict
 			}
 		});
 		cursor.close();
-		return root.getPyDictionary();
+		return reqBranch.getPyDictionary();
 	}
 
 	@Override
 	public String toString() {
 		return "SearchResultToDictionaryMapper [name=" + name + ", root=" + root + "]";
+	}
+
+	@Override
+	public PyDictionary getBranch() {
+		return reqBranch.getPyDictionary();
 	}
 	
 }

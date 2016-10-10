@@ -3,6 +3,7 @@ package com.epam.dlab.auth.ldap.api;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
@@ -27,11 +28,12 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
 import com.epam.dlab.auth.ldap.core.Request;
 import com.epam.dlab.auth.ldap.core.filter.SearchResultProcessor;
-import com.epam.dlab.auth.ldap.core.python.DeepDictionary;
+import com.epam.dlab.auth.ldap.core.filter.UserInfoEnrichment;
 import com.epam.dlab.auth.ldap.core.python.PythonUserInfoEnrichment;
 import com.epam.dlab.auth.ldap.core.python.SearchResultToDictionaryMapper;
 import com.epam.dlab.auth.rest.AbstractAuthenticationService;
 import com.epam.dlab.auth.rest.AuthorizedUsers;
+import com.epam.dlab.auth.rest.ExpirableContainer;
 import com.epam.dlab.dto.UserCredentialDTO;
 
 @Path("/")
@@ -44,7 +46,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	private final String bindTemplate;
 	private final LdapConnectionPool usersPool;
 	private final LdapConnectionPool searchPool;
-
+	private final ExpirableContainer<Map> filteredDictionaries = new ExpirableContainer<>();
+	
 	public LdapAuthenticationService(SecurityServiceConfiguration config) {
 		super(config);
 		this.connConfig = config.getLdapConnectionConfig();
@@ -64,7 +67,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		String username = credential.getUsername();
 		String password = credential.getPassword();
 		String accessToken = credential.getAccessToken();
-		log.debug("validating username:{} password:{} token:{}", username, password, accessToken);
+		log.debug("validating username:{} password:****** token:{}", username, accessToken);
 		UserInfo ui;
 
 		if (this.isAccessTokenAvailable(accessToken)) {
@@ -79,7 +82,6 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				userCon.unBind();
 				ui = new UserInfo(username, "******");
 				log.debug("user '{}' identified. fetching data...", username);
-				DeepDictionary root = new DeepDictionary();
 				LdapConnection searchCon = searchPool.borrowObject();
 				PyDictionary conextDictionary = new PyDictionary();
 				for(Request req: requests) {
@@ -95,13 +97,30 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 								put(Pattern.quote("${username}"), username);
 							}
 						});
-						cursor = searchCon.search(sr);
-						mapper.transformSearchResult(cursor);
+						String filter = sr.getFilter().toString();
+						Map contextMap = filteredDictionaries.get(filter);
+						if( contextMap == null ) {
+							log.debug("Retrieving new branch {} for {}",req.getName(),filter);
+							cursor = searchCon.search(sr);							
+							contextMap = mapper.transformSearchResult(cursor);
+							if(req.isCache()) {
+								filteredDictionaries.put(filter, contextMap, req.getExpirationTimeMsec());
+							}
+						} else {
+							log.debug("Restoring old branch {} for {}: {}",req.getName(),filter,contextMap);
+							mapper.getBranch().putAll(contextMap);
+						}
 						if (proc != null) {
 							log.debug("Executing: {}", proc.getLanguage());
-							PythonUserInfoEnrichment uie = new PythonUserInfoEnrichment(proc.getCode());
-							ui = uie.enrichUserInfo(ui, conextDictionary);
-							log.debug("Enriched UserInfo {}", ui);
+							switch(proc.getLanguage().toLowerCase()) {
+							case "python":
+								UserInfoEnrichment uie = new PythonUserInfoEnrichment(proc.getCode());
+								ui = uie.enrichUserInfo(ui, conextDictionary);
+								log.debug("Enriched UserInfo {}", ui);
+								break;
+							default:
+								throw new RuntimeException("Unsupported processing language: "+proc.getLanguage());
+							}
 						}
 					} catch (IOException | LdapException e) {
 						log.error("LDAP SEARCH error", e);
