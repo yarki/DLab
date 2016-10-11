@@ -12,25 +12,7 @@ parser.add_argument('--emr_name', type=str)
 parser.add_argument('--bucket_name', type=str)
 parser.add_argument('--tag_name', type=str)
 parser.add_argument('--tag_value', type=str)
-parser.add_argument('--notebook_name', type=str)
 args = parser.parse_args()
-
-
-# Function for terminating any EC2 instances inc notebook servers
-def remove_nb(notebook_tag_value_name):
-    print "========== EC2 =========="
-    ec2 = boto3.resource('ec2')
-    client = boto3.client('ec2')
-    notebook_tag_name = os.environ['conf_service_base_name']
-    notebook_instances = ec2.instances.filter(
-        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
-                 {'Name': 'tag:{}'.format(notebook_tag_name), 'Values': ['{}'.format(notebook_tag_value_name)]}])
-    for instance in notebook_instances:
-        print("ID: ", instance.id)
-        client.terminate_instances(InstanceIds=[instance.id])
-        waiter = client.get_waiter('instance_terminated')
-        waiter.wait(InstanceIds=[instance.id])
-        print "The notebook instance " + instance.id + " has been deleted successfully"
 
 
 # Function for terminating EMR cluster
@@ -62,6 +44,22 @@ def clean_s3(bucket_name, emr_name):
         sys.exit(1)
 
 
+# Function for terminating any EC2 instances inc notebook servers
+def remove_nb(tag_name, tag_value):
+    print "========== EC2 =========="
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    notebook_instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+    for instance in notebook_instances:
+        print("ID: ", instance.id)
+        client.terminate_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_terminated')
+        waiter.wait(InstanceIds=[instance.id])
+        print "The notebook instance " + instance.id + " has been deleted successfully"
+
+
 ##############
 # Run script #
 ##############
@@ -74,5 +72,5 @@ if __name__ == "__main__":
     clean_s3(args.bucket_name, args.emr_name)
 
     print "Removing notebook"
-    remove_nb(args.notebook_tag_value_name)
+    remove_nb(args.tag_name, args.tag_value)
 

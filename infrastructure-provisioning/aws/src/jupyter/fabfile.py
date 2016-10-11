@@ -184,23 +184,20 @@ def terminate():
     print 'Generating infrastructure names and tags'
     notebook_config = dict()
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
-    notebook_config['emr_name'] = os.environ['emr_cluster_name']
-    notebook_config['bucket_name'] = (
-        notebook_config['service_base_name'] + os.environ['edge_user_name'] + '-edge-bucket').lower().replace('_', '-')
-    notebook_config['ssh_user'] = os.environ['notebook_ssh_user']
-    notebook_config['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
+    notebook_config['emr_name'] = notebook_config['service_base_name'] + '-' + os.environ['notebook_user_name']
+    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + os.environ['notebook_user_name'] + '-edge-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
     try:
         logging.info('[TERMINATE EMR CLUSTER]')
         print '[TERMINATE EMR CLUSTER]'
-        params = "--emr_name %s --bucket_name %s --key_path %s --ssh_user %s --tag_name %s --tag_value %s" % \
-                 (notebook_config['emr_name'], notebook_config['bucket_name'], notebook_config['key_path'],
-                  notebook_config['ssh_user'], notebook_config['tag_name'], notebook_config['emr_name'])
+        params = "--emr_name %s --bucket_name %s --tag_name %s --tag_value %s" % \
+                 (notebook_config['emr_name'], notebook_config['bucket_name'], notebook_config['tag_name'],
+                  notebook_config['emr_name'])
         if not run_routine('terminate_notebook', params):
             logging.info('Failed to terminate notebook')
             with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to create instance", "conf": notebook_config}
+                res = {"error": "Failed to terminate notebook", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
