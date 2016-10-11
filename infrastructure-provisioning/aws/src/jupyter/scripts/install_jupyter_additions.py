@@ -17,6 +17,7 @@ def ensure_matplot():
         try:
             sudo('apt-get build-dep -y python-matplotlib')
             sudo('pip install matplotlib')
+            sudo('pip3 install matplotlib')
             sudo('touch /home/ubuntu/matplot_ensured')
         except:
             sys.exit(1)
@@ -39,7 +40,7 @@ def ensure_libraries_py2():
     if not exists('/home/ubuntu/ensure_libraries_py2_installed'):
         try:
             sudo('export LC_ALL=C')
-            sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
+            sudo('pip2 boto boto3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
             sudo('touch /home/ubuntu/ensure_libraries_py2_installed')
         except:
             sys.exit(1)
@@ -49,7 +50,7 @@ def ensure_libraries_py3():
     if not exists('/home/ubuntu/ensure_libraries_py3_installed'):
         try:
             sudo('apt-get install zlib1g-dev')
-            sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
+            sudo('pip3 boto boto3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
             sudo('touch /home/ubuntu/ensure_libraries_py3_installed')
         except:
             sys.exit(1)
