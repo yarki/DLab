@@ -1,19 +1,18 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.SecurityAPI;
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.SecurityDAO;
 import com.epam.dlab.dto.UserCredentialDTO;
 import com.epam.dlab.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -43,9 +42,9 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
     }
 
     @Path("/logout")
-    @POST
-    public Response logout(String accessToken) {
-        LOGGER.debug("Try logout accessToken {}", accessToken);
-        return securityService.post(LOGOUT, accessToken, Response.class);
+    @GET
+    public Response logout(@Auth UserInfo userInfo) {
+        LOGGER.debug("Try logout accessToken {}", userInfo.getAccessToken());
+        return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
     }
 }

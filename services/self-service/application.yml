@@ -3,8 +3,8 @@ mocked: true
 mongo:
   host: localhost
   port: 27017
-  username: dlab
-  password: dlab
+  username: admin
+  password: XS3ms9R3tP
   database: dlab
 
 securityService:
