@@ -1,5 +1,6 @@
 package com.epam.dlab.backendapi.resources;
 
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
@@ -9,15 +10,13 @@ import com.epam.dlab.restclient.RESTService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import io.dropwizard.auth.Auth;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
@@ -41,6 +40,12 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
+
+
+    @GET
+    public Response checkKey(@Auth UserInfo userInfo) {
+        return Response.status(dao.findKeyStatus(userInfo).getHttpStatus()).build();
+    }
 
     @POST
     @Path("/upload")

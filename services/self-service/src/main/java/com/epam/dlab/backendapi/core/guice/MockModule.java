@@ -8,10 +8,15 @@ import com.epam.dlab.dto.ImageMetadataDTO;
 import com.epam.dlab.restclient.RESTService;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
@@ -34,8 +39,13 @@ public class MockModule extends AbstractModule implements SecurityAPI, DockerAPI
     }
 
     private MongoService createMongoService() {
+        MongoCursor mongoCursor = mock(MongoCursor.class);
+        FindIterable findIterable = mock(FindIterable.class);
+        when(findIterable.iterator()).thenReturn(mongoCursor);
+        MongoCollection collection = mock(MongoCollection.class);
+        when(collection.find(any(Bson.class))).thenReturn(findIterable);
         MongoService result = mock(MongoService.class);
-        when(result.getCollection(anyString())).thenReturn(mock(MongoCollection.class));
+        when(result.getCollection(anyString())).thenReturn(collection);
         return result;
     }
 
