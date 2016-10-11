@@ -1,9 +1,7 @@
-package com.epam.dlab.backendapi.core.response;
+package com.epam.dlab.backendapi.core.response.folderlistener;
 
-import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.DockerCommands;
-import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
-import com.google.inject.Inject;
+import com.epam.dlab.backendapi.core.response.FileHandler;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,26 +15,28 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Alexey Suprun
  */
-public class FolderListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
+public class FolderListenerThread extends Thread {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FolderListenerThread.class);
 
-    @Inject
-    private ProvisioningServiceApplicationConfiguration configuration;
     private String directory;
     private Duration timeout;
     private FileHandler fileHandler;
+    private Duration fileLengthCheckDelay;
 
-    public void start(String directory, Duration timeout, FileHandler fileHandler) {
+    public FolderListenerThread(String directory, Duration timeout, FileHandler fileHandler, Duration fileLengthCheckDelay) {
         this.directory = directory;
         this.timeout = timeout;
         this.fileHandler = fileHandler;
-        new Thread(() -> {
-            try {
-                pollFile();
-            } catch (Exception e) {
-                LOGGER.error("FolderListener exception", e);
-            }
-        }).start();
+        this.fileLengthCheckDelay = fileLengthCheckDelay;
+    }
+
+    @Override
+    public void run() {
+        try {
+            pollFile();
+        } catch (Exception e) {
+            LOGGER.error("FolderListener exception", e);
+        }
     }
 
     private void pollFile() throws Exception {
@@ -76,7 +76,7 @@ public class FolderListener {
     }
 
     private void waitFileCompliteWrited(File file, long before) throws InterruptedException {
-        Thread.sleep(configuration.getFileLengthCheckDelay().toMilliseconds());
+        Thread.sleep(fileLengthCheckDelay.toMilliseconds());
         long after = file.length();
         if (before != after) {
             waitFileCompliteWrited(file, after);

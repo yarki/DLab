@@ -5,10 +5,10 @@ import com.epam.dlab.backendapi.client.rest.SelfAPI;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
-import com.epam.dlab.backendapi.core.response.FolderListener;
+import com.epam.dlab.backendapi.core.response.folderlistener.FolderListener;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
-import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
+import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.restclient.RESTService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -59,7 +59,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
 
     private FileHandler getResultHandler(final String user, final String uuid) {
         return (fileName, content) -> {
-            LOGGER.debug("get file {}", fileName);
+            LOGGER.debug("get file {} actually waited for {}", fileName, uuid);
             if (uuid.equals(DockerCommands.extractUUID(fileName))) {
                 JsonNode document = MAPPER.readTree(content);
                 UploadFileResultDTO result = new UploadFileResultDTO(user);
