@@ -2,7 +2,7 @@ package com.epam.dlab.backendapi.core.response.warmup;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecuter;
-import com.epam.dlab.backendapi.core.response.folderlistener.FolderListener;
+import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.dto.ImageMetadataDTO;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -47,7 +47,7 @@ public class DockerWarmuperTest {
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
-                bind(FolderListener.class).toInstance(mock(FolderListener.class));
+                bind(FolderListenerExecutor.class).toInstance(mock(FolderListenerExecutor.class));
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(createConfiguration());
                 bind(CommandExecuter.class).toInstance(createCommandExecuter());
             }

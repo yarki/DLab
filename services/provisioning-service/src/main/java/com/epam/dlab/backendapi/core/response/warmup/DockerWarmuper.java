@@ -4,7 +4,7 @@ import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
-import com.epam.dlab.backendapi.core.response.folderlistener.FolderListener;
+import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.dto.ImageMetadataDTO;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -26,7 +26,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
     @Inject
-    private FolderListener folderListener;
+    private FolderListenerExecutor folderListenerExecutor;
     @Inject
     private CommandExecuter commandExecuter;
     private Map<String, String> uuids = new ConcurrentHashMap<>();
@@ -35,7 +35,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     @Override
     public void start() throws Exception {
         LOGGER.debug("docker warm up start");
-        folderListener.start(configuration.getWarmupDirectory(), configuration.getWarmupPollTimeout(), getMetadataHandler());
+        folderListenerExecutor.start(configuration.getWarmupDirectory(), configuration.getWarmupPollTimeout(), getMetadataHandler());
         List<String> images = commandExecuter.executeSync(GET_IMAGES);
         for (String image : images) {
             LOGGER.debug("image: {}", image);
