@@ -20,9 +20,7 @@ def get_from_stdin():
         if not line:
             break
     if len(lines) > 0:
-        print "==========LINES========== "
-        for i in lines:
-            print "Line: " + i
+        print len(lines)
         return ''.join(lines)
     else:
         return "{}"
