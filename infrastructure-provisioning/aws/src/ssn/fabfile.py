@@ -31,7 +31,6 @@ def run():
         role_name = service_base_name + '-ssn-Role'
         role_profile_name = service_base_name + '-ssn-Profile'
         policy_name = service_base_name + '-ssn-Policy'
-        user_bucket_name = (service_base_name + '-ssn-bucket').lower().replace('_', '-')
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn-instance'
 
@@ -44,22 +43,6 @@ def run():
             logging.info('Unable to create roles')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-            sys.exit(1)
-    except:
-        sys.exit(1)
-
-    try:
-        logging.info('[CREATE BUCKETS]')
-        print('[CREATE BUCKETS]')
-        params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \
-                 (user_bucket_name, tag_name, "bucket")
-
-        if not run_routine('create_bucket', params):
-            logging.info('Unable to create bucket')
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
