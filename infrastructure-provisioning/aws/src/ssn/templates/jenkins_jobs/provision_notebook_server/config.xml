@@ -64,7 +64,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>rand=`openssl rand -hex 10`;
-                echo &apos;{}&apos;| sudo docker run -i -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e &quot;request_id=$rand&quot; -e &quot;conf_service_base_name=${Service_base_name}&quot; -e &quot;creds_region=$Region&quot; -e &quot;creds_key_name=$SSH_Key_Name&quot; -e &quot;notebook_subnet_cidr=$Subnet&quot; -e &quot;notebook_user_name=$Username&quot; -e &quot;creds_security_groups_ids=$SSN_SG_ids&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter --action $Action</command>
+                sudo docker run -i -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e &quot;request_id=$rand&quot; -e &quot;conf_service_base_name=${Service_base_name}&quot; -e &quot;creds_region=$Region&quot; -e &quot;creds_key_name=$SSH_Key_Name&quot; -e &quot;notebook_subnet_cidr=$Subnet&quot; -e &quot;notebook_user_name=$Username&quot; -e &quot;creds_security_groups_ids=$SSN_SG_ids&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter --action $Action</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
