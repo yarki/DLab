@@ -1,5 +1,6 @@
 import boto3, boto
 import time
+import os
 
 
 def put_to_bucket(bucket_name, local_file, destination_file):
@@ -83,3 +84,114 @@ def create_attach_policy(policy_name, role_name, file_path):
     with open(file_path, 'r') as myfile:
         json = myfile.read()
     conn.put_role_policy(role_name, policy_name, json)
+
+
+def remove_role(scientist, instance_type):
+    print "[Removing roles]"
+    client = boto3.client('iam')
+    if instance_type == "ssn":
+        role_name = os.environ['conf_service_base_name'] + '-ssn-Role'
+        role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
+    if instance_type == "edge":
+        role_name = os.environ['conf_service_base_name'] + '-edge-Role'
+        role_profile_name = os.environ['conf_service_base_name'] + '-edge-Profile'
+    elif instance_type == "notebook":
+        role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Role'
+        role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
+    try:
+        role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
+    except:
+        print "Wasn't able to get role!"
+    print "Name: ", role
+    policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
+    for i in policy_list:
+        policy_arn = i.get('PolicyArn')
+        print policy_arn
+        client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
+    print "[Removing instance profiles]"
+    try:
+        profile = client.get_instance_profile(InstanceProfileName="{}".format(role_profile_name)).get(
+            "InstanceProfile").get("InstanceProfileName")
+    except:
+        print "Wasn't able to get instance profile!"
+    print "Name: ", profile
+    try:
+        client.remove_role_from_instance_profile(InstanceProfileName=profile, RoleName=role)
+    except:
+        print "\nWasn't able to remove role from instance profile!"
+    try:
+        client.delete_instance_profile(InstanceProfileName=profile)
+    except:
+        print "\nWasn't able to remove instance profile!"
+    try:
+        client.delete_role(RoleName=role)
+    except:
+        print "\nWasn't able to remove role!"
+    print "The IAM role " + role + " has been deleted successfully"
+
+
+def remove_s3(scientist):
+    print "[Removing S3 buckets]"
+    s3 = boto3.resource('s3')
+    client = boto3.client('s3')
+    bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-edge-bucket').lower().replace('_', '-')
+    bucket = s3.Bucket("{}".format(bucket_name))
+    print bucket.name
+    try:
+        list_obj = client.list_objects(Bucket=bucket.name)
+    except:
+        print "Wasn't able to get S3!"
+    try:
+        list_obj = list_obj.get('Contents')
+    except:
+        print "Wasn't able to get S3!"
+    if list_obj is not None:
+        for o in list_obj:
+            list_obj = o.get('Key')
+            print list_obj
+            client.delete_objects(
+                Bucket=bucket_name,
+                Delete={'Objects': [{'Key': list_obj}]}
+            )
+            print "The S3 bucket " + bucket.name + " has been cleaned"
+    try:
+        client.delete_bucket(Bucket=bucket.name)
+    except:
+        print "Wasn't able to remove S3!"
+    print "The S3 bucket " + bucket.name + " has been deleted successfully"
+
+
+# def remove_subnets():
+#    print "[Removing subnets]"
+#    ec2 = boto3.resource('ec2')
+#    client = boto3.client('ec2')
+#    tag_name = os.environ['conf_service_base_name'] + '-tag'
+#    subnets = ec2.subnets.filter(
+#        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
+#    for subnet in subnets:
+#        print subnet.id
+#        client.delete_subnet(SubnetId=subnet.id)
+#        print "The subnet " + subnet.id + " has been deleted successfully"
+
+
+def remove_sgroups():
+    print "[Removing security groups]"
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    tag_name = os.environ['conf_service_base_name']
+    sgs = ec2.security_groups.filter(
+        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
+    for sg in sgs:
+        print sg.id
+        client.delete_security_group(GroupId=sg.id)
+        print "The security group " + sg.id + " has been deleted successfully"
+
+
+def deregister_image(scientist):
+    print "[De-registering images]"
+    client = boto3.client('ec2')
+    response = client.describe_images(
+        Filters=[{'Name': 'name', 'Values': ['{}-{}-notebook-image'.format(os.environ['conf_service_base_name'], scientist)]}])
+    images_list = response.get('Images')
+    for i in images_list:
+        client.deregister_image(ImageId=i.get('ImageId'))
