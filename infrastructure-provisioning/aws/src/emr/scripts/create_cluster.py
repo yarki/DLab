@@ -9,8 +9,6 @@ import sys
 from fabric.api import *
 import json
 
-ssh_user = 'ubuntu'
-
 parser = argparse.ArgumentParser()
 # parser.add_argument('--id', type=str, default='')
 parser.add_argument('--dry_run', action='store_true', help='Print all variables')
@@ -34,8 +32,8 @@ parser.add_argument('--subnet', type=str, default='', help='Subnet CIDR')
 parser.add_argument('--cp_jars_2_s3', action='store_true',
                     help='Copy executable JARS to S3 (Need only once per EMR release version)')
 parser.add_argument('--nbs_ip', type=str, default='', help='Notebook server IP cluster should be attached to')
-#parser.add_argument('--nbs_user', type=str, default='ubuntu',
-#                    help='Username to be used for connection to Notebook server')
+parser.add_argument('--nbs_user', type=str, default='ubuntu',
+                    help='Username to be used for connection to Notebook server')
 parser.add_argument('--s3_bucket', type=str, default='dsa-poc-test-bucket', help='S3 bucket name to work with')
 parser.add_argument('--emr_timeout', type=int, default=1200)
 parser.add_argument('--configurations', type=str, default='')
@@ -45,7 +43,7 @@ cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{
             "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/config/{1} --recursive, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
-    args.s3_bucket, args.name, ssh_user)
+    args.s3_bucket, args.name, args.nbs_user)
 
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{0}/jars/{1}/aws --recursive, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
           "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{0}/jars/{1}/lib --recursive,ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(

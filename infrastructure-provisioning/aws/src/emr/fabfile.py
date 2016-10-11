@@ -26,7 +26,7 @@ def run():
     emr_conf['instance_type'] = os.environ['emr_instance_type']
     emr_conf['instance_count'] = os.environ['emr_instance_count']
     emr_conf['notebook_ip'] = get_instance_ip_address(os.environ['notebook_name'])
-    emr_conf['notebook_user'] = os.environ['edge_user_name']
+    #emr_conf['notebook_user'] = os.environ['edge_user_name']
     emr_conf['role_service_name'] = os.environ['service_role']
     emr_conf['role_ec2_name'] = os.environ['ec2_role']
 
@@ -117,7 +117,7 @@ def run():
         params = "--name {} --applications '{}' --instance_type {} --instance_count {} --ssh_key {} --release_label {} --emr_timeout {} " \
                  "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --tags '{}'".format(
             emr_conf['cluster_name'], emr_conf['apps'], emr_conf['instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'], emr_conf['emr_timeout'],
-            emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], os.environ['edge_user_name'], emr_conf['bucket_name'], emr_conf['tags'])
+            emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], 'ubuntu', emr_conf['bucket_name'], emr_conf['tags'])
         if not run_routine('create_cluster', params):
             logging.info('Failed creating EMR Cluster')
             with open("/root/result.json", 'w') as result:
