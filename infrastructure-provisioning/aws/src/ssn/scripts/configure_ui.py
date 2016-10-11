@@ -43,9 +43,12 @@ def configure_mongo():
 def start_ss():
     try:
         if not exists('/tmp/ss_started'):
+            put('/root/templates/proxy_location_webapp_template.conf', '/tmp/proxy_location_webapp_template.conf')
+            sudo('cp /tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
             local('scp -i {} /root/application.yml {}:/tmp/application.yml'.format(args.keyfile, env.host_string))
             local('scp -i {} /root/self-service-1.0.jar {}:/tmp/self-service-1.0.jar'.format(args.keyfile, env.host_string))
             sudo('screen -d -m java -jar /tmp/self-service-1.0.jar server /tmp/application.yml; sleep 5')
+            sudo('service nginx restart')
             sudo('touch /tmp/ss_started')
         return True
     except:
