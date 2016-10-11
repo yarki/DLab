@@ -19,7 +19,7 @@ def get_from_stdin():
         lines.append(line)
         if not line:
             break
-    if len(lines) > 0:
+    if len(lines) > 1:
         print len(lines)
         return ''.join(lines)
     else:
