@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+
+import { UserService } from '../user.service';
 
 /**
  * This class represents the lazy loaded LoginComponent.
@@ -8,20 +11,21 @@ import { Component } from '@angular/core';
   selector: 'sd-login',
   templateUrl: 'login.component.html',
   styleUrls: ['login.component.css'],
+  providers: [UserService]
 })
 export class LoginComponent {
-	onLogin() {
-		var username = (<HTMLInputElement>document.getElementById('username')).value;
-		var password = (<HTMLInputElement>document.getElementById('password')).value;
-		var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        console.log(this.responseText);
+
+  constructor(private userService: UserService, private router: Router) {}
+
+	onSubmit(username, password) {
+    this.userService.login(username, password).subscribe((result) => {
+      if (result) {
+        this.router.navigate(['/dashboard']);
+        return true;
       }
-    };
-    xhttp.open("POST", "/api/login", true);
-    xhttp.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-    xhttp.send(JSON.stringify({"username": username, "password": password,"access_token":""}));
-		return false;
-	}
+
+      return false;
+    });
+
+  }
 }
