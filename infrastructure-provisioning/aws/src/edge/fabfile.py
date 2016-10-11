@@ -18,6 +18,7 @@ def run():
     # Base config
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['key_name'] = os.environ['creds_key_name']
+    edge_conf['user_keyname'] = os.environ['user_keyname']
     edge_conf['policy_arn'] = os.environ['conf_policy_arn']
     edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
     edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
@@ -242,6 +243,25 @@ def run():
             sys.exit(1)
     except:
         sys.exit(1)
+
+
+    try:
+        print '[INSTALLING USERs KEY]'
+        logging.info('[INSTALLING USERs KEY]')
+        additional_config = {"user_keyname": edge_conf['user_keyname'],
+                             "user_keydir": "/response/.ssh/"}
+        params = "--hostname {} --keyfile {} --additional_config '{}'".format(
+            instance_hostname, keyfile_name, json.dumps(additional_config))
+        if not run_routine('install_user_key', params):
+            logging.info('Failed installing user key')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed installing users key", "conf": edge_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        sys.exit(1)
+
 
     try:
         with open("/root/result.json", 'w') as result:
