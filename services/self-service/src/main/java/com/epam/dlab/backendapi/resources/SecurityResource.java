@@ -47,4 +47,15 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
         LOGGER.debug("Try logout accessToken {}", userInfo.getAccessToken());
         return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
     }
+
+    @Path("/authorize")
+    @POST
+    public Response logout(@Auth UserInfo userInfo, String username) {
+        LOGGER.debug("Try authorize accessToken {}", userInfo.getAccessToken());
+        return  Response
+                .status(userInfo.getName().toLowerCase().equals(username.toLowerCase()) ?
+                        Response.Status.OK :
+                        Response.Status.FORBIDDEN)
+                .build();
+    }
 }
