@@ -13,3 +13,36 @@ args = parser.parse_args()
 
 
 if __name__ == "__main__":
+    data = []
+    edge = {}
+    edge['environment_tag'] = args.service_base_name
+
+    # Get EDGE id
+    edge['id'] = get_instance_by_name('{}-{}-edge'.format(args.service_base_name, args.user_name))
+
+    # Get Notebook List
+    notebooks = []
+    nbs_list = get_ec2_list(args.service_base_name)
+    for i in nbs_list:
+        notebook = {}
+        notebook['Id'] = i.id
+        for tag in i.tags:
+            if tag['Key'] == 'Name':
+                notebook['Name'] = tag['Value']
+        notebook['Shape'] = i.instance_type
+        notebook['Status'] = i.state['Name']
+        emr_list = get_emr_list(notebook['Name'], 'Value')
+        resources = []
+        for j in emr_list:
+            emr = {}
+            emr['id'] = j
+            emr['status'] =  get_emr_info(j, 'Status')['State']
+            emr['nodes'] = ''
+            emr['shape'] = ''
+            emr['type'] =  get_emr_info(j, 'ReleaseLabel')
+            resources.append(emr)
+        notebook['computeresources'] = resources
+        notebooks.append(notebook)
+
+    edge['Notebooks'] = notebooks
+    data.append(edge)
