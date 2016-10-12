@@ -141,7 +141,6 @@ def remove_s3(bucket_type, scientist=''):
     elif bucket_type == 'edge':
         bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-edge-bucket').lower().replace('_', '-')
     bucket = s3.Bucket("{}".format(bucket_name))
-    print bucket.name
     try:
         list_obj = client.list_objects(Bucket=bucket.name)
     except:
