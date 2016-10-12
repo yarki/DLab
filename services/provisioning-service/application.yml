@@ -28,3 +28,6 @@ logging:
     com.epam: DEBUG
   appenders:
     - type: console
+    - type: file
+      currentLogFilename: /tmp/dlab/log/provisioning.log
+      archivedLogFilenamePattern: /tmp/dlab/log/provisioning-%d.log
