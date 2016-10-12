@@ -29,23 +29,25 @@ export class UserProfileService {
     let authToken = this.getAuthToken();
     let currentUser = this.getCurrentUserName();
 
+    if(authToken && currentUser)
+    {
+      let jsonHeader = this.webRequestHelper.getJsonHeader();
 
-    let jsonHeader = this.webRequestHelper.getJsonHeader();
-
-    return this.http
-      .post(
-        '/api/authorize',
-        JSON.stringify(
-          [{'username': currentUser, 'password': '' , 'access_token': authToken},
-            {'username': currentUser}]
-        ),
-        { headers: jsonHeader }
-      )
-      .map((response) => {
-        if (response.status == 200) {
-          return true;
-        }
-        return false;
-      }, this);
+      return this.http
+        .post(
+          '/api/authorize',
+          JSON.stringify(
+            [{'username': currentUser, 'password': '' , 'access_token': authToken},
+              {'username': currentUser}]
+          ),
+          { headers: jsonHeader }
+        )
+        .map((response) => {
+          if (response.status == 200) {
+            return true;
+          }
+          return false;
+        }, this);
+    }
   }
 }
