@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.epam.dlab.auth.ldap;
 
-import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,6 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 			params = new String[] { "server", "application.yml" };
 		}
 		LOG.debug("Starting Config Authentication Service with params: {}",String.join(",", params));
-		PythonInterpreter.initialize(System.getProperties(),System.getProperties(), new String[0]);
 		new SecurityServiceApplication().run(params);
 	}
 
@@ -50,10 +48,6 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 
 	@Override
 	public void run(SecurityServiceConfiguration conf, Environment env) throws Exception {
-		
-		String ldapBindTemplate = conf.getLdapBindTemplate();
-		LOG.debug("ldapBindTemplate {}",ldapBindTemplate);
-		
 		env.jersey().register( new LdapAuthenticationService(conf) );
 	}
 

@@ -1,5 +1,6 @@
 package com.epam.dlab.backendapi.dao;
 
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,5 +24,13 @@ public class KeyDAO extends BaseDAO implements MongoCollections {
 
     public void saveCredential(UserAWSCredentialDTO credential) throws JsonProcessingException {
         insertOne(USER_AWS_CREDENTIAL, credential);
+    }
+
+    public KeyLoadStatus findKeyStatus(UserInfo userInfo) {
+        Iterable<Document> documents = mongoService.getCollection(USER_KEYS).find(new Document(USER, userInfo.getName()));
+        for (Document document : documents) {
+            return KeyLoadStatus.findByStatus(document.get(STATUS).toString());
+        }
+        return KeyLoadStatus.NONE;
     }
 }

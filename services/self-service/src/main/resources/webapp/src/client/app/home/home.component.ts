@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NameListService } from '../shared/index';
+import { UserService } from '../user.service';
 
 /**
  * This class represents the lazy loaded HomeComponent.
@@ -23,11 +25,21 @@ export class HomeComponent implements OnInit {
    *
    * @param {NameListService} nameListService - The injected NameListService.
    */
-  constructor(public nameListService: NameListService) {}
+  constructor(public nameListService: NameListService, private userService: UserService, private router: Router) {}
 
   /**
    * Get the names OnInit
    */
+
+
+   logout() {
+     this.userService.logout();
+     this.router.navigate(['/login']);
+   }
+
+
+
+
   ngOnInit() {
     this.getNames();
   }

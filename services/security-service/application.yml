@@ -25,7 +25,7 @@ ldapBindTemplate: uid=%s,ou=People,dc=example,dc=com
 ldapSearch: 
   - name: userInfo
     cache: false
-    expirationTimeMsec: 600000
+#    expirationTimeMsec: 600000
     scope: SUBTREE
     attributes: 
       - cn
@@ -35,18 +35,19 @@ ldapSearch:
     filter: "(&(objectClass=inetOrgPerson)(uid=${username}))"
     searchResultProcessor:
       language: python
+#      path: c:\tmp\enrich.py
       code: |
         def enrichUserInfo(ui,context):
-          name = ui['username']
+          name = ui.getName()
           userInfo=context['userInfo']
           uid= userInfo['uid='+name+',ou=People,dc=example,dc=com']
           cn = context['userInfo']['uid='+name+',ou=People,dc=example,dc=com']['cn'].split(' ')
-          ui['firstName'] = cn[0]
-          ui['lastName'] = cn[1]
+          ui.setFirstName(cn[0])
+          ui.setLastName(cn[1])
           return ui
   - name: groupInfo
     cache: true
-    expirationTimeMsec: 60000
+    expirationTimeMsec: 600000
     scope: SUBTREE
     attributes: 
       - cn
@@ -55,29 +56,25 @@ ldapSearch:
     base: dc=example,dc=com
     filter: "(&(objectClass=posixGroup))"
     searchResultProcessor:
-      language: python
+      language: javascript
+#      path: c:\tmp\enrich.js
       code: |
-        def enrichUserInfo(ui,context):
-          name = ui['username']
-          userInfo=context['userInfo']
-          uid= userInfo['uid='+name+',ou=People,dc=example,dc=com']
-          userGid = uid['gidnumber']
-          groupInfo=context['groupInfo']
-          list = []
-          for dn in groupInfo:
-            group = groupInfo[dn]
-            if userGid == group['gidnumber']:
-              list = list + [group['cn']]
-          ui['roles'] = list 
-          return ui
-      
-#openLdapConfig: 
-#  host: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
-#  port: 389
-#  base: dc=example,dc=com
-#  username: admin
-#  password: ldap
-server:
+        var enrichUserInfo = function(ui,context) {
+          name = ui.getName();
+          userInfo=context['userInfo'];
+          uid= userInfo['uid='+name+',ou=People,dc=example,dc=com'];
+          userGid = uid['gidnumber'];
+          groupInfo=context['groupInfo'];
+          for( dn in groupInfo ) {
+            group = groupInfo[dn];
+            if( userGid == group['gidnumber'] ) {
+              ui.addRole(group['cn']);
+            }
+          }
+          return ui;
+        }
+
+server: 
   applicationConnectors:
   - type: http
     port: 8090

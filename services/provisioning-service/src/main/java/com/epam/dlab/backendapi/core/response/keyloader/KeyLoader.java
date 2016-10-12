@@ -5,10 +5,10 @@ import com.epam.dlab.backendapi.client.rest.SelfAPI;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
-import com.epam.dlab.backendapi.core.response.FolderListener;
+import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
-import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
+import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.restclient.RESTService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,7 +35,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
     @Inject
-    private FolderListener folderListener;
+    private FolderListenerExecutor folderListenerExecutor;
     @Inject
     private CommandExecuter commandExecuter;
     @Inject
@@ -44,7 +44,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     public String uploadKey(UploadFileDTO dto) throws IOException, InterruptedException {
         saveKeyToFile(dto);
         String uuid = DockerCommands.generateUUID();
-        folderListener.start(configuration.getKeyLoaderDirectory(), configuration.getKeyLoaderPollTimeout(),
+        folderListenerExecutor.start(configuration.getKeyLoaderDirectory(), configuration.getKeyLoaderPollTimeout(),
                 getResultHandler(dto.getUser(), uuid));
         commandExecuter.executeAsync(String.format(CREATE_EDGE_METADATA, configuration.getKeyDirectory(),
                 configuration.getKeyLoaderDirectory(), uuid, configuration.getAdminKey(),
@@ -57,9 +57,9 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         Files.write(Paths.get(configuration.getKeyDirectory(), dto.getUser() + KEY_EXTENTION), dto.getContent().getBytes());
     }
 
-    private FileHandler getResultHandler(final String user, final String uuid) {
+    private FileHandler getResultHandler(String user, String uuid) {
         return (fileName, content) -> {
-            LOGGER.debug("get file {}", fileName);
+            LOGGER.debug("get file {} actually waited for {}", fileName, uuid);
             if (uuid.equals(DockerCommands.extractUUID(fileName))) {
                 JsonNode document = MAPPER.readTree(content);
                 UploadFileResultDTO result = new UploadFileResultDTO(user);

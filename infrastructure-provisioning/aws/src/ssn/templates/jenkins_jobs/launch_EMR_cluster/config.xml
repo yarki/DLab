@@ -79,7 +79,7 @@
                 <hudson.model.StringParameterDefinition>
                     <name>User_name</name>
                     <description></description>
-                    <defaultValue>ubuntu</defaultValue>
+                    <defaultValue></defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.StringParameterDefinition>
                     <name>Subnet</name>
