@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from './../security/authentication.service';
+declare var $:any;
 
 @Component({
   moduleId: module.id,
@@ -19,5 +20,6 @@ export class HomeComponent implements OnInit {
    }
 
   ngOnInit() {
+     $('.upload_key').modal('show');
   }
 }
