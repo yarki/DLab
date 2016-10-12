@@ -5,7 +5,7 @@ mongo:
   port: 27017
   username: admin
   password: XS3ms9R3tP
-  database: dlab
+  database: admin
 
 securityService:
   protocol: http
