@@ -46,13 +46,15 @@ def remove_nb(tag_name, nb_tag_value):
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
     try:
-        notebook = ec2.instances.filter(
+        notebook_instances = ec2.instances.filter(
             Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
                      {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
-        client.terminate_instances(InstanceIds=[notebook.id])
-        waiter = client.get_waiter('instance_terminated')
-        waiter.wait(InstanceIds=[notebook.id])
-        print "The notebook instance " + notebook.id + " has been deleted successfully"
+        for instance in notebook_instances:
+            print("ID: ", instance.id)
+            client.terminate_instances(InstanceIds=[instance.id])
+            waiter = client.get_waiter('instance_terminated')
+            waiter.wait(InstanceIds=[instance.id])
+            print "The notebook instance " + instance.id + " has been deleted successfully"
     except:
         sys.exit(1)
 
