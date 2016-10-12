@@ -57,7 +57,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         Files.write(Paths.get(configuration.getKeyDirectory(), dto.getUser() + KEY_EXTENTION), dto.getContent().getBytes());
     }
 
-    private FileHandler getResultHandler(final String user, final String uuid) {
+    private FileHandler getResultHandler(String user, String uuid) {
         return (fileName, content) -> {
             LOGGER.debug("get file {} actually waited for {}", fileName, uuid);
             if (uuid.equals(DockerCommands.extractUUID(fileName))) {

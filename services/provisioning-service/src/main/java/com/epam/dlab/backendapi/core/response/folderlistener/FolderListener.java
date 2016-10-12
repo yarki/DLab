@@ -56,7 +56,7 @@ public class FolderListener implements Runnable {
         }
     }
 
-    private void handleFileAsync(final String fileName) {
+    private void handleFileAsync(String fileName) {
         new Thread(new AsyncFileHandler(fileName, directory, fileHandler, fileLengthCheckDelay))
                 .start();
     }
