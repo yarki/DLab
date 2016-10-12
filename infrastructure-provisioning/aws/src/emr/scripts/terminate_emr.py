@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--emr_name', type=str)
 parser.add_argument('--bucket_name', type=str)
 parser.add_argument('--tag_name', type=str)
-parser.add_argument('--tag_value', type=str)
+parser.add_argument('--nb_tag_value', type=str)
 parser.add_argument('--ssh_user', type=str)
 parser.add_argument('--key_path', type=str)
 args = parser.parse_args()
@@ -47,21 +47,24 @@ def clean_s3(bucket_name, emr_name):
 
 
 # Function for removing notebook's local kernels
-def remove_kernels(emr_name, tag_name, tag_value, ssh_user, key_path):
+def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
     ec2 = boto3.resource('ec2')
     instances = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['running']},
-                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
     for instance in instances:
-        private = getattr(instance, 'private_dns_name')
-        env.hosts = "{}".format(private)
-        env.user = "{}".format(ssh_user)
-        env.key_filename = "{}".format(key_path)
-        env.host_string = env.user + "@" + env.hosts
-        sudo('rm -rf ' + "/srv/hadoopconf/" + "{}".format(emr_name))
-        sudo('rm -rf ' + "/home/" + "{}".format(ssh_user) + "/.local/share/jupyter/kernels/pyspark_" + "{}".format(
-            emr_name))
-        print "Notebook's " + env.hosts + " kernels were removed"
+        try:
+            private = getattr(instance, 'private_dns_name')
+            env.hosts = "{}".format(private)
+            env.user = "{}".format(ssh_user)
+            env.key_filename = "{}".format(key_path)
+            env.host_string = env.user + "@" + env.hosts
+            sudo('rm -rf ' + "/srv/hadoopconf/" + "{}".format(emr_name))
+            sudo('rm -rf ' + "/home/" + "{}".format(ssh_user) + "/.local/share/jupyter/kernels/pyspark_" + "{}".format(
+                emr_name))
+            print "Notebook's " + env.hosts + " kernels were removed"
+        except:
+            sys.exit(1)
 
 
 ##############
@@ -76,5 +79,5 @@ if __name__ == "__main__":
     clean_s3(args.bucket_name, args.emr_name)
 
     print "Removing notebook's EMR kernels"
-    remove_kernels(args.emr_name, args.tag_name, args.tag_value, args.ssh_user, args.key_path)
+    remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path)
 
