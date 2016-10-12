@@ -2,7 +2,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
-from dlab.aws_action import *
+from dlab.aws_actions import *
 import sys
 
 
