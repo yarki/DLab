@@ -88,7 +88,7 @@ def create_attach_policy(policy_name, role_name, file_path):
 
 
 def remove_role(instance_type, scientist=''):
-    print "[Removing roles]"
+    print "[Removing roles and instance profiles]"
     client = boto3.client('iam')
     if instance_type == "ssn":
         role_name = os.environ['conf_service_base_name'] + '-ssn-Role'
@@ -108,7 +108,6 @@ def remove_role(instance_type, scientist=''):
     for i in policy_list:
         policy_arn = i.get('PolicyArn')
         client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
-    print "[Removing instance profiles]"
     try:
         profile = client.get_instance_profile(InstanceProfileName="{}".format(role_profile_name)).get(
             "InstanceProfile").get("InstanceProfileName")
