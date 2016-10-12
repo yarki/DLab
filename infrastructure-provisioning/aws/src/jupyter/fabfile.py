@@ -160,7 +160,7 @@ def run():
         if not run_routine('install_user_key', params):
             logging.info('Failed installing user key')
             with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing users key", "conf": notebook_config}
+                res = {"error": "Failed installing users key", "conf": params}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)

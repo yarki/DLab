@@ -3,7 +3,7 @@
 from fabric.api import *
 import argparse
 import json
-import os
+import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='edge')
@@ -13,17 +13,15 @@ args = parser.parse_args()
 
 
 def copy_key(config):
-    try:
-        if not exists('/tmp/userkey_installed'):
-            key = open('{}/{}.pub'.format(config['user_keydir'], config['user_keyname'])).read()
-            sudo('echo "{}" >> /home/ubuntu/.ssh/authorized_keys'.format(key))
-    except:
+    key = open('{}/{}.pub'.format(config['user_keydir'], config['user_keyname'])).read()
+    if sudo('echo "{}" >> /home/ubuntu/.ssh/authorized_keys'.format(key)).succeeded:
+        return True
+    else:
         return False
-    return True
 
 
 ##############
-# Run script #
+# Run script #:wq
 ##############
 if __name__ == "__main__":
     print "Configure connections"
