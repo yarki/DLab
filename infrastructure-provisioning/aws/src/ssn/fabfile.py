@@ -2,6 +2,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
+from dlab.aws_action import *
 import sys
 
 
@@ -83,6 +84,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_s3('ssn')
         sys.exit(1)
 
     try:

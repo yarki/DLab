@@ -130,11 +130,14 @@ def remove_role(scientist, instance_type):
     print "The IAM role " + role + " has been deleted successfully"
 
 
-def remove_s3(scientist):
+def remove_s3(bucket_type, scientist):
     print "[Removing S3 buckets]"
     s3 = boto3.resource('s3')
     client = boto3.client('s3')
-    bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-edge-bucket').lower().replace('_', '-')
+    if bucket_type == 'ssn':
+        bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
+    elif bucket_type == 'edge':
+        bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-edge-bucket').lower().replace('_', '-')
     bucket = s3.Bucket("{}".format(bucket_name))
     print bucket.name
     try:
