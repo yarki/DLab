@@ -75,7 +75,7 @@ def run():
                  "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s" % \
                  (instance_name, os.environ['ssn_ami_id'], os.environ['ssn_instance_size'],
                   os.environ['creds_key_name'], os.environ['creds_security_groups_ids'],
-                  os.environ['creds_subnet_id'], role_profile_name, tag_name, 'ssn')
+                  os.environ['creds_subnet_id'], role_profile_name, tag_name, instance_name)
 
         if not run_routine('create_instance', params):
             logging.info('Unable to create ssn instance')
