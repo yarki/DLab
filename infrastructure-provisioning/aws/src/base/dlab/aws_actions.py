@@ -86,7 +86,7 @@ def create_attach_policy(policy_name, role_name, file_path):
     conn.put_role_policy(role_name, policy_name, json)
 
 
-def remove_role(instance_type, scientist):
+def remove_role(instance_type, scientist=''):
     print "[Removing roles]"
     client = boto3.client('iam')
     if instance_type == "ssn":
@@ -130,7 +130,7 @@ def remove_role(instance_type, scientist):
     print "The IAM role " + role + " has been deleted successfully"
 
 
-def remove_s3(bucket_type, scientist):
+def remove_s3(bucket_type, scientist=''):
     print "[Removing S3 buckets]"
     s3 = boto3.resource('s3')
     client = boto3.client('s3')
