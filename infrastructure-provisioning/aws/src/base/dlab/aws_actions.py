@@ -1,5 +1,6 @@
 import boto3, boto
 import time
+import sys
 import os
 
 
@@ -102,11 +103,10 @@ def remove_role(instance_type, scientist=''):
         role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
     except:
         print "Wasn't able to get role!"
-    print "Name: ", role
+        sys.exit(1)
     policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
     for i in policy_list:
         policy_arn = i.get('PolicyArn')
-        print policy_arn
         client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
     print "[Removing instance profiles]"
     try:
@@ -114,19 +114,22 @@ def remove_role(instance_type, scientist=''):
             "InstanceProfile").get("InstanceProfileName")
     except:
         print "Wasn't able to get instance profile!"
-    print "Name: ", profile
+        sys.exit(1)
     try:
         client.remove_role_from_instance_profile(InstanceProfileName=profile, RoleName=role)
     except:
         print "\nWasn't able to remove role from instance profile!"
+        sys.exit(1)
     try:
         client.delete_instance_profile(InstanceProfileName=profile)
     except:
         print "\nWasn't able to remove instance profile!"
+        sys.exit(1)
     try:
         client.delete_role(RoleName=role)
     except:
         print "\nWasn't able to remove role!"
+        sys.exit(1)
     print "The IAM role " + role + " has been deleted successfully"
 
 
@@ -198,3 +201,20 @@ def deregister_image(scientist):
     images_list = response.get('Images')
     for i in images_list:
         client.deregister_image(ImageId=i.get('ImageId'))
+
+
+def remove_ec2(tag_name, tag_value):
+    print "[Removing EC2]"
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    try:
+        instances = ec2.instances.filter(
+            Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
+                     {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+        for instance in instances:
+            client.terminate_instances(InstanceIds=[instance.id])
+            waiter = client.get_waiter('instance_terminated')
+            waiter.wait(InstanceIds=[instance.id])
+            print "The notebook instance " + instance.id + " has been deleted successfully"
+    except:
+        sys.exit(1)
