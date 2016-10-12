@@ -167,7 +167,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
     print "Installing nginx as frontend."
-    if not ensure_nginx_test():
+    if not ensure_nginx():
         sys.exit(1)
 
     print "Configuring nginx."
