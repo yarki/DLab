@@ -8,6 +8,7 @@ import { AuthenticationService } from './../security/authentication.service';
   selector: 'sd-home',
   templateUrl: 'home.component.html',
   styleUrls: ['home.component.css'],
+  providers: [AuthenticationService]
 })
 
 

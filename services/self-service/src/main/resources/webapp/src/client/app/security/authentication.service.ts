@@ -1,18 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { WebRequestHelper } from './../util/webRequestHelper.service'
-import { UserProfileService } from './userProfile.service'
+import {Http, Headers} from '@angular/http';
 
 @Injectable()
 export class AuthenticationService {
   private accessTokenKey : string = "access_token";
 
-  constructor(private http: Http, private webRequestHelper : WebRequestHelper, private userProfileService : UserProfileService) {
+  constructor(private http: Http) {
   }
 
   login(userName, password) {
 
-    let jsonHeader = this.webRequestHelper.getJsonHeader();
+    let jsonHeader = this.getJsonHeader();
 
     return this.http
       .post(
@@ -21,8 +19,8 @@ export class AuthenticationService {
       .map((res) => {
         if (res.status == 200) {
 
-          this.userProfileService.setAuthToken(res.text())
-          this.userProfileService.setUserName(userName);
+          this.setAuthToken(res.text())
+          this.setUserName(userName);
           return true;
         }
         return false;
@@ -30,9 +28,9 @@ export class AuthenticationService {
   }
 
   logout() {
-    let jsonHeader = this.webRequestHelper.getJsonHeader();
+    let jsonHeader = this.getJsonHeader();
 
-    let authToken = this.userProfileService.getAuthToken();
+    let authToken = this.getAuthToken();
 
     if(!!authToken)
     {
@@ -44,6 +42,34 @@ export class AuthenticationService {
           { headers: jsonHeader }
         );
     }
-
   }
+
+  setUserName(userName)
+  {
+    localStorage.setItem('user_name', userName);
+  }
+
+  getUserName(){
+    localStorage.getItem('user_name');
+  }
+
+  setAuthToken(accessToken){
+    localStorage.setItem(this.accessTokenKey, accessToken);
+  }
+
+  getAuthToken() {
+    return localStorage.getItem(this.accessTokenKey);
+  }
+
+  isLoggedIn() {
+
+    return !!this.getAuthToken();
+  }
+
+  getJsonHeader() : Headers {
+    let result = new Headers();
+    result.append('Content-type', 'application/json; charset=utf-8');
+    return result;
+  }
+
 }
