@@ -1,6 +1,6 @@
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.core.response.ResponseDirectories;
+import com.epam.dlab.backendapi.core.response.Directories;
 import com.epam.dlab.restclient.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Created by Alexey Suprun
  */
-public class ProvisioningServiceApplicationConfiguration extends Configuration implements ResponseDirectories {
+public class ProvisioningServiceApplicationConfiguration extends Configuration implements Directories {
     public static final String SELF_SERVICE = "selfService";
 
     @NotEmpty
@@ -75,15 +75,19 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     }
 
     public String getWarmupDirectory() {
-        return responseDirectory + WARMUP;
+        return responseDirectory + WARMUP_DIRECTORY;
     }
 
     public String getImagesDirectory() {
-        return responseDirectory + IMAGES;
+        return responseDirectory + IMAGES_DIRECTORY;
     }
 
     public String getKeyLoaderDirectory() {
-        return responseDirectory + KEY_LOADER;
+        return responseDirectory + KEY_LOADER_DIRECTORY;
+    }
+
+    public String getSshKeyDirectory() {
+        return keyDirectory + SSH_DIRECTORY;
     }
 
 
