@@ -215,3 +215,28 @@ def remove_ec2(tag_name, tag_value):
             print "The instance " + instance.id + " has been deleted successfully"
     except:
         sys.exit(1)
+
+
+def terminate_emr(cluster_id, bucket_name):
+    client = boto3.client('emr')
+    try:
+        cluster = client.describe_cluster(ClusterId=cluster_id)
+        cluster = cluster.get("Cluster")
+        emr_name = cluster.get('Name')
+        client.terminate_job_flows(JobFlowIds=[cluster_id])
+        print "The EMR cluster " + emr_name + " has been deleted successfully"
+    except:
+        sys.exit(1)
+    clean_s3(bucket_name, emr_name)
+
+
+def clean_s3(bucket_name, emr_name):
+    s3 = boto3.resource('s3')
+    try:
+        s3_bucket = s3.Bucket(bucket_name)
+        s3_dir = "config/" + emr_name + "/"
+        for i in s3_bucket.objects.filter(Prefix=s3_dir):
+            s3.Object(s3_bucket.name, i.key).delete()
+        print "The bucket " + bucket_name + " has been cleaned successfully"
+    except:
+        sys.exit(1)
