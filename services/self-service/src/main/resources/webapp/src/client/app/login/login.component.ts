@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { UserService } from '../user.service';
+import { AuthenticationService } from './../security/authentication.service';
 
 /**
  * This class represents the lazy loaded LoginComponent.
@@ -11,14 +11,14 @@ import { UserService } from '../user.service';
   selector: 'sd-login',
   templateUrl: 'login.component.html',
   styleUrls: ['login.component.css'],
-  providers: [UserService]
+  providers: [AuthenticationService]
 })
 export class LoginComponent {
 
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(private authenticationService: AuthenticationService, private router: Router) {}
 
 	onSubmit(username, password) {
-    this.userService.login(username, password).subscribe((result) => {
+    this.authenticationService.login(username, password).subscribe((result) => {
       if (result) {
         this.router.navigate(['/dashboard']);
         return true;
