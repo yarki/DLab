@@ -152,7 +152,6 @@ def remove_s3(bucket_type, scientist=''):
     if list_obj is not None:
         for o in list_obj:
             list_obj = o.get('Key')
-            print list_obj
             client.delete_objects(
                 Bucket=bucket_name,
                 Delete={'Objects': [{'Key': list_obj}]}
@@ -213,6 +212,6 @@ def remove_ec2(tag_name, tag_value):
             client.terminate_instances(InstanceIds=[instance.id])
             waiter = client.get_waiter('instance_terminated')
             waiter.wait(InstanceIds=[instance.id])
-            print "The notebook instance " + instance.id + " has been deleted successfully"
+            print "The instance " + instance.id + " has been deleted successfully"
     except:
         sys.exit(1)
