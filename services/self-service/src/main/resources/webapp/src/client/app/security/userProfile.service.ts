@@ -1,30 +1,51 @@
 import { Injectable } from '@angular/core';
+import {Http} from '@angular/http';
+import { WebRequestHelper } from './../util/webRequestHelper.service'
 
 @Injectable()
 export class UserProfileService {
   private accessTokenKey : string = "access_token";
 
-  constructor() {
-  }
+  constructor(private http: Http, private webRequestHelper : WebRequestHelper) {}
 
   setUserName(userName)
   {
     localStorage.setItem('user_name', userName);
   }
 
-  getUserName(){
-    localStorage.getItem('user_name');
+  getCurrentUserName() : string {
+    return localStorage.getItem('user_name');
   }
 
   setAuthToken(accessToken){
     localStorage.setItem(this.accessTokenKey, accessToken);
   }
 
-  getAuthToken() {
+  getAuthToken() : string {
     return localStorage.getItem(this.accessTokenKey);
   }
 
   isLoggedIn() {
-    return !!this.getAuthToken();
+    let authToken = this.getAuthToken();
+    let currentUser = this.getCurrentUserName();
+
+
+    let jsonHeader = this.webRequestHelper.getJsonHeader();
+
+    return this.http
+      .post(
+        '/api/authorize',
+        JSON.stringify(
+          [{'username': currentUser, 'password': '' , 'access_token': authToken},
+            {'username': currentUser}]
+        ),
+        { headers: jsonHeader }
+      )
+      .map((response) => {
+        if (response.status == 200) {
+          return true;
+        }
+        return false;
+      }, this);
   }
 }

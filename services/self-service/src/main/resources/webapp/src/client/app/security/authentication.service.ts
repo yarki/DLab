@@ -17,7 +17,7 @@ export class AuthenticationService {
 
     return this.http
       .post(
-        '/api/login', JSON.stringify({'username': userName, 'password': password, accessTokenKey: ''}), { headers: jsonHeader }
+        '/api/login', JSON.stringify({'username': userName, 'password': password, 'access_token': ''}), { headers: jsonHeader }
       )
       .map((res) => {
         if (res.status == 200) {
