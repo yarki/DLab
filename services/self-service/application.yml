@@ -1,4 +1,4 @@
-mocked: true
+mocked: false
 
 mongo:
   host: localhost
@@ -38,6 +38,9 @@ logging:
     com.epam: DEBUG
   appenders:
     - type: console
+    - type: file
+      currentLogFilename: /tmp/dlab/log/selfservice.log
+      archivedLogFilenamePattern: /tmp/dlab/log/selfservice-%d.log
 
 
  
