@@ -1,57 +1,25 @@
 import { Component, OnInit } from '@angular/core';
-import { NameListService } from '../shared/index';
+import { Router } from '@angular/router';
+import { AuthenticationService } from './../security/authentication.service';
 
-/**
- * This class represents the lazy loaded HomeComponent.
- */
+
 @Component({
   moduleId: module.id,
   selector: 'sd-home',
   templateUrl: 'home.component.html',
   styleUrls: ['home.component.css'],
+  providers: [AuthenticationService]
 })
 
+
 export class HomeComponent implements OnInit {
+  constructor(private authenticationService: AuthenticationService, private router: Router) {}
 
-  newName: string = '';
-  errorMessage: string;
-  names: any[] = [];
+   logout() {
+     this.authenticationService.logout();
+     this.router.navigate(['/login']);
+   }
 
-  /**
-   * Creates an instance of the HomeComponent with the injected
-   * NameListService.
-   *
-   * @param {NameListService} nameListService - The injected NameListService.
-   */
-  constructor(public nameListService: NameListService) {}
-
-  /**
-   * Get the names OnInit
-   */
   ngOnInit() {
-    this.getNames();
   }
-
-  /**
-   * Handle the nameListService observable
-   */
-  getNames() {
-    this.nameListService.get()
-      .subscribe(
-        names => this.names = names,
-        error =>  this.errorMessage = <any>error
-      );
-  }
-
-  /**
-   * Pushes a new name onto the names array
-   * @return {boolean} false to prevent default form submit behavior to refresh the page.
-   */
-  addName(): boolean {
-    // TODO: implement nameListService.post
-    this.names.push(this.newName);
-    this.newName = '';
-    return false;
-  }
-
 }

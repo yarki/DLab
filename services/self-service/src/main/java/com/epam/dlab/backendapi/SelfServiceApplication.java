@@ -24,6 +24,7 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
     @Override
     public void initialize(Bootstrap<SelfServiceApplicationConfiguration> bootstrap) {
         super.initialize(bootstrap);
+        //bootstrap.addBundle(new AssetsBundle("/webapp/node_modules", "/node_modules", null, "node_modules"));
         bootstrap.addBundle(new AssetsBundle("/webapp/dist/prod", "/", "index.html"));
     }
 

@@ -1,27 +1,35 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
-/**
- * This class represents the lazy loaded LoginComponent.
- */
+import { AuthenticationService } from './../security/authentication.service';
+import {UserProfileService} from "../security/userProfile.service";
+
 @Component({
   moduleId: module.id,
   selector: 'sd-login',
   templateUrl: 'login.component.html',
   styleUrls: ['login.component.css'],
+  providers: [AuthenticationService, UserProfileService]
 })
 export class LoginComponent {
-	onLogin() {
-		var username = (<HTMLInputElement>document.getElementById('username')).value;
-		var password = (<HTMLInputElement>document.getElementById('password')).value;
-		var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        console.log(this.responseText);
-      }
-    };
-    xhttp.open("POST", "/api/login", true);
-    xhttp.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-    xhttp.send(JSON.stringify({"username": username, "password": password,"access_token":""}));
-		return false;
-	}
+
+  constructor(private authenticationService: AuthenticationService, private userProfileService : UserProfileService, private router: Router) {}
+
+	onSubmit(username, password) {
+    this.authenticationService
+      .login(username, password)
+      .subscribe((result) => {
+        if (result) {
+          this.router.navigate(['/dashboard']);
+          return true;
+        }
+
+        return false;
+    });
+  }
+
+  ngOnInit() {
+    if(this.userProfileService.isLoggedIn())
+      this.router.navigate(['/dashboard']);
+  }
 }

@@ -16,8 +16,9 @@ def get_from_stdin():
     lines = []
     while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
         line = sys.stdin.readline()
-        lines.append(line)
-        if not line:
+        if line:
+            lines.append(line)
+        else:
             break
     if len(lines) > 0:
         return ''.join(lines)
