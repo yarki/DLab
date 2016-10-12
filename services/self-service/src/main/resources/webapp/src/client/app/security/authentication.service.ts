@@ -1,16 +1,19 @@
 import { Injectable } from '@angular/core';
-import {Http, Headers} from '@angular/http';
+import {Http} from '@angular/http';
+import { WebRequestHelper } from './../util/webRequestHelper.service'
+import { UserProfileService } from './userProfile.service'
 
 @Injectable()
 export class AuthenticationService {
   private accessTokenKey : string = "access_token";
 
-  constructor(private http: Http) {
+  constructor(private http: Http, private webRequestHelper : WebRequestHelper,
+              private userProfileService : UserProfileService) {
   }
 
   login(userName, password) {
 
-    let jsonHeader = this.getJsonHeader();
+    let jsonHeader = this.webRequestHelper.getJsonHeader();
 
     return this.http
       .post(
@@ -19,8 +22,8 @@ export class AuthenticationService {
       .map((res) => {
         if (res.status == 200) {
 
-          this.setAuthToken(res.text())
-          this.setUserName(userName);
+          this.userProfileService.setAuthToken(res.text())
+          this.userProfileService.setUserName(userName);
           return true;
         }
         return false;
@@ -28,9 +31,9 @@ export class AuthenticationService {
   }
 
   logout() {
-    let jsonHeader = this.getJsonHeader();
+    let jsonHeader = this.webRequestHelper.getJsonHeader();
 
-    let authToken = this.getAuthToken();
+    let authToken = this.userProfileService.getAuthToken();
 
     if(!!authToken)
     {
@@ -43,33 +46,4 @@ export class AuthenticationService {
         );
     }
   }
-
-  setUserName(userName)
-  {
-    localStorage.setItem('user_name', userName);
-  }
-
-  getUserName(){
-    localStorage.getItem('user_name');
-  }
-
-  setAuthToken(accessToken){
-    localStorage.setItem(this.accessTokenKey, accessToken);
-  }
-
-  getAuthToken() {
-    return localStorage.getItem(this.accessTokenKey);
-  }
-
-  isLoggedIn() {
-
-    return !!this.getAuthToken();
-  }
-
-  getJsonHeader() : Headers {
-    let result = new Headers();
-    result.append('Content-type', 'application/json; charset=utf-8');
-    return result;
-  }
-
 }
