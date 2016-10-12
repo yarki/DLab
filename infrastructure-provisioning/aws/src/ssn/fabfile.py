@@ -65,6 +65,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_role('ssn')
         sys.exit(1)
 
     try:
@@ -84,6 +85,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_role('ssn')
         remove_s3('ssn')
         sys.exit(1)
 

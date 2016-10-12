@@ -86,7 +86,7 @@ def create_attach_policy(policy_name, role_name, file_path):
     conn.put_role_policy(role_name, policy_name, json)
 
 
-def remove_role(scientist, instance_type):
+def remove_role(instance_type, scientist):
     print "[Removing roles]"
     client = boto3.client('iam')
     if instance_type == "ssn":
