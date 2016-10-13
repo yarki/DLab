@@ -42,7 +42,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
     }
 
     @Path("/logout")
-    @GET
+    @POST
     public Response logout(@Auth UserInfo userInfo) {
         LOGGER.debug("Try logout accessToken {}", userInfo.getAccessToken());
         return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
@@ -50,7 +50,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
 
     @Path("/authorize")
     @POST
-    public Response logout(@Auth UserInfo userInfo, String username) {
+    public Response authorize(@Auth UserInfo userInfo, String username) {
         LOGGER.debug("Try authorize accessToken {}", userInfo.getAccessToken());
         return  Response
                 .status(userInfo.getName().toLowerCase().equals(username.toLowerCase()) ?
