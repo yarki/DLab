@@ -38,7 +38,7 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 		} else {
 			params = new String[] { "server", "application.yml" };
 		}
-		LOG.debug("Starting Config Authentication Service with params: {}",String.join(",", params));
+		LOG.debug("Starting Security Service Application with params: {}",String.join(",", params));
 		new SecurityServiceApplication().run(params);
 	}
 

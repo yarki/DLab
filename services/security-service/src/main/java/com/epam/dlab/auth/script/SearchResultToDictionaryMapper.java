@@ -51,13 +51,14 @@ public class SearchResultToDictionaryMapper implements SearchResultMapper<Map<St
 	}
 
 	@Override
-	public String toString() {
-		return "SearchResultToDictionaryMapper [name=" + name + ", root=" + root + "]";
-	}
-
-	@Override
 	public Map<String, Object> getBranch() {
 		return reqBranch.getRoot();
 	}
+
+	@Override
+	public String toString() {
+		return "SearchResultToDictionaryMapper [name=" + name + ", parent=" + root + ", branch=" + reqBranch + "]";
+	}
+
 	
 }
