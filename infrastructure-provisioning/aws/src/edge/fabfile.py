@@ -3,6 +3,7 @@ import json
 from dlab.fab import *
 from dlab.aws_meta import *
 import sys
+from dlab.aws_actions import *
 
 
 def run():
@@ -39,6 +40,7 @@ def run():
                                           "PrefixListIds": []}]
 
     # Notebook \ EMR config
+    edge_conf['notebook_instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb'
     edge_conf['notebook_role_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Role'
     edge_conf['notebook_policy_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Policy'
     edge_conf['notebook_role_profile_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Profile'
@@ -83,7 +85,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-
+        remove_subnets(get_subnet_by_cidr(edge_conf['private_subnet_cidr']))
         sys.exit(1)
 
     try:
@@ -100,6 +102,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_subnets(get_subnet_by_cidr(edge_conf['private_subnet_cidr']))
         remove_role('edge')
         sys.exit(1)
 
@@ -130,6 +133,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_subnets(get_subnet_by_cidr(edge_conf['private_subnet_cidr']))
         remove_role('edge')
         remove_role('notebook', os.environ['edge_user_name'])
         sys.exit(1)
@@ -148,7 +152,7 @@ def run():
         params = "--name %s --vpc_id %s --security_group_rules '%s' --egress '%s' --infra_tag_name %s --infra_tag_value %s" % \
                  (edge_conf['notebook_security_group_name'], edge_conf['vpc_id'],
                   json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template),
-                  edge_conf['service_base_name'], edge_conf['instance_name'])
+                  edge_conf['service_base_name'], edge_conf['notebook_instance_name'])
         if not run_routine('create_security_group', params):
             logging.info('Failed creating security group for private subnet')
             with open("/root/result.json", 'w') as result:
@@ -160,6 +164,10 @@ def run():
         with hide('stderr', 'running', 'warnings'):
             local("echo Waitning for changes to propagate; sleep 10")
     except:
+        remove_subnets(get_subnet_by_cidr(edge_conf['private_subnet_cidr']))
+        remove_role('edge')
+        remove_role('notebook', os.environ['edge_user_name'])
+        remove_sgroups(edge_conf['instance_name'])
         sys.exit(1)
 
     try:
@@ -175,6 +183,11 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_subnets(get_subnet_by_cidr(edge_conf['private_subnet_cidr']))
+        remove_role('edge')
+        remove_role('notebook', os.environ['edge_user_name'])
+        remove_sgroups(edge_conf['instance_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
         sys.exit(1)
 
     try:
@@ -197,6 +210,12 @@ def run():
         ip_address = get_instance_ip_address(edge_conf['instance_name'])
         keyfile_name = "/root/keys/%s.pem" % edge_conf['key_name']
     except:
+        remove_subnets(get_subnet_by_cidr(edge_conf['private_subnet_cidr']))
+        remove_role('edge')
+        remove_role('notebook', os.environ['edge_user_name'])
+        remove_sgroups(edge_conf['instance_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
+        remove_s3('edge')
         sys.exit(1)
 
     try:
@@ -211,6 +230,13 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_subnets(get_subnet_by_cidr(edge_conf['private_subnet_cidr']))
+        remove_role('edge')
+        remove_role('notebook', os.environ['edge_user_name'])
+        remove_sgroups(edge_conf['instance_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
+        remove_s3('edge')
+        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         sys.exit(1)
 
     try:
@@ -228,6 +254,13 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_subnets(get_subnet_by_cidr(edge_conf['private_subnet_cidr']))
+        remove_role('edge')
+        remove_role('notebook', os.environ['edge_user_name'])
+        remove_sgroups(edge_conf['instance_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
+        remove_s3('edge')
+        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         sys.exit(1)
 
     try:
@@ -245,6 +278,13 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_subnets(get_subnet_by_cidr(edge_conf['private_subnet_cidr']))
+        remove_role('edge')
+        remove_role('notebook', os.environ['edge_user_name'])
+        remove_sgroups(edge_conf['instance_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
+        remove_s3('edge')
+        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         sys.exit(1)
 
     try:
@@ -263,6 +303,13 @@ def run():
             print json.dumps(res)
             result.write(json.dumps(res))
     except:
+        remove_subnets(get_subnet_by_cidr(edge_conf['private_subnet_cidr']))
+        remove_role('edge')
+        remove_role('notebook', os.environ['edge_user_name'])
+        remove_sgroups(edge_conf['instance_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
+        remove_s3('edge')
+        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         sys.exit(1)
 
     sys.exit(0)

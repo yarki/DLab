@@ -177,7 +177,7 @@ def remove_subnets():
         print "The subnet " + subnet.id + " has been deleted successfully"
 
 
-def remove_sgroups():
+def remove_sgroups(tag_value):
     print "[Removing security groups]"
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
