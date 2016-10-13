@@ -87,7 +87,7 @@ logging:
     io.dropwizard: INFO
     com.epam: DEBUG
   appenders:
-    - type: console
+#    - type: console
     - type: file
       currentLogFilename: /tmp/dlab/log/security.log
       archivedLogFilenamePattern: /tmp/dlab/log/security-%d.log
