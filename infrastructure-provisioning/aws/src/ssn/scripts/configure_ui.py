@@ -92,15 +92,18 @@ if __name__ == "__main__":
         sys.exit(2)
 
     print "Installing MongoDB"
-    if not ensure_mongo():
-        sys.exit(1)
+    #if not ensure_mongo():
+    #    sys.exit(1)
+    ensure_mongo()
 
     print "Configuring MongoDB"
-    if not configure_mongo():
-        sys.exit(1)
+    #if not configure_mongo():
+    #    sys.exit(1)
+    configure_mongo()
 
     print "Starting Self-Service(UI)"
-    if not start_ss():
-        sys.exit(1)
+    #if not start_ss():
+    #    sys.exit(1)
+    start_ss()
 
     sys.exit(0)
