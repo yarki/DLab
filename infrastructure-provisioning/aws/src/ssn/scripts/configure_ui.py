@@ -61,7 +61,7 @@ def start_ss():
             sudo('mkdir -p ' + web_path + 'self-service/')
             sudo('chown -R ubuntu:ubuntu ' + web_path)
             try:
-                local('scp -i {} /root/web_app/self-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'self-service/')
+                local('scp_test -i {} /root/web_app/self-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'self-service/')
                 local('scp -i {} /root/web_app/security-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'security-service/')
                 local('scp -i {} /root/web_app/provisioning-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'provisioning-service/')
             except:
@@ -69,7 +69,6 @@ def start_ss():
                     res = {"error": "Unable to upload webapp jars", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
-                sys.exit(1)
             run('screen -d -m java -jar ' + web_path + 'self-service/self-service-1.0.jar server ' + web_path + 'self-service/application.yml; sleep 5')
             run('screen -d -m java -jar ' + web_path + 'security-service/security-service-1.0.jar server ' + web_path + 'security-service/application.yml; sleep 5')
             run('screen -d -m java -jar ' + web_path + 'provisioning-service/provisioning-service-1.0.jar server ' + web_path + 'provisioning-service/application.yml; sleep 5')
