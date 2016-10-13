@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from fabric.api import *
 from fabric.contrib.files import exists
+import logging
 import argparse
 import json
 import random
