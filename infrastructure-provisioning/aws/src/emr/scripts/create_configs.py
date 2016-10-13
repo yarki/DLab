@@ -15,6 +15,7 @@ emr_dir = '/opt/jars/'
 kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
 yarn_dir = '/srv/hadoopconf/'
 
+
 def prepare():
     local('rm -rf /srv/*')
     local('mkdir -p ' + yarn_dir)
@@ -22,18 +23,20 @@ def prepare():
     result = os.path.exists(emr_dir + args.emr_version + "/aws")
     return result
 
+
 def jars(args):
     print "Downloading jars..."
     s3client = boto3.client('s3')
     s3resource = boto3.resource('s3')
     get_files(s3client, s3resource, 'jars/', args.bucket, '/opt/')
 
+
 def yarn(args):
     print "Downloading yarn configuration..."
     s3client = boto3.client('s3')
     s3resource = boto3.resource('s3')
-    get_files(s3client, s3resource, 'config/', args.bucket, yarn_dir)
-    local('mv ' + yarn_dir + 'config/* ' + yarn_dir)
+    get_files(s3client, s3resource, 'config/{}'.format(args.cluster_name), args.bucket, yarn_dir)
+
 
 def pyspark_kernel(args):
     local('mkdir -p ' + kernels_dir + 'pyspark_' + args.cluster_name + '/')
@@ -51,6 +54,7 @@ def pyspark_kernel(args):
             for line in tpl:
                 out.write(line.replace('CLUSTER', args.cluster_name))
 
+
 def toree_kernel(args):
     local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
     kernel_path = kernels_dir + "toree_" + args.cluster_name + "/kernel.json"
@@ -59,6 +63,7 @@ def toree_kernel(args):
         with open(template_file) as tpl:
             for line in tpl:
                 out.write(line.replace('CLUSTER', args.cluster_name))
+
 
 def get_files(s3client, s3resource, dist, bucket, local):
     s3list = s3client.get_paginator('list_objects')
@@ -71,6 +76,7 @@ def get_files(s3client, s3resource, dist, bucket, local):
                 if not os.path.exists(os.path.dirname(local + os.sep + file.get('Key'))):
                      os.makedirs(os.path.dirname(local + os.sep + file.get('Key')))
                 s3resource.meta.client.download_file(bucket, file.get('Key'), local + os.sep + file.get('Key'))
+
 
 def spark_defaults():
     #local('cp /tmp/spark-defaults_template.conf /opt/spark/conf/spark-defaults.conf')
