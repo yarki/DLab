@@ -9,7 +9,7 @@ fileLengthCheckDelay: 500ms
 selfService:
   protocol: http
   host: localhost
-  port: 8081
+  port: 8080
   jerseyClient:
     timeout: 3s
     connectionTimeout: 3s
@@ -27,4 +27,7 @@ logging:
   loggers:
     com.epam: DEBUG
   appenders:
-    - type: console
+#    - type: console
+    - type: file
+      currentLogFilename: /tmp/dlab/log/provisioning.log
+      archivedLogFilenamePattern: /tmp/dlab/log/provisioning-%d.log

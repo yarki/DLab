@@ -1,69 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NameListService } from '../shared/index';
-import { UserService } from '../user.service';
+import { AuthenticationService } from './../security/authentication.service';
+declare var $:any;
 
-/**
- * This class represents the lazy loaded HomeComponent.
- */
 @Component({
   moduleId: module.id,
   selector: 'sd-home',
   templateUrl: 'home.component.html',
-  styleUrls: ['home.component.css'],
+  styleUrls: ['./home.component.css'],
+  providers: [AuthenticationService]
 })
 
 export class HomeComponent implements OnInit {
-
-  newName: string = '';
-  errorMessage: string;
-  names: any[] = [];
-
-  /**
-   * Creates an instance of the HomeComponent with the injected
-   * NameListService.
-   *
-   * @param {NameListService} nameListService - The injected NameListService.
-   */
-  constructor(public nameListService: NameListService, private userService: UserService, private router: Router) {}
-
-  /**
-   * Get the names OnInit
-   */
-
+  constructor(private authenticationService: AuthenticationService, private router: Router) {}
 
    logout() {
-     this.userService.logout();
-     this.router.navigate(['/login']);
+     this.authenticationService.logout().subscribe(
+       data => data,
+       err => console.log(err),
+       () => this.router.navigate(['/login']));
    }
 
-
-
-
   ngOnInit() {
-    this.getNames();
+     $('.upload_key').modal('show');
   }
-
-  /**
-   * Handle the nameListService observable
-   */
-  getNames() {
-    this.nameListService.get()
-      .subscribe(
-        names => this.names = names,
-        error =>  this.errorMessage = <any>error
-      );
-  }
-
-  /**
-   * Pushes a new name onto the names array
-   * @return {boolean} false to prevent default form submit behavior to refresh the page.
-   */
-  addName(): boolean {
-    // TODO: implement nameListService.post
-    this.names.push(this.newName);
-    this.newName = '';
-    return false;
-  }
-
 }

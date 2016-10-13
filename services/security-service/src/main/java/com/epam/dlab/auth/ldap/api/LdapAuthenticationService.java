@@ -1,6 +1,5 @@
 package com.epam.dlab.auth.ldap.api;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
-import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.message.SearchRequest;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
@@ -26,6 +24,7 @@ import org.apache.directory.ldap.client.api.ValidatingPoolableLdapConnectionFact
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
 import com.epam.dlab.auth.ldap.core.Request;
+import com.epam.dlab.auth.ldap.core.ReturnableConnection;
 import com.epam.dlab.auth.ldap.core.filter.SearchResultProcessor;
 import com.epam.dlab.auth.rest.AbstractAuthenticationService;
 import com.epam.dlab.auth.rest.AuthorizedUsers;
@@ -44,9 +43,9 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	private final String bindTemplate;
 	private final LdapConnectionPool usersPool;
 	private final LdapConnectionPool searchPool;
-	private final ExpirableContainer<Map<String,Object>> filteredDictionaries = new ExpirableContainer<>();
+	private final ExpirableContainer<Map<String, Object>> filteredDictionaries = new ExpirableContainer<>();
 	private final ScriptHolder script = new ScriptHolder();
-	
+
 	public LdapAuthenticationService(SecurityServiceConfiguration config) {
 		super(config);
 		this.connConfig = config.getLdapConnectionConfig();
@@ -72,20 +71,18 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		if (this.isAccessTokenAvailable(accessToken)) {
 			return accessToken;
 		} else {
-			String bind = String.format(bindTemplate, username);
-			LdapConnection userCon = null;
-			try {
-				userCon = usersPool.borrowObject();
+			try (ReturnableConnection userRCon = new ReturnableConnection(usersPool)) {
+				LdapConnection userCon = userRCon.getConnection();
 				// just confirm user exists
+				String bind = String.format(bindTemplate, username);
 				userCon.bind(bind, password);
 				userCon.unBind();
 				ui = new UserInfo(username, "******");
 				log.debug("user '{}' identified. fetching data...", username);
-				LdapConnection searchCon = searchPool.borrowObject();
-				Map<String,Object> conextTree = new HashMap<>();
-				for(Request req: requests) {
-					SearchCursor cursor = null;
-					try {
+				try (ReturnableConnection searchRCon = new ReturnableConnection(searchPool)) {
+					LdapConnection searchCon = searchRCon.getConnection();
+					Map<String, Object> conextTree = new HashMap<>();
+					for (Request req : requests) {
 						if (req == null) {
 							continue;
 						}
@@ -97,50 +94,33 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 							}
 						});
 						String filter = sr.getFilter().toString();
-						Map<String,Object> contextMap = filteredDictionaries.get(filter);
-						SearchResultToDictionaryMapper mapper = new SearchResultToDictionaryMapper(req.getName(),conextTree);
-						if( contextMap == null ) {
-							log.debug("Retrieving new branch {} for {}",req.getName(),filter);
-							cursor = searchCon.search(sr);							
-							contextMap = mapper.transformSearchResult(cursor);
-							if(req.isCache()) {
+						Map<String, Object> contextMap = filteredDictionaries.get(filter);
+						SearchResultToDictionaryMapper mapper = new SearchResultToDictionaryMapper(req.getName(),
+								conextTree);
+						if (contextMap == null) {
+							log.debug("Retrieving new branch {} for {}", req.getName(), filter);
+							try (SearchCursor cursor = searchCon.search(sr)) {
+								contextMap = mapper.transformSearchResult(cursor);
+							}
+							if (req.isCache()) {
 								filteredDictionaries.put(filter, contextMap, req.getExpirationTimeMsec());
 							}
 						} else {
-							log.debug("Restoring old branch {} for {}: {}",req.getName(),filter,contextMap);
+							log.debug("Restoring old branch {} for {}: {}", req.getName(), filter, contextMap);
 							mapper.getBranch().putAll(contextMap);
 						}
 						if (proc != null) {
 							log.debug("Executing: {}", proc.getLanguage());
-							ui = script.evalOnce(req.getName(), proc.getLanguage(), proc.getCode()).apply(ui,conextTree);
+							ui = script.evalOnce(req.getName(), proc.getLanguage(), proc.getCode()).apply(ui,
+									conextTree);
 						}
-					} catch (IOException | LdapException e) {
-						log.error("LDAP SEARCH error", e);
-						throw new WebApplicationException(e);
-					} finally {
-						if (cursor != null) {
-							try {
-								cursor.close();
-							} catch (IOException e) {
-							}
-						}
+
 					}
 				}
-				searchPool.releaseConnection(searchCon);
 
 			} catch (Exception e) {
 				log.error("LDAP error", e);
-				ui = null;
 				throw new WebApplicationException(e);
-			} finally {
-				if (userCon != null) {
-					try {
-						usersPool.releaseConnection(userCon);
-					} catch (Exception e) {
-						log.error("LDAP POOL error", e);
-						throw new WebApplicationException(e);
-					}
-				}
 			}
 			String token = getRandomToken();
 			rememberUserInfo(token, ui);
@@ -161,7 +141,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	@POST
 	@Path("/logout")
 	public Response logout(String access_token) {
-		this.forgetAccessToken(access_token);
+		UserInfo ui = this.forgetAccessToken(access_token);
+		log.debug("Logged out {} {}", access_token, ui);
 		return Response.ok().build();
 	}
 }

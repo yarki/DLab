@@ -66,8 +66,13 @@ public class AuthorizedUsers {
 		knownUsers.put(token, new UserInfoHolder(ui, inactiveTimeout));
 	}
 
-	public void removeUserInfo(String token) {
-		knownUsers.remove(token);
+	public UserInfo removeUserInfo(String token) {
+		UserInfoHolder uih = knownUsers.remove(token);
+		if(uih != null)  {
+			return uih.userInfo;
+		} else {
+			return null;
+		}
 	}
 
 	public void cleanup() {

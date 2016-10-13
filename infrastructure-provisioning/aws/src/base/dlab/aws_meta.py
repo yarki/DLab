@@ -99,7 +99,7 @@ def get_vpc_by_cidr(cidr):
     return ''
 
 
-def get_emr_list(tag_name):
+def get_emr_list(tag_name, type='Key'):
     emr = boto3.client('emr')
     clusters = emr.list_clusters(
         ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING']
@@ -110,7 +110,7 @@ def get_emr_list(tag_name):
         response = emr.describe_cluster(ClusterId=i.get('Id'))
         tag = response.get('Cluster').get('Tags')
         for j in tag:
-            if j.get('Key') == tag_name:
+            if j.get(type) == tag_name:
                 clusters_list.append(i.get('Id'))
     return clusters_list
 
