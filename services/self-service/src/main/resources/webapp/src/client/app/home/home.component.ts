@@ -20,8 +20,10 @@ export class HomeComponent implements OnInit {
   constructor(private http: Http, private authenticationService: AuthenticationService, private router: Router, private userProfileService : UserProfileService) {}
 
    logout() {
-     this.authenticationService.logout();
-     this.router.navigate(['/login']);
+     this.authenticationService.logout().subscribe(
+       data => data,
+       err => console.log(err),
+       () => this.router.navigate(['/login']));
    }
 
 
