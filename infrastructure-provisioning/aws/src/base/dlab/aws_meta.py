@@ -129,11 +129,16 @@ def get_emr_list(tag_name, type='Key'):
     return clusters_list
 
 
-def get_ec2_list(tag_name):
+def get_ec2_list(tag_name, value=''):
     ec2 = boto3.resource('ec2')
-    notebook_instances = ec2.instances.filter(
-        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
-                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['*nb*']}])
+    if value:
+        notebook_instances = ec2.instances.filter(
+            Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
+                     {'Name': 'tag:{}'.format(tag_name), 'Values': [value]}])
+    else:
+        notebook_instances = ec2.instances.filter(
+            Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
+                     {'Name': 'tag:{}'.format(tag_name), 'Values': ['*nb*']}])
     return notebook_instances
 
 
