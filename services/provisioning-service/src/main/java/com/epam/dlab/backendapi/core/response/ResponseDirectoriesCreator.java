@@ -20,7 +20,6 @@ public class ResponseDirectoriesCreator implements Managed {
         createDirectory(configuration.getWarmupDirectory());
         createDirectory(configuration.getImagesDirectory());
         createDirectory(configuration.getKeyLoaderDirectory());
-        createDirectory(configuration.getKeyDirectory());
     }
 
     private boolean createDirectory(String directory) {
