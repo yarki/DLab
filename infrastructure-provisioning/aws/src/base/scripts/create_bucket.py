@@ -16,7 +16,7 @@ args = parser.parse_args()
 if __name__ == "__main__":
     success = False
     tag = {"Key": args.infra_tag_name, "Value": args.infra_tag_value}
-    iff args.bucket_name != '':
+    if args.bucket_name != '':
         try:
             bucket = get_bucket_by_name(args.bucket_name)
             if bucket == '':
