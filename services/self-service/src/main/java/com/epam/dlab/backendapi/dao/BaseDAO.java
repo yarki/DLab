@@ -28,8 +28,4 @@ class BaseDAO {
     protected void insertOne(String collection, Object object) throws JsonProcessingException {
         mongoService.getCollection(collection).insertOne(Document.parse(MAPPER.writeValueAsString(object)).append(TIMESTAMP, new Date()));
     }
-
-    protected Document getUpdater(Document value) {
-        return new Document("$set", value);
-    }
 }

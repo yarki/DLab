@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.bson.Document;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 
 /**
  * Created by Alexey Suprun
@@ -19,7 +20,7 @@ public class KeyDAO extends BaseDAO implements MongoCollections {
     }
 
     public void updateKey(String user, String status) {
-        mongoService.getCollection(USER_KEYS).updateOne(eq(USER, user), getUpdater(new Document(STATUS, status)));
+        mongoService.getCollection(USER_KEYS).updateOne(eq(USER, user), set(STATUS, status));
     }
 
     public void saveCredential(UserAWSCredentialDTO credential) throws JsonProcessingException {
