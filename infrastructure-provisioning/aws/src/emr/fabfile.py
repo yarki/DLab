@@ -6,7 +6,6 @@ import sys
 
 
 def run():
-
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
@@ -35,18 +34,19 @@ def run():
                        + ', Notebook=' + os.environ['notebook_name']
     emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-' + str(index)
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-edge-bucket').lower().replace('_', '-')
+
     try:
         emr_conf['emr_timeout'] = os.environ['emr_timeout']
     except:
         emr_conf['emr_timeout'] = "1200"
 
         # TBD
-#    emr_conf['emr_security_group_name'] = emr_conf['instance_name'] + '-SG'
-#    emr_conf['isolated_security_group_name'] = emr_conf['instance_name'] + '-isolated-SG'
-#    emr_conf['security_group_rules'] = [{"IpProtocol": "-1",
-#                                          "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
-#                                          "UserIdGroupPairs": [],
-#                                          "PrefixListIds": []}]
+    #    emr_conf['emr_security_group_name'] = emr_conf['instance_name'] + '-SG'
+    #    emr_conf['isolated_security_group_name'] = emr_conf['instance_name'] + '-isolated-SG'
+    #    emr_conf['security_group_rules'] = [{"IpProtocol": "-1",
+    #                                          "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+    #                                          "UserIdGroupPairs": [],
+    #                                          "PrefixListIds": []}]
 
     print "Will create exploratory environment with edge node as access point as following: " + \
           json.dumps(emr_conf, sort_keys=True, indent=4, separators=(',', ': '))
@@ -154,3 +154,39 @@ def run():
         result.write(json.dumps(res))
 
     sys.exit(0)
+
+
+def terminate():
+    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filepath = "/response/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG,
+                        filename=local_log_filepath)
+
+    # generating variables dictionary
+    create_aws_config_files()
+    print 'Generating infrastructure names and tags'
+    emr_conf = dict()
+    emr_conf['service_base_name'] = os.environ['conf_service_base_name']
+    emr_conf['emr_name'] = os.environ['emr_cluster_name']
+    emr_conf['notebook_name'] = os.environ['notebook_instance_name']
+    emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-edge-bucket').lower().replace('_', '-')
+    emr_conf['ssh_user'] = os.environ['notebook_ssh_user']
+    emr_conf['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
+    emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
+
+    try:
+        logging.info('[TERMINATE EMR CLUSTER]')
+        print '[TERMINATE EMR CLUSTER]'
+        params = "--emr_name %s --bucket_name %s --key_path %s --ssh_user %s --tag_name %s --nb_tag_value %s" % \
+                 (emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['key_path'], emr_conf['ssh_user'],
+                  emr_conf['tag_name'], emr_conf['notebook_name'])
+        if not run_routine('terminate_emr', params):
+            logging.info('Failed to terminate EMR cluster')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to terminate EMR cluster", "conf": emr_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        sys.exit(1)
