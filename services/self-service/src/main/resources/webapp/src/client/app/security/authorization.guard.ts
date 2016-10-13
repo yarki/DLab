@@ -7,6 +7,12 @@ export class AuthorizationGuard implements CanActivate {
   constructor(private userProfileService : UserProfileService, private router: Router) {}
 
   canActivate() {
-    return this.userProfileService.isLoggedIn();
+    if(!this.userProfileService.isLoggedIn())
+    {
+      this.router.navigate(['/login'])
+      return false;
+    }
+
+    return true;
   }
 }

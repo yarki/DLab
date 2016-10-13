@@ -57,7 +57,8 @@ export class UserProfileService {
             return response
             && response.status == 200 ? true : false;
         }, this);
-
     }
+
+    return Observable.of(false);
   }
 }
