@@ -21,6 +21,7 @@ def run():
                 res = {"error": "Unable to create configuration", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+            sys.exit(1)
     except:
         sys.exit(1)
 
@@ -46,6 +47,7 @@ def run():
                 res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+            sys.exit(1)
     except:
         sys.exit(1)
 
@@ -61,6 +63,7 @@ def run():
                 res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+            sys.exit(1)
     except:
         remove_role('ssn')
         sys.exit(1)
@@ -80,6 +83,7 @@ def run():
                 res = {"error": "Unable to create ssn instance", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+            sys.exit(1)
     except:
         remove_role('ssn')
         remove_s3('ssn')
@@ -100,6 +104,7 @@ def run():
                 res = {"error": "Failed installing software: pip, apt", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+            sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
         remove_role('ssn')
@@ -122,6 +127,7 @@ def run():
                 res = {"error": "Failed configuring ssn", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+            sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
         remove_role('ssn')
@@ -144,6 +150,7 @@ def run():
                 res = {"error": "Unable to configure docker", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+            sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
         remove_role('ssn')
@@ -163,6 +170,7 @@ def run():
                 res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+            sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
         remove_role('ssn')
@@ -179,6 +187,7 @@ def run():
                 res = {"error": "Unable to upload UI", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+            sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
         remove_role('ssn')
