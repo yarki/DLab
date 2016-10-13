@@ -17,11 +17,16 @@ def status():
     # Base config
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['user_name'] = os.environ['edge_user_name']
+    edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
+    edge_conf['key_name'] = os.environ['creds_key_name']
+
+    instance_hostname = get_instance_hostname(edge_conf['instance_name'])
+    keyfile_name = "/root/keys/{}.pem".format(edge_conf['key_name'])
 
     try:
         logging.info('[COLLECT DATA]')
         print '[COLLECTING DATA]'
-        params = "--base_name '{}' --username '{}'".format(edge_conf['service_base_name'], edge_conf['user_name'])
+        params = "--hostname '{}' --keyfile '{}' --base_name '{}' --username '{}'".format(instance_hostname, keyfile_name, edge_conf['service_base_name'], edge_conf['user_name'])
         if not run_routine('collect_data', params):
             logging.info('Failed collecting data')
             with open("/root/result.json", 'w') as result:
