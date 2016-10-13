@@ -1,6 +1,6 @@
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.client.mongo.MongoServiceFactory;
+import com.epam.dlab.client.mongo.MongoServiceFactory;
 import com.epam.dlab.restclient.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
@@ -52,4 +52,5 @@ public class SelfServiceApplicationConfiguration extends Configuration {
     public RESTServiceFactory getProvisioningFactory() {
         return provisioningFactory;
     }
+    
 }
