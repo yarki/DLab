@@ -83,6 +83,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+
         sys.exit(1)
 
     try:
@@ -99,6 +100,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_role('edge')
         sys.exit(1)
 
     try:
@@ -128,6 +130,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_role('edge')
+        remove_role('notebook', os.environ['edge_user_name'])
         sys.exit(1)
 
     try:
