@@ -50,16 +50,16 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String post(@FormDataParam("user") String user,
+    public String post(@Auth UserInfo userInfo,
                        @FormDataParam("file") InputStream uploadedInputStream,
                        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
-        LOGGER.debug("upload key for user {}", user);
+        LOGGER.debug("upload key for user {}", userInfo.getName());
         String content = "";
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {
             content = buffer.lines().collect(Collectors.joining("\n"));
         }
-        dao.uploadKey(user, content);
-        return provisioningService.post(KEY_LOADER, new UploadFileDTO(user, content), String.class);
+        dao.uploadKey(userInfo.getName(), content);
+        return provisioningService.post(KEY_LOADER, new UploadFileDTO(userInfo.getName(), content), String.class);
     }
 
     @POST

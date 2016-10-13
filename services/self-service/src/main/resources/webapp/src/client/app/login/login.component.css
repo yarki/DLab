@@ -1,0 +1,64 @@
+.login_page .btn {
+  margin-top: 20px;
+  padding: 7px 51px;
+  font-size: 14px;
+}
+
+.login_page .logo {
+  display: inline-block;
+  margin-bottom: 55px;
+}
+
+.login_page {
+  background: url(../assets/img/login-background.jpg) top center;
+  background-size: cover;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.login_page .content {
+  max-width: 280px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  height: auto;
+}
+
+.login_page .form-control {
+  height: 40px;
+}
+
+.login_page .input-group {
+  margin-bottom: 20px;
+}
+
+.login_page .form-control,
+.login_page .input-group-addon {
+  background: #fff;
+  border: 1px solid #31b0d5;
+}
+
+.login_page .input-group-addon {
+  border-right: 0;
+}
+
+.login_page .input-group-addon .glyphicon {
+  color: #31b0d5;
+}
+
+.login_page .form-control {
+  font-size: 14px;
+}
+
+.validation-block {
+  text-align: left;
+  display: table-caption;
+  color: red;
+}
+
