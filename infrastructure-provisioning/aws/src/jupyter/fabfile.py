@@ -135,6 +135,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(notebook_config['service_base_name'], notebook_config['instance_name'])
         sys.exit(1)
 
     # installing python2 and python3 libs
@@ -150,6 +151,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(notebook_config['service_base_name'], notebook_config['instance_name'])
         sys.exit(1)
 
     # checking the need for image creation
