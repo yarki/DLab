@@ -33,7 +33,9 @@ export class LoginComponent {
   }
 
   ngOnInit() {
-    if(this.userProfileService.isLoggedIn())
-      this.router.navigate(['/dashboard']);
+    this.userProfileService.isLoggedIn().subscribe(result => {
+      if (result)
+        this.router.navigate(['/dashboard']);
+    });
   }
 }

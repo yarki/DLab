@@ -2,22 +2,21 @@
 import {Http} from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
 import { UserProfileService } from './userProfile.service'
+ import {Observable} from "rxjs";
 
 @Injectable()
 export class AuthenticationService {
-  private accessTokenKey : string = "access_token";
-
   constructor(private http: Http, private webRequestHelper : WebRequestHelper,
               private userProfileService : UserProfileService) {
   }
 
-  login(userName, password) {
+  login(userName, password) : Observable<Boolean> {
 
-    let jsonHeader = this.webRequestHelper.getJsonHeader();
+    let requestHeader = this.webRequestHelper.getJsonHeader();
 
     return this.http
       .post(
-        '/api/login', JSON.stringify({'username': userName, 'password': password, 'access_token': ''}), { headers: jsonHeader }
+        '/api/login', JSON.stringify({'username': userName, 'password': password, 'access_token': ''}), { headers: requestHeader }
       )
       .map((res) => {
         if (res.status == 200) {
@@ -30,20 +29,21 @@ export class AuthenticationService {
       }, this);
   }
 
-  logout() {
-    let jsonHeader = this.webRequestHelper.getJsonHeader();
-
+  logout() : Observable<String> {
+    let requestHeader = this.webRequestHelper.getJsonHeader();
     let authToken = this.userProfileService.getAuthToken();
 
     if(!!authToken)
     {
-      localStorage.removeItem(this.accessTokenKey);
-      this.http
+      requestHeader = this.userProfileService.appendBasicAuthHeader(requestHeader);
+
+      this.userProfileService.clearAuthToken();
+      return this.http
         .post(
           '/api/logout',
           JSON.stringify({accessTokenKey: authToken}),
-          { headers: jsonHeader }
-        );
+          { headers: requestHeader }
+      ).map(res => res.text());
     }
   }
 }
