@@ -135,7 +135,6 @@ def run():
         logging.info('[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]')
         print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
         params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {}".format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'], keyfile_name, emr_conf['notebook_ip'])
-        #params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
         if not run_routine('install_emr_kernels', params):
             logging.info('Failed installing EMR kernels')
             with open("/root/result.json", 'w') as result:
