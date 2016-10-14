@@ -36,23 +36,23 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
     @Named(SECURITY_SERVICE)
     RESTService securityService;
 
-    @Path("/login")
     @POST
+    @Path("/login")
     public String login(UserCredentialDTO credential) {
         LOGGER.debug("Try login user = {}", credential.getUsername());
         dao.writeLoginAttempt(credential);
         return securityService.post(LOGIN, credential, String.class);
     }
 
-    @Path("/logout")
     @POST
+    @Path("/logout")
     public Response logout(@Auth UserInfo userInfo) {
         LOGGER.debug("Try logout accessToken {}", userInfo.getAccessToken());
         return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
     }
 
-    @Path("/authorize")
     @POST
+    @Path("/authorize")
     public Response authorize(@Auth UserInfo userInfo, String username) {
         LOGGER.debug("Try authorize accessToken {}", userInfo.getAccessToken());
         return Response

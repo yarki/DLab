@@ -40,8 +40,8 @@ public class DockerResource implements MongoCollections, DockerAPI {
         return provisioningService.get(DOCKER, Set.class);
     }
 
-    @Path("/run")
     @POST
+    @Path("/run")
     public String run(@Auth UserInfo userInfo, String image) {
         LOGGER.debug("run docker image {} for user {}", image, userInfo.getName());
         dao.writeDockerAttempt(userInfo.getName(), DockerDAO.RUN);

@@ -5,7 +5,7 @@ import org.bson.Document;
 /**
  * Created by Alexey Suprun
  */
-public class DockerDAO extends BaseDAO implements MongoCollections {
+public class DockerDAO extends BaseDAO {
     public static final String DESCRIBE = "describe";
     public static final String RUN = "run";
 
