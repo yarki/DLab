@@ -27,10 +27,7 @@ public class KeyDAO extends BaseDAO implements MongoCollections {
     }
 
     public KeyLoadStatus findKeyStatus(UserInfo userInfo) {
-        Iterable<Document> documents = mongoService.getCollection(USER_KEYS).find(new Document(ID, userInfo.getName()));
-        for (Document document : documents) {
-            return KeyLoadStatus.findByStatus(document.get(STATUS).toString());
-        }
-        return KeyLoadStatus.NONE;
+        Document document = mongoService.getCollection(USER_KEYS).find(new Document(ID, userInfo.getName())).first();
+        return document != null ? KeyLoadStatus.findByStatus(document.get(STATUS).toString()) : KeyLoadStatus.NONE;
     }
 }
