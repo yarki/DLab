@@ -6,7 +6,10 @@ import org.bson.Document;
  * Created by Alexey Suprun
  */
 public class DockerDAO extends BaseDAO implements MongoCollections {
-    public void writeDockerAttempt() {
-        insertOne(DOCKER_ATTEMPTS, () -> new Document("action", "getImages"));
+    public static final String DESCRIBE = "describe";
+    public static final String RUN = "run";
+
+    public void writeDockerAttempt(String user, String action) {
+        insertOne(DOCKER_ATTEMPTS, () -> new Document(USER, user).append("action", action));
     }
 }
