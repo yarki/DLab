@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 class BaseDAO {
     private static final ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     public static final String ID = "_id";
-    public static final String USER = "user";
     public static final String TIMESTAMP = "timestamp";
 
     @Inject
