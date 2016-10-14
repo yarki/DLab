@@ -5,14 +5,17 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.SecurityDAO;
 import com.epam.dlab.dto.UserCredentialDTO;
-import com.epam.dlab.restclient.RESTService;
+import com.epam.dlab.client.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -52,7 +55,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
     @POST
     public Response authorize(@Auth UserInfo userInfo, String username) {
         LOGGER.debug("Try authorize accessToken {}", userInfo.getAccessToken());
-        return  Response
+        return Response
                 .status(userInfo.getName().toLowerCase().equals(username.toLowerCase()) ?
                         Response.Status.OK :
                         Response.Status.FORBIDDEN)

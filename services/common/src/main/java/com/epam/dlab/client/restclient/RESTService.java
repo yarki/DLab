@@ -1,4 +1,4 @@
-package com.epam.dlab.restclient;
+package com.epam.dlab.client.restclient;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;

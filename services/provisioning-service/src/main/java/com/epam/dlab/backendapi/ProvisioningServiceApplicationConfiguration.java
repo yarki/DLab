@@ -2,6 +2,8 @@ package com.epam.dlab.backendapi;
 
 import com.epam.dlab.backendapi.core.response.Directories;
 import com.epam.dlab.restclient.RESTServiceFactory;
+import com.epam.dlab.backendapi.core.response.ResponseDirectories;
+import com.epam.dlab.client.restclient.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;
@@ -89,6 +91,4 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     public String getSshKeyDirectory() {
         return keyDirectory + SSH_DIRECTORY;
     }
-
-
 }

@@ -5,7 +5,7 @@ import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
 import com.epam.dlab.backendapi.resources.DockerResource;
 import com.epam.dlab.backendapi.resources.KeyLoaderResource;
-import com.epam.dlab.restclient.RESTService;
+import com.epam.dlab.client.restclient.RESTService;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;

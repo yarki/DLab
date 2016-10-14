@@ -80,7 +80,15 @@ server:
     port: 8090
   adminConnectors:
   - type: http
-    port: 8091  
+    port: 8091
+
+mongo:
+  host: localhost
+  port: 27017
+  username: admin
+  password: XS3ms9R3tP
+  database: security
+
 logging:
   level: INFO
   loggers:
