@@ -15,11 +15,11 @@ public class KeyDAO extends BaseDAO implements MongoCollections {
     private static final String STATUS = "status";
 
     public void uploadKey(final String user, String content) {
-        insertOne(USER_KEYS, () -> new Document(USER, user).append("content", content).append(STATUS, KeyLoadStatus.NEW.getStatus()));
+        insertOne(USER_KEYS, () -> new Document(ID, user).append("content", content).append(STATUS, KeyLoadStatus.NEW.getStatus()));
     }
 
     public void updateKey(String user, String status) {
-        mongoService.getCollection(USER_KEYS).updateOne(eq(USER, user), getUpdater(new Document(STATUS, status)));
+        mongoService.getCollection(USER_KEYS).updateOne(eq(ID, user), getUpdater(new Document(STATUS, status)));
     }
 
     public void saveCredential(UserAWSCredentialDTO credential) throws JsonProcessingException {
@@ -27,7 +27,7 @@ public class KeyDAO extends BaseDAO implements MongoCollections {
     }
 
     public KeyLoadStatus findKeyStatus(UserInfo userInfo) {
-        Iterable<Document> documents = mongoService.getCollection(USER_KEYS).find(new Document(USER, userInfo.getName()));
+        Iterable<Document> documents = mongoService.getCollection(USER_KEYS).find(new Document(ID, userInfo.getName()));
         for (Document document : documents) {
             return KeyLoadStatus.findByStatus(document.get(STATUS).toString());
         }
