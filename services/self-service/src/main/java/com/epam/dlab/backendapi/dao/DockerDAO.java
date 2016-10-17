@@ -2,6 +2,8 @@ package com.epam.dlab.backendapi.dao;
 
 import org.bson.Document;
 
+import static com.epam.dlab.backendapi.dao.MongoCollections.DOCKER_ATTEMPTS;
+
 /**
  * Created by Alexey Suprun
  */
