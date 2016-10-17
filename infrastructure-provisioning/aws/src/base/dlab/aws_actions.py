@@ -29,6 +29,24 @@ def create_vpc(vpc_cidr, tag):
     return vpc.id
 
 
+def create_endpoint(vpc_id, service_name):
+    ec2 = boto3.client('ec2')
+    try:
+        response = ec2.create_vpc_endpoint(
+            VpcId=vpc_id,
+            ServiceName=service_name
+        #   PolicyDocument='string',
+        #   RouteTableIds=[
+        #       'string',
+        #   ],
+        #   ClientToken='string'
+        )
+        return response
+    except botocore.exceptions.ClientError as err:
+        print err.response['Error']['Message']
+
+
+
 def create_subnet(vpc_id, subnet, tag):
     ec2 = boto3.resource('ec2')
     subnet = ec2.create_subnet(VpcId=vpc_id, CidrBlock=subnet)
