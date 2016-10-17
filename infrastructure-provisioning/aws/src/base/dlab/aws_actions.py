@@ -94,8 +94,8 @@ def remove_role(instance_type, scientist=''):
         role_name = os.environ['conf_service_base_name'] + '-ssn-Role'
         role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
     if instance_type == "edge":
-        role_name = os.environ['conf_service_base_name'] + '-edge-Role'
-        role_profile_name = os.environ['conf_service_base_name'] + '-edge-Profile'
+        role_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Role'
+        role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
     elif instance_type == "notebook":
         role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Role'
         role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
