@@ -8,7 +8,7 @@ import org.bson.Document;
  * Created by Alexey Suprun
  */
 @Singleton
-public class SecurityDAO extends BaseDAO implements MongoCollections {
+public class SecurityDAO extends BaseDAO {
     public void writeLoginAttempt(UserCredentialDTO credentials) {
         insertOne(LOGIN_ATTEMPTS, () -> new Document("login", credentials.getUsername()));
     }
