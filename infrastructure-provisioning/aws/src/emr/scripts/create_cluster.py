@@ -7,6 +7,8 @@ import re
 import time
 import sys
 from fabric.api import *
+from dlab.aws_meta import *
+from dlab.aws_actions import *
 import json
 
 parser = argparse.ArgumentParser()
@@ -84,13 +86,6 @@ def emr_sg(id):
     return master, slave
 
 
-def get_subnet_from_cidr(cidr):
-    ec2 = boto3.resource('ec2')
-    for subnet in ec2.subnets.filter(Filters=[{'Name': 'cidrBlock', 'Values': [cidr]}]):
-        return subnet.id
-    return ''
-
-
 def wait_emr(bucket, cluster_name, timeout, delay=20):
     deadline = time.time() + timeout
     prefix = "config/" + cluster_name + "/"
@@ -129,17 +124,8 @@ def parse_steps(step_string):
     return steps
 
 
-def get_emr_state(id):
-    emr = boto3.client('emr')
-    data = emr.describe_cluster(
-        ClusterId=id
-    )
-    state = data.get('Cluster').get('Status').get('State')
-    return state
-
-
 def action_validate(id):
-    state = get_emr_state(id)
+    state = get_emr_info(id, 'Status')['State']
     if state in ("TERMINATING", "TERMINATED", "TERMINATED_WITH_ERRORS"):
         print "Cluster is alredy stopped. Bye"
         return ["False", state]
@@ -148,21 +134,6 @@ def action_validate(id):
     else:
         print "Cluster is still being built."
         return ["True", state]
-
-
-def terminate_emr(id):
-    emr = boto3.client('emr')
-    emr.terminate_job_flows(
-        JobFlowIds=[id]
-    )
-
-
-def s3_cleanup(bucket, cluster_name):
-    s3_res = boto3.resource('s3')
-    resource = s3_res.Bucket(bucket)
-    prefix = "config/" + cluster_name + "/"
-    for i in resource.objects.filter(Prefix=prefix):
-        s3_res.Object(resource.name, i.key).delete()
 
 
 def read_json(path):
@@ -224,7 +195,7 @@ def build_emr_cluster(args):
                        'Ec2KeyName': args.ssh_key,
                        # 'Placement': {'AvailabilityZone': args.availability_zone},
                        'KeepJobFlowAliveWhenNoSteps': not args.auto_terminate,
-                       'Ec2SubnetId': get_subnet_from_cidr(args.subnet)},
+                       'Ec2SubnetId': get_subnet_by_cidr(args.subnet)},
             Applications=names,
             Tags=tags,
             Steps=steps,

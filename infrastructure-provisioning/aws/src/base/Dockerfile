@@ -26,7 +26,7 @@ ENV KEYFILE_DIR /root/keys/
 ENV AWS_DIR /root/.aws
 RUN mkdir -p /root/conf
 RUN mkdir -p /root/templates
-RUN mkdir -p /root/keys
+RUN mkdir -p /root/keys/.ssh
 COPY . /root
 COPY dlab /usr/lib/python2.7/dlab
 RUN chmod a+x /root/*.py
