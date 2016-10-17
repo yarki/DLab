@@ -5,6 +5,7 @@ import com.epam.dlab.backendapi.core.guice.ModuleFactory;
 import com.epam.dlab.backendapi.resources.DockerResource;
 import com.epam.dlab.backendapi.resources.KeyUploaderResource;
 import com.epam.dlab.backendapi.resources.SecurityResource;
+import com.epam.dlab.backendapi.resources.UserNotebookResource;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
@@ -32,9 +33,10 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
     public void run(SelfServiceApplicationConfiguration configuration, Environment environment) throws Exception {
         Injector injector = Guice.createInjector(ModuleFactory.getModule(configuration, environment));
         injector.getInstance(SecurityFactory.class).configure(injector, environment);
+        environment.jersey().register(MultiPartFeature.class);
         environment.jersey().register(injector.getInstance(SecurityResource.class));
         environment.jersey().register(injector.getInstance(DockerResource.class));
         environment.jersey().register(injector.getInstance(KeyUploaderResource.class));
-        environment.jersey().register(MultiPartFeature.class);
+        environment.jersey().register(injector.getInstance(UserNotebookResource.class));
     }
 }
