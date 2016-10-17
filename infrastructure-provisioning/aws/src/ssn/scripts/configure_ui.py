@@ -69,6 +69,7 @@ def start_ss():
                     res = {"error": "Unable to upload webapp jars", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
+                sys.exit(1)
             run('screen -d -m java -jar ' + web_path + 'self-service/self-service-1.0.jar server ' + web_path + 'self-service/application.yml; sleep 5')
             run('screen -d -m java -jar ' + web_path + 'security-service/security-service-1.0.jar server ' + web_path + 'security-service/application.yml; sleep 5')
             run('screen -d -m java -jar ' + web_path + 'provisioning-service/provisioning-service-1.0.jar server ' + web_path + 'provisioning-service/application.yml; sleep 5')
