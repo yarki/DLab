@@ -6,6 +6,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.dropwizard.util.Duration;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Created by Alexey Suprun
  */
@@ -16,7 +18,6 @@ public class FolderListenerExecutor {
 
 
     public void start(String directory, Duration timeout, FileHandler fileHandler) {
-        new Thread(new FolderListener(directory, timeout, fileHandler, configuration.getFileLengthCheckDelay()))
-                .start();
+        CompletableFuture.runAsync(new FolderListener(directory, timeout, fileHandler, configuration.getFileLengthCheckDelay()));
     }
 }

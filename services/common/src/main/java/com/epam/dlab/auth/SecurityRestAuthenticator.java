@@ -1,6 +1,6 @@
 package com.epam.dlab.auth;
 
-import com.epam.dlab.restclient.RESTService;
+import com.epam.dlab.client.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.AuthenticationException;

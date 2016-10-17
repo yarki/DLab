@@ -20,6 +20,7 @@ def ensure_docker_daemon():
             sudo('apt-get update')
             sudo('apt-cache policy docker-engine')
             sudo('apt-get install -y docker-engine')
+            sudo('usermod -a -G docker ubuntu')
             sudo('sysv-rc-conf docker on')
             sudo('touch /tmp/docker_daemon_ensured')
         return True
