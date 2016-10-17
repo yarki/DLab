@@ -25,6 +25,10 @@ def cp_key():
         sudo('mkdir /project_images; chown ubuntu:ubuntu /project_images')
         local('scp -r -q -i {0} {0} {1}:/project_images/{2}'.format(args.keyfile, env.host_string, key_name[-1]))
         sudo('chmod 600 /project_images/*.pem')
+        sudo('mkdir -p /home/ubuntu/keys')
+        sudo('chown -R ubuntu:ubuntu /home/ubuntu/keys')
+        local('scp -r -q -i {0} {0} {1}:/home/ubuntu/keys/{2}'.format(args.keyfile, env.host_string, key_name[-1]))
+        sudo('chmod 600 /home/ubuntu/keys/*.pem')
         return True
     except:
         return False

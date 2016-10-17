@@ -1,6 +1,6 @@
 package com.epam.dlab.backendapi.dao;
 
-import com.epam.dlab.backendapi.client.mongo.MongoService;
+import com.epam.dlab.client.mongo.MongoService;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,9 +27,5 @@ class BaseDAO {
 
     protected void insertOne(String collection, Object object) throws JsonProcessingException {
         mongoService.getCollection(collection).insertOne(Document.parse(MAPPER.writeValueAsString(object)).append(TIMESTAMP, new Date()));
-    }
-
-    protected Document getUpdater(Document value) {
-        return new Document("$set", value);
     }
 }

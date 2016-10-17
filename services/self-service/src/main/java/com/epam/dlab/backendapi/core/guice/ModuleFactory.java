@@ -9,6 +9,8 @@ import io.dropwizard.setup.Environment;
  */
 public class ModuleFactory {
     public static AbstractModule getModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
-        return configuration.isMocked() ? new MockModule() : new ProductionModule(configuration, environment);
+        return configuration.isMocked() ?
+                new MockModule(configuration, environment) :
+                new ProductionModule(configuration, environment);
     }
 }

@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,7 +58,6 @@ public class FolderListener implements Runnable {
     }
 
     private void handleFileAsync(String fileName) {
-        new Thread(new AsyncFileHandler(fileName, directory, fileHandler, fileLengthCheckDelay))
-                .start();
+        CompletableFuture.runAsync(new AsyncFileHandler(fileName, directory, fileHandler, fileLengthCheckDelay));
     }
 }
