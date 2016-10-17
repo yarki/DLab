@@ -1,6 +1,6 @@
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.core.response.ResponseDirectoriesCreator;
+import com.epam.dlab.backendapi.core.response.DirectoriesCreator;
 import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
 import com.epam.dlab.backendapi.resources.DockerResource;
@@ -25,7 +25,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
     @Override
     public void run(ProvisioningServiceApplicationConfiguration configuration, Environment environment) throws Exception {
         Injector injector = createInjector(configuration, environment);
-        environment.lifecycle().manage(injector.getInstance(ResponseDirectoriesCreator.class));
+        environment.lifecycle().manage(injector.getInstance(DirectoriesCreator.class));
         environment.lifecycle().manage(injector.getInstance(DockerWarmuper.class));
         environment.jersey().register(injector.getInstance(DockerResource.class));
         environment.jersey().register(injector.getInstance(KeyLoaderResource.class));
