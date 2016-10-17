@@ -106,7 +106,7 @@ def get_emr_info(id, key = ''):
         try:
             result = info[key]
         except:
-            print "No such key"
+            print "Cluster has no {} attribute".format(key)
             result = info
     else:
         result = info
