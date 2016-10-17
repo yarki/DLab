@@ -132,10 +132,13 @@ def remove_role(scientist, instance_type):
 
 def s3_cleanup(bucket, cluster_name):
     s3_res = boto3.resource('s3')
-    resource = s3_res.Bucket(bucket)
-    prefix = "config/" + cluster_name + "/"
-    for i in resource.objects.filter(Prefix=prefix):
-        s3_res.Object(resource.name, i.key).delete()
+    try:
+        resource = s3_res.Bucket(bucket)
+        prefix = "config/" + cluster_name + "/"
+        for i in resource.objects.filter(Prefix=prefix):
+            s3_res.Object(resource.name, i.key).delete()
+    except botocore.exceptions.ClientError as err:
+        print err.response['Error']['Message']
 
 
 def remove_s3(scientist):
