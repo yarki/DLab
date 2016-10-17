@@ -2,51 +2,39 @@ package com.epam.dlab.backendapi.core.guice;
 
 import com.epam.dlab.auth.SecurityAPI;
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.client.mongo.MongoService;
+import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
+import com.epam.dlab.client.mongo.MongoService;
+import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.ImageMetadataDTO;
-import com.epam.dlab.restclient.RESTService;
-import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import org.bson.Document;
-import org.bson.conversions.Bson;
+import io.dropwizard.setup.Environment;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Created by Alexey Suprun
  */
-public class MockModule extends AbstractModule implements SecurityAPI, DockerAPI {
+public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
+    public MockModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
+        super(configuration, environment);
+    }
+
     @Override
     protected void configure() {
-        bind(MongoService.class).toInstance(createMongoService());
+        bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
         bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
                 .toInstance(createAuthenticationService());
         bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
                 .toInstance(createProvisioningService());
-    }
-
-    private MongoService createMongoService() {
-        MongoCursor mongoCursor = mock(MongoCursor.class);
-        FindIterable findIterable = mock(FindIterable.class);
-        when(findIterable.iterator()).thenReturn(mongoCursor);
-        MongoCollection collection = mock(MongoCollection.class);
-        when(collection.find(any(Bson.class))).thenReturn(findIterable);
-        MongoService result = mock(MongoService.class);
-        when(result.getCollection(anyString())).thenReturn(collection);
-        return result;
     }
 
     private RESTService createAuthenticationService() {

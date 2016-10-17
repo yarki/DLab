@@ -24,7 +24,7 @@
 
 <div class="sub_nav">
   <div class="container-fluid">
-    <button class="btn btn_create" data-toggle="modal" data-target=".create_computational">
+    <button class="btn btn_create" data-toggle="modal" data-target=".loading_modal">
       <span class="glyphicon glyphicon glyphicon-plus"></span> Create new
     </button>
     <button class="btn btn_refresh pull-right">
@@ -161,32 +161,47 @@
       </div>
     </div>
   </div>
-  </div>
+</div>
 
 
-<div class="modal fade upload_key" data-backdrop="static"  data-keyboard="false">
+<div class="modal fade upload_key"  data-backdrop="static"  data-keyboard="false">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="myModalLabel">Create initial infrastructure</h4>
       </div>
       <div class="modal-body">
-        <div class="form-group row">
-          <div  class="col-xs-7">
-            <label class="control-label">Upload public key start environment creation</label>
-            <div>
-              <small><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Where can I get public key?</small>
+        <form (submit)="uploadKey($event)" method="POST" action="/api/keyloader/upload?access_token={{ this.userProfileService.getAuthToken() }}" enctype="multipart/form-data">
+          <div class="form-group row">
+            <div  class="col-xs-7">
+              <label class="control-label">Upload public key start environment creation</label>
+              <div>
+                <small><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Where can I get public key?</small>
+              </div>
+            </div>
+            <div class="col-xs-5">
+              <span class="btn btn-default btn-file">
+                <span class="glyphicon glyphicon-upload"></span> Browse <input type="file" name="file" />
+              </span>
             </div>
           </div>
-          <div class="col-xs-5">
-            <span class="btn btn-default btn-file">
-            <span class="glyphicon glyphicon-upload"></span> Browse <input type="file">
-            </span>
+          <div class="text-right">
+            <button type="submit" class="btn btn-success">Create</button>
           </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade loading_modal">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="spinner_wrap">
+          <img src="assets/img/spinner.gif" alt="">
         </div>
-        <div class="text-right">
-          <button type="button" class="btn btn-success">Cancel</button>
-        </div>
+        <p>Initial infrastructure is being created, <br/>please, wait...</p>
       </div>
     </div>
   </div>
@@ -194,17 +209,15 @@
 
 
 
+<!-- <p>
+  Howdy! Here's a list of awesome computer scientists. Do you know any others? Add to the list yourself.
+</p>
 
+<form (submit)="addName()">
+  <input [(ngModel)]="newName" name="newName" placeholder="Awesome Computer Scientist">
+  <button type="submit">Add</button>
+</form>
 
-  <!-- <p>
-    Howdy! Here's a list of awesome computer scientists. Do you know any others? Add to the list yourself.
-  </p>
-  
-  <form (submit)="addName()">
-    <input [(ngModel)]="newName" name="newName" placeholder="Awesome Computer Scientist">
-    <button type="submit">Add</button>
-  </form>
-  
-  <ul>
-    <li *ngFor="let name of names">{{name}}</li>
-  </ul> -->
+<ul>
+  <li *ngFor="let name of names">{{name}}</li>
+</ul> -->
