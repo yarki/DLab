@@ -14,15 +14,15 @@ args = parser.parse_args()
 
 
 def enable_proxy(proxy_host, proxy_port):
-    if not exists('/home/ubuntu/proxy_enabled'):
-        try:
-            proxy_string = "http://%s:%s" % (proxy_host, proxy_port)
-            sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
-            sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
-            sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
-            sudo('touch /home/ubuntu/proxy_enabled ')
-        except:
-            sys.exit(1)
+    #if not exists('/home/ubuntu/proxy_enabled'):
+	try:
+		proxy_string = "http://%s:%s" % (proxy_host, proxy_port)
+		sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
+		sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
+		sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
+		sudo('touch /home/ubuntu/proxy_enabled ')
+	except:
+		sys.exit(1)
 
 
 def renew_gpg_key():
