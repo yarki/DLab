@@ -183,7 +183,7 @@ def remove_sgroups(tag_value):
     client = boto3.client('ec2')
     tag_name = os.environ['conf_service_base_name']
     sgs = ec2.security_groups.filter(
-        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': tag_value}])
+        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': [tag_value]}])
     for sg in sgs:
         print sg.id
         client.delete_security_group(GroupId=sg.id)
