@@ -98,7 +98,7 @@ def run():
                  "--pip_packages 'boto3 boto argparse fabric jupyter awscli'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
-        if not run_routine_test('install_prerequisites', params):
+        if not run_routine('install_prerequisites', params):
             logging.info('Failed installing software: pip, apt')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing software: pip, apt", "conf": os.environ.__dict__}

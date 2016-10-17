@@ -247,7 +247,7 @@ def run():
                              "template_file": "/root/templates/squid.conf"}
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, keyfile_name, json.dumps(additional_config))
-        if not run_routine('configure_http_proxy', params):
+        if not run_routine_test('configure_http_proxy', params):
             logging.info('Failed installing http proxy')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing http proxy", "conf": edge_conf}
