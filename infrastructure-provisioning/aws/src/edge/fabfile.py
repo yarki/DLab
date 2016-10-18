@@ -283,7 +283,7 @@ def run():
         print '[INSTALLING USERs KEY]'
         logging.info('[INSTALLING USERs KEY]')
         additional_config = {"user_keyname": edge_conf['user_keyname'],
-                             "user_keydir": "/root/keys/.ssh/"}
+                             "user_keydir": "/root/keys/"}
         params = "--hostname {} --keyfile {} --additional_config '{}'".format(
             instance_hostname, keyfile_name, json.dumps(additional_config))
         if not run_routine('install_user_key', params):
