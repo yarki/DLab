@@ -1,17 +1,14 @@
 import {Modal} from "./modal.component";
-//import {RouteModal} from "./modal.routes";
 import {CommonModule} from "@angular/common";
 import {NgModule, Component} from "@angular/core";
 
 export * from "./modal.component";
-//export * from "./modal.routes";
 
 @Component({
     selector: "modal-header",
     template: `<ng-content></ng-content>`
 })
 export class ModalHeader {
-
 }
 
 @Component({
@@ -19,7 +16,6 @@ export class ModalHeader {
     template: `<ng-content></ng-content>`
 })
 export class ModalContent {
-
 }
 
 @Component({
@@ -27,7 +23,6 @@ export class ModalContent {
     template: `<ng-content></ng-content>`
 })
 export class ModalFooter {
-
 }
 
 @NgModule({

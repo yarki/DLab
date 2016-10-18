@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import {Http, Headers} from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
 import {Observable, Subject} from "rxjs";
+import {Router} from "@angular/router";
 
 @Injectable()
 export class UserProfileService {
   private accessTokenKey : string = "access_token";
   private userNameKey : string = "user_name";
-  constructor(private http: Http, private webRequestHelper : WebRequestHelper) {}
+  constructor(private http: Http, private webRequestHelper : WebRequestHelper, private router: Router) {}
 
   setUserName(userName)
   {
@@ -54,10 +55,16 @@ export class UserProfileService {
           { headers: requestHeader }
         )
         .map((response) => {
-            return response
-            && response.status == 200 ? true : false;
+            if(response && response.status == 200)
+              return true;
+          if(this.router.url != "/login")
+          this.router.navigate(['/login']);
+            return false;
         }, this);
     }
+
+    if(this.router.url != "/login")
+      this.router.navigate(['/login']);
 
     return Observable.of(false);
   }
