@@ -20,7 +20,6 @@ public class DirectoriesCreator implements Managed {
         createDirectory(configuration.getWarmupDirectory());
         createDirectory(configuration.getImagesDirectory());
         createDirectory(configuration.getKeyLoaderDirectory());
-        createDirectory(configuration.getSshKeyDirectory());
     }
 
     private boolean createDirectory(String directory) {
