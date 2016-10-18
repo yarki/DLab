@@ -13,6 +13,7 @@ def ensure_apt(requisites):
         if not exists('/tmp/apt_upgraded'):
             sudo('apt-get update')
             sudo('apt-get -y upgrade')
+            sudo('export LC_ALL=C')
             sudo('touch /tmp/apt_upgraded')
         sudo('apt-get -y install ' + requisites)
         return True
