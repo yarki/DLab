@@ -116,7 +116,7 @@ def ensure_jenkins():
 
 def configure_jenkins():
     try:
-        if not exists_test('/tmp/jenkins_configured'):
+        if not exists('/tmp/jenkins_configured'):
             sudo('echo \'JENKINS_ARGS="--prefix=/jenkins --httpPort=8070"\' >> /etc/default/jenkins')
             sudo('rm -rf /var/lib/jenkins/*')
             sudo('mkdir -p /var/lib/jenkins/jobs/')
