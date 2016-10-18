@@ -85,8 +85,4 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     public String getKeyLoaderDirectory() {
         return responseDirectory + KEY_LOADER_DIRECTORY;
     }
-
-    public String getSshKeyDirectory() {
-        return keyDirectory + SSH_DIRECTORY;
-    }
 }

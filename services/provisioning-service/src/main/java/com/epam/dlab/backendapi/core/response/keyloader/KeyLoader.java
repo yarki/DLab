@@ -54,7 +54,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
 
     private void saveKeyToFile(UploadFileDTO dto) throws IOException {
         LOGGER.debug("save key");
-        Files.write(Paths.get(configuration.getSshKeyDirectory(), dto.getUser() + KEY_EXTENTION), dto.getContent().getBytes());
+        Files.write(Paths.get(configuration.getKeyDirectory(), dto.getUser() + KEY_EXTENTION), dto.getContent().getBytes());
     }
 
     private FileHandler getResultHandler(String user, String uuid) {
