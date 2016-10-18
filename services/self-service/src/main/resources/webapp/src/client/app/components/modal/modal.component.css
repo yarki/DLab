@@ -1,3 +1,7 @@
+div.modal
+{
+  position: relative;
+}
 .modal-dialog {
   width: 525px;
 }
