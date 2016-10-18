@@ -15,10 +15,10 @@ args = parser.parse_args()
 
 
 web_path = '/tmp/web_app/'
-local_log_filename = "%s.log" % os.environ['request_id']
+local_log_filename = "{}_UI.log".format(os.environ['request_id'])
 local_log_filepath = "/response/" + local_log_filename
 logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                    level=logging.DEBUG,
+                    level=logging.INFO,
                     filename=local_log_filepath)
 
 
@@ -91,17 +91,17 @@ if __name__ == "__main__":
 
     print "Installing MongoDB"
     if not ensure_mongo():
-        logging.info('Failed to install MongoDB')
+        logging.error('Failed to install MongoDB')
         sys.exit(1)
 
     print "Configuring MongoDB"
     if not configure_mongo():
-        logging.info('MongoDB configuration script has failed.')
+        logging.error('MongoDB configuration script has failed.')
         sys.exit(1)
 
     print "Starting Self-Service(UI)"
     if not start_ss():
-        logging.info('Failed to start UI')
+        logging.error('Failed to start UI')
         sys.exit(1)
 
     sys.exit(0)
