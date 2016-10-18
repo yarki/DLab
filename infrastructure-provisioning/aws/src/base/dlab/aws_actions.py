@@ -1,4 +1,4 @@
-import boto3, boto
+import boto3, boto, botocore
 import time
 import sys
 import os
@@ -132,6 +132,17 @@ def remove_role(instance_type, scientist=''):
     print "The IAM role " + role + " has been deleted successfully"
 
 
+def s3_cleanup(bucket, cluster_name):
+    s3_res = boto3.resource('s3')
+    try:
+        resource = s3_res.Bucket(bucket)
+        prefix = "config/" + cluster_name + "/"
+        for i in resource.objects.filter(Prefix=prefix):
+            s3_res.Object(resource.name, i.key).delete()
+    except botocore.exceptions.ClientError as err:
+        print err.response['Error']['Message']
+
+
 def remove_s3(bucket_type, scientist=''):
     print "[Removing S3 buckets]"
     s3 = boto3.resource('s3')
@@ -240,3 +251,10 @@ def clean_s3(bucket_name, emr_name):
         print "The bucket " + bucket_name + " has been cleaned successfully"
     except:
         sys.exit(1)
+
+
+def terminate_emr(id):
+    emr = boto3.client('emr')
+    emr.terminate_job_flows(
+        JobFlowIds=[id]
+    )
