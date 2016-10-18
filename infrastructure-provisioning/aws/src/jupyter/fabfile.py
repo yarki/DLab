@@ -91,7 +91,7 @@ def run():
         additional_config = {"proxy_host": edge_instance_hostname, "proxy_port": "3128"}
         params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
-        if not run_routine_test('configure_proxy', params):
+        if not run_routine('configure_proxy', params):
             logging.info('Failed to configure proxy')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to configure proxy", "conf": notebook_config}
