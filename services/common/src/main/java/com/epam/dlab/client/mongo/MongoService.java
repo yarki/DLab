@@ -1,4 +1,4 @@
-package com.epam.dlab.backendapi.client.mongo;
+package com.epam.dlab.client.mongo;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;

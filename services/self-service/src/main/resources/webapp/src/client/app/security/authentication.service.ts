@@ -1,5 +1,5 @@
- import { Injectable } from '@angular/core';
-import {Http} from '@angular/http';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
 import { UserProfileService } from './userProfile.service'
  import {Observable} from "rxjs";

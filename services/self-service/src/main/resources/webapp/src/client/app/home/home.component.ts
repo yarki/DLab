@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthenticationService } from './../security/authentication.service';
-declare var $:any;
+import {UserAccessKeyService} from "../services/userAccessKey.service";
+import {AppRoutingService} from "../routing/appRouting.service";
 
 @Component({
   moduleId: module.id,
@@ -12,16 +12,67 @@ declare var $:any;
 })
 
 export class HomeComponent implements OnInit {
-  constructor(private authenticationService: AuthenticationService, private router: Router) {}
+  key: any;
+  keyStatus: number;
+  uploadAccessKeyUrl : string;
 
-   logout() {
-     this.authenticationService.logout().subscribe(
-       data => data,
-       err => console.log(err),
-       () => this.router.navigate(['/login']));
-   }
+  @ViewChild('keyUploadModal') keyUploadModal;
+  @ViewChild('preloaderModal') preloaderModal;
+
+  // -------------------------------------------------------------------------
+  // Overrides
+  // --
+
+  constructor(
+    private authenticationService: AuthenticationService,
+    private userAccessKeyProfileService: UserAccessKeyService,
+    private appRoutingService : AppRoutingService
+  )
+  {
+    this.uploadAccessKeyUrl = this.userAccessKeyProfileService.getAccessKeyUrl();
+  }
 
   ngOnInit() {
-     $('.upload_key').modal('show');
+    this.checkInfrastructureCreationProgress();
+  }
+
+  //
+  // Handlers
+  //
+  checkInfrastructureCreationProgress()
+  {
+    this.userAccessKeyProfileService.checkUserAccessKey()
+      .subscribe(
+        data => {
+          this.key = data;
+        },
+        err => {
+          if(err.status == 404) // key haven't been uploaded
+          {
+            if(!this.keyUploadModal.isOpened)
+              this.keyUploadModal.open({isFooter: false});
+          } else if (err.status == 406) // key is being uploaded in progress
+          {
+            if(this.keyUploadModal.isOpened)
+              this.keyUploadModal.close();
+
+            if(!this.preloaderModal.isOpened)
+              this.preloaderModal.open({isHeader: false, isFooter: false});
+          }
+        }
+      );
+  }
+
+  logout() {
+    this.authenticationService.logout().subscribe(
+      data => data,
+      error => console.log(error),
+      () => this.appRoutingService.redirectToLoginPage());
+  }
+
+  uploadUserAccessKey($event) {
+    setTimeout(function () {
+      this.checkInfrastructureCreationProgress();
+    }.bind(this), 10000);
   }
 }

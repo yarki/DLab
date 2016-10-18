@@ -3,10 +3,10 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
+import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
-import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
-import com.epam.dlab.restclient.RESTService;
+import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -48,7 +48,6 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     }
 
     @POST
-    @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public String post(@Auth UserInfo userInfo,
                        @FormDataParam("file") InputStream uploadedInputStream,
@@ -63,6 +62,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     }
 
     @POST
+    @Path("/callback")
     public Response loadKeyResponse(UploadFileResultDTO result) throws JsonProcessingException {
         LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
         dao.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));

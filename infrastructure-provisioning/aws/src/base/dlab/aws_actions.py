@@ -30,6 +30,27 @@ def create_vpc(vpc_cidr, tag):
     return vpc.id
 
 
+def create_endpoint(vpc_id, service_name):
+    ec2 = boto3.client('ec2')
+    route_table = []
+    response = ''
+    try:
+        for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
+            route_table.append(i['Associations'][0]['RouteTableId'])
+        response = ec2.create_vpc_endpoint(
+            VpcId=vpc_id,
+            ServiceName=service_name,
+            RouteTableIds=route_table
+        #   ClientToken='string'
+        )
+        response = response['VpcEndpoint']['VpcEndpointId']
+    except botocore.exceptions.ClientError as err:
+        print err.response['Error']['Message']
+    finally:
+        return response
+
+
+
 def create_subnet(vpc_id, subnet, tag):
     ec2 = boto3.resource('ec2')
     subnet = ec2.create_subnet(VpcId=vpc_id, CidrBlock=subnet)
@@ -143,7 +164,7 @@ def s3_cleanup(bucket, cluster_name):
         print err.response['Error']['Message']
 
 
-def remove_s3(bucket_type, scientist=''):
+def remove_s3(scientist):
     print "[Removing S3 buckets]"
     s3 = boto3.resource('s3')
     client = boto3.client('s3')
@@ -211,6 +232,13 @@ def deregister_image(scientist):
         client.deregister_image(ImageId=i.get('ImageId'))
 
 
+def terminate_emr(id):
+    emr = boto3.client('emr')
+    emr.terminate_job_flows(
+        JobFlowIds=[id]
+    )
+
+
 def remove_ec2(tag_name, tag_value):
     print "[Removing EC2]"
     ec2 = boto3.resource('ec2')
@@ -224,31 +252,6 @@ def remove_ec2(tag_name, tag_value):
             waiter = client.get_waiter('instance_terminated')
             waiter.wait(InstanceIds=[instance.id])
             print "The instance " + instance.id + " has been deleted successfully"
-    except:
-        sys.exit(1)
-
-
-def terminate_emr(cluster_id, bucket_name):
-    client = boto3.client('emr')
-    try:
-        cluster = client.describe_cluster(ClusterId=cluster_id)
-        cluster = cluster.get("Cluster")
-        emr_name = cluster.get('Name')
-        client.terminate_job_flows(JobFlowIds=[cluster_id])
-        print "The EMR cluster " + emr_name + " has been deleted successfully"
-    except:
-        sys.exit(1)
-    clean_s3(bucket_name, emr_name)
-
-
-def clean_s3(bucket_name, emr_name):
-    s3 = boto3.resource('s3')
-    try:
-        s3_bucket = s3.Bucket(bucket_name)
-        s3_dir = "config/" + emr_name + "/"
-        for i in s3_bucket.objects.filter(Prefix=s3_dir):
-            s3.Object(s3_bucket.name, i.key).delete()
-        print "The bucket " + bucket_name + " has been cleaned successfully"
     except:
         sys.exit(1)
 
