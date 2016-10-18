@@ -167,7 +167,7 @@
     <h4 class="modal-title">Create initial infrastructure</h4>
   </modal-header>
   <modal-content>
-    <form (submit)="uploadingKey($event)" method="POST" action="/api/keyloader/upload?access_token={{ this.userProfileService.getAuthToken() }}" enctype="multipart/form-data">
+    <form (submit)="uploadUserAccessKey($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
       <div class="form-group row">
         <div  class="col-xs-8">
           <label class="control-label">Upload public key start environment creation</label>

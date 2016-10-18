@@ -1,9 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { Http } from '@angular/http';
 import { AuthenticationService } from './../security/authentication.service';
-import { UserProfileService } from "../security/userProfile.service";
 import {UserAccessKeyService} from "../services/userAccessKey.service";
+import {AppRoutingService} from "../routing/appRouting.service";
 
 @Component({
   moduleId: module.id,
@@ -16,29 +14,31 @@ import {UserAccessKeyService} from "../services/userAccessKey.service";
 export class HomeComponent implements OnInit {
   key: any;
   keyStatus: number;
+  uploadAccessKeyUrl : string;
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
 
-  constructor(
-    private http: Http,
-    private authenticationService: AuthenticationService,
-    private router: Router,
-    private userProfileService : UserProfileService,
-    private userAccessKeyProfileService: UserAccessKeyService
-    ) {}
+  // -------------------------------------------------------------------------
+  // Overrides
+  // --
 
-   logout() {
-     this.authenticationService.logout().subscribe(
-       data => data,
-       err => console.log(err),
-       () => this.router.navigate(['/login']));
-   }
+  constructor(
+    private authenticationService: AuthenticationService,
+    private userAccessKeyProfileService: UserAccessKeyService,
+    private appRoutingService : AppRoutingService
+  )
+  {
+    this.uploadAccessKeyUrl = this.userAccessKeyProfileService.getAccessKeyUrl();
+  }
 
   ngOnInit() {
     this.checkInfrastructureCreationProgress();
   }
 
+  //
+  // Handlers
+  //
   checkInfrastructureCreationProgress()
   {
     this.userAccessKeyProfileService.checkUserAccessKey()
@@ -63,7 +63,14 @@ export class HomeComponent implements OnInit {
       );
   }
 
-  uploadingKey(event) {
+  logout() {
+    this.authenticationService.logout().subscribe(
+      data => data,
+      error => console.log(error),
+      () => this.appRoutingService.redirectToLoginPage());
+  }
+
+  uploadUserAccessKey($event) {
     setTimeout(function () {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);

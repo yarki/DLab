@@ -1,10 +1,8 @@
 import {Modal} from "./modal.component";
-//import {RouteModal} from "./modal.routes";
 import {CommonModule} from "@angular/common";
 import {NgModule, Component} from "@angular/core";
 
 export * from "./modal.component";
-//export * from "./modal.routes";
 
 @Component({
     selector: "modal-header",
