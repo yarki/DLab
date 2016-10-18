@@ -40,7 +40,8 @@ def ensure_libraries_py2():
     if not exists('/home/ubuntu/ensure_libraries_py2_installed'):
         try:
             sudo('export LC_ALL=C')
-            sudo('pip2 install boto boto3 NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
+            sudo('pip2 install boto boto3')
+            sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
             sudo('touch /home/ubuntu/ensure_libraries_py2_installed')
         except:
             sys.exit(1)
@@ -50,7 +51,8 @@ def ensure_libraries_py3():
     if not exists('/home/ubuntu/ensure_libraries_py3_installed'):
         try:
             sudo('apt-get install zlib1g-dev')
-            sudo('pip3 install boto boto3 NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
+            sudo('pip3 install boto boto3')
+            sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
             sudo('touch /home/ubuntu/ensure_libraries_py3_installed')
         except:
             sys.exit(1)

@@ -4,6 +4,39 @@ from dlab.fab import *
 from dlab.aws_meta import *
 import sys
 
+def status():
+    local_log_filename = "{}.log".format(os.environ['request_id'])
+    local_log_filepath = "/response/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG,
+                        filename=local_log_filepath)
+
+    create_aws_config_files()
+    print 'Collecting names and tags'
+    edge_conf = dict()
+    # Base config
+    edge_conf['service_base_name'] = os.environ['conf_service_base_name']
+    edge_conf['user_name'] = os.environ['edge_user_name']
+    edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
+    edge_conf['key_name'] = os.environ['creds_key_name']
+
+    instance_hostname = get_instance_hostname(edge_conf['instance_name'])
+    keyfile_name = "/root/keys/{}.pem".format(edge_conf['key_name'])
+
+    try:
+        logging.info('[COLLECT DATA]')
+        print '[COLLECTING DATA]'
+        params = "--hostname '{}' --keyfile '{}' --base_name '{}' --username '{}'".format(instance_hostname, keyfile_name, edge_conf['service_base_name'], edge_conf['user_name'])
+        if not run_routine('collect_data', params):
+            logging.info('Failed collecting data')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to collect necessary information", "conf": edge_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        sys.exit(1)
+
 
 def run():
     local_log_filename = "%s.log" % os.environ['request_id']
@@ -18,6 +51,7 @@ def run():
     # Base config
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['key_name'] = os.environ['creds_key_name']
+    edge_conf['user_keyname'] = os.environ['edge_user_name']
     edge_conf['policy_arn'] = os.environ['conf_policy_arn']
     edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
     edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
@@ -243,6 +277,25 @@ def run():
             sys.exit(1)
     except:
         sys.exit(1)
+
+
+    try:
+        print '[INSTALLING USERs KEY]'
+        logging.info('[INSTALLING USERs KEY]')
+        additional_config = {"user_keyname": edge_conf['user_keyname'],
+                             "user_keydir": "/root/keys/"}
+        params = "--hostname {} --keyfile {} --additional_config '{}'".format(
+            instance_hostname, keyfile_name, json.dumps(additional_config))
+        if not run_routine('install_user_key', params):
+            logging.info('Failed installing user key')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed installing users key", "conf": edge_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        sys.exit(1)
+
 
     try:
         with open("/root/result.json", 'w') as result:

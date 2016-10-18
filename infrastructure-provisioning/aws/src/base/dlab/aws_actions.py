@@ -1,4 +1,4 @@
-import boto3, boto
+import boto3, boto, botocore
 import time
 import os
 
@@ -27,6 +27,27 @@ def create_vpc(vpc_cidr, tag):
     vpc = ec2.create_vpc(CidrBlock=vpc_cidr)
     vpc.create_tags(Tags=[tag])
     return vpc.id
+
+
+def create_endpoint(vpc_id, service_name):
+    ec2 = boto3.client('ec2')
+    route_table = []
+    response = ''
+    try:
+        for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
+            route_table.append(i['Associations'][0]['RouteTableId'])
+        response = ec2.create_vpc_endpoint(
+            VpcId=vpc_id,
+            ServiceName=service_name,
+            RouteTableIds=route_table
+        #   ClientToken='string'
+        )
+        response = response['VpcEndpoint']['VpcEndpointId']
+    except botocore.exceptions.ClientError as err:
+        print err.response['Error']['Message']
+    finally:
+        return response
+
 
 
 def create_subnet(vpc_id, subnet, tag):
@@ -130,6 +151,17 @@ def remove_role(scientist, instance_type):
     print "The IAM role " + role + " has been deleted successfully"
 
 
+def s3_cleanup(bucket, cluster_name):
+    s3_res = boto3.resource('s3')
+    try:
+        resource = s3_res.Bucket(bucket)
+        prefix = "config/" + cluster_name + "/"
+        for i in resource.objects.filter(Prefix=prefix):
+            s3_res.Object(resource.name, i.key).delete()
+    except botocore.exceptions.ClientError as err:
+        print err.response['Error']['Message']
+
+
 def remove_s3(scientist):
     print "[Removing S3 buckets]"
     s3 = boto3.resource('s3')
@@ -195,3 +227,10 @@ def deregister_image(scientist):
     images_list = response.get('Images')
     for i in images_list:
         client.deregister_image(ImageId=i.get('ImageId'))
+
+
+def terminate_emr(id):
+    emr = boto3.client('emr')
+    emr.terminate_job_flows(
+        JobFlowIds=[id]
+    )

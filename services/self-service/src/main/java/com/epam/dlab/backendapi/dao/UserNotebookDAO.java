@@ -3,6 +3,7 @@ package com.epam.dlab.backendapi.dao;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 
+import static com.epam.dlab.backendapi.dao.MongoCollections.USER_NOTEBOOKS;
 import static com.mongodb.client.model.Filters.eq;
 
 /**
@@ -18,6 +19,6 @@ public class UserNotebookDAO extends BaseDAO {
     }
 
     public DeleteResult delete(String id) {
-        return mongoService.getCollection(USER_NOTEBOOKS).deleteOne(eq(ID, id));
+        return mongoService.getCollection(USER_NOTEBOOKS).deleteOne(eq(USER, id));
     }
 }

@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 /**
  * Created by Alexey Suprun
  */
-class BaseDAO implements MongoCollections {
+class BaseDAO {
     private static final ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     public static final String ID = "_id";
     public static final String USER = "user";

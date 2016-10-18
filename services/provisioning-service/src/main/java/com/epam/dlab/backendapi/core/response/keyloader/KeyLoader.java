@@ -27,7 +27,7 @@ import java.nio.file.Paths;
 @Singleton
 public class KeyLoader implements DockerCommands, SelfAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyLoader.class);
-    private static final String KEY_EXTENTION = ".pem";
+    private static final String KEY_EXTENTION = ".pub";
     private static final String STATUS_FIELD = "status";
     private static final String RESPONSE_NODE = "response";
     private static final String RESULT_NODE = "result";
@@ -48,7 +48,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
                 getResultHandler(dto.getUser(), uuid));
         commandExecuter.executeAsync(String.format(CREATE_EDGE_METADATA, configuration.getKeyDirectory(),
                 configuration.getKeyLoaderDirectory(), uuid, configuration.getAdminKey(),
-                dto.getUser(), dto.getUser(), configuration.getEdgeImage()));
+                dto.getUser(), dto.getUser(), dto.getUser(), configuration.getEdgeImage()));
         return uuid;
     }
 

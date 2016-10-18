@@ -4,6 +4,8 @@ import com.epam.dlab.dto.UserCredentialDTO;
 import com.google.inject.Singleton;
 import org.bson.Document;
 
+import static com.epam.dlab.backendapi.dao.MongoCollections.LOGIN_ATTEMPTS;
+
 /**
  * Created by Alexey Suprun
  */

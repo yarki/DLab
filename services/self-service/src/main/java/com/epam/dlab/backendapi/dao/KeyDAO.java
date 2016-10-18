@@ -6,6 +6,8 @@ import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.bson.Document;
 
+import static com.epam.dlab.backendapi.dao.MongoCollections.USER_AWS_CREDENTIALS;
+import static com.epam.dlab.backendapi.dao.MongoCollections.USER_KEYS;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 

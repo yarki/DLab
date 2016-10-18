@@ -99,6 +99,20 @@ def get_vpc_by_cidr(cidr):
     return ''
 
 
+def get_emr_info(id, key = ''):
+    emr = boto3.client('emr')
+    info = emr.describe_cluster(ClusterId=id)['Cluster']
+    if key:
+        try:
+            result = info[key]
+        except:
+            print "Cluster has no {} attribute".format(key)
+            result = info
+    else:
+        result = info
+    return result
+
+
 def get_emr_list(tag_name, type='Key'):
     emr = boto3.client('emr')
     clusters = emr.list_clusters(
@@ -115,26 +129,17 @@ def get_emr_list(tag_name, type='Key'):
     return clusters_list
 
 
-def get_ec2_list(tag_name):
+def get_ec2_list(tag_name, value=''):
     ec2 = boto3.resource('ec2')
-    notebook_instances = ec2.instances.filter(
-        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
-                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['*nb*']}])
-    return notebook_instances
-
-
-def resource_count(resource_type, tag_name):
-    if resource_type == 'EC2':
-        notebooks = get_ec2_list(tag_name)
-        count = 0
-        for i in notebooks:
-            count += 1
-        return count
-    elif resource_type == 'EMR':
-        count = len(get_emr_list(tag_name))
-        return count
+    if value:
+        notebook_instances = ec2.instances.filter(
+            Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
+                     {'Name': 'tag:{}'.format(tag_name), 'Values': [value]}])
     else:
-        print "Incorrect resource type!"
+        notebook_instances = ec2.instances.filter(
+            Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
+                     {'Name': 'tag:{}'.format(tag_name), 'Values': ['*nb*']}])
+    return notebook_instances
 
 
 def provide_index(resource_type, tag_name):

@@ -11,7 +11,7 @@ import java.io.File;
  * Created by Alexey Suprun
  */
 @Singleton
-public class ResponseDirectoriesCreator implements Managed {
+public class DirectoriesCreator implements Managed {
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
 
