@@ -21,7 +21,7 @@ def copy_key(config):
 
 
 ##############
-# Run script #:wq
+# Run script #
 ##############
 if __name__ == "__main__":
     print "Configure connections"
@@ -37,4 +37,5 @@ if __name__ == "__main__":
     if copy_key(deeper_config):
         sys.exit(0)
     else:
+        print "Users keyfile {0}.pub could not be found at {1}/{0}".format(args.keyfile, deeper_config['user_keydir'])
         sys.exit(1)

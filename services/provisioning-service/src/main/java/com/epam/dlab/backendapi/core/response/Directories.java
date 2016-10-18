@@ -7,5 +7,4 @@ public interface Directories {
     String WARMUP_DIRECTORY = "/warmup";
     String IMAGES_DIRECTORY = "/images";
     String KEY_LOADER_DIRECTORY = "/keyloader";
-    String SSH_DIRECTORY = "/.ssh";
 }
