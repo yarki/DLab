@@ -49,7 +49,7 @@ export class HomeComponent implements OnInit {
             clearInterval(this.preloadModalInterval);
           }
         },
-        err => { 
+        err => {
           if(err.status == 404) // key haven't been uploaded
           {
             if(!this.keyUploadModal.isOpened)
