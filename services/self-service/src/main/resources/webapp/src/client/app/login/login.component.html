@@ -3,7 +3,7 @@
     <a href="#" class="logo">
       <img src="assets/img/logo.png" alt="">
     </a>
-    <form name="form" class="form_wrap" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
+    <form name="form" class="form_wrap" (ngSubmit)="f.form.valid && login_btnClick()" #f="ngForm" novalidate>
       <div class="input-group" [ngClass]="{ 'has-error': f.submitted && !username.valid }">
         <span class="input-group-addon" id="sizing-addon2">
             <span class="glyphicon glyphicon-user" aria-hidden="true"></span>

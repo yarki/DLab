@@ -11,9 +11,7 @@ export class AuthenticationService {
   }
 
   login(userName, password) : Observable<Boolean> {
-
     let requestHeader = this.webRequestHelper.getJsonHeader();
-
     return this.http
       .post(
         '/api/login', JSON.stringify({'username': userName, 'password': password, 'access_token': ''}), { headers: requestHeader }
@@ -45,5 +43,7 @@ export class AuthenticationService {
           { headers: requestHeader }
       ).map(res => res.text());
     }
+
+    return Observable.of("");
   }
 }
