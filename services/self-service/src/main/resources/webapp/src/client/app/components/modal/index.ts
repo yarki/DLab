@@ -11,7 +11,6 @@ export * from "./modal.component";
     template: `<ng-content></ng-content>`
 })
 export class ModalHeader {
-
 }
 
 @Component({
@@ -19,7 +18,6 @@ export class ModalHeader {
     template: `<ng-content></ng-content>`
 })
 export class ModalContent {
-
 }
 
 @Component({
@@ -27,7 +25,6 @@ export class ModalContent {
     template: `<ng-content></ng-content>`
 })
 export class ModalFooter {
-
 }
 
 @NgModule({
