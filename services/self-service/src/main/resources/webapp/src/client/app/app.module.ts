@@ -18,6 +18,7 @@ import {WebRequestHelper} from "./util/webRequestHelper.service";
 import {UserProfileService} from "./security/userProfile.service";
 import {FormsModule} from "@angular/forms";
 import {UserAccessKeyService} from "./services/userAccessKey.service";
+import {AppRoutingService} from "./routing/appRouting.service";
 
 @NgModule({
   imports: [BrowserModule, HttpModule, RouterModule.forRoot(routes, { useHash: true }), LoginModule, HomeModule, FormsModule],
@@ -26,7 +27,13 @@ import {UserAccessKeyService} from "./services/userAccessKey.service";
     provide: LocationStrategy,
     useClass: HashLocationStrategy,
     useValue: '<%= APP_BASE %>'
-  }, AuthenticationService, AuthorizationGuard, WebRequestHelper, UserProfileService, UserAccessKeyService],
+  },
+    AuthenticationService,
+    AuthorizationGuard,
+    WebRequestHelper,
+    UserProfileService,
+    UserAccessKeyService,
+    AppRoutingService],
   bootstrap: [AppComponent]
 
 })
