@@ -1,11 +1,13 @@
-import {Component, Input, Output, EventEmitter, ElementRef, ViewChild} from "@angular/core";
+import {Component, Input, Output, EventEmitter, ElementRef, ViewChild, ViewEncapsulation} from "@angular/core";
 
 @Component({
     moduleId: module.id,
     selector: 'modal',
     templateUrl: 'modal.component.html',
-    styleUrls: ['./modal.component.css']
+    styleUrls: ['./modal.component.css'],
+    encapsulation : ViewEncapsulation.None
 })
+
 export class Modal {
 
     // -------------------------------------------------------------------------
@@ -90,7 +92,7 @@ export class Modal {
         if (this.isOpened)
             return;
         //console.log('!!!!!!!!!!', this);
-        
+
         if (option) {
             for(let key in option) {
                 this[key] = option[key]
@@ -107,7 +109,7 @@ export class Modal {
     close(...args: any[]) {
         if (!this.isOpened)
             return;
-        
+
         this.isOpened = false;
         this.onClose.emit(args);
         document.body.removeChild(this.backdropElement);
@@ -128,5 +130,4 @@ export class Modal {
         this.backdropElement.classList.add("fade");
         this.backdropElement.classList.add("in");
     }
-
 }

@@ -7,8 +7,6 @@ import { AuthenticationService } from './../security/authentication.service';
 import { UserProfileService } from "../security/userProfile.service";
 //import { ModalModule } from './../components/modal/index';
 
-
-
 @Component({
   moduleId: module.id,
   selector: 'sd-home',
@@ -25,9 +23,9 @@ export class HomeComponent implements OnInit {
   @ViewChild('preloaderModal') preloaderModal;
 
   constructor(
-    private http: Http, 
-    private authenticationService: AuthenticationService, 
-    private router: Router, 
+    private http: Http,
+    private authenticationService: AuthenticationService,
+    private router: Router,
     private userProfileService : UserProfileService
     ) {}
 
@@ -80,12 +78,12 @@ export class HomeComponent implements OnInit {
 
   // openModal(className: string) {
 
-    
+
   //   [].forEach.call(document.querySelectorAll('.modal'), function(modal) {
   //     modal.setAttribute('open', '');
   //   });
   //   document.querySelector(className).setAttribute('open', 'true');
-    
+
   // }
 
   // closeModal(className: string) {
