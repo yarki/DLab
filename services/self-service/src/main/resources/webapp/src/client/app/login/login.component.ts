@@ -15,9 +15,25 @@ import {AppRoutingService} from "../routing/appRouting.service";
 export class LoginComponent {
   model = new LoginModel ('', '');
   error = '';
+
+  //
+  // Override
+  //
+
   constructor(private authenticationService: AuthenticationService, private userProfileService : UserProfileService, private appRoutingService : AppRoutingService) {}
 
-	login() {
+  ngOnInit() {
+    this.userProfileService.isLoggedIn().subscribe(result => {
+      if (result)
+        this.appRoutingService.redirectToHomePage();
+    });
+  }
+
+  //
+  // Handlers
+  //
+
+  login_btnClick() {
     this.authenticationService
       .login(this.model.username, this.model.password)
       .subscribe((result) => {
@@ -29,13 +45,6 @@ export class LoginComponent {
         }
 
         return false;
-    });
-  }
-
-  ngOnInit() {
-    this.userProfileService.isLoggedIn().subscribe(result => {
-      if (result)
-        this.appRoutingService.redirectToHomePage();
-    });
+      });
   }
 }

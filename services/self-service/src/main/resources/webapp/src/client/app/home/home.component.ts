@@ -38,7 +38,25 @@ export class HomeComponent implements OnInit {
   //
   // Handlers
   //
-  checkInfrastructureCreationProgress()
+
+  logout_btnClick() {
+    this.authenticationService.logout().subscribe(
+      () => this.appRoutingService.redirectToLoginPage(),
+      error => console.log(error),
+      () => this.appRoutingService.redirectToLoginPage());
+  }
+
+  uploadUserAccessKey_btnClick($event) {
+    this.preloadModalInterval = setInterval(function () {
+      this.checkInfrastructureCreationProgress();
+    }.bind(this), 10000);
+  }
+
+  //
+  // Private Methods
+  //
+
+  private checkInfrastructureCreationProgress()
   {
     this.userAccessKeyProfileService.checkUserAccessKey()
       .subscribe(
@@ -64,18 +82,5 @@ export class HomeComponent implements OnInit {
           }
         }
       );
-  }
-
-  logout() {
-    this.authenticationService.logout().subscribe(
-      data => data,
-      error => console.log(error),
-      () => this.appRoutingService.redirectToLoginPage());
-  }
-
-  uploadUserAccessKey($event) {
-    this.preloadModalInterval = setInterval(function () {
-      this.checkInfrastructureCreationProgress();
-    }.bind(this), 10000);
   }
 }
