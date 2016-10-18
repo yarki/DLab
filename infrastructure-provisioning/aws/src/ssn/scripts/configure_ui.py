@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
     print "Starting Self-Service(UI)"
     if not start_ss():
-        sys.exit(1)
+        logging.info('Failed to start UI')
+        sys.exit(0)
 
     sys.exit(0)
