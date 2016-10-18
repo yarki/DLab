@@ -3,6 +3,7 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.dto.ResourceDTO;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
@@ -31,14 +32,14 @@ public class ExploratoryResource implements DockerCommands {
 
     @Path("/terminate")
     @POST
-    public String terminate(String user, String notebook) throws IOException, InterruptedException {
+    public String terminate(ResourceDTO exploratoryEnv) throws IOException, InterruptedException {
         LOGGER.debug("terminating emr cluster");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(String.format(TERMINATE_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
-                user, // conf_service_base_name
-                user, // notebook_user_name
-                "creds_region",
-                notebook, // notebook_instance_name
+                exploratoryEnv.getUser(), // conf_service_base_name
+                exploratoryEnv.getUser(), // notebook_user_name
+                exploratoryEnv.getRegion(), // creds_region
+                exploratoryEnv.getName(), // notebook_instance_name
                 configuration.getAdminKey(), // creds_key_name
                 configuration.getEdgeImage()));
         return uuid;

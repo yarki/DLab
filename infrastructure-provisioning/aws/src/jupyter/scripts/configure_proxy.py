@@ -43,7 +43,7 @@ if __name__ == "__main__":
     env.host_string = 'ubuntu@' + args.hostname
     deeper_config = json.loads(args.additional_config)
 
-    print "Enabling proxy for notebook server for repositories access."
+    print "Enabling proxy for user server for repositories access."
     enable_proxy(deeper_config['proxy_host'], deeper_config['proxy_port'])
 
     print "Renewing gpg key"

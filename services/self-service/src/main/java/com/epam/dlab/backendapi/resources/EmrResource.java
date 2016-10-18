@@ -2,7 +2,9 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.rest.EmrAPI;
+import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.dto.ResourceDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -27,6 +29,8 @@ public class EmrResource implements EmrAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmrResource.class);
 
     @Inject
+    private SettingsDAO dao;
+    @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
@@ -34,6 +38,10 @@ public class EmrResource implements EmrAPI {
     @Path("/terminate")
     public String post(@Auth UserInfo userInfo, String emr) {
         LOGGER.debug("terminating emr {}", userInfo.getName());
-        return provisioningService.post(EMR_TERMINATE, userInfo.getName(), emr, String.class);
+        ResourceDTO emrCluster = new ResourceDTO()
+                .withName(emr)
+                .withUser(userInfo.getName())
+                .withRegion(dao.getAwsRegion());
+        return provisioningService.post(EMR_TERMINATE, emrCluster, String.class);
     }
 }

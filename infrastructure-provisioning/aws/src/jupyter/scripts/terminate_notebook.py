@@ -41,7 +41,7 @@ def terminate_emr(cluster_id, bucket_name):
     clean_s3(bucket_name, emr_name)
 
 
-# Function for terminating any EC2 instances inc notebook servers
+# Function for terminating any EC2 instances inc user servers
 def remove_nb(tag_name, nb_tag_value):
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
@@ -54,7 +54,7 @@ def remove_nb(tag_name, nb_tag_value):
             client.terminate_instances(InstanceIds=[instance.id])
             waiter = client.get_waiter('instance_terminated')
             waiter.wait(InstanceIds=[instance.id])
-            print "The notebook instance " + instance.id + " has been deleted successfully"
+            print "The user instance " + instance.id + " has been deleted successfully"
     except:
         sys.exit(1)
 
@@ -71,6 +71,6 @@ if __name__ == "__main__":
         print 'Terminating EMR cluster and cleaning EMR config from S3 bucket'
         terminate_emr(cluster_id, args.bucket_name)
 
-    print "Removing notebook"
+    print "Removing user"
     remove_nb(args.tag_name, args.nb_tag_value)
 

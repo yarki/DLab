@@ -26,28 +26,28 @@ if __name__ == "__main__":
     notebooks = []
     nbs_list = get_ec2_list(args.service_base_name)
     for i in nbs_list:
-        notebook = {}
-        notebook['Id'] = i.id
+        user = {}
+        user['Id'] = i.id
         for tag in i.tags:
             if tag['Key'] == 'Name':
-                notebook['Name'] = tag['Value']
-        notebook['Shape'] = i.instance_type
-        notebook['Status'] = i.state['Name']
-        emr_list = get_emr_list(notebook['Name'], 'Value')
+                user['Name'] = tag['Value']
+        user['Shape'] = i.instance_type
+        user['Status'] = i.state['Name']
+        emr_list = get_emr_list(user['Name'], 'Value')
         resources = []
         for j in emr_list:
             emr = {}
             emr['id'] = j
             emr['status'] =  get_emr_info(j, 'Status')['State']
             counter = 0
-            for instance in get_ec2_list('Notebook', notebook['Name']):
+            for instance in get_ec2_list('Notebook', user['Name']):
                 counter +=1
                 emr['shape'] = instance.instance_type
             emr['nodes_count'] = counter
             emr['type'] =  get_emr_info(j, 'ReleaseLabel')
             resources.append(emr)
-        notebook['computeresources'] = resources
-        notebooks.append(notebook)
+        user['computeresources'] = resources
+        notebooks.append(user)
 
     edge['Notebooks'] = notebooks
     data.append(edge)

@@ -46,7 +46,7 @@ def clean_s3(bucket_name, emr_name):
         sys.exit(1)
 
 
-# Function for removing notebook's local kernels
+# Function for removing user's local kernels
 def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
     ec2 = boto3.resource('ec2')
     instances = ec2.instances.filter(
@@ -77,6 +77,6 @@ if __name__ == "__main__":
     print 'Cleaning EMR config from S3 bucket'
     clean_s3(args.bucket_name, args.emr_name)
 
-    print "Removing notebook's EMR kernels"
+    print "Removing user's EMR kernels"
     remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path)
 

@@ -2,7 +2,9 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
+import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.dto.ResourceDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -27,20 +29,30 @@ public class ExploratoryResource implements ExploratoryAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
 
     @Inject
+    private SettingsDAO dao;
+    @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
     @POST
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, String notebook) {
-        LOGGER.debug("terminating exploratory {}", userInfo.getName());
-        return provisioningService.post(EXPLORATORY_TERMINATE, userInfo.getName(), notebook, String.class);
+        LOGGER.debug("terminating exploratory environment {}", userInfo.getName());
+        ResourceDTO exploratoryEnv = new ResourceDTO()
+                .withName(notebook)
+                .withUser(userInfo.getName())
+                .withRegion(dao.getAwsRegion());
+        return provisioningService.post(EXPLORATORY_TERMINATE, exploratoryEnv, String.class);
     }
 
     @POST
     @Path("/stop")
     public String stop(@Auth UserInfo userInfo, String notebook) {
-        LOGGER.debug("stop exploratory {}", userInfo.getName());
-        return provisioningService.post(EXPLORATORY_STOP, userInfo.getName(), notebook, String.class);
+        LOGGER.debug("stopping exploratory environment {}", userInfo.getName());
+        ResourceDTO exploratoryEnv = new ResourceDTO()
+                .withName(notebook)
+                .withUser(userInfo.getName())
+                .withRegion(dao.getAwsRegion());
+        return provisioningService.post(EXPLORATORY_STOP, exploratoryEnv, String.class);
     }
 }

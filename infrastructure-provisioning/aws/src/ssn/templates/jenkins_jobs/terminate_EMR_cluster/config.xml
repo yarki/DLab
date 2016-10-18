@@ -4,7 +4,7 @@
   <description>This job:&#xd;
 - terminates emr cluster&#xd;
 - cleans up s3 bucket&#xd;
-- removes notebook&apos;s kernels</description>
+- removes user&apos;s kernels</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -26,7 +26,7 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>Notebook_Name</name>
-          <description>name of the notebook, EMR is linked to.</description>
+          <description>name of the user, EMR is linked to.</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
