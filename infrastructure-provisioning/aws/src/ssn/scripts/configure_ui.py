@@ -91,15 +91,17 @@ if __name__ == "__main__":
 
     print "Installing MongoDB"
     if not ensure_mongo():
+        logging.info('Failed to install MongoDB')
         sys.exit(1)
 
     print "Configuring MongoDB"
     if not configure_mongo():
+        logging.info('MongoDB configuration script has failed.')
         sys.exit(1)
 
     print "Starting Self-Service(UI)"
     if not start_ss():
         logging.info('Failed to start UI')
-        sys.exit(0)
+        sys.exit(1)
 
     sys.exit(0)
