@@ -227,10 +227,10 @@ def run():
     except:
         remove_role('edge', os.environ['edge_user_name'])
         remove_role('notebook', os.environ['edge_user_name'])
+        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         remove_sgroups(edge_conf['instance_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_s3('edge')
-        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         sys.exit(1)
 
     try:
@@ -250,10 +250,10 @@ def run():
     except:
         remove_role('edge', os.environ['edge_user_name'])
         remove_role('notebook', os.environ['edge_user_name'])
+        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         remove_sgroups(edge_conf['instance_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_s3('edge')
-        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         sys.exit(1)
 
     try:
@@ -273,10 +273,10 @@ def run():
     except:
         remove_role('edge', os.environ['edge_user_name'])
         remove_role('notebook', os.environ['edge_user_name'])
+        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         remove_sgroups(edge_conf['instance_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_s3('edge')
-        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         sys.exit(1)
 
     try:
@@ -297,10 +297,10 @@ def run():
     except:
         remove_role('edge', os.environ['edge_user_name'])
         remove_role('notebook', os.environ['edge_user_name'])
+        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         remove_sgroups(edge_conf['instance_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_s3('edge')
-        remove_ec2(edge_conf['service_base_name'], edge_conf['instance_name'])
         sys.exit(1)
 
     sys.exit(0)
