@@ -13,18 +13,6 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 args = parser.parse_args()
 
 
-def cp_key():
-    try:
-        key_name = args.keyfile.split("/")
-        sudo('mkdir -p /home/ubuntu/keys')
-        sudo('chown -R ubuntu:ubuntu /home/ubuntu/keys')
-        local('scp -r -q -i {0} {0} {1}:/home/ubuntu/keys/{2}'.format(args.keyfile, env.host_string, key_name[-1]))
-        sudo('chmod 600 /home/ubuntu/keys/*.pem')
-    except:
-        print "Unable to copy SSH key."
-        sys.exit(1)
-
-
 def configure_http_proxy_server(config):
     try:
         if not exists('/tmp/http_proxy_ensured'):
@@ -58,9 +46,6 @@ if __name__ == "__main__":
         deeper_config = json.loads(args.additional_config)
     except:
         sys.exit(2)
-
-    print "Copying key."
-    cp_key()
 
     print "Installing proxy for notebooks."
     if configure_http_proxy_server(deeper_config):
