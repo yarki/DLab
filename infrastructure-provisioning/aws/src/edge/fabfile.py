@@ -51,7 +51,7 @@ def run():
     # Base config
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['key_name'] = os.environ['creds_key_name']
-    edge_conf['user_keyname'] = os.environ['user_keyname']
+    edge_conf['user_keyname'] = os.environ['edge_user_name']
     edge_conf['policy_arn'] = os.environ['conf_policy_arn']
     edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
     edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
