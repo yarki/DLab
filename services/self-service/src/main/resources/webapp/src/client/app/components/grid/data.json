@@ -1,0 +1,31 @@
+{
+  "resources": [{
+    "ENVIRONMENT_NAME": "Jupiter",
+    "STATUS": "Running",
+    "SHAPE": "M4.xlarge",
+    "COMPUTATIONAL_RESOURCES": []
+  }, {
+    "ENVIRONMENT_NAME": "Jupiter + Spark lib box",
+    "STATUS": "Stopped",
+    "SHAPE": "R3.xlarge",
+    "COMPUTATIONAL_RESOURCES": [
+      ["EMR cluster 20 nodes"],
+      ["EMR cluster 5 nodes"]
+    ]
+  }, {
+    "ENVIRONMENT_NAME": "Jupiter + test lib2 box",
+    "STATUS": "Creating",
+    "SHAPE": "R4.xlarge",
+    "COMPUTATIONAL_RESOURCES": [
+      ["EMR cluster 20 nodes"],
+      ["EMR cluster 5 nodes"],
+      ["EMR cluster 12 nodes"],
+      ["EMR cluster 3 nodes"]
+    ]
+  }, {
+    "ENVIRONMENT_NAME": "Empty box",
+    "STATUS": "Creating",
+    "SHAPE": "M3.xlarge",
+    "COMPUTATIONAL_RESOURCES": []
+  }]
+}

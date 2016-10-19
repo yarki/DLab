@@ -10,4 +10,9 @@ import {Component, Input, Output} from "@angular/core";
 export class ResourcesList {
   @Input() resources: any[];
 
+  collapse: boolean = false;
+
+  toggleResourceList() {
+    this.collapse = !this.collapse;
+  }
 }

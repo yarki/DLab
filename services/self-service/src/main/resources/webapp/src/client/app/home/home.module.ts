@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 
 import { HomeComponent } from './home.component';
 import { AuthenticationService } from './../security/authentication.service';
-import { EnvironmentsService } from './home.service';
+
+import { EnvironmentsService } from './../services/environments.service';
 
 import { ModalModule } from './../components/modal/index';
-import { ResourcesModule } from './../components/list-of-resources/index';
+import { GridModule } from './../components/grid/index';
 
 @NgModule({
-  imports: [CommonModule, ModalModule, ResourcesModule],
+  imports: [CommonModule, ModalModule, GridModule],
   declarations: [HomeComponent],
   exports: [HomeComponent],
   providers: [AuthenticationService, EnvironmentsService]

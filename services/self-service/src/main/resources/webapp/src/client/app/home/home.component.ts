@@ -5,10 +5,7 @@ import { Observable }     from 'rxjs/Observable';
 
 import { AuthenticationService } from './../security/authentication.service';
 import { UserProfileService } from "../security/userProfile.service";
-import { EnvironmentsService } from './home.service';
 //import { ModalModule } from './../components/modal/index';
-
-import { ResourcesList } from '../components/list-of-resources/resources.component';
 
 @Component({
   moduleId: module.id,
@@ -22,9 +19,6 @@ export class HomeComponent implements OnInit {
   key: any;
   keyStatus: number;
 
-  environments: any;
-  collapse: boolean = false;
-
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
 
@@ -32,8 +26,7 @@ export class HomeComponent implements OnInit {
     private http: Http,
     private authenticationService: AuthenticationService,
     private router: Router,
-    private userProfileService: UserProfileService,
-    private environmentsService: EnvironmentsService
+    private userProfileService: UserProfileService
     ) {}
 
    logout() {
@@ -55,10 +48,6 @@ export class HomeComponent implements OnInit {
         this.keyUploadModal.open({isFooter: false});
       }
     );
-
-    this.environmentsService.getEnvironmentsList().subscribe((list) => {
-      this.environments = list['resources'];
-    });
   }
 
   uploadingKey(event) {
@@ -72,12 +61,6 @@ export class HomeComponent implements OnInit {
   checkKey() {
     return this.http.get(`/api/keyloader=?access_token=${this.userProfileService.getAuthToken()}`).map(( res:Response ) => res.json());
   }
-
-  toggleResourceList() {
-    console.log('toggle');
-    this.collapse = !this.collapse;
-  }
-
 
 
 
