@@ -38,10 +38,10 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
 
     @POST
     @Path("/login")
-    public String login(UserCredentialDTO credential) {
+    public Response login(UserCredentialDTO credential) {
         LOGGER.debug("Try login user = {}", credential.getUsername());
         dao.writeLoginAttempt(credential);
-        return securityService.post(LOGIN, credential, String.class);
+        return securityService.post(LOGIN, credential, Response.class);
     }
 
     @POST

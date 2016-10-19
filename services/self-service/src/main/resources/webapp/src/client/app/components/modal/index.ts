@@ -31,19 +31,16 @@ export class ModalFooter {
     ],
     declarations: [
         Modal,
-        //RouteModal,
         ModalHeader,
         ModalContent,
         ModalFooter,
     ],
     exports: [
         Modal,
-        //RouteModal,
         ModalHeader,
         ModalContent,
         ModalFooter,
     ],
 })
 export class ModalModule {
-
 }

@@ -12,4 +12,9 @@ export class AppRoutingService {
     if(this.router.url != "/login")
       this.router.navigate(['/login']);
   }
+
+  redirectToHomePage()
+  {
+    this.router.navigate(['/dashboard']);
+  }
 }

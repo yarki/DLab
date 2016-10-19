@@ -13,9 +13,8 @@ import {AppRoutingService} from "../routing/appRouting.service";
 
 export class HomeComponent implements OnInit {
   key: any;
-  keyStatus: number;
   uploadAccessKeyUrl : string;
-
+  preloadModalInterval:any;
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
 
@@ -39,12 +38,34 @@ export class HomeComponent implements OnInit {
   //
   // Handlers
   //
-  checkInfrastructureCreationProgress()
+
+  logout_btnClick() {
+    this.authenticationService.logout().subscribe(
+      () => this.appRoutingService.redirectToLoginPage(),
+      error => console.log(error),
+      () => this.appRoutingService.redirectToLoginPage());
+  }
+
+  uploadUserAccessKey_btnClick($event) {
+    this.preloadModalInterval = setInterval(function () {
+      this.checkInfrastructureCreationProgress();
+    }.bind(this), 10000);
+  }
+
+  //
+  // Private Methods
+  //
+
+  private checkInfrastructureCreationProgress()
   {
     this.userAccessKeyProfileService.checkUserAccessKey()
       .subscribe(
         data => {
-          this.key = data;
+          if(this.preloaderModal.isOpened)
+          {
+            this.preloaderModal.close();
+            clearInterval(this.preloadModalInterval);
+          }
         },
         err => {
           if(err.status == 404) // key haven't been uploaded
@@ -61,18 +82,5 @@ export class HomeComponent implements OnInit {
           }
         }
       );
-  }
-
-  logout() {
-    this.authenticationService.logout().subscribe(
-      data => data,
-      error => console.log(error),
-      () => this.appRoutingService.redirectToLoginPage());
-  }
-
-  uploadUserAccessKey($event) {
-    setTimeout(function () {
-      this.checkInfrastructureCreationProgress();
-    }.bind(this), 10000);
   }
 }
