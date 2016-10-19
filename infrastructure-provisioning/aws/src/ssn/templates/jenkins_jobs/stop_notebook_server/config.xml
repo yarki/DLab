@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>This job terminates notebook server and all EMRs which are linked to it</description>
+  <description>This job stops notebook server.</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -13,7 +13,7 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>Notebook_Name</name>
-          <description>name of the notebook, EMR is linked to.</description>
+          <description>name of the notebook to stop</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -23,7 +23,7 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
-          <description>Key name at AWS to be used for accessing Jupyter</description>
+          <description>AWS admin key name</description>
           <defaultValue>BDCC-DSS-POC</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
@@ -41,7 +41,7 @@
           <description></description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
-              <string>terminate</string>
+              <string>stop</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>

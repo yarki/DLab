@@ -41,20 +41,20 @@ def terminate_emr(cluster_id, bucket_name):
     clean_s3(bucket_name, emr_name)
 
 
-# Function for terminating any EC2 instances inc notebook servers
-def remove_nb(tag_name, nb_tag_value):
+# Function for stopping any EC2 instances inc notebook servers
+def stop_nb(tag_name, nb_tag_value):
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
     try:
         notebook_instances = ec2.instances.filter(
-            Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped', 'pending', 'stopping']},
+            Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'pending']},
                      {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
         for instance in notebook_instances:
             print("ID: ", instance.id)
-            client.terminate_instances(InstanceIds=[instance.id])
-            waiter = client.get_waiter('instance_terminated')
+            client.stop_instances(InstanceIds=[instance.id])
+            waiter = client.get_waiter('instance_stopped')
             waiter.wait(InstanceIds=[instance.id])
-            print "The notebook instance " + instance.id + " has been terminated successfully"
+            print "The notebook instance " + instance.id + " has been stopped successfully"
     except:
         sys.exit(1)
 
@@ -71,6 +71,6 @@ if __name__ == "__main__":
         print 'Terminating EMR cluster and cleaning EMR config from S3 bucket'
         terminate_emr(cluster_id, args.bucket_name)
 
-    print "Removing notebook"
-    remove_nb(args.tag_name, args.nb_tag_value)
+    print "stopping notebook"
+    stop_nb(args.tag_name, args.nb_tag_value)
 
