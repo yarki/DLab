@@ -40,7 +40,7 @@ def ensure_libraries_py2():
     if not exists('/home/ubuntu/.ensure_dir/ensure_libraries_py2_installed'):
         try:
             sudo('export LC_ALL=C')
-            sudo('apt-get install zlib1g-dev')
+            sudo('apt-get install -y libjpeg8-dev zlib1g-dev')
             sudo('pip2 install boto boto3')
             sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
             sudo('touch /home/ubuntu/.ensure_dir/ensure_libraries_py2_installed')
