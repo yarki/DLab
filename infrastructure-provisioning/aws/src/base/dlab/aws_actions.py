@@ -56,12 +56,15 @@ def create_endpoint(vpc_id, service_name, tag):
 
 def create_tag(resource, tag):
     ec2 = boto3.client('ec2')
-    ec2.create_tags(
-        Resources = resource,
-        Tags = [
-            json.loads(tag)
-        ]
-    )
+    try:
+        ec2.create_tags(
+            Resources = resource,
+            Tags = [
+                json.loads(tag)
+            ]
+        )
+    except botocore.exceptions.ClientError as err:
+        print err.response['Error']['Message']
 
 
 def create_subnet(vpc_id, subnet, tag):
