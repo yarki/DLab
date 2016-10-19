@@ -16,7 +16,7 @@ import {AppRoutingService} from "../routing/appRouting.service";
 export class LoginComponent {
   model = new LoginModel ('', '');
   error = '';
-
+  loading = false;
   //
   // Override
   //
@@ -35,17 +35,25 @@ export class LoginComponent {
   //
 
   login_btnClick() {
+    this.error = '';
+    this.loading = true;
+
     this.authenticationService
       .login(this.model.username, this.model.password)
       .subscribe((result) => {
+
         if (result) {
           this.appRoutingService.redirectToHomePage();
           return true;
         } else {
           this.error = 'Username or password is incorrect.';
+          this.loading = false;
         }
 
         return false;
-      }, (error) => this.error = 'System failure. Please contact administrator.');
+      }, (error) => {
+        this.error = 'System failure. Please contact administrator.';
+        this.loading = false;
+      });
   }
 }
