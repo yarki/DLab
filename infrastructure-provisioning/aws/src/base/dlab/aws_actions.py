@@ -49,7 +49,6 @@ def create_endpoint(vpc_id, service_name):
         return response
 
 
-
 def create_subnet(vpc_id, subnet, tag):
     ec2 = boto3.resource('ec2')
     subnet = ec2.create_subnet(VpcId=vpc_id, CidrBlock=subnet)
@@ -105,6 +104,32 @@ def create_attach_policy(policy_name, role_name, file_path):
     with open(file_path, 'r') as myfile:
         json = myfile.read()
     conn.put_role_policy(role_name, policy_name, json)
+
+
+def remove_ec2(tag_name, nb_tag_value):
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped', 'pending', 'stopping']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
+    for instance in instances:
+        print("ID: ", instance.id)
+        client.terminate_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_terminated')
+        waiter.wait(InstanceIds=[instance.id])
+
+
+def stop_ec2(tag_name, nb_tag_value):
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'pending']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
+    for instance in instances:
+        print("ID: ", instance.id)
+        client.stop_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_stopped')
+        waiter.wait(InstanceIds=[instance.id])
 
 
 def remove_role(scientist, instance_type):
