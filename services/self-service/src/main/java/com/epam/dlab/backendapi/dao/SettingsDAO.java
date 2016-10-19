@@ -9,10 +9,9 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  * Created by Maksym_Pendyshchuk on 10/18/2016.
  */
 public class SettingsDAO extends BaseDAO {
-    private static String NAME = "name";
-    private static String VALUE = "value";
+    private static final String VALUE = "value";
 
     public String getAwsRegion() {
-        return mongoService.getCollection(SETTINGS).find(eq(NAME, AWS_REGION)).first().getOrDefault(VALUE, EMPTY).toString();
+        return mongoService.getCollection(SETTINGS).find(eq(ID, AWS_REGION)).first().getOrDefault(VALUE, EMPTY).toString();
     }
 }
