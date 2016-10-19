@@ -12,6 +12,7 @@ import {AppRoutingService} from "../routing/appRouting.service";
   styleUrls: ['./login.component.css'],
   providers: [AuthenticationService, UserProfileService]
 })
+
 export class LoginComponent {
   model = new LoginModel ('', '');
   error = '';
@@ -41,10 +42,10 @@ export class LoginComponent {
           this.appRoutingService.redirectToHomePage();
           return true;
         } else {
-          this.error = 'Username or password is incorrect';
+          this.error = 'Username or password is incorrect.';
         }
 
         return false;
-      });
+      }, (error) => this.error = 'System failure. Please contact administrator.');
   }
 }
