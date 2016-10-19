@@ -51,7 +51,7 @@ def run():
     # Base config
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['key_name'] = os.environ['creds_key_name']
-    edge_conf['user_keyname'] = os.environ['user_keyname']
+    edge_conf['user_keyname'] = os.environ['edge_user_name']
     edge_conf['policy_arn'] = os.environ['conf_policy_arn']
     edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
     edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
@@ -283,7 +283,7 @@ def run():
         print '[INSTALLING USERs KEY]'
         logging.info('[INSTALLING USERs KEY]')
         additional_config = {"user_keyname": edge_conf['user_keyname'],
-                             "user_keydir": "/root/keys/.ssh/"}
+                             "user_keydir": "/root/keys/"}
         params = "--hostname {} --keyfile {} --additional_config '{}'".format(
             instance_hostname, keyfile_name, json.dumps(additional_config))
         if not run_routine('install_user_key', params):

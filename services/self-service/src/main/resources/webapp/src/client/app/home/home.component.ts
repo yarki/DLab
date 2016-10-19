@@ -1,9 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Http, Response } from '@angular/http';
-import { Observable }     from 'rxjs/Observable';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthenticationService } from './../security/authentication.service';
-import { UserProfileService } from "../security/userProfile.service";
+import {UserAccessKeyService} from "../services/userAccessKey.service";
+import {AppRoutingService} from "../routing/appRouting.service";
 
 @Component({
   moduleId: module.id,
@@ -15,54 +13,74 @@ import { UserProfileService } from "../security/userProfile.service";
 
 export class HomeComponent implements OnInit {
   key: any;
-  keyStatus: number;
+  uploadAccessKeyUrl : string;
+  preloadModalInterval:any;
+  @ViewChild('keyUploadModal') keyUploadModal;
+  @ViewChild('preloaderModal') preloaderModal;
 
-  constructor(private http: Http, private authenticationService: AuthenticationService, private router: Router, private userProfileService : UserProfileService) {}
+  // -------------------------------------------------------------------------
+  // Overrides
+  // --
 
-   logout() {
-     this.authenticationService.logout().subscribe(
-       data => data,
-       err => console.log(err),
-       () => this.router.navigate(['/login']));
-   }
-
+  constructor(
+    private authenticationService: AuthenticationService,
+    private userAccessKeyProfileService: UserAccessKeyService,
+    private appRoutingService : AppRoutingService
+  )
+  {
+    this.uploadAccessKeyUrl = this.userAccessKeyProfileService.getAccessKeyUrl();
+  }
 
   ngOnInit() {
-    this.getMethod()
-    .subscribe(
-      data => {
-        this.key = data;
-      },
-      err => {
-        this.keyStatus = err.status;
-        this.openModal('.upload_key');
-      }
-    );
+    this.checkInfrastructureCreationProgress();
   }
 
-  uploadKey(event) {
-    this.uploadPreloader();
+  //
+  // Handlers
+  //
+
+  logout_btnClick() {
+    this.authenticationService.logout().subscribe(
+      () => this.appRoutingService.redirectToLoginPage(),
+      error => console.log(error),
+      () => this.appRoutingService.redirectToLoginPage());
   }
 
-  uploadPreloader() {
-    this.openModal('.loading_modal');
-    setTimeout(function () {
-      this.closeModal('.loading_modal');
+  uploadUserAccessKey_btnClick($event) {
+    this.preloadModalInterval = setInterval(function () {
+      this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
   }
 
-  getMethod() {
-    return this.http.get(`/api/keyloader=?access_token=${this.userProfileService.getAuthToken()}`).map(( res:Response ) => res.json());
-  }
+  //
+  // Private Methods
+  //
 
-  openModal(className: string) {
-    [].forEach.call(document.querySelectorAll('.modal'), function(modal) {
-      modal.setAttribute('open', '');
-    });
-    document.querySelector(className).setAttribute('open', 'true');
-  }
+  private checkInfrastructureCreationProgress()
+  {
+    this.userAccessKeyProfileService.checkUserAccessKey()
+      .subscribe(
+        data => {
+          if(this.preloaderModal.isOpened)
+          {
+            this.preloaderModal.close();
+            clearInterval(this.preloadModalInterval);
+          }
+        },
+        err => {
+          if(err.status == 404) // key haven't been uploaded
+          {
+            if(!this.keyUploadModal.isOpened)
+              this.keyUploadModal.open({isFooter: false});
+          } else if (err.status == 406) // key is being uploaded in progress
+          {
+            if(this.keyUploadModal.isOpened)
+              this.keyUploadModal.close();
 
-  closeModal(className: string) {
-    document.querySelector(className).setAttribute('open', '');
+            if(!this.preloaderModal.isOpened)
+              this.preloaderModal.open({isHeader: false, isFooter: false});
+          }
+        }
+      );
   }
 }
