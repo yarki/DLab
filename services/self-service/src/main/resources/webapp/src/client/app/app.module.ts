@@ -19,6 +19,7 @@ import {UserProfileService} from "./security/userProfile.service";
 import {FormsModule} from "@angular/forms";
 import {UserAccessKeyService} from "./services/userAccessKey.service";
 import {AppRoutingService} from "./routing/appRouting.service";
+import {UserResourceService} from "./services/userResource.service";
 
 @NgModule({
   imports: [BrowserModule, HttpModule, RouterModule.forRoot(routes, { useHash: true }), LoginModule, HomeModule, FormsModule],
@@ -33,7 +34,9 @@ import {AppRoutingService} from "./routing/appRouting.service";
     WebRequestHelper,
     UserProfileService,
     UserAccessKeyService,
-    AppRoutingService],
+    AppRoutingService,
+    UserResourceService
+    ],
   bootstrap: [AppComponent]
 
 })

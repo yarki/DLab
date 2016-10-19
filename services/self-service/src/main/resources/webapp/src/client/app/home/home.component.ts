@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthenticationService } from './../security/authentication.service';
 import {UserAccessKeyService} from "../services/userAccessKey.service";
+import {UserResourceService} from "../services/userResource.service";
 import {AppRoutingService} from "../routing/appRouting.service";
+import {Http, Response} from '@angular/http';
 
 @Component({
   moduleId: module.id,
@@ -14,7 +16,12 @@ import {AppRoutingService} from "../routing/appRouting.service";
 export class HomeComponent implements OnInit {
   key: any;
   uploadAccessKeyUrl : string;
-  preloadModalInterval:any;
+  preloadModalInterval: any;
+
+  templatesList: any;
+
+
+
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
 
@@ -25,7 +32,9 @@ export class HomeComponent implements OnInit {
   constructor(
     private authenticationService: AuthenticationService,
     private userAccessKeyProfileService: UserAccessKeyService,
-    private appRoutingService : AppRoutingService
+    private userResourceService: UserResourceService,
+    private appRoutingService : AppRoutingService,
+    private http: Http
   )
   {
     this.uploadAccessKeyUrl = this.userAccessKeyProfileService.getAccessKeyUrl();
@@ -64,6 +73,8 @@ export class HomeComponent implements OnInit {
           }
         }
       );
+
+    this.initAnalyticSelectors();
   }
 
   logout() {
@@ -78,4 +89,15 @@ export class HomeComponent implements OnInit {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
   }
+
+  initAnalyticSelectors() {
+    this.userResourceService.getTemplates()
+      .subscribe (
+        data => {
+          this.templatesList = data;
+        }
+      );
+    
+  }
+
 }

@@ -1,7 +1,3 @@
-div.modal
-{
-  position: relative;
-}
 .modal-dialog {
   width: 525px;
 }
@@ -46,10 +42,6 @@ div.modal
 }
 .modal .btn-success {
   margin-left: 40px;
-}
-.modal .btn {
-  min-width: 140px;
-  margin-top: 20px;
 }
 .modal-content {
   border-radius: 3px;
@@ -110,7 +102,10 @@ div.modal
 
 .modal .btn {
   padding: 6px 15px;
-  min-width: 141px;
+  min-width: 140px;
+}
+.modal-footer .btn {
+  margin-top: 0;
 }
 .modal .btn-file {
   position: relative;
