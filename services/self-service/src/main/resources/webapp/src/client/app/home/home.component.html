@@ -41,12 +41,51 @@
     <th class="th_resources">Computational resources</th>
     <th class="th_actions">ACTIONS</th>
   </tr>
-  <tr>
+
+  <!--<tr>
     <td>To start working, please, create new environment</td>
     <td></td>
     <td></td>
     <td></td>
     <td></td>
+  </tr>-->
+
+  <tr *ngFor="let item of environments">
+    <td>{{item.ENVIRONMENT_NAME}}</td>
+    <td class="{{item.STATUS.toLowerCase()}}">{{item.STATUS}}</td>
+    <td>{{item.SHAPE}}</td>
+    <td>
+
+      <expanded-grid [resources]="item.COMPUTATIONAL_RESOURCES"></expanded-grid>
+
+
+      <span *ngIf="item.COMPUTATIONAL_RESOURCES.length" class="glyphicon glyphicon-remove"></span>
+      <span *ngIf="!item.COMPUTATIONAL_RESOURCES.length" class="no_details">no details</span>
+      {{item.COMPUTATIONAL_RESOURCES[0]}}
+      <span *ngIf="item.COMPUTATIONAL_RESOURCES.length"
+            class="glyphicon pull-right"
+            [ngClass]="{'glyphicon-triangle-bottom': !collapse, 'glyphicon-triangle-top': collapse}"
+            (click)="toggleResourceList()"></span>
+
+      <div  *ngIf="collapse">
+        <div *ngFor="let resource of item.COMPUTATIONAL_RESOURCES | slice:1">
+          <span class="glyphicon glyphicon-remove"></span>
+          {{resource}}
+        </div>
+      </div>
+    </td>
+    <td>
+      <div class="dropdown">
+        <span  data-toggle="dropdown" class="glyphicon glyphicon-cog"></span>
+        <div class="dropdown-menu">
+          <ul class=list-unstyled>
+            <li>Stop</li>
+            <li>Terminate</li>
+            <li>Deploy EMR</li>
+          </ul>
+        </div>
+      </div>
+    </td>
   </tr>
   <!-- <tr>
     <td>Jupiter box</td>
