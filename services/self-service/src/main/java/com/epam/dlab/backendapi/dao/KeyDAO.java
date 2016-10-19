@@ -6,6 +6,8 @@ import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.bson.Document;
 
+import java.io.IOException;
+
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_AWS_CREDENTIALS;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_KEYS;
 import static com.mongodb.client.model.Filters.eq;
@@ -25,8 +27,13 @@ public class KeyDAO extends BaseDAO {
         mongoService.getCollection(USER_KEYS).updateOne(eq(ID, user), set(STATUS, status));
     }
 
-    public void saveCredential(UserAWSCredentialDTO credential) throws JsonProcessingException {
-        insertOne(USER_AWS_CREDENTIALS, credential);
+    public void saveCredential(String user, UserAWSCredentialDTO credential) throws JsonProcessingException {
+        insertOne(USER_AWS_CREDENTIALS, credential, user);
+    }
+
+    public UserAWSCredentialDTO findCredential(String user) throws IOException {
+        Document document = mongoService.getCollection(USER_AWS_CREDENTIALS).find(eq(ID, user)).first();
+        return MAPPER.readValue(document.toString(), UserAWSCredentialDTO.class);
     }
 
     public KeyLoadStatus findKeyStatus(UserInfo userInfo) {

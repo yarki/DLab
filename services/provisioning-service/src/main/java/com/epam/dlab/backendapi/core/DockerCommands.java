@@ -11,12 +11,11 @@ import java.util.UUID;
 public interface DockerCommands {
     String JSON_EXTENTION = ".json";
     String GET_IMAGES = "docker images | awk '{print $1\":\"$2}' | sort | uniq | grep \"dlab\" | grep -v \"none\" | grep -v \"edge\"";
-    String DOCKER_BASE = "docker run -v %s:/root/keys -v %s:/response -e \"request_id=%s\" -t ";
+    String DOCKER_BASE = "docker run -v %s:/root/keys -v %s:/response -e \"request_id=%s\" ";
     String GET_IMAGE_METADATA = DOCKER_BASE + "%s --action describe";
     String CREATE_EDGE_METADATA = DOCKER_BASE + "-e \"creds_key_name=%s\" " +
             "-e \"conf_service_base_name=%s\" " +
             "-e \"edge_user_name=%s\" " +
-            "-e \"user_keyname=%s\" " +
             "%s --action create";
     String RUN_IMAGE = DOCKER_BASE + "-e \"dry_run=true\" %s --action run";
     String TERMINATE_COMPUTATIONAL_RESOURCES = DOCKER_BASE + "-e \"conf_service_base_name=%s\" " +
@@ -31,6 +30,19 @@ public interface DockerCommands {
             "-e \"notebook_instance_name=%s\" " +
             "-e \"creds_key_name=%s\" " +
             "%s --action terminate";
+    String CREATE_EMR_CLUSTER = DOCKER_BASE +
+            "-e \"conf_service_base_name=%s\" " +
+            "-e \"emr_instance_count=%s\" " +
+            "-e \"emr_instance_type=%s\" " +
+            "-e \"emr_version=%s\" " +
+            "-e \"ec2_role=%s\" " +
+            "-e \"service_role=%s\" " +
+            "-e \"notebook_name=%s\" " +
+            "-e \"edge_user_name=%s\" " +
+            "-e \"edge_subnet_cidr=%s\" " +
+            "-e \"creds_region=%s\" " +
+            "-e \"creds_key_name=%s\" " +
+            "%s --action create";
     ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
     static String generateUUID() {

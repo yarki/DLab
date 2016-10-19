@@ -6,6 +6,10 @@ adminKey: BDCC-DSS-POC
 edgeImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-edge
 fileLengthCheckDelay: 500ms
 
+emrImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-emr
+emrEC2RoleDefault: EMR_EC2_DefaultRole
+emrServiceRoleDefault: EMR_DefaultRole
+
 selfService:
   protocol: http
   host: localhost

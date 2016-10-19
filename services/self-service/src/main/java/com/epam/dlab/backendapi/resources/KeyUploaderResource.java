@@ -67,7 +67,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
         dao.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
         if (result.isSuccess()) {
-            dao.saveCredential(result.getCredential());
+            dao.saveCredential(result.getUser(), result.getCredential());
         }
         return Response.ok().build();
     }
