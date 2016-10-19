@@ -18,7 +18,12 @@ export class UserResourceService {
 
   getShapesUrl() : string
   {
-    return `/api/docker?access_token=${this.userProfileService.getAuthToken()}`;
+    return `/api/usernotebook/shape?access_token=${this.userProfileService.getAuthToken()}`;
+  }
+
+  getCreateUsernotebookUrl() : string
+  {
+    return `/api/usernotebook/?access_token=${this.userProfileService.getAuthToken()}`;
   }
 
   getTemplates() 
@@ -27,9 +32,18 @@ export class UserResourceService {
       .map(( res:Response ) => res.json());
   }
 
-  // getShapes(){
-  //   return this.ResourceList.map((obj) => {
-  //     console.log(obj.);
-  //   })
-  // }
+  getShapes() 
+  {
+    return this.http.get(this.getShapesUrl())
+      .map(( res:Response ) => res.json());
+  }
+  createUsernotebook(data)
+  {  
+    let body = JSON.stringify(data);
+    let requestHeader = this.webRequestHelper.getJsonHeader();
+      return this.http.post(this.getCreateUsernotebookUrl(), body, { headers: requestHeader })
+        .map((res) => {
+          return res;
+      });
+  }
 }

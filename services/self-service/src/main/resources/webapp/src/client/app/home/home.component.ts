@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit {
   preloadModalInterval: any;
 
   templatesList: any;
+  shapesList: any;
 
 
 
@@ -42,12 +43,31 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.checkInfrastructureCreationProgress();
+    this.initAnalyticSelectors();
   }
 
   //
   // Handlers
   //
-  checkInfrastructureCreationProgress()
+
+  logout_btnClick() {
+    this.authenticationService.logout().subscribe(
+      () => this.appRoutingService.redirectToLoginPage(),
+      error => console.log(error),
+      () => this.appRoutingService.redirectToLoginPage());
+  }
+
+  uploadUserAccessKey_btnClick($event) {
+    this.preloadModalInterval = setInterval(function () {
+      this.checkInfrastructureCreationProgress();
+    }.bind(this), 10000);
+  }
+
+  //
+  // Private Methods
+  //
+
+  private checkInfrastructureCreationProgress()
   {
     this.userAccessKeyProfileService.checkUserAccessKey()
       .subscribe(
@@ -58,7 +78,7 @@ export class HomeComponent implements OnInit {
             clearInterval(this.preloadModalInterval);
           }
         },
-        err => { 
+        err => {
           if(err.status == 404) // key haven't been uploaded
           {
             if(!this.keyUploadModal.isOpened)
@@ -73,9 +93,8 @@ export class HomeComponent implements OnInit {
           }
         }
       );
-
-    this.initAnalyticSelectors();
   }
+
 
   logout() {
     this.authenticationService.logout().subscribe(
@@ -97,7 +116,20 @@ export class HomeComponent implements OnInit {
           this.templatesList = data;
         }
       );
-    
+    this.userResourceService.getShapes()
+      .subscribe (
+        data => {
+          this.shapesList = data;
+        }
+      );
   }
 
+  createUsernotebook(template, name, shape){
+    this.userResourceService
+      .createUsernotebook({template: template, name: name, shape: shape})
+      .subscribe((result) => {
+        console.log('result: ', result);
+      });
+      return false;
+  };
 }

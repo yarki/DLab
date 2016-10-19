@@ -61,7 +61,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	@Override
 	@POST
 	@Path("/login")
-	public String login(UserCredentialDTO credential) {
+	public Response login(UserCredentialDTO credential) {
 		String username = credential.getUsername();
 		String password = credential.getPassword();
 		String accessToken = credential.getAccessToken();
@@ -69,7 +69,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		UserInfo ui;
 
 		if (this.isAccessTokenAvailable(accessToken)) {
-			return accessToken;
+			return Response.ok(accessToken).build();
 		} else {
 			try (ReturnableConnection userRCon = new ReturnableConnection(usersPool)) {
 				LdapConnection userCon = userRCon.getConnection();
@@ -120,11 +120,11 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 
 			} catch (Exception e) {
 				log.error("LDAP error", e);
-				throw new WebApplicationException(e);
+				return Response.status(Response.Status.UNAUTHORIZED).build();
 			}
 			String token = getRandomToken();
 			rememberUserInfo(token, ui);
-			return token;
+			return Response.ok(token).build();
 		}
 	}
 
