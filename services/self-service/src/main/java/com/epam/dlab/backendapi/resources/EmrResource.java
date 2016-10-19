@@ -7,9 +7,8 @@ import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.ResourceDTO;
-import com.epam.dlab.dto.emr.EMRCreateDTO;
+import com.epam.dlab.dto.EMRCreateDTO;
 import com.google.inject.Inject;
-import com.google.inject.Key;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
@@ -45,7 +44,7 @@ public class EmrResource implements EmrAPI {
     @POST
     @Path("/create")
     public String create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) throws IOException {
-        LOGGER.debug("create emr {}", userInfo.getName());
+        LOGGER.debug("creating emr {}", userInfo.getName());
         EMRCreateDTO dto = new EMRCreateDTO();
         dto.setServiceBaseName(dao.getServiceBaseName());
         dto.setInstanceCount(formDTO.getInstanceCount());

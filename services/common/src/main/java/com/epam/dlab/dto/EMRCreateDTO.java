@@ -1,4 +1,4 @@
-package com.epam.dlab.dto.emr;
+package com.epam.dlab.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -4,7 +4,7 @@ import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.dto.ResourceDTO;
-import com.epam.dlab.dto.emr.EMRCreateDTO;
+import com.epam.dlab.dto.EMRCreateDTO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class EmrResource implements DockerCommands {
     public String terminateEmr(ResourceDTO emrCluster) throws IOException, InterruptedException {
         LOGGER.debug("terminating emr cluster");
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(String.format(TERMINATE_COMPUTATIONAL_RESOURCES, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
+        commandExecuter.executeAsync(String.format(TERMINATE_EMR_CLUSTER, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
                 emrCluster.getUser(), // conf_service_base_name
                 emrCluster.getUser(), // edge_user_name
                 emrCluster.getName(), // emr_cluster_name
