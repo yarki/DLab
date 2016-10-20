@@ -1,0 +1,12 @@
+.glyphicon-remove {
+  color: #f05141;
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: -5px;
+}
+.no_details {
+  color: #bdc9d5;
+}
+.source {
+  line-height: 30px;
+}
