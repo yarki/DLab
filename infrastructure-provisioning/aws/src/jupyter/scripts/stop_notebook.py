@@ -35,9 +35,10 @@ if __name__ == "__main__":
     except:
         sys.exit(1)
 
-    print "Terminating notebook"
+    print "Stopping notebook"
     try:
-        remove_ec2(args.tag_name, args.nb_tag_value)
+        stop_ec2(args.tag_name, args.nb_tag_value)
     except:
         sys.exit(1)
-    print "The notebook instance " + args.nb_tag_value + " has been terminated successfully"
+    print "The notebook instance " + args.nb_tag_value + " has been stopped successfully"
+

@@ -125,6 +125,31 @@ def create_attach_policy(policy_name, role_name, file_path):
     conn.put_role_policy(role_name, policy_name, json)
 
 
+def remove_ec2(tag_name, tag_value):
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped', 'pending', 'stopping']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+    for instance in instances:
+        client.terminate_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_terminated')
+        waiter.wait(InstanceIds=[instance.id])
+
+
+def stop_ec2(tag_name, nb_tag_value):
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'pending']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
+    for instance in instances:
+        print("ID: ", instance.id)
+        client.stop_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_stopped')
+        waiter.wait(InstanceIds=[instance.id])
+
+
 def remove_role(instance_type, scientist=''):
     print "[Removing roles and instance profiles]"
     client = boto3.client('iam')
@@ -247,30 +272,6 @@ def deregister_image(scientist):
     images_list = response.get('Images')
     for i in images_list:
         client.deregister_image(ImageId=i.get('ImageId'))
-
-
-def terminate_emr(id):
-    emr = boto3.client('emr')
-    emr.terminate_job_flows(
-        JobFlowIds=[id]
-    )
-
-
-def remove_ec2(tag_name, tag_value):
-    print "[Removing EC2]"
-    ec2 = boto3.resource('ec2')
-    client = boto3.client('ec2')
-    try:
-        instances = ec2.instances.filter(
-            Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
-                     {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
-        for instance in instances:
-            client.terminate_instances(InstanceIds=[instance.id])
-            waiter = client.get_waiter('instance_terminated')
-            waiter.wait(InstanceIds=[instance.id])
-            print "The instance " + instance.id + " has been deleted successfully"
-    except:
-        sys.exit(1)
 
 
 def terminate_emr(id):
