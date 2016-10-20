@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  * Created by Alexey Suprun
  */
 class BaseDAO {
-    private static final ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+    protected static final ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     public static final String ID = "_id";
     public static final String USER = "user";
     public static final String TIMESTAMP = "timestamp";
@@ -34,8 +34,12 @@ class BaseDAO {
     }
 
     protected void insertOne(String collection, Object object) throws JsonProcessingException {
+        insertOne(collection, object, generateUUID());
+    }
+
+    protected void insertOne(String collection, Object object, String uuid) throws JsonProcessingException {
         mongoService.getCollection(collection).insertOne(Document.parse(MAPPER.writeValueAsString(object))
-                .append(ID, generateUUID())
+                .append(ID, uuid)
                 .append(TIMESTAMP, new Date()));
     }
 

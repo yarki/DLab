@@ -3,6 +3,8 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.dto.EMRCreateDTO;
+import com.epam.dlab.dto.ExploratoryCreateDTO;
 import com.epam.dlab.dto.ResourceDTO;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.NotImplementedException;
@@ -30,10 +32,26 @@ public class ExploratoryResource implements DockerCommands {
     @Inject
     private CommandExecuter commandExecuter;
 
+    @Path("/create")
+    @POST
+    public String create(ExploratoryCreateDTO dto) throws IOException, InterruptedException {
+        LOGGER.debug("create exploratory environment");
+        String uuid = DockerCommands.generateUUID();
+        commandExecuter.executeAsync(String.format(CREATE_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
+                dto.getServiceBaseName(), // conf_service_base_name
+                dto.getNotebookUserName(), // notebook_user_name
+                dto.getNotebookSubnet(), // notebook_subnet_cidr
+                dto.getRegion(), // creds_region
+                dto.getSecurityGroupIds(), // creds_security_groups_ids
+                configuration.getAdminKey(), // creds_key_name
+                dto.getImage()));
+        return uuid;
+    }
+
     @Path("/terminate")
     @POST
     public String terminate(ResourceDTO exploratoryEnv) throws IOException, InterruptedException {
-        LOGGER.debug("terminating emr cluster");
+        LOGGER.debug("terminating exploratory environment");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(String.format(TERMINATE_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
                 exploratoryEnv.getUser(), // conf_service_base_name

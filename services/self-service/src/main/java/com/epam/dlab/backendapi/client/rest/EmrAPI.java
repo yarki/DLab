@@ -5,5 +5,6 @@ package com.epam.dlab.backendapi.client.rest;
  */
 public interface EmrAPI {
     String EMR = "emr";
+    String EMR_CREATE = EMR + "/create";
     String EMR_TERMINATE = EMR + "/terminate";
 }
