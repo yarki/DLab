@@ -51,6 +51,22 @@ def run():
         sys.exit(1)
 
     try:
+        logging.info('[CREATE ENDPOINT AND ROUTE-TABLE]')
+        print('[CREATE ENDPOINT AND ROUTE-TABLE]')
+        params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \
+                 (user_bucket_name, tag_name, "bucket")
+
+        if not run_routine('create_bucket', params):
+            logging.info('Unable to create bucket')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        sys.exit(1)
+
+    try:
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
         params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \

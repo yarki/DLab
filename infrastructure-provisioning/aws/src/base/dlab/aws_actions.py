@@ -50,6 +50,7 @@ def create_endpoint(vpc_id, service_name, tag):
         response = response['VpcEndpoint']['VpcEndpointId']
     except botocore.exceptions.ClientError as err:
         print err.response['Error']['Message']
+        # Remove RT
     finally:
         return response
 
