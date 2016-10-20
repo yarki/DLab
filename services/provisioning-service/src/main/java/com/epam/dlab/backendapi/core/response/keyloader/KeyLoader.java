@@ -46,9 +46,11 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getKeyLoaderDirectory(), configuration.getKeyLoaderPollTimeout(),
                 getResultHandler(dto.getUser(), uuid));
-        commandExecuter.executeAsync(String.format(CREATE_EDGE_METADATA, configuration.getKeyDirectory(),
-                configuration.getKeyLoaderDirectory(), uuid, configuration.getAdminKey(),
-                dto.getUser(), dto.getUser(), dto.getUser(), configuration.getEdgeImage()));
+        commandExecuter.executeAsync(String.format(CREATE_EDGE_METADATA, configuration.getKeyDirectory(), configuration.getKeyLoaderDirectory(), uuid,
+                dto.getServiceBaseName(),
+                configuration.getAdminKey(),
+                dto.getUser(),
+                configuration.getEdgeImage()));
         return uuid;
     }
 

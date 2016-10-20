@@ -16,8 +16,8 @@ public interface DockerCommands {
     String RUN_IMAGE = DOCKER_BASE + "-e \"dry_run=true\" %s --action run";
 
     String CREATE_EDGE_METADATA = DOCKER_BASE +
-            "-e \"creds_key_name=%s\" " +
             "-e \"conf_service_base_name=%s\" " +
+            "-e \"creds_key_name=%s\" " +
             "-e \"edge_user_name=%s\" " +
             "%s --action create";
 

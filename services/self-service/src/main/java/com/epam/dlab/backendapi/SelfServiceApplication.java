@@ -2,10 +2,7 @@ package com.epam.dlab.backendapi;
 
 import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.core.guice.ModuleFactory;
-import com.epam.dlab.backendapi.resources.DockerResource;
-import com.epam.dlab.backendapi.resources.KeyUploaderResource;
-import com.epam.dlab.backendapi.resources.SecurityResource;
-import com.epam.dlab.backendapi.resources.UserNotebookResource;
+import com.epam.dlab.backendapi.resources.*;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
@@ -38,5 +35,7 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
         environment.jersey().register(injector.getInstance(DockerResource.class));
         environment.jersey().register(injector.getInstance(KeyUploaderResource.class));
         environment.jersey().register(injector.getInstance(UserNotebookResource.class));
+        environment.jersey().register(injector.getInstance(EmrResource.class));
+        environment.jersey().register(injector.getInstance(ExploratoryResource.class));
     }
 }

@@ -41,6 +41,3 @@ logging:
     - type: file
       currentLogFilename: /tmp/dlab/log/selfservice.log
       archivedLogFilenamePattern: /tmp/dlab/log/selfservice-%d.log
-
-
- 
