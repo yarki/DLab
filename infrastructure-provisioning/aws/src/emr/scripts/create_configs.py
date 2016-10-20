@@ -17,7 +17,7 @@ yarn_dir = '/srv/hadoopconf/'
 
 
 def prepare():
-    local('rm -rf /srv/*')
+    # local('rm -rf /srv/*')
     local('mkdir -p ' + yarn_dir)
     local('mkdir -p ' + emr_dir)
     result = os.path.exists(emr_dir + args.emr_version + "/aws")
@@ -35,7 +35,7 @@ def yarn(args):
     print "Downloading yarn configuration..."
     s3client = boto3.client('s3')
     s3resource = boto3.resource('s3')
-    get_files(s3client, s3resource, 'config/{}'.format(args.cluster_name), args.bucket, yarn_dir)
+    get_files(s3client, s3resource, 'config/{}/'.format(args.cluster_name), args.bucket, yarn_dir)
 
 
 def pyspark_kernel(args):
