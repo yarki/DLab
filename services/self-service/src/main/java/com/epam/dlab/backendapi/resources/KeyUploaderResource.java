@@ -68,6 +68,8 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         dao.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
         if (result.isSuccess()) {
             dao.saveCredential(result.getUser(), result.getCredential());
+        } else {
+            dao.deleteKey(result.getUser());
         }
         return Response.ok().build();
     }

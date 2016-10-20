@@ -27,6 +27,10 @@ public class KeyDAO extends BaseDAO {
         mongoService.getCollection(USER_KEYS).updateOne(eq(ID, user), set(STATUS, status));
     }
 
+    public void deleteKey(String user) {
+        mongoService.getCollection(USER_KEYS).deleteOne(eq(ID, user));
+    }
+
     public void saveCredential(String user, UserAWSCredentialDTO credential) throws JsonProcessingException {
         insertOne(USER_AWS_CREDENTIALS, credential, user);
     }
