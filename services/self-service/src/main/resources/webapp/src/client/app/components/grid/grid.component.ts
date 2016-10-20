@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { EnvironmentsService } from './../../services/environments.service';
-import { GridModel } from './grid.model';
+import { GridRowModel } from './grid.model';
 
 @Component({
   moduleId: module.id,
@@ -10,17 +10,27 @@ import { GridModel } from './grid.model';
 })
 
 export class Grid {
-  public environments: any;
-  // environments: Array<GridModel>;
 
+  list: Array<any>;
+  environments: Array<GridRowModel>;
 
-  constructor(private environmentsService: EnvironmentsService) {
-    // this.environments = new GridModel<any>([]);
-  }
+  constructor(private environmentsService: EnvironmentsService) { }
 
   ngOnInit() {
     this.environmentsService.getEnvironmentsList().subscribe((list) => {
-      this.environments = list['resources'];
+      this.list = list['resources'];
+
+      this.environments = this.loadEnvironments();
+      console.log('models ', this.environments);
+    });
+  }
+
+  loadEnvironments(): Array<any> {
+    return this.list.map((value) => {
+      return new GridRowModel(value.ENVIRONMENT_NAME,
+        value.STATUS,
+        value.SHAPE,
+        value.COMPUTATIONAL_RESOURCES);
     });
   }
 }

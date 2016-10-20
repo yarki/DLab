@@ -1,3 +1,19 @@
+.dashboard_table {
+  width: 100%;
+}
+
+.dashboard_table .th_status {
+  width: 16%;
+}
+.dashboard_table .th_shape {
+  width: 17%;
+}
+.dashboard_table .th_resources {
+  width: 32%;
+}
+.dashboard_table .th_actions {
+  width: 8%;
+}
 .dashboard_table tr td {
   font-size: 14px;
   padding: 26px 14px;
@@ -22,7 +38,14 @@
 .dashboard_table tr:nth-child(2n+1) td:first-child {
   background: #edf6f9;
 }
-
+.dashboard_table th {
+  background: #a1b7d1;
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 11px 15px;
+  font-size: 12px;
+}
 .dashboard_table .running {
   color: #49af38;
 }
@@ -43,6 +66,10 @@
   margin-left: 0;
   right: 15px;
   padding: 5px 15px;
+}
+.dropdown .disabled {
+  color: #d2d2d2;
+  cursor: not-allowed;
 }
 .dashboard_table .dropdown-menu li {
   font-size: 14px;

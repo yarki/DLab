@@ -5,9 +5,7 @@ import { Observable } from "rxjs";
 
 @Injectable()
 export class EnvironmentsService {
-constructor(private http: Http) {
-      console.log('EnvironmentsService2 created!!!');
-  }
+constructor(private http: Http) {}
 
   getEnvironmentsList() : Observable<String>{
       return this.http

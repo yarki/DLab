@@ -14,7 +14,7 @@
     ]
   }, {
     "ENVIRONMENT_NAME": "Jupiter + test lib2 box",
-    "STATUS": "Creating",
+    "STATUS": "Running",
     "SHAPE": "R4.xlarge",
     "COMPUTATIONAL_RESOURCES": [
       ["EMR cluster 20 nodes"],

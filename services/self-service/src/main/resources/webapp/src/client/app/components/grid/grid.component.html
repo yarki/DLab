@@ -12,15 +12,18 @@
   </tr> -->
 
   <tr *ngFor="let env of environments">
-    <td>{{env.ENVIRONMENT_NAME}}</td>
-    <td class="{{env.STATUS.toLowerCase()}}">{{env.STATUS}}</td>
-    <td>{{env.SHAPE}}</td>
+    <td>{{env.name}}</td>
+    <td class="{{env.status.toLowerCase()}}">{{env.status}}</td>
+    <td>{{env.shape}}</td>
     <td>
-      <expanded-grid [resources]="env.COMPUTATIONAL_RESOURCES"></expanded-grid>
+      <expanded-grid [resources]="env.resources"></expanded-grid>
     </td>
     <td>
       <div class="dropdown">
-        <span data-toggle="dropdown" class="glyphicon glyphicon-cog"></span>
+        <span data-toggle="dropdown"
+              class="glyphicon glyphicon-cog"
+              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating'}">
+        </span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">
             <li>Stop</li>
