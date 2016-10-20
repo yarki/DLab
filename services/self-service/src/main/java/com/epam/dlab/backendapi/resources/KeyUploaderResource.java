@@ -11,7 +11,6 @@ import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.sun.scenario.Settings;
 import io.dropwizard.auth.Auth;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
