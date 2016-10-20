@@ -5,35 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Created by Alexey Suprun
  */
-public class ExploratoryCreateDTO {
-    @JsonProperty("conf_service_base_name ")
-    private String serviceBaseName;
-    @JsonProperty("notebook_user_name")
-    private String notebookUserName;
+public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDTO> {
     @JsonProperty("notebook_subnet_cidr")
     private String notebookSubnet;
-    @JsonProperty("creds_region")
-    private String region;
     @JsonProperty("creds_security_groups_ids")
     private String securityGroupIds;
     @JsonProperty("image")
     private String image;
-
-    public String getServiceBaseName() {
-        return serviceBaseName;
-    }
-
-    public void setServiceBaseName(String serviceBaseName) {
-        this.serviceBaseName = serviceBaseName;
-    }
-
-    public String getNotebookUserName() {
-        return notebookUserName;
-    }
-
-    public void setNotebookUserName(String notebookUserName) {
-        this.notebookUserName = notebookUserName;
-    }
 
     public String getNotebookSubnet() {
         return notebookSubnet;
@@ -43,12 +21,9 @@ public class ExploratoryCreateDTO {
         this.notebookSubnet = notebookSubnet;
     }
 
-    public String getRegion() {
-        return region;
-    }
-
-    public void setRegion(String region) {
-        this.region = region;
+    public ExploratoryCreateDTO withNotebookSubnet(String notebookSubnet) {
+        setNotebookSubnet(notebookSubnet);
+        return this;
     }
 
     public String getSecurityGroupIds() {
@@ -59,11 +34,21 @@ public class ExploratoryCreateDTO {
         this.securityGroupIds = securityGroupIds;
     }
 
+    public ExploratoryCreateDTO withSecurityGroupIds(String securityGroupIds) {
+        setSecurityGroupIds(securityGroupIds);
+        return this;
+    }
+
     public String getImage() {
         return image;
     }
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public ExploratoryCreateDTO withImage(String image) {
+        setImage(image);
+        return this;
     }
 }

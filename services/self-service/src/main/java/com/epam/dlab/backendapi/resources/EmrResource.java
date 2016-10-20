@@ -2,11 +2,12 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.api.EMRCreateFormDTO;
+import com.epam.dlab.backendapi.api.EMRTerminateFormDTO;
 import com.epam.dlab.backendapi.client.rest.EmrAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.dto.ResourceDTO;
+import com.epam.dlab.dto.EMRTerminateDTO;
 import com.epam.dlab.dto.EMRCreateDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -45,26 +46,27 @@ public class EmrResource implements EmrAPI {
     @Path("/create")
     public String create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) throws IOException {
         LOGGER.debug("creating emr {}", userInfo.getName());
-        EMRCreateDTO dto = new EMRCreateDTO();
-        dto.setServiceBaseName(dao.getServiceBaseName());
-        dto.setInstanceCount(formDTO.getInstanceCount());
-        dto.setInstanceType(formDTO.getInstanceType());
-        dto.setVersion(formDTO.getVersion());
-        dto.setNotebookName(formDTO.getNotebookName());
-        dto.setNotebookName(userInfo.getName());
-        dto.setEdgeSubnet(keyDao.findCredential(userInfo.getName()).getNotebookSubnet());
-        dto.setRegion(dao.getAwsRegion());
+        EMRCreateDTO dto = new EMRCreateDTO()
+                .withServiceBaseName(dao.getServiceBaseName())
+                .withInstanceCount(formDTO.getInstanceCount())
+                .withInstanceType(formDTO.getInstanceType())
+                .withVersion(formDTO.getVersion())
+                .withNotebookName(formDTO.getNotebookName())
+                .withNotebookName(userInfo.getName())
+                .withEdgeSubnet(keyDao.findCredential(userInfo.getName()).getNotebookSubnet())
+                .withRegion(dao.getAwsRegion());
         return provisioningService.post(EMR_CREATE, dto, String.class);
     }
 
     @POST
     @Path("/terminate")
-    public String terminate(@Auth UserInfo userInfo, String emr) {
+    public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
         LOGGER.debug("terminating emr {}", userInfo.getName());
-        ResourceDTO emrCluster = new ResourceDTO()
-                .withName(emr)
-                .withUser(userInfo.getName())
+        EMRTerminateDTO dto = new EMRTerminateDTO()
+                .withServiceBaseName(userInfo.getName())
+                .withEdgeUserName(userInfo.getName())
+                .withClusterName(formDTO.getClusterName())
                 .withRegion(dao.getAwsRegion());
-        return provisioningService.post(EMR_TERMINATE, emrCluster, String.class);
+        return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }
 }

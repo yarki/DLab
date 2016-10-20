@@ -3,7 +3,7 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
-import com.epam.dlab.dto.ResourceDTO;
+import com.epam.dlab.dto.EMRTerminateDTO;
 import com.epam.dlab.dto.EMRCreateDTO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class EmrResource implements DockerCommands {
 
     @Path("/create")
     @POST
-    public String createEmr(EMRCreateDTO dto) throws IOException, InterruptedException {
+    public String create(EMRCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create emr cluster");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(String.format(CREATE_EMR_CLUSTER, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
@@ -53,14 +53,14 @@ public class EmrResource implements DockerCommands {
 
     @Path("/terminate")
     @POST
-    public String terminateEmr(ResourceDTO emrCluster) throws IOException, InterruptedException {
-        LOGGER.debug("terminating emr cluster");
+    public String terminate(EMRTerminateDTO dto) throws IOException, InterruptedException {
+        LOGGER.debug("terminate emr cluster");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(String.format(TERMINATE_EMR_CLUSTER, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
-                emrCluster.getUser(), // conf_service_base_name
-                emrCluster.getUser(), // edge_user_name
-                emrCluster.getName(), // emr_cluster_name
-                emrCluster.getRegion(), // creds_region
+                dto.getServiceBaseName(), // conf_service_base_name
+                dto.getEdgeUserName(), // edge_user_name
+                dto.getClusterName(), // emr_cluster_name
+                dto.getRegion(), // creds_region
                 configuration.getAdminKey(), // creds_key_name
                 configuration.getEmrImage()));
         return uuid;

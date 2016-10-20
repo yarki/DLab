@@ -3,9 +3,8 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
-import com.epam.dlab.dto.EMRCreateDTO;
 import com.epam.dlab.dto.ExploratoryCreateDTO;
-import com.epam.dlab.dto.ResourceDTO;
+import com.epam.dlab.dto.ExploratoryTerminateDTO;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
@@ -50,14 +49,14 @@ public class ExploratoryResource implements DockerCommands {
 
     @Path("/terminate")
     @POST
-    public String terminate(ResourceDTO exploratoryEnv) throws IOException, InterruptedException {
-        LOGGER.debug("terminating exploratory environment");
+    public String terminate(ExploratoryTerminateDTO dto) throws IOException, InterruptedException {
+        LOGGER.debug("terminate exploratory environment");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(String.format(TERMINATE_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
-                exploratoryEnv.getUser(), // conf_service_base_name
-                exploratoryEnv.getUser(), // notebook_user_name
-                exploratoryEnv.getRegion(), // creds_region
-                exploratoryEnv.getName(), // notebook_instance_name
+                dto.getServiceBaseName(), // conf_service_base_name
+                dto.getNotebookUserName(), // notebook_user_name
+                dto.getRegion(), // creds_region
+                dto.getNotebookInstanceName(), // notebook_instance_name
                 configuration.getAdminKey(), // creds_key_name
                 configuration.getEdgeImage()));
         return uuid;
@@ -66,6 +65,7 @@ public class ExploratoryResource implements DockerCommands {
     @Path("/stop")
     @POST
     public String stop(String user, String emr) throws IOException, InterruptedException {
+        LOGGER.debug("stop exploratory environment");
         throw new NotImplementedException("StopExploratoryEnvironment has not been implemented yet");
     }
 }
