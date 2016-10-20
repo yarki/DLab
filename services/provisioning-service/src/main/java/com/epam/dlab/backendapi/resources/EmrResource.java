@@ -32,7 +32,7 @@ public class EmrResource implements DockerCommands {
 
     @Path("/create")
     @POST
-    public String createEmr(EMRCreateDTO dto) throws IOException, InterruptedException {
+    public String create(EMRCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create emr cluster");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(String.format(CREATE_EMR_CLUSTER, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
@@ -53,7 +53,7 @@ public class EmrResource implements DockerCommands {
 
     @Path("/terminate")
     @POST
-    public String terminateEmr(EMRTerminateDTO dto) throws IOException, InterruptedException {
+    public String terminate(EMRTerminateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("terminate emr cluster");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(String.format(TERMINATE_EMR_CLUSTER, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,

@@ -2,6 +2,7 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.api.ExploratoryCreateFormDTO;
+import com.epam.dlab.backendapi.api.ExploratoryTerminateFormDTO;
 import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
@@ -44,39 +45,39 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @POST
     @Path("/create")
-    public String terminate(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) throws IOException {
+    public String create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) throws IOException {
         LOGGER.debug("creating exploratory environment {}", userInfo.getName());
         UserAWSCredentialDTO credentialDTO = keyDao.findCredential(userInfo.getName());
-        ExploratoryCreateDTO dto = new ExploratoryCreateDTO();
-        dto.setServiceBaseName(dao.getServiceBaseName());
-        dto.setNotebookUserName(credentialDTO.getUserOwnBicketName());
-        dto.setNotebookSubnet(credentialDTO.getNotebookSubnet());
-        dto.setRegion(dao.getAwsRegion());
-        dto.setSecurityGroupIds("");
-        dto.setImage(formDTO.getImage());
+        ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
+                .withServiceBaseName(dao.getServiceBaseName())
+                .withNotebookUserName(credentialDTO.getUserOwnBicketName())
+                .withNotebookSubnet(credentialDTO.getNotebookSubnet())
+                .withRegion(dao.getAwsRegion())
+                .withSecurityGroupIds("")
+                .withImage(formDTO.getImage());
         return provisioningService.post(EXPLORATORY_CREATE, dto, String.class);
     }
 
     @POST
     @Path("/terminate")
-    public String terminate(@Auth UserInfo userInfo, String notebook) {
+    public String terminate(@Auth UserInfo userInfo, ExploratoryTerminateFormDTO formDTO) {
         LOGGER.debug("terminating exploratory environment {}", userInfo.getName());
         ExploratoryTerminateDTO dto = new ExploratoryTerminateDTO()
                 .withServiceBaseName(userInfo.getName())
                 .withNotebookUserName(userInfo.getName())
-                .withNotebookInstanceName(notebook)
+                .withNotebookInstanceName(formDTO.getNotebookInstanceName())
                 .withRegion(dao.getAwsRegion());
         return provisioningService.post(EXPLORATORY_TERMINATE, dto, String.class);
     }
 
     @POST
     @Path("/stop")
-    public String stop(@Auth UserInfo userInfo, String notebook) {
+    public String stop(@Auth UserInfo userInfo, ExploratoryTerminateFormDTO formDTO) {
         LOGGER.debug("stopping exploratory environment {}", userInfo.getName());
         ExploratoryTerminateDTO dto = new ExploratoryTerminateDTO()
                 .withServiceBaseName(userInfo.getName())
                 .withNotebookUserName(userInfo.getName())
-                .withNotebookInstanceName(notebook)
+                .withNotebookInstanceName(formDTO.getNotebookInstanceName())
                 .withRegion(dao.getAwsRegion());
         return provisioningService.post(EXPLORATORY_STOP, dto, String.class);
     }

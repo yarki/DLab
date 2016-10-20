@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Created by Alexey Suprun
  */
-public class EMRCreateDTO {
-    @JsonProperty("conf_service_base_name ")
-    private String serviceBaseName;
+public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
     @JsonProperty("emr_instance_count")
     private String instanceCount;
     @JsonProperty("emr_instance_type")
@@ -16,20 +14,8 @@ public class EMRCreateDTO {
     private String version;
     @JsonProperty("notebook_name")
     private String notebookName;
-    @JsonProperty("edge_user_name")
-    private String edgeUserName;
     @JsonProperty("edge_subnet_cidr")
     private String edgeSubnet;
-    @JsonProperty("creds_region")
-    private String region;
-
-    public String getServiceBaseName() {
-        return serviceBaseName;
-    }
-
-    public void setServiceBaseName(String serviceBaseName) {
-        this.serviceBaseName = serviceBaseName;
-    }
 
     public String getInstanceCount() {
         return instanceCount;
@@ -37,6 +23,11 @@ public class EMRCreateDTO {
 
     public void setInstanceCount(String instanceCount) {
         this.instanceCount = instanceCount;
+    }
+
+    public EMRCreateDTO withInstanceCount(String instanceCount) {
+        setInstanceCount(instanceCount);
+        return this;
     }
 
     public String getInstanceType() {
@@ -47,12 +38,22 @@ public class EMRCreateDTO {
         this.instanceType = instanceType;
     }
 
+    public EMRCreateDTO withInstanceType(String instanceType) {
+        setInstanceType(instanceType);
+        return this;
+    }
+
     public String getVersion() {
         return version;
     }
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public EMRCreateDTO withVersion(String version) {
+        setVersion(version);
+        return this;
     }
 
     public String getNotebookName() {
@@ -63,12 +64,9 @@ public class EMRCreateDTO {
         this.notebookName = notebookName;
     }
 
-    public String getEdgeUserName() {
-        return edgeUserName;
-    }
-
-    public void setEdgeUserName(String edgeUserName) {
-        this.edgeUserName = edgeUserName;
+    public EMRCreateDTO withNotebookName(String notebookName) {
+        setNotebookName(notebookName);
+        return this;
     }
 
     public String getEdgeSubnet() {
@@ -79,11 +77,9 @@ public class EMRCreateDTO {
         this.edgeSubnet = edgeSubnet;
     }
 
-    public String getRegion() {
-        return region;
+    public EMRCreateDTO withEdgeSubnet(String edgeSubnet) {
+        setEdgeSubnet(edgeSubnet);
+        return this;
     }
 
-    public void setRegion(String region) {
-        this.region = region;
-    }
 }

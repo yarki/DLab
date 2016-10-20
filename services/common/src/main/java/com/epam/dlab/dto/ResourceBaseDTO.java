@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Created by Maksym_Pendyshchuk on 10/20/2016.
  */
-public class BaseDTO<T extends BaseDTO<?>> {
+abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     @JsonProperty("conf_service_base_name ")
     private String serviceBaseName;
     @JsonProperty("creds_region")
@@ -24,8 +24,6 @@ public class BaseDTO<T extends BaseDTO<?>> {
         setServiceBaseName(serviceBaseName);
         return (T) this;
     }
-
-
 
     public String getRegion() {
         return region;
