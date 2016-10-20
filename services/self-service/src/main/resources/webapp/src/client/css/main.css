@@ -71,30 +71,6 @@ body {
 .navbar {
   border-radius: 0;
 }
-.dashboard_table {
-  width: 100%;
-}
-.dashboard_table th {
-  background: #a1b7d1;
-  color: #fff;
-  font-weight: 600;
-  text-transform: uppercase;
-  padding: 11px 15px;
-  font-size: 12px;
-}
-
-.dashboard_table .th_status {
-  width: 16%;
-}
-.dashboard_table .th_shape {
-  width: 17%;
-}
-.dashboard_table .th_resources {
-  width: 32%;
-}
-.dashboard_table .th_actions {
-  width: 8%;
-}
 .navbar {
   min-height: 48px;
   margin-bottom: 12px;

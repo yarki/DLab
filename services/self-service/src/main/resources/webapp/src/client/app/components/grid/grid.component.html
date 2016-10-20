@@ -1,0 +1,37 @@
+<table class="dashboard_table">
+  <tr>
+    <th class="th_name">Environment name</th>
+    <th class="th_status">Status</th>
+    <th class="th_shape">Shape</th>
+    <th class="th_resources">Computational resources</th>
+    <th class="th_actions">Actions</th>
+  </tr>
+
+  <!-- <tr *ngIf="!environments.length">
+    <td>To start working, please, create new environment</td>
+  </tr> -->
+
+  <tr *ngFor="let env of environments">
+    <td>{{env.name}}</td>
+    <td class="{{env.status.toLowerCase()}}">{{env.status}}</td>
+    <td>{{env.shape}}</td>
+    <td>
+      <expanded-grid [resources]="env.resources"></expanded-grid>
+    </td>
+    <td>
+      <div class="dropdown">
+        <span data-toggle="dropdown"
+              class="glyphicon glyphicon-cog"
+              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating'}">
+        </span>
+        <div class="dropdown-menu">
+          <ul class="list-unstyled">
+            <li>Stop</li>
+            <li>Terminate</li>
+            <li>Deploy EMR</li>
+          </ul>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>

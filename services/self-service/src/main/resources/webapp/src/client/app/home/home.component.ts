@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthenticationService } from './../security/authentication.service';
-import {UserAccessKeyService} from "../services/userAccessKey.service";
-import {UserResourceService} from "../services/userResource.service";
-import {AppRoutingService} from "../routing/appRouting.service";
-import {Http, Response} from '@angular/http';
+import { UserAccessKeyService } from "../services/userAccessKey.service";
+import { UserResourceService } from "../services/userResource.service";
+import { AppRoutingService } from "../routing/appRouting.service";
+import { Http, Response } from '@angular/http';
 
 @Component({
   moduleId: module.id,
@@ -15,7 +15,7 @@ import {Http, Response} from '@angular/http';
 
 export class HomeComponent implements OnInit {
   key: any;
-  uploadAccessKeyUrl : string;
+  uploadAccessKeyUrl: string;
   preloadModalInterval: any;
 
   templatesList: any;
@@ -34,10 +34,9 @@ export class HomeComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private userAccessKeyProfileService: UserAccessKeyService,
     private userResourceService: UserResourceService,
-    private appRoutingService : AppRoutingService,
+    private appRoutingService: AppRoutingService,
     private http: Http
-  )
-  {
+  ) {
     this.uploadAccessKeyUrl = this.userAccessKeyProfileService.getAccessKeyUrl();
   }
 
@@ -58,7 +57,7 @@ export class HomeComponent implements OnInit {
   }
 
   uploadUserAccessKey_btnClick($event) {
-    this.preloadModalInterval = setInterval(function () {
+    this.preloadModalInterval = setInterval(function() {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
   }
@@ -67,31 +66,29 @@ export class HomeComponent implements OnInit {
   // Private Methods
   //
 
-  private checkInfrastructureCreationProgress()
-  {
+  private checkInfrastructureCreationProgress() {
     this.userAccessKeyProfileService.checkUserAccessKey()
       .subscribe(
-        data => {
-          if(this.preloaderModal.isOpened)
-          {
-            this.preloaderModal.close();
-            clearInterval(this.preloadModalInterval);
-          }
-        },
-        err => {
-          if(err.status == 404) // key haven't been uploaded
-          {
-            if(!this.keyUploadModal.isOpened)
-              this.keyUploadModal.open({isFooter: false});
-          } else if (err.status == 406) // key is being uploaded in progress
-          {
-            if(this.keyUploadModal.isOpened)
-              this.keyUploadModal.close();
-
-            if(!this.preloaderModal.isOpened)
-              this.preloaderModal.open({isHeader: false, isFooter: false});
-          }
+      data => {
+        if (this.preloaderModal.isOpened) {
+          this.preloaderModal.close();
+          clearInterval(this.preloadModalInterval);
         }
+      },
+      err => {
+        if (err.status == 404) // key haven't been uploaded
+        {
+          if (!this.keyUploadModal.isOpened)
+            this.keyUploadModal.open({ isFooter: false });
+        } else if (err.status == 406) // key is being uploaded in progress
+        {
+          if (this.keyUploadModal.isOpened)
+            this.keyUploadModal.close();
+
+          if (!this.preloaderModal.isOpened)
+            this.preloaderModal.open({ isHeader: false, isFooter: false });
+        }
+      }
       );
   }
 
@@ -104,32 +101,32 @@ export class HomeComponent implements OnInit {
   }
 
   uploadUserAccessKey($event) {
-    this.preloadModalInterval = setInterval(function () {
+    this.preloadModalInterval = setInterval(function() {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
   }
 
   initAnalyticSelectors() {
     this.userResourceService.getTemplates()
-      .subscribe (
-        data => {
-          this.templatesList = data;
-        }
+      .subscribe(
+      data => {
+        this.templatesList = data;
+      }
       );
     this.userResourceService.getShapes()
-      .subscribe (
-        data => {
-          this.shapesList = data;
-        }
+      .subscribe(
+      data => {
+        this.shapesList = data;
+      }
       );
   }
 
-  createUsernotebook(template, name, shape){
+  createUsernotebook(template, name, shape) {
     this.userResourceService
       .createUsernotebook({"image": name.value})
       .subscribe((result) => {
         console.log('result: ', result);
       });
-      return false;
+    return false;
   };
 }
