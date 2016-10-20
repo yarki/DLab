@@ -43,43 +43,43 @@ def yarn(args):
     print "Downloading yarn configuration..."
     s3client = boto3.client('s3')
     s3resource = boto3.resource('s3')
-    get_files(s3client, s3resource, 'config/{}'.format(args.cluster_name), args.bucket, yarn_dir)
+    get_files(s3client, s3resource, 'config/{}/'.format(args.cluster_name), args.bucket, yarn_dir)
 
 
 def pyspark_kernel(args):
     local('mkdir -p ' + kernels_dir + 'pyspark_' + args.cluster_name + '/')
     kernel_path = kernels_dir + "pyspark_" + args.cluster_name + "/kernel.json"
     template_file = "/tmp/pyspark_emr_template.json"
-    with open(kernel_path, 'w') as out:
-        with open(template_file) as tpl:
-            for line in tpl:
-                out.write(line.replace('CLUSTER', args.cluster_name))
-                out.write(line.replace('SPARK_VERSION', 'Spark-' + args.spark_version))
-                out.write(line.replace('SPARK_PATH',
-                                       '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/'))
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('CLUSTER', args.cluster_name)
+    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+    text = text.replace('SPARK_PATH', '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    with open(kernel_path, 'w') as f:
+        f.write(text)
     local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
     kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
     template_file = "/tmp/py3spark_emr_template.json"
-    with open(kernel_path, 'w') as out:
-        with open(template_file) as tpl:
-            for line in tpl:
-                out.write(line.replace('CLUSTER', args.cluster_name))
-                out.write(line.replace('SPARK_VERSION', 'Spark-' + args.spark_version))
-                out.write(line.replace('SPARK_PATH',
-                                       '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/'))
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('CLUSTER', args.cluster_name)
+    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+    text = text.replace('SPARK_PATH', '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    with open(kernel_path, 'w') as f:
+        f.write(text)
 
 
 def toree_kernel(args):
     local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
     kernel_path = kernels_dir + "toree_" + args.cluster_name + "/kernel.json"
     template_file = "/tmp/toree_emr_template.json"
-    with open(kernel_path, 'w') as out:
-        with open(template_file) as tpl:
-            for line in tpl:
-                out.write(line.replace('CLUSTER', args.cluster_name))
-                out.write(line.replace('SPARK_VERSION', 'Spark-' + args.spark_version))
-                out.write(line.replace('SPARK_PATH',
-                                       '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/'))
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('CLUSTER', args.cluster_name)
+    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+    text = text.replace('SPARK_PATH', '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    with open(kernel_path, 'w') as f:
+        f.write(text)
 
 
 def get_files(s3client, s3resource, dist, bucket, local):
