@@ -5,10 +5,14 @@ import string
 import yaml
 import subprocess
 import time
-import sys
+import argparse
 
 path = "/etc/mongod.conf"
 outfile = "/etc/mongo_params.yml"
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--region', type=str, default='')
+args = parser.parse_args()
 
 
 def id_generator(size=10, chars=string.digits + string.ascii_letters):
@@ -62,7 +66,7 @@ if __name__ == "__main__":
         time.sleep(5)
         client.dlabdb.add_user('admin', mongo_passwd, roles=[{'role':'userAdminAnyDatabase','db':'admin'}])
         client.dlabdb.command('grantRolesToUser', "admin", roles=["readWrite"])
-        #client.dlabdb.grantRolesToUser("admin",["readWrite"])
+        client.dlabdb.settings.insert_one({"_id": "aws_region", "value": args.region})
         if add_2_yml_config(path,'security','authorization','enabled'):
             command = ['service', 'mongod', 'restart']
             subprocess.call(command, shell=False)

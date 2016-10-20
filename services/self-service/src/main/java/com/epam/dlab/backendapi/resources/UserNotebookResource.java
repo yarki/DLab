@@ -31,6 +31,13 @@ public class UserNotebookResource {
         return dao.find(userInfo.getName());
     }
 
+    @GET
+    @Path("/shape")
+    public Iterable<Document> getShapes(@Auth UserInfo userInfo) {
+        LOGGER.debug("loading shapes for user {}", userInfo.getName());
+        return dao.findShapes();
+    }
+
     @POST
     @Path("/{image}")
     public Response insertNotebook(@Auth UserInfo userInfo, @PathParam("image") String image) {

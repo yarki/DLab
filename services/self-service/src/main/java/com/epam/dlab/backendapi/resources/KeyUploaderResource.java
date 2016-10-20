@@ -48,7 +48,6 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     }
 
     @POST
-    @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public String post(@Auth UserInfo userInfo,
                        @FormDataParam("file") InputStream uploadedInputStream,
@@ -63,6 +62,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     }
 
     @POST
+    @Path("/callback")
     public Response loadKeyResponse(UploadFileResultDTO result) throws JsonProcessingException {
         LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
         dao.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));

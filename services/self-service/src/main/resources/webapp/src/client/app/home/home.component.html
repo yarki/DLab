@@ -18,14 +18,14 @@
         <img src="assets/img/logo-nav.png" alt="">
       </a>
     </div>
-    <button class="btn btn-logout" (click)="logout()">Log out</button>
+    <button class="btn btn-logout" (click)="logout_btnClick()">Log out</button>
   </div>
 </nav>
 
 <div class="sub_nav">
   <div class="container-fluid">
-    <button class="btn btn_create" data-toggle="modal" data-target=".loading_modal">
-      <span class="glyphicon glyphicon glyphicon-plus"></span> Create new
+    <button class="btn btn_create" (click)="createAnalyticalModal.open({isFooter: false})">
+      <span class="glyphicon glyphicon glyphicon-plus" ></span> Create new
     </button>
     <button class="btn btn_refresh pull-right">
       <span class="glyphicon glyphicon-refresh"></span> Refresh
@@ -92,7 +92,6 @@
   </tr> -->
 </table>
 
-
 <div class="modal fade create_computational">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
@@ -103,6 +102,7 @@
         <h4 class="modal-title" id="myModalLabel">Create computational resource</h4>
       </div>
       <div class="modal-body">
+      <form>
         <div class="form-group row">
           <div  class="col-xs-4">
             <label class="control-label">Select template</label>
@@ -154,103 +154,96 @@
             </select>
           </div>
         </div>
+        <br/>
         <div class="text-right">
           <button type="button" class="btn btn-default">Cancel</button>
-          <button type="button" class="btn btn-success">Create</button>
+          <button type="submit" class="btn btn-success">Create</button>
         </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
 
-  <modal #keyUploadModal modalClass="modal-lg">
-      <modal-header>
-        <h4 class="modal-title">Create initial infrastructure</h4>
-      </modal-header>
-      <modal-content>
-        <form (submit)="uploadingKey($event)" method="POST" action="/api/keyloader/upload?access_token={{ this.userProfileService.getAuthToken() }}" enctype="multipart/form-data">
-          <div class="form-group row">
-            <div  class="col-xs-8">
-              <label class="control-label">Upload public key start environment creation</label>
-              <div>
-                <small><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Where can I get public key?</small>
-              </div>
-            </div>
-            <div class="col-xs-4">
-              <span class="btn btn-default btn-file">
-                <span class="glyphicon glyphicon-upload"></span> Browse <input type="file" name="file" />
-              </span>
-            </div>
-          </div>
-          <div class="text-right">
-            <button type="submit" class="btn btn-success">Create</button>
-          </div>
-        </form>
-      </modal-content>
-  </modal>
-
-
-  <modal #preloaderModal>
-      <modal-header></modal-header>
-      <modal-content class="text-center">
-        <div class="spinner_wrap">
-          <img src="assets/img/spinner.gif" alt="">
+<modal #createAnalyticalModal>
+  <modal-header>
+    <h4 class="modal-title" id="myModalLabel">Create analytical tool</h4>
+  </modal-header>
+  <modal-content>
+  <form (submit)="createUsernotebook(template.value, name.value, shape.value)">
+    <div class="form-group row">
+      <div  class="col-xs-4">
+        <label class="control-label">Select template</label>
+        <div>
+          <small>Template discription .. </small>
         </div>
-        <p>Initial infrastructure is being created, <br/>please, wait...</p>
-      </modal-content>
-      <modal-footer class="text-right"></modal-footer>
-  </modal>
-
-
-
-
-
-
-
-
-<!-- <div class="modal fade upload_key" #preloaderModal  data-backdrop="static"  data-keyboard="false">
-  <div class="modal-dialog modal-md" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="myModalLabel">Create initial infrastructure</h4>
       </div>
-      <div class="modal-body">
-        <form (submit)="uploadKey($event)" method="POST" action="/api/keyloader/upload?access_token={{ this.userProfileService.getAuthToken() }}" enctype="multipart/form-data">
-          <div class="form-group row">
-            <div  class="col-xs-7">
-              <label class="control-label">Upload public key start environment creation</label>
-              <div>
-                <small><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Where can I get public key?</small>
-              </div>
-            </div>
-            <div class="col-xs-5">
-              <span class="btn btn-default btn-file">
-                <span class="glyphicon glyphicon-upload"></span> Browse <input type="file" name="file" />
-              </span>
-            </div>
-          </div>
-          <div class="text-right">
-            <button type="submit" class="btn btn-success">Create</button>
-          </div>
-        </form>
+      <div class="col-xs-8">
+        <select class="form-control" #template>
+          <option *ngFor="let template of templatesList">{{template.template_name}}</option>
+        </select>
       </div>
     </div>
-  </div>
-</div> -->
+    <div class="form-group row">
+      <div  class="col-xs-4">
+        <label class="control-label">Name</label>
+      </div>
+      <div class="col-xs-8">
+        <input type="text" class="form-control" placeholder="Enter Name" required #name>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div  class="col-xs-4">
+        <label class="control-label">Instance shape</label>
+      </div>
+      <div class="col-xs-8">
+        <select class="form-control" #shape>
+          <option *ngFor="let shape of shapesList">{{shape.shape_name}}</option>
+        </select>
+      </div>
+    </div>
+    <div class="text-right">
+      <button type="button" class="btn btn-default">Cancel</button>
+      <button type="submit" class="btn btn-success">Create</button>
+    </div>
+  </form>
+  </modal-content>
+</modal>
 
 
+<modal #keyUploadModal modalClass="modal-lg">
+  <modal-header>
+    <h4 class="modal-title">Create initial infrastructure</h4>
+  </modal-header>
+  <modal-content>
+    <form (submit)="uploadUserAccessKey_btnClick($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
+      <div class="form-group row">
+        <div  class="col-xs-8">
+          <label class="control-label">Upload public key start environment creation</label>
+          <div>
+            <small><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Where can I get public key?</small>
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <span class="btn btn-default btn-file">
+            <span class="glyphicon glyphicon-upload"></span> Browse <input type="file" name="file" accept=".pem" />
+          </span>
+        </div>
+      </div>
+      <div class="text-right">
+        <button type="submit" class="btn btn-success">Create</button>
+      </div>
+    </form>
+  </modal-content>
+</modal>
 
-
-
-<!-- <p>
-  Howdy! Here's a list of awesome computer scientists. Do you know any others? Add to the list yourself.
-</p>
-
-<form (submit)="addName()">
-  <input [(ngModel)]="newName" name="newName" placeholder="Awesome Computer Scientist">
-  <button type="submit">Add</button>
-</form>
-
-<ul>
-  <li *ngFor="let name of names">{{name}}</li>
-</ul> -->
+<modal #preloaderModal>
+  <modal-header></modal-header>
+  <modal-content class="text-center">
+    <div class="spinner_wrap">
+      <img src="assets/img/spinner.gif" alt="">
+    </div>
+    <p>Initial infrastructure is being created, <br/>please, wait...</p>
+  </modal-content>
+  <modal-footer class="text-right"></modal-footer>
+</modal>

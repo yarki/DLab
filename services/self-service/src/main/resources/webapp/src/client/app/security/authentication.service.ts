@@ -11,9 +11,7 @@ export class AuthenticationService {
   }
 
   login(userName, password) : Observable<Boolean> {
-
     let requestHeader = this.webRequestHelper.getJsonHeader();
-
     return this.http
       .post(
         '/api/login', JSON.stringify({'username': userName, 'password': password, 'access_token': ''}), { headers: requestHeader }
@@ -29,7 +27,7 @@ export class AuthenticationService {
       }, this);
   }
 
-  logout() : Observable<String> {
+  logout() : Observable<Boolean> {
     let requestHeader = this.webRequestHelper.getJsonHeader();
     let authToken = this.userProfileService.getAuthToken();
 
@@ -43,7 +41,14 @@ export class AuthenticationService {
           '/api/logout',
           JSON.stringify({accessTokenKey: authToken}),
           { headers: requestHeader }
-      ).map(res => res.text());
+      ).map((res) => {
+            if (res.status == 200) {
+              return true;
+            }
+            return false;
+          }, this);
     }
+
+    return Observable.of(false);
   }
 }

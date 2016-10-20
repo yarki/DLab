@@ -1,5 +1,4 @@
 .login_page .btn {
-  margin-top: 20px;
   padding: 7px 51px;
   font-size: 14px;
 }
@@ -61,4 +60,9 @@
   display: table-caption;
   color: red;
 }
+
+.login_page .alert {
+  margin: 0;
+}
+
 

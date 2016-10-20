@@ -34,7 +34,7 @@ public abstract class AbstractAuthenticationService<C extends Configuration> ext
 		super(config);
 	}
 
-	public abstract String login(UserCredentialDTO credential);
+	public abstract Response login(UserCredentialDTO credential);
 	public abstract UserInfo getUserInfo(String access_token);
 	public abstract Response logout(String access_token);
 
