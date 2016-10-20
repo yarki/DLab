@@ -30,10 +30,10 @@ if __name__ == "__main__":
         notebook['Id'] = i.id
         for tag in i.tags:
             if tag['Key'] == 'Name':
-                user['Name'] = tag['Value']
-        user['Shape'] = i.instance_type
-        user['Status'] = i.state['Name']
-        emr_list = get_emr_list(user['Name'], 'Value')
+                notebook['Name'] = tag['Value']
+        notebook['Shape'] = i.instance_type
+        notebook['Status'] = i.state['Name']
+        emr_list = get_emr_list(notebook['Name'], 'Value')
         resources = []
         for j in emr_list:
             emr = {}
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     edge['Notebooks'] = notebooks
     data.append(edge)
 
-    filename = '{}.json'.format(args.user_name)
+    filename = '{}_data.json'.format(args.user_name)
     with open('/root/' + filename, 'w') as outfile:
         json.dump(data, outfile)
 

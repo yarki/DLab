@@ -60,7 +60,7 @@ def remove_role(notebook_name, instance_type):
     print "The IAM role " + role + " has been deleted successfully"
 
 
-# Function for terminating any EC2 instances inc notebookservers
+# Function for terminating any EC2 instances inc notebook servers
 def remove_ec2(ssn_tag_value, notebook_tag_value):
     print "========== EC2 =========="
     ec2 = boto3.resource('ec2')
