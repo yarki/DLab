@@ -27,7 +27,7 @@ export class AuthenticationService {
       }, this);
   }
 
-  logout() : Observable<String> {
+  logout() : Observable<Boolean> {
     let requestHeader = this.webRequestHelper.getJsonHeader();
     let authToken = this.userProfileService.getAuthToken();
 
@@ -41,9 +41,14 @@ export class AuthenticationService {
           '/api/logout',
           JSON.stringify({accessTokenKey: authToken}),
           { headers: requestHeader }
-      ).map(res => res.text());
+      ).map((res) => {
+            if (res.status == 200) {
+              return true;
+            }
+            return false;
+          }, this);
     }
 
-    return Observable.of("");
+    return Observable.of(false);
   }
 }
