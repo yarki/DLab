@@ -3,7 +3,10 @@
     "ENVIRONMENT_NAME": "Jupiter",
     "STATUS": "Running",
     "SHAPE": "M4.xlarge",
-    "COMPUTATIONAL_RESOURCES": []
+    "URL": "some string",
+    "UP_TIME_HOURS": 12,
+    "UP_TIME_SINCE": "",
+    "COMPUTATIONAL_RESOURCES": [{},{}]
   }, {
     "ENVIRONMENT_NAME": "Jupiter + Spark lib box",
     "STATUS": "Stopped",
