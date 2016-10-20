@@ -6,7 +6,7 @@ import com.epam.dlab.backendapi.client.rest.EmrAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.dto.ResourceDTO;
+import com.epam.dlab.dto.EMRTerminateDTO;
 import com.epam.dlab.dto.EMRCreateDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -61,10 +61,11 @@ public class EmrResource implements EmrAPI {
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, String emr) {
         LOGGER.debug("terminating emr {}", userInfo.getName());
-        ResourceDTO emrCluster = new ResourceDTO()
-                .withName(emr)
-                .withUser(userInfo.getName())
+        EMRTerminateDTO dto = new EMRTerminateDTO()
+                .withServiceBaseName(userInfo.getName())
+                .withEdgeUserName(userInfo.getName())
+                .withClusterName(emr)
                 .withRegion(dao.getAwsRegion());
-        return provisioningService.post(EMR_TERMINATE, emrCluster, String.class);
+        return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }
 }

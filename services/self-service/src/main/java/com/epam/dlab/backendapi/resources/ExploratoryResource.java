@@ -7,7 +7,7 @@ import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.ExploratoryCreateDTO;
-import com.epam.dlab.dto.ResourceDTO;
+import com.epam.dlab.dto.ExploratoryTerminateDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -61,21 +61,23 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, String notebook) {
         LOGGER.debug("terminating exploratory environment {}", userInfo.getName());
-        ResourceDTO exploratoryEnv = new ResourceDTO()
-                .withName(notebook)
-                .withUser(userInfo.getName())
+        ExploratoryTerminateDTO dto = new ExploratoryTerminateDTO()
+                .withServiceBaseName(userInfo.getName())
+                .withNotebookUserName(userInfo.getName())
+                .withNotebookInstanceName(notebook)
                 .withRegion(dao.getAwsRegion());
-        return provisioningService.post(EXPLORATORY_TERMINATE, exploratoryEnv, String.class);
+        return provisioningService.post(EXPLORATORY_TERMINATE, dto, String.class);
     }
 
     @POST
     @Path("/stop")
     public String stop(@Auth UserInfo userInfo, String notebook) {
         LOGGER.debug("stopping exploratory environment {}", userInfo.getName());
-        ResourceDTO exploratoryEnv = new ResourceDTO()
-                .withName(notebook)
-                .withUser(userInfo.getName())
+        ExploratoryTerminateDTO dto = new ExploratoryTerminateDTO()
+                .withServiceBaseName(userInfo.getName())
+                .withNotebookUserName(userInfo.getName())
+                .withNotebookInstanceName(notebook)
                 .withRegion(dao.getAwsRegion());
-        return provisioningService.post(EXPLORATORY_STOP, exploratoryEnv, String.class);
+        return provisioningService.post(EXPLORATORY_STOP, dto, String.class);
     }
 }
