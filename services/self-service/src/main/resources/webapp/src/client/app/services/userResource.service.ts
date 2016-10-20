@@ -23,7 +23,7 @@ export class UserResourceService {
 
   getCreateUsernotebookUrl() : string
   {
-    return `/api/usernotebook/?access_token=${this.userProfileService.getAuthToken()}`;
+    return `/api/exploratory/create?access_token=${this.userProfileService.getAuthToken()}`;
   }
 
   getTemplates() 
