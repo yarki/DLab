@@ -17,7 +17,6 @@ yarn_dir = '/srv/hadoopconf/'
 
 
 def prepare():
-    # local('rm -rf /srv/*')
     local('mkdir -p ' + yarn_dir)
     local('mkdir -p ' + emr_dir)
     result = os.path.exists(emr_dir + args.emr_version + "/aws")
@@ -79,7 +78,6 @@ def get_files(s3client, s3resource, dist, bucket, local):
 
 
 def spark_defaults():
-    #local('cp /tmp/spark-defaults_template.conf /opt/spark/conf/spark-defaults.conf')
     spark_def_path = '/opt/spark/conf/spark-defaults.conf'
     template_file = "/tmp/spark-defaults_template.conf"
     with open(spark_def_path, 'w') as out:

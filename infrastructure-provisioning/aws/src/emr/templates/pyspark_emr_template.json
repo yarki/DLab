@@ -9,8 +9,8 @@
  "language": "python",
  "display_name": "PySpark (Python-2.7 / Spark ) [CLUSTER]",
  "env": {
-  "HADOOP_CONF_DIR" : "/srv/hadoopconf/CLUSTER",
-  "YARN_CONF_DIR": "/srv/hadoopconf/CLUSTER",
+  "HADOOP_CONF_DIR" : "/srv/hadoopconf/config/CLUSTER",
+  "YARN_CONF_DIR": "/srv/hadoopconf/config/CLUSTER",
   "PYSPARK_PYTHON": "python2.7",
   "SPARK_HOME": "/opt/spark/",
   "PYTHONPATH": "/opt/spark/python/lib/py4j-0.9-src.zip:/opt/spark/python/:",
