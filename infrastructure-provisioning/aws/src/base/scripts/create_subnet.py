@@ -10,8 +10,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--vpc_id', type=str, default='')
 parser.add_argument('--subnet', type=str, default='')
 parser.add_argument('--region', type=str, default='us-west-2')
-parser.add_argument('--infra_tag_name', type=str, default='BDCC-DSA-test-infra')
-parser.add_argument('--infra_tag_value', type=str, default='tmp')
+parser.add_argument('--infra_tag_name', type=str, default='Name')
+parser.add_argument('--infra_tag_value', type=str, default='BDCC-DSA-POC-infra')
 args = parser.parse_args()
 
 
@@ -25,6 +25,7 @@ if __name__ == "__main__":
                 print "Creating subnet %s in vpc %s, region %s with tag %s." % \
                       (args.subnet, args.vpc_id, args.region, json.dumps(tag))
                 subnet_id = create_subnet(args.vpc_id, args.subnet, tag)
+                endpoint = create_endpoint(vpc_id, "com.amazonaws.{}.s3".format(args.region), json.dumps(tag))
             else:
                 print "REQUESTED SUBNET ALREADY EXISTS"
             print "SUBNET_ID " + subnet_id

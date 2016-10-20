@@ -1,6 +1,7 @@
 import boto3, boto, botocore
 import time
 import os
+import json
 
 
 def put_to_bucket(bucket_name, local_file, destination_file):
@@ -29,13 +30,17 @@ def create_vpc(vpc_cidr, tag):
     return vpc.id
 
 
-def create_endpoint(vpc_id, service_name):
+def create_endpoint(vpc_id, service_name, tag):
     ec2 = boto3.client('ec2')
     route_table = []
     response = ''
     try:
-        for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
-            route_table.append(i['Associations'][0]['RouteTableId'])
+        # for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
+        #    route_table.append(i['Associations'][0]['RouteTableId'])
+        route_table.append(ec2.create_route_table(
+            VpcId = vpc_id
+        )['RouteTable']['RouteTableId'])
+        create_tag(route_table, tag)
         response = ec2.create_vpc_endpoint(
             VpcId=vpc_id,
             ServiceName=service_name,
@@ -48,6 +53,18 @@ def create_endpoint(vpc_id, service_name):
     finally:
         return response
 
+
+def create_tag(resource, tag):
+    ec2 = boto3.client('ec2')
+    try:
+        ec2.create_tags(
+            Resources = resource,
+            Tags = [
+                json.loads(tag)
+            ]
+        )
+    except botocore.exceptions.ClientError as err:
+        print err.response['Error']['Message']
 
 
 def create_subnet(vpc_id, subnet, tag):
