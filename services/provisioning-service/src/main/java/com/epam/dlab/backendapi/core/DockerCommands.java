@@ -10,7 +10,8 @@ import java.util.UUID;
  */
 public interface DockerCommands {
     String JSON_EXTENTION = ".json";
-    String GET_IMAGES = "docker images | awk '{print $1\":\"$2}' | sort | uniq | grep \"dlab\" | grep -v \"none\" | grep -v \"edge\"";
+    String GET_IMAGES = "docker images | awk '{print $1\":\"$2}' | sort | uniq | grep \"dlab\" | grep -v \"none\" " +
+            "| grep -v \"base\" | grep -v \"ssn\" | grep -v \"edge\"";
     String DOCKER_BASE = "docker run -v %s:/root/keys -v %s:/response -e \"request_id=%s\" ";
     String GET_IMAGE_METADATA = DOCKER_BASE + "%s --action describe";
     String RUN_IMAGE = DOCKER_BASE + "-e \"dry_run=true\" %s --action run";
