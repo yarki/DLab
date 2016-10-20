@@ -1,5 +1,6 @@
 import boto3, boto, botocore
 import time
+import sys
 import os
 import json
 
@@ -124,15 +125,15 @@ def create_attach_policy(policy_name, role_name, file_path):
     conn.put_role_policy(role_name, policy_name, json)
 
 
-def remove_role(scientist, instance_type):
-    print "[Removing roles]"
+def remove_role(instance_type, scientist=''):
+    print "[Removing roles and instance profiles]"
     client = boto3.client('iam')
     if instance_type == "ssn":
         role_name = os.environ['conf_service_base_name'] + '-ssn-Role'
         role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
     if instance_type == "edge":
-        role_name = os.environ['conf_service_base_name'] + '-edge-Role'
-        role_profile_name = os.environ['conf_service_base_name'] + '-edge-Profile'
+        role_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Role'
+        role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
     elif instance_type == "notebook":
         role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Role'
         role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
@@ -140,31 +141,32 @@ def remove_role(scientist, instance_type):
         role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
     except:
         print "Wasn't able to get role!"
-    print "Name: ", role
+        sys.exit(1)
     policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
     for i in policy_list:
         policy_arn = i.get('PolicyArn')
-        print policy_arn
         client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
-    print "[Removing instance profiles]"
     try:
         profile = client.get_instance_profile(InstanceProfileName="{}".format(role_profile_name)).get(
             "InstanceProfile").get("InstanceProfileName")
     except:
         print "Wasn't able to get instance profile!"
-    print "Name: ", profile
+        sys.exit(1)
     try:
         client.remove_role_from_instance_profile(InstanceProfileName=profile, RoleName=role)
     except:
         print "\nWasn't able to remove role from instance profile!"
+        sys.exit(1)
     try:
         client.delete_instance_profile(InstanceProfileName=profile)
     except:
         print "\nWasn't able to remove instance profile!"
+        sys.exit(1)
     try:
         client.delete_role(RoleName=role)
     except:
         print "\nWasn't able to remove role!"
+        sys.exit(1)
     print "The IAM role " + role + " has been deleted successfully"
 
 
@@ -183,9 +185,11 @@ def remove_s3(scientist):
     print "[Removing S3 buckets]"
     s3 = boto3.resource('s3')
     client = boto3.client('s3')
-    bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-edge-bucket').lower().replace('_', '-')
+    if bucket_type == 'ssn':
+        bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
+    elif bucket_type == 'edge':
+        bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-edge-bucket').lower().replace('_', '-')
     bucket = s3.Bucket("{}".format(bucket_name))
-    print bucket.name
     try:
         list_obj = client.list_objects(Bucket=bucket.name)
     except:
@@ -197,7 +201,6 @@ def remove_s3(scientist):
     if list_obj is not None:
         for o in list_obj:
             list_obj = o.get('Key')
-            print list_obj
             client.delete_objects(
                 Bucket=bucket_name,
                 Delete={'Objects': [{'Key': list_obj}]}
@@ -210,26 +213,26 @@ def remove_s3(scientist):
     print "The S3 bucket " + bucket.name + " has been deleted successfully"
 
 
-# def remove_subnets():
-#    print "[Removing subnets]"
-#    ec2 = boto3.resource('ec2')
-#    client = boto3.client('ec2')
-#    tag_name = os.environ['conf_service_base_name'] + '-tag'
-#    subnets = ec2.subnets.filter(
-#        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
-#    for subnet in subnets:
-#        print subnet.id
-#        client.delete_subnet(SubnetId=subnet.id)
-#        print "The subnet " + subnet.id + " has been deleted successfully"
+def remove_subnets(subnet_id):
+    print "[Removing subnets]"
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    #tag_name = os.environ['conf_service_base_name'] + '-tag'
+    #subnets = ec2.subnets.filter(
+    #    Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
+    #for subnet in subnets:
+    #    print subnet.id
+    client.delete_subnet(SubnetId=subnet_id)
+    #    print "The subnet " + subnet.id + " has been deleted successfully"
 
 
-def remove_sgroups():
+def remove_sgroups(tag_value):
     print "[Removing security groups]"
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
     tag_name = os.environ['conf_service_base_name']
     sgs = ec2.security_groups.filter(
-        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
+        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': [tag_value]}])
     for sg in sgs:
         print sg.id
         client.delete_security_group(GroupId=sg.id)
@@ -244,6 +247,30 @@ def deregister_image(scientist):
     images_list = response.get('Images')
     for i in images_list:
         client.deregister_image(ImageId=i.get('ImageId'))
+
+
+def terminate_emr(id):
+    emr = boto3.client('emr')
+    emr.terminate_job_flows(
+        JobFlowIds=[id]
+    )
+
+
+def remove_ec2(tag_name, tag_value):
+    print "[Removing EC2]"
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    try:
+        instances = ec2.instances.filter(
+            Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
+                     {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+        for instance in instances:
+            client.terminate_instances(InstanceIds=[instance.id])
+            waiter = client.get_waiter('instance_terminated')
+            waiter.wait(InstanceIds=[instance.id])
+            print "The instance " + instance.id + " has been deleted successfully"
+    except:
+        sys.exit(1)
 
 
 def terminate_emr(id):
