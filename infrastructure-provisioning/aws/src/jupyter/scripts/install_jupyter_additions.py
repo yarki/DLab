@@ -73,9 +73,9 @@ if __name__ == "__main__":
     print "Installing required libraries for Python 3"
     ensure_libraries_py3()
 
-    print "Installing user additions: matplotlib."
+    print "Installing notebook additions: matplotlib."
     ensure_matplot()
 
-    print "Installing user additions: sbt."
+    print "Installing notebook additions: sbt."
     ensure_sbt()
 

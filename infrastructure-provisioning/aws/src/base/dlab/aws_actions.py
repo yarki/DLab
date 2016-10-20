@@ -116,7 +116,7 @@ def remove_role(scientist, instance_type):
     if instance_type == "edge":
         role_name = os.environ['conf_service_base_name'] + '-edge-Role'
         role_profile_name = os.environ['conf_service_base_name'] + '-edge-Profile'
-    elif instance_type == "user":
+    elif instance_type == "notebook":
         role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Role'
         role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
     try:
@@ -223,7 +223,7 @@ def deregister_image(scientist):
     print "[De-registering images]"
     client = boto3.client('ec2')
     response = client.describe_images(
-        Filters=[{'Name': 'name', 'Values': ['{}-{}-user-image'.format(os.environ['conf_service_base_name'], scientist)]}])
+        Filters=[{'Name': 'name', 'Values': ['{}-{}-notebook-image'.format(os.environ['conf_service_base_name'], scientist)]}])
     images_list = response.get('Images')
     for i in images_list:
         client.deregister_image(ImageId=i.get('ImageId'))

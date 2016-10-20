@@ -25,7 +25,7 @@ def remove_role(notebook_name, instance_type):
     if instance_type == "ssn":
         role_name = os.environ['conf_service_base_name'] + '-role'
         role_profile_name = os.environ['conf_service_base_name'] + '-role-profile'
-    elif instance_type == "user":
+    elif instance_type == "notebook":
         role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(notebook_name) + '-role'
         role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(notebook_name) + '-role-profile'
     try:
@@ -60,7 +60,7 @@ def remove_role(notebook_name, instance_type):
     print "The IAM role " + role + " has been deleted successfully"
 
 
-# Function for terminating any EC2 instances inc user servers
+# Function for terminating any EC2 instances inc notebookservers
 def remove_ec2(ssn_tag_value, notebook_tag_value):
     print "========== EC2 =========="
     ec2 = boto3.resource('ec2')
@@ -88,8 +88,8 @@ def remove_ec2(ssn_tag_value, notebook_tag_value):
         client.terminate_instances(InstanceIds=[instance.id])
         waiter = client.get_waiter('instance_terminated')
         waiter.wait(InstanceIds=[instance.id])
-        remove_role(notebook_name, "user")
-        print "The user instance " + instance.id + " has been deleted successfully"
+        remove_role(notebook_name, "notebook")
+        print "The notebook instance " + instance.id + " has been deleted successfully"
 
 
 # Function for terminating security groups
@@ -166,7 +166,7 @@ def remove_s3():
     print "The S3 bucket " + bucket.name + " has been deleted successfully"
 
 
-# Function for terminating EMR clusters, cleaning buckets and removing user's local kernels
+# Function for terminating EMR clusters, cleaning buckets and removing notebook's local kernels
 def remove_emr(emr_name):
     print "========= EMR =========="
     client = boto3.client('emr')

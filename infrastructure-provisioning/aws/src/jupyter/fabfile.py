@@ -5,7 +5,7 @@ from dlab.fab import *
 from dlab.aws_meta import *
 
 
-# Function for creating AMI from already provisioned user
+# Function for creating AMI from already provisioned notebook
 def create_image_from_instance(instance_name='', image_name=''):
     ec2 = boto3.resource('ec2')
     instances = ec2.instances.filter(
@@ -13,7 +13,7 @@ def create_image_from_instance(instance_name='', image_name=''):
                  {'Name': 'instance-state-name', 'Values': ['running']}])
     for instance in instances:
         image = instance.create_image(Name=image_name,
-                                      Description='Automatically created image for user server',
+                                      Description='Automatically created image for notebook server',
                                       NoReboot=True)
         image.load()
         while image.state != 'available':
@@ -43,7 +43,7 @@ def run():
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-nb-' + str(provide_index('EC2', os.environ['conf_service_base_name'] + '-Tag'))
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
-        'notebook_user_name'] + '-user-image'
+        'notebook_user_name'] + '-notebook-image'
     notebook_config['role_profile_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + "-nb-Profile"
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
@@ -58,7 +58,7 @@ def run():
         print 'No preconfigured image found. Using default one: ' + os.environ['notebook_ami_id']
         notebook_config['ami_id'] = os.environ['notebook_ami_id']
 
-    # launching instance for user server
+    # launching instance for notebook server
     try:
         logging.info('[CREATE JUPYTER NOTEBOOK INSTANCE]')
         print '[CREATE JUPYTER NOTEBOOK INSTANCE]'
@@ -170,7 +170,7 @@ def run():
 
     # checking the need for image creation
     if ami_id == '':
-        print "Looks like it's first time we configure user server. Creating image."
+        print "Looks like it's first time we configure notebook server. Creating image."
         image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
                                               image_name=notebook_config['expected_ami_name'])
         if image_id != '':
@@ -212,9 +212,9 @@ def terminate():
         params = "--bucket_name %s --tag_name %s --nb_tag_value %s" % \
                  (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'])
         if not run_routine('terminate_notebook', params):
-            logging.info('Failed to terminate user')
+            logging.info('Failed to terminate notebook')
             with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to terminate user", "conf": notebook_config}
+                res = {"error": "Failed to terminate notebook", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)

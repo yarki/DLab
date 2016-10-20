@@ -71,7 +71,7 @@ def configure_notebook_server(notebook_name):
         sudo('pip install jupyter')
         sudo('rm -rf /root/.jupyter/jupyter_notebook_config.py')
         sudo("for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
-        sudo('jupyter user --generate-config --config /root/.jupyter/jupyter_notebook_config.py')
+        sudo('jupyter notebook --generate-config --config /root/.jupyter/jupyter_notebook_config.py')
         # sudo('echo "c.NotebookApp.password = \'' + jupyter_passwd(jupyter_password) +
         #     '\'" >> /root/.jupyter/jupyter_notebook_config.py')
         sudo('echo "c.NotebookApp.ip = \'*\'" >> /root/.jupyter/jupyter_notebook_config.py')
@@ -89,7 +89,7 @@ def configure_notebook_server(notebook_name):
 
     try:
         sudo("sleep 5; for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
-        sudo("sleep 5; screen -d -m jupyter user --config /root/.jupyter/jupyter_notebook_config.py; "
+        sudo("sleep 5; screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py; "
              "sleep 5;")
     except:
         sys.exit(1)
@@ -107,5 +107,5 @@ if __name__ == "__main__":
     env.host_string = 'ubuntu@' + args.hostname
     deeper_config = json.loads(args.additional_config)
 
-    print "Configuring user server."
+    print "Configuring notebook server."
     configure_notebook_server("_".join(args.instance_name.split()))

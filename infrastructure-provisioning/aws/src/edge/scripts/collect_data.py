@@ -26,8 +26,8 @@ if __name__ == "__main__":
     notebooks = []
     nbs_list = get_ec2_list(args.service_base_name)
     for i in nbs_list:
-        user = {}
-        user['Id'] = i.id
+        notebook = {}
+        notebook['Id'] = i.id
         for tag in i.tags:
             if tag['Key'] == 'Name':
                 user['Name'] = tag['Value']
@@ -40,19 +40,19 @@ if __name__ == "__main__":
             emr['id'] = j
             emr['status'] =  get_emr_info(j, 'Status')['State']
             counter = 0
-            for instance in get_ec2_list('Notebook', user['Name']):
+            for instance in get_ec2_list('Notebook', notebook['Name']):
                 counter +=1
                 emr['shape'] = instance.instance_type
             emr['nodes_count'] = counter
             emr['type'] =  get_emr_info(j, 'ReleaseLabel')
             resources.append(emr)
-        user['computeresources'] = resources
-        notebooks.append(user)
+        notebook['computeresources'] = resources
+        notebooks.append(notebook)
 
     edge['Notebooks'] = notebooks
     data.append(edge)
 
-    filename = '{}_data.json'.format(args.user_name)
+    filename = '{}.json'.format(args.user_name)
     with open('/root/' + filename, 'w') as outfile:
         json.dump(data, outfile)
 

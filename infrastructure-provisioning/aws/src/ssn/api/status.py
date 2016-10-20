@@ -5,7 +5,7 @@ from fabric.api import local, hide
 
 
 def create_shadow_config():
-    sections = ['creds', 'conf', 'ssn', 'user']
+    sections = ['creds', 'conf', 'ssn', 'notebook']
     shadow_overwrite_config = SafeConfigParser()
     shadow_config_file = os.environ['PROVISION_CONFIG_DIR'] + 'shadow_overwrite.ini'
     for key in os.environ:
