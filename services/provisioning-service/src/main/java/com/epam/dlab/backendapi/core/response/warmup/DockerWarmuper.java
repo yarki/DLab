@@ -5,7 +5,7 @@ import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
-import com.epam.dlab.dto.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.dropwizard.lifecycle.Managed;

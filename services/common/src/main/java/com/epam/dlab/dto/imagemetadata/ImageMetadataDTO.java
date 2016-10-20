@@ -1,6 +1,8 @@
-package com.epam.dlab.dto;
+package com.epam.dlab.dto.imagemetadata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 /**
  * Created by Alexey Suprun
@@ -12,17 +14,22 @@ public class ImageMetadataDTO {
     private String templateName;
     @JsonProperty
     private String description;
+    @JsonProperty
+    private String type;
+    @JsonProperty
+    private List<TemplateDTO> templates;
     @JsonProperty(value = "request_id")
     private String requestId;
 
     public ImageMetadataDTO() {
     }
 
-    public ImageMetadataDTO(String image, String templateName, String description, String requestId) {
+    public ImageMetadataDTO(String image, String templateName, String description, String requestId, String type) {
         this.image = image;
         this.templateName = templateName;
         this.description = description;
         this.requestId = requestId;
+        this.type = type;
     }
 
     public ImageMetadataDTO(String image) {
@@ -51,6 +58,22 @@ public class ImageMetadataDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<TemplateDTO> getTemplates() {
+        return templates;
+    }
+
+    public void setTemplates(List<TemplateDTO> templates) {
+        this.templates = templates;
     }
 
     public String getRequestId() {

@@ -4,7 +4,7 @@ import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecuter;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
-import com.epam.dlab.dto.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

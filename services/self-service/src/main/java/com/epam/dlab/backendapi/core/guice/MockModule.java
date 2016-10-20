@@ -6,7 +6,7 @@ import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.client.mongo.MongoService;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.dto.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.google.inject.name.Names;
 import io.dropwizard.setup.Environment;
 
@@ -47,7 +47,7 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
     private RESTService createProvisioningService() {
         RESTService result = mock(RESTService.class);
         when(result.get(eq(DOCKER), any()))
-                .thenReturn(new HashSet<>(Arrays.asList(new ImageMetadataDTO("test image", "template", "decription", "request_id"))));
+                .thenReturn(new HashSet<>(Arrays.asList(new ImageMetadataDTO("test image", "template", "decription", "request_id", "type"))));
         return result;
     }
 }
