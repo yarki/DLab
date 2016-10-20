@@ -6,7 +6,6 @@ import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.dto.ExploratoryCreateDTO;
 import com.epam.dlab.dto.ExploratoryTerminateDTO;
 import com.google.inject.Inject;
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +37,11 @@ public class ExploratoryResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(String.format(CREATE_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
                 dto.getServiceBaseName(), // conf_service_base_name
+                dto.getRegion(), // creds_region
+                configuration.getAdminKey(), // creds_key_name
                 dto.getNotebookUserName(), // notebook_user_name
                 dto.getNotebookSubnet(), // notebook_subnet_cidr
-                dto.getRegion(), // creds_region
                 dto.getSecurityGroupIds(), // creds_security_groups_ids
-                configuration.getAdminKey(), // creds_key_name
                 dto.getImage()));
         return uuid;
     }
@@ -54,18 +53,26 @@ public class ExploratoryResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(String.format(TERMINATE_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
                 dto.getServiceBaseName(), // conf_service_base_name
-                dto.getNotebookUserName(), // notebook_user_name
                 dto.getRegion(), // creds_region
-                dto.getNotebookInstanceName(), // notebook_instance_name
                 configuration.getAdminKey(), // creds_key_name
+                dto.getNotebookUserName(), // notebook_user_name
+                dto.getNotebookInstanceName(), // notebook_instance_name
                 configuration.getEdgeImage()));
         return uuid;
     }
 
     @Path("/stop")
     @POST
-    public String stop(String user, String emr) throws IOException, InterruptedException {
+    public String stop(ExploratoryTerminateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("stop exploratory environment");
-        throw new NotImplementedException("StopExploratoryEnvironment has not been implemented yet");
+        String uuid = DockerCommands.generateUUID();
+        commandExecuter.executeAsync(String.format(STOP_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
+                dto.getServiceBaseName(), // conf_service_base_name
+                dto.getRegion(), // creds_region
+                configuration.getAdminKey(), // creds_key_name
+                dto.getNotebookUserName(), // notebook_user_name
+                dto.getNotebookInstanceName(), // notebook_instance_name
+                configuration.getEdgeImage()));
+        return uuid;
     }
 }

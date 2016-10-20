@@ -42,22 +42,26 @@ public interface DockerCommands {
             "-e \"creds_key_name=%s\" " +
             "%s --action terminate";
 
-    String CREATE_EXPLORATORY_ENVIRONMENT = DOCKER_BASE +
+    String EXPLORATORY_ENVIRONMENT = DOCKER_BASE +
             "-e \"conf_service_base_name=%s\" " +
+            "-e \"creds_region=%s\" " +
+            "-e \"creds_key_name=%s\" ";
+
+    String CREATE_EXPLORATORY_ENVIRONMENT = EXPLORATORY_ENVIRONMENT +
             "-e \"notebook_user_name=%s\" " +
             "-e \"notebook_subnet_cidr=%s\" " +
-            "-e \"creds_region=%s\" " +
             "-e \"creds_security_groups_ids=%s\" " +
-            "-e \"creds_key_name=%s\" " +
             "%s --action create";
 
     String TERMINATE_EXPLORATORY_ENVIRONMENT = DOCKER_BASE +
-            "-e \"conf_service_base_name=%s\" " +
             "-e \"notebook_user_name=%s\" " +
-            "-e \"creds_region=%s\" " +
             "-e \"notebook_instance_name=%s\" " +
-            "-e \"creds_key_name=%s\" " +
             "%s --action terminate";
+
+    String STOP_EXPLORATORY_ENVIRONMENT = DOCKER_BASE +
+            "-e \"notebook_user_name=%s\" " +
+            "-e \"notebook_instance_name=%s\" " +
+            "%s --action stop";
 
     ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
