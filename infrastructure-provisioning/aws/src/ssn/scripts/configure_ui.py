@@ -41,7 +41,7 @@ def configure_mongo():
             local('scp -i {} /root/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
             sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
         local('scp -i {} /root/scripts/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
-        sudo('python /tmp/configure_mongo.py --region {}'.format(os.environ['creds_region']))
+        sudo('python /tmp/configure_mongo.py --region {} --base_name {}'.format(os.environ['creds_region'], os.environ['conf_service_base_name']))
         return True
     except:
         return False
