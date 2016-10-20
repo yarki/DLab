@@ -4,9 +4,6 @@ from fabric.contrib.files import exists
 import logging
 import argparse
 import json
-import random
-import string
-import crypt
 import sys
 import os
 
@@ -18,10 +15,10 @@ args = parser.parse_args()
 
 
 web_path = '/tmp/web_app/'
-local_log_filename = "%s.log" % os.environ['request_id']
+local_log_filename = "{}_UI.log".format(os.environ['request_id'])
 local_log_filepath = "/response/" + local_log_filename
 logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                    level=logging.DEBUG,
+                    level=logging.INFO,
                     filename=local_log_filepath)
 
 
@@ -44,7 +41,7 @@ def configure_mongo():
             local('scp -i {} /root/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
             sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
         local('scp -i {} /root/scripts/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
-        sudo('python /tmp/configure_mongo.py')
+        sudo('python /tmp/configure_mongo.py --region {}'.format(os.environ['creds_region']))
         return True
     except:
         return False
@@ -94,14 +91,17 @@ if __name__ == "__main__":
 
     print "Installing MongoDB"
     if not ensure_mongo():
+        logging.error('Failed to install MongoDB')
         sys.exit(1)
 
     print "Configuring MongoDB"
     if not configure_mongo():
+        logging.error('MongoDB configuration script has failed.')
         sys.exit(1)
 
     print "Starting Self-Service(UI)"
     if not start_ss():
+        logging.error('Failed to start UI')
         sys.exit(1)
 
     sys.exit(0)

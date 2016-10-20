@@ -39,7 +39,7 @@ def run():
     notebook_config['instance_type'] = os.environ['notebook_instance_type']
     notebook_config['subnet_cidr'] = os.environ['notebook_subnet_cidr']
     notebook_config['key_name'] = os.environ['creds_key_name']
-    notebook_config['user_keyname'] = os.environ['user_keyname']
+    notebook_config['user_keyname'] = os.environ['notebook_user_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-nb-' + str(provide_index('EC2', os.environ['conf_service_base_name'] + '-Tag'))
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
@@ -155,7 +155,7 @@ def run():
         print '[INSTALLING USERs KEY]'
         logging.info('[INSTALLING USERs KEY]')
         additional_config = {"user_keyname": notebook_config['user_keyname'],
-                             "user_keydir": "/root/keys/.ssh/"}
+                             "user_keydir": "/root/keys/"}
         params = "--hostname {} --keyfile {} --additional_config '{}'".format(
             instance_hostname, keyfile_name, json.dumps(additional_config))
         if not run_routine('install_user_key', params):

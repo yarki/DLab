@@ -91,7 +91,6 @@ export class Modal {
     open(option: Object, ...args: any[]) {
         if (this.isOpened)
             return;
-        //console.log('!!!!!!!!!!', this);
 
         if (option) {
             for(let key in option) {
