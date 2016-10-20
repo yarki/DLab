@@ -50,7 +50,10 @@ def create_endpoint(vpc_id, service_name, tag):
         response = response['VpcEndpoint']['VpcEndpointId']
     except botocore.exceptions.ClientError as err:
         print err.response['Error']['Message']
-        # Remove RT
+        print 'Removing RT'
+        ec2.delete_route_table(
+            RouteTableId=route_table[0]
+        )
     finally:
         return response
 
