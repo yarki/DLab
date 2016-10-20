@@ -126,7 +126,7 @@ export class HomeComponent implements OnInit {
 
   createUsernotebook(template, name, shape){
     this.userResourceService
-      .createUsernotebook({template: template, name: name, shape: shape})
+      .createUsernotebook({"image": name.value})
       .subscribe((result) => {
         console.log('result: ', result);
       });

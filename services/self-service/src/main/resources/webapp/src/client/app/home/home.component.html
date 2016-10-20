@@ -170,7 +170,7 @@
     <h4 class="modal-title" id="myModalLabel">Create analytical tool</h4>
   </modal-header>
   <modal-content>
-  <form (submit)="createUsernotebook(template.value, name.value, shape.value)">
+  <form (submit)="createUsernotebook(template, name, shape)">
     <div class="form-group row">
       <div  class="col-xs-4">
         <label class="control-label">Select template</label>
@@ -180,7 +180,7 @@
       </div>
       <div class="col-xs-8">
         <select class="form-control" #template>
-          <option *ngFor="let template of templatesList">{{template.template_name}}</option>
+          <option *ngFor="let template of templatesList" value="{{template.image}}">{{template.template_name}}</option>
         </select>
       </div>
     </div>
