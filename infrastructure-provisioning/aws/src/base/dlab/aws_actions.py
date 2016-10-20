@@ -157,7 +157,7 @@ def start_ec2(tag_name, tag_value):
                  {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
     for instance in instances:
         client.start_instances(InstanceIds=[instance.id])
-        waiter = client.get_waiter('instance_running')
+        waiter = client.get_waiter('instance_status_ok')
         waiter.wait(InstanceIds=[instance.id])
 
 
