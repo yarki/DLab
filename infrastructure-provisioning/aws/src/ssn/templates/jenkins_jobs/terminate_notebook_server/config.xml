@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>This job terminates user server and all EMRs which are linked to it</description>
+  <description>This job terminates notebook server and all EMRs which are linked to it</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -13,7 +13,7 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>Notebook_Name</name>
-          <description>name of the user, EMR is linked to.</description>
+          <description>name of the notebook, EMR is linked to.</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
