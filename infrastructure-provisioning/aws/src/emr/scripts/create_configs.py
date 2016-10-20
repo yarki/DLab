@@ -20,9 +20,9 @@ spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version 
 
 
 def install_emr_spark():
-    sudo('wget ' + spark_link + ' -O /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
-    sudo('mkdir -p /opt/' + args.emr_version)
-    sudo('tar -zxvf /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/' + args.emr_version + '/')
+    local('wget ' + spark_link + ' -O /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
+    local('mkdir -p /opt/' + args.emr_version)
+    local('tar -zxvf /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/' + args.emr_version + '/')
 
 def prepare():
     local('rm -rf /srv/*')
