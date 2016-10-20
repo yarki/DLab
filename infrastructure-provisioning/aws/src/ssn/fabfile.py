@@ -2,6 +2,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
+from dlab.aws_actions import *
 import sys
 
 
@@ -64,6 +65,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_role('ssn')
         sys.exit(1)
 
     try:
@@ -83,6 +85,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -102,6 +106,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -122,6 +129,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -142,6 +152,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -159,6 +172,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -173,6 +189,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -197,4 +216,7 @@ def run():
             params += "--key_id %s" % os.environ['creds_access_key']
             run_routine('finalize', params)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)

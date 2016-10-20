@@ -124,3 +124,10 @@ body {
 .navbar .btn-logout {
   margin-top: 0;
 }
+
+.modal .btn {
+  margin-top: 20px;
+}
+.modal .modal-footer .btn {
+  margin-top: 0;
+}

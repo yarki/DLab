@@ -3,6 +3,7 @@ import json
 import sys
 from dlab.fab import *
 from dlab.aws_meta import *
+from dlab.aws_actions import *
 
 
 # Function for creating AMI from already provisioned notebook
@@ -99,6 +100,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
     # updating repositories & installing python packages
@@ -114,6 +116,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
     # installing and configuring jupiter and all dependencies
@@ -134,6 +137,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
     # installing python2 and python3 libs
@@ -149,6 +153,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
     try:
