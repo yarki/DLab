@@ -52,7 +52,7 @@ public class EmrResource implements EmrAPI {
                 .withInstanceType(formDTO.getInstanceType())
                 .withVersion(formDTO.getVersion())
                 .withNotebookName(formDTO.getNotebookName())
-                .withNotebookName(userInfo.getName())
+                .withEdgeUserName(userInfo.getName())
                 .withEdgeSubnet(keyDao.findCredential(userInfo.getName()).getNotebookSubnet())
                 .withRegion(dao.getAwsRegion());
         return provisioningService.post(EMR_CREATE, dto, String.class);
