@@ -2,6 +2,9 @@
 
 import argparse
 from fabric.api import *
+import boto3
+from dlab.aws_meta import *
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket', type=str, default='')
@@ -25,10 +28,26 @@ def configure_notebook():
     sudo('chmod 755 /usr/local/bin/create_configs.py')
 
 
+def get_spark_version():
+    spark_version = ''
+    emr = boto3.client('emr')
+    clusters = emr.list_clusters(ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING'])
+    clusters = clusters.get('Clusters')
+    for i in clusters:
+        response = emr.describe_cluster(ClusterId=i.get('Id'))
+        if response.get("Cluster").get("Name") == args.cluster_name:
+            response =  response.get("Cluster").get("Applications")
+            for j in response:
+                if j.get("Name") == 'Spark':
+                    spark_version = j.get("Version")
+    return spark_version
+
+
 if __name__ == "__main__":
     env.hosts = "{}".format(args.notebook_ip)
     env.user = "ubuntu"
     env.key_filename = "{}".format(args.keyfile)
     env.host_string = env.user + "@" + env.hosts
     configure_notebook()
-    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version)
+    spark_version = get_spark_version()
+    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version)
