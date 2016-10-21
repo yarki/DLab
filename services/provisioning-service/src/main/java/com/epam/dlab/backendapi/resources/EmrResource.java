@@ -1,3 +1,15 @@
+/******************************************************************************************************
+
+ Copyright (c) 2016 EPAM Systems Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+ *****************************************************************************************************/
+
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
@@ -5,8 +17,8 @@ import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.dto.EMRTerminateDTO;
-import com.epam.dlab.dto.EMRCreateDTO;
+import com.epam.dlab.dto.emr.EMRTerminateDTO;
+import com.epam.dlab.dto.emr.EMRCreateDTO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +30,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
-/**
- * Created by Maksym_Pendyshchuk on 10/17/2016.
- */
 @Path("/emr")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -41,37 +50,6 @@ public class EmrResource implements DockerCommands {
         LOGGER.debug("create emr cluster");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(
-                /*String.format(CREATE_EMR_CLUSTER, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
-                dto.getServiceBaseName(), // conf_service_base_name
-                dto.getInstanceCount(), // emr_instance_count
-                dto.getInstanceType(), // emr_instance_type
-                dto.getVersion(), // emr_version
-                configuration.getEmrEC2RoleDefault(), // ec2_role
-                configuration.getEmrServiceRoleDefault(), // service_role
-                dto.getNotebookName(), // notebook_name
-                dto.getEdgeUserName(), // edge_user_name
-                dto.getEdgeSubnet(), // edge_subnet_cidr
-                dto.getRegion(), // creds_region
-                configuration.getAdminKey(), // creds_key_name
-                configuration.getEmrImage()));*/
-        /*new RunDockerCommand()
-                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                .withVolumeForResponse(configuration.getImagesDirectory())
-                .withRequestId(uuid)
-                .withConfServiceBaseName(dto.getServiceBaseName())
-                .withEmrInstanceCount(dto.getInstanceCount())
-                .withEmrInstanceType( dto.getInstanceType())
-                .withEmrVersion( dto.getVersion())
-                .withEc2Role(configuration.getEmrEC2RoleDefault())
-                .withServiceRole(configuration.getEmrServiceRoleDefault())
-                .withNotebookName(dto.getNotebookName())
-                .withEdgeUserName(dto.getEdgeUserName())
-                .withEdgeSubnetCidr( dto.getEdgeSubnet())
-                .withCredsRegion( dto.getRegion())
-                .withCredsKeyName(configuration.getAdminKey())
-                .withActionCreate(configuration.getEmrImage())
-                .toCMD()*/
-
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withVolumeForRootKeys(configuration.getKeyDirectory())
@@ -93,27 +71,6 @@ public class EmrResource implements DockerCommands {
         LOGGER.debug("terminate emr cluster");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(
-
-                /*String.format(TERMINATE_EMR_CLUSTER, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
-                dto.getServiceBaseName(), // conf_service_base_name
-                dto.getEdgeUserName(), // edge_user_name
-                dto.getClusterName(), // emr_cluster_name
-                dto.getRegion(), // creds_region
-                configuration.getAdminKey(), // creds_key_name
-                configuration.getEmrImage())*/
-
-                /*new RunDockerCommand()
-                        .withVolumeForRootKeys(configuration.getKeyDirectory())
-                        .withVolumeForResponse(configuration.getImagesDirectory())
-                        .withRequestId(uuid)
-                        .withConfServiceBaseName(dto.getServiceBaseName())
-                        .withEdgeUserName( dto.getEdgeUserName())
-                        .withEmrClusterName( dto.getClusterName())
-                        .withCredsRegion( dto.getRegion())
-                        .withCredsKeyName(configuration.getAdminKey())
-                        .withActionTerminate(configuration.getEmrImage())
-                .toCMD()*/
-
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withVolumeForRootKeys(configuration.getKeyDirectory())

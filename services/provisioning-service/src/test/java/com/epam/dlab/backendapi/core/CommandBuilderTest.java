@@ -1,7 +1,7 @@
 package com.epam.dlab.backendapi.core;
 
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.dto.EMRCreateDTO;
+import com.epam.dlab.dto.emr.EMRCreateDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 

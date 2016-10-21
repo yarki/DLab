@@ -10,29 +10,26 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.dao;
+package com.epam.dlab.dto.exploratory;
 
-import com.mongodb.client.result.DeleteResult;
-import org.bson.Document;
+import com.epam.dlab.dto.ResourceBaseDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import static com.epam.dlab.backendapi.dao.MongoCollections.SHAPES;
-import static com.epam.dlab.backendapi.dao.MongoCollections.USER_NOTEBOOKS;
-import static com.mongodb.client.model.Filters.eq;
+public class ExploratoryBaseDTO<T extends ExploratoryBaseDTO<?>> extends ResourceBaseDTO<T> {
+    @JsonProperty("notebook_user_name")
+    private String notebookUserName;
 
-public class UserNotebookDAO extends BaseDAO {
-    public Iterable<Document> find(String user) {
-        return mongoService.getCollection(USER_NOTEBOOKS).find(eq(USER, user));
+    public String getNotebookUserName() {
+        return notebookUserName;
     }
 
-    public Iterable<Document> findShapes() {
-        return mongoService.getCollection(SHAPES).find();
+    public void setNotebookUserName(String notebookUserName) {
+        this.notebookUserName = notebookUserName;
     }
 
-    public void insert(String user, String image) {
-        insertOne(USER_NOTEBOOKS, () -> new Document(USER, user).append("image", image));
-    }
-
-    public DeleteResult delete(String id) {
-        return mongoService.getCollection(USER_NOTEBOOKS).deleteOne(eq(USER, id));
+    @SuppressWarnings("unchecked")
+    public T withNotebookUserName(String notebookUserName) {
+        setNotebookUserName(notebookUserName);
+        return (T) this;
     }
 }

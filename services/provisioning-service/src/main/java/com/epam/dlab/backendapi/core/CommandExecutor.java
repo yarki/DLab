@@ -12,10 +12,6 @@
 
 package com.epam.dlab.backendapi.core;
 
-import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.dto.EMRBaseDTO;
-import com.epam.dlab.generate_json.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

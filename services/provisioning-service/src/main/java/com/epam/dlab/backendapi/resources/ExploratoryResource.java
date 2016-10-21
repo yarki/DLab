@@ -1,3 +1,15 @@
+/******************************************************************************************************
+
+ Copyright (c) 2016 EPAM Systems Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+ *****************************************************************************************************/
+
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
@@ -5,8 +17,8 @@ import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.dto.ExploratoryCreateDTO;
-import com.epam.dlab.dto.ExploratoryTerminateDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryTerminateDTO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +30,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
-/**
- * Created by Maksym_Pendyshchuk on 10/17/2016.
- */
 @Path("/exploratory")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -42,30 +51,6 @@ public class ExploratoryResource implements DockerCommands {
         LOGGER.debug("create exploratory environment");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(
-                /*
-                String.format(CREATE_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
-                dto.getServiceBaseName(), // conf_service_base_name
-                dto.getRegion(), // creds_region
-                configuration.getAdminKey(), // creds_key_name
-                dto.getNotebookUserName(), // notebook_user_name
-                dto.getNotebookSubnet(), // notebook_subnet_cidr
-                dto.getSecurityGroupIds(), // creds_security_groups_ids
-                dto.getImage()));
-                */
-
-//                new RunDockerCommand()
-//                        .withVolumeForRootKeys(configuration.getKeyDirectory())
-//                        .withVolumeForResponse(configuration.getImagesDirectory())
-//                        .withRequestId(uuid)
-//                        .withConfServiceBaseName(dto.getServiceBaseName())
-//                        .withCredsRegion(dto.getRegion())
-//                        .withCredsKeyName(configuration.getAdminKey())
-//                        .withNotebookUserName(dto.getNotebookUserName())
-//                        .withNotebookSubnetCidr(dto.getNotebookSubnet())
-//                        .withCredsSecurityGroupsIds(dto.getSecurityGroupIds())
-//                        .withActionCreate(dto.getImage())
-//                        .toCMD()
-
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withInteractive()
@@ -86,28 +71,6 @@ public class ExploratoryResource implements DockerCommands {
         LOGGER.debug("terminate exploratory environment");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(
-                /*
-                String.format(TERMINATE_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
-                dto.getServiceBaseName(), // conf_service_base_name
-                dto.getRegion(), // creds_region
-                configuration.getAdminKey(), // creds_key_name
-                dto.getNotebookUserName(), // notebook_user_name
-                dto.getNotebookInstanceName(), // notebook_instance_name
-                configuration.getEdgeImage()));
-                */
-
-                /*new RunDockerCommand()
-                        .withVolumeForRootKeys(configuration.getKeyDirectory())
-                        .withVolumeForResponse(configuration.getImagesDirectory())
-                        .withRequestId(uuid)
-                        .withConfServiceBaseName(dto.getServiceBaseName())
-                        .withCredsRegion(dto.getRegion())
-                        .withCredsKeyName(configuration.getAdminKey())
-                        .withNotebookUserName(dto.getNotebookUserName())
-                        .withNotebookInstanceName(dto.getNotebookInstanceName())
-                        .withActionTerminate(configuration.getEdgeImage())
-                        .toCMD()*/
-
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withVolumeForRootKeys(configuration.getKeyDirectory())
@@ -128,28 +91,6 @@ public class ExploratoryResource implements DockerCommands {
         LOGGER.debug("stop exploratory environment");
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(
-                /*
-                String.format(STOP_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
-                dto.getServiceBaseName(), // conf_service_base_name
-                dto.getRegion(), // creds_region
-                configuration.getAdminKey(), // creds_key_name
-                dto.getNotebookUserName(), // notebook_user_name
-                dto.getNotebookInstanceName(), // notebook_instance_name
-                configuration.getEdgeImage())
-                */
-
-                /*new RunDockerCommand()
-                        .withVolumeForRootKeys(configuration.getKeyDirectory())
-                        .withVolumeForResponse(configuration.getImagesDirectory())
-                        .withRequestId(uuid)
-                        .withConfServiceBaseName(dto.getServiceBaseName())
-                        .withCredsRegion(dto.getRegion())
-                        .withCredsKeyName(configuration.getAdminKey())
-                        .withNotebookUserName(dto.getNotebookUserName())
-                        .withNotebookInstanceName(dto.getNotebookInstanceName())
-                        .withActionStop(configuration.getEdgeImage())
-                        .toCMD()*/
-
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withVolumeForRootKeys(configuration.getKeyDirectory())
