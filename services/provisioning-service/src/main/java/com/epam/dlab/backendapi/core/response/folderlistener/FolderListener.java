@@ -1,5 +1,6 @@
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
+import com.epam.dlab.backendapi.core.Constants;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import io.dropwizard.util.Duration;
@@ -49,7 +50,7 @@ public class FolderListener implements Runnable {
             List<WatchEvent<?>> events = watchKey.pollEvents();
             for (WatchEvent event : events) {
                 String fileName = event.context().toString();
-                if (fileName.endsWith(DockerCommands.JSON_EXTENTION)) {
+                if (fileName.endsWith(Constants.JSON_EXTENSION)) {
                     handleFileAsync(fileName);
                 }
                 pollFile();

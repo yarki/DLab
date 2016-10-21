@@ -1,7 +1,7 @@
 package com.epam.dlab.backendapi.core.response.warmup;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.CommandExecuter;
+import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.google.inject.AbstractModule;
@@ -49,7 +49,7 @@ public class DockerWarmuperTest {
             protected void configure() {
                 bind(FolderListenerExecutor.class).toInstance(mock(FolderListenerExecutor.class));
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(createConfiguration());
-                bind(CommandExecuter.class).toInstance(createCommandExecuter());
+                bind(CommandExecutor.class).toInstance(createCommandExecuter());
             }
         });
     }
@@ -61,8 +61,8 @@ public class DockerWarmuperTest {
         return result;
     }
 
-    private CommandExecuter createCommandExecuter() {
-        CommandExecuter result = mock(CommandExecuter.class);
+    private CommandExecutor createCommandExecuter() {
+        CommandExecutor result = mock(CommandExecutor.class);
         try {
             when(result.executeSync(anyString())).thenReturn(Collections.singletonList("executeResult"));
         } catch (Exception e) {

@@ -2,15 +2,16 @@ package com.epam.dlab.backendapi.core.response.keyloader;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.SelfAPI;
-import com.epam.dlab.backendapi.core.CommandExecuter;
+import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
+import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
-import com.epam.dlab.client.restclient.RESTService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -37,7 +38,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecuter commandExecuter;
+    private CommandExecutor commandExecuter;
     @Inject
     private RESTService selfService;
 
@@ -46,11 +47,25 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getKeyLoaderDirectory(), configuration.getKeyLoaderPollTimeout(),
                 getResultHandler(dto.getUser(), uuid));
-        commandExecuter.executeAsync(String.format(CREATE_EDGE_METADATA, configuration.getKeyDirectory(), configuration.getKeyLoaderDirectory(), uuid,
+        commandExecuter.executeAsync(
+                /*String.format(CREATE_EDGE_METADATA, configuration.getKeyDirectory(), configuration.getKeyLoaderDirectory(), uuid,
                 dto.getServiceBaseName(),
                 configuration.getAdminKey(),
                 dto.getUser(),
-                configuration.getEdgeImage()));
+                configuration.getEdgeImage())*/
+
+
+                new RunDockerCommand()
+                        .withVolumeForRootKeys(configuration.getKeyDirectory())
+                        .withVolumeForResponse(configuration.getKeyLoaderDirectory())
+                        .withRequestId(uuid)
+                        .withConfServiceBaseName(dto.getServiceBaseName())
+                        .withCredsKeyName(configuration.getAdminKey())
+                        .withEdgeUserName(dto.getUser())
+                        .withActionCreate(configuration.getEdgeImage())
+                        .toCMD()
+        );
+
         return uuid;
     }
 

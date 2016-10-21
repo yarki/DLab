@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Created by Maksym_Pendyshchuk on 10/20/2016.
  */
 abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
-    @JsonProperty("conf_service_base_name ")
+    @JsonProperty("conf_service_base_name")
     private String serviceBaseName;
     @JsonProperty("creds_region")
     private String region;

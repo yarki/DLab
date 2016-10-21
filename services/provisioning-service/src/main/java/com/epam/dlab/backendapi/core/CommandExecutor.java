@@ -1,5 +1,9 @@
 package com.epam.dlab.backendapi.core;
 
+import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
+import com.epam.dlab.dto.EMRBaseDTO;
+import com.epam.dlab.generate_json.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +18,8 @@ import java.util.List;
  * Created by Alexey Suprun
  */
 @Singleton
-public class CommandExecuter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecuter.class);
+public class CommandExecutor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
 
     public List<String> executeSync(String command) throws IOException {
         Process process = execute(command);

@@ -1,5 +1,7 @@
 package com.epam.dlab.backendapi.core;
 
+import com.epam.dlab.backendapi.core.docker.command.ImagesDockerCommand;
+import com.epam.dlab.backendapi.core.docker.command.UnixCommand;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -9,60 +11,14 @@ import java.util.UUID;
  * Created by Alexey Suprun
  */
 public interface DockerCommands {
-    String JSON_EXTENTION = ".json";
-    String GET_IMAGES = "docker images | awk '{print $1\":\"$2}' | sort | uniq | grep \"dlab\" | grep -v \"none\" " +
-            "| grep -v \"base\" | grep -v \"ssn\" | grep -v \"edge\"";
-    String DOCKER_BASE = "docker run -v %s:/root/keys -v %s:/response -e \"request_id=%s\" ";
-    String GET_IMAGE_METADATA = DOCKER_BASE + "%s --action describe";
-    String RUN_IMAGE = DOCKER_BASE + "-e \"dry_run=true\" %s --action run";
-
-    String CREATE_EDGE_METADATA = DOCKER_BASE +
-            "-e \"conf_service_base_name=%s\" " +
-            "-e \"creds_key_name=%s\" " +
-            "-e \"edge_user_name=%s\" " +
-            "%s --action create";
-
-    String CREATE_EMR_CLUSTER = DOCKER_BASE +
-            "-e \"conf_service_base_name=%s\" " +
-            "-e \"emr_instance_count=%s\" " +
-            "-e \"emr_instance_type=%s\" " +
-            "-e \"emr_version=%s\" " +
-            "-e \"ec2_role=%s\" " +
-            "-e \"service_role=%s\" " +
-            "-e \"notebook_name=%s\" " +
-            "-e \"edge_user_name=%s\" " +
-            "-e \"edge_subnet_cidr=%s\" " +
-            "-e \"creds_region=%s\" " +
-            "-e \"creds_key_name=%s\" " +
-            "%s --action create";
-    String TERMINATE_EMR_CLUSTER = DOCKER_BASE +
-            "-e \"conf_service_base_name=%s\" " +
-            "-e \"edge_user_name=%s\" " +
-            "-e \"emr_cluster_name=%s\" " +
-            "-e \"creds_region=%s\" " +
-            "-e \"creds_key_name=%s\" " +
-            "%s --action terminate";
-
-    String EXPLORATORY_ENVIRONMENT = DOCKER_BASE +
-            "-e \"conf_service_base_name=%s\" " +
-            "-e \"creds_region=%s\" " +
-            "-e \"creds_key_name=%s\" ";
-
-    String CREATE_EXPLORATORY_ENVIRONMENT = EXPLORATORY_ENVIRONMENT +
-            "-e \"notebook_user_name=%s\" " +
-            "-e \"notebook_subnet_cidr=%s\" " +
-            "-e \"creds_security_groups_ids=%s\" " +
-            "%s --action create";
-
-    String TERMINATE_EXPLORATORY_ENVIRONMENT = DOCKER_BASE +
-            "-e \"notebook_user_name=%s\" " +
-            "-e \"notebook_instance_name=%s\" " +
-            "%s --action terminate";
-
-    String STOP_EXPLORATORY_ENVIRONMENT = DOCKER_BASE +
-            "-e \"notebook_user_name=%s\" " +
-            "-e \"notebook_instance_name=%s\" " +
-            "%s --action stop";
+    String GET_IMAGES = new ImagesDockerCommand()
+            .pipe(UnixCommand.awk("{print $1\":\"$2}"))
+            .pipe(UnixCommand.sort())
+            .pipe(UnixCommand.uniq())
+            .pipe(UnixCommand.grep("dlab"))
+            .pipe(UnixCommand.grep("none", "-v"))
+            .pipe(UnixCommand.grep("edge", "-v"))
+            .toCMD();
 
     ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
@@ -71,6 +27,6 @@ public interface DockerCommands {
     }
 
     static String extractUUID(String fileName) {
-        return fileName.replace(JSON_EXTENTION, "");
+        return fileName.replace(Constants.JSON_EXTENSION, "");
     }
 }
