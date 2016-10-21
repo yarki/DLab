@@ -17,6 +17,8 @@ public interface DockerCommands {
             .pipe(UnixCommand.uniq())
             .pipe(UnixCommand.grep("dlab"))
             .pipe(UnixCommand.grep("none", "-v"))
+            .pipe(UnixCommand.grep("base", "-v"))
+            .pipe(UnixCommand.grep("ssn", "-v"))
             .pipe(UnixCommand.grep("edge", "-v"))
             .toCMD();
 
