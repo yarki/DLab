@@ -54,7 +54,7 @@ def run():
         logging.info('[CREATE ENDPOINT AND ROUTE-TABLE]')
         print('[CREATE ENDPOINT AND ROUTE-TABLE]')
         params = "--vpc_id {} --region {} --infra_tag_name {} --infra_tag_value {}".format(
-            creds_vpc_id, creds_region, "Name", service_base_name)
+            os.environ('creds_vpc_id'), os.environ('creds_region'), "Name", service_base_name)
         if not run_routine('create_endpoint', params):
             logging.info('Unable to create Endpoint')
             with open("/root/result.json", 'w') as result:
