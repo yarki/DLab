@@ -35,6 +35,7 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements ExploratoryAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
+    private static final String DEFAULT_SECURITY_GROUP = "sg-e338c89a";
 
     @Inject
     private SettingsDAO dao;
@@ -60,7 +61,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                 .withNotebookUserName(userInfo.getName())
                 .withNotebookSubnet(credentialDTO.getNotebookSubnet())
                 .withRegion(dao.getAwsRegion())
-                .withSecurityGroupIds("")
+                .withSecurityGroupIds(DEFAULT_SECURITY_GROUP)
                 .withImage(formDTO.getImage());
         return provisioningService.post(EXPLORATORY_CREATE, dto, String.class);
     }

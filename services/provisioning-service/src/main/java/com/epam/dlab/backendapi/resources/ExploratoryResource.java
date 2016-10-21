@@ -53,28 +53,29 @@ public class ExploratoryResource implements DockerCommands {
                 dto.getImage()));
                 */
 
-                new RunDockerCommand()
-                        .withVolumeForRootKeys(configuration.getKeyDirectory())
-                        .withVolumeForResponse(configuration.getImagesDirectory())
-                        .withRequestId(uuid)
-                        .withConfServiceBaseName(dto.getServiceBaseName())
-                        .withCredsRegion(dto.getRegion())
-                        .withCredsKeyName(configuration.getAdminKey())
-                        .withNotebookUserName(dto.getNotebookUserName())
-                        .withNotebookSubnetCidr(dto.getNotebookSubnet())
-                        .withCredsSecurityGroupsIds(dto.getSecurityGroupIds())
-                        .withActionCreate(dto.getImage())
-                        .toCMD()
+//                new RunDockerCommand()
+//                        .withVolumeForRootKeys(configuration.getKeyDirectory())
+//                        .withVolumeForResponse(configuration.getImagesDirectory())
+//                        .withRequestId(uuid)
+//                        .withConfServiceBaseName(dto.getServiceBaseName())
+//                        .withCredsRegion(dto.getRegion())
+//                        .withCredsKeyName(configuration.getAdminKey())
+//                        .withNotebookUserName(dto.getNotebookUserName())
+//                        .withNotebookSubnetCidr(dto.getNotebookSubnet())
+//                        .withCredsSecurityGroupsIds(dto.getSecurityGroupIds())
+//                        .withActionCreate(dto.getImage())
+//                        .toCMD()
 
-//                commandBuilder.buildCommand(
-//                        new RunDockerCommand()
-//                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-//                                .withVolumeForResponse(configuration.getImagesDirectory())
-//                                .withRequestId(uuid)
-//                                .withCredsKeyName(configuration.getAdminKey())
-//                                .withActionCreate(dto.getImage()),
-//                        dto
-//                )
+                commandBuilder.buildCommand(
+                        new RunDockerCommand()
+                                .withInteractive()
+                                .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                .withVolumeForResponse(configuration.getImagesDirectory())
+                                .withRequestId(uuid)
+                                .withCredsKeyName(configuration.getAdminKey())
+                                .withActionCreate(dto.getImage()),
+                        dto
+                )
         );
         return uuid;
     }
