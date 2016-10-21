@@ -18,7 +18,7 @@ export class Grid {
 
   ngOnInit() {
     this.environmentsService.getEnvironmentsList().subscribe((list) => {
-      this.list = list['resources'];
+      this.list = list['RESOURCES'];
 
       this.environments = this.loadEnvironments();
       console.log('models ', this.environments);
@@ -32,5 +32,9 @@ export class Grid {
         value.SHAPE,
         value.COMPUTATIONAL_RESOURCES);
     });
+  }
+
+  printDetailEnvironmentModal(data) {
+    console.log(data);
   }
 }

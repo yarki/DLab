@@ -15,4 +15,8 @@ export class ResourcesList {
   toggleResourceList() {
     this.collapse = !this.collapse;
   }
+
+  printDetailResourceModal(data) {
+    console.log(data);
+  }
 }

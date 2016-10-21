@@ -4,9 +4,17 @@
   vertical-align: middle;
   margin-top: -5px;
 }
+
 .no_details {
   color: #bdc9d5;
 }
+
+.detailed-link {
+  color: #333;
+  cursor: pointer;
+  text-decoration: none;
+}
+
 .source {
   line-height: 30px;
 }

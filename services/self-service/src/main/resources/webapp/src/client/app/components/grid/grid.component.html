@@ -12,7 +12,7 @@
   </tr> -->
 
   <tr *ngFor="let env of environments">
-    <td>{{env.name}}</td>
+    <td (click)="printDetailEnvironmentModal(env)">{{env.name}}</td>
     <td class="{{env.status.toLowerCase()}}">{{env.status}}</td>
     <td>{{env.shape}}</td>
     <td>
