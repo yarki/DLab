@@ -1,3 +1,15 @@
+/******************************************************************************************************
+
+Copyright (c) 2016 EPAM Systems Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*****************************************************************************************************/
+
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthenticationService } from './../security/authentication.service';
 import {UserAccessKeyService} from "../services/userAccessKey.service";
@@ -5,6 +17,7 @@ import {UserResourceService} from "../services/userResource.service";
 import {UserEmrService} from "../services/createEmr.service";
 import {AppRoutingService} from "../routing/appRouting.service";
 import {Http, Response} from '@angular/http';
+import { AppRoutingService } from "../routing/appRouting.service";
 
 @Component({
   moduleId: module.id,
@@ -16,7 +29,7 @@ import {Http, Response} from '@angular/http';
 
 export class HomeComponent implements OnInit {
   key: any;
-  uploadAccessKeyUrl : string;
+  uploadAccessKeyUrl: string;
   preloadModalInterval: any;
 
   templatesList: any;
@@ -38,8 +51,7 @@ export class HomeComponent implements OnInit {
     private userEmrService: UserEmrService,
     private appRoutingService : AppRoutingService,
     private http: Http
-  )
-  {
+  ) {
     this.uploadAccessKeyUrl = this.userAccessKeyProfileService.getAccessKeyUrl();
   }
 
@@ -60,7 +72,7 @@ export class HomeComponent implements OnInit {
   }
 
   uploadUserAccessKey_btnClick($event) {
-    this.preloadModalInterval = setInterval(function () {
+    this.preloadModalInterval = setInterval(function() {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
   }
@@ -69,31 +81,29 @@ export class HomeComponent implements OnInit {
   // Private Methods
   //
 
-  private checkInfrastructureCreationProgress()
-  {
+  private checkInfrastructureCreationProgress() {
     this.userAccessKeyProfileService.checkUserAccessKey()
       .subscribe(
-        data => {
-          if(this.preloaderModal.isOpened)
-          {
-            this.preloaderModal.close();
-            clearInterval(this.preloadModalInterval);
-          }
-        },
-        err => {
-          if(err.status == 404) // key haven't been uploaded
-          {
-            if(!this.keyUploadModal.isOpened)
-              this.keyUploadModal.open({isFooter: false});
-          } else if (err.status == 406) // key is being uploaded in progress
-          {
-            if(this.keyUploadModal.isOpened)
-              this.keyUploadModal.close();
-
-            if(!this.preloaderModal.isOpened)
-              this.preloaderModal.open({isHeader: false, isFooter: false});
-          }
+      data => {
+        if (this.preloaderModal.isOpened) {
+          this.preloaderModal.close();
+          clearInterval(this.preloadModalInterval);
         }
+      },
+      err => {
+        if (err.status == 404) // key haven't been uploaded
+        {
+          if (!this.keyUploadModal.isOpened)
+            this.keyUploadModal.open({ isFooter: false });
+        } else if (err.status == 406) // key is being uploaded in progress
+        {
+          if (this.keyUploadModal.isOpened)
+            this.keyUploadModal.close();
+
+          if (!this.preloaderModal.isOpened)
+            this.preloaderModal.open({ isHeader: false, isFooter: false });
+        }
+      }
       );
   }
 
@@ -106,32 +116,23 @@ export class HomeComponent implements OnInit {
   }
 
   uploadUserAccessKey($event) {
-    this.preloadModalInterval = setInterval(function () {
+    this.preloadModalInterval = setInterval(function() {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
   }
 
   initAnalyticSelectors() {
     this.userResourceService.getTemplates()
-      .subscribe (
-        data => {
-          this.templatesList = data;
-        }
+      .subscribe(
+      data => {
+        this.templatesList = data;
+      }
       );
     this.userResourceService.getShapes()
-      .subscribe (
-        data => {
-          this.shapesList = data;
-        }
-      );
-  }
-
-  createComputationalSelectors {
-    this.userEmrService.getTemplates()
-      .subscribe (
-        data => {
-          this.templatesList = data;
-        }
+      .subscribe(
+      data => {
+        this.shapesList = data;
+      }
       );
   }
 
@@ -141,6 +142,6 @@ export class HomeComponent implements OnInit {
       .subscribe((result) => {
         console.log('result: ', result);
       });
-      return false;
+    return false;
   };
 }
