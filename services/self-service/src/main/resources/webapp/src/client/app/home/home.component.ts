@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthenticationService } from './../security/authentication.service';
 import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
+import {UserEmrService} from "../services/createEmr.service";
 import {AppRoutingService} from "../routing/appRouting.service";
 import {Http, Response} from '@angular/http';
 
@@ -34,6 +35,7 @@ export class HomeComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private userAccessKeyProfileService: UserAccessKeyService,
     private userResourceService: UserResourceService,
+    private userEmrService: UserEmrService,
     private appRoutingService : AppRoutingService,
     private http: Http
   )
@@ -120,6 +122,15 @@ export class HomeComponent implements OnInit {
       .subscribe (
         data => {
           this.shapesList = data;
+        }
+      );
+  }
+
+  createComputationalSelectors {
+    this.userEmrService.getTemplates()
+      .subscribe (
+        data => {
+          this.templatesList = data;
         }
       );
   }

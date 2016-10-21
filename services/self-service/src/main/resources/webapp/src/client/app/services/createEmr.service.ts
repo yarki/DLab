@@ -4,21 +4,16 @@ import { WebRequestHelper } from './../util/webRequestHelper.service'
 import { UserProfileService } from './../security/userProfile.service'
 
 @Injectable()
-export class UserResourceService {
+export class UserEmrService {
 
   constructor(private http: Http,
               private webRequestHelper : WebRequestHelper,
               private userProfileService : UserProfileService) {
   }
 
-  getTemplatesUrl() : string
+  getEmrTemplatesUrl() : string
   {
-    return `/api/userlist/computational?access_token=${this.userProfileService.getAuthToken()}`;
-  }
-
-  getShapesUrl() : string
-  {
-    return `/api/userlist/shape?access_token=${this.userProfileService.getAuthToken()}`;
+    return `/api/docker?access_token=${this.userProfileService.getAuthToken()}`;
   }
 
   getCreateUsernotebookUrl() : string
@@ -26,18 +21,7 @@ export class UserResourceService {
     return `/api/exploratory/create?access_token=${this.userProfileService.getAuthToken()}`;
   }
 
-  getTemplates() 
-  {
-    return this.http.get(this.getTemplatesUrl())
-      .map(( res:Response ) => res.json());
-  }
-
-  getShapes() 
-  {
-    return this.http.get(this.getShapesUrl())
-      .map(( res:Response ) => res.json());
-  }
-  createUsernotebook(data)
+  createComputational (data)
   {  
     let body = JSON.stringify(data);
     let requestHeader = this.webRequestHelper.getJsonHeader();
