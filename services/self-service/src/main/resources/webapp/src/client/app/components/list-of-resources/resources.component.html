@@ -4,13 +4,13 @@
   </div>
   <div *ngIf="resources.length">
     <span *ngIf="resources.length" class="glyphicon glyphicon-remove"></span>
-    <a class="detailed-link" (click)="printDetailResourceModal(resources[0])">{{resources[0].resource_name}}</a>
+    <a class="detailed-link" (click)="printDetailResourceModal(resources[0])">{{resources[0].RESOURCE_NAME}} {{resources[0].NODES_NUMBER}} nodes</a>
     <span class="glyphicon pull-right" [ngClass]="{'glyphicon-triangle-bottom': !collapse, 'glyphicon-triangle-top': collapse}" (click)="toggleResourceList()"></span>
   </div>
 </div>
 <div *ngIf="collapse" class="source">
   <div *ngFor="let resource of resources | slice:1">
     <span class="glyphicon glyphicon-remove"></span>
-    <a class="detailed-link" (click)="printDetailResourceModal(resource)">{{resource.resource_name}}</a>
+    <a class="detailed-link" (click)="printDetailResourceModal(resource)">{{resource.RESOURCE_NAME}} {{resource.NODES_NUMBER}} nodes</a>
   </div>
 </div>

@@ -15,11 +15,24 @@
     "UP_TIME_HOURS": 2,
     "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
     "COMPUTATIONAL_RESOURCES": [{
-      "resource_name": "EMR cluster 7 nodes",
-      "resource_status": "Stopped"
+      "RESOURCE_NAME": "EMR cluster",
+      "NODES_NUMBER": 11,
+      "RESOURCE_STATUS": "Stopped",
+      "UP_TIME_HOURS": 2,
+      "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
+      "MASTER_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_INSTANCE_NUMBER": 1
+
     }, {
-      "resource_name": "EMR cluster 4 nodes",
-      "resource_status": "Stopped"
+      "RESOURCE_NAME": "EMR cluster",
+      "NODES_NUMBER": 3,
+      "RESOURCE_STATUS": "Stopped",
+      "UP_TIME_HOURS": 2,
+      "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
+      "MASTER_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_INSTANCE_NUMBER": 1
     }]
   }, {
     "ENVIRONMENT_NAME": "Jupiter + test lib2 box",
@@ -29,17 +42,41 @@
     "UP_TIME_HOURS": 8,
     "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
     "COMPUTATIONAL_RESOURCES": [{
-      "resource_name": "EMR cluster 21 nodes",
-      "resource_status": "Running"
+      "RESOURCE_NAME": "EMR cluster",
+      "NODES_NUMBER": 21,
+      "RESOURCE_STATUS": "Running",
+      "UP_TIME_HOURS": 3,
+      "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
+      "MASTER_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_INSTANCE_NUMBER": 4
     }, {
-      "resource_name": "EMR cluster 16 nodes",
-      "resource_status": "Running"
+      "RESOURCE_NAME": "EMR cluster",
+      "NODES_NUMBER": 16,
+      "RESOURCE_STATUS": "Running",
+      "UP_TIME_HOURS": 6,
+      "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
+      "MASTER_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_INSTANCE_NUMBER": 2
     }, {
-      "resource_name": "EMR cluster 4 nodes",
-      "resource_status": "Running"
+      "RESOURCE_NAME": "EMR cluster",
+      "NODES_NUMBER": 4,
+      "RESOURCE_STATUS": "Running",
+      "UP_TIME_HOURS": 2,
+      "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
+      "MASTER_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_INSTANCE_NUMBER": 1
     }, {
-      "resource_name": "EMR cluster 11 nodes",
-      "resource_status": "Running"
+      "RESOURCE_NAME": "EMR cluster",
+      "NODES_NUMBER": 11,
+      "RESOURCE_STATUS": "Running",
+      "UP_TIME_HOURS": 12,
+      "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
+      "MASTER_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_NODE_SHAPE": "M4.xlarge",
+      "SLAVE_INSTANCE_NUMBER": 2
     }]
   }, {
     "ENVIRONMENT_NAME": "Empty box",
