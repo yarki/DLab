@@ -1,4 +1,4 @@
-package com.epam.dlab.backendapi.api;
+package com.epam.dlab.backendapi.api.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

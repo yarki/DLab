@@ -1,11 +1,13 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.api.ExploratoryCreateFormDTO;
-import com.epam.dlab.backendapi.api.ExploratoryTerminateFormDTO;
+import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
+import com.epam.dlab.backendapi.api.form.ExploratoryTerminateFormDTO;
+import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
+import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.ExploratoryCreateDTO;
 import com.epam.dlab.dto.ExploratoryTerminateDTO;
@@ -21,7 +23,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
 import java.io.IOException;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
@@ -40,6 +41,8 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Inject
     private KeyDAO keyDao;
     @Inject
+    private UserListDAO userListDAO;
+    @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
@@ -47,6 +50,10 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/create")
     public String create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) throws IOException {
         LOGGER.debug("creating exploratory environment {}", userInfo.getName());
+        userListDAO.insertExploratory(new UserInstanceDTO()
+                .withUser(userInfo.getName())
+                .withEnvironmentName(formDTO.getName())
+                .withShape(formDTO.getShape()));
         UserAWSCredentialDTO credentialDTO = keyDao.findCredential(userInfo.getName());
         ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                 .withServiceBaseName(dao.getServiceBaseName())

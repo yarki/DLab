@@ -2,13 +2,12 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
-import com.epam.dlab.backendapi.dao.UserNotebookDAO;
+import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageType;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.mongodb.client.result.DeleteResult;
 import io.dropwizard.auth.Auth;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -16,9 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,7 +31,7 @@ public class UserListResource implements DockerAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
 
     @Inject
-    private UserNotebookDAO dao;
+    private UserListDAO dao;
     @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;

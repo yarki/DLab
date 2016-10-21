@@ -1,15 +1,21 @@
 package com.epam.dlab.backendapi.dao;
 
 import com.epam.dlab.client.mongo.MongoService;
+import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 import java.util.function.Supplier;
+
+import static com.epam.dlab.backendapi.dao.MongoCollections.USER_AWS_CREDENTIALS;
+import static com.mongodb.client.model.Filters.eq;
 
 /**
  * Created by Alexey Suprun
@@ -41,6 +47,11 @@ class BaseDAO {
         mongoService.getCollection(collection).insertOne(Document.parse(MAPPER.writeValueAsString(object))
                 .append(ID, uuid)
                 .append(TIMESTAMP, new Date()));
+    }
+
+    protected <T> T find(String collection, Bson eq, Class<T> clazz) throws IOException {
+        Document document = mongoService.getCollection(collection).find(eq).first();
+        return MAPPER.readValue(document.toString(), clazz);
     }
 
     private String generateUUID() {

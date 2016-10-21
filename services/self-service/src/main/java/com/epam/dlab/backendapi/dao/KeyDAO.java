@@ -36,8 +36,7 @@ public class KeyDAO extends BaseDAO {
     }
 
     public UserAWSCredentialDTO findCredential(String user) throws IOException {
-        Document document = mongoService.getCollection(USER_AWS_CREDENTIALS).find(eq(ID, user)).first();
-        return MAPPER.readValue(document.toString(), UserAWSCredentialDTO.class);
+        return find(USER_AWS_CREDENTIALS, eq(ID, user), UserAWSCredentialDTO.class);
     }
 
     public KeyLoadStatus findKeyStatus(UserInfo userInfo) {

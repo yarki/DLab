@@ -1,8 +1,8 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.api.EMRCreateFormDTO;
-import com.epam.dlab.backendapi.api.EMRTerminateFormDTO;
+import com.epam.dlab.backendapi.api.form.EMRCreateFormDTO;
+import com.epam.dlab.backendapi.api.form.EMRTerminateFormDTO;
 import com.epam.dlab.backendapi.client.rest.EmrAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
