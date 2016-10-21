@@ -51,8 +51,6 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
             LOGGER.debug("image: {}", image);
             String uuid = UUID.randomUUID().toString();
             uuids.put(uuid, image);
-            /*String command = String.format(GET_IMAGE_METADATA, configuration.getKeyDirectory(),
-                    configuration.getWarmupDirectory(), uuid, image);*/
             String command = new RunDockerCommand()
                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                     .withVolumeForResponse(configuration.getWarmupDirectory())
