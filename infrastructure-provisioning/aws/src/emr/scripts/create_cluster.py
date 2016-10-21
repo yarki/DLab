@@ -48,8 +48,8 @@ cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{
     args.s3_bucket, args.name, args.nbs_user)
 
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{0}/jars/{1}/aws --recursive, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-          "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{0}/jars/{1}/lib --recursive,ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar" \
-          "Name=CUSTOM_JAR, Args=aws s3 cp /usr/lib/hadoop-lzo/ s3://{0}/jars/{1}/lib --recursive, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; ".format(
+          "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{0}/jars/{1}/lib --recursive,ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
+          "Name=CUSTOM_JAR, Args=aws s3 cp /usr/lib/hadoop-lzo/ s3://{0}/jars/{1}/lib --recursive, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
     args.s3_bucket, args.release_label)
 
 
