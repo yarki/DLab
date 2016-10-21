@@ -17,43 +17,59 @@ import { UserProfileService } from './../security/userProfile.service'
 
 @Injectable()
 export class UserResourceService {
+  url = {
+    createTmpls: 'userlist/computational',
+    emrTmpls: 'userlist/computational',
+    shapes: 'userlist/shape',
+    createNotebook: 'exploratory/create',
+    createEmr: 'exploratory/emr'
+  };
 
   constructor(private http: Http,
               private webRequestHelper : WebRequestHelper,
               private userProfileService : UserProfileService) {
   }
 
-  getTemplatesUrl() : string
-  {
-    return `/api/userlist/computational?access_token=${this.userProfileService.getAuthToken()}`;
+  getResourceUrl(resource: string) {
+   return `/api/${this.url[resource]}?access_token=${this.userProfileService.getAuthToken()}`; 
   }
 
-  getShapesUrl() : string
+  getCreateTmpl()
   {
-    return `/api/userlist/shape?access_token=${this.userProfileService.getAuthToken()}`;
+    return this.http.get(this.getResourceUrl('createTmpls'))
+      .map(( res:Response ) => res.json())
+      .catch((error: any) => error);
   }
 
-  getCreateUsernotebookUrl() : string
+  getEmrTmpl()
   {
-    return `/api/exploratory/create?access_token=${this.userProfileService.getAuthToken()}`;
-  }
-
-  getTemplates()
-  {
-    return this.http.get(this.getTemplatesUrl())
-      .map(( res:Response ) => res.json());
+    return this.http.get(this.getResourceUrl('emrTmpls'))
+      .map(( res:Response ) => res.json())
+      .catch((error: any) => error);
   }
 
   getShapes()
   {
-    return this.http.get(this.getShapesUrl())
-      .map(( res:Response ) => res.json());
+    return this.http.get(this.getResourceUrl('shapes'))
+      .map(( res:Response ) => res.json())
+      .catch((error: any) => error);
   }
+
   createUsernotebook(data)
   {
     let body = JSON.stringify(data);
     let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getCreateUsernotebookUrl(), body, { headers: requestHeader })
+      return this.http.post(this.getResourceUrl('createNotebook'), body, { headers: requestHeader })
+        .map((res) => {
+          return res;
+      });
+  }
+
+  createEmr(data)
+  {
+    let body = JSON.stringify(data);
+    let requestHeader = this.webRequestHelper.getJsonHeader();
+      return this.http.post(this.getResourceUrl('createEmr'), body, { headers: requestHeader })
         .map((res) => {
           return res;
       });

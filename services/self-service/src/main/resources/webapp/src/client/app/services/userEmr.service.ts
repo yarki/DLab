@@ -16,18 +16,18 @@ export class UserEmrService {
     return `/api/docker?access_token=${this.userProfileService.getAuthToken()}`;
   }
 
-  getCreateUsernotebookUrl() : string
-  {
-    return `/api/exploratory/create?access_token=${this.userProfileService.getAuthToken()}`;
-  }
+  // getCreateUsernotebookUrl() : string
+  // {
+  //   return `/api/exploratory/create?access_token=${this.userProfileService.getAuthToken()}`;
+  // }
 
-  createComputational (data)
-  {  
-    let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getCreateUsernotebookUrl(), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
-  }
+  // createComputational (data)
+  // {  
+  //   let body = JSON.stringify(data);
+  //   let requestHeader = this.webRequestHelper.getJsonHeader();
+  //     return this.http.post(this.getCreateUsernotebookUrl(), body, { headers: requestHeader })
+  //       .map((res) => {
+  //         return res;
+  //     });
+  // }
 }

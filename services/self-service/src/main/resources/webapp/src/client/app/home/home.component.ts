@@ -14,7 +14,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthenticationService } from './../security/authentication.service';
 import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
-import {UserEmrService} from "../services/createEmr.service";
 import {AppRoutingService} from "../routing/appRouting.service";
 import {Http, Response} from '@angular/http';
 
@@ -31,8 +30,9 @@ export class HomeComponent implements OnInit {
   uploadAccessKeyUrl: string;
   preloadModalInterval: any;
 
-  templatesList: any;
-  shapesList: any;
+  createTempls: any;
+  shapes: any;
+  emrTempls: any;
 
 
 
@@ -47,7 +47,6 @@ export class HomeComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private userAccessKeyProfileService: UserAccessKeyService,
     private userResourceService: UserResourceService,
-    private userEmrService: UserEmrService,
     private appRoutingService : AppRoutingService,
     private http: Http
   ) {
@@ -121,21 +120,33 @@ export class HomeComponent implements OnInit {
   }
 
   initAnalyticSelectors() {
-    this.userResourceService.getTemplates()
+    this.userResourceService.getCreateTmpl()
       .subscribe(
-      data => {
-        this.templatesList = data;
-      }
+        data => this.createTempls = data,
+        error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
+      );
+    this.userResourceService.getEmrTmpl()
+      .subscribe(
+        data => this.emrTempls = data,
+        error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
     this.userResourceService.getShapes()
       .subscribe(
-      data => {
-        this.shapesList = data;
-      }
+        data => this.shapes = data,
+        error => this.shapes = [{shape_name: 'M4.large'}, {shape_name: 'M4.large'}]
       );
   }
 
   createUsernotebook(template, name, shape){
+    this.userResourceService
+      .createUsernotebook({"image": name.value})
+      .subscribe((result) => {
+        console.log('result: ', result);
+      });
+    return false;
+  };
+
+  createEmr(template, name, shape){
     this.userResourceService
       .createUsernotebook({"image": name.value})
       .subscribe((result) => {
