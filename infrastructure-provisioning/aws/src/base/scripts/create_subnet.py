@@ -25,7 +25,9 @@ if __name__ == "__main__":
                 print "Creating subnet %s in vpc %s, region %s with tag %s." % \
                       (args.subnet, args.vpc_id, args.region, json.dumps(tag))
                 subnet_id = create_subnet(args.vpc_id, args.subnet, tag)
-                endpoint = create_endpoint(vpc_id, "com.amazonaws.{}.s3".format(args.region), json.dumps(tag))
+                print "Associating route_table with subnet"
+                route_table = get_route_table_by_tag(args.infra_tag_name, args.infra_tag_value)
+                route_table.associate_with_subnet(SubnetId=subnet_id)
             else:
                 print "REQUESTED SUBNET ALREADY EXISTS"
             print "SUBNET_ID " + subnet_id
