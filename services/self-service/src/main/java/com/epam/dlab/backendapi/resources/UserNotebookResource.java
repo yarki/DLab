@@ -12,31 +12,53 @@
 
 package com.epam.dlab.backendapi.resources;
 
-import com.epam.dlab.backendapi.core.response.keyloader.KeyLoader;
-import com.epam.dlab.dto.keyload.UploadFileDTO;
+import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.backendapi.dao.UserNotebookDAO;
 import com.google.inject.Inject;
+import com.mongodb.client.result.DeleteResult;
+import io.dropwizard.auth.Auth;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
+import javax.ws.rs.core.Response;
 
-@Path("/keyloader")
+@Path("/usernotebook")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class KeyLoaderResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(KeyLoaderResource.class);
+public class UserNotebookResource {
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
 
     @Inject
-    private KeyLoader keyLoader;
+    private UserNotebookDAO dao;
+
+    @GET
+    public Iterable<Document> getNotebooks(@Auth UserInfo userInfo) {
+        LOGGER.debug("loading notebooks for user {}", userInfo.getName());
+        return dao.find(userInfo.getName());
+    }
+
+    @GET
+    @Path("/shape")
+    public Iterable<Document> getShapes(@Auth UserInfo userInfo) {
+        LOGGER.debug("loading shapes for user {}", userInfo.getName());
+        return dao.findShapes();
+    }
 
     @POST
-    public String loadKey(UploadFileDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("load key for user {}", dto.getUser());
-        return keyLoader.uploadKey(dto);
+    @Path("/{image}")
+    public Response insertNotebook(@Auth UserInfo userInfo, @PathParam("image") String image) {
+        LOGGER.debug("insert notebook {} for user {}", image, userInfo.getName());
+        dao.insert(userInfo.getName(), image);
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public DeleteResult deleteNotebook(@Auth UserInfo userInfo, @PathParam("id") String id) {
+        LOGGER.debug("delete notebook with id {} for user {} ", id, userInfo.getName());
+        return dao.delete(id);
     }
 }
