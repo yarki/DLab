@@ -19,7 +19,7 @@ hadoop_version = "2.6"
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 
 
-def install_emr_spark():
+def install_emr_spark(args):
     local('wget ' + spark_link + ' -O /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
     local('mkdir -p /opt/' + args.emr_version)
     local('tar -zxvf /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/' + args.emr_version + '/')
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         if result == False :
             jars(args)
         yarn(args)
-        pyspark_kernel(args)
+        install_emr_spark(args)
         pyspark_kernel(args)
         toree_kernel(args)
         spark_defaults()
