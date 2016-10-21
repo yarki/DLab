@@ -33,13 +33,6 @@ public class DockerResource implements MongoCollections, DockerAPI {
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
-    @GET
-    public Set<ImageMetadataDTO> getDockerImages(@Auth UserInfo userInfo) {
-        LOGGER.debug("docker statuses asked for user {}", userInfo.getName());
-        dao.writeDockerAttempt(userInfo.getName(), DockerDAO.DESCRIBE);
-        return provisioningService.get(DOCKER, Set.class);
-    }
-
     @POST
     @Path("/run")
     public String run(@Auth UserInfo userInfo, String image) {

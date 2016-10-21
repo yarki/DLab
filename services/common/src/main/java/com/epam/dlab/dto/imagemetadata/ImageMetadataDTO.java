@@ -24,12 +24,13 @@ public class ImageMetadataDTO {
     public ImageMetadataDTO() {
     }
 
-    public ImageMetadataDTO(String image, String templateName, String description, String requestId, String type) {
+    public ImageMetadataDTO(String image, String templateName, String description, String requestId, String type, List<TemplateDTO> templates) {
         this.image = image;
         this.templateName = templateName;
         this.description = description;
         this.requestId = requestId;
         this.type = type;
+        this.templates = templates;
     }
 
     public ImageMetadataDTO(String image) {

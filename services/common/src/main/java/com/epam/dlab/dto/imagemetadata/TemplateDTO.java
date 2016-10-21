@@ -9,6 +9,13 @@ public class TemplateDTO {
     @JsonProperty
     private String version;
 
+    public TemplateDTO() {
+    }
+
+    public TemplateDTO(String version) {
+        this.version = version;
+    }
+
     public String getVersion() {
         return version;
     }

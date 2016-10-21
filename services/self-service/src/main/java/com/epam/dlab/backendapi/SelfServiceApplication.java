@@ -34,7 +34,7 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
         environment.jersey().register(injector.getInstance(SecurityResource.class));
         environment.jersey().register(injector.getInstance(DockerResource.class));
         environment.jersey().register(injector.getInstance(KeyUploaderResource.class));
-        environment.jersey().register(injector.getInstance(UserNotebookResource.class));
+        environment.jersey().register(injector.getInstance(UserListResource.class));
         environment.jersey().register(injector.getInstance(EmrResource.class));
         environment.jersey().register(injector.getInstance(ExploratoryResource.class));
     }
