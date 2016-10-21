@@ -14,7 +14,7 @@ public class ImageMetadataDTO {
     private String templateName;
     @JsonProperty
     private String description;
-    @JsonProperty
+    @JsonProperty("environment_type")
     private String type;
     @JsonProperty
     private List<TemplateDTO> templates;
