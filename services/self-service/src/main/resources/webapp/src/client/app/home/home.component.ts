@@ -17,7 +17,6 @@ import {UserResourceService} from "../services/userResource.service";
 import {UserEmrService} from "../services/createEmr.service";
 import {AppRoutingService} from "../routing/appRouting.service";
 import {Http, Response} from '@angular/http';
-import { AppRoutingService } from "../routing/appRouting.service";
 
 @Component({
   moduleId: module.id,
