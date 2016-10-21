@@ -7,8 +7,8 @@ import com.epam.dlab.backendapi.client.rest.EmrAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.dto.EMRTerminateDTO;
 import com.epam.dlab.dto.EMRCreateDTO;
+import com.epam.dlab.dto.EMRTerminateDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -20,7 +20,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
 import java.io.IOException;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;

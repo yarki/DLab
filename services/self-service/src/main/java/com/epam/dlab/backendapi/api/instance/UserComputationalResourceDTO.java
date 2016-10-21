@@ -26,7 +26,7 @@ public class UserComputationalResourceDTO {
     public void setEnvironmentName(String environmentName) {
         this.environmentName = environmentName;
     }
-    
+
     public UserComputationalResourceDTO withEnvironmentName(String environmentName) {
         setEnvironmentName(environmentName);
         return this;
@@ -78,7 +78,7 @@ public class UserComputationalResourceDTO {
     public void setSlaveShape(String slaveShape) {
         this.slaveShape = slaveShape;
     }
-    
+
     public UserComputationalResourceDTO withSlaveShape(String slaveShape) {
         setSlaveShape(slaveShape);
         return this;

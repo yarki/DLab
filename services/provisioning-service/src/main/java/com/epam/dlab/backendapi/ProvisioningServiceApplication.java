@@ -4,6 +4,8 @@ import com.epam.dlab.backendapi.core.response.DirectoriesCreator;
 import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
 import com.epam.dlab.backendapi.resources.DockerResource;
+import com.epam.dlab.backendapi.resources.EmrResource;
+import com.epam.dlab.backendapi.resources.ExploratoryResource;
 import com.epam.dlab.backendapi.resources.KeyLoaderResource;
 import com.epam.dlab.client.restclient.RESTService;
 import com.google.inject.AbstractModule;
@@ -29,6 +31,9 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         environment.lifecycle().manage(injector.getInstance(DockerWarmuper.class));
         environment.jersey().register(injector.getInstance(DockerResource.class));
         environment.jersey().register(injector.getInstance(KeyLoaderResource.class));
+        environment.jersey().register(injector.getInstance(KeyLoaderResource.class));
+        environment.jersey().register(injector.getInstance(ExploratoryResource.class));
+        environment.jersey().register(injector.getInstance(EmrResource.class));
     }
 
     private Injector createInjector(ProvisioningServiceApplicationConfiguration configuration, Environment environment) {

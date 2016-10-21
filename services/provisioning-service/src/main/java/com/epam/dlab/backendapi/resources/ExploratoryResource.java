@@ -53,7 +53,7 @@ public class ExploratoryResource implements DockerCommands {
                 dto.getImage()));
                 */
 
-                /*new RunDockerCommand()
+                new RunDockerCommand()
                         .withVolumeForRootKeys(configuration.getKeyDirectory())
                         .withVolumeForResponse(configuration.getImagesDirectory())
                         .withRequestId(uuid)
@@ -64,16 +64,17 @@ public class ExploratoryResource implements DockerCommands {
                         .withNotebookSubnetCidr(dto.getNotebookSubnet())
                         .withCredsSecurityGroupsIds(dto.getSecurityGroupIds())
                         .withActionCreate(dto.getImage())
-                        .toCMD()*/
+                        .toCMD()
 
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withCredsKeyName(configuration.getAdminKey()),
-                        dto
-                )
+//                commandBuilder.buildCommand(
+//                        new RunDockerCommand()
+//                                .withVolumeForRootKeys(configuration.getKeyDirectory())
+//                                .withVolumeForResponse(configuration.getImagesDirectory())
+//                                .withRequestId(uuid)
+//                                .withCredsKeyName(configuration.getAdminKey())
+//                                .withActionCreate(dto.getImage()),
+//                        dto
+//                )
         );
         return uuid;
     }
