@@ -1,6 +1,7 @@
 import boto3, boto, botocore
 import time
-import os
+import os, sys
+import json
 
 
 def put_to_bucket(bucket_name, local_file, destination_file):
@@ -29,25 +30,67 @@ def create_vpc(vpc_cidr, tag):
     return vpc.id
 
 
-def create_endpoint(vpc_id, service_name):
+def create_endpoint(vpc_id, service_name, tag):
     ec2 = boto3.client('ec2')
     route_table = []
     response = ''
     try:
-        for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
-            route_table.append(i['Associations'][0]['RouteTableId'])
-        response = ec2.create_vpc_endpoint(
-            VpcId=vpc_id,
-            ServiceName=service_name,
-            RouteTableIds=route_table
-        #   ClientToken='string'
-        )
-        response = response['VpcEndpoint']['VpcEndpointId']
+        # for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
+        #    route_table.append(i['Associations'][0]['RouteTableId'])
+        route_table.append(ec2.create_route_table(
+            VpcId = vpc_id
+        )['RouteTable']['RouteTableId'])
+        create_tag(route_table, tag)
+        endpoints = get_vpc_endpoints(vpc_id)
+        if not endpoints:
+            response = ec2.create_vpc_endpoint(
+                VpcId=vpc_id,
+                ServiceName=service_name,
+                RouteTableIds=route_table
+            #   ClientToken='string'
+            )
+            response = response['VpcEndpoint']['VpcEndpointId']
+        else:
+            endpoint_id = endpoints[0].get('VpcEndpointId')
+            result = ec2.modify_vpc_endpoint(
+                VpcEndpointId=endpoint_id,
+                AddRouteTableIds=route_table
+            )
+            if result:
+                response = endpoint_id
+        return response
     except botocore.exceptions.ClientError as err:
         print err.response['Error']['Message']
-    finally:
-        return response
+        print 'Failed to create endpoint. Removing RT'
+        ec2.delete_route_table(
+            RouteTableId=route_table[0]
+        )
+        sys.exit(1)
 
+
+def get_vpc_endpoints(vpc_id):
+    # Returns LIST of Endpoint DICTIONARIES
+    ec2 = boto3.client('ec2')
+    endpoints = ec2.describe_vpc_endpoints(
+        Filters=[{
+            'Name':'vpc-id',
+            'Values':[vpc_id]
+        }]
+    ).get('VpcEndpoints')
+    return endpoints
+
+
+def create_tag(resource, tag):
+    ec2 = boto3.client('ec2')
+    try:
+        ec2.create_tags(
+            Resources = resource,
+            Tags = [
+                json.loads(tag)
+            ]
+        )
+    except botocore.exceptions.ClientError as err:
+        print err.response['Error']['Message']
 
 
 def create_subnet(vpc_id, subnet, tag):

@@ -1,13 +1,13 @@
 #!/usr/bin/python
-import sys
 import argparse
 import json
 from dlab.aws_actions import *
 from dlab.aws_meta import *
+import sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--vpc', type=str, default='')
+parser.add_argument('--vpc_id', type=str, default='')
 parser.add_argument('--region', type=str, default='us-west-2')
 parser.add_argument('--infra_tag_name', type=str, default='Name')
 parser.add_argument('--infra_tag_value', type=str, default='BDCC-DSA-POC-infra')
@@ -17,18 +17,14 @@ args = parser.parse_args()
 if __name__ == "__main__":
     success = False
     tag = {"Key": args.infra_tag_name, "Value": args.infra_tag_value}
-    if args.vpc != '':
+    if args.vpc_id != '':
         try:
-            vpc_id = get_vpc_by_cidr(args.vpc)
-            if vpc_id != '':
-                print "Creating vpc %s in region %s with tag %s." % (args.vpc, args.region, json.dumps(tag))
-                vpc_id = create_vpc(args.vpc, tag)
-                endpoint = create_endpoint(vpc_id, "com.amazonaws.{}.s3".format(args.region), json.dumps(tag))
+            print "Creating Endpoint in vpc {}, region {} with tag {}.".format(args.vpc_id, args.region, json.dumps(tag))
+            endpoint = create_endpoint(vpc_id, "com.amazonaws.{}.s3".format(args.region), json.dumps(tag))
+            if endpoint:
+                print "ENDPOINT: " + endpoint
             else:
-                print "REQUESTED VPC ALREADY EXISTS"
-            print "VPC_ID " + vpc_id
-            print "ENDPOINT " + endpoint
-            args.vpc_id = vpc_id
+                print "REQUESTED ENDPOINT ALREADY EXISTS"
             success = True
         except:
             success = False
