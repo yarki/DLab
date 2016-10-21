@@ -59,7 +59,7 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
             env.user = "{}".format(ssh_user)
             env.key_filename = "{}".format(key_path)
             env.host_string = env.user + "@" + env.hosts
-            sudo('rm -rf /srv/hadoopconf/{}'.format(emr_name))
+            sudo('rm -rf /srv/hadoopconf/config/{}'.format(emr_name))
             sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
             print "Notebook's " + env.hosts + " kernels were removed"
         except:
