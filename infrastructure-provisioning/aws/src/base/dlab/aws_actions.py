@@ -54,17 +54,43 @@ def create_endpoint(vpc_id, service_name, tag):
             VpcId = vpc_id
         )['RouteTable']['RouteTableId'])
         create_tag(route_table, tag)
-        response = ec2.create_vpc_endpoint(
-            VpcId=vpc_id,
-            ServiceName=service_name,
-            RouteTableIds=route_table
-        #   ClientToken='string'
-        )
-        response = response['VpcEndpoint']['VpcEndpointId']
+        endpoints = get_vpc_endpoints(vpc_id)
+        if not endpoints:
+            response = ec2.create_vpc_endpoint(
+                VpcId=vpc_id,
+                ServiceName=service_name,
+                RouteTableIds=route_table
+            #   ClientToken='string'
+            )
+            response = response['VpcEndpoint']['VpcEndpointId']
+        else:
+            endpoint_id = endpoints[0].get('VpcEndpointId')
+            result = ec2.modify_vpc_endpoint(
+                VpcEndpointId=endpoint_id,
+                AddRouteTableIds=route_table
+            )
+            if result:
+                response = endpoint_id
+        return response
     except botocore.exceptions.ClientError as err:
         print err.response['Error']['Message']
-    finally:
-        return response
+        print 'Failed to create endpoint. Removing RT'
+        ec2.delete_route_table(
+            RouteTableId=route_table[0]
+        )
+        sys.exit(1)
+
+
+def get_vpc_endpoints(vpc_id):
+    # Returns LIST of Endpoint DICTIONARIES
+    ec2 = boto3.client('ec2')
+    endpoints = ec2.describe_vpc_endpoints(
+        Filters=[{
+            'Name':'vpc-id',
+            'Values':[vpc_id]
+        }]
+    ).get('VpcEndpoints')
+    return endpoints
 
 
 def create_tag(resource, tag):

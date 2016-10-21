@@ -22,7 +22,6 @@ import sys
 parser = argparse.ArgumentParser()
 parser.add_argument('--vpc_id', type=str, default='')
 parser.add_argument('--subnet', type=str, default='')
-parser.add_argument('--region', type=str, default='us-west-2')
 parser.add_argument('--infra_tag_name', type=str, default='Name')
 parser.add_argument('--infra_tag_value', type=str, default='BDCC-DSA-POC-infra')
 args = parser.parse_args()
@@ -35,8 +34,8 @@ if __name__ == "__main__":
         try:
             subnet_id = get_subnet_by_cidr(args.subnet)
             if subnet_id == '':
-                print "Creating subnet %s in vpc %s, region %s with tag %s." % \
-                      (args.subnet, args.vpc_id, args.region, json.dumps(tag))
+                print "Creating subnet %s in vpc %s with tag %s." % \
+                      (args.subnet, args.vpc_id, json.dumps(tag))
                 subnet_id = create_subnet(args.vpc_id, args.subnet, tag)
                 print "Associating route_table with subnet"
                 route_table = get_route_table_by_tag("Name", args.infra_tag_value)
