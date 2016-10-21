@@ -50,7 +50,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         UserAWSCredentialDTO credentialDTO = keyDao.findCredential(userInfo.getName());
         ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                 .withServiceBaseName(dao.getServiceBaseName())
-                .withNotebookUserName(credentialDTO.getUserOwnBicketName())
+                .withNotebookUserName(userInfo.getName())
                 .withNotebookSubnet(credentialDTO.getNotebookSubnet())
                 .withRegion(dao.getAwsRegion())
                 .withSecurityGroupIds("")
