@@ -250,7 +250,7 @@ def run():
             sys.exit(1)
 
         instance_hostname = get_instance_hostname(edge_conf['instance_name'])
-        ip_address = get_instance_ip_address(edge_conf['instance_name'])
+        ip_address = get_instance_ip_address(edge_conf['instance_name']).get('Private')
         keyfile_name = "/root/keys/%s.pem" % edge_conf['key_name']
     except:
         remove_role('edge', os.environ['edge_user_name'])

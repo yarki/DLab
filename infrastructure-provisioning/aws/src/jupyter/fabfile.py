@@ -195,7 +195,7 @@ def run():
             print "Image was successfully created. It's ID is " + image_id
 
     # generating output information
-    ip_address = get_instance_ip_address(notebook_config['instance_name'])
+    ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')
     dns_name = get_instance_hostname(notebook_config['instance_name'])
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
         'key_name'] + '.pem ubuntu@' + ip_address
