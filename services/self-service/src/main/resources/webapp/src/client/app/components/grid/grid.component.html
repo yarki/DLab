@@ -16,7 +16,7 @@
     <td class="{{env.status.toLowerCase()}}">{{env.status}}</td>
     <td>{{env.shape}}</td>
     <td>
-      <expanded-grid [resources]="env.resources"></expanded-grid>
+      <expanded-grid [resources]="env.resources" [environment]="env"></expanded-grid>
     </td>
     <td>
       <div class="dropdown">
@@ -26,9 +26,10 @@
         </span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">
-            <li>Stop</li>
-            <li>Terminate</li>
-            <li>Deploy EMR</li>
+            <li (click)="mathAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped'">Stop</li>
+            <li (click)="mathAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped'">Run</li>
+            <li (click)="mathAction(env, 'terminate')">Terminate</li>
+            <li (click)="mathAction(env, 'deploy')">Deploy EMR</li>
           </ul>
         </div>
       </div>

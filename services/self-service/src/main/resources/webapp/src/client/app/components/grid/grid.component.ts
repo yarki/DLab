@@ -37,4 +37,8 @@ export class Grid {
   printDetailEnvironmentModal(data) {
     console.log(data);
   }
+
+  mathAction(data, action) {
+    console.log('action ' + action, data);
+  }
 }

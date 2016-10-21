@@ -23,7 +23,6 @@
       "MASTER_NODE_SHAPE": "M4.xlarge",
       "SLAVE_NODE_SHAPE": "M4.xlarge",
       "SLAVE_INSTANCE_NUMBER": 1
-
     }, {
       "RESOURCE_NAME": "EMR cluster",
       "NODES_NUMBER": 3,
