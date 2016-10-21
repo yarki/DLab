@@ -1,6 +1,6 @@
 import boto3, boto, botocore
 import time
-import os
+import os, sys
 import json
 
 
@@ -58,14 +58,14 @@ def create_endpoint(vpc_id, service_name, tag):
             )
             if result:
                 response = endpoint_id
+        return response
     except botocore.exceptions.ClientError as err:
         print err.response['Error']['Message']
         print 'Failed to create endpoint. Removing RT'
         ec2.delete_route_table(
             RouteTableId=route_table[0]
         )
-    finally:
-        return response
+        sys.exit(1)
 
 
 def get_vpc_endpoints(vpc_id):
