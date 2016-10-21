@@ -1,34 +1,53 @@
 {
-  "resources": [{
+  "RESOURCES": [{
     "ENVIRONMENT_NAME": "Jupiter",
     "STATUS": "Running",
     "SHAPE": "M4.xlarge",
-    "URL": "some string",
+    "URL": "http://localhost:8080",
     "UP_TIME_HOURS": 12,
-    "UP_TIME_SINCE": "",
-    "COMPUTATIONAL_RESOURCES": [{},{}]
+    "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
+    "COMPUTATIONAL_RESOURCES": []
   }, {
     "ENVIRONMENT_NAME": "Jupiter + Spark lib box",
     "STATUS": "Stopped",
     "SHAPE": "R3.xlarge",
-    "COMPUTATIONAL_RESOURCES": [
-      ["EMR cluster 20 nodes"],
-      ["EMR cluster 5 nodes"]
-    ]
+    "URL": "http://localhost:8080",
+    "UP_TIME_HOURS": 2,
+    "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
+    "COMPUTATIONAL_RESOURCES": [{
+      "resource_name": "EMR cluster 7 nodes",
+      "resource_status": "Stopped"
+    }, {
+      "resource_name": "EMR cluster 4 nodes",
+      "resource_status": "Stopped"
+    }]
   }, {
     "ENVIRONMENT_NAME": "Jupiter + test lib2 box",
     "STATUS": "Running",
     "SHAPE": "R4.xlarge",
-    "COMPUTATIONAL_RESOURCES": [
-      ["EMR cluster 20 nodes"],
-      ["EMR cluster 5 nodes"],
-      ["EMR cluster 12 nodes"],
-      ["EMR cluster 3 nodes"]
-    ]
+    "URL": "http://localhost:8080",
+    "UP_TIME_HOURS": 8,
+    "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
+    "COMPUTATIONAL_RESOURCES": [{
+      "resource_name": "EMR cluster 21 nodes",
+      "resource_status": "Running"
+    }, {
+      "resource_name": "EMR cluster 16 nodes",
+      "resource_status": "Running"
+    }, {
+      "resource_name": "EMR cluster 4 nodes",
+      "resource_status": "Running"
+    }, {
+      "resource_name": "EMR cluster 11 nodes",
+      "resource_status": "Running"
+    }]
   }, {
     "ENVIRONMENT_NAME": "Empty box",
     "STATUS": "Creating",
     "SHAPE": "M3.xlarge",
+    "URL": "http://localhost:8080",
+    "UP_TIME_HOURS": 0,
+    "UP_TIME_SINCE": "Thu Oct 20 2016 23:45:04 GMT+0300 (EEST)",
     "COMPUTATIONAL_RESOURCES": []
   }]
 }

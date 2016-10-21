@@ -1,14 +1,16 @@
 <div class="source">
-  <span *ngIf="resources.length" class="glyphicon glyphicon-remove"></span>
-  <span *ngIf="!resources.length" class="no_details">no details</span> {{resources[0]}}
-  <span *ngIf="resources.length"
-        class="glyphicon pull-right"
-        [ngClass]="{'glyphicon-triangle-bottom': !collapse, 'glyphicon-triangle-top': collapse}"
-        (click)="toggleResourceList()">
-  </span>
+  <div *ngIf="!resources.length">
+    <span *ngIf="!resources.length" class="no_details">no details</span>
+  </div>
+  <div *ngIf="resources.length">
+    <span *ngIf="resources.length" class="glyphicon glyphicon-remove"></span>
+    <a class="detailed-link" (click)="printDetailResourceModal(resources[0])">{{resources[0].resource_name}}</a>
+    <span class="glyphicon pull-right" [ngClass]="{'glyphicon-triangle-bottom': !collapse, 'glyphicon-triangle-top': collapse}" (click)="toggleResourceList()"></span>
+  </div>
 </div>
 <div *ngIf="collapse" class="source">
   <div *ngFor="let resource of resources | slice:1">
-    <span class="glyphicon glyphicon-remove"></span> {{resource}}
+    <span class="glyphicon glyphicon-remove"></span>
+    <a class="detailed-link" (click)="printDetailResourceModal(resource)">{{resource.resource_name}}</a>
   </div>
 </div>
