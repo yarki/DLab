@@ -32,7 +32,7 @@ def get_instance_ip_address(instance_name):
         public = getattr(instance, 'public_ip_address')
         private = getattr(instance, 'private_ip_address')
         ips = {'Public': public, 'Private': private}
-        return ips
+    return ips
 
 
 def get_ami_id_by_name(ami_name):

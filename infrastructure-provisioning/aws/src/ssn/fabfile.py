@@ -2,7 +2,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
-import sys
+import sys, os
 
 
 def run():
