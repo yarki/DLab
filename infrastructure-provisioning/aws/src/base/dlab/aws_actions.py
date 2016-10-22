@@ -34,19 +34,20 @@ def create_endpoint(vpc_id, service_name, tag):
     ec2 = boto3.client('ec2')
     route_table = []
     response = ''
-    print 'Vars are: {}, {}, {}'.format(vpc_id, service_name, tag)
+    open('/response/ep.log', 'a') as out
+    out.write('Vars are: {}, {}, {}'.format(vpc_id, service_name, tag))
     try:
         # for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
         #    route_table.append(i['Associations'][0]['RouteTableId'])
         route_table.append(ec2.create_route_table(
             VpcId = vpc_id
         )['RouteTable']['RouteTableId'])
-        print route_table
+        out.write(route_table)
         create_tag(route_table, tag)
         endpoints = get_vpc_endpoints(vpc_id)
-        print endpoints
+        out.write(endpoints)
         if not endpoints:
-            print 'Creating EP'
+            out.write('Creating EP')
             response = ec2.create_vpc_endpoint(
                 VpcId=vpc_id,
                 ServiceName=service_name,
@@ -55,7 +56,7 @@ def create_endpoint(vpc_id, service_name, tag):
             )
             response = response['VpcEndpoint']['VpcEndpointId']
         else:
-            print 'Updating EP'
+            out.write('Updating EP')
             endpoint_id = endpoints[0].get('VpcEndpointId')
             result = ec2.modify_vpc_endpoint(
                 VpcEndpointId=endpoint_id,
@@ -65,7 +66,7 @@ def create_endpoint(vpc_id, service_name, tag):
                 response = endpoint_id
         return response
     except botocore.exceptions.ClientError as err:
-        print err.response['Error']['Message']
+        out.write(err.response['Error']['Message'])
         print 'Failed to create endpoint. Removing RT'
         ec2.delete_route_table(
             RouteTableId=route_table[0]
