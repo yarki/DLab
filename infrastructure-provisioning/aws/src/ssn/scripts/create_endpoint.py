@@ -3,7 +3,7 @@ import argparse
 import json
 from dlab.aws_actions import *
 from dlab.aws_meta import *
-import sys
+import sys, os
 import boto3, botocore
 
 
@@ -25,23 +25,24 @@ if __name__ == "__main__":
             ec2 = boto3.client('ec2')
             route_table = []
             endpoint = ''
-            out = open('/response/ep.log', 'w')
-            out.write('Vars are: {}, {}, {}'.format(vpc_id, service_name, json.dumps(tag)))
-            print 'Vars are: {}, {}, {}'.format(vpc_id, service_name, json.dumps(tag))
+            service_name = 'com.amazonaws.{}.s3'.format(args.region)
+            out = open('/root/ep.log', 'w')
+            out.write('Vars are: {}, {}, {}'.format(args.vpc_id, service_name, json.dumps(tag)))
+            print 'Vars are: {}, {}, {}'.format(args.vpc_id, service_name, json.dumps(tag))
             try:
                 # for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
                 #    route_table.append(i['Associations'][0]['RouteTableId'])
                 route_table.append(ec2.create_route_table(
-                    VpcId = vpc_id
+                    VpcId = args.vpc_id
                 )['RouteTable']['RouteTableId'])
                 print route_table
                 create_tag(route_table, json.dumps(tag))
-                endpoints = get_vpc_endpoints(vpc_id)
+                endpoints = get_vpc_endpoints(args.vpc_id)
                 print endpoints
                 if not endpoints:
                     out.write('Creating EP')
                     endpoint = ec2.create_vpc_endpoint(
-                        VpcId=vpc_id,
+                        VpcId=args.vpc_id,
                         ServiceName=service_name,
                         RouteTableIds=route_table
                         #   ClientToken='string'
