@@ -35,7 +35,7 @@ def create_endpoint(vpc_id, service_name, tag):
     route_table = []
     response = ''
     out = open('/response/ep.log', 'a')
-    out.write('Vars are: {}, {}, {}'.format(vpc_id, service_name, tag))
+    out.write('Vars are: {}, {}, {}'.format(vpc_id, service_name, json.dumps(tag)))
     try:
         # for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
         #    route_table.append(i['Associations'][0]['RouteTableId'])
@@ -43,7 +43,7 @@ def create_endpoint(vpc_id, service_name, tag):
             VpcId = vpc_id
         )['RouteTable']['RouteTableId'])
         out.write(route_table)
-        create_tag(route_table, tag)
+        create_tag(route_table, json.dumps(tag))
         endpoints = get_vpc_endpoints(vpc_id)
         out.write(endpoints)
         if not endpoints:

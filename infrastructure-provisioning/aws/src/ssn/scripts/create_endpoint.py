@@ -4,6 +4,7 @@ import json
 from dlab.aws_actions import *
 from dlab.aws_meta import *
 import sys
+import boto3, botocore
 
 
 parser = argparse.ArgumentParser()
@@ -20,7 +21,7 @@ if __name__ == "__main__":
     if args.vpc_id:
         try:
             print "Creating Endpoint in vpc {}, region {} with tag {}.".format(args.vpc_id, args.region, json.dumps(tag))
-            endpoint = create_endpoint(vpc_id, "com.amazonaws.{}.s3".format(args.region), json.dumps(tag))
+            endpoint = create_endpoint(vpc_id, 'com.amazonaws.{}.s3'.format(args.region), tag)
             if endpoint:
                 print "ENDPOINT: " + endpoint
             else:
