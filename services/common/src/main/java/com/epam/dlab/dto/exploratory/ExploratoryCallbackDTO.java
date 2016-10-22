@@ -14,20 +14,54 @@ package com.epam.dlab.dto.exploratory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExploratoryTerminateDTO extends ExploratoryStatusDTO<ExploratoryTerminateDTO> {
-    @JsonProperty("notebook_instance_name")
-    private String notebookInstanceName;
+/**
+ * Created by Alexey Suprun
+ */
+public class ExploratoryCallbackDTO {
+    @JsonProperty
+    private String user;
+    @JsonProperty
+    private String name;
+    @JsonProperty
+    private String status;
 
-    public String getNotebookInstanceName() {
-        return notebookInstanceName;
+    public String getUser() {
+        return user;
     }
 
-    public void setNotebookInstanceName(String notebookInstanceName) {
-        this.notebookInstanceName = notebookInstanceName;
+    public void setUser(String user) {
+        this.user = user;
     }
 
-    public ExploratoryTerminateDTO withNotebookInstanceName(String notebookInstanceName) {
-        setNotebookInstanceName(notebookInstanceName);
+    public ExploratoryCallbackDTO withUser(String user) {
+        setUser(user);
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ExploratoryCallbackDTO withName(String name) {
+        setName(name);
+        return this;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public ExploratoryCallbackDTO withStatus(String status) {
+        setStatus(status);
         return this;
     }
 }
+

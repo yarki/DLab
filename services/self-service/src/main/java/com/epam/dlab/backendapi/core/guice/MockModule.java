@@ -25,7 +25,6 @@ import com.google.inject.name.Names;
 import io.dropwizard.setup.Environment;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.UUID;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
@@ -60,7 +59,7 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
     private RESTService createProvisioningService() {
         RESTService result = mock(RESTService.class);
         when(result.get(eq(DOCKER), any()))
-                .thenReturn(new ImageMetadataDTO[] {
+                .thenReturn(new ImageMetadataDTO[]{
                         new ImageMetadataDTO("test computational image", "template", "decription", "request_id", ImageType.COMPUTATIONAL.getType(),
                                 Arrays.asList(new TemplateDTO("emr-6.3.0"), new TemplateDTO("emr-6.8.0"))),
                         new ImageMetadataDTO("test exploratory image", "template", "decription", "request_id", ImageType.EXPLORATORY.getType(),

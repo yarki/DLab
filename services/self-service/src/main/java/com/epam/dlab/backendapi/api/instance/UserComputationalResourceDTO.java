@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserComputationalResourceDTO {
     @JsonProperty("resource_name")
     private String resourceName;
-    @JsonProperty("resource_status")
+    @JsonProperty
     private String status;
     @JsonProperty("up_time_since")
     private String upTimeSince;

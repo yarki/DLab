@@ -15,7 +15,7 @@ package com.epam.dlab.dto.exploratory;
 import com.epam.dlab.dto.ResourceBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExploratoryBaseDTO<T extends ExploratoryBaseDTO<?>> extends ResourceBaseDTO<T> {
+public class ExploratoryStatusDTO<T extends ExploratoryStatusDTO<?>> extends ResourceBaseDTO<T> {
     @JsonProperty("notebook_user_name")
     private String notebookUserName;
 

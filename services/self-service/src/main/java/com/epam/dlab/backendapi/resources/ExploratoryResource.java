@@ -24,6 +24,7 @@ import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryTerminateDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryCallbackDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -61,7 +62,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @POST
     @Path("/create")
     public Response create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) throws IOException {
-        LOGGER.debug("creating exploratory environment {}", userInfo.getName());
+        LOGGER.debug("creating exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = userListDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
                 .withEnvironmentName(formDTO.getName())
@@ -85,9 +86,17 @@ public class ExploratoryResource implements ExploratoryAPI {
     }
 
     @POST
+    @Path("/create/status")
+    public Response create(ExploratoryCallbackDTO dto) throws IOException {
+        LOGGER.debug("callback for creating exploratory environment {} for user {}", dto.getName(), dto.getUser());
+        userListDAO.updateExploratoryStatus(dto);
+        return Response.ok().build();
+    }
+
+    @POST
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, ExploratoryTerminateFormDTO formDTO) {
-        LOGGER.debug("terminating exploratory environment {}", userInfo.getName());
+        LOGGER.debug("terminating exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
         ExploratoryTerminateDTO dto = new ExploratoryTerminateDTO()
                 .withServiceBaseName(userInfo.getName())
                 .withNotebookUserName(userInfo.getName())
@@ -99,7 +108,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @POST
     @Path("/stop")
     public String stop(@Auth UserInfo userInfo, ExploratoryTerminateFormDTO formDTO) {
-        LOGGER.debug("stopping exploratory environment {}", userInfo.getName());
+        LOGGER.debug("stopping exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
         ExploratoryTerminateDTO dto = new ExploratoryTerminateDTO()
                 .withServiceBaseName(userInfo.getName())
                 .withNotebookUserName(userInfo.getName())

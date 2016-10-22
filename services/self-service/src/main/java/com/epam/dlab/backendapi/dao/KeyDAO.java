@@ -24,8 +24,6 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
 public class KeyDAO extends BaseDAO {
-    private static final String STATUS = "status";
-
     public void uploadKey(final String user, String content) {
         insertOne(USER_KEYS, () -> new Document("content", content).append(STATUS, KeyLoadStatus.NEW.getStatus()), user);
     }

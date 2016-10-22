@@ -14,7 +14,7 @@ package com.epam.dlab.dto.exploratory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDTO> {
+public class ExploratoryCreateDTO extends ExploratoryStatusDTO<ExploratoryCreateDTO> {
     @JsonProperty("notebook_subnet_cidr")
     private String notebookSubnet;
     @JsonProperty("creds_security_groups_ids")

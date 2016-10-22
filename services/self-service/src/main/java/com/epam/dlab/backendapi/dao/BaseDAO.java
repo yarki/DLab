@@ -29,8 +29,8 @@ class BaseDAO implements MongoCollections {
     protected static final ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     public static final String ID = "_id";
     public static final String USER = "user";
+    public static final String STATUS = "status";
     public static final String TIMESTAMP = "timestamp";
-    public static final String ENVIRONMENT_NAME = "environment_name";
 
     @Inject
     protected MongoService mongoService;

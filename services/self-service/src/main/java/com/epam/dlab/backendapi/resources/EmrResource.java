@@ -59,7 +59,7 @@ public class EmrResource implements EmrAPI {
     @POST
     @Path("/create")
     public Response create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) throws IOException {
-        LOGGER.debug("creating emr {}", userInfo.getName());
+        LOGGER.debug("creating emr {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = userListDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
                         .withResourceName(formDTO.getName())
@@ -85,7 +85,7 @@ public class EmrResource implements EmrAPI {
     @POST
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
-        LOGGER.debug("terminating emr {}", userInfo.getName());
+        LOGGER.debug("terminating emr {} for user {}", formDTO.getClusterName(), userInfo.getName());
         EMRTerminateDTO dto = new EMRTerminateDTO()
                 .withServiceBaseName(userInfo.getName())
                 .withEdgeUserName(userInfo.getName())
