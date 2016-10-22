@@ -34,7 +34,7 @@ def create_endpoint(vpc_id, service_name, tag):
     ec2 = boto3.client('ec2')
     route_table = []
     response = ''
-    out = open('/response/ep.log', 'a')
+    out = open('/response/ep.log', 'w')
     out.write('Vars are: {}, {}, {}'.format(vpc_id, service_name, json.dumps(tag)))
     try:
         # for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
