@@ -12,7 +12,6 @@
 
 package com.epam.dlab.backendapi.dao;
 
-import static com.epam.dlab.backendapi.dao.MongoCollections.SETTINGS;
 import static com.epam.dlab.backendapi.dao.MongoSetting.AWS_REGION;
 import static com.epam.dlab.backendapi.dao.MongoSetting.SERIVICE_BASE_NAME;
 import static com.mongodb.client.model.Filters.eq;

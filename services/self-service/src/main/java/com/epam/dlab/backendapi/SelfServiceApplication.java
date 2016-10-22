@@ -14,6 +14,7 @@ package com.epam.dlab.backendapi;
 
 import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.core.guice.ModuleFactory;
+import com.epam.dlab.backendapi.dao.IndexCreator;
 import com.epam.dlab.backendapi.resources.*;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -38,6 +39,7 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
     @Override
     public void run(SelfServiceApplicationConfiguration configuration, Environment environment) throws Exception {
         Injector injector = Guice.createInjector(ModuleFactory.getModule(configuration, environment));
+        environment.lifecycle().manage(injector.getInstance(IndexCreator.class));
         injector.getInstance(SecurityFactory.class).configure(injector, environment);
         environment.jersey().register(MultiPartFeature.class);
         environment.jersey().register(injector.getInstance(SecurityResource.class));

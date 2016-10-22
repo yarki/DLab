@@ -16,6 +16,7 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
 import com.epam.dlab.backendapi.api.form.ExploratoryTerminateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
+import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
@@ -35,6 +36,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
@@ -58,21 +60,28 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @POST
     @Path("/create")
-    public String create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) throws IOException {
+    public Response create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) throws IOException {
         LOGGER.debug("creating exploratory environment {}", userInfo.getName());
-        userNotebookDAO.insertExploratory(new UserInstanceDTO()
+        boolean isAdded = userNotebookDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
                 .withEnvironmentName(formDTO.getName())
+                .withStatus(UserInstanceStatus.CREATING.getStatus())
                 .withShape(formDTO.getShape()));
-        UserAWSCredentialDTO credentialDTO = keyDao.findCredential(userInfo.getName());
-        ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
-                .withServiceBaseName(dao.getServiceBaseName())
-                .withNotebookUserName(userInfo.getName())
-                .withNotebookSubnet(credentialDTO.getNotebookSubnet())
-                .withRegion(dao.getAwsRegion())
-                .withSecurityGroupIds(DEFAULT_SECURITY_GROUP)
-                .withImage(formDTO.getImage());
-        return provisioningService.post(EXPLORATORY_CREATE, dto, String.class);
+        if (isAdded) {
+            UserAWSCredentialDTO credentialDTO = keyDao.findCredential(userInfo.getName());
+            ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
+                    .withServiceBaseName(dao.getServiceBaseName())
+                    .withNotebookUserName(userInfo.getName())
+                    .withNotebookSubnet(credentialDTO.getNotebookSubnet())
+                    .withRegion(dao.getAwsRegion())
+                    .withSecurityGroupIds(DEFAULT_SECURITY_GROUP)
+                    .withImage(formDTO.getImage());
+            return Response
+                    .ok(provisioningService.post(EXPLORATORY_CREATE, dto, String.class))
+                    .build();
+        } else {
+            return Response.status(Response.Status.FOUND).build();
+        }
     }
 
     @POST

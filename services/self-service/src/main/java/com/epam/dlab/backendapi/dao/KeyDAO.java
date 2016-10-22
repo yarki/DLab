@@ -20,8 +20,6 @@ import org.bson.Document;
 
 import java.io.IOException;
 
-import static com.epam.dlab.backendapi.dao.MongoCollections.USER_AWS_CREDENTIALS;
-import static com.epam.dlab.backendapi.dao.MongoCollections.USER_KEYS;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
