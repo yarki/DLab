@@ -10,54 +10,28 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.exploratory;
+package com.epam.dlab.dto.emr;
 
+import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDTO> {
-    @JsonProperty("notebook_subnet_cidr")
-    private String notebookSubnet;
-    @JsonProperty("creds_security_groups_ids")
-    private String securityGroupIds;
-    @JsonProperty("image")
-    private String image;
+/**
+ * Created by Alexey Suprun
+ */
+public class EMRStatusDTO extends StatusBaseDTO<EMRStatusDTO> {
+    @JsonProperty("resource_name")
+    private String resourceName;
 
-    public String getNotebookSubnet() {
-        return notebookSubnet;
+    public String getResourceName() {
+        return resourceName;
     }
 
-    public void setNotebookSubnet(String notebookSubnet) {
-        this.notebookSubnet = notebookSubnet;
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
-    public ExploratoryCreateDTO withNotebookSubnet(String notebookSubnet) {
-        setNotebookSubnet(notebookSubnet);
-        return this;
-    }
-
-    public String getSecurityGroupIds() {
-        return securityGroupIds;
-    }
-
-    public void setSecurityGroupIds(String securityGroupIds) {
-        this.securityGroupIds = securityGroupIds;
-    }
-
-    public ExploratoryCreateDTO withSecurityGroupIds(String securityGroupIds) {
-        setSecurityGroupIds(securityGroupIds);
-        return this;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public ExploratoryCreateDTO withImage(String image) {
-        setImage(image);
+    public EMRStatusDTO withResourceName(String resourceName) {
+        setResourceName(resourceName);
         return this;
     }
 }

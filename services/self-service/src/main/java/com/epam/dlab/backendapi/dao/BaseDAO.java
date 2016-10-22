@@ -27,6 +27,8 @@ import java.util.function.Supplier;
 
 class BaseDAO implements MongoCollections {
     protected static final ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+    public static final String FIELD_DELIMETER = ".";
+    public static final String FIELD_SET_DELIMETER = ".$.";
     public static final String ID = "_id";
     public static final String USER = "user";
     public static final String STATUS = "status";

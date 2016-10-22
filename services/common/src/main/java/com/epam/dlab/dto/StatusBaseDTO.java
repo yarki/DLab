@@ -10,11 +10,12 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.exploratory;
+
+package com.epam.dlab.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExploratoryCallbackDTO {
+abstract public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @JsonProperty
     private String user;
     @JsonProperty
@@ -30,9 +31,10 @@ public class ExploratoryCallbackDTO {
         this.user = user;
     }
 
-    public ExploratoryCallbackDTO withUser(String user) {
+    @SuppressWarnings("unchecked")
+    public T withUser(String user) {
         setUser(user);
-        return this;
+        return (T) this;
     }
 
     public String getName() {
@@ -43,9 +45,10 @@ public class ExploratoryCallbackDTO {
         this.name = name;
     }
 
-    public ExploratoryCallbackDTO withName(String name) {
+    @SuppressWarnings("unchecked")
+    public T withName(String name) {
         setName(name);
-        return this;
+        return (T) this;
     }
 
     public String getStatus() {
@@ -56,9 +59,9 @@ public class ExploratoryCallbackDTO {
         this.status = status;
     }
 
-    public ExploratoryCallbackDTO withStatus(String status) {
+    @SuppressWarnings("unchecked")
+    public T withStatus(String status) {
         setStatus(status);
-        return this;
+        return (T) this;
     }
 }
-

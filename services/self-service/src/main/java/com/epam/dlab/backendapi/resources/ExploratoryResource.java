@@ -22,9 +22,9 @@ import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryTerminateDTO;
-import com.epam.dlab.dto.exploratory.ExploratoryCallbackDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -87,8 +87,8 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @POST
     @Path("/create/status")
-    public Response create(ExploratoryCallbackDTO dto) throws IOException {
-        LOGGER.debug("callback for creating exploratory environment {} for user {}", dto.getName(), dto.getUser());
+    public Response create(StatusBaseDTO dto) throws IOException {
+        LOGGER.debug("update status for exploratory environment {} for user {}", dto.getName(), dto.getUser());
         userListDAO.updateExploratoryStatus(dto);
         return Response.ok().build();
     }

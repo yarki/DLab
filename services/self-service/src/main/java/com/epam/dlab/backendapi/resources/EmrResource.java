@@ -23,6 +23,7 @@ import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.emr.EMRCreateDTO;
+import com.epam.dlab.dto.emr.EMRStatusDTO;
 import com.epam.dlab.dto.emr.EMRTerminateDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -80,6 +81,14 @@ public class EmrResource implements EmrAPI {
         } else {
             return Response.status(Response.Status.FOUND).build();
         }
+    }
+
+    @POST
+    @Path("/create/status")
+    public Response create(EMRStatusDTO dto) throws IOException {
+        LOGGER.debug("update status for emr {} for user {}", dto.getResourceName(), dto.getUser());
+        userListDAO.updateComputationalStatus(dto);
+        return Response.ok().build();
     }
 
     @POST

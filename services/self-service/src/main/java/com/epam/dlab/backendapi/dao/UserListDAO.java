@@ -14,7 +14,8 @@ package com.epam.dlab.backendapi.dao;
 
 import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
-import com.epam.dlab.dto.exploratory.ExploratoryCallbackDTO;
+import com.epam.dlab.dto.StatusBaseDTO;
+import com.epam.dlab.dto.emr.EMRStatusDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.MongoWriteException;
 import org.bson.Document;
@@ -29,6 +30,7 @@ import static com.mongodb.client.model.Updates.set;
 public class UserListDAO extends BaseDAO {
     public static final String ENVIRONMENT_NAME = "environment_name";
     public static final String COMPUTATIONAL_RESOURCES = "computational_resources";
+    public static final String RESOURCE_NAME = "resource_name";
 
     public Iterable<Document> find(String user) {
         return mongoService.getCollection(USER_INSTANCES).find(eq(USER, user));
@@ -47,7 +49,7 @@ public class UserListDAO extends BaseDAO {
         }
     }
 
-    public void updateExploratoryStatus(ExploratoryCallbackDTO dto) {
+    public void updateExploratoryStatus(StatusBaseDTO dto) {
         update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(ENVIRONMENT_NAME, dto.getName())), set(STATUS, dto.getStatus()));
     }
 
@@ -62,5 +64,11 @@ public class UserListDAO extends BaseDAO {
         } else {
             return false;
         }
+    }
+
+    public void updateComputationalStatus(EMRStatusDTO dto) {
+        update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(ENVIRONMENT_NAME, dto.getName())
+                , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + RESOURCE_NAME, dto.getResourceName())),
+                set(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, dto.getStatus()));
     }
 }
