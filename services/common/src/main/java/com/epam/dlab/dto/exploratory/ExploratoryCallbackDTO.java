@@ -14,9 +14,6 @@ package com.epam.dlab.dto.exploratory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Created by Alexey Suprun
- */
 public class ExploratoryCallbackDTO {
     @JsonProperty
     private String user;
