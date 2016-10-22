@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserComputationalResourceDTO {
     @JsonProperty("resource_name")
-    private String environmentName;
+    private String resourceName;
     @JsonProperty("resource_status")
     private String status;
     @JsonProperty("up_time_since")
@@ -28,16 +28,16 @@ public class UserComputationalResourceDTO {
     @JsonProperty("slave_instance_number")
     private String slaveNumber;
 
-    public String getEnvironmentName() {
-        return environmentName;
+    public String getResourceName() {
+        return resourceName;
     }
 
-    public void setEnvironmentName(String environmentName) {
-        this.environmentName = environmentName;
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
-    public UserComputationalResourceDTO withEnvironmentName(String environmentName) {
-        setEnvironmentName(environmentName);
+    public UserComputationalResourceDTO withResourceName(String resourceName) {
+        setResourceName(resourceName);
         return this;
     }
 

@@ -15,6 +15,8 @@ package com.epam.dlab.backendapi.api.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EMRCreateFormDTO {
+    @JsonProperty
+    private String name;
     @JsonProperty("emr_instance_count")
     private String instanceCount;
     @JsonProperty("emr_instance_type")
@@ -23,6 +25,10 @@ public class EMRCreateFormDTO {
     private String version;
     @JsonProperty("notebook_name")
     private String notebookName;
+
+    public String getName() {
+        return name;
+    }
 
     public String getInstanceCount() {
         return instanceCount;

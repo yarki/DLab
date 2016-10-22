@@ -53,7 +53,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Inject
     private KeyDAO keyDao;
     @Inject
-    private UserListDAO userNotebookDAO;
+    private UserListDAO userListDAO;
     @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
@@ -62,7 +62,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/create")
     public Response create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) throws IOException {
         LOGGER.debug("creating exploratory environment {}", userInfo.getName());
-        boolean isAdded = userNotebookDAO.insertExploratory(new UserInstanceDTO()
+        boolean isAdded = userListDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
                 .withEnvironmentName(formDTO.getName())
                 .withStatus(UserInstanceStatus.CREATING.getStatus())

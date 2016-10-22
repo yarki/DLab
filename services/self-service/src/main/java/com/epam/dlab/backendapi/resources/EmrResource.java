@@ -15,9 +15,12 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.api.form.EMRCreateFormDTO;
 import com.epam.dlab.backendapi.api.form.EMRTerminateFormDTO;
+import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
+import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.EmrAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
+import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.emr.EMRCreateDTO;
 import com.epam.dlab.dto.emr.EMRTerminateDTO;
@@ -32,6 +35,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
@@ -47,23 +51,35 @@ public class EmrResource implements EmrAPI {
     @Inject
     private KeyDAO keyDao;
     @Inject
+    private UserListDAO userListDAO;
+    @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
     @POST
     @Path("/create")
-    public String create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) throws IOException {
+    public Response create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) throws IOException {
         LOGGER.debug("creating emr {}", userInfo.getName());
-        EMRCreateDTO dto = new EMRCreateDTO()
-                .withServiceBaseName(dao.getServiceBaseName())
-                .withInstanceCount(formDTO.getInstanceCount())
-                .withInstanceType(formDTO.getInstanceType())
-                .withVersion(formDTO.getVersion())
-                .withNotebookName(formDTO.getNotebookName())
-                .withEdgeUserName(userInfo.getName())
-                .withEdgeSubnet(keyDao.findCredential(userInfo.getName()).getNotebookSubnet())
-                .withRegion(dao.getAwsRegion());
-        return provisioningService.post(EMR_CREATE, dto, String.class);
+        boolean isAdded = userListDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
+                new UserComputationalResourceDTO()
+                        .withResourceName(formDTO.getName())
+                        .withStatus(UserInstanceStatus.CREATING.getStatus()));
+        if (isAdded) {
+            EMRCreateDTO dto = new EMRCreateDTO()
+                    .withServiceBaseName(dao.getServiceBaseName())
+                    .withInstanceCount(formDTO.getInstanceCount())
+                    .withInstanceType(formDTO.getInstanceType())
+                    .withVersion(formDTO.getVersion())
+                    .withNotebookName(formDTO.getNotebookName())
+                    .withEdgeUserName(userInfo.getName())
+                    .withEdgeSubnet(keyDao.findCredential(userInfo.getName()).getNotebookSubnet())
+                    .withRegion(dao.getAwsRegion());
+            return Response
+                    .ok(provisioningService.post(EMR_CREATE, dto, String.class))
+                    .build();
+        } else {
+            return Response.status(Response.Status.FOUND).build();
+        }
     }
 
     @POST

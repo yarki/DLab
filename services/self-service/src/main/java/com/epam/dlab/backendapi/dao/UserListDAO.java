@@ -12,14 +12,21 @@
 
 package com.epam.dlab.backendapi.dao;
 
+import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.MongoWriteException;
 import org.bson.Document;
 
+import java.io.IOException;
+
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.push;
 
 public class UserListDAO extends BaseDAO {
+    public static final String COMPUTATIONAL_RESOURCES = "computational_resources";
+
     public Iterable<Document> find(String user) {
         return mongoService.getCollection(USER_INSTANCES).find(eq(USER, user));
     }
@@ -33,6 +40,20 @@ public class UserListDAO extends BaseDAO {
             insertOne(USER_INSTANCES, dto);
             return true;
         } catch (MongoWriteException e) {
+            return false;
+        }
+    }
+
+    public boolean addComputational(String user, String name, UserComputationalResourceDTO resourceDTO) throws IOException {
+        UserInstanceDTO dto = find(USER_INSTANCES, and(eq(USER, user), eq(ENVIRONMENT_NAME, name)), UserInstanceDTO.class);
+        long count = dto.getResources().stream()
+                .filter(i -> resourceDTO.getResourceName().equals(i.getResourceName()))
+                .count();
+        if  (count == 0) {
+            dto.getResources().add(resourceDTO);
+            update(USER_INSTANCES, eq(ID, dto.getId()), push(COMPUTATIONAL_RESOURCES, convertToBson(resourceDTO)));
+            return true;
+        } else {
             return false;
         }
     }

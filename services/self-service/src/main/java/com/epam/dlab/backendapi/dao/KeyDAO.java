@@ -31,7 +31,7 @@ public class KeyDAO extends BaseDAO {
     }
 
     public void updateKey(String user, String status) {
-        mongoService.getCollection(USER_KEYS).updateOne(eq(ID, user), set(STATUS, status));
+        update(USER_KEYS, eq(ID, user), set(STATUS, status));
     }
 
     public void deleteKey(String user) {

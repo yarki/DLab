@@ -50,9 +50,17 @@ class BaseDAO implements MongoCollections {
     }
 
     protected void insertOne(String collection, Object object, String uuid) throws JsonProcessingException {
-        mongoService.getCollection(collection).insertOne(Document.parse(MAPPER.writeValueAsString(object))
+        mongoService.getCollection(collection).insertOne(convertToBson(object)
                 .append(ID, uuid)
                 .append(TIMESTAMP, new Date()));
+    }
+
+    protected void update(String collection, Bson condition, Bson value) {
+        mongoService.getCollection(collection).updateOne(condition, value);
+    }
+
+    protected Document convertToBson(Object object) throws JsonProcessingException {
+        return Document.parse(MAPPER.writeValueAsString(object));
     }
 
     protected <T> T find(String collection, Bson eq, Class<T> clazz) throws IOException {

@@ -12,11 +12,16 @@
 
 package com.epam.dlab.backendapi.api.instance;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInstanceDTO {
+    @JsonProperty("_id")
+    private String id;
     @JsonProperty
     private String user;
     @JsonProperty("environment_name")
@@ -30,7 +35,11 @@ public class UserInstanceDTO {
     @JsonProperty("up_time_since")
     private String upTimeSince;
     @JsonProperty("computational_resources")
-    private List<UserComputationalResourceDTO> resources;
+    private List<UserComputationalResourceDTO> resources = new ArrayList<>();
+
+    public String getId() {
+        return id;
+    }
 
     public String getUser() {
         return user;
