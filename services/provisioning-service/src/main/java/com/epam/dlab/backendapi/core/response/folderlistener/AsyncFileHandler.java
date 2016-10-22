@@ -24,13 +24,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class AsyncFileHandler implements Runnable {
+public final class AsyncFileHandler implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
 
-    private String fileName;
-    private String directory;
-    private FileHandler fileHandler;
-    private Duration fileLengthCheckDelay;
+    private final String fileName;
+    private final String directory;
+    private final FileHandler fileHandler;
+    private final Duration fileLengthCheckDelay;
 
     public AsyncFileHandler(String fileName, String directory, FileHandler fileHandler, Duration fileLengthCheckDelay) {
         this.fileName = fileName;

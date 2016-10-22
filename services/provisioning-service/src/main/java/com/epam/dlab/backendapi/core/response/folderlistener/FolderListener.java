@@ -26,13 +26,13 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class FolderListener implements Runnable {
+public final class FolderListener implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
 
-    private String directory;
-    private Duration timeout;
-    private FileHandler fileHandler;
-    private Duration fileLengthCheckDelay;
+    private final String directory;
+    private final Duration timeout;
+    private final FileHandler fileHandler;
+    private final Duration fileLengthCheckDelay;
 
     public FolderListener(String directory, Duration timeout, FileHandler fileHandler, Duration fileLengthCheckDelay) {
         this.directory = directory;
