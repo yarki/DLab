@@ -17,7 +17,7 @@ args = parser.parse_args()
 if __name__ == "__main__":
     success = False
     tag = {"Key": args.infra_tag_name, "Value": args.infra_tag_value}
-    if args.vpc_id != '':
+    if args.vpc_id:
         try:
             print "Creating Endpoint in vpc {}, region {} with tag {}.".format(args.vpc_id, args.region, json.dumps(tag))
             endpoint = create_endpoint(vpc_id, "com.amazonaws.{}.s3".format(args.region), json.dumps(tag))
