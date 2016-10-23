@@ -71,7 +71,8 @@ def create_endpoint(vpc_id, service_name, tag):
         ec2.delete_route_table(
             RouteTableId=route_table[0]
         )
-        sys.exit(1)
+        return response
+        #sys.exit(1)
 
 
 def get_vpc_endpoints(vpc_id):
