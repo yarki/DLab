@@ -67,7 +67,7 @@ cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{0}/jars/{1}/aws
 
 logfile = '{}_creation.log'.format(args.name)
 logpath = '/response/' + logfile
-open(logpath, 'w') as out
+out = open(logpath, 'w')
 out.close()
 
 
