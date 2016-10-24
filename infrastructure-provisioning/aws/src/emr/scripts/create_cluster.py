@@ -1,5 +1,17 @@
 #!/usr/bin/python
 
+# ******************************************************************************************************
+#
+# Copyright (c) 2016 EPAM Systems Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# ****************************************************************************************************/
+
 # v1.3 from 05/10/2016
 import boto3
 import argparse
@@ -17,7 +29,8 @@ parser.add_argument('--dry_run', action='store_true', help='Print all variables'
 parser.add_argument('--name', type=str, default='', help='Name to be applied to Cluster ( MANDATORY !!! )')
 parser.add_argument('--applications', type=str, default='Hadoop Hive Hue Spark',
                     help='Set of applications to be installed on EMR (Default are: "Hadoop Hive Hue Spark")')
-parser.add_argument('--instance_type', type=str, default='m3.xlarge', help='EC2 instance size (Default: m3.xlarge)')
+parser.add_argument('--master_instance_type', type=str, default='m3.xlarge', help='EC2 instance size for Master-Node (Default: m3.xlarge)')
+parser.add_argument('--slave_instance_type', type=str, default='m3.xlarge', help='EC2 instance size for Worker-Nodes (Default: m3.xlarge)')
 parser.add_argument('--instance_count', type=int, default='3',
                     help='Number of nodes the cluster will consist of (Default: 3)')
 parser.add_argument('--release_label', type=str, default='emr-4.8.0', help='EMR release version (Default: "emr-4.8.0")')
@@ -48,8 +61,14 @@ cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{
     args.s3_bucket, args.name, args.nbs_user)
 
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{0}/jars/{1}/aws --recursive, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-          "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{0}/jars/{1}/lib --recursive,ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
+          "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{0}/jars/{1}/lib --recursive,ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
+          "Name=CUSTOM_JAR, Args=aws s3 cp /usr/lib/hadoop-lzo/ s3://{0}/jars/{1}/lib --recursive, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
     args.s3_bucket, args.release_label)
+
+logfile = '{}_creation.log'.format(args.name)
+logpath = '/response/' + logfile
+open(logpath, 'w') as out
+out.close()
 
 
 def get_object_count(bucket, prefix):
@@ -189,8 +208,8 @@ def build_emr_cluster(args):
         result = socket.run_job_flow(
             Name=args.name,
             ReleaseLabel=args.release_label,
-            Instances={'MasterInstanceType': args.instance_type,
-                       'SlaveInstanceType': args.instance_type,
+            Instances={'MasterInstanceType': args.master_instance_type,
+                       'SlaveInstanceType': args.slave_instance_type,
                        'InstanceCount': args.instance_count,
                        'Ec2KeyName': args.ssh_key,
                        # 'Placement': {'AvailabilityZone': args.availability_zone},
@@ -219,20 +238,28 @@ if __name__ == "__main__":
         # get_emr_state(args.id)
         build_emr_cluster(args)
     else:
+        open(logpath, 'a') as out
+        out.write('[BUILDING NEW CLUSTER - {}\n]'.format(args.name))
         cluster_id = build_emr_cluster(args)
+        out.write('Cluster ID: {}\n'.format(cluster_id))
         if wait_emr(args.s3_bucket, args.name, args.emr_timeout):
             # Append Cluster's SGs to the Notebook server to grant access
             nbs_id = get_instance_by_ip(args.nbs_ip)
+            out.write('Notebook server "{}" IP is "{}"\n'.format(nbs_id, args.nbs_ip))
             current_sg = nbs_id.security_groups
+            out.write('Current Notebooks SGs: {}\n'.format(current_sg))
             sg_list=[]
             for i in current_sg:
                 sg_list.append(i['GroupId'])
             sg_master, sg_slave = emr_sg(cluster_id)
             sg_list.extend([sg_master, sg_slave])
+            out.write('Updating SGs for Notebook to: {}\n'.format(sg_list))
+            out.close()
             nbs_id.modify_attribute( Groups = sg_list)
         else:
-            if action_validate(id)[0] == "True":
-                print "Timeout reached. Please increase timeout period and try again. Now terminating the cluster..."
+            out.write("Timeout of {} seconds reached. Please increase timeout period and try again. Now terminating the cluster...".format(args.emr_timeout))
+            out.close()
+            if action_validate(cluster_id)[0] == "True":
                 terminate_emr(cluster_id)
             s3_cleanup(args.s3_bucket, args.name)
             sys.exit(1)
