@@ -1,4 +1,17 @@
 #!/usr/bin/python
+
+# ******************************************************************************************************
+#
+# Copyright (c) 2016 EPAM Systems Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# ****************************************************************************************************/
+
 import boto3
 from fabric.api import *
 import argparse
@@ -25,7 +38,6 @@ def install_emr_spark():
     local('tar -zxvf /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/' + args.emr_version + '/')
 
 def prepare():
-    local('rm -rf /srv/*')
     local('mkdir -p ' + yarn_dir)
     local('mkdir -p ' + emr_dir)
     result = os.path.exists(emr_dir + args.emr_version + "/aws")
@@ -54,7 +66,8 @@ def pyspark_kernel(args):
         text = f.read()
     text = text.replace('CLUSTER', args.cluster_name)
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('SPARK_PATH', '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    text = text.replace('SPARK_PATH',
+                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
     with open(kernel_path, 'w') as f:
         f.write(text)
     local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
@@ -64,7 +77,8 @@ def pyspark_kernel(args):
         text = f.read()
     text = text.replace('CLUSTER', args.cluster_name)
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('SPARK_PATH', '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    text = text.replace('SPARK_PATH',
+                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
     with open(kernel_path, 'w') as f:
         f.write(text)
 
@@ -77,7 +91,8 @@ def toree_kernel(args):
         text = f.read()
     text = text.replace('CLUSTER', args.cluster_name)
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('SPARK_PATH', '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    text = text.replace('SPARK_PATH',
+                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
     with open(kernel_path, 'w') as f:
         f.write(text)
 
@@ -111,6 +126,7 @@ if __name__ == "__main__":
         if result == False :
             jars(args)
         yarn(args)
+        install_emr_spark(args)
         pyspark_kernel(args)
         toree_kernel(args)
         spark_defaults()

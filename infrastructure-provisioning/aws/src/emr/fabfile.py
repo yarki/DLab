@@ -1,4 +1,17 @@
 #!/usr/bin/python
+
+# ******************************************************************************************************
+#
+# Copyright (c) 2016 EPAM Systems Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# ****************************************************************************************************/
+
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
@@ -24,7 +37,7 @@ def run():
     emr_conf['release_label'] = os.environ['emr_version']
     emr_conf['instance_type'] = os.environ['emr_instance_type']
     emr_conf['instance_count'] = os.environ['emr_instance_count']
-    emr_conf['notebook_ip'] = get_instance_ip_address(os.environ['notebook_name'])
+    emr_conf['notebook_ip'] = get_instance_ip_address(os.environ['notebook_name']).get('Private')
     #emr_conf['notebook_user'] = os.environ['edge_user_name']
     emr_conf['role_service_name'] = os.environ['service_role']
     emr_conf['role_ec2_name'] = os.environ['ec2_role']

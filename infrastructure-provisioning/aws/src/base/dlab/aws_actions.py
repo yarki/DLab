@@ -1,6 +1,19 @@
+# ******************************************************************************************************
+#
+# Copyright (c) 2016 EPAM Systems Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# ****************************************************************************************************/
+
 import boto3, boto, botocore
 import time
-import os
+import os, sys
+import json
 
 
 def put_to_bucket(bucket_name, local_file, destination_file):
@@ -29,25 +42,29 @@ def create_vpc(vpc_cidr, tag):
     return vpc.id
 
 
-def create_endpoint(vpc_id, service_name):
+def get_vpc_endpoints(vpc_id):
+    # Returns LIST of Endpoint DICTIONARIES
     ec2 = boto3.client('ec2')
-    route_table = []
-    response = ''
+    endpoints = ec2.describe_vpc_endpoints(
+        Filters=[{
+            'Name':'vpc-id',
+            'Values':[vpc_id]
+        }]
+    ).get('VpcEndpoints')
+    return endpoints
+
+
+def create_tag(resource, tag):
+    ec2 = boto3.client('ec2')
     try:
-        for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
-            route_table.append(i['Associations'][0]['RouteTableId'])
-        response = ec2.create_vpc_endpoint(
-            VpcId=vpc_id,
-            ServiceName=service_name,
-            RouteTableIds=route_table
-        #   ClientToken='string'
+        ec2.create_tags(
+            Resources = resource,
+            Tags = [
+                json.loads(tag)
+            ]
         )
-        response = response['VpcEndpoint']['VpcEndpointId']
     except botocore.exceptions.ClientError as err:
         print err.response['Error']['Message']
-    finally:
-        return response
-
 
 
 def create_subnet(vpc_id, subnet, tag):
@@ -107,15 +124,51 @@ def create_attach_policy(policy_name, role_name, file_path):
     conn.put_role_policy(role_name, policy_name, json)
 
 
-def remove_role(scientist, instance_type):
-    print "[Removing roles]"
+def remove_ec2(tag_name, tag_value):
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped', 'pending', 'stopping']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+    for instance in instances:
+        client.terminate_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_terminated')
+        waiter.wait(InstanceIds=[instance.id])
+
+
+def stop_ec2(tag_name, nb_tag_value):
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'pending']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
+    for instance in instances:
+        client.stop_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_stopped')
+        waiter.wait(InstanceIds=[instance.id])
+
+
+def start_ec2(tag_name, tag_value):
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['stopped']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+    for instance in instances:
+        client.start_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_status_ok')
+        waiter.wait(InstanceIds=[instance.id])
+
+
+def remove_role(instance_type, scientist=''):
+    print "[Removing roles and instance profiles]"
     client = boto3.client('iam')
     if instance_type == "ssn":
         role_name = os.environ['conf_service_base_name'] + '-ssn-Role'
         role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
     if instance_type == "edge":
-        role_name = os.environ['conf_service_base_name'] + '-edge-Role'
-        role_profile_name = os.environ['conf_service_base_name'] + '-edge-Profile'
+        role_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Role'
+        role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
     elif instance_type == "notebook":
         role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Role'
         role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
@@ -123,31 +176,32 @@ def remove_role(scientist, instance_type):
         role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
     except:
         print "Wasn't able to get role!"
-    print "Name: ", role
+        sys.exit(1)
     policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
     for i in policy_list:
         policy_arn = i.get('PolicyArn')
-        print policy_arn
         client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
-    print "[Removing instance profiles]"
     try:
         profile = client.get_instance_profile(InstanceProfileName="{}".format(role_profile_name)).get(
             "InstanceProfile").get("InstanceProfileName")
     except:
         print "Wasn't able to get instance profile!"
-    print "Name: ", profile
+        sys.exit(1)
     try:
         client.remove_role_from_instance_profile(InstanceProfileName=profile, RoleName=role)
     except:
         print "\nWasn't able to remove role from instance profile!"
+        sys.exit(1)
     try:
         client.delete_instance_profile(InstanceProfileName=profile)
     except:
         print "\nWasn't able to remove instance profile!"
+        sys.exit(1)
     try:
         client.delete_role(RoleName=role)
     except:
         print "\nWasn't able to remove role!"
+        sys.exit(1)
     print "The IAM role " + role + " has been deleted successfully"
 
 
@@ -166,9 +220,11 @@ def remove_s3(scientist):
     print "[Removing S3 buckets]"
     s3 = boto3.resource('s3')
     client = boto3.client('s3')
-    bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-edge-bucket').lower().replace('_', '-')
+    if bucket_type == 'ssn':
+        bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
+    elif bucket_type == 'edge':
+        bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-edge-bucket').lower().replace('_', '-')
     bucket = s3.Bucket("{}".format(bucket_name))
-    print bucket.name
     try:
         list_obj = client.list_objects(Bucket=bucket.name)
     except:
@@ -180,7 +236,6 @@ def remove_s3(scientist):
     if list_obj is not None:
         for o in list_obj:
             list_obj = o.get('Key')
-            print list_obj
             client.delete_objects(
                 Bucket=bucket_name,
                 Delete={'Objects': [{'Key': list_obj}]}
@@ -193,26 +248,26 @@ def remove_s3(scientist):
     print "The S3 bucket " + bucket.name + " has been deleted successfully"
 
 
-# def remove_subnets():
-#    print "[Removing subnets]"
-#    ec2 = boto3.resource('ec2')
-#    client = boto3.client('ec2')
-#    tag_name = os.environ['conf_service_base_name'] + '-tag'
-#    subnets = ec2.subnets.filter(
-#        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
-#    for subnet in subnets:
-#        print subnet.id
-#        client.delete_subnet(SubnetId=subnet.id)
-#        print "The subnet " + subnet.id + " has been deleted successfully"
+def remove_subnets(subnet_id):
+    print "[Removing subnets]"
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    #tag_name = os.environ['conf_service_base_name'] + '-tag'
+    #subnets = ec2.subnets.filter(
+    #    Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
+    #for subnet in subnets:
+    #    print subnet.id
+    client.delete_subnet(SubnetId=subnet_id)
+    #    print "The subnet " + subnet.id + " has been deleted successfully"
 
 
-def remove_sgroups():
+def remove_sgroups(tag_value):
     print "[Removing security groups]"
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
     tag_name = os.environ['conf_service_base_name']
     sgs = ec2.security_groups.filter(
-        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
+        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': [tag_value]}])
     for sg in sgs:
         print sg.id
         client.delete_security_group(GroupId=sg.id)
