@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit {
   keyName: string;
   uploadAccessKeyUrl: string;
   preloadModalInterval: any;
-
+  uploadAccessUserKeyFormInvalid: boolean;
   createTempls: any;
   shapes: any;
   emrTempls: any;
@@ -51,6 +51,7 @@ export class HomeComponent implements OnInit {
     private appRoutingService : AppRoutingService,
     private http: Http
   ) {
+    this.uploadAccessUserKeyFormInvalid = true;
     this.uploadAccessKeyUrl = this.userAccessKeyProfileService.getAccessKeyUrl();
   }
 
@@ -76,8 +77,14 @@ export class HomeComponent implements OnInit {
     }.bind(this), 10000);
   }
 
-  showKey($event) {
-    this.keyName = $event.target.files[0].name;
+  uploadUserAccessKey_onChange($event) {
+    if($event.target.files.length > 0)
+    {
+      let fileName = $event.target.files[0].name;
+      this.uploadAccessUserKeyFormInvalid = !fileName.toLowerCase().endsWith(".pub");
+      if(!this.uploadAccessUserKeyFormInvalid)
+        this.keyName = fileName;
+    }
   }
 
   //
