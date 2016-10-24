@@ -111,6 +111,11 @@ def get_files(s3client, s3resource, dist, bucket, local):
 
 
 def spark_defaults():
+    s3_client = boto3.client('s3')
+    s3_client.download_file(args.bucket, 'spark-defaults.conf', '/tmp/sparkEMR.conf')
+    print "========== SPARK EMR ============"
+    print(open('/tmp/sparkEMR.conf').read())
+    print "================================="
     spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
     template_file = "/tmp/spark-defaults_template.conf"
     with open(spark_def_path, 'w') as out:
