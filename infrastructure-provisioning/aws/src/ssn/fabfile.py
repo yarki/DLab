@@ -47,6 +47,7 @@ def run():
         policy_name = service_base_name + '-ssn-Policy'
         user_bucket_name = (service_base_name + '-ssn-bucket').lower().replace('_', '-')
         tag_name = service_base_name + '-Tag'
+        route_table_name = service_base_name + '-RT'
         instance_name = service_base_name + '-ssn-instance'
 
         logging.info('[CREATE ROLES]')
@@ -68,7 +69,7 @@ def run():
         logging.info('[CREATE ENDPOINT AND ROUTE-TABLE]')
         print('[CREATE ENDPOINT AND ROUTE-TABLE]')
         params = "--vpc_id {} --region {} --infra_tag_name {} --infra_tag_value {}".format(
-            os.environ['creds_vpc_id'], os.environ['creds_region'], "Name", service_base_name)
+            os.environ['creds_vpc_id'], os.environ['creds_region'], tag_name, route_table_name)
         if not run_routine('create_endpoint', params):
             logging.info('Unable to create Endpoint')
             with open("/root/result.json", 'w') as result:
