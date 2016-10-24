@@ -12,10 +12,10 @@
 
 package com.epam.dlab.dto.keyload;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserAWSCredentialDTO {
     @JsonProperty
     private String hostname;
@@ -39,4 +39,48 @@ public class UserAWSCredentialDTO {
     private String edgeSG;
     @JsonProperty("full_edge_conf")
     private String fullEdgeConf;
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public String getKeyName() {
+        return keyName;
+    }
+
+    public String getUserOwnBicketName() {
+        return userOwnBicketName;
+    }
+
+    public String getTunnelPort() {
+        return tunnelPort;
+    }
+
+    public String getSocksPort() {
+        return socksPort;
+    }
+
+    public String getNotebookSg() {
+        return notebookSg;
+    }
+
+    public String getNotebookProfile() {
+        return notebookProfile;
+    }
+
+    public String getNotebookSubnet() {
+        return notebookSubnet;
+    }
+
+    public String getEdgeSG() {
+        return edgeSG;
+    }
+
+    public String getFullEdgeConf() {
+        return fullEdgeConf;
+    }
 }

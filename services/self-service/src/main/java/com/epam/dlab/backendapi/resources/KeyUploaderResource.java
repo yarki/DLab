@@ -15,6 +15,7 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
+import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
@@ -47,6 +48,8 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @Inject
     private KeyDAO dao;
     @Inject
+    private SettingsDAO settingsDAO;
+    @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
@@ -67,7 +70,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
             content = buffer.lines().collect(Collectors.joining("\n"));
         }
         dao.uploadKey(userInfo.getName(), content);
-        return provisioningService.post(KEY_LOADER, new UploadFileDTO(userInfo.getName(), content), String.class);
+        return provisioningService.post(KEY_LOADER, new UploadFileDTO(userInfo.getName(), content, settingsDAO.getServiceBaseName()), String.class);
     }
 
     @POST
@@ -76,7 +79,9 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
         dao.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
         if (result.isSuccess()) {
-            dao.saveCredential(result.getCredential());
+            dao.saveCredential(result.getUser(), result.getCredential());
+        } else {
+            dao.deleteKey(result.getUser());
         }
         return Response.ok().build();
     }

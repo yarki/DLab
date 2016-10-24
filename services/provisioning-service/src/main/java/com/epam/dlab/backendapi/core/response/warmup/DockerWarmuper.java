@@ -13,11 +13,12 @@
 package com.epam.dlab.backendapi.core.response.warmup;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.CommandExecuter;
+import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
-import com.epam.dlab.dto.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.dropwizard.lifecycle.Managed;
@@ -37,7 +38,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecuter commandExecuter;
+    private CommandExecutor commandExecuter;
     private Map<String, String> uuids = new ConcurrentHashMap<>();
     private Set<ImageMetadataDTO> metadatas = new ConcurrentHashSet<>();
 
@@ -50,8 +51,12 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
             LOGGER.debug("image: {}", image);
             String uuid = UUID.randomUUID().toString();
             uuids.put(uuid, image);
-            String command = String.format(GET_IMAGE_METADATA, configuration.getKeyDirectory(),
-                    configuration.getWarmupDirectory(), uuid, image);
+            String command = new RunDockerCommand()
+                    .withVolumeForRootKeys(configuration.getKeyDirectory())
+                    .withVolumeForResponse(configuration.getWarmupDirectory())
+                    .withRequestId(uuid)
+                    .withActionDescribe(image)
+                    .toCMD();
             commandExecuter.executeAsync(command);
         }
     }
