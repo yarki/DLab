@@ -25,14 +25,14 @@ parser.add_argument('--emr_version', type=str, default='emr-4.8.0')
 parser.add_argument('--spark_version', type=str, default='1.6.0')
 args = parser.parse_args()
 
-emr_dir = '/opt/jars/'
+emr_dir = '/opt/' + args.emr_version + '/jars/'
 kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
 yarn_dir = '/srv/hadoopconf/'
 hadoop_version = "2.6"
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 
 
-def install_emr_spark():
+def install_emr_spark(args):
     local('wget ' + spark_link + ' -O /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
     local('mkdir -p /opt/' + args.emr_version)
     local('tar -zxvf /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/' + args.emr_version + '/')
@@ -48,7 +48,10 @@ def jars(args):
     print "Downloading jars..."
     s3client = boto3.client('s3')
     s3resource = boto3.resource('s3')
-    get_files(s3client, s3resource, 'jars/', args.bucket, '/opt/')
+    s3_client = boto3.client('s3')
+    s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
+    local('tar -zxvf /tmp/jars.tar.gz -C ' + emr_dir)
+    #get_files(s3client, s3resource, 'jars/', args.bucket, '/opt/')
 
 
 def yarn(args):

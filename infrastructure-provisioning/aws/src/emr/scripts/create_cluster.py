@@ -59,10 +59,9 @@ cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
     args.s3_bucket, args.name, args.nbs_user)
 
-cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{0}/jars/{1}/aws --recursive, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-          "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/hadoop/ s3://{0}/jars/{1}/lib --recursive,ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
+cp_jars = "Name=CUSTOM_JAR, Args=tar -zcvf ~/jars.tar.gz /usr/lib/hadoop/* /usr/lib/hadoop-lzo/* /usr/lib/hadoop-yarn/* /usr/share/aws-java-sdk/* /usr/share/aws/emr/emrfs/lib/* /usr/share/aws/emr/emrfs/auxlib/* /usr/lib/spark/lib/* /usr/lib/hadoop/cleint/* , ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
           "Name=CUSTOM_JAR,Args=aws s3 cp /usr/lib/spark/conf/spark-defaults.conf s3://{0}/ ,ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
-          "Name=CUSTOM_JAR, Args=aws s3 cp /usr/lib/hadoop-lzo/ s3://{0}/jars/{1}/lib --recursive, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
+          "Name=CUSTOM_JAR, Args=aws s3 cp ~/jars.tar.gz s3://{0}/jars/{1}/lib --recursive, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
     args.s3_bucket, args.release_label)
 
 
