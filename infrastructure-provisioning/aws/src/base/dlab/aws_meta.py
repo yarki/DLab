@@ -44,14 +44,17 @@ def get_route_tables(vpc, tags):
     ec2 = boto3.client('ec2')
     tag_name = json.loads(tags).get('Key')
     tag_value = json.loads(tags).get('Value')
-    print
+    rts = []
     result = ec2.describe_route_tables(
         Filters=[
             {'Name': 'vpc-id', 'Values': [vpc]},
-            {'Name': tag_name, 'Values': [tag_value]}
+            {'Name': 'tag-key', 'Values': [tag_name]},
+            {'Name': 'tag-value', 'Values': [tag_value]}
         ]
-    )
-    return result
+    ).get('RouteTables')
+    for i in result:
+        rts.append(i.get('RouteTableId'))
+    return rts
 
 
 def get_bucket_by_name(bucket_name):
