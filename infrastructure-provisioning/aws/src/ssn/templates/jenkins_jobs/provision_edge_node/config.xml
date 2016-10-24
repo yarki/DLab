@@ -27,9 +27,9 @@
           <defaultValue>sg-e338c89a</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>Notebook subnet CIDR</name>
+          <name>notebook_subnet_cidr</name>
           <description>The CIDR for notebook subnet to create</description>
-          <defaultValue>sg-e338c89a</defaultValue>
+          <defaultValue>172.31.202.0/24</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>Action</name>
