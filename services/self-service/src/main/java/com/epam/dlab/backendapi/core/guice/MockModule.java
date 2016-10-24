@@ -24,6 +24,7 @@ import com.epam.dlab.dto.imagemetadata.TemplateDTO;
 import com.google.inject.name.Names;
 import io.dropwizard.setup.Environment;
 
+import javax.ws.rs.core.Response;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -51,7 +52,7 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
 
     private RESTService createAuthenticationService() {
         RESTService result = mock(RESTService.class);
-        when(result.post(eq(LOGIN), any(), any())).thenReturn("token123");
+        when(result.post(eq(LOGIN), any(), any())).thenReturn(Response.ok("token123").build());
         when(result.post(eq(GET_USER_INFO), eq("token123"), eq(UserInfo.class))).thenReturn(new UserInfo("test", "token123"));
         return result;
     }

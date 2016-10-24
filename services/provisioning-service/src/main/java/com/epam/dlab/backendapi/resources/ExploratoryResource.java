@@ -16,9 +16,11 @@ import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.backendapi.core.docker.command.DockerAction;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
+import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
-import com.epam.dlab.dto.exploratory.ExploratoryTerminateDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +50,29 @@ public class ExploratoryResource implements DockerCommands {
     @Path("/create")
     @POST
     public String create(ExploratoryCreateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("create exploratory environment");
+        return action(dto, DockerAction.CREATE);
+    }
+
+    @Path("/start")
+    @POST
+    public String start(ExploratoryActionDTO dto) throws IOException, InterruptedException {
+        return action(dto, DockerAction.START);
+    }
+
+    @Path("/terminate")
+    @POST
+    public String terminate(ExploratoryActionDTO dto) throws IOException, InterruptedException {
+        return action(dto, DockerAction.TERMINATE);
+    }
+
+    @Path("/stop")
+    @POST
+    public String stop(ExploratoryActionDTO dto) throws IOException, InterruptedException {
+        return action(dto, DockerAction.STOP);
+    }
+
+    private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException, InterruptedException {
+        LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
@@ -58,46 +82,8 @@ public class ExploratoryResource implements DockerCommands {
                                 .withVolumeForResponse(configuration.getImagesDirectory())
                                 .withRequestId(uuid)
                                 .withCredsKeyName(configuration.getAdminKey())
-                                .withActionCreate(dto.getImage()),
-                        dto
-                )
-        );
-        return uuid;
-    }
-
-    @Path("/terminate")
-    @POST
-    public String terminate(ExploratoryTerminateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("terminate exploratory environment");
-        String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withActionTerminate(configuration.getEdgeImage())
-                        ,
-                        dto
-                )
-        );
-        return uuid;
-    }
-
-    @Path("/stop")
-    @POST
-    public String stop(ExploratoryTerminateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("stop exploratory environment");
-        String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withActionStop(configuration.getEdgeImage()),
+                                .withImage(configuration.getNotebookImage())
+                                .withAction(action),
                         dto
                 )
         );

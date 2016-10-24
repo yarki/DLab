@@ -11,7 +11,7 @@
  *****************************************************************************************************/
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import {Http, Response} from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
 import { UserProfileService } from './userProfile.service'
  import {Observable} from "rxjs";
@@ -28,14 +28,14 @@ export class AuthenticationService {
       .post(
         '/api/login', JSON.stringify({'username': userName, 'password': password, 'access_token': ''}), { headers: requestHeader }
       )
-      .map((res) => {
-        if (res.status == 200) {
+      .map((res : Response) => {
+          if (res.status == 200) {
 
-          this.userProfileService.setAuthToken(res.text())
-          this.userProfileService.setUserName(userName);
-          return true;
-        }
-        return false;
+            this.userProfileService.setAuthToken(res.text())
+            this.userProfileService.setUserName(userName);
+            return true;
+          }
+          return false;
       }, this);
   }
 

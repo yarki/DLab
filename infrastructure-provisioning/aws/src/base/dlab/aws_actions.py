@@ -127,37 +127,52 @@ def create_attach_policy(policy_name, role_name, file_path):
 def remove_ec2(tag_name, tag_value):
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
-    instances = ec2.instances.filter(
+    inst = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped', 'pending', 'stopping']},
                  {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
-    for instance in instances:
-        client.terminate_instances(InstanceIds=[instance.id])
-        waiter = client.get_waiter('instance_terminated')
-        waiter.wait(InstanceIds=[instance.id])
+    instances = list(inst)
+    if instances:
+        for instance in instances:
+            client.terminate_instances(InstanceIds=[instance.id])
+            waiter = client.get_waiter('instance_terminated')
+            waiter.wait(InstanceIds=[instance.id])
+            print "The instance " + tag_value + " has been terminated successfully"
+    else:
+        print "There are no instances with " + tag_value + " name to terminate"
 
 
-def stop_ec2(tag_name, nb_tag_value):
+def stop_ec2(tag_name, tag_value):
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
-    instances = ec2.instances.filter(
+    inst = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'pending']},
-                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
-    for instance in instances:
-        client.stop_instances(InstanceIds=[instance.id])
-        waiter = client.get_waiter('instance_stopped')
-        waiter.wait(InstanceIds=[instance.id])
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+    instances = list(inst)
+    if instances:
+        for instance in instances:
+            client.stop_instances(InstanceIds=[instance.id])
+            waiter = client.get_waiter('instance_stopped')
+            waiter.wait(InstanceIds=[instance.id])
+            print "The instance " + tag_value + " has been stopped successfully"
+    else:
+        print "There are no instances with " + tag_value + " name to stop"
 
 
 def start_ec2(tag_name, tag_value):
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
-    instances = ec2.instances.filter(
+    inst = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['stopped']},
                  {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
-    for instance in instances:
-        client.start_instances(InstanceIds=[instance.id])
-        waiter = client.get_waiter('instance_status_ok')
-        waiter.wait(InstanceIds=[instance.id])
+    instances = list(inst)
+    if instances:
+        for instance in instances:
+            client.start_instances(InstanceIds=[instance.id])
+            waiter = client.get_waiter('instance_status_ok')
+            waiter.wait(InstanceIds=[instance.id])
+            print "The instance " + tag_value + " has been started successfully"
+    else:
+        print "There are no instances with " + tag_value + " name to start"
 
 
 def remove_role(instance_type, scientist=''):
