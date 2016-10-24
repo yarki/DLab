@@ -10,11 +10,12 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.exploratory;
+package com.epam.dlab.backendapi.api.form;
 
+import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExploratoryTerminateDTO extends ExploratoryBaseDTO<ExploratoryTerminateDTO> {
+public class ExploratoryActionFormDTO extends ExploratoryBaseDTO<ExploratoryActionFormDTO> {
     @JsonProperty("notebook_instance_name")
     private String notebookInstanceName;
 
@@ -22,12 +23,4 @@ public class ExploratoryTerminateDTO extends ExploratoryBaseDTO<ExploratoryTermi
         return notebookInstanceName;
     }
 
-    public void setNotebookInstanceName(String notebookInstanceName) {
-        this.notebookInstanceName = notebookInstanceName;
-    }
-
-    public ExploratoryTerminateDTO withNotebookInstanceName(String notebookInstanceName) {
-        setNotebookInstanceName(notebookInstanceName);
-        return this;
-    }
 }

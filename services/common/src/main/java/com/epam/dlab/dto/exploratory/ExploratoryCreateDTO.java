@@ -19,8 +19,6 @@ public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDT
     private String notebookSubnet;
     @JsonProperty("creds_security_groups_ids")
     private String securityGroupIds;
-    @JsonProperty("image")
-    private String image;
 
     public String getNotebookSubnet() {
         return notebookSubnet;
@@ -48,16 +46,4 @@ public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDT
         return this;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public ExploratoryCreateDTO withImage(String image) {
-        setImage(image);
-        return this;
-    }
 }
