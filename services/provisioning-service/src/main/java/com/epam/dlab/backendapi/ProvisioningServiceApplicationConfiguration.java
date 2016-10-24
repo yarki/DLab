@@ -50,6 +50,18 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     @JsonProperty
     private Duration fileLengthCheckDelay = Duration.seconds(3);
 
+    @NotEmpty
+    @JsonProperty
+    private String emrImage;
+
+    @NotEmpty
+    @JsonProperty
+    private String emrEC2RoleDefault;
+
+    @NotEmpty
+    @JsonProperty
+    private String emrServiceRoleDefault;
+
     @Valid
     @NotNull
     @JsonProperty(SELF_SERVICE)
@@ -77,6 +89,18 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
 
     public Duration getFileLengthCheckDelay() {
         return fileLengthCheckDelay;
+    }
+
+    public String getEmrImage() {
+        return emrImage;
+    }
+
+    public String getEmrEC2RoleDefault() {
+        return emrEC2RoleDefault;
+    }
+
+    public String getEmrServiceRoleDefault() {
+        return emrServiceRoleDefault;
     }
 
     public RESTServiceFactory getSelfFactory() {

@@ -32,9 +32,10 @@ args = parser.parse_args()
 # Function for removing notebook's local kernels
 def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
     ec2 = boto3.resource('ec2')
-    instances = ec2.instances.filter(
+    inst = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['running']},
                  {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
+    instances = list(inst)
     if instances:
         for instance in instances:
             try:

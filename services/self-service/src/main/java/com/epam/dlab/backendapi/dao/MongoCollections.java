@@ -18,6 +18,6 @@ public interface MongoCollections {
     String DOCKER_ATTEMPTS = "dockerAttempts";
     String USER_KEYS = "userKeys";
     String USER_AWS_CREDENTIALS = "userAWSCredentials";
-    String USER_NOTEBOOKS = "userNotebooks";
+    String USER_INSTANCES = "userInstances";
     String SHAPES = "shapes";
 }

@@ -19,13 +19,17 @@ public class UploadFileDTO {
     private String user;
     @JsonProperty
     private String content;
+    @JsonProperty("conf_service_base_name ")
+    private String serviceBaseName;
+
 
     public UploadFileDTO() {
     }
 
-    public UploadFileDTO(String user, String content) {
+    public UploadFileDTO(String user, String content, String serviceBaseName) {
         this.user = user;
         this.content = content;
+        this.serviceBaseName = serviceBaseName;
     }
 
     public String getUser() {
@@ -34,5 +38,9 @@ public class UploadFileDTO {
 
     public String getContent() {
         return content;
+    }
+
+    public String getServiceBaseName() {
+        return serviceBaseName;
     }
 }

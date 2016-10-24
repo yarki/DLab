@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-public class CommandExecuter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecuter.class);
+public class CommandExecutor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
 
     public List<String> executeSync(String command) throws IOException {
         Process process = execute(command);

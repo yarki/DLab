@@ -10,29 +10,11 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.dao;
+package com.epam.dlab.backendapi.client.rest;
 
-import com.mongodb.client.result.DeleteResult;
-import org.bson.Document;
-
-import static com.epam.dlab.backendapi.dao.MongoCollections.SHAPES;
-import static com.epam.dlab.backendapi.dao.MongoCollections.USER_NOTEBOOKS;
-import static com.mongodb.client.model.Filters.eq;
-
-public class UserNotebookDAO extends BaseDAO {
-    public Iterable<Document> find(String user) {
-        return mongoService.getCollection(USER_NOTEBOOKS).find(eq(USER, user));
-    }
-
-    public Iterable<Document> findShapes() {
-        return mongoService.getCollection(SHAPES).find();
-    }
-
-    public void insert(String user, String image) {
-        insertOne(USER_NOTEBOOKS, () -> new Document(USER, user).append("image", image));
-    }
-
-    public DeleteResult delete(String id) {
-        return mongoService.getCollection(USER_NOTEBOOKS).deleteOne(eq(USER, id));
-    }
+public interface ExploratoryAPI {
+    String EXPLORATORY = "exploratory";
+    String EXPLORATORY_CREATE = EXPLORATORY + "/create";
+    String EXPLORATORY_TERMINATE = EXPLORATORY + "/terminate";
+    String EXPLORATORY_STOP = EXPLORATORY + "/stop";
 }
