@@ -166,7 +166,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </modal>
 
 <button  (click)="keyUploadModal.open({isFooter: false})">EMR</button>
-<modal #keyUploadModal modalClass="modal-lg">
+<modal #keyUploadModal modalClass="modal-lg" [hideCloseButton]="true" [closeOnEscape]="false" [closeOnOutsideClick]="false">
   <modal-header>
     <h4 class="modal-title">Create initial infrastructure</h4>
   </modal-header>
