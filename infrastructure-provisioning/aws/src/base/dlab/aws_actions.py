@@ -1,3 +1,15 @@
+# ******************************************************************************************************
+#
+# Copyright (c) 2016 EPAM Systems Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# ****************************************************************************************************/
+
 import boto3, boto, botocore
 import time
 import sys
@@ -125,6 +137,42 @@ def create_attach_policy(policy_name, role_name, file_path):
     conn.put_role_policy(role_name, policy_name, json)
 
 
+def remove_ec2(tag_name, tag_value):
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped', 'pending', 'stopping']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+    for instance in instances:
+        client.terminate_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_terminated')
+        waiter.wait(InstanceIds=[instance.id])
+
+
+def stop_ec2(tag_name, nb_tag_value):
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'pending']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
+    for instance in instances:
+        client.stop_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_stopped')
+        waiter.wait(InstanceIds=[instance.id])
+
+
+def start_ec2(tag_name, tag_value):
+    ec2 = boto3.resource('ec2')
+    client = boto3.client('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['stopped']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+    for instance in instances:
+        client.start_instances(InstanceIds=[instance.id])
+        waiter = client.get_waiter('instance_status_ok')
+        waiter.wait(InstanceIds=[instance.id])
+
+
 def remove_role(instance_type, scientist=''):
     print "[Removing roles and instance profiles]"
     client = boto3.client('iam')
@@ -247,30 +295,6 @@ def deregister_image(scientist):
     images_list = response.get('Images')
     for i in images_list:
         client.deregister_image(ImageId=i.get('ImageId'))
-
-
-def terminate_emr(id):
-    emr = boto3.client('emr')
-    emr.terminate_job_flows(
-        JobFlowIds=[id]
-    )
-
-
-def remove_ec2(tag_name, tag_value):
-    print "[Removing EC2]"
-    ec2 = boto3.resource('ec2')
-    client = boto3.client('ec2')
-    try:
-        instances = ec2.instances.filter(
-            Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
-                     {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
-        for instance in instances:
-            client.terminate_instances(InstanceIds=[instance.id])
-            waiter = client.get_waiter('instance_terminated')
-            waiter.wait(InstanceIds=[instance.id])
-            print "The instance " + instance.id + " has been deleted successfully"
-    except:
-        sys.exit(1)
 
 
 def terminate_emr(id):

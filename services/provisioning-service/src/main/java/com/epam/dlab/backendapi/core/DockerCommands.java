@@ -1,63 +1,35 @@
+/******************************************************************************************************
+
+ Copyright (c) 2016 EPAM Systems Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+ *****************************************************************************************************/
+
 package com.epam.dlab.backendapi.core;
 
+import com.epam.dlab.backendapi.core.docker.command.ImagesDockerCommand;
+import com.epam.dlab.backendapi.core.docker.command.UnixCommand;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
-/**
- * Created by Alexey Suprun
- */
 public interface DockerCommands {
-    String JSON_EXTENTION = ".json";
-    String GET_IMAGES = "docker images | awk '{print $1\":\"$2}' | sort | uniq | grep \"dlab\" | grep -v \"none\" | grep -v \"edge\"";
-    String DOCKER_BASE = "docker run -v %s:/root/keys -v %s:/response -e \"request_id=%s\" ";
-    String GET_IMAGE_METADATA = DOCKER_BASE + "%s --action describe";
-    String RUN_IMAGE = DOCKER_BASE + "-e \"dry_run=true\" %s --action run";
-
-    String CREATE_EDGE_METADATA = DOCKER_BASE +
-            "-e \"creds_key_name=%s\" " +
-            "-e \"conf_service_base_name=%s\" " +
-            "-e \"edge_user_name=%s\" " +
-            "%s --action create";
-
-    String CREATE_EMR_CLUSTER = DOCKER_BASE +
-            "-e \"conf_service_base_name=%s\" " +
-            "-e \"emr_instance_count=%s\" " +
-            "-e \"emr_instance_type=%s\" " +
-            "-e \"emr_version=%s\" " +
-            "-e \"ec2_role=%s\" " +
-            "-e \"service_role=%s\" " +
-            "-e \"notebook_name=%s\" " +
-            "-e \"edge_user_name=%s\" " +
-            "-e \"edge_subnet_cidr=%s\" " +
-            "-e \"creds_region=%s\" " +
-            "-e \"creds_key_name=%s\" " +
-            "%s --action create";
-    String TERMINATE_EMR_CLUSTER = DOCKER_BASE +
-            "-e \"conf_service_base_name=%s\" " +
-            "-e \"edge_user_name=%s\" " +
-            "-e \"emr_cluster_name=%s\" " +
-            "-e \"creds_region=%s\" " +
-            "-e \"creds_key_name=%s\" " +
-            "%s --action terminate";
-
-    String CREATE_EXPLORATORY_ENVIRONMENT = DOCKER_BASE +
-            "-e \"conf_service_base_name=%s\" " +
-            "-e \"notebook_user_name=%s\" " +
-            "-e \"notebook_subnet_cidr=%s\" " +
-            "-e \"creds_region=%s\" " +
-            "-e \"creds_security_groups_ids=%s\" " +
-            "-e \"creds_key_name=%s\" " +
-            "%s --action create";
-
-    String TERMINATE_EXPLORATORY_ENVIRONMENT = DOCKER_BASE +
-            "-e \"conf_service_base_name=%s\" " +
-            "-e \"notebook_user_name=%s\" " +
-            "-e \"creds_region=%s\" " +
-            "-e \"notebook_instance_name=%s\" " +
-            "-e \"creds_key_name=%s\" " +
-            "%s --action terminate";
+    String GET_IMAGES = new ImagesDockerCommand()
+            .pipe(UnixCommand.awk("{print $1\":\"$2}"))
+            .pipe(UnixCommand.sort())
+            .pipe(UnixCommand.uniq())
+            .pipe(UnixCommand.grep("dlab"))
+            .pipe(UnixCommand.grep("none", "-v"))
+            .pipe(UnixCommand.grep("base", "-v"))
+            .pipe(UnixCommand.grep("ssn", "-v"))
+            .pipe(UnixCommand.grep("edge", "-v"))
+            .toCMD();
 
     ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
@@ -66,6 +38,6 @@ public interface DockerCommands {
     }
 
     static String extractUUID(String fileName) {
-        return fileName.replace(JSON_EXTENTION, "");
+        return fileName.replace(Constants.JSON_EXTENSION, "");
     }
 }

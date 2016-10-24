@@ -1,13 +1,25 @@
+/******************************************************************************************************
+
+ Copyright (c) 2016 EPAM Systems Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+ *****************************************************************************************************/
+
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.CommandExecuter;
+import com.epam.dlab.backendapi.core.CommandBuilder;
+import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
-import com.epam.dlab.dto.EMRCreateDTO;
-import com.epam.dlab.dto.ExploratoryCreateDTO;
-import com.epam.dlab.dto.ResourceDTO;
+import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
+import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryTerminateDTO;
 import com.google.inject.Inject;
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +30,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
-/**
- * Created by Maksym_Pendyshchuk on 10/17/2016.
- */
 @Path("/exploratory")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -30,42 +39,68 @@ public class ExploratoryResource implements DockerCommands {
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
     @Inject
-    private CommandExecuter commandExecuter;
+    private CommandExecutor commandExecuter;
+
+    @Inject
+    private CommandBuilder commandBuilder;
+
 
     @Path("/create")
     @POST
     public String create(ExploratoryCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create exploratory environment");
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(String.format(CREATE_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
-                dto.getServiceBaseName(), // conf_service_base_name
-                dto.getNotebookUserName(), // notebook_user_name
-                dto.getNotebookSubnet(), // notebook_subnet_cidr
-                dto.getRegion(), // creds_region
-                dto.getSecurityGroupIds(), // creds_security_groups_ids
-                configuration.getAdminKey(), // creds_key_name
-                dto.getImage()));
+        commandExecuter.executeAsync(
+                commandBuilder.buildCommand(
+                        new RunDockerCommand()
+                                .withInteractive()
+                                .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                .withVolumeForResponse(configuration.getImagesDirectory())
+                                .withRequestId(uuid)
+                                .withCredsKeyName(configuration.getAdminKey())
+                                .withActionCreate(dto.getImage()),
+                        dto
+                )
+        );
         return uuid;
     }
 
     @Path("/terminate")
     @POST
-    public String terminate(ResourceDTO exploratoryEnv) throws IOException, InterruptedException {
-        LOGGER.debug("terminating exploratory environment");
+    public String terminate(ExploratoryTerminateDTO dto) throws IOException, InterruptedException {
+        LOGGER.debug("terminate exploratory environment");
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(String.format(TERMINATE_EXPLORATORY_ENVIRONMENT, configuration.getKeyDirectory(), configuration.getImagesDirectory(), uuid,
-                exploratoryEnv.getUser(), // conf_service_base_name
-                exploratoryEnv.getUser(), // notebook_user_name
-                exploratoryEnv.getRegion(), // creds_region
-                exploratoryEnv.getName(), // notebook_instance_name
-                configuration.getAdminKey(), // creds_key_name
-                configuration.getEdgeImage()));
+        commandExecuter.executeAsync(
+                commandBuilder.buildCommand(
+                        new RunDockerCommand()
+                                .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                .withVolumeForResponse(configuration.getImagesDirectory())
+                                .withRequestId(uuid)
+                                .withCredsKeyName(configuration.getAdminKey())
+                                .withActionTerminate(configuration.getEdgeImage())
+                        ,
+                        dto
+                )
+        );
         return uuid;
     }
 
     @Path("/stop")
     @POST
-    public String stop(String user, String emr) throws IOException, InterruptedException {
-        throw new NotImplementedException("StopExploratoryEnvironment has not been implemented yet");
+    public String stop(ExploratoryTerminateDTO dto) throws IOException, InterruptedException {
+        LOGGER.debug("stop exploratory environment");
+        String uuid = DockerCommands.generateUUID();
+        commandExecuter.executeAsync(
+                commandBuilder.buildCommand(
+                        new RunDockerCommand()
+                                .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                .withVolumeForResponse(configuration.getImagesDirectory())
+                                .withRequestId(uuid)
+                                .withCredsKeyName(configuration.getAdminKey())
+                                .withActionStop(configuration.getEdgeImage()),
+                        dto
+                )
+        );
+        return uuid;
     }
 }

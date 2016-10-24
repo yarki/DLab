@@ -1,4 +1,17 @@
 #!/usr/bin/python
+
+# ******************************************************************************************************
+#
+# Copyright (c) 2016 EPAM Systems Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# ****************************************************************************************************/
+
 import json
 import sys
 from dlab.fab import *
@@ -24,7 +37,7 @@ def create_image_from_instance(instance_name='', image_name=''):
     return ''
 
 
-# Main function
+# Main function for provisioning notebook server
 def run():
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename
@@ -195,6 +208,7 @@ def run():
         result.write(json.dumps(res))
 
 
+# Main function for terminating exploratory environment
 def terminate():
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename
@@ -220,6 +234,71 @@ def terminate():
             logging.info('Failed to terminate notebook')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to terminate notebook", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        sys.exit(1)
+
+
+# Main function for stopping notebook server
+def stop():
+    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filepath = "/response/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG,
+                        filename=local_log_filepath)
+
+    # generating variables dictionary
+    create_aws_config_files()
+    print 'Generating infrastructure names and tags'
+    notebook_config = dict()
+    notebook_config['service_base_name'] = os.environ['conf_service_base_name']
+    notebook_config['notebook_name'] = os.environ['notebook_instance_name']
+    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-' + os.environ['notebook_user_name'] + '-edge-bucket').lower().replace('_', '-')
+    notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
+
+    try:
+        logging.info('[STOP NOTEBOOK]')
+        print '[STOP NOTEBOOK]'
+        params = "--bucket_name %s --tag_name %s --nb_tag_value %s" % \
+                 (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'])
+        if not run_routine('stop_notebook', params):
+            logging.info('Failed to stop notebook')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to stop notebook", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        sys.exit(1)
+
+
+# Main function for starting notebook server
+def start():
+    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filepath = "/response/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG,
+                        filename=local_log_filepath)
+
+    # generating variables dictionary
+    create_aws_config_files()
+    print 'Generating infrastructure names and tags'
+    notebook_config = dict()
+    notebook_config['service_base_name'] = os.environ['conf_service_base_name']
+    notebook_config['notebook_name'] = os.environ['notebook_instance_name']
+    notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
+
+    try:
+        logging.info('[START NOTEBOOK]')
+        print '[START NOTEBOOK]'
+        params = "--tag_name %s --nb_tag_value %s" % \
+                 (notebook_config['tag_name'], notebook_config['notebook_name'])
+        if not run_routine('start_notebook', params):
+            logging.info('Failed to start notebook')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to start notebook", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
