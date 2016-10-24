@@ -23,7 +23,7 @@ if __name__ == "__main__":
             if vpc_id != '':
                 print "Creating vpc %s in region %s with tag %s." % (args.vpc, args.region, json.dumps(tag))
                 vpc_id = create_vpc(args.vpc, tag)
-                endpoint = create_endpoint(vpc_id, "com.amazonaws.{}.s3".format(args.region), json.dumps(tag))
+                #endpoint = create_endpoint(vpc_id, "com.amazonaws.{}.s3".format(args.region), json.dumps(tag))
             else:
                 print "REQUESTED VPC ALREADY EXISTS"
             print "VPC_ID " + vpc_id

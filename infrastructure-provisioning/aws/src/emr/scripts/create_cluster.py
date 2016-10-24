@@ -232,7 +232,7 @@ if __name__ == "__main__":
             sg_list.extend([sg_master, sg_slave])
             nbs_id.modify_attribute( Groups = sg_list)
         else:
-            if action_validate(id)[0] == "True":
+            if action_validate(cluster_id)[0] == "True":
                 print "Timeout reached. Please increase timeout period and try again. Now terminating the cluster..."
                 terminate_emr(cluster_id)
             s3_cleanup(args.s3_bucket, args.name)
