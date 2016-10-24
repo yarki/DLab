@@ -22,15 +22,23 @@ parser.add_argument('--bucket', type=str, default='')
 parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--dry_run', type=str, default='false')
 parser.add_argument('--emr_version', type=str, default='emr-4.8.0')
+parser.add_argument('--spark_version', type=str, default='1.6.0')
 args = parser.parse_args()
 
 emr_dir = '/opt/jars/'
 kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
 yarn_dir = '/srv/hadoopconf/'
+hadoop_version = "2.6"
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
+
+
+def install_emr_spark(args):
+    local('wget ' + spark_link + ' -O /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
+    local('mkdir -p /opt/' + args.emr_version)
+    local('tar -zxvf /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/' + args.emr_version + '/')
 
 
 def prepare():
-    local('rm -rf /srv/*')
     local('mkdir -p ' + yarn_dir)
     local('mkdir -p ' + emr_dir)
     result = os.path.exists(emr_dir + args.emr_version + "/aws")
@@ -48,34 +56,46 @@ def yarn(args):
     print "Downloading yarn configuration..."
     s3client = boto3.client('s3')
     s3resource = boto3.resource('s3')
-    get_files(s3client, s3resource, 'config/{}'.format(args.cluster_name), args.bucket, yarn_dir)
+    get_files(s3client, s3resource, 'config/{}/'.format(args.cluster_name), args.bucket, yarn_dir)
 
 
 def pyspark_kernel(args):
     local('mkdir -p ' + kernels_dir + 'pyspark_' + args.cluster_name + '/')
     kernel_path = kernels_dir + "pyspark_" + args.cluster_name + "/kernel.json"
     template_file = "/tmp/pyspark_emr_template.json"
-    with open(kernel_path, 'w') as out:
-        with open(template_file) as tpl:
-            for line in tpl:
-                out.write(line.replace('CLUSTER', args.cluster_name))
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('CLUSTER', args.cluster_name)
+    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+    text = text.replace('SPARK_PATH',
+                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    with open(kernel_path, 'w') as f:
+        f.write(text)
     local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
     kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
     template_file = "/tmp/py3spark_emr_template.json"
-    with open(kernel_path, 'w') as out:
-        with open(template_file) as tpl:
-            for line in tpl:
-                out.write(line.replace('CLUSTER', args.cluster_name))
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('CLUSTER', args.cluster_name)
+    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+    text = text.replace('SPARK_PATH',
+                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    with open(kernel_path, 'w') as f:
+        f.write(text)
 
 
 def toree_kernel(args):
     local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
     kernel_path = kernels_dir + "toree_" + args.cluster_name + "/kernel.json"
     template_file = "/tmp/toree_emr_template.json"
-    with open(kernel_path, 'w') as out:
-        with open(template_file) as tpl:
-            for line in tpl:
-                out.write(line.replace('CLUSTER', args.cluster_name))
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('CLUSTER', args.cluster_name)
+    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+    text = text.replace('SPARK_PATH',
+                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    with open(kernel_path, 'w') as f:
+        f.write(text)
 
 
 def get_files(s3client, s3resource, dist, bucket, local):
@@ -92,8 +112,7 @@ def get_files(s3client, s3resource, dist, bucket, local):
 
 
 def spark_defaults():
-    #local('cp /tmp/spark-defaults_template.conf /opt/spark/conf/spark-defaults.conf')
-    spark_def_path = '/opt/spark/conf/spark-defaults.conf'
+    spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
     template_file = "/tmp/spark-defaults_template.conf"
     with open(spark_def_path, 'w') as out:
         with open(template_file) as tpl:
@@ -108,6 +127,7 @@ if __name__ == "__main__":
         if result == False :
             jars(args)
         yarn(args)
+        install_emr_spark(args)
         pyspark_kernel(args)
         toree_kernel(args)
         spark_defaults()

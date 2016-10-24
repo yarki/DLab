@@ -123,7 +123,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   position: relative;
   overflow: hidden;
   margin-top: 10px;
-  float: right;
+  margin-bottom: 10px;
+  display: inline-block;
 }
 .modal .btn-file input[type=file] {
   width: 100%;

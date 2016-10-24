@@ -15,6 +15,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
+import sys, os
 from dlab.aws_actions import *
 import sys
 
@@ -58,6 +59,21 @@ def run():
             logging.info('Unable to create roles')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        sys.exit(1)
+
+    try:
+        logging.info('[CREATE ENDPOINT AND ROUTE-TABLE]')
+        print('[CREATE ENDPOINT AND ROUTE-TABLE]')
+        params = "--vpc_id {} --region {} --infra_tag_name {} --infra_tag_value {}".format(
+            os.environ['creds_vpc_id'], os.environ['creds_region'], "Name", service_base_name)
+        if not run_routine('create_endpoint', params):
+            logging.info('Unable to create Endpoint')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to create an endpoint", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)

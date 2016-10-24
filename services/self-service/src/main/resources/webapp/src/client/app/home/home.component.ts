@@ -27,6 +27,7 @@ import {Http, Response} from '@angular/http';
 
 export class HomeComponent implements OnInit {
   key: any;
+  keyName: string;
   uploadAccessKeyUrl: string;
   preloadModalInterval: any;
 
@@ -73,6 +74,10 @@ export class HomeComponent implements OnInit {
     this.preloadModalInterval = setInterval(function() {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
+  }
+
+  showKey($event) {
+    this.keyName = $event.target.files[0].name;
   }
 
   //

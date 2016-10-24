@@ -106,8 +106,8 @@ def run():
     try:
         logging.info('[CREATE SUBNET]')
         print '[CREATE SUBNET]'
-        params = "--vpc_id '%s' --subnet '%s' --region %s --infra_tag_name %s --infra_tag_value %s" % \
-                 (edge_conf['vpc_id'], edge_conf['private_subnet_cidr'], edge_conf['region'],
+        params = "--vpc_id '%s' --subnet '%s' --infra_tag_name %s --infra_tag_value %s" % \
+                 (edge_conf['vpc_id'], edge_conf['private_subnet_cidr'],
                   edge_conf['instance_name'], edge_conf['instance_name'])
         if not run_routine('create_subnet', params):
             logging.info('Failed creating subnet')
@@ -250,7 +250,7 @@ def run():
             sys.exit(1)
 
         instance_hostname = get_instance_hostname(edge_conf['instance_name'])
-        ip_address = get_instance_ip_address(edge_conf['instance_name'])
+        ip_address = get_instance_ip_address(edge_conf['instance_name']).get('Private')
         keyfile_name = "/root/keys/%s.pem" % edge_conf['key_name']
     except:
         remove_role('edge', os.environ['edge_user_name'])
