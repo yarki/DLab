@@ -43,6 +43,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   color: #455c74;
   font-weight: 600;
   font-size: 16px;
+  cursor: pointer;
 }
 .dashboard_table tr:nth-child(2n+1){
   background: #f9fafb;

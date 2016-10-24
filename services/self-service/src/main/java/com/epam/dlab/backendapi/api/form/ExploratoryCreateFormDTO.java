@@ -10,32 +10,34 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto;
+package com.epam.dlab.backendapi.api.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ImageMetadataDTO {
+public class ExploratoryCreateFormDTO {
+    @JsonProperty
+    private String name;
+    @JsonProperty
+    private String shape;
     @JsonProperty
     private String image;
-    @JsonProperty(value = "template_name")
-    private String templateName;
     @JsonProperty
-    private String description;
-    @JsonProperty(value = "request_id")
-    private String requestId;
+    private String version;
 
-    public ImageMetadataDTO() {
+    public String getName() {
+        return name;
     }
 
-    public ImageMetadataDTO(String image, String templateName, String description, String requestId) {
-        this.image = image;
-        this.templateName = templateName;
-        this.description = description;
-        this.requestId = requestId;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public ImageMetadataDTO(String image) {
-        this.image = image;
+    public String getShape() {
+        return shape;
+    }
+
+    public void setShape(String shape) {
+        this.shape = shape;
     }
 
     public String getImage() {
@@ -46,43 +48,11 @@ public class ImageMetadataDTO {
         this.image = image;
     }
 
-    public String getTemplateName() {
-        return templateName;
+    public String getVersion() {
+        return version;
     }
 
-    public void setTemplateName(String templateName) {
-        this.templateName = templateName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ImageMetadataDTO metadata = (ImageMetadataDTO) o;
-
-        return image != null ? image.equals(metadata.image) : metadata.image == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        return image != null ? image.hashCode() : 0;
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

@@ -12,10 +12,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthenticationService } from './../security/authentication.service';
-import { UserAccessKeyService } from "../services/userAccessKey.service";
-import { UserResourceService } from "../services/userResource.service";
-import { AppRoutingService } from "../routing/appRouting.service";
-import { Http, Response } from '@angular/http';
+import {UserAccessKeyService} from "../services/userAccessKey.service";
+import {UserResourceService} from "../services/userResource.service";
+import {AppRoutingService} from "../routing/appRouting.service";
+import {Http, Response} from '@angular/http';
 
 @Component({
   moduleId: module.id,
@@ -27,11 +27,13 @@ import { Http, Response } from '@angular/http';
 
 export class HomeComponent implements OnInit {
   key: any;
+  keyName: string;
   uploadAccessKeyUrl: string;
   preloadModalInterval: any;
 
-  templatesList: any;
-  shapesList: any;
+  createTempls: any;
+  shapes: any;
+  emrTempls: any;
 
 
 
@@ -46,7 +48,7 @@ export class HomeComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private userAccessKeyProfileService: UserAccessKeyService,
     private userResourceService: UserResourceService,
-    private appRoutingService: AppRoutingService,
+    private appRoutingService : AppRoutingService,
     private http: Http
   ) {
     this.uploadAccessKeyUrl = this.userAccessKeyProfileService.getAccessKeyUrl();
@@ -72,6 +74,10 @@ export class HomeComponent implements OnInit {
     this.preloadModalInterval = setInterval(function() {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
+  }
+
+  showKey($event) {
+    this.keyName = $event.target.files[0].name;
   }
 
   //
@@ -119,21 +125,33 @@ export class HomeComponent implements OnInit {
   }
 
   initAnalyticSelectors() {
-    this.userResourceService.getTemplates()
+    this.userResourceService.getCreateTmpl()
       .subscribe(
-      data => {
-        this.templatesList = data;
-      }
+        data => this.createTempls = data,
+        error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
+      );
+    this.userResourceService.getEmrTmpl()
+      .subscribe(
+        data => this.emrTempls = data,
+        error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
     this.userResourceService.getShapes()
       .subscribe(
-      data => {
-        this.shapesList = data;
-      }
+        data => this.shapes = data,
+        error => this.shapes = [{shape_name: 'M4.large'}, {shape_name: 'M4.large'}]
       );
   }
 
-  createUsernotebook(template, name, shape) {
+  createUsernotebook(template, name, shape){
+    this.userResourceService
+      .createUsernotebook({"image": name.value})
+      .subscribe((result) => {
+        console.log('result: ', result);
+      });
+    return false;
+  };
+
+  createEmr(template, name, shape){
     this.userResourceService
       .createUsernotebook({"image": name.value})
       .subscribe((result) => {

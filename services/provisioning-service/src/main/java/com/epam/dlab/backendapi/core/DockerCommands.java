@@ -12,22 +12,25 @@
 
 package com.epam.dlab.backendapi.core;
 
+import com.epam.dlab.backendapi.core.docker.command.ImagesDockerCommand;
+import com.epam.dlab.backendapi.core.docker.command.UnixCommand;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
 public interface DockerCommands {
-    String JSON_EXTENTION = ".json";
-    String GET_IMAGES = "docker images | awk '{print $1\":\"$2}' | sort | uniq | grep \"dlab\" | grep -v \"none\" | grep -v \"edge\"";
-    String DOCKER_BASE = "docker run -v %s:/root/keys -v %s:/response -e \"request_id=%s\" -t ";
-    String GET_IMAGE_METADATA = DOCKER_BASE + "%s --action describe";
-    String CREATE_EDGE_METADATA = DOCKER_BASE + "-e \"creds_key_name=%s\" " +
-            "-e \"conf_service_base_name=%s\" " +
-            "-e \"edge_user_name=%s\" " +
-            "-e \"user_keyname=%s\" " +
-            "%s --action create";
-    String RUN_IMAGE = DOCKER_BASE + "-e \"dry_run=true\" %s --action run";
+    String GET_IMAGES = new ImagesDockerCommand()
+            .pipe(UnixCommand.awk("{print $1\":\"$2}"))
+            .pipe(UnixCommand.sort())
+            .pipe(UnixCommand.uniq())
+            .pipe(UnixCommand.grep("dlab"))
+            .pipe(UnixCommand.grep("none", "-v"))
+            .pipe(UnixCommand.grep("base", "-v"))
+            .pipe(UnixCommand.grep("ssn", "-v"))
+            .pipe(UnixCommand.grep("edge", "-v"))
+            .toCMD();
+
     ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
     static String generateUUID() {
@@ -35,6 +38,6 @@ public interface DockerCommands {
     }
 
     static String extractUUID(String fileName) {
-        return fileName.replace(JSON_EXTENTION, "");
+        return fileName.replace(Constants.JSON_EXTENSION, "");
     }
 }

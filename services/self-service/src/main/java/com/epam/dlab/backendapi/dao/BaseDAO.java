@@ -18,15 +18,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-class BaseDAO {
-    private static final ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+class BaseDAO implements MongoCollections {
+    protected static final ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+    public static final String FIELD_DELIMETER = ".";
+    public static final String FIELD_SET_DELIMETER = ".$.";
     public static final String ID = "_id";
     public static final String USER = "user";
+    public static final String STATUS = "status";
     public static final String TIMESTAMP = "timestamp";
 
     @Inject
@@ -43,9 +48,26 @@ class BaseDAO {
     }
 
     protected void insertOne(String collection, Object object) throws JsonProcessingException {
-        mongoService.getCollection(collection).insertOne(Document.parse(MAPPER.writeValueAsString(object))
-                .append(ID, generateUUID())
+        insertOne(collection, object, generateUUID());
+    }
+
+    protected void insertOne(String collection, Object object, String uuid) throws JsonProcessingException {
+        mongoService.getCollection(collection).insertOne(convertToBson(object)
+                .append(ID, uuid)
                 .append(TIMESTAMP, new Date()));
+    }
+
+    protected void update(String collection, Bson condition, Bson value) {
+        mongoService.getCollection(collection).updateOne(condition, value);
+    }
+
+    protected Document convertToBson(Object object) throws JsonProcessingException {
+        return Document.parse(MAPPER.writeValueAsString(object));
+    }
+
+    protected <T> T find(String collection, Bson eq, Class<T> clazz) throws IOException {
+        Document document = mongoService.getCollection(collection).find(eq).first();
+        return MAPPER.readValue(document.toJson(), clazz);
     }
 
     private String generateUUID() {
