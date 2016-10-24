@@ -12,7 +12,7 @@
 
 package com.epam.dlab.backendapi.core.response.warmup;
 
-import com.epam.dlab.dto.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 
 import java.util.Set;
 

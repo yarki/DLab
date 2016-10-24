@@ -18,15 +18,18 @@ import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.client.mongo.MongoService;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.dto.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageType;
+import com.epam.dlab.dto.imagemetadata.TemplateDTO;
 import com.google.inject.name.Names;
 import io.dropwizard.setup.Environment;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.UUID;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
+import static com.epam.dlab.backendapi.client.rest.ExploratoryAPI.EXPLORATORY_CREATE;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -56,7 +59,13 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
     private RESTService createProvisioningService() {
         RESTService result = mock(RESTService.class);
         when(result.get(eq(DOCKER), any()))
-                .thenReturn(new HashSet<>(Arrays.asList(new ImageMetadataDTO("test image", "template", "decription", "request_id"))));
+                .thenReturn(new ImageMetadataDTO[]{
+                        new ImageMetadataDTO("test computational image", "template", "decription", "request_id", ImageType.COMPUTATIONAL.getType(),
+                                Arrays.asList(new TemplateDTO("emr-6.3.0"), new TemplateDTO("emr-6.8.0"))),
+                        new ImageMetadataDTO("test exploratory image", "template", "decription", "request_id", ImageType.EXPLORATORY.getType(),
+                                Arrays.asList(new TemplateDTO("jupyter-2"), new TemplateDTO("jupyter-3")))
+                });
+        when(result.post(eq(EXPLORATORY_CREATE), any(), eq(String.class))).thenReturn(UUID.randomUUID().toString());
         return result;
     }
 }

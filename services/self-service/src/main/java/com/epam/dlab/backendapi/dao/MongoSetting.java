@@ -13,6 +13,7 @@
 package com.epam.dlab.backendapi.dao;
 
 public enum MongoSetting {
+    SERIVICE_BASE_NAME("service_base_name"),
     AWS_REGION("aws_region");
 
     private String id;

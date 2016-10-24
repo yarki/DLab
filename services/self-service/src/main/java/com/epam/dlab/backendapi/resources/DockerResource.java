@@ -17,16 +17,17 @@ import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.backendapi.dao.DockerDAO;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.dto.ImageMetadataDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Set;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
@@ -41,13 +42,6 @@ public class DockerResource implements MongoCollections, DockerAPI {
     @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
-
-    @GET
-    public Set<ImageMetadataDTO> getDockerImages(@Auth UserInfo userInfo) {
-        LOGGER.debug("docker statuses asked for user {}", userInfo.getName());
-        dao.writeDockerAttempt(userInfo.getName(), DockerDAO.DESCRIBE);
-        return provisioningService.get(DOCKER, Set.class);
-    }
 
     @POST
     @Path("/run")
