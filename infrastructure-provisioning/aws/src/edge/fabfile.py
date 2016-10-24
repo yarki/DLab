@@ -195,6 +195,8 @@ def run():
         out.write(edge_group_id)
         print edge_group_id
         out.write('\n')
+        out.write(os.environ)
+        out.write('\n')
         ingress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": os.environ['creds_security_groups_ids']}], "PrefixListIds": []}
