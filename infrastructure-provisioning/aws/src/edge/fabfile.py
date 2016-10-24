@@ -15,7 +15,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
-import sys
+import sys, time
 from dlab.aws_actions import *
 
 def status():
@@ -178,6 +178,10 @@ def run():
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
+
+        with hide('stderr', 'running', 'warnings'):
+            print 'Waiting for changes to propagate'
+            time.sleep(10)
     except:
         remove_role('edge', os.environ['edge_user_name'])
         remove_role('notebook', os.environ['edge_user_name'])
@@ -188,7 +192,8 @@ def run():
         print '[CREATE SECURITY GROUP FOR PRIVATE SUBNET]'
         out = open('/root/sg.log', 'w')
         edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
-        out.write(edge_group_id + '\n')
+        out.write(edge_group_id)
+        out.write('\n')
         ingress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": os.environ['creds_security_groups_ids']}], "PrefixListIds": []}
@@ -213,7 +218,9 @@ def run():
             sys.exit(1)
 
         with hide('stderr', 'running', 'warnings'):
-            local("echo Waitning for changes to propagate; sleep 10")
+            #local("echo Waitning for changes to propagate; sleep 10")
+            print 'Waiting for changes to propagate'
+            time.sleep(10)
     except:
         remove_role('edge', os.environ['edge_user_name'])
         remove_role('notebook', os.environ['edge_user_name'])
