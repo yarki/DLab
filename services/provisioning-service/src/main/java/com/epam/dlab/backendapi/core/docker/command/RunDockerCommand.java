@@ -18,6 +18,8 @@ import java.util.List;
 public class RunDockerCommand implements DockerCommand {
     private String command = "docker run";
     private List<String> options = new LinkedList<>();
+    private String image;
+    private DockerAction action;
 
     private static final String ROOT_KEYS_PATH = "/root/keys";
     private static final String RESPONSE_PATH = "/response";
@@ -56,28 +58,49 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withImage(String image) {
+        this.image = image;
+        return this;
+    }
+
+    public RunDockerCommand withAction(DockerAction action) {
+        this.action = action;
+        return this;
+    }
+
     public RunDockerCommand withActionDescribe(String toDescribe) {
-        options.add(String.format("%s --action describe", toDescribe));
+        this.image = toDescribe;
+        this.action = DockerAction.DESCRIBE;
         return this;
     }
 
     public RunDockerCommand withActionCreate(String toCreate) {
-        options.add(String.format("%s --action create", toCreate));
+        this.image = toCreate;
+        this.action = DockerAction.CREATE;
+        return this;
+    }
+
+    public RunDockerCommand withActionStart(String toStart) {
+        this.image = toStart;
+        this.action = DockerAction.START;
         return this;
     }
 
     public RunDockerCommand withActionRun(String toRun) {
-        options.add(String.format("%s --action run", toRun));
+        this.image = toRun;
+        this.action = DockerAction.RUN;
         return this;
     }
 
     public RunDockerCommand withActionTerminate(String toTerminate) {
-        options.add(String.format("%s --action terminate", toTerminate));
+        this.image = toTerminate;
+        this.action = DockerAction.TERMINATE;
         return this;
     }
 
-    public RunDockerCommand withActionStop(String toTerminate) {
-        options.add(String.format("%s --action stop", toTerminate));
+    public RunDockerCommand withActionStop(String toStop) {
+        this.image = toStop;
+        this.action = DockerAction.STOP;
         return this;
     }
 
@@ -176,6 +199,9 @@ public class RunDockerCommand implements DockerCommand {
         StringBuilder sb = new StringBuilder(command);
         for (String option : options) {
             sb.append(" ").append(option);
+        }
+        if (image != null && action != null) {
+            sb.append(" ").append(image).append(" --action ").append(action.toString());
         }
         return sb.toString();
     }
