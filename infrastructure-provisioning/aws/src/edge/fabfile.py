@@ -186,20 +186,26 @@ def run():
     try:
         logging.info('[CREATE SECURITY GROUP FOR PRIVATE SUBNET]')
         print '[CREATE SECURITY GROUP FOR PRIVATE SUBNET]'
+        out = open('/root/sg.log', 'w')
         edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
+        out.write(edge_group_id + '\n')
         ingress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": os.environ['creds_security_groups_ids']}], "PrefixListIds": []}
         ]
+        out.write('Ingress successful\n')
         egress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}
         ]
+        out.write('Egress OK\n')
         params = "--name %s --vpc_id %s --security_group_rules '%s' --egress '%s' --infra_tag_name %s --infra_tag_value %s" % \
                  (edge_conf['notebook_security_group_name'], edge_conf['vpc_id'],
                   json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template),
                   edge_conf['service_base_name'], edge_conf['notebook_instance_name'])
+        out.write(params + '\n')
         if not run_routine('create_security_group', params):
             logging.info('Failed creating security group for private subnet')
+            out.write('Failed creating security group for private subnet')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed creating security group for private subnet", "conf": edge_conf}
                 print json.dumps(res)
