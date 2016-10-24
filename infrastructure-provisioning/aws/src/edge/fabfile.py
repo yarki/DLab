@@ -68,7 +68,7 @@ def run():
     edge_conf['user_keyname'] = os.environ['edge_user_name']
     edge_conf['policy_arn'] = os.environ['conf_policy_arn']
     edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
-    edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
+    # edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
     edge_conf['vpc_id'] = os.environ['edge_vpc_id']
     edge_conf['region'] = os.environ['edge_region']
     edge_conf['ami_id'] = os.environ['edge_ami_id']
@@ -98,6 +98,8 @@ def run():
                                                    "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
                                                    "UserIdGroupPairs": [],
                                                    "PrefixListIds": []}]
+
+    edge_conf['private_subnet_cidr'] = ''
 
     print "Will create exploratory environment with edge node as access point as following: " + \
           json.dumps(edge_conf, sort_keys=True, indent=4, separators=(',', ': '))

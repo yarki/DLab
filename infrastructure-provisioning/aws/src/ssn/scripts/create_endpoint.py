@@ -26,6 +26,7 @@ if __name__ == "__main__":
         service_name = 'com.amazonaws.{}.s3'.format(args.region)
         print 'Vars are: {}, {}, {}'.format(args.vpc_id, service_name, json.dumps(tag))
         try:
+            route_table = get_route_tables(args.vpc_id, json.dumps(tag))
             route_table.append(ec2.create_route_table(
                 VpcId = args.vpc_id
             )['RouteTable']['RouteTableId'])

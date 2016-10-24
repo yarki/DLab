@@ -11,6 +11,7 @@
 # ****************************************************************************************************/
 
 import boto3
+import json
 
 
 def get_instance_hostname(instance_name):
@@ -37,6 +38,20 @@ def get_vpc_endpoints(vpc_id):
         }]
     ).get('VpcEndpoints')
     return endpoints
+
+
+def get_route_tables(vpc, tags):
+    ec2 = boto3.client('ec2')
+    tag_name = json.loads(tags).get('Key')
+    tag_value = json.loads(tags).get('Value')
+    print
+    result = ec2.describe_route_tables(
+        Filters=[
+            {'Name': 'vpc-id', 'Values': [vpc]},
+            {'Name': tag_name, 'Values': [tag_value]}
+        ]
+    )
+    return result
 
 
 def get_bucket_by_name(bucket_name):
