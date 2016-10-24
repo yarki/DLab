@@ -42,18 +42,6 @@ def create_vpc(vpc_cidr, tag):
     return vpc.id
 
 
-def get_vpc_endpoints(vpc_id):
-    # Returns LIST of Endpoint DICTIONARIES
-    ec2 = boto3.client('ec2')
-    endpoints = ec2.describe_vpc_endpoints(
-        Filters=[{
-            'Name':'vpc-id',
-            'Values':[vpc_id]
-        }]
-    ).get('VpcEndpoints')
-    return endpoints
-
-
 def create_tag(resource, tag):
     ec2 = boto3.client('ec2')
     try:

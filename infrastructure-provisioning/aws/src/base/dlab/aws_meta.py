@@ -27,6 +27,18 @@ def get_instance_hostname(instance_name):
             return private
 
 
+def get_vpc_endpoints(vpc_id):
+    # Returns LIST of Endpoint DICTIONARIES
+    ec2 = boto3.client('ec2')
+    endpoints = ec2.describe_vpc_endpoints(
+        Filters=[{
+            'Name':'vpc-id',
+            'Values':[vpc_id]
+        }]
+    ).get('VpcEndpoints')
+    return endpoints
+
+
 def get_bucket_by_name(bucket_name):
     s3 = boto3.resource('s3')
     for bucket in s3.buckets.all():
