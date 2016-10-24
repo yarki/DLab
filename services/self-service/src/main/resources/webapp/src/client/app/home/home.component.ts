@@ -71,10 +71,11 @@ export class HomeComponent implements OnInit {
       () => this.appRoutingService.redirectToLoginPage());
   }
 
-  uploadUserAccessKey_btnClick($event) {
+  uploadUserAccessKey_btnClick(event) {
     this.preloadModalInterval = setInterval(function() {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
+    event.preventDefault()
   }
 
   uploadUserAccessKey_onChange($event) {
@@ -147,6 +148,7 @@ export class HomeComponent implements OnInit {
             })
           });
           this.createTempls = arr;
+          console.log(arr);
         },
         error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
@@ -165,6 +167,7 @@ export class HomeComponent implements OnInit {
             })
           });
           this.emrTempls = arr;
+          console.log(arr);
         },
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );

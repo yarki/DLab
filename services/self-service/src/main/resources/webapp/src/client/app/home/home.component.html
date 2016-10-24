@@ -52,13 +52,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 
-<!-- <button  (click)="createEmrModal.open({isFooter: false})">EMR</button> -->
+<!-- <button  (click)="createEmrModal.open({isFooter: false})">createEmrModal</button> -->
 <modal #createEmrModal>
   <modal-header>
     <h4 class="modal-title">Create computational resource</h4>
   </modal-header>
   <modal-content>
-    <form (submit)="createUsernotebook(template, name, shape)">
+    <form>
       <div class="form-group row">
         <div  class="col-xs-4">
           <label class="control-label">Select template</label>
@@ -67,9 +67,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           </div>
         </div>
         <div class="col-xs-8">
-          <select class="form-control">
-            <option  *ngFor="let template of emrTempls" value="{{template.template_name}}">
-              {{template.template_name}}
+          <select class="form-control" #createEmr_tmplIndex>
+            <option *ngFor="let template of emrTempls; let i = index" value="{{i}}">
+              {{template.template_name}}, version - {{template.version}}
             </option>
           </select>
         </div>
@@ -87,7 +87,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <label class="control-label">Master Instance shape</label>
         </div>
         <div class="col-xs-8">
-          <select class="form-control">
+          <select class="form-control" #createEmr_shape>
             <option *ngFor="let shape of shapes">{{shape.shape_name}}</option>
           </select>
         </div>
@@ -114,7 +114,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="text-right">
         <button type="button" class="btn btn-default">Cancel</button>
-        <button type="submit" class="btn btn-success">Create</button>
+        <button type="button"  (click)="createUsernotebook(createEmr_tmplIndex, #createEmr_shape)" class="btn btn-success">Create</button>
       </div>
     </form>
   </modal-content>
@@ -135,7 +135,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="col-xs-8">
         <select class="form-control" #createTmpl_tmplIndex>
-          <option *ngFor="let template of createTempls; let i = index" value="{{i}}">{{template.template_name}}, version - {{template.version}}</option>
+          <option *ngFor="let template of createTempls; let i = index" value="{{i}}">
+            {{template.template_name}}, version - {{template.version}}
+          </option>
         </select>
         <div class="hidden" >
           <input type="hidden" #createTmpl_image>
@@ -168,13 +170,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   </modal-content>
 </modal>
 
-<button  (click)="keyUploadModal.open({isFooter: false})">EMR</button>
+<!-- <button  (click)="keyUploadModal.open({isFooter: false})">keyUploadModal</button> -->
 <modal #keyUploadModal modalClass="modal-lg" [hideCloseButton]="true" [closeOnEscape]="false" [closeOnOutsideClick]="false">
   <modal-header>
     <h4 class="modal-title">Create initial infrastructure</h4>
   </modal-header>
   <modal-content>
-    <form (submit)="uploadUserAccessKey_btnClick($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
+    <form class="row" (submit)="uploadUserAccessKey_btnClick($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
       <div class="form-group row">
         <div  class="col-xs-7">
           <label class="control-label">Upload public key start environment creation</label>
