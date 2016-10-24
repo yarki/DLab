@@ -135,17 +135,36 @@ export class HomeComponent implements OnInit {
     this.userResourceService.getCreateTmpl()
       .subscribe(
         data => {
-          
-          this.createTempls = data
-          console.log("CreateTmpl !!!", this.createTempls);
+          let arr = [];
+          data.forEach((obj, index) => {
+           let versions = obj.templates.map((versionObj, index) => {
+              return versionObj.version;
+            });
+            delete obj.templates;
+            versions.forEach((version, index) => {
+              arr.push(Object.assign({}, obj))
+              arr[index].version = version;
+            })
+          });
+          this.createTempls = arr;
         },
         error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
     this.userResourceService.getEmrTmpl()
       .subscribe(
         data => {
-          console.log("EmrTmpl !!!", data);
-          this.emrTempls = data
+          let arr = [];
+          data.forEach((obj, index) => {
+            let versions = obj.templates.map((versionObj, index) => {
+              return versionObj.version;
+            });
+            delete obj.templates;
+            versions.forEach((version, index) => {
+              arr.push(Object.assign({}, obj))
+              arr[index].version = version;
+            })
+          });
+          this.emrTempls = arr;
         },
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
@@ -165,10 +184,11 @@ export class HomeComponent implements OnInit {
         name: name,
         shape: shape,
         image: this.createTempls[tmplIndex].image,
-        version: this.createTempls[tmplIndex].template_name
+        version: this.createTempls[tmplIndex].version
       })
       .subscribe((result) => {
         console.log('result: ', result);
+
       });
       return false;
   };

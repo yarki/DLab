@@ -135,7 +135,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="col-xs-8">
         <select class="form-control" #createTmpl_tmplIndex>
-          <option *ngFor="let template of createTempls; let i = index" value="{{i}}">{{template.template_name}}</option>
+          <option *ngFor="let template of createTempls; let i = index" value="{{i}}">{{template.template_name}}, version - {{template.version}}</option>
         </select>
         <div class="hidden" >
           <input type="hidden" #createTmpl_image>
