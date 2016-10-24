@@ -18,7 +18,7 @@ import { UserProfileService } from './../security/userProfile.service'
 @Injectable()
 export class UserResourceService {
   url = {
-    createTmpls: 'userlist/computational',
+    createTmpls: 'userlist/exploratory',
     emrTmpls: 'userlist/computational',
     shapes: 'userlist/shape',
     createNotebook: 'exploratory/create',

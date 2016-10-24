@@ -127,28 +127,43 @@ export class HomeComponent implements OnInit {
   initAnalyticSelectors() {
     this.userResourceService.getCreateTmpl()
       .subscribe(
-        data => this.createTempls = data,
+        data => {
+          
+          this.createTempls = data
+          console.log("CreateTmpl !!!", this.createTempls);
+        },
         error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
     this.userResourceService.getEmrTmpl()
       .subscribe(
-        data => this.emrTempls = data,
+        data => {
+          console.log("EmrTmpl !!!", data);
+          this.emrTempls = data
+        },
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
     this.userResourceService.getShapes()
       .subscribe(
-        data => this.shapes = data,
+        data => {
+          console.log("shapes !!!", data);
+          this.shapes = data
+        },
         error => this.shapes = [{shape_name: 'M4.large'}, {shape_name: 'M4.large'}]
       );
   }
 
-  createUsernotebook(template, name, shape){
+  createUsernotebook(tmplIndex, name, shape){
     this.userResourceService
-      .createUsernotebook({"image": name.value})
+      .createUsernotebook({
+        name: name,
+        shape: shape,
+        image: this.createTempls[tmplIndex].image,
+        version: this.createTempls[tmplIndex].template_name
+      })
       .subscribe((result) => {
         console.log('result: ', result);
       });
-    return false;
+      return false;
   };
 
   createEmr(template, name, shape){
