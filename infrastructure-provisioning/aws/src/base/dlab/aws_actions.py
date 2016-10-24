@@ -12,8 +12,7 @@
 
 import boto3, boto, botocore
 import time
-import sys
-import os
+import os, sys
 import json
 
 
@@ -43,28 +42,16 @@ def create_vpc(vpc_cidr, tag):
     return vpc.id
 
 
-def create_endpoint(vpc_id, service_name, tag):
+def get_vpc_endpoints(vpc_id):
+    # Returns LIST of Endpoint DICTIONARIES
     ec2 = boto3.client('ec2')
-    route_table = []
-    response = ''
-    try:
-        # for i in ec2.describe_route_tables(Filters=[{'Name':'vpc-id', 'Values':[vpc_id]}])['RouteTables']:
-        #    route_table.append(i['Associations'][0]['RouteTableId'])
-        route_table.append(ec2.create_route_table(
-            VpcId = vpc_id
-        )['RouteTable']['RouteTableId'])
-        create_tag(route_table, tag)
-        response = ec2.create_vpc_endpoint(
-            VpcId=vpc_id,
-            ServiceName=service_name,
-            RouteTableIds=route_table
-        #   ClientToken='string'
-        )
-        response = response['VpcEndpoint']['VpcEndpointId']
-    except botocore.exceptions.ClientError as err:
-        print err.response['Error']['Message']
-    finally:
-        return response
+    endpoints = ec2.describe_vpc_endpoints(
+        Filters=[{
+            'Name':'vpc-id',
+            'Values':[vpc_id]
+        }]
+    ).get('VpcEndpoints')
+    return endpoints
 
 
 def create_tag(resource, tag):

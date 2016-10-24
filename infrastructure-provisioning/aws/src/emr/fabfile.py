@@ -37,7 +37,7 @@ def run():
     emr_conf['release_label'] = os.environ['emr_version']
     emr_conf['instance_type'] = os.environ['emr_instance_type']
     emr_conf['instance_count'] = os.environ['emr_instance_count']
-    emr_conf['notebook_ip'] = get_instance_ip_address(os.environ['notebook_name'])
+    emr_conf['notebook_ip'] = get_instance_ip_address(os.environ['notebook_name']).get('Private')
     #emr_conf['notebook_user'] = os.environ['edge_user_name']
     emr_conf['role_service_name'] = os.environ['service_role']
     emr_conf['role_ec2_name'] = os.environ['ec2_role']

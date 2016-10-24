@@ -43,10 +43,8 @@ def get_instance_ip_address(instance_name):
     for instance in instances:
         public = getattr(instance, 'public_ip_address')
         private = getattr(instance, 'private_ip_address')
-        if public:
-            return public
-        else:
-            return private
+        ips = {'Public': public, 'Private': private}
+    return ips
 
 
 def get_ami_id_by_name(ami_name):
