@@ -67,7 +67,7 @@ cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /usr/share/aws/ s3://{0}/jars/{1}/aws
 
 logfile = '{}_creation.log'.format(args.name)
 logpath = '/response/' + logfile
-open(logpath, 'w') as out
+out = open(logpath, 'w')
 out.close()
 
 
@@ -238,7 +238,7 @@ if __name__ == "__main__":
         # get_emr_state(args.id)
         build_emr_cluster(args)
     else:
-        open(logpath, 'a') as out
+        out = open(logpath, 'a')
         out.write('[BUILDING NEW CLUSTER - {}\n]'.format(args.name))
         cluster_id = build_emr_cluster(args)
         out.write('Cluster ID: {}\n'.format(cluster_id))
