@@ -1,7 +1,21 @@
 #!/usr/bin/python
+
+# ******************************************************************************************************
+#
+# Copyright (c) 2016 EPAM Systems Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# ****************************************************************************************************/
+
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
+from dlab.aws_actions import *
 import sys, os
 
 
@@ -54,7 +68,7 @@ def run():
         logging.info('[CREATE ENDPOINT AND ROUTE-TABLE]')
         print('[CREATE ENDPOINT AND ROUTE-TABLE]')
         params = "--vpc_id {} --region {} --infra_tag_name {} --infra_tag_value {}".format(
-            os.environ['creds_vpc_id'], os.environ['creds_region'], "Name", service_base_name)
+            os.environ['creds_vpc_id'], os.environ['creds_region'], tag_name, service_base_name)
         if not run_routine('create_endpoint', params):
             logging.info('Unable to create Endpoint')
             with open("/root/result.json", 'w') as result:
@@ -79,6 +93,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_role('ssn')
         sys.exit(1)
 
     try:
@@ -98,6 +113,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -117,6 +134,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -137,6 +157,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -157,6 +180,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -174,6 +200,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -188,6 +217,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)
 
     try:
@@ -212,4 +244,7 @@ def run():
             params += "--key_id %s" % os.environ['creds_access_key']
             run_routine('finalize', params)
     except:
+        remove_ec2(tag_name, instance_name)
+        remove_role('ssn')
+        remove_s3('ssn')
         sys.exit(1)

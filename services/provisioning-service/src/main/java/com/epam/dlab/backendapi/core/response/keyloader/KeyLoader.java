@@ -1,16 +1,29 @@
+/******************************************************************************************************
+
+ Copyright (c) 2016 EPAM Systems Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+ *****************************************************************************************************/
+
 package com.epam.dlab.backendapi.core.response.keyloader;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.SelfAPI;
-import com.epam.dlab.backendapi.core.CommandExecuter;
+import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
+import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
-import com.epam.dlab.client.restclient.RESTService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -21,9 +34,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-/**
- * Created by Alexey Suprun
- */
 @Singleton
 public class KeyLoader implements DockerCommands, SelfAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyLoader.class);
@@ -37,7 +47,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecuter commandExecuter;
+    private CommandExecutor commandExecuter;
     @Inject
     private RESTService selfService;
 
@@ -46,9 +56,19 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getKeyLoaderDirectory(), configuration.getKeyLoaderPollTimeout(),
                 getResultHandler(dto.getUser(), uuid));
-        commandExecuter.executeAsync(String.format(CREATE_EDGE_METADATA, configuration.getKeyDirectory(),
-                configuration.getKeyLoaderDirectory(), uuid, configuration.getAdminKey(),
-                dto.getUser(), dto.getUser(), dto.getUser(), configuration.getEdgeImage()));
+        commandExecuter.executeAsync(
+                new RunDockerCommand()
+                        .withVolumeForRootKeys(configuration.getKeyDirectory())
+                        .withVolumeForResponse(configuration.getKeyLoaderDirectory())
+                        .withRequestId(uuid)
+                        .withConfServiceBaseName(dto.getServiceBaseName())
+                        .withCredsKeyName(configuration.getAdminKey())
+                        .withEdgeUserName(dto.getUser())
+                        .withActionCreate(configuration.getEdgeImage())
+                        .withCredsSecurityGroupsIds(dto.getSecurityGroup())
+                        .toCMD()
+        );
+
         return uuid;
     }
 

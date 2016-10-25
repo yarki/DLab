@@ -1,4 +1,17 @@
 #!/usr/bin/python
+
+# ******************************************************************************************************
+#
+# Copyright (c) 2016 EPAM Systems Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# ****************************************************************************************************/
+
 from fabric.api import *
 from fabric.contrib.files import exists
 import argparse
@@ -28,7 +41,7 @@ def id_generator(size=10, chars=string.digits + string.ascii_letters):
 
 
 def ensure_spark_scala():
-    if not exists('/home/ubuntu/spark_scala_ensured'):
+    if not exists('/home/ubuntu/.ensure_dir/spark_scala_ensured'):
         try:
             sudo('apt-get install -y default-jre')
             sudo('apt-get install -y default-jdk')
@@ -48,40 +61,35 @@ def ensure_spark_scala():
             sudo('pip install --pre toree')
             sudo('ln -s /opt/spark/ /usr/local/spark')
             sudo('jupyter toree install')
-            sudo('touch /home/ubuntu/spark_scala_ensured')
+            sudo('touch /home/ubuntu/.ensure_dir/spark_scala_ensured')
         except:
             sys.exit(1)
 
 
 def ensure_python3_kernel():
-    if not exists('/home/ubuntu/python3_kernel_ensured'):
+    if not exists('/home/ubuntu/.ensure_dir/python3_kernel_ensured'):
         try:
             sudo('apt-get install python3-setuptools')
             sudo('apt install -y python3-pip')
             sudo('pip3 install ipython ipykernel')
             sudo('python3 -m ipykernel install')
-            sudo('touch /home/ubuntu/python3_kernel_ensured')
+            sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
         except:
             sys.exit(1)
 
 
 def configure_notebook_server(notebook_name):
     try:
-        # jupyter_password = id_generator()
         sudo('pip install jupyter')
         sudo('rm -rf /root/.jupyter/jupyter_notebook_config.py')
         sudo("for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
         sudo('jupyter notebook --generate-config --config /root/.jupyter/jupyter_notebook_config.py')
-        # sudo('echo "c.NotebookApp.password = \'' + jupyter_passwd(jupyter_password) +
-        #     '\'" >> /root/.jupyter/jupyter_notebook_config.py')
         sudo('echo "c.NotebookApp.ip = \'*\'" >> /root/.jupyter/jupyter_notebook_config.py')
         sudo('echo c.NotebookApp.open_browser = False >> /root/.jupyter/jupyter_notebook_config.py')
         sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name +
              '/\'" >> /root/.jupyter/jupyter_notebook_config.py')
         sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() +
              '"\' >> /root/.jupyter/jupyter_notebook_config.py')
-        # with open("/tmp/" + notebook_name + "passwd.file", 'wb') as f:
-        #    f.write(jupyter_password)
     except:
         sys.exit(1)
 
@@ -108,4 +116,9 @@ if __name__ == "__main__":
     deeper_config = json.loads(args.additional_config)
 
     print "Configuring notebook server."
+    try:
+        if not exists('/home/ubuntu/.ensure_dir'):
+            sudo('mkdir /home/ubuntu/.ensure_dir')
+    except:
+        sys.exit(1)
     configure_notebook_server("_".join(args.instance_name.split()))

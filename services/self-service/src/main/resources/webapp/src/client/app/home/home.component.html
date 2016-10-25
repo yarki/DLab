@@ -1,3 +1,15 @@
+<!------------------------------------------------------------------------------------------------------------
+
+Copyright (c) 2016 EPAM Systems Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+------------------------------------------------------------------------------------------------------------->
+
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -24,8 +36,8 @@
 
 <div class="sub_nav">
   <div class="container-fluid">
-    <button class="btn btn_create" data-toggle="modal" data-target=".loading_modal">
-      <span class="glyphicon glyphicon glyphicon-plus"></span> Create new
+    <button class="btn btn_create" (click)="createAnalyticalModal.open({isFooter: false})">
+      <span class="glyphicon glyphicon glyphicon-plus" ></span> Create new
     </button>
     <button class="btn btn_refresh pull-right">
       <span class="glyphicon glyphicon-refresh"></span> Refresh
@@ -33,156 +45,154 @@
   </div>
 </div>
 
-<table class="dashboard_table">
-  <tr>
-    <th class="th_name">ENVIRONMENT NAME</th>
-    <th class="th_status">STATUS</th>
-    <th class="th_shape">SHAPE</th>
-    <th class="th_resources">Computational resources</th>
-    <th class="th_actions">ACTIONS</th>
-  </tr>
-  <tr>
-    <td>To start working, please, create new environment</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <!-- <tr>
-    <td>Jupiter box</td>
-    <td>
-      <span class="running">Running</span>
-    </td>
-    <td>M4.xlarge</td>
-    <td>
-      <span class="no_details">no details</span>
-    </td>
-    <td>
-      <div class="dropdown">
-        <span  data-toggle="dropdown" class="glyphicon glyphicon-cog"></span>
-        <div class="dropdown-menu">
-          <ul class=list-unstyled>
-            <li>Stop</li>
-            <li>Terminate</li>
-            <li>Deploy EMR</li>
-          </ul>
-        </div>
-      </div>
-    </td>
-  </tr>
-  <tr>
-    <td>Jupiter + Spark lib box</td>
-    <td>
-      <span class="stopped">Stopped</span>
-    </td>
-    <td>R3.xlarge</td>
-    <td>EMR cluster 5 nodes <span class="glyphicon glyphicon-remove"></span></td>
-    <td>
-      <div class="dropdown">
-        <span  data-toggle="dropdown" class="glyphicon glyphicon-cog"></span>
-        <div class="dropdown-menu">
-          <ul class=list-unstyled>
-            <li>Stop</li>
-            <li>Terminate</li>
-            <li>Deploy EMR</li>
-          </ul>
-        </div>
-      </div>
-    </td>
-  </tr> -->
-</table>
+<ng-grid></ng-grid>
 
-<div class="modal fade create_computational">
-  <div class="modal-dialog modal-md" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-        <h4 class="modal-title" id="myModalLabel">Create computational resource</h4>
+
+
+
+
+
+<!-- <button  (click)="createEmrModal.open({isFooter: false})">createEmrModal</button> -->
+<modal #createEmrModal>
+  <modal-header>
+    <h4 class="modal-title">Create computational resource</h4>
+  </modal-header>
+  <modal-content>
+    <form>
+      <div class="form-group row">
+        <div  class="col-xs-4">
+          <label class="control-label">Select template</label>
+          <div>
+            <small>Template discription .. <br/>EMR 5.0 Spark 2.0</small>
+          </div>
+        </div>
+        <div class="col-xs-8">
+          <select class="form-control" #createEmr_tmplIndex>
+            <option *ngFor="let template of emrTempls; let i = index" value="{{i}}">
+              {{template.template_name}}, version - {{template.version}}
+            </option>
+          </select>
+        </div>
       </div>
-      <div class="modal-body">
-        <div class="form-group row">
-          <div  class="col-xs-4">
-            <label class="control-label">Select template</label>
-            <div>
-              <small>Template discription .. <br/>EMR 5.0 Spark 2.0</small>
-            </div>
-          </div>
-          <div class="col-xs-8">
-            <select class="form-control">
-              <option>EMR + Spark</option>
-            </select>
-          </div>
+      <div class="form-group row">
+        <div  class="col-xs-4">
+          <label class="control-label">Cluster Alias</label>
         </div>
-        <div class="form-group row">
-          <div  class="col-xs-4">
-            <label class="control-label">Cluster Alias</label>
-          </div>
-          <div class="col-xs-8">
-            <input type="text" class="form-control" placeholder="Enter Cluster Alias">
-          </div>
+        <div class="col-xs-8">
+          <input type="text" class="form-control" placeholder="Enter Cluster Alias">
         </div>
-        <div class="form-group row">
-          <div  class="col-xs-4">
-            <label class="control-label">Master Instance shape</label>
-          </div>
-          <div class="col-xs-8">
-            <select class="form-control">
-              <option>M4.large</option>
-            </select>
-          </div>
+      </div>
+      <div class="form-group row">
+        <div  class="col-xs-4">
+          <label class="control-label">Master Instance shape</label>
         </div>
-        <div class="form-group row">
-          <div  class="col-xs-4">
-            <label class="control-label">Slave Instance number</label>
-          </div>
-          <div class="col-xs-8">
-            <select class="form-control">
-              <option>2</option>
-            </select>
-          </div>
+        <div class="col-xs-8">
+          <select class="form-control" #createEmr_shape>
+            <option *ngFor="let shape of shapes">{{shape.shape_name}}</option>
+          </select>
         </div>
-        <div class="form-group row">
-          <div  class="col-xs-4">
-            <label class="control-label">Slave Instance shape</label>
-          </div>
-          <div class="col-xs-8">
-            <select class="form-control">
-              <option>M4.large</option>
-            </select>
-          </div>
+      </div>
+      <div class="form-group row">
+        <div  class="col-xs-4">
+          <label class="control-label">Slave Instance number</label>
         </div>
-        <div class="text-right">
-          <button type="button" class="btn btn-default">Cancel</button>
-          <button type="button" class="btn btn-success">Create</button>
+        <div class="col-xs-8">
+          <select class="form-control">
+            <option>2</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group row">
+        <div  class="col-xs-4">
+          <label class="control-label">Slave Instance shape</label>
+        </div>
+        <div class="col-xs-8">
+          <select class="form-control">
+            <option *ngFor="let shape of shapes">{{shape.shape_name}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="text-right">
+        <button type="button" class="btn btn-default">Cancel</button>
+        <button type="button"  (click)="createUsernotebook(createEmr_tmplIndex, createEmr_shape)" class="btn btn-success">Create</button>
+      </div>
+    </form>
+  </modal-content>
+</modal>
+
+<modal #createAnalyticalModal>
+  <modal-header>
+    <h4 class="modal-title" id="myModalLabel">Create analytical tool</h4>
+  </modal-header>
+  <modal-content>
+  <form>
+    <div class="form-group row">
+      <div  class="col-xs-4">
+        <label class="control-label">Select template</label>
+        <div>
+          <small>Template discription .. </small>
+        </div>
+      </div>
+      <div class="col-xs-8">
+        <select class="form-control" #createTmpl_tmplIndex>
+          <option *ngFor="let template of createTempls; let i = index" value="{{i}}">
+            {{template.template_name}}, version - {{template.version}}
+          </option>
+        </select>
+        <div class="hidden" >
+          <input type="hidden" #createTmpl_image>
         </div>
       </div>
     </div>
-  </div>
-</div>
+    <div class="form-group row">
+      <div  class="col-xs-4">
+        <label class="control-label">Name</label>
+      </div>
+      <div class="col-xs-8">
+        <input type="text" class="form-control" placeholder="Enter Name" required #createTmpl_name>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div  class="col-xs-4">
+        <label class="control-label">Instance shape</label>
+      </div>
+      <div class="col-xs-8">
+        <select class="form-control" #createTmpl_shape>
+          <option *ngFor="let shape of shapes">{{shape.shape_name}}</option>
+        </select>
+      </div>
+    </div>
+    <div class="text-right">
+      <button type="button" class="btn btn-default">Cancel</button>
+      <button type="button" class="btn btn-success" (click)="createUsernotebook(createTmpl_tmplIndex.value, createTmpl_name.value, createTmpl_shape.value)">Create</button>
+    </div>
+  </form>
+  </modal-content>
+</modal>
 
-<modal #keyUploadModal modalClass="modal-lg">
+<!-- <button  (click)="keyUploadModal.open({isFooter: false})">keyUploadModal</button> -->
+<modal #keyUploadModal modalClass="modal-lg" [hideCloseButton]="true" [closeOnEscape]="false" [closeOnOutsideClick]="false">
   <modal-header>
     <h4 class="modal-title">Create initial infrastructure</h4>
   </modal-header>
   <modal-content>
-    <form (submit)="uploadUserAccessKey_btnClick($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
+    <form class="row" (submit)="uploadUserAccessKey_btnClick($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
       <div class="form-group row">
-        <div  class="col-xs-8">
+        <div  class="col-xs-7">
           <label class="control-label">Upload public key start environment creation</label>
           <div>
             <small><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Where can I get public key?</small>
           </div>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-5 text-right">
           <span class="btn btn-default btn-file">
-            <span class="glyphicon glyphicon-upload"></span> Browse <input type="file" name="file" accept=".pem" />
+            <span class="glyphicon glyphicon-upload"></span> Browse <input type="file" name="file" accept=".pub" (change)="uploadUserAccessKey_onChange($event)"/>
           </span>
+          <div class="text-right">{{keyName}}</div>
         </div>
       </div>
       <div class="text-right">
-        <button type="submit" class="btn btn-success">Create</button>
+        <button [disabled]="uploadAccessUserKeyFormInvalid" type="submit" class="btn btn-success">Create</button>
       </div>
     </form>
   </modal-content>

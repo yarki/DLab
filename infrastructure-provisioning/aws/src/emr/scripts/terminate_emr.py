@@ -1,7 +1,19 @@
 #!/usr/bin/python
-# =============================================================================
-# Copyright (c) 2016 EPAM Systems Inc. 
-# =============================================================================
+
+# ******************************************************************************************************
+#
+# Copyright (c) 2016 EPAM Systems Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# ****************************************************************************************************/
+
+from dlab.aws_meta import *
+from dlab.aws_actions import *
 import boto3
 from fabric.api import *
 import argparse
@@ -17,53 +29,28 @@ parser.add_argument('--key_path', type=str)
 args = parser.parse_args()
 
 
-# Function for terminating EMR cluster
-def terminate_emr(emr_name):
-    client = boto3.client('emr')
-    try:
-        clusters = client.list_clusters(ClusterStates=['STARTING', 'BOOTSTRAPPING', 'RUNNING', 'WAITING'])
-        clusters = clusters.get("Clusters")
-        for c in clusters:
-            if c.get('Name') == "{}".format(emr_name):
-                cluster_id = c.get('Id')
-                cluster_name = c.get('Name')
-                client.terminate_job_flows(JobFlowIds=[cluster_id])
-                print "The EMR cluster " + cluster_name + " has been deleted successfully"
-    except:
-        sys.exit(1)
-
-
-# Function for cleaning EMR config from S3 bucket
-def clean_s3(bucket_name, emr_name):
-    s3 = boto3.resource('s3')
-    try:
-        s3_bucket = s3.Bucket(bucket_name)
-        s3_dir = "config/" + emr_name + "/"
-        for i in s3_bucket.objects.filter(Prefix=s3_dir):
-            s3.Object(s3_bucket.name, i.key).delete()
-        print "The bucket " + bucket_name + " has been cleaned successfully"
-    except:
-        sys.exit(1)
-
-
 # Function for removing notebook's local kernels
 def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
     ec2 = boto3.resource('ec2')
-    instances = ec2.instances.filter(
+    inst = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['running']},
                  {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
-    for instance in instances:
-        try:
-            private = getattr(instance, 'private_dns_name')
-            env.hosts = "{}".format(private)
-            env.user = "{}".format(ssh_user)
-            env.key_filename = "{}".format(key_path)
-            env.host_string = env.user + "@" + env.hosts
-            sudo('rm -rf /srv/hadoopconf/{}'.format(emr_name))
-            sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
-            print "Notebook's " + env.hosts + " kernels were removed"
-        except:
-            sys.exit(1)
+    instances = list(inst)
+    if instances:
+        for instance in instances:
+            try:
+                private = getattr(instance, 'private_dns_name')
+                env.hosts = "{}".format(private)
+                env.user = "{}".format(ssh_user)
+                env.key_filename = "{}".format(key_path)
+                env.host_string = env.user + "@" + env.hosts
+                sudo('rm -rf /srv/hadoopconf/config/{}'.format(emr_name))
+                sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
+                print "Notebook's " + env.hosts + " kernels were removed"
+            except:
+                sys.exit(1)
+    else:
+        print "There are no notebooks to clean kernels."
 
 
 ##############
@@ -71,12 +58,24 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
 ##############
 
 if __name__ == "__main__":
-    print 'Terminating EMR cluster'
-    terminate_emr(args.emr_name)
+    print 'Terminating EMR cluster and cleaning EMR config from S3 bucket'
+    try:
+        clusters_list = get_emr_list(args.nb_tag_value, 'Value')
+        if clusters_list:
+            for cluster_id in clusters_list:
+                client = boto3.client('emr')
+                cluster = client.describe_cluster(ClusterId=cluster_id)
+                cluster = cluster.get("Cluster")
+                emr_name = cluster.get('Name')
+                s3_cleanup(args.bucket_name, emr_name)
+                print "The bucket " + args.bucket_name + " has been cleaned successfully"
+                terminate_emr(cluster_id)
+                print "The EMR cluster " + emr_name + " has been terminated successfully"
+        else:
+            print "There are no EMR clusters to terminate."
+    except:
+        sys.exit(1)
 
-    print 'Cleaning EMR config from S3 bucket'
-    clean_s3(args.bucket_name, args.emr_name)
-
-    print "Removing notebook's EMR kernels"
+    print "Removing EMR kernels from notebook"
     remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path)
 

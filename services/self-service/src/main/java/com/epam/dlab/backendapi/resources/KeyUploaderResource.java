@@ -1,8 +1,21 @@
+/******************************************************************************************************
+
+ Copyright (c) 2016 EPAM Systems Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+ *****************************************************************************************************/
+
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
+import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
@@ -27,9 +40,6 @@ import java.util.stream.Collectors;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
-/**
- * Created by Alexey Suprun
- */
 @Path("/keyloader")
 @Produces(MediaType.APPLICATION_JSON)
 public class KeyUploaderResource implements KeyLoaderAPI {
@@ -37,6 +47,8 @@ public class KeyUploaderResource implements KeyLoaderAPI {
 
     @Inject
     private KeyDAO dao;
+    @Inject
+    private SettingsDAO settingsDAO;
     @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
@@ -58,7 +70,12 @@ public class KeyUploaderResource implements KeyLoaderAPI {
             content = buffer.lines().collect(Collectors.joining("\n"));
         }
         dao.uploadKey(userInfo.getName(), content);
-        return provisioningService.post(KEY_LOADER, new UploadFileDTO(userInfo.getName(), content), String.class);
+        UploadFileDTO dto = new UploadFileDTO()
+                .withUser(userInfo.getName())
+                .withContent(content)
+                .withServiceBaseName(settingsDAO.getServiceBaseName())
+                .withSecurityGroup(settingsDAO.getSecurityGroup());
+        return provisioningService.post(KEY_LOADER, dto, String.class);
     }
 
     @POST
@@ -67,7 +84,9 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
         dao.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
         if (result.isSuccess()) {
-            dao.saveCredential(result.getCredential());
+            dao.saveCredential(result.getUser(), result.getCredential());
+        } else {
+            dao.deleteKey(result.getUser());
         }
         return Response.ok().build();
     }
