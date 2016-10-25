@@ -129,9 +129,9 @@ def run():
         logging.info('[CREATE EMR CLUSTER]')
         print '[CREATE EMR CLUSTER]'
         params = "--name {} --applications '{}' --master_instance_type {} --slave_instance_type {} --instance_count {} --ssh_key {} --release_label {} --emr_timeout {} " \
-                 "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --tags '{}'".format(
+                 "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --region {} --tags '{}'".format(
             emr_conf['cluster_name'], emr_conf['apps'], emr_conf['master_instance_type'], emr_conf['slave_instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'], emr_conf['emr_timeout'],
-            emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], 'ubuntu', emr_conf['bucket_name'], emr_conf['tags'])
+            emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], 'ubuntu', emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'])
         if not run_routine('create_cluster', params):
             logging.info('Failed creating EMR Cluster')
             with open("/root/result.json", 'w') as result:

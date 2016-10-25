@@ -48,6 +48,7 @@ def run():
         user_bucket_name = (service_base_name + '-ssn-bucket').lower().replace('_', '-')
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn-instance'
+        region = os.environ['creds_region']
 
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
@@ -82,8 +83,8 @@ def run():
     try:
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
-        params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \
-                 (user_bucket_name, tag_name, "bucket")
+        params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s --region %s" % \
+                 (user_bucket_name, tag_name, "bucket", region)
 
         if not run_routine('create_bucket', params):
             logging.info('Unable to create bucket')
