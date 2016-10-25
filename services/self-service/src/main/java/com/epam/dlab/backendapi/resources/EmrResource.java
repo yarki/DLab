@@ -37,7 +37,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
@@ -59,7 +58,7 @@ public class EmrResource implements EmrAPI {
 
     @POST
     @Path("/create")
-    public Response create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) throws IOException {
+    public Response create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) {
         LOGGER.debug("creating emr {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = userListDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
@@ -91,7 +90,7 @@ public class EmrResource implements EmrAPI {
 
     @POST
     @Path("/status")
-    public Response create(EMRStatusDTO dto) throws IOException {
+    public Response create(EMRStatusDTO dto) {
         LOGGER.debug("update status for emr {} for user {}", dto.getResourceName(), dto.getUser());
         userListDAO.updateComputationalStatus(dto);
         return Response.ok().build();
