@@ -19,8 +19,10 @@ public class EMRCreateFormDTO {
     private String name;
     @JsonProperty("emr_instance_count")
     private String instanceCount;
-    @JsonProperty("emr_instance_type")
-    private String instanceType;
+    @JsonProperty("emr_master_instance_type")
+    private String masterInstanceType;
+    @JsonProperty("emr_slave_instance_type")
+    private String slaveInstanceType;
     @JsonProperty("emr_version")
     private String version;
     @JsonProperty("notebook_name")
@@ -34,8 +36,12 @@ public class EMRCreateFormDTO {
         return instanceCount;
     }
 
-    public String getInstanceType() {
-        return instanceType;
+    public String getMasterInstanceType() {
+        return masterInstanceType;
+    }
+
+    public String getSlaveInstanceType() {
+        return slaveInstanceType;
     }
 
     public String getVersion() {
