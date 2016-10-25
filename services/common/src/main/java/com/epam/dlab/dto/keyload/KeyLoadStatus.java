@@ -17,7 +17,7 @@ import java.util.Arrays;
 
 public enum KeyLoadStatus {
     NONE("none", null, Response.Status.NOT_FOUND),
-    NEW("new", null, Response.Status.NOT_ACCEPTABLE),
+    NEW("new", null, Response.Status.ACCEPTED),
     SUCCESS("success", "ok", Response.Status.OK),
     ERROR("error", "err", Response.Status.OK);
 
