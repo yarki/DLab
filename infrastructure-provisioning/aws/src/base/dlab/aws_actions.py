@@ -233,7 +233,7 @@ def s3_cleanup(bucket, cluster_name):
         print err.response['Error']['Message']
 
 
-def remove_s3(scientist):
+def remove_s3(bucket_type, scientist=''):
     print "[Removing S3 buckets]"
     s3 = boto3.resource('s3')
     client = boto3.client('s3')
