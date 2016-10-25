@@ -15,7 +15,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
-import sys, time
+import sys, time, os
 from dlab.aws_actions import *
 
 def status():
@@ -73,6 +73,7 @@ def run():
     edge_conf['region'] = os.environ['edge_region']
     edge_conf['ami_id'] = os.environ['edge_ami_id']
     edge_conf['instance_size'] = os.environ['edge_instance_size']
+    edge_conf['sg_ids'] = os.environ['creds_security_groups_ids']
 
     # Edge config
     edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
@@ -199,7 +200,7 @@ def run():
         out.write('\n')
         ingress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
-            {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": os.environ['creds_security_groups_ids']}], "PrefixListIds": []}
+            {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_conf['sg_ids']}], "PrefixListIds": []}
         ]
         out.write('Ingress successful\n')
         print 'Ingress successful'
