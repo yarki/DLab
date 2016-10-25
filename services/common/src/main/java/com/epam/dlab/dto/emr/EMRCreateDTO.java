@@ -17,8 +17,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
     @JsonProperty("emr_instance_count")
     private String instanceCount;
-    @JsonProperty("emr_instance_type")
-    private String instanceType;
+    @JsonProperty("emr_master_instance_type")
+    private String masterInstanceType;
+    @JsonProperty("emr_slave_instance_type")
+    private String slaveInstanceType;
     @JsonProperty("emr_version")
     private String version;
     @JsonProperty("notebook_name")
@@ -39,16 +41,29 @@ public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
         return this;
     }
 
-    public String getInstanceType() {
-        return instanceType;
+    public String getMasterInstanceType() {
+        return masterInstanceType;
     }
 
-    public void setInstanceType(String instanceType) {
-        this.instanceType = instanceType;
+    public void setMasterInstanceType(String masterInstanceType) {
+        this.masterInstanceType = masterInstanceType;
     }
 
-    public EMRCreateDTO withInstanceType(String instanceType) {
-        setInstanceType(instanceType);
+    public EMRCreateDTO withMasterInstanceType(String masterInstanceType) {
+        setMasterInstanceType(masterInstanceType);
+        return this;
+    }
+
+    public String getSlaveInstanceType() {
+        return slaveInstanceType;
+    }
+
+    public void setSlaveInstanceType(String slaveInstanceType) {
+        this.slaveInstanceType = slaveInstanceType;
+    }
+
+    public EMRCreateDTO withSlaveInstanceType(String slaveInstanceType) {
+        setSlaveInstanceType(slaveInstanceType);
         return this;
     }
 
