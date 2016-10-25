@@ -33,17 +33,20 @@ export class Grid implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.buildGrid();
+  }
+
+  buildGrid() {
     // this.environmentsService.getEnvironmentsList().subscribe((list) => {
     this.userResourceService.getGridData().subscribe((list) => {
-      this.list = list;
 
+      this.list = list;
       this.environments = this.loadEnvironments();
       console.log('models ', this.environments);
     });
   }
 
   loadEnvironments(): Array<any> {
-
     if (this.list['RESOURCES']) {
       return this.list['RESOURCES'].map((value) => {
         return new GridRowModel(value.ENVIRONMENT_NAME,

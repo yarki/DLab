@@ -16,6 +16,7 @@ import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
 import {AppRoutingService} from "../routing/appRouting.service";
 import {Http, Response} from '@angular/http';
+import { Grid } from '../components/grid/grid.component';
 
 @Component({
   moduleId: module.id,
@@ -39,6 +40,7 @@ export class HomeComponent implements OnInit {
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
+  @ViewChild(Grid) refresh:Grid ;
 
   // -------------------------------------------------------------------------
   // Overrides
@@ -86,6 +88,10 @@ export class HomeComponent implements OnInit {
       if(!this.uploadAccessUserKeyFormInvalid)
         this.keyName = fileName;
     }
+  }
+
+  refreshGrid() {
+    this.refresh.buildGrid();
   }
 
   //
