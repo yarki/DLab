@@ -71,10 +71,11 @@ export class HomeComponent implements OnInit {
       () => this.appRoutingService.redirectToLoginPage());
   }
 
-  uploadUserAccessKey_btnClick($event) {
+  uploadUserAccessKey_btnClick(event) {
     this.preloadModalInterval = setInterval(function() {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
+    event.preventDefault()
   }
 
   uploadUserAccessKey_onChange($event) {
@@ -134,28 +135,65 @@ export class HomeComponent implements OnInit {
   initAnalyticSelectors() {
     this.userResourceService.getCreateTmpl()
       .subscribe(
-        data => this.createTempls = data,
+        data => {
+          let arr = [];
+          data.forEach((obj, index) => {
+           let versions = obj.templates.map((versionObj, index) => {
+              return versionObj.version;
+            });
+            delete obj.templates;
+            versions.forEach((version, index) => {
+              arr.push(Object.assign({}, obj))
+              arr[index].version = version;
+            })
+          });
+          this.createTempls = arr;
+          console.log(arr);
+        },
         error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
     this.userResourceService.getEmrTmpl()
       .subscribe(
-        data => this.emrTempls = data,
+        data => {
+          let arr = [];
+          data.forEach((obj, index) => {
+            let versions = obj.templates.map((versionObj, index) => {
+              return versionObj.version;
+            });
+            delete obj.templates;
+            versions.forEach((version, index) => {
+              arr.push(Object.assign({}, obj))
+              arr[index].version = version;
+            })
+          });
+          this.emrTempls = arr;
+          console.log(arr);
+        },
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
     this.userResourceService.getShapes()
       .subscribe(
-        data => this.shapes = data,
+        data => {
+          console.log("shapes !!!", data);
+          this.shapes = data
+        },
         error => this.shapes = [{shape_name: 'M4.large'}, {shape_name: 'M4.large'}]
       );
   }
 
-  createUsernotebook(template, name, shape){
+  createUsernotebook(tmplIndex, name, shape){
     this.userResourceService
-      .createUsernotebook({"image": name.value})
+      .createUsernotebook({
+        name: name,
+        shape: shape,
+        image: this.createTempls[tmplIndex].image,
+        version: this.createTempls[tmplIndex].version
+      })
       .subscribe((result) => {
         console.log('result: ', result);
+
       });
-    return false;
+      return false;
   };
 
   createEmr(template, name, shape){

@@ -238,7 +238,7 @@ if __name__ == "__main__":
         # get_emr_state(args.id)
         build_emr_cluster(args)
     else:
-        out = open(logpath, 'w')
+        out = open(logpath, 'a')
         out.write('[BUILDING NEW CLUSTER - {}\n]'.format(args.name))
         cluster_id = build_emr_cluster(args)
         out.write('Cluster ID: {}\n'.format(cluster_id))
