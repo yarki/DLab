@@ -10,17 +10,39 @@
 
  *****************************************************************************************************/
 
-import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from "rxjs";
+package com.epam.dlab.dto.keyload;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Injectable()
-export class EnvironmentsService {
-  constructor(private http: Http) { }
+public class UserKeyDTO {
+    @JsonProperty
+    private String content;
+    @JsonProperty
+    private String status;
 
-  getEnvironmentsList(): Observable<String> {
-    return this.http.get('app/components/grid/data.json')
-      .map((res: Response) => res.json());
-  }
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public UserKeyDTO withContent(String content) {
+        setContent(content);
+        return this;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public UserKeyDTO withStatus(String status) {
+        setStatus(status);
+        return this;
+    }
 }
