@@ -170,6 +170,7 @@ export class HomeComponent implements OnInit {
             })
           });
           this.emrTempls = arr;
+          console.log("emrTempls: ", arr);
         },
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
@@ -188,7 +189,6 @@ export class HomeComponent implements OnInit {
       .createUsernotebook({
         name: name,
         shape: shape,
-        image: this.createTempls[tmplIndex].image,
         version: this.createTempls[tmplIndex].version
       })
       .subscribe((result) => {
