@@ -64,7 +64,10 @@ public class EmrResource implements EmrAPI {
         boolean isAdded = userListDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
                         .withResourceName(formDTO.getName())
-                        .withStatus(UserInstanceStatus.CREATING.getStatus()));
+                        .withStatus(UserInstanceStatus.CREATING.getStatus())
+                        .withMasterShape(formDTO.getMasterInstanceType())
+                        .withSlaveShape(formDTO.getSlaveInstanceType())
+                        .withSlaveNumber(formDTO.getInstanceCount()));
         if (isAdded) {
             EMRCreateDTO dto = new EMRCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
@@ -99,12 +102,11 @@ public class EmrResource implements EmrAPI {
     public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
         LOGGER.debug("terminating emr {} for user {}", formDTO.getClusterName(), userInfo.getName());
         EMRTerminateDTO dto = new EMRTerminateDTO()
-                .withServiceBaseName(userInfo.getName())
+                .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withEdgeUserName(userInfo.getName())
                 .withClusterName(formDTO.getClusterName())
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }
-
 
 }

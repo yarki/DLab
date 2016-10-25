@@ -22,6 +22,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--bucket_name', type=str, default='dsa-test-bucket')
 parser.add_argument('--infra_tag_name', type=str, default='BDCC-DSA-test-infra')
 parser.add_argument('--infra_tag_value', type=str, default='tmp')
+parser.add_argument('--region', type=str, default='us-west-2')
 args = parser.parse_args()
 
 
@@ -33,7 +34,7 @@ if __name__ == "__main__":
             bucket = get_bucket_by_name(args.bucket_name)
             if bucket == '':
                 print "Creating bucket %s with tag %s." % (args.bucket_name, json.dumps(tag))
-                bucket = create_s3_bucket(args.bucket_name, tag)
+                bucket = create_s3_bucket(args.bucket_name, tag, args.region)
             else:
                 print "REQUESTED BUCKET ALREADY EXISTS"
             print "BUCKET_NAME " + bucket

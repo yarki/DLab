@@ -22,7 +22,7 @@ export class UserResourceService {
     emrTmpls: 'userlist/computational',
     shapes: 'userlist/shape',
     createNotebook: 'exploratory/create',
-    createEmr: 'exploratory/emr'
+    createEmr: 'emr/create'
   };
 
   constructor(private http: Http,

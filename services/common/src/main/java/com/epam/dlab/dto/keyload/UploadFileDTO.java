@@ -49,7 +49,7 @@ public class UploadFileDTO {
     }
 
     public UploadFileDTO withContent(String content) {
-        setServiceBaseName(content);
+        setContent(content);
         return this;
     }
 

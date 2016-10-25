@@ -61,7 +61,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String post(@Auth UserInfo userInfo,
+    public Response post(@Auth UserInfo userInfo,
                        @FormDataParam("file") InputStream uploadedInputStream,
                        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
         LOGGER.debug("upload key for user {}", userInfo.getName());
@@ -70,12 +70,21 @@ public class KeyUploaderResource implements KeyLoaderAPI {
             content = buffer.lines().collect(Collectors.joining("\n"));
         }
         keyDAO.uploadKey(userInfo.getName(), content);
-        UploadFileDTO dto = new UploadFileDTO()
-                .withUser(userInfo.getName())
-                .withContent(content)
-                .withServiceBaseName(settingsDAO.getServiceBaseName())
-                .withSecurityGroup(settingsDAO.getSecurityGroup());
-        return provisioningService.post(KEY_LOADER, dto, String.class);
+        try {
+            UploadFileDTO dto = new UploadFileDTO()
+                    .withUser(userInfo.getName())
+                    .withContent(content)
+                    .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withSecurityGroup(settingsDAO.getSecurityGroup());
+            Response response = provisioningService.post(KEY_LOADER, dto, Response.class);
+            if (Response.Status.ACCEPTED.getStatusCode() != response.getStatus()) {
+                keyDAO.deleteKey(userInfo.getName());
+            }
+        } catch (Exception e) {
+            LOGGER.debug("uploading file exception", e);
+            keyDAO.deleteKey(userInfo.getName());
+        }
+        return Response.ok().build();
     }
 
     @POST
