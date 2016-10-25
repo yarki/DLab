@@ -37,8 +37,6 @@ public class UserAWSCredentialDTO {
     private String notebookSubnet;
     @JsonProperty("edge_sg")
     private String edgeSG;
-    @JsonProperty("full_edge_conf")
-    private String fullEdgeConf;
 
     public String getHostname() {
         return hostname;
@@ -78,9 +76,5 @@ public class UserAWSCredentialDTO {
 
     public String getEdgeSG() {
         return edgeSG;
-    }
-
-    public String getFullEdgeConf() {
-        return fullEdgeConf;
     }
 }
