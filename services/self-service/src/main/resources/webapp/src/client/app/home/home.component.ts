@@ -170,7 +170,6 @@ export class HomeComponent implements OnInit {
             })
           });
           this.emrTempls = arr;
-          console.log("emrTempls: ", arr);
         },
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
