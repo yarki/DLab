@@ -48,7 +48,7 @@ public class EmrResource implements EmrAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmrResource.class);
 
     @Inject
-    private SettingsDAO dao;
+    private SettingsDAO settingsDAO;
     @Inject
     private KeyDAO keyDao;
     @Inject
@@ -64,10 +64,13 @@ public class EmrResource implements EmrAPI {
         boolean isAdded = userListDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
                         .withResourceName(formDTO.getName())
-                        .withStatus(UserInstanceStatus.CREATING.getStatus()));
+                        .withStatus(UserInstanceStatus.CREATING.getStatus())
+                        .withMasterShape(formDTO.getMasterInstanceType())
+                        .withSlaveShape(formDTO.getSlaveInstanceType())
+                        .withSlaveNumber(formDTO.getInstanceCount()));
         if (isAdded) {
             EMRCreateDTO dto = new EMRCreateDTO()
-                    .withServiceBaseName(dao.getServiceBaseName())
+                    .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withInstanceCount(formDTO.getInstanceCount())
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
@@ -75,7 +78,7 @@ public class EmrResource implements EmrAPI {
                     .withNotebookName(formDTO.getNotebookName())
                     .withEdgeUserName(userInfo.getName())
                     .withEdgeSubnet(keyDao.findCredential(userInfo.getName()).getNotebookSubnet())
-                    .withRegion(dao.getAwsRegion());
+                    .withRegion(settingsDAO.getAwsRegion());
             LOGGER.debug("created emr {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EMR_CREATE, dto, String.class))
@@ -99,10 +102,10 @@ public class EmrResource implements EmrAPI {
     public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
         LOGGER.debug("terminating emr {} for user {}", formDTO.getClusterName(), userInfo.getName());
         EMRTerminateDTO dto = new EMRTerminateDTO()
-                .withServiceBaseName(userInfo.getName())
+                .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withEdgeUserName(userInfo.getName())
                 .withClusterName(formDTO.getClusterName())
-                .withRegion(dao.getAwsRegion());
+                .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }
 }
