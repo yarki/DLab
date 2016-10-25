@@ -137,7 +137,9 @@ export class HomeComponent implements OnInit {
       .subscribe(
         data => {
           let arr = [];
-          data.forEach((obj, index) => {
+          let str = JSON.stringify(data);
+          let dataArr = JSON.parse(str);
+          dataArr.forEach((obj, index) => {
            let versions = obj.templates.map((versionObj, index) => {
               return versionObj.version;
             });
@@ -148,7 +150,6 @@ export class HomeComponent implements OnInit {
             })
           });
           this.createTempls = arr;
-          console.log(arr);
         },
         error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
@@ -156,7 +157,9 @@ export class HomeComponent implements OnInit {
       .subscribe(
         data => {
           let arr = [];
-          data.forEach((obj, index) => {
+          let str = JSON.stringify(data);
+          let dataArr = JSON.parse(str);
+          dataArr.forEach((obj, index) => {
             let versions = obj.templates.map((versionObj, index) => {
               return versionObj.version;
             });
@@ -167,7 +170,6 @@ export class HomeComponent implements OnInit {
             })
           });
           this.emrTempls = arr;
-          console.log(arr);
         },
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
