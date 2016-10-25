@@ -13,6 +13,7 @@
 package com.epam.dlab.backendapi.dao;
 
 import static com.epam.dlab.backendapi.dao.MongoSetting.AWS_REGION;
+import static com.epam.dlab.backendapi.dao.MongoSetting.SECURITY_GROUP;
 import static com.epam.dlab.backendapi.dao.MongoSetting.SERIVICE_BASE_NAME;
 import static com.mongodb.client.model.Filters.eq;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -29,7 +30,7 @@ public class SettingsDAO extends BaseDAO {
     }
 
     public String getSecurityGroup() {
-        return getSetting(AWS_REGION);
+        return getSetting(SECURITY_GROUP);
     }
 
     private String getSetting(MongoSetting setting) {
