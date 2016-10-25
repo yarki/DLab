@@ -10,7 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
+import { UserResourceService } from "./../../services/userResource.service";
 import { EnvironmentsService } from './../../services/environments.service';
 import { GridRowModel } from './grid.model';
 
@@ -25,8 +26,17 @@ export class Grid {
 
   list: Array<any>;
   environments: Array<GridRowModel>;
+  notebookName: any;
 
-  constructor(private environmentsService: EnvironmentsService) { }
+  @ViewChild('createEmrModal') createEmrModal;
+  @Input() emrTempls;
+  @Input() shapes;
+
+
+  constructor(
+    private environmentsService: EnvironmentsService,
+    private userResourceService: UserResourceService
+    ) { }
 
   ngOnInit() {
     this.environmentsService.getEnvironmentsList().subscribe((list) => {
@@ -52,5 +62,27 @@ export class Grid {
 
   mathAction(data, action) {
     console.log('action ' + action, data);
+    if(action === 'deploy') {
+      this.notebookName = data.name
+      this.createEmrModal.open({isFooter: false });
+    }
+
   }
+
+  createEmr(name, count, shape_master, shape_slave, tmplIndex){
+    this.userResourceService
+      .createEmr({
+        name: name,
+        emr_instance_count: ++count,
+        emr_master_instance_type: shape_master,
+        emr_slave_instance_type: shape_slave,
+        emr_version: this.emrTempls[tmplIndex].version,
+        notebook_name: this.notebookName
+      })
+      .subscribe((result) => {
+        console.log('result: ', result);
+
+      });
+      return false;
+  };
 }

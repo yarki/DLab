@@ -13,8 +13,8 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
 import com.epam.dlab.backendapi.api.form.ExploratoryActionFormDTO;
+import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
@@ -23,8 +23,8 @@ import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.StatusBaseDTO;
-import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -38,7 +38,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
@@ -60,7 +59,7 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @POST
     @Path("/create")
-    public Response create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) throws IOException {
+    public Response create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) {
         LOGGER.debug("creating exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = userListDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
@@ -68,11 +67,10 @@ public class ExploratoryResource implements ExploratoryAPI {
                 .withStatus(UserInstanceStatus.CREATING.getStatus())
                 .withShape(formDTO.getShape()));
         if (isAdded) {
-            UserAWSCredentialDTO credentialDTO = keyDao.findCredential(userInfo.getName());
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookUserName(userInfo.getName())
-                    .withNotebookSubnet(credentialDTO.getNotebookSubnet())
+                    .withNotebookSubnet(keyDao.findSubnet(userInfo.getName()))
                     .withRegion(settingsDAO.getAwsRegion())
                     .withSecurityGroupIds(settingsDAO.getSecurityGroup());
             LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
@@ -87,7 +85,7 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @POST
     @Path("/status")
-    public Response create(StatusBaseDTO dto) throws IOException {
+    public Response create(StatusBaseDTO dto) {
         LOGGER.debug("update status for exploratory environment {} for user {}", dto.getName(), dto.getUser());
         userListDAO.updateExploratoryStatus(dto);
         return Response.ok().build();

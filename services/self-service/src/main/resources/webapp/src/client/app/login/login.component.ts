@@ -29,6 +29,7 @@ export class LoginComponent {
   model = new LoginModel ('', '');
   error = '';
   loading = false;
+  userPattern = "/S+";
   //
   // Override
   //

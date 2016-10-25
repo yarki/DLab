@@ -10,44 +10,25 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.keyload;
+package com.epam.dlab.providers;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
+import javax.ws.rs.ext.ExceptionMapper;
 
-public enum KeyLoadStatus {
-    NONE("none", null, Response.Status.NOT_FOUND),
-    NEW("new", null, Response.Status.ACCEPTED),
-    SUCCESS("success", "ok", Response.Status.OK),
-    ERROR("error", "err", Response.Status.OK);
+abstract public class GenericExceptionMapper<E extends Throwable> implements ExceptionMapper<E> {
+    final static Logger LOGGER = LoggerFactory.getLogger(GenericExceptionMapper.class);
 
-    private String status;
-    private String value;
-    private Response.Status httpStatus;
+    @Override
+    public Response toResponse(E exception) {
+        Response response500 = Response
+                .serverError()
+                .build();
 
-    KeyLoadStatus(String status, String value, Response.Status httpStatus) {
-        this.status = status;
-        this.value = value;
-        this.httpStatus = httpStatus;
-    }
+        LOGGER.error("Uncaught exception in application", exception);
 
-    public String getStatus() {
-        return status;
-    }
-
-    public Response.Status getHttpStatus() {
-        return httpStatus;
-    }
-
-    public static boolean isSuccess(String value) {
-        return SUCCESS.value.equals(value);
-    }
-
-    public static String getStatus(boolean successed) {
-        return successed ? SUCCESS.status : ERROR.status;
-    }
-
-    public static KeyLoadStatus findByStatus(String status) {
-        return Arrays.stream(values()).reduce(NONE, (result, next) -> next.status.equals(status) ? next : result);
+        return response500;
     }
 }

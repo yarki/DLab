@@ -37,7 +37,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
@@ -48,7 +47,7 @@ public class EmrResource implements EmrAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmrResource.class);
 
     @Inject
-    private SettingsDAO dao;
+    private SettingsDAO settingsDAO;
     @Inject
     private KeyDAO keyDao;
     @Inject
@@ -59,23 +58,26 @@ public class EmrResource implements EmrAPI {
 
     @POST
     @Path("/create")
-    public Response create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) throws IOException {
+    public Response create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) {
         LOGGER.debug("creating emr {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = userListDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
                         .withResourceName(formDTO.getName())
-                        .withStatus(UserInstanceStatus.CREATING.getStatus()));
+                        .withStatus(UserInstanceStatus.CREATING.getStatus())
+                        .withMasterShape(formDTO.getMasterInstanceType())
+                        .withSlaveShape(formDTO.getSlaveInstanceType())
+                        .withSlaveNumber(formDTO.getInstanceCount()));
         if (isAdded) {
             EMRCreateDTO dto = new EMRCreateDTO()
-                    .withServiceBaseName(dao.getServiceBaseName())
+                    .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withInstanceCount(formDTO.getInstanceCount())
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                     .withVersion(formDTO.getVersion())
                     .withNotebookName(formDTO.getNotebookName())
                     .withEdgeUserName(userInfo.getName())
-                    .withEdgeSubnet(keyDao.findCredential(userInfo.getName()).getNotebookSubnet())
-                    .withRegion(dao.getAwsRegion());
+                    .withEdgeSubnet(keyDao.findSubnet(userInfo.getName()))
+                    .withRegion(settingsDAO.getAwsRegion());
             LOGGER.debug("created emr {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EMR_CREATE, dto, String.class))
@@ -88,7 +90,7 @@ public class EmrResource implements EmrAPI {
 
     @POST
     @Path("/status")
-    public Response create(EMRStatusDTO dto) throws IOException {
+    public Response create(EMRStatusDTO dto) {
         LOGGER.debug("update status for emr {} for user {}", dto.getResourceName(), dto.getUser());
         userListDAO.updateComputationalStatus(dto);
         return Response.ok().build();
@@ -99,10 +101,11 @@ public class EmrResource implements EmrAPI {
     public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
         LOGGER.debug("terminating emr {} for user {}", formDTO.getClusterName(), userInfo.getName());
         EMRTerminateDTO dto = new EMRTerminateDTO()
-                .withServiceBaseName(userInfo.getName())
+                .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withEdgeUserName(userInfo.getName())
                 .withClusterName(formDTO.getClusterName())
-                .withRegion(dao.getAwsRegion());
+                .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }
+
 }

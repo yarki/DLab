@@ -15,17 +15,19 @@ package com.epam.dlab.backendapi.dao;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
+import com.epam.dlab.dto.keyload.UserKeyDTO;
+import com.epam.dlab.exceptions.DlabException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.bson.Document;
 
-import java.io.IOException;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
 public class KeyDAO extends BaseDAO {
     public void uploadKey(final String user, String content) {
-        insertOne(USER_KEYS, () -> new Document("content", content).append(STATUS, KeyLoadStatus.NEW.getStatus()), user);
+        UserKeyDTO key = new UserKeyDTO().withContent(content).withStatus(KeyLoadStatus.NEW.getStatus());
+        insertOne(USER_KEYS, key, user);
     }
 
     public void updateKey(String user, String status) {
@@ -36,16 +38,26 @@ public class KeyDAO extends BaseDAO {
         mongoService.getCollection(USER_KEYS).deleteOne(eq(ID, user));
     }
 
-    public void saveCredential(String user, UserAWSCredentialDTO credential) throws JsonProcessingException {
+    public void saveCredential(String user, UserAWSCredentialDTO credential) {
         insertOne(USER_AWS_CREDENTIALS, credential, user);
     }
 
-    public UserAWSCredentialDTO findCredential(String user) throws IOException {
+    public Optional<UserAWSCredentialDTO> findCredential(String user) {
         return find(USER_AWS_CREDENTIALS, eq(ID, user), UserAWSCredentialDTO.class);
     }
 
     public KeyLoadStatus findKeyStatus(UserInfo userInfo) {
-        Document document = mongoService.getCollection(USER_KEYS).find(eq(ID, userInfo.getName())).first();
-        return document != null ? KeyLoadStatus.findByStatus(document.get(STATUS).toString()) : KeyLoadStatus.NONE;
+        return find(USER_KEYS, eq(ID, userInfo.getName()), UserKeyDTO.class)
+                .map(UserKeyDTO::getStatus)
+                .map(KeyLoadStatus::findByStatus)
+                .orElse(KeyLoadStatus.NONE);
+    }
+
+    public String findSubnet(String user) {
+        Optional<String> subnet = this.findCredential(user).map(UserAWSCredentialDTO::getNotebookSubnet);
+        if (subnet.isPresent()) {
+            return subnet.get();
+        }
+        throw new DlabException("No notebook subnet set for user '" + user + "'");
     }
 }
