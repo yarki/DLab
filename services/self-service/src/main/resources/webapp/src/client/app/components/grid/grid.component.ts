@@ -10,9 +10,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import { Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
-import { UserResourceService } from "./../../services/userResource.service";
+import { Component, EventEmitter, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { EnvironmentsService } from './../../services/environments.service';
+import { UserResourceService } from "./../../services/userResource.service";
 import { GridRowModel } from './grid.model';
 
 @Component({
@@ -22,9 +22,9 @@ import { GridRowModel } from './grid.model';
   styleUrls: ['./grid.component.css']
 })
 
-export class Grid {
+export class Grid implements OnInit {
 
-  list: Array<any>;
+  list: any;
   environments: Array<GridRowModel>;
   notebookName: any;
 
@@ -39,21 +39,28 @@ export class Grid {
     ) { }
 
   ngOnInit() {
-    this.environmentsService.getEnvironmentsList().subscribe((list) => {
-      this.list = list['RESOURCES'];
+    this.buildGrid();
+  }
 
+  buildGrid() {
+    // this.environmentsService.getEnvironmentsList().subscribe((list) => {
+    this.userResourceService.getGridData().subscribe((list) => {
+
+      this.list = list;
       this.environments = this.loadEnvironments();
       console.log('models ', this.environments);
     });
   }
 
   loadEnvironments(): Array<any> {
-    return this.list.map((value) => {
-      return new GridRowModel(value.ENVIRONMENT_NAME,
-        value.STATUS,
-        value.SHAPE,
-        value.COMPUTATIONAL_RESOURCES);
-    });
+    if (this.list['RESOURCES']) {
+      return this.list['RESOURCES'].map((value) => {
+        return new GridRowModel(value.ENVIRONMENT_NAME,
+          value.STATUS,
+          value.SHAPE,
+          value.COMPUTATIONAL_RESOURCES);
+      });
+    }
   }
 
   printDetailEnvironmentModal(data) {
