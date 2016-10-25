@@ -31,6 +31,7 @@ import java.util.UUID;
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.backendapi.client.rest.ExploratoryAPI.EXPLORATORY_CREATE;
+import static com.epam.dlab.backendapi.client.rest.KeyLoaderAPI.KEY_LOADER;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -59,6 +60,7 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
 
     private RESTService createProvisioningService() {
         RESTService result = mock(RESTService.class);
+        when(result.post(eq(KEY_LOADER), any(), eq(Response.class))).thenReturn(Response.accepted().build());
         when(result.get(eq(DOCKER), any()))
                 .thenReturn(new ImageMetadataDTO[]{
                         new ImageMetadataDTO("test computational image", "template", "decription", "request_id", ImageType.COMPUTATIONAL.getType(),
