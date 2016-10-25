@@ -103,7 +103,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <h4 class="modal-title">Create initial infrastructure</h4>
   </modal-header>
   <modal-content>
-    <form class="row" (submit)="uploadUserAccessKey_btnClick($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
+    <form (submit)="uploadUserAccessKey_btnClick($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
       <div class="form-group row">
         <div  class="col-xs-7">
           <label class="control-label">Upload public key start environment creation</label>
