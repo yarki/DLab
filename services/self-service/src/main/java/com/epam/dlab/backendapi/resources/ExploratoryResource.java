@@ -47,10 +47,9 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements ExploratoryAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
-    private static final String DEFAULT_SECURITY_GROUP = "sg-e338c89a";
 
     @Inject
-    private SettingsDAO dao;
+    private SettingsDAO settingsDAO;
     @Inject
     private KeyDAO keyDao;
     @Inject
@@ -71,11 +70,11 @@ public class ExploratoryResource implements ExploratoryAPI {
         if (isAdded) {
             UserAWSCredentialDTO credentialDTO = keyDao.findCredential(userInfo.getName());
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
-                    .withServiceBaseName(dao.getServiceBaseName())
+                    .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookUserName(userInfo.getName())
                     .withNotebookSubnet(credentialDTO.getNotebookSubnet())
-                    .withRegion(dao.getAwsRegion())
-                    .withSecurityGroupIds(DEFAULT_SECURITY_GROUP);
+                    .withRegion(settingsDAO.getAwsRegion())
+                    .withSecurityGroupIds(settingsDAO.getSecurityGroup());
             LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EXPLORATORY_CREATE, dto, String.class))
@@ -117,10 +116,10 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     private String action(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO, String action) {
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
-                .withServiceBaseName(userInfo.getName())
+                .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withNotebookUserName(userInfo.getName())
                 .withNotebookInstanceName(formDTO.getNotebookInstanceName())
-                .withRegion(dao.getAwsRegion());
+                .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(action, dto, String.class);
     }
 }

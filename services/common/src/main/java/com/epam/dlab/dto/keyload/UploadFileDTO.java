@@ -19,28 +19,63 @@ public class UploadFileDTO {
     private String user;
     @JsonProperty
     private String content;
-    @JsonProperty("conf_service_base_name ")
+    @JsonProperty("conf_service_base_name")
     private String serviceBaseName;
-
+    @JsonProperty("security_group")
+    private String securityGroup;
 
     public UploadFileDTO() {
-    }
-
-    public UploadFileDTO(String user, String content, String serviceBaseName) {
-        this.user = user;
-        this.content = content;
-        this.serviceBaseName = serviceBaseName;
     }
 
     public String getUser() {
         return user;
     }
 
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public UploadFileDTO withUser(String user) {
+        setUser(user);
+        return this;
+    }
+
     public String getContent() {
         return content;
     }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public UploadFileDTO withContent(String content) {
+        setServiceBaseName(content);
+        return this;
+    }
+
     public String getServiceBaseName() {
         return serviceBaseName;
+    }
+
+    public void setServiceBaseName(String serviceBaseName) {
+        this.serviceBaseName = serviceBaseName;
+    }
+
+    public UploadFileDTO withServiceBaseName(String serviceBaseName) {
+        setServiceBaseName(serviceBaseName);
+        return this;
+    }
+
+    public String getSecurityGroup() {
+        return securityGroup;
+    }
+
+    public void setSecurityGroup(String securityGroup) {
+        this.securityGroup = securityGroup;
+    }
+
+    public UploadFileDTO withSecurityGroup(String securityGroup) {
+        setSecurityGroup(securityGroup);
+        return this;
     }
 }
