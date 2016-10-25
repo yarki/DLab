@@ -68,11 +68,10 @@ public class ExploratoryResource implements ExploratoryAPI {
                 .withStatus(UserInstanceStatus.CREATING.getStatus())
                 .withShape(formDTO.getShape()));
         if (isAdded) {
-            UserAWSCredentialDTO credentialDTO = keyDao.findCredential(userInfo.getName());
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookUserName(userInfo.getName())
-                    .withNotebookSubnet(credentialDTO.getNotebookSubnet())
+                    .withNotebookSubnet(keyDao.findSubnet(userInfo.getName()))
                     .withRegion(settingsDAO.getAwsRegion())
                     .withSecurityGroupIds(settingsDAO.getSecurityGroup());
             LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());

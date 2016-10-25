@@ -17,11 +17,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import jdk.nashorn.internal.runtime.options.Option;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -65,9 +67,12 @@ class BaseDAO implements MongoCollections {
         return Document.parse(MAPPER.writeValueAsString(object));
     }
 
-    protected <T> T find(String collection, Bson eq, Class<T> clazz) throws IOException {
+    protected <T> Optional<T> find(String collection, Bson eq, Class<T> clazz) throws IOException {
         Document document = mongoService.getCollection(collection).find(eq).first();
-        return MAPPER.readValue(document.toJson(), clazz);
+        if (document == null) {
+            return Optional.empty();
+        }
+        return Optional.of(MAPPER.readValue(document.toJson(), clazz));
     }
 
     private String generateUUID() {

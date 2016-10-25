@@ -46,7 +46,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
 
     @Inject
-    private KeyDAO dao;
+    private KeyDAO keyDAO;
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
@@ -55,8 +55,8 @@ public class KeyUploaderResource implements KeyLoaderAPI {
 
 
     @GET
-    public Response checkKey(@Auth UserInfo userInfo) {
-        return Response.status(dao.findKeyStatus(userInfo).getHttpStatus()).build();
+    public Response checkKey(@Auth UserInfo userInfo) throws IOException {
+        return Response.status(keyDAO.findKeyStatus(userInfo).getHttpStatus()).build();
     }
 
     @POST
@@ -69,7 +69,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {
             content = buffer.lines().collect(Collectors.joining("\n"));
         }
-        dao.uploadKey(userInfo.getName(), content);
+        keyDAO.uploadKey(userInfo.getName(), content);
         UploadFileDTO dto = new UploadFileDTO()
                 .withUser(userInfo.getName())
                 .withContent(content)
@@ -82,11 +82,11 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @Path("/callback")
     public Response loadKeyResponse(UploadFileResultDTO result) throws JsonProcessingException {
         LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
-        dao.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
+        keyDAO.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
         if (result.isSuccess()) {
-            dao.saveCredential(result.getUser(), result.getCredential());
+            keyDAO.saveCredential(result.getUser(), result.getCredential());
         } else {
-            dao.deleteKey(result.getUser());
+            keyDAO.deleteKey(result.getUser());
         }
         return Response.ok().build();
     }
