@@ -15,25 +15,10 @@ package com.epam.dlab.dto.keyload;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserKeyDTO {
-//    @JsonProperty
-//    private String user;
     @JsonProperty
     private String content;
     @JsonProperty
     private String status;
-
-//    public String getUser() {
-//        return user;
-//    }
-//
-//    public void setUser(String user) {
-//        this.user = user;
-//    }
-//
-//    public UserKeyDTO withUser(String user) {
-//        setUser(user);
-//        return this;
-//    }
 
     public String getContent() {
         return content;
