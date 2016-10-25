@@ -47,7 +47,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <ng-grid [emrTempls]="emrTempls" [shapes]="shapes"></ng-grid>
 
-
 <modal #createAnalyticalModal>
   <modal-header>
     <h4 class="modal-title" id="myModalLabel">Create analytical tool</h4>
@@ -91,7 +90,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
     </div>
     <div class="text-right">
-      <button type="button" class="btn btn-default">Cancel</button>
+      <button type="button" class="btn btn-default" (click)="createAnalyticalModal.close()">Cancel</button>
       <button type="button" class="btn btn-success" (click)="createUsernotebook(createTmpl_tmplIndex.value, createTmpl_name.value, createTmpl_shape.value)">Create</button>
     </div>
   </form>
