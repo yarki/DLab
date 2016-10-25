@@ -52,6 +52,7 @@ public class EmrResource implements DockerCommands {
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
+                                .withInteractive()
                                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                                 .withVolumeForResponse(configuration.getImagesDirectory())
                                 .withRequestId(uuid)
@@ -73,6 +74,7 @@ public class EmrResource implements DockerCommands {
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
+                                .withInteractive()
                                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                                 .withVolumeForResponse(configuration.getImagesDirectory())
                                 .withRequestId(uuid)

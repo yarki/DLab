@@ -53,19 +53,23 @@ export class LoginComponent {
     this.authenticationService
       .login(this.model.username, this.model.password)
       .subscribe((result) => {
-
         if (result) {
           this.appRoutingService.redirectToHomePage();
           return true;
-        } else {
-          this.error = 'Username or password is incorrect.';
-          this.loading = false;
         }
 
         return false;
-      }, (error) => {
-        this.error = 'System failure. Please contact administrator.';
-        this.loading = false;
-      });
+      }, (err) => {
+          if(err.status == 401){
+            this.error = 'Username or password is incorrect.';
+            this.loading = false;
+          }
+          else {
+            this.error = 'System failure. Please contact administrator.';
+            this.loading = false;
+          }
+        });
+
+    return false;
   }
 }

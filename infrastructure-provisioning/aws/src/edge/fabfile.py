@@ -18,6 +18,7 @@ from dlab.aws_meta import *
 import sys, time, os
 from dlab.aws_actions import *
 
+
 def status():
     local_log_filename = "{}.log".format(os.environ['request_id'])
     local_log_filepath = "/response/" + local_log_filename
@@ -109,7 +110,7 @@ def run():
         print '[CREATE SUBNET]'
         params = "--vpc_id '%s' --subnet '%s' --infra_tag_name %s --infra_tag_value %s" % \
                  (edge_conf['vpc_id'], edge_conf['private_subnet_cidr'],
-                  edge_conf['instance_name'], edge_conf['instance_name'])
+                  edge_conf['tag_name'], edge_conf['service_base_name'])
         if not run_routine('create_subnet', params):
             logging.info('Failed creating subnet')
             with open("/root/result.json", 'w') as result:
@@ -191,32 +192,20 @@ def run():
     try:
         logging.info('[CREATE SECURITY GROUP FOR PRIVATE SUBNET]')
         print '[CREATE SECURITY GROUP FOR PRIVATE SUBNET]'
-        out = open('/response/sg.log', 'w')
         edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
-        out.write(edge_group_id)
-        print edge_group_id
-        out.write('\n')
         ingress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_conf['sg_ids']}], "PrefixListIds": []}
         ]
-        out.write('Ingress successful\n')
-        print 'Ingress successful'
         egress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}
         ]
-        out.write('Egress OK\n')
-        print 'Egress is OK'
         params = "--name %s --vpc_id %s --security_group_rules '%s' --egress '%s' --infra_tag_name %s --infra_tag_value %s" % \
                  (edge_conf['notebook_security_group_name'], edge_conf['vpc_id'],
                   json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template),
                   edge_conf['service_base_name'], edge_conf['notebook_instance_name'])
-        out.write(params + '\n')
-        print params
         if not run_routine('create_security_group', params):
             logging.info('Failed creating security group for private subnet')
-            out.write('Failed creating security group for private subnet')
-            print 'Failed creating SG'
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed creating security group for private subnet", "conf": edge_conf}
                 print json.dumps(res)
@@ -224,7 +213,6 @@ def run():
             sys.exit(1)
 
         with hide('stderr', 'running', 'warnings'):
-            #local("echo Waitning for changes to propagate; sleep 10")
             print 'Waiting for changes to propagate'
             time.sleep(10)
     except:

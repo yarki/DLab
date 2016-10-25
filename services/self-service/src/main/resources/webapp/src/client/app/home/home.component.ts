@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit {
   keyName: string;
   uploadAccessKeyUrl: string;
   preloadModalInterval: any;
-
+  uploadAccessUserKeyFormInvalid: boolean;
   createTempls: any;
   shapes: any;
   emrTempls: any;
@@ -51,6 +51,7 @@ export class HomeComponent implements OnInit {
     private appRoutingService : AppRoutingService,
     private http: Http
   ) {
+    this.uploadAccessUserKeyFormInvalid = true;
     this.uploadAccessKeyUrl = this.userAccessKeyProfileService.getAccessKeyUrl();
   }
 
@@ -70,14 +71,21 @@ export class HomeComponent implements OnInit {
       () => this.appRoutingService.redirectToLoginPage());
   }
 
-  uploadUserAccessKey_btnClick($event) {
+  uploadUserAccessKey_btnClick(event) {
     this.preloadModalInterval = setInterval(function() {
       this.checkInfrastructureCreationProgress();
     }.bind(this), 10000);
+    event.preventDefault()
   }
 
-  showKey($event) {
-    this.keyName = $event.target.files[0].name;
+  uploadUserAccessKey_onChange($event) {
+    if($event.target.files.length > 0)
+    {
+      let fileName = $event.target.files[0].name;
+      this.uploadAccessUserKeyFormInvalid = !fileName.toLowerCase().endsWith(".pub");
+      if(!this.uploadAccessUserKeyFormInvalid)
+        this.keyName = fileName;
+    }
   }
 
   //
@@ -127,28 +135,67 @@ export class HomeComponent implements OnInit {
   initAnalyticSelectors() {
     this.userResourceService.getCreateTmpl()
       .subscribe(
-        data => this.createTempls = data,
+        data => {
+          let arr = [];
+          let str = JSON.stringify(data);
+          let dataArr = JSON.parse(str);
+          dataArr.forEach((obj, index) => {
+           let versions = obj.templates.map((versionObj, index) => {
+              return versionObj.version;
+            });
+            delete obj.templates;
+            versions.forEach((version, index) => {
+              arr.push(Object.assign({}, obj))
+              arr[index].version = version;
+            })
+          });
+          this.createTempls = arr;
+        },
         error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
     this.userResourceService.getEmrTmpl()
       .subscribe(
-        data => this.emrTempls = data,
+        data => {
+          let arr = [];
+          let str = JSON.stringify(data);
+          let dataArr = JSON.parse(str);
+          dataArr.forEach((obj, index) => {
+            let versions = obj.templates.map((versionObj, index) => {
+              return versionObj.version;
+            });
+            delete obj.templates;
+            versions.forEach((version, index) => {
+              arr.push(Object.assign({}, obj))
+              arr[index].version = version;
+            })
+          });
+          this.emrTempls = arr;
+        },
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
     this.userResourceService.getShapes()
       .subscribe(
-        data => this.shapes = data,
+        data => {
+          console.log("shapes !!!", data);
+          this.shapes = data
+        },
         error => this.shapes = [{shape_name: 'M4.large'}, {shape_name: 'M4.large'}]
       );
   }
 
-  createUsernotebook(template, name, shape){
+  createUsernotebook(tmplIndex, name, shape){
     this.userResourceService
-      .createUsernotebook({"image": name.value})
+      .createUsernotebook({
+        name: name,
+        shape: shape,
+        image: this.createTempls[tmplIndex].image,
+        version: this.createTempls[tmplIndex].version
+      })
       .subscribe((result) => {
         console.log('result: ', result);
+
       });
-    return false;
+      return false;
   };
 
   createEmr(template, name, shape){
