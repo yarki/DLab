@@ -12,7 +12,8 @@
 
 import boto3, boto, botocore
 import time
-import os, sys
+import sys
+import os
 import json
 
 
