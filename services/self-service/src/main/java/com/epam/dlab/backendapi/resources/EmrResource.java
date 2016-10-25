@@ -48,7 +48,7 @@ public class EmrResource implements EmrAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmrResource.class);
 
     @Inject
-    private SettingsDAO dao;
+    private SettingsDAO settingsDAO;
     @Inject
     private KeyDAO keyDao;
     @Inject
@@ -67,15 +67,15 @@ public class EmrResource implements EmrAPI {
                         .withStatus(UserInstanceStatus.CREATING.getStatus()));
         if (isAdded) {
             EMRCreateDTO dto = new EMRCreateDTO()
-                    .withServiceBaseName(dao.getServiceBaseName())
+                    .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withInstanceCount(formDTO.getInstanceCount())
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                     .withVersion(formDTO.getVersion())
                     .withNotebookName(formDTO.getNotebookName())
                     .withEdgeUserName(userInfo.getName())
-                    .withEdgeSubnet(keyDao.findCredential(userInfo.getName()).getNotebookSubnet())
-                    .withRegion(dao.getAwsRegion());
+                    .withEdgeSubnet(keyDao.findSubnet(userInfo.getName()))
+                    .withRegion(settingsDAO.getAwsRegion());
             LOGGER.debug("created emr {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EMR_CREATE, dto, String.class))
@@ -102,7 +102,9 @@ public class EmrResource implements EmrAPI {
                 .withServiceBaseName(userInfo.getName())
                 .withEdgeUserName(userInfo.getName())
                 .withClusterName(formDTO.getClusterName())
-                .withRegion(dao.getAwsRegion());
+                .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }
+
+
 }
