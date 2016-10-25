@@ -99,7 +99,6 @@ def run():
                                                    "UserIdGroupPairs": [],
                                                    "PrefixListIds": []}]
 
-    edge_conf['private_subnet_cidr'] = ''
 
     print "Will create exploratory environment with edge node as access point as following: " + \
           json.dumps(edge_conf, sort_keys=True, indent=4, separators=(',', ': '))
@@ -120,6 +119,9 @@ def run():
             sys.exit(1)
     except:
         sys.exit(1)
+
+    edge_conf['private_subnet_cidr'] = os.environ['creds_private_subnet_cidr']
+    print 'NEW SUBNET CIDR CREATED: {}'.format(edge_conf['private_subnet_cidr'])
 
     try:
         logging.info('[CREATE EDGE ROLES]')
