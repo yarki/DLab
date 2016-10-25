@@ -17,7 +17,7 @@ import json
 from dlab.aws_actions import *
 from dlab.aws_meta import *
 import sys
-
+import boto3
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--vpc_id', type=str, default='')
@@ -37,6 +37,11 @@ if __name__ == "__main__":
                 print "Creating subnet %s in vpc %s with tag %s." % \
                       (args.subnet, args.vpc_id, json.dumps(tag))
                 subnet_id = create_subnet(args.vpc_id, args.subnet, tag)
+                print "Associating route_table with subnet"
+                ec2 = boto3.resource('ec2')
+                rt = get_route_table_by_tag(args.infra_tag_name, args.infra_tag_value)
+                route_table = ec2.RouteTable(rt)
+                route_table.associate_with_subnet(SubnetId=subnet_id)
             else:
                 print "REQUESTED SUBNET ALREADY EXISTS"
             print "SUBNET_ID " + subnet_id

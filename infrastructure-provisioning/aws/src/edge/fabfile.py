@@ -11,12 +11,12 @@
 #
 # ****************************************************************************************************/
 
-
+import sys
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
-import sys
 from dlab.aws_actions import *
+
 
 def status():
     local_log_filename = "{}.log".format(os.environ['request_id'])
@@ -108,7 +108,7 @@ def run():
         print '[CREATE SUBNET]'
         params = "--vpc_id '%s' --subnet '%s' --infra_tag_name %s --infra_tag_value %s" % \
                  (edge_conf['vpc_id'], edge_conf['private_subnet_cidr'],
-                  edge_conf['instance_name'], edge_conf['instance_name'])
+                  edge_conf['tag_name'], edge_conf['service_base_name'])
         if not run_routine('create_subnet', params):
             logging.info('Failed creating subnet')
             with open("/root/result.json", 'w') as result:
