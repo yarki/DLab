@@ -28,6 +28,10 @@ public class SettingsDAO extends BaseDAO {
         return getSetting(AWS_REGION);
     }
 
+    public String getSecurityGroup() {
+        return getSetting(AWS_REGION);
+    }
+
     private String getSetting(MongoSetting setting) {
         return mongoService.getCollection(SETTINGS).find(eq(ID, setting.getId())).first().getOrDefault(VALUE, EMPTY).toString();
     }

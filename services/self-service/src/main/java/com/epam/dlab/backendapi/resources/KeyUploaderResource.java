@@ -70,7 +70,12 @@ public class KeyUploaderResource implements KeyLoaderAPI {
             content = buffer.lines().collect(Collectors.joining("\n"));
         }
         dao.uploadKey(userInfo.getName(), content);
-        return provisioningService.post(KEY_LOADER, new UploadFileDTO(userInfo.getName(), content, settingsDAO.getServiceBaseName()), String.class);
+        UploadFileDTO dto = new UploadFileDTO()
+                .withUser(userInfo.getName())
+                .withContent(content)
+                .withServiceBaseName(settingsDAO.getServiceBaseName())
+                .withSecurityGroup(settingsDAO.getSecurityGroup());
+        return provisioningService.post(KEY_LOADER, dto, String.class);
     }
 
     @POST
