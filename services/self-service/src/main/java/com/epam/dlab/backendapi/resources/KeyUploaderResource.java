@@ -64,7 +64,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     public String post(@Auth UserInfo userInfo,
                        @FormDataParam("file") InputStream uploadedInputStream,
                        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
-        LOGGER.debug("upload keyDAO for user {}", userInfo.getName());
+        LOGGER.debug("upload key for user {}", userInfo.getName());
         String content = "";
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {
             content = buffer.lines().collect(Collectors.joining("\n"));
@@ -81,7 +81,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @POST
     @Path("/callback")
     public Response loadKeyResponse(UploadFileResultDTO result) throws JsonProcessingException {
-        LOGGER.debug("upload keyDAO result for user {}", result.getUser(), result.isSuccess());
+        LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
         keyDAO.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
         if (result.isSuccess()) {
             keyDAO.saveCredential(result.getUser(), result.getCredential());
