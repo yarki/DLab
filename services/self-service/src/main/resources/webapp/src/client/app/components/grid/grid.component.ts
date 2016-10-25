@@ -10,7 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
 import { EnvironmentsService } from './../../services/environments.service';
 import { GridRowModel } from './grid.model';
 
@@ -25,6 +25,13 @@ export class Grid {
 
   list: Array<any>;
   environments: Array<GridRowModel>;
+  notebook: Object;
+
+
+  @ViewChild('createEmrModal') createEmrModal;
+  @Input() emrTempls;
+  @Input() shapes;
+
 
   constructor(private environmentsService: EnvironmentsService) { }
 
@@ -52,5 +59,10 @@ export class Grid {
 
   mathAction(data, action) {
     console.log('action ' + action, data);
+    if(action === 'deploy') {
+      this.notebook = data;
+      this.createEmrModal.open();
+    }
+
   }
 }
