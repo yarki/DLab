@@ -69,22 +69,25 @@ public class EmrResource implements EmrAPI {
             EMRCreateDTO dto = new EMRCreateDTO()
                     .withServiceBaseName(dao.getServiceBaseName())
                     .withInstanceCount(formDTO.getInstanceCount())
-                    .withInstanceType(formDTO.getInstanceType())
+                    .withMasterInstanceType(formDTO.getMasterInstanceType())
+                    .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                     .withVersion(formDTO.getVersion())
                     .withNotebookName(formDTO.getNotebookName())
                     .withEdgeUserName(userInfo.getName())
                     .withEdgeSubnet(keyDao.findCredential(userInfo.getName()).getNotebookSubnet())
                     .withRegion(dao.getAwsRegion());
+            LOGGER.debug("created emr {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EMR_CREATE, dto, String.class))
                     .build();
         } else {
+            LOGGER.debug("used existing emr {} for user {}", formDTO.getName(), userInfo.getName());
             return Response.status(Response.Status.FOUND).build();
         }
     }
 
     @POST
-    @Path("/create/status")
+    @Path("/status")
     public Response create(EMRStatusDTO dto) throws IOException {
         LOGGER.debug("update status for emr {} for user {}", dto.getResourceName(), dto.getUser());
         userListDAO.updateComputationalStatus(dto);

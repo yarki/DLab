@@ -65,6 +65,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
                         .withCredsKeyName(configuration.getAdminKey())
                         .withEdgeUserName(dto.getUser())
                         .withActionCreate(configuration.getEdgeImage())
+                        .withCredsSecurityGroupsIds(dto.getSecurityGroup())
                         .toCMD()
         );
 

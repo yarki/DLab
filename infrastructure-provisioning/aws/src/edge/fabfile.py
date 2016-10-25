@@ -15,8 +15,9 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
-import sys
+import sys, time, os
 from dlab.aws_actions import *
+
 
 def status():
     local_log_filename = "{}.log".format(os.environ['request_id'])
@@ -73,6 +74,7 @@ def run():
     edge_conf['region'] = os.environ['edge_region']
     edge_conf['ami_id'] = os.environ['edge_ami_id']
     edge_conf['instance_size'] = os.environ['edge_instance_size']
+    edge_conf['sg_ids'] = os.environ['creds_security_groups_ids']
 
     # Edge config
     edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
@@ -108,7 +110,7 @@ def run():
         print '[CREATE SUBNET]'
         params = "--vpc_id '%s' --subnet '%s' --infra_tag_name %s --infra_tag_value %s" % \
                  (edge_conf['vpc_id'], edge_conf['private_subnet_cidr'],
-                  edge_conf['instance_name'], edge_conf['instance_name'])
+                  edge_conf['tag_name'], edge_conf['service_base_name'])
         if not run_routine('create_subnet', params):
             logging.info('Failed creating subnet')
             with open("/root/result.json", 'w') as result:
@@ -178,6 +180,10 @@ def run():
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
+
+        with hide('stderr', 'running', 'warnings'):
+            print 'Waiting for changes to propagate'
+            time.sleep(10)
     except:
         remove_role('edge', os.environ['edge_user_name'])
         remove_role('notebook', os.environ['edge_user_name'])
@@ -189,7 +195,7 @@ def run():
         edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
         ingress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
-            {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": os.environ['creds_security_groups_ids']}], "PrefixListIds": []}
+            {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_conf['sg_ids']}], "PrefixListIds": []}
         ]
         egress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}
@@ -207,7 +213,8 @@ def run():
             sys.exit(1)
 
         with hide('stderr', 'running', 'warnings'):
-            local("echo Waitning for changes to propagate; sleep 10")
+            print 'Waiting for changes to propagate'
+            time.sleep(10)
     except:
         remove_role('edge', os.environ['edge_user_name'])
         remove_role('notebook', os.environ['edge_user_name'])

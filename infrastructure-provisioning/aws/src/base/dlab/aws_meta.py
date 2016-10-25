@@ -177,3 +177,11 @@ def provide_index(resource_type, tag_name):
         else:
             index += 1
     return index
+
+
+def get_route_table_by_tag(tag_name, tag_value):
+    client = boto3.client('ec2')
+    route_tables = client.describe_route_tables(
+        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+    rt_id = route_tables.get('RouteTables')[0].get('RouteTableId')
+    return rt_id

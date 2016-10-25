@@ -10,40 +10,19 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.exploratory;
+package com.epam.dlab.backendapi.core.docker.command;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public enum DockerAction {
+    DESCRIBE,
+    CREATE,
+    START,
+    RUN,
+    STOP,
+    TERMINATE;
 
-public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDTO> {
-    @JsonProperty("notebook_subnet_cidr")
-    private String notebookSubnet;
-    @JsonProperty("creds_security_groups_ids")
-    private String securityGroupIds;
-
-    public String getNotebookSubnet() {
-        return notebookSubnet;
-    }
-
-    public void setNotebookSubnet(String notebookSubnet) {
-        this.notebookSubnet = notebookSubnet;
-    }
-
-    public ExploratoryCreateDTO withNotebookSubnet(String notebookSubnet) {
-        setNotebookSubnet(notebookSubnet);
-        return this;
-    }
-
-    public String getSecurityGroupIds() {
-        return securityGroupIds;
-    }
-
-    public void setSecurityGroupIds(String securityGroupIds) {
-        this.securityGroupIds = securityGroupIds;
-    }
-
-    public ExploratoryCreateDTO withSecurityGroupIds(String securityGroupIds) {
-        setSecurityGroupIds(securityGroupIds);
-        return this;
+    @Override
+    public String toString() {
+        return super.toString().toLowerCase();
     }
 
 }

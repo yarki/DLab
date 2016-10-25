@@ -52,6 +52,10 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
 
     @NotEmpty
     @JsonProperty
+    private String notebookImage;
+
+    @NotEmpty
+    @JsonProperty
     private String emrImage;
 
     @NotEmpty
@@ -89,6 +93,10 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
 
     public Duration getFileLengthCheckDelay() {
         return fileLengthCheckDelay;
+    }
+
+    public String getNotebookImage() {
+        return  notebookImage;
     }
 
     public String getEmrImage() {

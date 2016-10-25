@@ -20,8 +20,6 @@ public class ExploratoryCreateFormDTO {
     @JsonProperty
     private String shape;
     @JsonProperty
-    private String image;
-    @JsonProperty
     private String version;
 
     public String getName() {
@@ -38,14 +36,6 @@ public class ExploratoryCreateFormDTO {
 
     public void setShape(String shape) {
         this.shape = shape;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public String getVersion() {
