@@ -196,8 +196,9 @@ def run():
     try:
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
-        params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s" % \
-                 (edge_conf['bucket_name'], edge_conf['service_base_name'], edge_conf['instance_name'] + "bucket")
+        params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s --region %s" % \
+                 (edge_conf['bucket_name'], edge_conf['service_base_name'], edge_conf['instance_name'] + "bucket",
+                  edge_conf['region'])
         if not run_routine('create_bucket', params):
             logging.info('Failed creating bucket')
             with open("/root/result.json", 'w') as result:
