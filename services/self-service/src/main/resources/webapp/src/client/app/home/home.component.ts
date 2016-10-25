@@ -191,7 +191,6 @@ export class HomeComponent implements OnInit {
       .createUsernotebook({
         name: name,
         shape: shape,
-        image: this.createTempls[tmplIndex].image,
         version: this.createTempls[tmplIndex].version
       })
       .subscribe((result) => {

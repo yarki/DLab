@@ -100,7 +100,7 @@ export class Modal {
     // Public Methods
     // -------------------------------------------------------------------------
 
-    open(option: Object, ...args: any[]) {
+    open(option: Object, GridRowModel: Object, ...args: any[]) {
         if (this.isOpened)
             return;
 
