@@ -12,6 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { EnvironmentsService } from './../../services/environments.service';
+import { UserResourceService } from "./../../services/userResource.service";
 import { GridRowModel } from './grid.model';
 
 @Component({
@@ -26,10 +27,14 @@ export class Grid {
   list: Array<any>;
   environments: Array<GridRowModel>;
 
-  constructor(private environmentsService: EnvironmentsService) { }
+  constructor(
+    private environmentsService: EnvironmentsService,
+    private userResourceService: UserResourceService,
+  ) { }
 
   ngOnInit() {
     this.environmentsService.getEnvironmentsList().subscribe((list) => {
+    // this.userResourceService.getGridData().subscribe((list) => {
       this.list = list['RESOURCES'];
 
       this.environments = this.loadEnvironments();
