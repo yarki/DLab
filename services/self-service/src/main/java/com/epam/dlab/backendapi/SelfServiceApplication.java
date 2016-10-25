@@ -15,11 +15,14 @@ package com.epam.dlab.backendapi;
 import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.core.guice.ModuleFactory;
 import com.epam.dlab.backendapi.dao.IndexCreator;
+import com.epam.dlab.providers.JsonProcessingExceptionMapper;
+import com.epam.dlab.providers.RuntimeExceptionMapper;
 import com.epam.dlab.backendapi.resources.*;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -41,12 +44,15 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
         Injector injector = Guice.createInjector(ModuleFactory.getModule(configuration, environment));
         environment.lifecycle().manage(injector.getInstance(IndexCreator.class));
         injector.getInstance(SecurityFactory.class).configure(injector, environment);
-        environment.jersey().register(MultiPartFeature.class);
-        environment.jersey().register(injector.getInstance(SecurityResource.class));
-        environment.jersey().register(injector.getInstance(DockerResource.class));
-        environment.jersey().register(injector.getInstance(KeyUploaderResource.class));
-        environment.jersey().register(injector.getInstance(UserListResource.class));
-        environment.jersey().register(injector.getInstance(EmrResource.class));
-        environment.jersey().register(injector.getInstance(ExploratoryResource.class));
+        JerseyEnvironment jersey = environment.jersey();
+        jersey.register(new RuntimeExceptionMapper());
+        jersey.register(new JsonProcessingExceptionMapper());
+        jersey.register(MultiPartFeature.class);
+        jersey.register(injector.getInstance(SecurityResource.class));
+        jersey.register(injector.getInstance(DockerResource.class));
+        jersey.register(injector.getInstance(KeyUploaderResource.class));
+        jersey.register(injector.getInstance(UserListResource.class));
+        jersey.register(injector.getInstance(EmrResource.class));
+        jersey.register(injector.getInstance(ExploratoryResource.class));
     }
 }
