@@ -27,7 +27,7 @@ def put_to_bucket(bucket_name, local_file, destination_file):
         return False
 
 
-def create_s3_bucket(bucket_name, tag, region='us-west-2'):
+def create_s3_bucket(bucket_name, tag, region):
     s3 = boto3.resource('s3')
     bucket = s3.create_bucket(Bucket=bucket_name,
                               CreateBucketConfiguration={'LocationConstraint': region})
