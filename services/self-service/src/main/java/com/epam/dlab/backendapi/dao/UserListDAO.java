@@ -16,14 +16,11 @@ import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.emr.EMRStatusDTO;
-import com.epam.dlab.exceptions.DlabException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.MongoWriteException;
 import org.bson.Document;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -57,20 +54,15 @@ public class UserListDAO extends BaseDAO {
     }
 
     public boolean addComputational(String user, String name, UserComputationalResourceDTO resourceDTO) throws IOException {
-        Optional<UserInstanceDTO> optional = find(USER_INSTANCES, and(eq(USER, user), eq(ENVIRONMENT_NAME, name)), UserInstanceDTO.class);
-        if (optional.isPresent()) {
-            UserInstanceDTO dto = optional.get();
-            long count = dto.getResources().stream()
-                    .filter(i -> resourceDTO.getResourceName().equals(i.getResourceName()))
-                    .count();
-            if (count == 0) {
-                update(USER_INSTANCES, eq(ID, dto.getId()), push(COMPUTATIONAL_RESOURCES, convertToBson(resourceDTO)));
-                return true;
-            } else {
-                return false;
-            }
+        UserInstanceDTO dto = find(USER_INSTANCES, and(eq(USER, user), eq(ENVIRONMENT_NAME, name)), UserInstanceDTO.class);
+        long count = dto.getResources().stream()
+                .filter(i -> resourceDTO.getResourceName().equals(i.getResourceName()))
+                .count();
+        if (count == 0) {
+            update(USER_INSTANCES, eq(ID, dto.getId()), push(COMPUTATIONAL_RESOURCES, convertToBson(resourceDTO)));
+            return true;
         } else {
-            throw new DlabException("User '" + user + "' has no records for environment '" + name + "'");
+            return false;
         }
     }
 

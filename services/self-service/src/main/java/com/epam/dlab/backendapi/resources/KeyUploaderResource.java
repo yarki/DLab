@@ -55,7 +55,11 @@ public class KeyUploaderResource implements KeyLoaderAPI {
 
 
     @GET
+<<<<<<<<< Temporary merge branch 1
     public Response checkKey(@Auth UserInfo userInfo) throws IOException {
+=========
+    public Response checkKey(@Auth UserInfo userInfo) {
+>>>>>>>>> Temporary merge branch 2
         return Response.status(keyDAO.findKeyStatus(userInfo).getHttpStatus()).build();
     }
 
