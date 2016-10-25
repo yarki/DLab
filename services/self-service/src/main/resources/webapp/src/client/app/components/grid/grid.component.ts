@@ -64,14 +64,14 @@ export class Grid {
     console.log('action ' + action, data);
     if(action === 'deploy') {
       this.notebookName = data.name
-      this.createEmrModal.open();
+      this.createEmrModal.open({isFooter: false });
     }
 
   }
 
   createEmr(name, count, shape_master, shape_slave, tmplIndex){
     this.userResourceService
-      .createUsernotebook({
+      .createEmr({
         name: name,
         emr_instance_count: ++count,
         emr_master_instance_type: shape_master,
