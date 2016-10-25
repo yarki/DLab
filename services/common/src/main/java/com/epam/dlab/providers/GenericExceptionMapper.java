@@ -10,14 +10,13 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.providers;
+package com.epam.dlab.providers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
 
 abstract public class GenericExceptionMapper<E extends Throwable> implements ExceptionMapper<E> {
     final static Logger LOGGER = LoggerFactory.getLogger(GenericExceptionMapper.class);

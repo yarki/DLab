@@ -10,10 +10,12 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.providers;
+package com.epam.dlab.providers;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.ws.rs.ext.Provider;
 
 @Provider
-public class RuntimeExceptionMapper extends GenericExceptionMapper<RuntimeException> {
+public class JsonProcessingExceptionMapper extends GenericExceptionMapper<JsonProcessingException> {
 }

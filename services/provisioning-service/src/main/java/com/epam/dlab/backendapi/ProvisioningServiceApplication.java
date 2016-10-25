@@ -20,10 +20,13 @@ import com.epam.dlab.backendapi.resources.EmrResource;
 import com.epam.dlab.backendapi.resources.ExploratoryResource;
 import com.epam.dlab.backendapi.resources.KeyLoaderResource;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.providers.JsonProcessingExceptionMapper;
+import com.epam.dlab.providers.RuntimeExceptionMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
+import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Environment;
 
 import static com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration.SELF_SERVICE;
@@ -38,11 +41,14 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         Injector injector = createInjector(configuration, environment);
         environment.lifecycle().manage(injector.getInstance(DirectoriesCreator.class));
         environment.lifecycle().manage(injector.getInstance(DockerWarmuper.class));
-        environment.jersey().register(injector.getInstance(DockerResource.class));
-        environment.jersey().register(injector.getInstance(KeyLoaderResource.class));
-        environment.jersey().register(injector.getInstance(KeyLoaderResource.class));
-        environment.jersey().register(injector.getInstance(ExploratoryResource.class));
-        environment.jersey().register(injector.getInstance(EmrResource.class));
+        JerseyEnvironment jersey = environment.jersey();
+        jersey.register(new RuntimeExceptionMapper());
+        jersey.register(new JsonProcessingExceptionMapper());
+        jersey.register(injector.getInstance(DockerResource.class));
+        jersey.register(injector.getInstance(KeyLoaderResource.class));
+        jersey.register(injector.getInstance(KeyLoaderResource.class));
+        jersey.register(injector.getInstance(ExploratoryResource.class));
+        jersey.register(injector.getInstance(EmrResource.class));
     }
 
     private Injector createInjector(ProvisioningServiceApplicationConfiguration configuration, Environment environment) {
