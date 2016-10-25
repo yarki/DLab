@@ -46,13 +46,13 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private authenticationService: AuthenticationService,
-    private userAccessKeyProfileService: UserAccessKeyService,
+    private userAccessKeyService: UserAccessKeyService,
     private userResourceService: UserResourceService,
     private appRoutingService : AppRoutingService,
     private http: Http
   ) {
     this.uploadAccessUserKeyFormInvalid = true;
-    this.uploadAccessKeyUrl = this.userAccessKeyProfileService.getAccessKeyUrl();
+    this.uploadAccessKeyUrl = this.userAccessKeyService.getAccessKeyUrl();
   }
 
   ngOnInit() {
@@ -93,12 +93,22 @@ export class HomeComponent implements OnInit {
   //
 
   private checkInfrastructureCreationProgress() {
-    this.userAccessKeyProfileService.checkUserAccessKey()
+    this.userAccessKeyService.checkUserAccessKey()
       .subscribe(
-      data => {
-        if (this.preloaderModal.isOpened) {
-          this.preloaderModal.close();
-          clearInterval(this.preloadModalInterval);
+      status => {
+        if(status == 200)
+        {
+          if (this.preloaderModal.isOpened) {
+            this.preloaderModal.close();
+            clearInterval(this.preloadModalInterval);
+          }
+        } else if (status == 201)
+        {
+          if (this.keyUploadModal.isOpened)
+            this.keyUploadModal.close();
+
+          if (!this.preloaderModal.isOpened)
+            this.preloaderModal.open({ isHeader: false, isFooter: false });
         }
       },
       err => {
@@ -106,13 +116,6 @@ export class HomeComponent implements OnInit {
         {
           if (!this.keyUploadModal.isOpened)
             this.keyUploadModal.open({ isFooter: false });
-        } else if (err.status == 406) // key is being uploaded in progress
-        {
-          if (this.keyUploadModal.isOpened)
-            this.keyUploadModal.close();
-
-          if (!this.preloaderModal.isOpened)
-            this.preloaderModal.open({ isHeader: false, isFooter: false });
         }
       }
       );
@@ -188,6 +191,7 @@ export class HomeComponent implements OnInit {
       .createUsernotebook({
         name: name,
         shape: shape,
+        image: this.createTempls[tmplIndex].image,
         version: this.createTempls[tmplIndex].version
       })
       .subscribe((result) => {
