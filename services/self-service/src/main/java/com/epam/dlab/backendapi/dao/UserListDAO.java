@@ -16,11 +16,11 @@ import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.emr.EMRStatusDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
 import org.bson.Document;
 
-import java.io.IOException;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -40,7 +40,7 @@ public class UserListDAO extends BaseDAO {
         return mongoService.getCollection(SHAPES).find();
     }
 
-    public boolean insertExploratory(UserInstanceDTO dto) throws JsonProcessingException {
+    public boolean insertExploratory(UserInstanceDTO dto) {
         try {
             insertOne(USER_INSTANCES, dto);
             return true;
@@ -53,16 +53,21 @@ public class UserListDAO extends BaseDAO {
         update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(ENVIRONMENT_NAME, dto.getName())), set(STATUS, dto.getStatus()));
     }
 
-    public boolean addComputational(String user, String name, UserComputationalResourceDTO resourceDTO) throws IOException {
-        UserInstanceDTO dto = find(USER_INSTANCES, and(eq(USER, user), eq(ENVIRONMENT_NAME, name)), UserInstanceDTO.class);
-        long count = dto.getResources().stream()
-                .filter(i -> resourceDTO.getResourceName().equals(i.getResourceName()))
-                .count();
-        if (count == 0) {
-            update(USER_INSTANCES, eq(ID, dto.getId()), push(COMPUTATIONAL_RESOURCES, convertToBson(resourceDTO)));
-            return true;
+    public boolean addComputational(String user, String name, UserComputationalResourceDTO resourceDTO) {
+        Optional<UserInstanceDTO> optional = find(USER_INSTANCES, and(eq(USER, user), eq(ENVIRONMENT_NAME, name)), UserInstanceDTO.class);
+        if (optional.isPresent()) {
+            UserInstanceDTO dto = optional.get();
+            long count = dto.getResources().stream()
+                    .filter(i -> resourceDTO.getResourceName().equals(i.getResourceName()))
+                    .count();
+            if (count == 0) {
+                update(USER_INSTANCES, eq(ID, dto.getId()), push(COMPUTATIONAL_RESOURCES, convertToBson(resourceDTO)));
+                return true;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            throw new DlabException("User '" + user + "' has no records for environment '" + name + "'");
         }
     }
 
