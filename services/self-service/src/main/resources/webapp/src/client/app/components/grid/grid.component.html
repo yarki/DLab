@@ -19,9 +19,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <th class="th_actions">Actions</th>
   </tr>
 
-  <!-- <tr *ngIf="!environments.length">
-    <td>To start working, please, create new environment</td>
-  </tr> -->
+  <tr *ngIf="!environments" class="message_block">
+    <td colspan="5">To start working, please, create new environment</td>
+  </tr>
 
   <tr *ngFor="let env of environments">
     <td (click)="printDetailEnvironmentModal(env)">{{env.name}}</td>
