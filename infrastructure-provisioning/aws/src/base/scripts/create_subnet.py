@@ -59,13 +59,16 @@ if __name__ == "__main__":
 
         subnet_cidr = '{}.{}.{}.0/24'.format(cidr.split('.')[0], cidr.split('.')[1], position)
         subnet_id = get_subnet_by_cidr(subnet_cidr)
-        if subnet_id == '':
-            print "Creating subnet %s in vpc %s with tag %s." % \
-                  (subnet_cidr, args.vpc_id, json.dumps(tag))
-            subnet_id = create_subnet(args.vpc_id, subnet_cidr, tag)
+        subnet_check = get_subnet_by_tag(tag)
+        if not subnet_check:
+            if subnet_id == '':
+                print "Creating subnet %s in vpc %s with tag %s." % \
+                      (subnet_cidr, args.vpc_id, json.dumps(tag))
+                subnet_id = create_subnet(args.vpc_id, subnet_cidr, tag)
         else:
-            print "REQUESTED SUBNET ALREADY EXISTS"
-        print "SUBNET_ID " + subnet_id
+            print "REQUESTED SUBNET ALREADY EXISTS. USING CIDR {}".format(subnet_check)
+            subnet_id = get_subnet_by_cidr(subnet_check)
+        print "SUBNET_ID: " + subnet_id
         success = True
     except:
         success = False

@@ -15,7 +15,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
-import sys
+import sys, os.path
 from dlab.aws_actions import *
 
 def status():
@@ -98,6 +98,13 @@ def run():
                                                    "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
                                                    "UserIdGroupPairs": [],
                                                    "PrefixListIds": []}]
+
+
+    # FUSE in case of absence of user's key
+    fname = "/root/keys/{}.pub".format(edge_conf['user_keyname'])
+    if not os.path.isfile(fname):
+        print "USERs PUBLIC KEY DOES NOT EXIST in {}".format(fname)
+        sys.exit(1)
 
 
     print "Will create exploratory environment with edge node as access point as following: " + \
