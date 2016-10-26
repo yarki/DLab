@@ -119,7 +119,8 @@ def run():
     except:
         sys.exit(1)
 
-    edge_conf['private_subnet_cidr'] = os.environ['creds_private_subnet_cidr']
+    tag = {"Key": edge_conf['instance_name'], "Value": edge_conf['instance_name']}
+    edge_conf['private_subnet_cidr'] = get_subnet_by_tag(tag)
     print 'NEW SUBNET CIDR CREATED: {}'.format(edge_conf['private_subnet_cidr'])
 
     try:

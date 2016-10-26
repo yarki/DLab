@@ -58,7 +58,6 @@ if __name__ == "__main__":
             #print 'position: ' + str(position)
 
         subnet_cidr = '{}.{}.{}.0/24'.format(cidr.split('.')[0], cidr.split('.')[1], position)
-        os.environ['creds_private_subnet_cidr'] = subnet_cidr
         subnet_id = get_subnet_by_cidr(subnet_cidr)
         if subnet_id == '':
             print "Creating subnet %s in vpc %s with tag %s." % \

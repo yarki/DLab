@@ -132,6 +132,16 @@ def get_subnet_by_cidr(cidr):
     return ''
 
 
+def get_subnet_by_tag(tag):
+    ec2 = boto3.resource('ec2')
+    for subnet in ec2.subnets.filter(Filters=[
+        {'Name': 'tag-key', 'Values': [tag.get('Key')]},
+        {'Name': 'tag-value', 'Values': [tag.get('Value')]}
+    ]):
+        return subnet.cidr_block
+    return ''
+
+
 def get_vpc_by_cidr(cidr):
     ec2 = boto3.resource('ec2')
     for vpc in ec2.vpcs.filter(Filters=[{'Name': 'cidr', 'Values': [cidr]}]):
