@@ -116,8 +116,8 @@ def run():
     try:
         logging.info('[CREATE SUBNET]')
         print '[CREATE SUBNET]'
-        params = "--vpc_id '%s' --infra_tag_name %s --infra_tag_value %s" % \
-                 (edge_conf['vpc_id'], edge_conf['tag_name'], edge_conf['service_base_name'])
+        params = "--vpc_id '%s' --infra_tag_name %s --infra_tag_value %s --username %s" % \
+                 (edge_conf['vpc_id'], edge_conf['tag_name'], edge_conf['service_base_name'], os.environ['edge_user_name'])
         if not run_routine('create_subnet', params):
             logging.info('Failed creating subnet')
             with open("/root/result.json", 'w') as result:
@@ -128,7 +128,7 @@ def run():
     except:
         sys.exit(1)
 
-    tag = {"Key": edge_conf['instance_name'], "Value": edge_conf['instance_name']}
+    tag = {"Key": edge_conf['instance_name'], "Value": "{}-{}-subnet".format(edge_conf['service_base_name'], os.environ['edge_user_name'])}
     edge_conf['private_subnet_cidr'] = get_subnet_by_tag(tag)
     print 'NEW SUBNET CIDR CREATED: {}'.format(edge_conf['private_subnet_cidr'])
 
