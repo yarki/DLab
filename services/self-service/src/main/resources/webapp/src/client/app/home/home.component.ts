@@ -83,7 +83,6 @@ export class HomeComponent implements OnInit {
     this.userResourceService.uploadKey(formData)
     .subscribe(
       status => {
-        console.log(status)
         if(status === 200) {
           this.checkInfrastructureCreationProgress();
           this.preloadModalInterval = setInterval(function() {
@@ -106,11 +105,11 @@ export class HomeComponent implements OnInit {
     {
       let fileName = $event.target.files[0].name;
       this.uploadAccessUserKeyFormInvalid = !fileName.toLowerCase().endsWith(".pub");
-      if(!this.uploadAccessUserKeyFormInvalid)
-        this.keyName = fileName;
-    }
+      this.keyName = fileName
 
+    }
   }
+
 
   refreshGrid() {
     this.refresh.buildGrid();
@@ -160,12 +159,6 @@ export class HomeComponent implements OnInit {
       () => this.appRoutingService.redirectToLoginPage());
   }
 
-  // uploadUserAccessKey($event) {
-  //   this.preloadModalInterval = setInterval(function() {
-  //     this.checkInfrastructureCreationProgress();
-  //   }.bind(this), 10000);
-  // }
-
   initAnalyticSelectors() {
     this.userResourceService.getCreateTmpl()
       .subscribe(
@@ -210,7 +203,6 @@ export class HomeComponent implements OnInit {
     this.userResourceService.getShapes()
       .subscribe(
         data => {
-          console.log("shapes !!!", data);
           this.shapes = data
         },
         error => this.shapes = [{shape_name: 'M4.large'}, {shape_name: 'M4.large'}]
