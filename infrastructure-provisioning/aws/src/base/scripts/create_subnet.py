@@ -63,7 +63,7 @@ if __name__ == "__main__":
         if subnet_id == '':
             print "Creating subnet %s in vpc %s with tag %s." % \
                   (subnet_cidr, args.vpc_id, json.dumps(tag))
-            subnet_id = create_subnet(args.vpc_id, args.subnet, tag)
+            subnet_id = create_subnet(args.vpc_id, subnet_cidr, tag)
         else:
             print "REQUESTED SUBNET ALREADY EXISTS"
         print "SUBNET_ID " + subnet_id
