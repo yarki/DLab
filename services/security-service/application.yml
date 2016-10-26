@@ -12,13 +12,12 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-defaultRedirectFromAuthentication: http://localhost:8080/after
-#inactiveUserTimeoutMillSec: 3600000
+inactiveUserTimeoutMillSec: 3600000
 ldapConnectionConfig:
-#  ldapHost: localhost
-  ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
-#  ldapPort: 3890
-  ldapPort: 389
+  ldapHost: localhost
+#  ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
+  ldapPort: 3890
+#  ldapPort: 389
   name: cn=admin,dc=example,dc=com
   credentials: ldap
 ldapBindTemplate: uid=%s,ou=People,dc=example,dc=com
@@ -76,18 +75,31 @@ ldapSearch:
 
 server: 
   applicationConnectors:
-  - type: http
+  - type: https
     port: 8090
+    trustStorePath: \Program Files\Java\jre1.8.0_101\lib\security\cacerts
+    trustStorePassword: changeit
+    keyStorePath: \work\keystore.jks
+    keyStorePassword: changeit
+#    certAlias: dlabcert
+
   adminConnectors:
-  - type: http
+  - type: https
     port: 8091
+    trustStorePath: \Program Files\Java\jre1.8.0_101\lib\security\cacerts
+    trustStorePassword: changeit
+    keyStorePath: \work\keystore.jks
+    keyStorePassword: changeit
+#    certAlias: dlabcert
+
+userInfoPersistenceEnabled: true
 
 mongo:
   host: localhost
   port: 27017
   username: admin
   password: XS3ms9R3tP
-  database: security
+  database: admin
 
 logging:
   level: INFO
@@ -95,7 +107,7 @@ logging:
     io.dropwizard: INFO
     com.epam: DEBUG
   appenders:
-#    - type: console
+    - type: console
     - type: file
       currentLogFilename: /tmp/dlab/log/security.log
       archivedLogFilenamePattern: /tmp/dlab/log/security-%d.log

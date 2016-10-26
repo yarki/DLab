@@ -15,6 +15,9 @@ package com.epam.dlab.auth.rest;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 import org.slf4j.LoggerFactory;
@@ -44,14 +47,24 @@ public class AuthorizedUsers {
 		
 	}
 	
+	private final static ScheduledExecutorService cleaner = Executors.newScheduledThreadPool(1);
+	
 	private final static AuthorizedUsers users = new AuthorizedUsers();
 	
+	static {
+		cleaner.scheduleAtFixedRate(new Runnable() {
+			@Override
+			public void run() {
+				users.cleanup();
+			}
+		}, 1, 1, TimeUnit.MINUTES);
+	}
 	private volatile long inactiveTimeout = 600000;
 	
 	private final Map<String,UserInfoHolder> knownUsers = new ConcurrentHashMap<>();
 	
 	private AuthorizedUsers() {
-		
+
 	}
 	
 	public static void setInactiveTimeout(long timeout) {
@@ -73,13 +86,16 @@ public class AuthorizedUsers {
 	}
 
 	public void cleanup() {
+		LOG.debug("cleaning user cache {} known users ...",knownUsers.size());
 		for(String token: Lists.newArrayList(knownUsers.keySet())) {
 			UserInfoHolder uih = knownUsers.get(token);			
 			if(uih == null) {
 				knownUsers.remove(token);
+				LOG.debug("removed empty token {}",token);
 			} else {
 				if(uih.expired()) {
 					knownUsers.remove(token);
+					LOG.debug("removed expired handler {}",uih);
 				}
 			}
 		}

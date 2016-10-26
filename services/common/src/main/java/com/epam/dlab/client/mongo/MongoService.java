@@ -28,4 +28,9 @@ public class MongoService {
     public MongoCollection<Document> getCollection(String name) {
         return client.getDatabase(database).getCollection(name, Document.class);
     }
+
+    public <T> MongoCollection<T> getCollection(String name,Class<T> c) {
+        return client.getDatabase(database).getCollection(name, c);
+    }
+
 }

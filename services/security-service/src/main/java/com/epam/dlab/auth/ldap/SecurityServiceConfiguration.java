@@ -19,7 +19,6 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.apache.directory.api.ldap.model.message.SearchRequest;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +39,20 @@ public class SecurityServiceConfiguration extends Configuration {
 		super();
 	}
 	
-    @Valid
-    @NotNull
-    @JsonProperty(MONGO)
-    private MongoServiceFactory mongoFactory = new MongoServiceFactory();
+	private boolean userInfoPersistenceEnabled = false;
 	
+	@JsonProperty
+	private long inactiveUserTimeoutMillSec;
+	
+	public long getInactiveUserTimeoutMillSec() {
+		return inactiveUserTimeoutMillSec;
+	}
+
+	@JsonProperty
+	public boolean isUserInfoPersistenceEnabled() {
+		return userInfoPersistenceEnabled;
+	}
+
 	@JsonProperty
 	private List<Request> ldapSearch;
 	
@@ -77,14 +85,10 @@ public class SecurityServiceConfiguration extends Configuration {
 		return ldapBindTemplate;
 	}
 	
-	List<SearchRequest> searchRequestList = null;
-
-	@JsonProperty
-	private String defaultRedirectFromAuthentication;
-
-	public String getDefaultRedirectFromAuthentication() {
-		return defaultRedirectFromAuthentication;
-	}
+  @Valid
+  @NotNull
+  @JsonProperty(MONGO)
+  private MongoServiceFactory mongoFactory = new MongoServiceFactory();
 
     public MongoServiceFactory getMongoFactory() {
         return mongoFactory;

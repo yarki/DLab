@@ -45,7 +45,7 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 
 	@Override
 	public void run(SecurityServiceConfiguration conf, Environment env) throws Exception {
-		env.jersey().register( new LdapAuthenticationService(conf) );
+		env.jersey().register( new LdapAuthenticationService(conf,env) );
 	}
 
 }
