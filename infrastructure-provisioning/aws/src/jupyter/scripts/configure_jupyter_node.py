@@ -77,14 +77,15 @@ def ensure_python3_kernel():
             sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
         except:
             sys.exit(1)
-			
+
+
 def ensure_s3_kernel():
     if not exists('/home/ubuntu/.ensure_dir/s3_kernel_ensured'):
         try:
             sudo('mkdir -p ' + s3_jars_dir)
-            sudo('tar -xzf ' templates_dir + 'jars/local_jars.tar.gz -C ' + s3_jars_dir)
+            sudo('tar -xzf ' + templates_dir + 'jars/local_jars.tar.gz -C ' + s3_jars_dir)
             put(templates_dir + 'spark-defaults_local.conf', '/tmp/spark-defaults_local.conf')
-			sudo('\cp /tmp/spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
+            sudo('\cp /tmp/spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
             sudo('touch /home/ubuntu/.ensure_dir/s3_kernel_ensured')
         except:
             sys.exit(1)
@@ -115,8 +116,8 @@ def configure_notebook_server(notebook_name):
         sys.exit(1)
 
     ensure_python3_kernel()
-	
-	ensure_s3_kernel()
+
+    ensure_s3_kernel()
 
 
 ##############
