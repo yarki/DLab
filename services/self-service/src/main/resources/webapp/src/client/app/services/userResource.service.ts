@@ -24,7 +24,8 @@ export class UserResourceService {
     shapes: 'userlist/shape',
     createNotebook: 'exploratory/create',
     createEmr: 'emr/create',
-    gridData: 'userlist'
+    gridData: 'userlist',
+    keyloader: 'keyloader'
   };
 
   constructor(private http: Http,
@@ -84,7 +85,7 @@ export class UserResourceService {
   uploadKey(data)
   {
     let body = data;
-      return this.http.post("/api/keyloader?access_token=token123", body)
+      return this.http.post(this.getResourceUrl('keyloader'), body)
         .map((res: Response) => {
           return res.status;
         });
