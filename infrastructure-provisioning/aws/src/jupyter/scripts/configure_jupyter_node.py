@@ -83,7 +83,8 @@ def ensure_s3_kernel():
     if not exists('/home/ubuntu/.ensure_dir/s3_kernel_ensured'):
         try:
             sudo('mkdir -p ' + s3_jars_dir)
-            sudo('tar -xzf ' + templates_dir + 'jars/local_jars.tar.gz -C ' + s3_jars_dir)
+            put(templates_dir + 'jars/local_jars.tar.gz', '/tmp/local_jars.tar.gz')
+            sudo('tar -xzf /tmp/local_jars.tar.gz -C ' + s3_jars_dir)
             put(templates_dir + 'spark-defaults_local.conf', '/tmp/spark-defaults_local.conf')
             sudo('\cp /tmp/spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
             sudo('touch /home/ubuntu/.ensure_dir/s3_kernel_ensured')
