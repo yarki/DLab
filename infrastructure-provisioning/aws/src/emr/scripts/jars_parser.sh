@@ -14,7 +14,7 @@
 BUCKET_NAME=$1
 EMR_VERSION=$2
 REGION=$3
-SPARK_DEF_PATH="/usr/lib/conf/spark-defaults.conf"
+SPARK_DEF_PATH="/usr/lib/spark/conf/spark-defaults.conf"
 SPARK_DEF_PATH_LINE1=`cat $SPARK_DEF_PATH | grep spark.driver.extraClassPath | awk '{print $2}' | tr ':' '\n' | sed 's|/\*||g' | sed 's|$|/\*|g' | tr '\n' ' '`
 SPARK_DEF_PATH_LINE2=`cat $SPARK_DEF_PATH | grep spark.driver.extraLibraryPath | awk '{print $2}' | tr ':' '\n' | sed 's|/\*||g' | sed 's|$|/\*|g' | tr '\n' ' '`
 /bin/tar -zcvf /tmp/jars.tar.gz --no-recursion --absolute-names $SPARK_DEF_PATH_LINE1 $SPARK_DEF_PATH_LINE2
