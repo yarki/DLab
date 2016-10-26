@@ -243,6 +243,7 @@ if __name__ == "__main__":
         upload_jars_parser(args)
         build_emr_cluster(args)
     else:
+        upload_jars_parser(args)
         out = open(logpath, 'a')
         out.write('[BUILDING NEW CLUSTER - {}\n]'.format(args.name))
         cluster_id = build_emr_cluster(args)
