@@ -48,7 +48,7 @@ def jars(args):
     print "Downloading jars..."
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
-    local('tar -zxvf /tmp/jars.tar.gz -C ' + emr_dir)
+    local('tar -zhxvf /tmp/jars.tar.gz -C ' + emr_dir)
 
 
 def yarn(args):
@@ -111,13 +111,14 @@ def get_files(s3client, s3resource, dist, bucket, local):
 
 
 def spark_defaults(args):
+    missed_jar_path = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/client/*'
     spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
     local('touch /tmp/spark-defaults-temporary.conf')
-    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath | tr ":" "\n" | sed "s|^|/opt/' + args.emr_version + '/jars|g" | tr "\n" ":" | sed "s|/opt/' + args.emr_version + '/jars||1" | sed "s/\(.*\)\:/\1 /" > /tmp/spark-defaults-temporary.conf')
+    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath | tr " " ":" | sed "s|:||1" | sed "s|:||1" | sed "s|:||1" | tr ":" "\n" | sed "s|^|/opt/' + args.bucket + '/jars|g" | tr "\n" ":" | sed "s|/opt/' + args.emr_version + '/jars||1" | sed "s/\(.*\)\:/\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:' + missed_jar_path + '|" | sed "s|\(.*\)\ |\1|" > /tmp/spark-defaults-temporary.conf')
     local('printf "\n"')
-    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath | tr ":" "\n" | sed "s|^|/opt/' + args.emr_version + '/jars|g" | tr "\n" ":" | sed "s|/opt/' + args.emr_version + '/jars||1" | sed "s/\(.*\)\:/\1 /" >> /tmp/spark-defaults-temporary.conf')
+    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath | tr " " ":" | sed "s|:||1" | sed "s|:||1" | sed "s|:||1" | tr ":" "\n" | sed "s|^|/opt/' + args.emr_version + '/jars|g" | tr "\n" ":" | sed "s|/opt/' + args.emr_version + '/jars||1" | sed "s/\(.*\)\:/\1 /" | sed "s|:|    |1" >> /tmp/spark-defaults-temporary.conf')
     local('sudo mv /tmp/spark-defaults-temporary.conf ' + spark_def_path)
     # spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
     # template_file = "/tmp/spark-defaults_template.conf"
