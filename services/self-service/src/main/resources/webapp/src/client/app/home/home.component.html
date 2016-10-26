@@ -39,7 +39,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <button class="btn btn_create" (click)="createAnalyticalModal.open({isFooter: false})">
       <span class="glyphicon glyphicon glyphicon-plus" ></span> Create new
     </button>
-    <button class="btn btn_refresh pull-right">
+    <button class="btn btn_refresh pull-right" (click)="refreshGrid()">
       <span class="glyphicon glyphicon-refresh"></span> Refresh
     </button>
   </div>
@@ -103,7 +103,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <h4 class="modal-title">Create initial infrastructure</h4>
   </modal-header>
   <modal-content>
-    <form class="row" (submit)="uploadUserAccessKey_btnClick($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
+    <form (submit)="uploadUserAccessKey_btnClick($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
       <div class="form-group row">
         <div  class="col-xs-7">
           <label class="control-label">Upload public key start environment creation</label>

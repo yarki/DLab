@@ -100,3 +100,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .dashboard_table .dropdown-menu ul {
   margin-bottom: 0;
 }
+.message_block td {
+  text-align: left !important;
+}

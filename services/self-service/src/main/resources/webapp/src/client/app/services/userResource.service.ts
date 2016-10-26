@@ -22,7 +22,8 @@ export class UserResourceService {
     emrTmpls: 'userlist/computational',
     shapes: 'userlist/shape',
     createNotebook: 'exploratory/create',
-    createEmr: 'emr/create'
+    createEmr: 'emr/create',
+    gridData: 'userlist'
   };
 
   constructor(private http: Http,
@@ -31,7 +32,7 @@ export class UserResourceService {
   }
 
   getResourceUrl(resource: string) {
-   return `/api/${this.url[resource]}?access_token=${this.userProfileService.getAuthToken()}`; 
+   return `/api/${this.url[resource]}?access_token=${this.userProfileService.getAuthToken()}`;
   }
 
   getCreateTmpl()
@@ -51,6 +52,12 @@ export class UserResourceService {
   getShapes()
   {
     return this.http.get(this.getResourceUrl('shapes'))
+      .map(( res:Response ) => res.json())
+      .catch((error: any) => error);
+  }
+
+  getGridData() {
+    return this.http.get(this.getResourceUrl('gridData'))
       .map(( res:Response ) => res.json())
       .catch((error: any) => error);
   }

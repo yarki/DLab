@@ -12,8 +12,11 @@
 
 package com.epam.dlab.dto.keyload;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserKeyDTO {
     @JsonProperty
     private String content;
