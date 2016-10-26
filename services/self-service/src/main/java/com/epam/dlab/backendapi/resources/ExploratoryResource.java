@@ -94,34 +94,28 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/start")
     public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        updateExploratoryStatus(userInfo, formDTO, UserInstanceStatus.RUNNING);
-        return action(userInfo, formDTO, EXPLORATORY_START);
+        return action(userInfo, formDTO, EXPLORATORY_START, UserInstanceStatus.RUNNING);
     }
 
     @POST
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("terminating exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        updateExploratoryStatus(userInfo, formDTO, UserInstanceStatus.TERMINATING);
-        return action(userInfo, formDTO, EXPLORATORY_TERMINATE);
+        return action(userInfo, formDTO, EXPLORATORY_TERMINATE, UserInstanceStatus.TERMINATING);
     }
 
     @POST
     @Path("/stop")
     public String stop(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("stopping exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        updateExploratoryStatus(userInfo, formDTO, UserInstanceStatus.STOPPING);
-        return action(userInfo, formDTO, EXPLORATORY_STOP);
+        return action(userInfo, formDTO, EXPLORATORY_STOP, UserInstanceStatus.STOPPING);
     }
 
-    private void updateExploratoryStatus(UserInfo userInfo, ExploratoryActionFormDTO formDTO, UserInstanceStatus status) {
+    private String action(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO, String action, UserInstanceStatus status) {
         userListDAO.updateExploratoryStatus(new StatusBaseDTO()
                 .withUser(userInfo.getName())
                 .withName(formDTO.getNotebookInstanceName())
                 .withStatus(status.getStatus()));
-    }
-
-    private String action(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO, String action) {
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withNotebookUserName(userInfo.getName())
