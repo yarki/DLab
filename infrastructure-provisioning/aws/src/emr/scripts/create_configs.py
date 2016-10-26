@@ -46,12 +46,9 @@ def prepare():
 
 def jars(args):
     print "Downloading jars..."
-    s3client = boto3.client('s3')
-    s3resource = boto3.resource('s3')
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
     local('tar -zxvf /tmp/jars.tar.gz -C ' + emr_dir)
-    #get_files(s3client, s3resource, 'jars/', args.bucket, '/opt/')
 
 
 def yarn(args):
