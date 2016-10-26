@@ -115,8 +115,8 @@ def spark_defaults(args):
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
     local('touch ' + spark_def_path)
-    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath | tr ":" "\n" | sed "s|^|/opt/' + args.emr_version +'/jars|g" | tr "\n" ":" | sed "s|/opt/' + args.emr_version + '/jars||1" > ' + spark_def_path)
-    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath | tr ":" "\n" | sed "s|^|/opt/' + args.emr_version +'/jars|g" | tr "\n" ":" | sed "s|/opt/' + args.emr_version + '/jars||1" >> ' + spark_def_path)
+    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath | tr ":" "\n" | sed "s|^|/opt/' + args.emr_version +'/jars|g" | tr "\n" ":" | sed "s|/opt/' + args.emr_version + '/jars||1" | sed "s/\(.*\)\:/\1 /" > ' + spark_def_path)
+    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath | tr ":" "\n" | sed "s|^|/opt/' + args.emr_version +'/jars|g" | tr "\n" ":" | sed "s|/opt/' + args.emr_version + '/jars||1" | sed "s/\(.*\)\:/\1 /" >> ' + spark_def_path)
     # spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
     # template_file = "/tmp/spark-defaults_template.conf"
     # with open(spark_def_path, 'w') as out:
