@@ -84,12 +84,9 @@ export class UserResourceService {
   uploadKey(data)
   {
     let body = data;
-    // let headers = new Headers({
-    //     "enctype": "multipart/form-data"
-    // });
       return this.http.post("/api/keyloader?access_token=token123", body)
-        .map((res) => {
-          return res;
-      });
+        .map((res: Response) => {
+          return res.status;
+        });
   }
 }

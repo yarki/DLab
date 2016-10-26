@@ -76,19 +76,27 @@ export class HomeComponent implements OnInit {
 
 
   uploadUserAccessKey_btnClick(event) {
-    this.keyUploadModal.close();
-    this.preloaderModal.open({ isHeader: false, isFooter: false });
 
     let formData = new FormData();
     formData.append("file", this.uploadKey);
 
     this.userResourceService.uploadKey(formData)
-    .subscribe((data) => console.log(data));
+    .subscribe(
+      status => {
+        console.log(status)
+        if(status === 200) {
+          this.checkInfrastructureCreationProgress();
+          this.preloadModalInterval = setInterval(function() {
+            this.checkInfrastructureCreationProgress();
+          }.bind(this), 10000);
+        }
+       
+      },
+      error => console.log(error)
+     );
 
     
-     this.preloadModalInterval = setInterval(function() {
-      this.checkInfrastructureCreationProgress();  
-     }.bind(this), 10000);
+     
      event.preventDefault();
   }
 
@@ -122,7 +130,7 @@ export class HomeComponent implements OnInit {
             this.preloaderModal.close();
             clearInterval(this.preloadModalInterval);
           }
-        } else if (status == 201)
+        } else if (status == 202)
         {
           if (this.keyUploadModal.isOpened)
             this.keyUploadModal.close();
@@ -137,6 +145,9 @@ export class HomeComponent implements OnInit {
           if (!this.keyUploadModal.isOpened)
             this.keyUploadModal.open({ isFooter: false });
         }
+        else {
+            console.error(err);
+        }
       }
       );
   }
@@ -149,11 +160,11 @@ export class HomeComponent implements OnInit {
       () => this.appRoutingService.redirectToLoginPage());
   }
 
-  uploadUserAccessKey($event) {
-    this.preloadModalInterval = setInterval(function() {
-      this.checkInfrastructureCreationProgress();
-    }.bind(this), 10000);
-  }
+  // uploadUserAccessKey($event) {
+  //   this.preloadModalInterval = setInterval(function() {
+  //     this.checkInfrastructureCreationProgress();
+  //   }.bind(this), 10000);
+  // }
 
   initAnalyticSelectors() {
     this.userResourceService.getCreateTmpl()
