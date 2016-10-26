@@ -116,9 +116,9 @@ def spark_defaults(args):
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
     local('touch /tmp/spark-defaults-temporary.conf')
-    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath | tr " " ":" | sed "s|:||1" | sed "s|:||1" | sed "s|:||1" | tr ":" "\n" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR|" | sed "s|\(.*\)\ |\1|" > /tmp/spark-defaults-temporary.conf')
-    local('printf "\n"')
-    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath | tr " " ":" | sed "s|:||1" | sed "s|:||1" | sed "s|:||1" | tr ":" "\n" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\1 /" | sed "s|:|    |1" >> /tmp/spark-defaults-temporary.conf')
+    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath | tr " " ":" | sed "s|:||1" | sed "s|:||1" | sed "s|:||1" | tr ":" "\\n" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR|" | sed "s|\(.*\)\ |\\1|" > /tmp/spark-defaults-temporary.conf')
+    local('printf "\\n"')
+    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath | tr " " ":" | sed "s|:||1" | sed "s|:||1" | sed "s|:||1" | tr ":" "\\n" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" >> /tmp/spark-defaults-temporary.conf')
     #local('sudo mv /tmp/spark-defaults-temporary.conf ' + spark_def_path)
     template_file = "/tmp/spark-defaults-temporary.conf"
     with open(template_file, 'r') as f:
