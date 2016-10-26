@@ -62,7 +62,7 @@ cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
     args.s3_bucket, args.name, args.nbs_user, args.region)
 
-cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /tmp/jars.tar.gz s3://{0}/jars/{1}/ --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region)
+cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /tmp/jars.tar.gz s3://{0}/jars/{1}/ --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region)
 
 logfile = '{}_creation.log'.format(args.name)
 logpath = '/response/' + logfile
