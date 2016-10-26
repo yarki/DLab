@@ -10,24 +10,42 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.exploratory;
+package com.epam.dlab.dto.keyload;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExploratoryTerminateDTO extends ExploratoryBaseDTO<ExploratoryTerminateDTO> {
-    @JsonProperty("notebook_instance_name")
-    private String notebookInstanceName;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UserKeyDTO {
+    @JsonProperty
+    private String content;
+    @JsonProperty
+    private String status;
 
-    public String getNotebookInstanceName() {
-        return notebookInstanceName;
+    public String getContent() {
+        return content;
     }
 
-    public void setNotebookInstanceName(String notebookInstanceName) {
-        this.notebookInstanceName = notebookInstanceName;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public ExploratoryTerminateDTO withNotebookInstanceName(String notebookInstanceName) {
-        setNotebookInstanceName(notebookInstanceName);
+    public UserKeyDTO withContent(String content) {
+        setContent(content);
+        return this;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public UserKeyDTO withStatus(String status) {
+        setStatus(status);
         return this;
     }
 }

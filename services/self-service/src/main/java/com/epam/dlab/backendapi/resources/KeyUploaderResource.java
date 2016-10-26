@@ -46,7 +46,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
 
     @Inject
-    private KeyDAO dao;
+    private KeyDAO keyDAO;
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
@@ -56,12 +56,12 @@ public class KeyUploaderResource implements KeyLoaderAPI {
 
     @GET
     public Response checkKey(@Auth UserInfo userInfo) {
-        return Response.status(dao.findKeyStatus(userInfo).getHttpStatus()).build();
+        return Response.status(keyDAO.findKeyStatus(userInfo).getHttpStatus()).build();
     }
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String post(@Auth UserInfo userInfo,
+    public Response post(@Auth UserInfo userInfo,
                        @FormDataParam("file") InputStream uploadedInputStream,
                        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
         LOGGER.debug("upload key for user {}", userInfo.getName());
@@ -69,19 +69,33 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {
             content = buffer.lines().collect(Collectors.joining("\n"));
         }
-        dao.uploadKey(userInfo.getName(), content);
-        return provisioningService.post(KEY_LOADER, new UploadFileDTO(userInfo.getName(), content, settingsDAO.getServiceBaseName()), String.class);
+        keyDAO.uploadKey(userInfo.getName(), content);
+        try {
+            UploadFileDTO dto = new UploadFileDTO()
+                    .withUser(userInfo.getName())
+                    .withContent(content)
+                    .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withSecurityGroup(settingsDAO.getSecurityGroup());
+            Response response = provisioningService.post(KEY_LOADER, dto, Response.class);
+            if (Response.Status.ACCEPTED.getStatusCode() != response.getStatus()) {
+                keyDAO.deleteKey(userInfo.getName());
+            }
+        } catch (Exception e) {
+            LOGGER.debug("uploading file exception", e);
+            keyDAO.deleteKey(userInfo.getName());
+        }
+        return Response.ok().build();
     }
 
     @POST
     @Path("/callback")
-    public Response loadKeyResponse(UploadFileResultDTO result) throws JsonProcessingException {
+    public Response loadKeyResponse(UploadFileResultDTO result) {
         LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
-        dao.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
+        keyDAO.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
         if (result.isSuccess()) {
-            dao.saveCredential(result.getUser(), result.getCredential());
+            keyDAO.saveCredential(result.getUser(), result.getCredential());
         } else {
-            dao.deleteKey(result.getUser());
+            keyDAO.deleteKey(result.getUser());
         }
         return Response.ok().build();
     }

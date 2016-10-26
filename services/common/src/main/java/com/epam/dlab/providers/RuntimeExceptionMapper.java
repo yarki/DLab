@@ -10,17 +10,10 @@
 
  *****************************************************************************************************/
 
-import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from "rxjs";
+package com.epam.dlab.providers;
 
+import javax.ws.rs.ext.Provider;
 
-@Injectable()
-export class EnvironmentsService {
-  constructor(private http: Http) { }
-
-  getEnvironmentsList(): Observable<String> {
-    return this.http.get('app/components/grid/data.json')
-      .map((res: Response) => res.json());
-  }
+@Provider
+public class RuntimeExceptionMapper extends GenericExceptionMapper<RuntimeException> {
 }

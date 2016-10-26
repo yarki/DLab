@@ -17,11 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -34,9 +35,12 @@ import org.apache.directory.ldap.client.api.LdapConnectionPool;
 import org.apache.directory.ldap.client.api.ValidatingPoolableLdapConnectionFactory;
 
 import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.auth.UserInfoDAO;
 import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
 import com.epam.dlab.auth.ldap.core.Request;
 import com.epam.dlab.auth.ldap.core.ReturnableConnection;
+import com.epam.dlab.auth.ldap.core.UserInfoDAODumbImpl;
+import com.epam.dlab.auth.ldap.core.UserInfoDAOMongoImpl;
 import com.epam.dlab.auth.ldap.core.filter.SearchResultProcessor;
 import com.epam.dlab.auth.rest.AbstractAuthenticationService;
 import com.epam.dlab.auth.rest.AuthorizedUsers;
@@ -44,6 +48,8 @@ import com.epam.dlab.auth.rest.ExpirableContainer;
 import com.epam.dlab.auth.script.ScriptHolder;
 import com.epam.dlab.auth.script.SearchResultToDictionaryMapper;
 import com.epam.dlab.dto.UserCredentialDTO;
+
+import io.dropwizard.setup.Environment;
 
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -58,7 +64,9 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	private final ExpirableContainer<Map<String, Object>> filteredDictionaries = new ExpirableContainer<>();
 	private final ScriptHolder script = new ScriptHolder();
 
-	public LdapAuthenticationService(SecurityServiceConfiguration config) {
+	private UserInfoDAO userInfoDao;
+	
+	public LdapAuthenticationService(SecurityServiceConfiguration config, Environment env) {
 		super(config);
 		this.connConfig = config.getLdapConnectionConfig();
 		this.requests = config.getLdapSearch();
@@ -68,16 +76,23 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		PoolableObjectFactory<LdapConnection> searchPoolFactory = new ValidatingPoolableLdapConnectionFactory(
 				connConfig);
 		this.searchPool = new LdapConnectionPool(searchPoolFactory);
+		AuthorizedUsers.setInactiveTimeout(config.getInactiveUserTimeoutMillSec());
+		if(config.isUserInfoPersistenceEnabled()) {
+			this.userInfoDao = new UserInfoDAOMongoImpl(config.getMongoFactory().build(env),config.getInactiveUserTimeoutMillSec());
+		} else {
+			this.userInfoDao = new UserInfoDAODumbImpl();
+		}
 	}
 
 	@Override
 	@POST
 	@Path("/login")
-	public Response login(UserCredentialDTO credential) {
-		String username = credential.getUsername();
-		String password = credential.getPassword();
+	public Response login(UserCredentialDTO credential, @Context HttpServletRequest request) {
+		String username    = credential.getUsername();
+		String password    = credential.getPassword();
 		String accessToken = credential.getAccessToken();
-		log.debug("validating username:{} password:****** token:{}", username, accessToken);
+		String remoteIp    = request.getRemoteAddr();
+		log.debug("validating username:{} password:****** token:{} ip:{}", username, accessToken,remoteIp);
 		UserInfo ui;
 
 		if (this.isAccessTokenAvailable(accessToken)) {
@@ -134,7 +149,10 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				log.error("LDAP error", e);
 				return Response.status(Response.Status.UNAUTHORIZED).build();
 			}
+			ui.setRemoteIp(remoteIp);
 			String token = getRandomToken();
+			UserInfo finalUserInfo = rememberUserInfo(token, ui);
+			userInfoDao.saveUserInfo(finalUserInfo);
 			rememberUserInfo(token, ui);
 			return Response.ok(token).build();
 		}
@@ -143,9 +161,21 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	@Override
 	@POST
 	@Path("/getuserinfo")
-	public UserInfo getUserInfo(String access_token) {
-		UserInfo ui = AuthorizedUsers.getInstance().getUserInfo(access_token);
-		log.debug("Authorized {} {}", access_token, ui);
+	public UserInfo getUserInfo(String access_token, @Context HttpServletRequest request) {
+		String remoteIp = request.getRemoteAddr();
+		UserInfo ui     = AuthorizedUsers.getInstance().getUserInfo(access_token);
+		if(ui == null) {
+			ui = userInfoDao.getUserInfoByAccessToken(access_token);
+			if( ui != null ) {
+				ui = rememberUserInfo(access_token, ui);
+				userInfoDao.updateUserInfoTTL(access_token, ui);
+				log.debug("restored UserInfo from DB {}",ui);
+			}
+		} else {
+			log.debug("updating TTL {}",ui);
+			userInfoDao.updateUserInfoTTL(access_token, ui);
+		}
+		log.debug("Authorized {} {} {}", access_token, ui, remoteIp);
 		return ui;
 	}
 
@@ -154,6 +184,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	@Path("/logout")
 	public Response logout(String access_token) {
 		UserInfo ui = this.forgetAccessToken(access_token);
+		userInfoDao.deleteUserInfo(access_token);
 		log.debug("Logged out {} {}", access_token, ui);
 		return Response.ok().build();
 	}

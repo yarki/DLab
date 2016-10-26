@@ -15,7 +15,7 @@ package com.epam.dlab.backendapi.api.form;
 import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExploratoryTerminateFormDTO extends ExploratoryBaseDTO<ExploratoryTerminateFormDTO> {
+public class ExploratoryActionFormDTO extends ExploratoryBaseDTO<ExploratoryActionFormDTO> {
     @JsonProperty("notebook_instance_name")
     private String notebookInstanceName;
 

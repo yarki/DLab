@@ -12,7 +12,8 @@
 
 import boto3, boto, botocore
 import time
-import os, sys
+import sys
+import os
 import json
 
 
@@ -26,9 +27,10 @@ def put_to_bucket(bucket_name, local_file, destination_file):
         return False
 
 
-def create_s3_bucket(bucket_name, tag):
+def create_s3_bucket(bucket_name, tag, region):
     s3 = boto3.resource('s3')
-    bucket = s3.create_bucket(Bucket=bucket_name)
+    bucket = s3.create_bucket(Bucket=bucket_name,
+                              CreateBucketConfiguration={'LocationConstraint': region})
     tagging = bucket.Tagging()
     tagging.put(Tagging={'TagSet': [tag]})
     tagging.reload()
@@ -115,37 +117,52 @@ def create_attach_policy(policy_name, role_name, file_path):
 def remove_ec2(tag_name, tag_value):
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
-    instances = ec2.instances.filter(
+    inst = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped', 'pending', 'stopping']},
                  {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
-    for instance in instances:
-        client.terminate_instances(InstanceIds=[instance.id])
-        waiter = client.get_waiter('instance_terminated')
-        waiter.wait(InstanceIds=[instance.id])
+    instances = list(inst)
+    if instances:
+        for instance in instances:
+            client.terminate_instances(InstanceIds=[instance.id])
+            waiter = client.get_waiter('instance_terminated')
+            waiter.wait(InstanceIds=[instance.id])
+            print "The instance " + tag_value + " has been terminated successfully"
+    else:
+        print "There are no instances with " + tag_value + " name to terminate"
 
 
-def stop_ec2(tag_name, nb_tag_value):
+def stop_ec2(tag_name, tag_value):
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
-    instances = ec2.instances.filter(
+    inst = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'pending']},
-                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
-    for instance in instances:
-        client.stop_instances(InstanceIds=[instance.id])
-        waiter = client.get_waiter('instance_stopped')
-        waiter.wait(InstanceIds=[instance.id])
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
+    instances = list(inst)
+    if instances:
+        for instance in instances:
+            client.stop_instances(InstanceIds=[instance.id])
+            waiter = client.get_waiter('instance_stopped')
+            waiter.wait(InstanceIds=[instance.id])
+            print "The instance " + tag_value + " has been stopped successfully"
+    else:
+        print "There are no instances with " + tag_value + " name to stop"
 
 
 def start_ec2(tag_name, tag_value):
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
-    instances = ec2.instances.filter(
+    inst = ec2.instances.filter(
         Filters=[{'Name': 'instance-state-name', 'Values': ['stopped']},
                  {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
-    for instance in instances:
-        client.start_instances(InstanceIds=[instance.id])
-        waiter = client.get_waiter('instance_status_ok')
-        waiter.wait(InstanceIds=[instance.id])
+    instances = list(inst)
+    if instances:
+        for instance in instances:
+            client.start_instances(InstanceIds=[instance.id])
+            waiter = client.get_waiter('instance_status_ok')
+            waiter.wait(InstanceIds=[instance.id])
+            print "The instance " + tag_value + " has been started successfully"
+    else:
+        print "There are no instances with " + tag_value + " name to start"
 
 
 def remove_role(instance_type, scientist=''):
@@ -204,7 +221,7 @@ def s3_cleanup(bucket, cluster_name):
         print err.response['Error']['Message']
 
 
-def remove_s3(scientist):
+def remove_s3(bucket_type, scientist=''):
     print "[Removing S3 buckets]"
     s3 = boto3.resource('s3')
     client = boto3.client('s3')

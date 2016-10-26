@@ -14,6 +14,7 @@ package com.epam.dlab.backendapi.api.instance;
 
 public enum UserInstanceStatus {
     CREATING("creating"),
+    CREATED("created"),
     RUNNING("running"),
     STOPPING("stopping"),
     STOPPED("stopped"),

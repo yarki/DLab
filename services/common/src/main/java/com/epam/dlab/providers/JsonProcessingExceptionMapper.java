@@ -10,17 +10,12 @@
 
  *****************************************************************************************************/
 
-import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from "rxjs";
+package com.epam.dlab.providers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 
-@Injectable()
-export class EnvironmentsService {
-  constructor(private http: Http) { }
+import javax.ws.rs.ext.Provider;
 
-  getEnvironmentsList(): Observable<String> {
-    return this.http.get('app/components/grid/data.json')
-      .map((res: Response) => res.json());
-  }
+@Provider
+public class JsonProcessingExceptionMapper extends GenericExceptionMapper<JsonProcessingException> {
 }

@@ -63,14 +63,14 @@ public class UserListResource implements DockerAPI {
     @GET
     @Path("/computational")
     public Iterable<ImageMetadataDTO> getComputationalTemplates(@Auth UserInfo userInfo) {
-        LOGGER.debug("loading computational tempates for user {}", userInfo.getName());
+        LOGGER.debug("loading computational templates for user {}", userInfo.getName());
         return getTemplates(ImageType.COMPUTATIONAL);
     }
 
     @GET
     @Path("/exploratory")
     public Iterable<ImageMetadataDTO> getExploratoryTemplates(@Auth UserInfo userInfo) {
-        LOGGER.debug("loading exploratory tempates for user {}", userInfo.getName());
+        LOGGER.debug("loading exploratory templates for user {}", userInfo.getName());
         return getTemplates(ImageType.EXPLORATORY);
     }
 

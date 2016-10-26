@@ -15,6 +15,7 @@ package com.epam.dlab.auth.rest;
 
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import com.epam.dlab.auth.UserInfo;
@@ -47,16 +48,18 @@ public abstract class AbstractAuthenticationService<C extends Configuration> ext
 		super(config);
 	}
 
-	public abstract Response login(UserCredentialDTO credential);
-	public abstract UserInfo getUserInfo(String access_token);
+	public abstract Response login(UserCredentialDTO credential, HttpServletRequest request);
+	public abstract UserInfo getUserInfo(String access_token, HttpServletRequest request);
 	public abstract Response logout(String access_token);
 
 	public UserInfo forgetAccessToken(String token) {
 		return AuthorizedUsers.getInstance().removeUserInfo(token);
 	}
 	
-	public void rememberUserInfo(String token, UserInfo user) {
-		AuthorizedUsers.getInstance().addUserInfo(token, user.withToken(token));
+	public UserInfo rememberUserInfo(String token, UserInfo user) {
+		UserInfo ui = user.withToken(token);
+		AuthorizedUsers.getInstance().addUserInfo(token, ui);
+		return ui;
 	}
 	
 	public boolean isAccessTokenAvailable(String token) {

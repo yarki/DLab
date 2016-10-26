@@ -10,17 +10,25 @@
 
  *****************************************************************************************************/
 
-import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from "rxjs";
+package com.epam.dlab.providers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Injectable()
-export class EnvironmentsService {
-  constructor(private http: Http) { }
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 
-  getEnvironmentsList(): Observable<String> {
-    return this.http.get('app/components/grid/data.json')
-      .map((res: Response) => res.json());
-  }
+abstract public class GenericExceptionMapper<E extends Throwable> implements ExceptionMapper<E> {
+    final static Logger LOGGER = LoggerFactory.getLogger(GenericExceptionMapper.class);
+
+    @Override
+    public Response toResponse(E exception) {
+        Response response500 = Response
+                .serverError()
+                .build();
+
+        LOGGER.error("Uncaught exception in application", exception);
+
+        return response500;
+    }
 }

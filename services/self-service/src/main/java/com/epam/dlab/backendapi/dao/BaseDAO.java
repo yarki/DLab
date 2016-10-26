@@ -13,8 +13,8 @@
 package com.epam.dlab.backendapi.dao;
 
 import com.epam.dlab.client.mongo.MongoService;
+import com.epam.dlab.exceptions.DlabException;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import org.bson.Document;
@@ -22,6 +22,7 @@ import org.bson.conversions.Bson;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -47,11 +48,11 @@ class BaseDAO implements MongoCollections {
                 .append(TIMESTAMP, new Date()));
     }
 
-    protected void insertOne(String collection, Object object) throws JsonProcessingException {
+    protected void insertOne(String collection, Object object) {
         insertOne(collection, object, generateUUID());
     }
 
-    protected void insertOne(String collection, Object object, String uuid) throws JsonProcessingException {
+    protected void insertOne(String collection, Object object, String uuid) {
         mongoService.getCollection(collection).insertOne(convertToBson(object)
                 .append(ID, uuid)
                 .append(TIMESTAMP, new Date()));
@@ -61,13 +62,25 @@ class BaseDAO implements MongoCollections {
         mongoService.getCollection(collection).updateOne(condition, value);
     }
 
-    protected Document convertToBson(Object object) throws JsonProcessingException {
-        return Document.parse(MAPPER.writeValueAsString(object));
+    protected Document convertToBson(Object object) {
+        try {
+            return Document.parse(MAPPER.writeValueAsString(object));
+        } catch (IOException e) {
+            throw new DlabException("error converting to bson");
+        }
     }
 
-    protected <T> T find(String collection, Bson eq, Class<T> clazz) throws IOException {
-        Document document = mongoService.getCollection(collection).find(eq).first();
-        return MAPPER.readValue(document.toJson(), clazz);
+    protected <T> Optional<T> find(String collection, Bson eq, Class<T> clazz) {
+        return Optional.ofNullable(mongoService.getCollection(collection).find(eq).first())
+                .flatMap(document -> Optional.of(convertFromDocument(document, clazz)));
+    }
+
+    private <T> T convertFromDocument(Document document, Class<T> clazz) {
+        try {
+            return MAPPER.readValue(document.toJson(), clazz);
+        } catch (IOException e) {
+            throw new DlabException("error converting from document with id " + document.get(ID));
+        }
     }
 
     private String generateUUID() {

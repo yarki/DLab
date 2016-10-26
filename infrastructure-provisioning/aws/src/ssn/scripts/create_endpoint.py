@@ -44,7 +44,7 @@ if __name__ == "__main__":
                 )
                 endpoint = endpoint['VpcEndpoint']['VpcEndpointId']
             else:
-                print 'For current VPC {} endpoint already exists. ID: {}. Route table list will be modified'.format(args.vpc_id, endpoints)
+                print 'For current VPC {} endpoint already exists. ID: {}. Route table list will be modified'.format(args.vpc_id, endpoints[0].get('VpcEndpointId'))
                 endpoint_id = endpoints[0].get('VpcEndpointId')
                 result = ec2.modify_vpc_endpoint(
                     VpcEndpointId=endpoint_id,

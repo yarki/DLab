@@ -14,6 +14,7 @@ import { Injectable } from '@angular/core';
 import {Http, Response} from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
 import { UserProfileService } from './../security/userProfile.service'
+import {Observable} from "rxjs";
 
 @Injectable()
 export class UserAccessKeyService {
@@ -27,12 +28,13 @@ export class UserAccessKeyService {
     return `/api/keyloader?access_token=${this.userProfileService.getAuthToken()}`;
   }
 
-  checkUserAccessKey() {
+  checkUserAccessKey() : Observable<number> {
     let requestHeader = this.webRequestHelper.getJsonHeader();
     requestHeader = this.userProfileService.appendBasicAuthHeader(requestHeader);
 
-    return this.http.get(this.getAccessKeyUrl()
-      , {headers : requestHeader})
-      .map(( res:Response ) => res.json());
+    return this.http.get
+      (this.getAccessKeyUrl(),
+      {headers : requestHeader})
+      .map((response:Response) => response.status);
   }
 }

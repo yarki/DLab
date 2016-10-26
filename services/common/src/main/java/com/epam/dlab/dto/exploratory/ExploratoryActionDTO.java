@@ -10,17 +10,24 @@
 
  *****************************************************************************************************/
 
-import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from "rxjs";
+package com.epam.dlab.dto.exploratory;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Injectable()
-export class EnvironmentsService {
-  constructor(private http: Http) { }
+public class ExploratoryActionDTO extends ExploratoryBaseDTO<ExploratoryActionDTO> {
+    @JsonProperty("notebook_instance_name")
+    private String notebookInstanceName;
 
-  getEnvironmentsList(): Observable<String> {
-    return this.http.get('app/components/grid/data.json')
-      .map((res: Response) => res.json());
-  }
+    public String getNotebookInstanceName() {
+        return notebookInstanceName;
+    }
+
+    public void setNotebookInstanceName(String notebookInstanceName) {
+        this.notebookInstanceName = notebookInstanceName;
+    }
+
+    public ExploratoryActionDTO withNotebookInstanceName(String notebookInstanceName) {
+        setNotebookInstanceName(notebookInstanceName);
+        return this;
+    }
 }
