@@ -25,7 +25,6 @@ import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
-import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -95,6 +94,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/start")
     public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
+        updateExploratoryStatus(userInfo, formDTO, UserInstanceStatus.RUNNING);
         return action(userInfo, formDTO, EXPLORATORY_START);
     }
 
@@ -102,6 +102,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("terminating exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
+        updateExploratoryStatus(userInfo, formDTO, UserInstanceStatus.TERMINATING);
         return action(userInfo, formDTO, EXPLORATORY_TERMINATE);
     }
 
@@ -109,7 +110,15 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/stop")
     public String stop(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("stopping exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
+        updateExploratoryStatus(userInfo, formDTO, UserInstanceStatus.STOPPING);
         return action(userInfo, formDTO, EXPLORATORY_STOP);
+    }
+
+    private void updateExploratoryStatus(UserInfo userInfo, ExploratoryActionFormDTO formDTO, UserInstanceStatus status) {
+        userListDAO.updateExploratoryStatus(new StatusBaseDTO()
+                .withUser(userInfo.getName())
+                .withName(formDTO.getNotebookInstanceName())
+                .withStatus(status.getStatus()));
     }
 
     private String action(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO, String action) {
