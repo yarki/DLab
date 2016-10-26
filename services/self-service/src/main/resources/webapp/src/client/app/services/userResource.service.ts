@@ -14,6 +14,7 @@ import { Injectable } from '@angular/core';
 import {Http, Response} from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
 import { UserProfileService } from './../security/userProfile.service'
+import {Headers} from "@angular/http";
 
 @Injectable()
 export class UserResourceService {
@@ -77,6 +78,16 @@ export class UserResourceService {
     let body = JSON.stringify(data);
     let requestHeader = this.webRequestHelper.getJsonHeader();
       return this.http.post(this.getResourceUrl('createEmr'), body, { headers: requestHeader })
+        .map(res => res.json());
+  }
+
+  uploadKey(data)
+  {
+    let body = data;
+    // let headers = new Headers({
+    //     "enctype": "multipart/form-data"
+    // });
+      return this.http.post("/api/keyloader?access_token=token123", body)
         .map((res) => {
           return res;
       });

@@ -35,6 +35,7 @@ export class HomeComponent implements OnInit {
   createTempls: any;
   shapes: any;
   emrTempls: any;
+  uploadKey: any;
 
 
 
@@ -73,14 +74,26 @@ export class HomeComponent implements OnInit {
       () => this.appRoutingService.redirectToLoginPage());
   }
 
+
   uploadUserAccessKey_btnClick(event) {
-    this.preloadModalInterval = setInterval(function() {
-      this.checkInfrastructureCreationProgress();
-    }.bind(this), 10000);
-    event.preventDefault()
+    this.keyUploadModal.close();
+    this.preloaderModal.open({ isHeader: false, isFooter: false });
+
+    let formData = new FormData();
+    formData.append("file", this.uploadKey);
+
+    this.userResourceService.uploadKey(formData)
+    .subscribe((data) => console.log(data));
+
+    
+     this.preloadModalInterval = setInterval(function() {
+      this.checkInfrastructureCreationProgress();  
+     }.bind(this), 10000);
+     event.preventDefault();
   }
 
   uploadUserAccessKey_onChange($event) {
+    this.uploadKey = $event.srcElement.files[0];
     if($event.target.files.length > 0)
     {
       let fileName = $event.target.files[0].name;
@@ -88,6 +101,7 @@ export class HomeComponent implements OnInit {
       if(!this.uploadAccessUserKeyFormInvalid)
         this.keyName = fileName;
     }
+
   }
 
   refreshGrid() {
