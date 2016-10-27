@@ -70,6 +70,7 @@ def get_instance_ip_address(instance_name):
     instances = ec2.instances.filter(
         Filters=[{'Name': 'tag:Name', 'Values': [instance_name]},
                  {'Name': 'instance-state-name', 'Values': ['running']}])
+    ips = {}
     for instance in instances:
         public = getattr(instance, 'public_ip_address')
         private = getattr(instance, 'private_ip_address')

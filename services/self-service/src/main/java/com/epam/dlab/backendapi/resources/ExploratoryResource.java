@@ -25,7 +25,6 @@ import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
-import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -95,29 +94,39 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/start")
     public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        return action(userInfo, formDTO, EXPLORATORY_START);
+        return action(userInfo, formDTO, EXPLORATORY_START, UserInstanceStatus.RUNNING);
     }
 
     @POST
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("terminating exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        return action(userInfo, formDTO, EXPLORATORY_TERMINATE);
+        UserInstanceStatus status = UserInstanceStatus.TERMINATING;
+        userListDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, formDTO, status));
+        return action(userInfo, formDTO, EXPLORATORY_TERMINATE, status);
     }
 
     @POST
     @Path("/stop")
     public String stop(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("stopping exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        return action(userInfo, formDTO, EXPLORATORY_STOP);
+        return action(userInfo, formDTO, EXPLORATORY_STOP, UserInstanceStatus.STOPPING);
     }
 
-    private String action(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO, String action) {
+    private String action(UserInfo userInfo, ExploratoryActionFormDTO formDTO, String action, UserInstanceStatus status) {
+        userListDAO.updateExploratoryStatus(createStatusDTO(userInfo, formDTO, status));
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withNotebookUserName(userInfo.getName())
                 .withNotebookInstanceName(formDTO.getNotebookInstanceName())
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(action, dto, String.class);
+    }
+
+    private StatusBaseDTO createStatusDTO(UserInfo userInfo, ExploratoryActionFormDTO formDTO, UserInstanceStatus status) {
+        return new StatusBaseDTO()
+                .withUser(userInfo.getName())
+                .withName(formDTO.getNotebookInstanceName())
+                .withStatus(status.getStatus());
     }
 }
