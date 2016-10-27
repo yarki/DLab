@@ -17,6 +17,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDTO> {
     @JsonProperty("notebook_subnet_cidr")
     private String notebookSubnet;
+    @JsonProperty("notebook_instance_type ")
+    private String notebookInstanceType;
     @JsonProperty("creds_security_groups_ids")
     private String securityGroupIds;
 
@@ -30,6 +32,19 @@ public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDT
 
     public ExploratoryCreateDTO withNotebookSubnet(String notebookSubnet) {
         setNotebookSubnet(notebookSubnet);
+        return this;
+    }
+
+    public String getNotebookInstanceType() {
+        return notebookInstanceType;
+    }
+
+    public void setNotebookInstanceType(String notebookInstanceType) {
+        this.notebookInstanceType = notebookInstanceType;
+    }
+
+    public ExploratoryCreateDTO withNotebookInstanceType(String notebookInstanceType) {
+        setNotebookInstanceType(notebookInstanceType);
         return this;
     }
 
