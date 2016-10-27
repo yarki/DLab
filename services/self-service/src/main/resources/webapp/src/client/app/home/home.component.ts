@@ -99,12 +99,14 @@ export class HomeComponent implements OnInit {
   }
 
   uploadUserAccessKey_onChange($event) {
+    this.keyName = "";
+
     if($event.target.files.length > 0)
     {
       let fileName = $event.target.files[0].name;
       this.uploadAccessUserKeyFormInvalid = !fileName.toLowerCase().endsWith(".pub");
       this.uploadKey = $event.target.files[0];
-      this.keyName = fileName;
+      this.keyName = this.uploadAccessUserKeyFormInvalid ? ".pub file is required." : fileName;
     }
   }
 
