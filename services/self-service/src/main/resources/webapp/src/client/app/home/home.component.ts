@@ -10,7 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { AuthenticationService } from './../security/authentication.service';
 import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
@@ -33,11 +33,13 @@ export class HomeComponent implements OnInit {
   uploadKey: any;
   userAccessKeyUploaded: boolean;
   uploadAccessKeyLabel: string;
+  notebookExist: boolean = false;
+
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
   @ViewChild('createAnalyticalModal') createAnalyticalModal;
-  @ViewChild(Grid) refresh:Grid ;
+  @ViewChild(Grid) grid:Grid ;
 
   // -------------------------------------------------------------------------
   // Overrides
@@ -100,7 +102,7 @@ export class HomeComponent implements OnInit {
   }
 
   refreshGrid() {
-    this.refresh.buildGrid();
+    this.grid.buildGrid();
   }
 
   //
@@ -197,12 +199,21 @@ export class HomeComponent implements OnInit {
       );
   }
 
-  createUsernotebook(tmplIndex, name, shape){
+  createUsernotebook(event, tmplIndex, name, shape){
+    event.preventDefault();
+
+    this.grid.list.forEach(function(notebook){
+      if(name.value.toLowerCase() === notebook.environment_name.toLowerCase()) {
+        this.notebookExist = true;
+        return false;
+      }
+    }, this);
+    
+
     this.userResourceService
       .createUsernotebook({
-        name: name,
-        shape: shape,
-        // image: this.createTempls[tmplIndex].image,
+        name: name.value,
+        shape: shape.value,
         version: this.createTempls[tmplIndex].version
       })
       .subscribe((result) => {
@@ -211,17 +222,10 @@ export class HomeComponent implements OnInit {
         if (this.createAnalyticalModal.isOpened) {
          this.createAnalyticalModal.close();
        }
-       this.refresh.buildGrid();
+       this.grid.buildGrid();
+       name.value = "";
+       this.notebookExist = false;
       });
-      return false;
   };
 
-  createEmr(template, name, shape){
-    this.userResourceService
-      .createUsernotebook({"image": name.value})
-      .subscribe((result) => {
-        console.log('result: ', result);
-      });
-    return false;
-  };
 }
