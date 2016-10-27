@@ -43,7 +43,6 @@ export class Grid implements OnInit {
   }
 
   buildGrid() {
-    // this.environmentsService.getEnvironmentsList().subscribe((list) => {
     this.userResourceService.getGridData().subscribe((list) => {
 
       this.list = list;
@@ -53,15 +52,15 @@ export class Grid implements OnInit {
   }
 
   loadEnvironments(): Array<any> {
-    if (this.list['RESOURCES']) {
-      return this.list['RESOURCES'].map((value) => {
-        return new GridRowModel(value.ENVIRONMENT_NAME,
-          value.STATUS,
-          value.SHAPE,
-          value.COMPUTATIONAL_RESOURCES);
-      });
-    }
-  }
+     if (this.list) {
+       return this.list.map((value) => {
+         return new GridRowModel(value.environment_name,
+           value.status,
+           value.shape,
+           value.computational_resources);
+       });
+     }
+   }
 
   printDetailEnvironmentModal(data) {
     console.log(data);
@@ -69,11 +68,24 @@ export class Grid implements OnInit {
 
   mathAction(data, action) {
     console.log('action ' + action, data);
-    if(action === 'deploy') {
+    if (action === 'deploy') {
       this.notebookName = data.name
-      this.createEmrModal.open({isFooter: false });
+      this.createEmrModal.open({ isFooter: false });
+    } else if (action === 'run') {
+      this.userResourceService
+        .startUsernotebook({ notebook_instance_name: data.name })
+        .subscribe((result) => {
+          console.log('startUsernotebook result: ', result);
+          this.buildGrid();
+        });
+    } else if (action === 'stop') {
+      this.userResourceService
+        .stopUsernotebook({ notebook_instance_name: data.name })
+        .subscribe((result) => {
+          console.log('stopUsernotebook result: ', result);
+          this.buildGrid();
+        });
     }
-
   }
 
   createEmr(name, count, shape_master, shape_slave, tmplIndex){
@@ -89,6 +101,10 @@ export class Grid implements OnInit {
       .subscribe((result) => {
         console.log('result: ', result);
 
+        if (this.createEmrModal.isOpened) {
+         this.createEmrModal.close();
+       }
+       this.buildGrid();
       });
       return false;
   };

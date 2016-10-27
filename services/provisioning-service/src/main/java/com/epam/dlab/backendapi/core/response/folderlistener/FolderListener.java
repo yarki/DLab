@@ -13,31 +13,32 @@
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import com.epam.dlab.backendapi.core.Constants;
-import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.backendapi.core.response.ErrorFileHandler;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public final class FolderListener implements Runnable {
+public class FolderListener implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
 
     private final String directory;
     private final Duration timeout;
     private final FileHandler fileHandler;
+    private final ErrorFileHandler errorFileHandler;
     private final Duration fileLengthCheckDelay;
+    private volatile boolean success;
 
-    public FolderListener(String directory, Duration timeout, FileHandler fileHandler, Duration fileLengthCheckDelay) {
+    public FolderListener(String directory, Duration timeout, FileHandler fileHandler, ErrorFileHandler errorFileHandler, Duration fileLengthCheckDelay) {
         this.directory = directory;
         this.timeout = timeout;
         this.fileHandler = fileHandler;
+        this.errorFileHandler = errorFileHandler;
         this.fileLengthCheckDelay = fileLengthCheckDelay;
     }
 
@@ -64,10 +65,18 @@ public final class FolderListener implements Runnable {
                 }
                 pollFile();
             }
+        } else if (!success) {
+            if (errorFileHandler != null) {
+                errorFileHandler.handle();
+            } else {
+                LOGGER.warn("docker returned no result, silently ignored");
+            }
         }
     }
 
     private void handleFileAsync(String fileName) {
-        CompletableFuture.runAsync(new AsyncFileHandler(fileName, directory, fileHandler, fileLengthCheckDelay));
+        CompletableFuture
+                .supplyAsync(new AsyncFileHandler(fileName, directory, fileHandler, fileLengthCheckDelay))
+                .thenAccept(result -> success = success || result);
     }
 }

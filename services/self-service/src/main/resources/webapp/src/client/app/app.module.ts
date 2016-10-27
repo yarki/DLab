@@ -12,8 +12,8 @@
 
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
-import { HttpModule } from '@angular/http';
+import {RouterModule, Router, } from '@angular/router';
+import {ConnectionBackend, HttpModule, Http, XHRBackend, RequestOptions} from '@angular/http';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
 
@@ -32,6 +32,7 @@ import {FormsModule} from "@angular/forms";
 import {UserAccessKeyService} from "./services/userAccessKey.service";
 import {AppRoutingService} from "./routing/appRouting.service";
 import {UserResourceService} from "./services/userResource.service";
+import {HttpInterceptor} from "./util/interceptors/httpInterceptor.service";
 
 @NgModule({
   imports: [BrowserModule, HttpModule, RouterModule.forRoot(routes, { useHash: true }), LoginModule, HomeModule, FormsModule],
@@ -40,7 +41,13 @@ import {UserResourceService} from "./services/userResource.service";
     provide: LocationStrategy,
     useClass: HashLocationStrategy,
     useValue: '<%= APP_BASE %>'
-  },
+    },
+    {
+      provide: Http,
+      useFactory: (backend: XHRBackend, defaultOptions: RequestOptions, router: Router) => {
+      return new HttpInterceptor(backend, defaultOptions, router);
+    },
+    deps: [ XHRBackend, RequestOptions, Router]},
     AuthenticationService,
     AuthorizationGuard,
     WebRequestHelper,
@@ -50,7 +57,6 @@ import {UserResourceService} from "./services/userResource.service";
     UserResourceService
     ],
   bootstrap: [AppComponent]
-
 })
 
 export class AppModule {}

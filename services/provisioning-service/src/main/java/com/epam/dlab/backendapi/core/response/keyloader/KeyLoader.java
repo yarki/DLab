@@ -17,6 +17,7 @@ import com.epam.dlab.backendapi.client.rest.SelfAPI;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
+import com.epam.dlab.backendapi.core.response.ErrorFileHandler;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.client.restclient.RESTService;
@@ -55,7 +56,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         saveKeyToFile(dto);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getKeyLoaderDirectory(), configuration.getKeyLoaderPollTimeout(),
-                getResultHandler(dto.getUser(), uuid));
+                getResultHandler(dto.getUser(), uuid), getErrorHandler(dto.getUser()));
         commandExecuter.executeAsync(
                 new RunDockerCommand()
                         .withVolumeForRootKeys(configuration.getKeyDirectory())
@@ -91,6 +92,10 @@ public class KeyLoader implements DockerCommands, SelfAPI {
             }
             return false;
         };
+    }
+
+    private ErrorFileHandler getErrorHandler(String user) {
+        return () -> selfService.post(KEY_LOADER, new UploadFileResultDTO(user), UploadFileResultDTO.class);
     }
 
     private UserAWSCredentialDTO extractCredential(JsonNode document) throws IOException {
