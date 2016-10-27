@@ -12,17 +12,43 @@
 
 package com.epam.dlab.providers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 @Provider
 public class RuntimeExceptionMapper extends GenericExceptionMapper<RuntimeException> {
+    final static Logger LOGGER = LoggerFactory.getLogger(RuntimeExceptionMapper.class);
+
     @Override
     public Response toResponse(RuntimeException exception) {
+        Response defaultResponse = super.toResponse(exception);
         if (exception instanceof WebApplicationException) {
-            throw exception;
+            return handleWebApplicationException(exception, defaultResponse);
         }
-        return super.toResponse(exception);
+        return defaultResponse;
+    }
+
+    private Response handleWebApplicationException(RuntimeException exception, Response defaultResponse) {
+        WebApplicationException webAppException = (WebApplicationException) exception;
+
+        // No logging
+        if (webAppException.getResponse().getStatus() == 401) {
+            return Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .build();
+        }
+        if (webAppException.getResponse().getStatus() == 404) {
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .build();
+        }
+
+        LOGGER.error("web application exception: {}", exception.getMessage());
+
+        return defaultResponse;
     }
 }
