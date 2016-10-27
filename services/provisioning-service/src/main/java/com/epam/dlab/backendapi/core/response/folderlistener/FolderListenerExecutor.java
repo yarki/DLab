@@ -13,6 +13,7 @@
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.core.response.ErrorFileHandler;
 import com.epam.dlab.backendapi.core.response.FileHandler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -27,6 +28,10 @@ public class FolderListenerExecutor {
 
 
     public void start(String directory, Duration timeout, FileHandler fileHandler) {
-        CompletableFuture.runAsync(new FolderListener(directory, timeout, fileHandler, configuration.getFileLengthCheckDelay()));
+        start(directory, timeout, fileHandler, null);
+    }
+
+    public void start(String directory, Duration timeout, FileHandler fileHandler, ErrorFileHandler errorFileHandler) {
+        CompletableFuture.runAsync(new FolderListener(directory, timeout, fileHandler, errorFileHandler, configuration.getFileLengthCheckDelay()));
     }
 }

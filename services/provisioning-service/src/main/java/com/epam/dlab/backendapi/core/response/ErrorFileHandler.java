@@ -10,58 +10,8 @@
 
  *****************************************************************************************************/
 
+package com.epam.dlab.backendapi.core.response;
 
-package com.epam.dlab.dto;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
-    @JsonProperty
-    private String user;
-    @JsonProperty
-    private String name;
-    @JsonProperty
-    private String status;
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T withUser(String user) {
-        setUser(user);
-        return (T) this;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T withName(String name) {
-        setName(name);
-        return (T) this;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T withStatus(String status) {
-        setStatus(status);
-        return (T) this;
-    }
+public interface ErrorFileHandler {
+    void handle();
 }
