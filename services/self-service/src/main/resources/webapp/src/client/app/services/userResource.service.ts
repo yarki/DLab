@@ -27,6 +27,7 @@ export class UserResourceService {
     stopNotebook: 'exploratory/stop',
     terminateNotebook: 'exploratory/terminate',
     createEmr: 'emr/create',
+    terminateEmr: 'emr/terminate',
     gridData: 'userlist',
     keyloader: 'keyloader'
   };
@@ -110,6 +111,15 @@ export class UserResourceService {
     let requestHeader = this.webRequestHelper.getJsonHeader();
       return this.http.post(this.getResourceUrl('createEmr'), body, { headers: requestHeader })
         .map(res => res.json());
+  }
+
+  terminateEmr(data) {
+    let body = JSON.stringify(data);
+    let requestHeader = this.webRequestHelper.getJsonHeader();
+      return this.http.post(this.getResourceUrl('terminateEmr'), body, { headers: requestHeader })
+        .map((res: Response) => {
+          return res.status;
+        });
   }
 
   uploadKey(data)
