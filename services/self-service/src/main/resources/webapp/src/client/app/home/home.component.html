@@ -36,7 +36,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <div class="sub_nav">
   <div class="container-fluid">
-    <button class="btn btn_create" (click)="createAnalyticalModal.open({isFooter: false})">
+    <button class="btn btn_create" [disabled]="!userAccessKeyUploaded" (click)="createAnalyticalModal.open({isFooter: false})">
       <span class="glyphicon glyphicon glyphicon-plus" ></span> Create new
     </button>
     <button class="btn btn_refresh pull-right" (click)="refreshGrid()">
@@ -115,7 +115,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             <span class="glyphicon glyphicon-upload"></span> Browse
             <input (change)="uploadUserAccessKey_onChange($event)" type="file" name="file" accept=".pub" />
           </span>
-          <div class="text-right" [class.danger_color]="uploadAccessUserKeyFormInvalid">{{keyName}}</div>
+          <div class="text-right" [class.danger_color]="uploadAccessUserKeyFormInvalid">{{uploadAccessKeyLabel}}</div>
         </div>
       </div>
       <div class="text-right">
