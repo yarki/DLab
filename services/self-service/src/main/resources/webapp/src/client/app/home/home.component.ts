@@ -89,13 +89,13 @@ export class HomeComponent implements OnInit {
             this.checkInfrastructureCreationProgress();
           }.bind(this), 10000);
         }
-       
+
       },
       error => console.log(error)
      );
 
-    
-     
+
+
      event.preventDefault();
   }
 
@@ -150,15 +150,7 @@ export class HomeComponent implements OnInit {
       }
       );
   }
-
-
-  logout() {
-    this.authenticationService.logout().subscribe(
-      data => data,
-      error => console.log(error),
-      () => this.appRoutingService.redirectToLoginPage());
-  }
-
+  
   initAnalyticSelectors() {
     this.userResourceService.getCreateTmpl()
       .subscribe(
