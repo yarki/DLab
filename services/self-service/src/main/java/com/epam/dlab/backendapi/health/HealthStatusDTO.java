@@ -10,41 +10,39 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.resources;
+package com.epam.dlab.backendapi.health;
 
-import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.dao.SettingsDAO;
-import com.epam.dlab.backendapi.health.*;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import io.dropwizard.auth.Auth;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+public class HealthStatusDTO {
+    @JsonProperty("mongo_alive")
+    private boolean mongoAlive;
+    @JsonProperty("provisioning_alive")
+    private boolean provisioningAlive;
 
-import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
-import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
+    public boolean isMongoAlive() {
+        return mongoAlive;
+    }
 
-@Path("/infrastructure")
-@Produces(MediaType.APPLICATION_JSON)
-public class InfrasctructureResource {
-    @Inject
-    @Named(MONGO_HEALTH_CHECKER)
-    private HealthChecker mongoHealthChecker;
-    @Inject
-    @Named(PROVISIONING_HEALTH_CHECKER)
-    private HealthChecker provisioningHealthChecker;
+    public void setMongoAlive(boolean mongoAlive) {
+        this.mongoAlive = mongoAlive;
+    }
 
-    @GET
-    @Path(("/status"))
-    public HealthStatusDTO status(@Auth UserInfo userInfo) {
-        return new HealthStatusDTO()
-                .withMongoAlive(mongoHealthChecker.isAlive())
-                .withProvisioningAlive(provisioningHealthChecker.isAlive());
+    public HealthStatusDTO withMongoAlive(boolean mongoAlive) {
+        setMongoAlive(mongoAlive);
+        return this;
+    }
+
+    public boolean isProvisioningAlive() {
+        return provisioningAlive;
+    }
+
+    public void setProvisioningAlive(boolean provisioningAlive) {
+        this.provisioningAlive = provisioningAlive;
+    }
+
+    public HealthStatusDTO withProvisioningAlive(boolean provisioningAlive) {
+        setProvisioningAlive(provisioningAlive);
+        return this;
     }
 }

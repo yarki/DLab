@@ -12,39 +12,21 @@
 
 package com.epam.dlab.backendapi.resources;
 
-import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.dao.SettingsDAO;
-import com.epam.dlab.backendapi.health.*;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import io.dropwizard.auth.Auth;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
-import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
+import java.io.IOException;
 
 @Path("/infrastructure")
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class InfrasctructureResource {
-    @Inject
-    @Named(MONGO_HEALTH_CHECKER)
-    private HealthChecker mongoHealthChecker;
-    @Inject
-    @Named(PROVISIONING_HEALTH_CHECKER)
-    private HealthChecker provisioningHealthChecker;
-
+public class InfrastructureResource {
     @GET
-    @Path(("/status"))
-    public HealthStatusDTO status(@Auth UserInfo userInfo) {
-        return new HealthStatusDTO()
-                .withMongoAlive(mongoHealthChecker.isAlive())
-                .withProvisioningAlive(provisioningHealthChecker.isAlive());
+    @Path("/status")
+    public Response status() throws IOException, InterruptedException {
+        return Response.status(Response.Status.OK).build();
     }
 }

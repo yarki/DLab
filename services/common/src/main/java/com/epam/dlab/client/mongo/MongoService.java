@@ -29,8 +29,12 @@ public class MongoService {
         return client.getDatabase(database).getCollection(name, Document.class);
     }
 
-    public <T> MongoCollection<T> getCollection(String name,Class<T> c) {
+    public <T> MongoCollection<T> getCollection(String name, Class<T> c) {
         return client.getDatabase(database).getCollection(name, c);
     }
 
+    public Document ping() {
+        Document ping = new Document("ping", "1");
+        return client.getDatabase(database).runCommand(ping);
+    }
 }
