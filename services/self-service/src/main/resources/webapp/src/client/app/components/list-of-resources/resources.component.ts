@@ -11,6 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 *****************************************************************************************************/
 
 import {Component, Input, Output} from "@angular/core";
+import { UserResourceService } from "./../../services/userResource.service";
 
 @Component({
     moduleId: module.id,
@@ -25,6 +26,10 @@ export class ResourcesList {
 
   collapse: boolean = false;
 
+  constructor(
+    private userResourceService: UserResourceService
+    ) { }
+
   toggleResourceList() {
     this.collapse = !this.collapse;
   }
@@ -33,7 +38,16 @@ export class ResourcesList {
     console.log(data);
   }
 
-  resourceDecommission(parent_obj, resource) {
-    console.log('Computational resources ' + resource.RESOURCE_NAME + ' ' + resource.NODES_NUMBER + ' nodes ' +  ' will be decommisioned. (ENVIRONMENT: ' + parent_obj.name + ')');
-  }
+  terminateEmr(parent_obj, resource){
+    this.userResourceService
+      .terminateEmr({
+        // notebook_name: parent_obj.name,
+        emr_cluster_name: resource.resource_name
+      })
+      .subscribe((result) => {
+        console.log('terminateEmr ', result);
+        console.log('Computational resources ' + resource.resource_name + ' nodes ' +  ' will be decommisioned. (ENVIRONMENT: ' + parent_obj.name + ')');
+      });
+      return false;
+  };
 }
