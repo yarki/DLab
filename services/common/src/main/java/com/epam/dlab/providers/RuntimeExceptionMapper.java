@@ -12,6 +12,7 @@
 
 package com.epam.dlab.providers;
 
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +36,12 @@ public class RuntimeExceptionMapper extends GenericExceptionMapper<RuntimeExcept
     private Response handleWebApplicationException(RuntimeException exception, Response defaultResponse) {
         WebApplicationException webAppException = (WebApplicationException) exception;
 
-        // No logging
-        if (webAppException.getResponse().getStatus() == 401) {
+        if (webAppException.getResponse().getStatusInfo() == Response.Status.UNAUTHORIZED) {
             return Response
                     .status(Response.Status.UNAUTHORIZED)
                     .build();
         }
-        if (webAppException.getResponse().getStatus() == 404) {
+        if (webAppException.getResponse().getStatusInfo() == Response.Status.NOT_FOUND) {
             return Response
                     .status(Response.Status.NOT_FOUND)
                     .build();
