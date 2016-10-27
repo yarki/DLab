@@ -69,7 +69,7 @@ def run():
     edge_conf['user_keyname'] = os.environ['edge_user_name']
     edge_conf['policy_arn'] = os.environ['conf_policy_arn']
     edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
-    edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
+    # edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
     edge_conf['vpc_id'] = os.environ['edge_vpc_id']
     edge_conf['region'] = os.environ['edge_region']
     edge_conf['ami_id'] = os.environ['edge_ami_id']
@@ -101,6 +101,14 @@ def run():
                                                    "UserIdGroupPairs": [],
                                                    "PrefixListIds": []}]
 
+
+    # FUSE in case of absence of user's key
+    fname = "/root/keys/{}.pub".format(edge_conf['user_keyname'])
+    if not os.path.isfile(fname):
+        print "USERs PUBLIC KEY DOES NOT EXIST in {}".format(fname)
+        sys.exit(1)
+
+
     print "Will create exploratory environment with edge node as access point as following: " + \
           json.dumps(edge_conf, sort_keys=True, indent=4, separators=(',', ': '))
     logging.info(json.dumps(edge_conf))
@@ -108,9 +116,8 @@ def run():
     try:
         logging.info('[CREATE SUBNET]')
         print '[CREATE SUBNET]'
-        params = "--vpc_id '%s' --subnet '%s' --infra_tag_name %s --infra_tag_value %s" % \
-                 (edge_conf['vpc_id'], edge_conf['private_subnet_cidr'],
-                  edge_conf['tag_name'], edge_conf['service_base_name'])
+        params = "--vpc_id '%s' --infra_tag_name %s --infra_tag_value %s --username %s" % \
+                 (edge_conf['vpc_id'], edge_conf['tag_name'], edge_conf['service_base_name'], os.environ['edge_user_name'])
         if not run_routine('create_subnet', params):
             logging.info('Failed creating subnet')
             with open("/root/result.json", 'w') as result:
@@ -120,6 +127,10 @@ def run():
             sys.exit(1)
     except:
         sys.exit(1)
+
+    tag = {"Key": edge_conf['tag_name'], "Value": "{}-{}-subnet".format(edge_conf['service_base_name'], os.environ['edge_user_name'])}
+    edge_conf['private_subnet_cidr'] = get_subnet_by_tag(tag)
+    print 'NEW SUBNET CIDR CREATED: {}'.format(edge_conf['private_subnet_cidr'])
 
     try:
         logging.info('[CREATE EDGE ROLES]')

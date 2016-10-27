@@ -53,14 +53,14 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
 
     private RESTService createAuthenticationService() {
         RESTService result = mock(RESTService.class);
-        when(result.post(eq(LOGIN), any(), any())).thenReturn(Response.ok("token123").build());
+        when(result.post(eq(LOGIN), any(), any())).then(invocationOnMock -> Response.ok("token123").build());
         when(result.post(eq(GET_USER_INFO), eq("token123"), eq(UserInfo.class))).thenReturn(new UserInfo("test", "token123"));
         return result;
     }
 
     private RESTService createProvisioningService() {
         RESTService result = mock(RESTService.class);
-        when(result.post(eq(KEY_LOADER), any(), eq(Response.class))).thenReturn(Response.accepted().build());
+        when(result.post(eq(KEY_LOADER), any(), eq(Response.class))).then(invocationOnMock -> Response.accepted().build());
         when(result.get(eq(DOCKER), any()))
                 .thenReturn(new ImageMetadataDTO[]{
                         new ImageMetadataDTO("test computational image", "template", "decription", "request_id", ImageType.COMPUTATIONAL.getType(),

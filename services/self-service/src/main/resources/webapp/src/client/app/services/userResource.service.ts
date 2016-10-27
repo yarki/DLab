@@ -14,6 +14,7 @@ import { Injectable } from '@angular/core';
 import {Http, Response} from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
 import { UserProfileService } from './../security/userProfile.service'
+import {Headers} from "@angular/http";
 
 @Injectable()
 export class UserResourceService {
@@ -22,8 +23,13 @@ export class UserResourceService {
     emrTmpls: 'userlist/computational',
     shapes: 'userlist/shape',
     createNotebook: 'exploratory/create',
+    startNotebook: 'exploratory/start',
+    stopNotebook: 'exploratory/stop',
+    terminateNotebook: 'exploratory/terminate',
     createEmr: 'emr/create',
-    gridData: 'userlist'
+    terminateEmr: 'emr/terminate',
+    gridData: 'userlist',
+    keyloader: 'keyloader'
   };
 
   constructor(private http: Http,
@@ -72,13 +78,56 @@ export class UserResourceService {
       });
   }
 
+  startUsernotebook(data) {
+    let body = JSON.stringify(data);
+    let requestHeader = this.webRequestHelper.getJsonHeader();
+      return this.http.post(this.getResourceUrl('startNotebook'), body, { headers: requestHeader })
+        .map((res) => {
+          return res;
+      });
+  }
+
+  stopUsernotebook(data) {
+    let body = JSON.stringify(data);
+    let requestHeader = this.webRequestHelper.getJsonHeader();
+      return this.http.post(this.getResourceUrl('stopNotebook'), body, { headers: requestHeader })
+        .map((res) => {
+          return res;
+      });
+  }
+
+  terminateUsernotebook(data) {
+    let body = JSON.stringify(data);
+    let requestHeader = this.webRequestHelper.getJsonHeader();
+      return this.http.post(this.getResourceUrl('terminateNotebook'), body, { headers: requestHeader })
+        .map((res) => {
+          return res;
+      });
+  }
+
   createEmr(data)
   {
     let body = JSON.stringify(data);
     let requestHeader = this.webRequestHelper.getJsonHeader();
       return this.http.post(this.getResourceUrl('createEmr'), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
+        .map(res => res.json());
+  }
+
+  terminateEmr(data) {
+    let body = JSON.stringify(data);
+    let requestHeader = this.webRequestHelper.getJsonHeader();
+      return this.http.post(this.getResourceUrl('terminateEmr'), body, { headers: requestHeader })
+        .map((res: Response) => {
+          return res.status;
+        });
+  }
+
+  uploadKey(data)
+  {
+    let body = data;
+      return this.http.post(this.getResourceUrl('keyloader'), body)
+        .map((res: Response) => {
+          return res.status;
+        });
   }
 }

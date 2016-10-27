@@ -10,17 +10,8 @@
 
  *****************************************************************************************************/
 
-import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Observable } from "rxjs";
+package com.epam.dlab.backendapi.core.response;
 
-
-@Injectable()
-export class EnvironmentsService {
-  constructor(private http: Http) { }
-
-  getEnvironmentsList(): Observable<String> {
-    return this.http.get('app/components/grid/data.json')
-      .map((res: Response) => res.json());
-  }
+public interface ErrorFileHandler {
+    void handle();
 }

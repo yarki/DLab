@@ -23,8 +23,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Supplier;
 
-public final class AsyncFileHandler implements Runnable {
+public final class AsyncFileHandler implements Supplier<Boolean> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
 
     private final String fileName;
@@ -40,15 +41,17 @@ public final class AsyncFileHandler implements Runnable {
     }
 
     @Override
-    public void run() {
+    public Boolean get() {
         Path path = Paths.get(directory, fileName);
         try {
             if (fileHandler.handle(fileName, readBytes(path))) {
                 Files.delete(path);
+                return true;
             }
         } catch (Exception e) {
             LOGGER.debug("handle file async", e);
         }
+        return false;
     }
 
     private byte[] readBytes(Path path) throws IOException, InterruptedException {
