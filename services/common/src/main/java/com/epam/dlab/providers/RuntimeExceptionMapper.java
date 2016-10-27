@@ -12,8 +12,17 @@
 
 package com.epam.dlab.providers;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 @Provider
 public class RuntimeExceptionMapper extends GenericExceptionMapper<RuntimeException> {
+    @Override
+    public Response toResponse(RuntimeException exception) {
+        if (exception instanceof WebApplicationException) {
+            throw exception;
+        }
+        return super.toResponse(exception);
+    }
 }
