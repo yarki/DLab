@@ -30,7 +30,6 @@ export class AuthenticationService {
       )
       .map((res : Response) => {
           if (res.status == 200) {
-
             this.userProfileService.setAuthToken(res.text())
             this.userProfileService.setUserName(userName);
             return true;

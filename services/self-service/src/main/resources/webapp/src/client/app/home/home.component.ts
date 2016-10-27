@@ -151,15 +151,7 @@ export class HomeComponent implements OnInit {
       }
       );
   }
-
-
-  logout() {
-    this.authenticationService.logout().subscribe(
-      data => data,
-      error => console.log(error),
-      () => this.appRoutingService.redirectToLoginPage());
-  }
-
+  
   initAnalyticSelectors() {
     this.userResourceService.getCreateTmpl()
       .subscribe(
