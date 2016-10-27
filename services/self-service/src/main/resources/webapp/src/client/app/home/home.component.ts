@@ -10,12 +10,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { AuthenticationService } from './../security/authentication.service';
 import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
 import {AppRoutingService} from "../routing/appRouting.service";
-import {Http, Response} from '@angular/http';
 import { Grid } from '../components/grid/grid.component';
 
 @Component({
@@ -27,22 +26,20 @@ import { Grid } from '../components/grid/grid.component';
 })
 
 export class HomeComponent implements OnInit {
-  key: any;
-  keyName: string;
-  uploadAccessKeyUrl: string;
-  preloadModalInterval: any;
   uploadAccessUserKeyFormInvalid: boolean;
   createTempls: any;
   shapes: any;
   emrTempls: any;
   uploadKey: any;
-
+  userAccessKeyUploaded: boolean;
+  uploadAccessKeyLabel: string;
+  notebookExist: boolean = false;
 
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
   @ViewChild('createAnalyticalModal') createAnalyticalModal;
-  @ViewChild(Grid) refresh:Grid ;
+  @ViewChild(Grid) grid:Grid ;
 
   // -------------------------------------------------------------------------
   // Overrides
@@ -52,15 +49,14 @@ export class HomeComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private userAccessKeyService: UserAccessKeyService,
     private userResourceService: UserResourceService,
-    private appRoutingService : AppRoutingService,
-    private http: Http
+    private appRoutingService : AppRoutingService
   ) {
+    this.userAccessKeyUploaded = false;
     this.uploadAccessUserKeyFormInvalid = true;
-    this.uploadAccessKeyUrl = this.userAccessKeyService.getAccessKeyUrl();
   }
 
   ngOnInit() {
-    this.checkInfrastructureCreationProgress();
+    this.checkInfrastructureCreationProgress(true);
     this.initAnalyticSelectors();
   }
 
@@ -84,51 +80,44 @@ export class HomeComponent implements OnInit {
     this.userResourceService.uploadKey(formData)
     .subscribe(
       status => {
-        if(status === 200) {
-          this.checkInfrastructureCreationProgress();
-          this.preloadModalInterval = setInterval(function() {
-            this.checkInfrastructureCreationProgress();
-          }.bind(this), 10000);
-        }
-
+        if(status === 200)
+          this.checkInfrastructureCreationProgress(false);
       },
       error => console.log(error)
      );
-
-
 
      event.preventDefault();
   }
 
   uploadUserAccessKey_onChange($event) {
-    this.uploadKey = $event.srcElement.files[0];
+    this.uploadAccessKeyLabel = "";
+
     if($event.target.files.length > 0)
     {
       let fileName = $event.target.files[0].name;
       this.uploadAccessUserKeyFormInvalid = !fileName.toLowerCase().endsWith(".pub");
-      this.keyName = fileName
-
+      this.uploadKey = $event.target.files[0];
+      this.uploadAccessKeyLabel = this.uploadAccessUserKeyFormInvalid ? ".pub file is required." : fileName;
     }
   }
 
-
   refreshGrid() {
-    this.refresh.buildGrid();
+    this.grid.buildGrid();
   }
 
   //
   // Private Methods
   //
 
-  private checkInfrastructureCreationProgress() {
+  private checkInfrastructureCreationProgress(callOnce: boolean) {
     this.userAccessKeyService.checkUserAccessKey()
       .subscribe(
       status => {
         if(status == 200)
         {
+          this.userAccessKeyUploaded = true;
           if (this.preloaderModal.isOpened) {
             this.preloaderModal.close();
-            clearInterval(this.preloadModalInterval);
           }
         } else if (status == 202)
         {
@@ -137,6 +126,9 @@ export class HomeComponent implements OnInit {
 
           if (!this.preloaderModal.isOpened)
             this.preloaderModal.open({ isHeader: false, isFooter: false });
+
+          if(!callOnce)
+            setTimeout(() => this.checkInfrastructureCreationProgress(false), 10000)
         }
       },
       err => {
@@ -144,6 +136,9 @@ export class HomeComponent implements OnInit {
         {
           if (!this.keyUploadModal.isOpened)
             this.keyUploadModal.open({ isFooter: false });
+
+          if(!callOnce)
+            setTimeout(() => this.checkInfrastructureCreationProgress(false), 10000)
         }
         else {
             console.error(err);
@@ -151,7 +146,7 @@ export class HomeComponent implements OnInit {
       }
       );
   }
-  
+
   initAnalyticSelectors() {
     this.userResourceService.getCreateTmpl()
       .subscribe(
@@ -173,6 +168,7 @@ export class HomeComponent implements OnInit {
         },
         error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
+
     this.userResourceService.getEmrTmpl()
       .subscribe(
         data => {
@@ -193,6 +189,7 @@ export class HomeComponent implements OnInit {
         },
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
+
     this.userResourceService.getShapes()
       .subscribe(
         data => {
@@ -202,12 +199,21 @@ export class HomeComponent implements OnInit {
       );
   }
 
-  createUsernotebook(tmplIndex, name, shape){
+  createUsernotebook(event, tmplIndex, name, shape){
+    event.preventDefault();
+
+    this.grid.list.forEach(function(notebook){
+      if(name.value.toLowerCase() === notebook.environment_name.toLowerCase()) {
+        this.notebookExist = true;
+        return false;
+      }
+    }, this);
+    
+
     this.userResourceService
       .createUsernotebook({
-        name: name,
-        shape: shape,
-        // image: this.createTempls[tmplIndex].image,
+        name: name.value,
+        shape: shape.value,
         version: this.createTempls[tmplIndex].version
       })
       .subscribe((result) => {
@@ -216,9 +222,10 @@ export class HomeComponent implements OnInit {
         if (this.createAnalyticalModal.isOpened) {
          this.createAnalyticalModal.close();
        }
-       this.refresh.buildGrid();
+       this.grid.buildGrid();
+       name.value = "";
+       this.notebookExist = false;
       });
-      return false;
   };
 
   createEmr(template, name, shape){
