@@ -118,7 +118,7 @@ def spark_defaults(args):
     local('touch /tmp/spark-defaults-temporary.conf')
     local('cat  /tmp/spark-defaults-temporary.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR|" | sed "s|\(.*\)\ |\\1|" > /tmp/spark-defaults-temporary.conf')
     local('printf "\\n"')
-    local('cat ~/Downloads/spark-defaults.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> /tmp/spark-defaults-temporary.conf')
+    local('cat /tmp/spark-defaults-temporary.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> /tmp/spark-defaults-temporary.conf')
     #local('sudo mv /tmp/spark-defaults-temporary.conf ' + spark_def_path)
     template_file = "/tmp/spark-defaults-temporary.conf"
     with open(template_file, 'r') as f:
