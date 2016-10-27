@@ -101,7 +101,9 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("terminating exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        return action(userInfo, formDTO, EXPLORATORY_TERMINATE, UserInstanceStatus.TERMINATING);
+        UserInstanceStatus status = UserInstanceStatus.TERMINATING;
+        userListDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, formDTO, status));
+        return action(userInfo, formDTO, EXPLORATORY_TERMINATE, status);
     }
 
     @POST
@@ -111,16 +113,20 @@ public class ExploratoryResource implements ExploratoryAPI {
         return action(userInfo, formDTO, EXPLORATORY_STOP, UserInstanceStatus.STOPPING);
     }
 
-    private String action(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO, String action, UserInstanceStatus status) {
-        userListDAO.updateExploratoryStatus(new StatusBaseDTO()
-                .withUser(userInfo.getName())
-                .withName(formDTO.getNotebookInstanceName())
-                .withStatus(status.getStatus()));
+    private String action(UserInfo userInfo, ExploratoryActionFormDTO formDTO, String action, UserInstanceStatus status) {
+        userListDAO.updateExploratoryStatus(createStatusDTO(userInfo, formDTO, status));
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withNotebookUserName(userInfo.getName())
                 .withNotebookInstanceName(formDTO.getNotebookInstanceName())
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(action, dto, String.class);
+    }
+
+    private StatusBaseDTO createStatusDTO(UserInfo userInfo, ExploratoryActionFormDTO formDTO, UserInstanceStatus status) {
+        return new StatusBaseDTO()
+                .withUser(userInfo.getName())
+                .withName(formDTO.getNotebookInstanceName())
+                .withStatus(status.getStatus());
     }
 }
