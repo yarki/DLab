@@ -13,7 +13,7 @@
   "YARN_CONF_DIR": "/srv/hadoopconf/config/CLUSTER",
   "PYSPARK_PYTHON": "python2.7",
   "SPARK_HOME": "SPARK_PATH",
-  "PYTHONPATH": "SPARK_PATHpython/lib/py4j-0.9-src.zip:SPARK_PATHpython/:",
+  "PYTHONPATH": "PY4J:SPARK_PATHpython/:",
   "PYTHONSTARTUP": "SPARK_PATHpython/pyspark/shell.py",
   "PYSPARK_SUBMIT_ARGS": "--master yarn pyspark-shell"
  }

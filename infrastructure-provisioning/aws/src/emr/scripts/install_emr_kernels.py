@@ -54,6 +54,20 @@ def get_spark_version():
                     spark_version = j.get("Version")
     return spark_version
 
+def get_hadoop_version():
+    hadoop_version = ''
+    emr = boto3.client('emr')
+    clusters = emr.list_clusters(ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING'])
+    clusters = clusters.get('Clusters')
+    for i in clusters:
+        response = emr.describe_cluster(ClusterId=i.get('Id'))
+        if response.get("Cluster").get("Name") == args.cluster_name:
+            response =  response.get("Cluster").get("Applications")
+            for j in response:
+                if j.get("Name") == 'Hadoop':
+                    hadoop_version = j.get("Version")
+    return hadoop_version[0:3]
+
 
 if __name__ == "__main__":
     env.hosts = "{}".format(args.notebook_ip)
@@ -62,4 +76,5 @@ if __name__ == "__main__":
     env.host_string = env.user + "@" + env.hosts
     configure_notebook()
     spark_version = get_spark_version()
-    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version)
+    hadoop_version = get_hadoop_version()
+    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version + ' --hadoop_version ' + hadoop_version)
