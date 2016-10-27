@@ -35,6 +35,7 @@ export class HomeComponent implements OnInit {
   createTempls: any;
   shapes: any;
   emrTempls: any;
+  uploadKey: any;
 
 
 
@@ -73,22 +74,42 @@ export class HomeComponent implements OnInit {
       () => this.appRoutingService.redirectToLoginPage());
   }
 
+
   uploadUserAccessKey_btnClick(event) {
-    this.preloadModalInterval = setInterval(function() {
-      this.checkInfrastructureCreationProgress();
-    }.bind(this), 10000);
-    event.preventDefault()
+
+    let formData = new FormData();
+    formData.append("file", this.uploadKey);
+
+    this.userResourceService.uploadKey(formData)
+    .subscribe(
+      status => {
+        if(status === 200) {
+          this.checkInfrastructureCreationProgress();
+          this.preloadModalInterval = setInterval(function() {
+            this.checkInfrastructureCreationProgress();
+          }.bind(this), 10000);
+        }
+       
+      },
+      error => console.log(error)
+     );
+
+    
+     
+     event.preventDefault();
   }
 
   uploadUserAccessKey_onChange($event) {
+    this.uploadKey = $event.srcElement.files[0];
     if($event.target.files.length > 0)
     {
       let fileName = $event.target.files[0].name;
       this.uploadAccessUserKeyFormInvalid = !fileName.toLowerCase().endsWith(".pub");
-      if(!this.uploadAccessUserKeyFormInvalid)
-        this.keyName = fileName;
+      this.keyName = fileName
+
     }
   }
+
 
   refreshGrid() {
     this.refresh.buildGrid();
@@ -108,7 +129,7 @@ export class HomeComponent implements OnInit {
             this.preloaderModal.close();
             clearInterval(this.preloadModalInterval);
           }
-        } else if (status == 201)
+        } else if (status == 202)
         {
           if (this.keyUploadModal.isOpened)
             this.keyUploadModal.close();
@@ -123,6 +144,9 @@ export class HomeComponent implements OnInit {
           if (!this.keyUploadModal.isOpened)
             this.keyUploadModal.open({ isFooter: false });
         }
+        else {
+            console.error(err);
+        }
       }
       );
   }
@@ -133,12 +157,6 @@ export class HomeComponent implements OnInit {
       data => data,
       error => console.log(error),
       () => this.appRoutingService.redirectToLoginPage());
-  }
-
-  uploadUserAccessKey($event) {
-    this.preloadModalInterval = setInterval(function() {
-      this.checkInfrastructureCreationProgress();
-    }.bind(this), 10000);
   }
 
   initAnalyticSelectors() {
@@ -185,7 +203,6 @@ export class HomeComponent implements OnInit {
     this.userResourceService.getShapes()
       .subscribe(
         data => {
-          console.log("shapes !!!", data);
           this.shapes = data
         },
         error => this.shapes = [{shape_name: 'M4.large'}, {shape_name: 'M4.large'}]

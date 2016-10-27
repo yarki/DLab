@@ -14,6 +14,7 @@ import { Injectable } from '@angular/core';
 import {Http, Response} from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
 import { UserProfileService } from './../security/userProfile.service'
+import {Headers} from "@angular/http";
 
 @Injectable()
 export class UserResourceService {
@@ -23,7 +24,8 @@ export class UserResourceService {
     shapes: 'userlist/shape',
     createNotebook: 'exploratory/create',
     createEmr: 'emr/create',
-    gridData: 'userlist'
+    gridData: 'userlist',
+    keyloader: 'keyloader'
   };
 
   constructor(private http: Http,
@@ -77,8 +79,15 @@ export class UserResourceService {
     let body = JSON.stringify(data);
     let requestHeader = this.webRequestHelper.getJsonHeader();
       return this.http.post(this.getResourceUrl('createEmr'), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
+        .map(res => res.json());
+  }
+
+  uploadKey(data)
+  {
+    let body = data;
+      return this.http.post(this.getResourceUrl('keyloader'), body)
+        .map((res: Response) => {
+          return res.status;
+        });
   }
 }
