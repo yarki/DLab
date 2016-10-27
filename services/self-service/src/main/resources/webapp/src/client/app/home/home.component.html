@@ -47,7 +47,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <ng-grid [emrTempls]="emrTempls" [shapes]="shapes"></ng-grid>
 
-<modal #createAnalyticalModal>
+<modal #createAnalyticalModal modalClass="modal-lg">
   <modal-header>
     <h4 class="modal-title" id="myModalLabel">Create analytical tool</h4>
   </modal-header>
@@ -98,7 +98,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   </modal-content>
 </modal>
 
-<modal #keyUploadModal modalClass="modal-lg" [hideCloseButton]="true" [closeOnEscape]="false" [closeOnOutsideClick]="false">
+<modal #keyUploadModal modalClass="modal-md" [hideCloseButton]="true" [closeOnEscape]="false" [closeOnOutsideClick]="false">
   <modal-header>
     <h4 class="modal-title">Create initial infrastructure</h4>
   </modal-header>
@@ -108,12 +108,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <div  class="col-xs-7">
           <label class="control-label">Upload public key start environment creation</label>
           <div>
-            <small><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Where can I get public key?</small>
+            <small><span class="glyphicon glyphicon-question-sign" ></span> Where can I get public key?</small>
           </div>
         </div>
         <div class="col-xs-5 text-right">
           <span class="btn btn-default btn-file">
-            <span class="glyphicon glyphicon-upload"></span> Browse
+            <span class="upload-icon" ></span> Browse
             <input (change)="uploadUserAccessKey_onChange($event)" type="file" name="file" accept=".pub" />
           </span>
           <div class="text-right" [class.danger_color]="uploadAccessUserKeyFormInvalid">{{uploadAccessKeyLabel}}</div>
