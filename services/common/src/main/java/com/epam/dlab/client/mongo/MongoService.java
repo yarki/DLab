@@ -20,6 +20,8 @@ public class MongoService {
     private MongoClient client;
     private String database;
 
+    private static final Document PING = new Document("ping", "1");
+
     public MongoService(MongoClient client, String database) {
         this.client = client;
         this.database = database;
@@ -34,7 +36,6 @@ public class MongoService {
     }
 
     public Document ping() {
-        Document ping = new Document("ping", "1");
-        return client.getDatabase(database).runCommand(ping);
+        return client.getDatabase(database).runCommand(PING);
     }
 }

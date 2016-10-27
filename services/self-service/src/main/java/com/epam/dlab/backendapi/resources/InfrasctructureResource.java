@@ -13,19 +13,16 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.dao.SettingsDAO;
-import com.epam.dlab.backendapi.health.*;
+import com.epam.dlab.backendapi.health.HealthChecker;
+import com.epam.dlab.backendapi.health.HealthStatusDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
 import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
@@ -41,7 +38,7 @@ public class InfrasctructureResource {
     private HealthChecker provisioningHealthChecker;
 
     @GET
-    @Path(("/status"))
+    @Path("/status")
     public HealthStatusDTO status(@Auth UserInfo userInfo) {
         return new HealthStatusDTO()
                 .withMongoAlive(mongoHealthChecker.isAlive())

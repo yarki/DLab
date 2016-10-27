@@ -35,18 +35,16 @@ public class ProvisioningHealthChecker implements HealthChecker {
 
     @Override
     public boolean isAlive() {
-        boolean alive;
         try {
             Response response = provisioningService.get("/infrastructure/status", Response.class);
-            alive = response.getStatusInfo() == Response.Status.OK;
+            boolean alive = response.getStatusInfo() == Response.Status.OK;
             if (!alive) {
                 LOGGER.error("Provisioning service is not available");
             }
+            return alive;
         } catch (Throwable t) {
             LOGGER.error("Provisioning service is not available", t);
-            alive = false;
+            return false;
         }
-
-        return alive;
     }
 }
