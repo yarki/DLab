@@ -26,6 +26,7 @@ outfile = "/etc/mongo_params.yml"
 parser = argparse.ArgumentParser()
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--base_name', type=str, default='')
+parser.add_argument('--sg', type=str, default='')
 args = parser.parse_args()
 
 
@@ -82,6 +83,7 @@ if __name__ == "__main__":
         client.dlabdb.command('grantRolesToUser', "admin", roles=["readWrite"])
         client.dlabdb.settings.insert_one({"_id": "aws_region", "value": args.region})
         client.dlabdb.settings.insert_one({"_id": "service_base_name", "value": args.base_name})
+        client.dlabdb.settings.insert_one({"_id": "security_groups_ids", "value": args.sg})
         if add_2_yml_config(path,'security','authorization','enabled'):
             command = ['service', 'mongod', 'restart']
             subprocess.call(command, shell=False)
