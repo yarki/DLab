@@ -95,22 +95,18 @@ export class HomeComponent implements OnInit {
       error => console.log(error)
      );
 
-
-
      event.preventDefault();
   }
 
   uploadUserAccessKey_onChange($event) {
-    this.uploadKey = $event.srcElement.files[0];
     if($event.target.files.length > 0)
     {
       let fileName = $event.target.files[0].name;
       this.uploadAccessUserKeyFormInvalid = !fileName.toLowerCase().endsWith(".pub");
-      this.keyName = fileName
-
+      this.uploadKey = $event.target.files[0];
+      this.keyName = fileName;
     }
   }
-
 
   refreshGrid() {
     this.refresh.buildGrid();
@@ -151,7 +147,7 @@ export class HomeComponent implements OnInit {
       }
       );
   }
-  
+
   initAnalyticSelectors() {
     this.userResourceService.getCreateTmpl()
       .subscribe(
