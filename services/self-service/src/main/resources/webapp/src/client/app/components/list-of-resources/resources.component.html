@@ -15,15 +15,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <span *ngIf="!resources.length" class="no_details">no details</span>
   </div>
   <div *ngIf="resources.length">
-    <span *ngIf="resources.length" class="glyphicon glyphicon-remove" (click)="resourceDecommission(environment, resources[0])"></span>
-    <a class="detailed-link" (click)="printDetailResourceModal(resources[0])">{{resources[0].RESOURCE_NAME}} {{resources[0].NODES_NUMBER}} nodes</a>
-    <span class="glyphicon pull-right" [ngClass]="{'glyphicon-triangle-bottom': !collapse, 'glyphicon-triangle-top': collapse}" (click)="toggleResourceList()"></span>
+    <span class="glyphicon glyphicon-remove" (click)="resourceDecommission(environment, resources[0])"></span>
+    <a class="detailed-link" (click)="printDetailResourceModal(resources[0])">
+      {{resources[0].resource_name}}
+      <span *ngIf="resources[0].nodes_number">{{resources[0].nodes_number}} nodes</span>
+    </a>
+    <span *ngIf="resources.length > 1" class="glyphicon pull-right" [ngClass]="{'glyphicon-triangle-bottom': !collapse, 'glyphicon-triangle-top': collapse}" (click)="toggleResourceList()"></span>
   </div>
 </div>
 
 <div *ngIf="collapse" class="source">
   <div *ngFor="let resource of resources | slice:1">
     <span class="glyphicon glyphicon-remove" (click)="resourceDecommission(environment, resource)"></span>
-    <a class="detailed-link" (click)="printDetailResourceModal(resource)">{{resource.RESOURCE_NAME}} {{resource.NODES_NUMBER}} nodes</a>
+    <a class="detailed-link" (click)="printDetailResourceModal(resource)">
+      {{resource.resource_name}}
+      <span *ngIf="resource.nodes_number">{{resource.nodes_number}} nodes</span>
+    </a>
   </div>
 </div>

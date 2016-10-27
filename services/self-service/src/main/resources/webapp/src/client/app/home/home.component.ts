@@ -15,7 +15,6 @@ import { AuthenticationService } from './../security/authentication.service';
 import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
 import {AppRoutingService} from "../routing/appRouting.service";
-import {Http, Response} from '@angular/http';
 import { Grid } from '../components/grid/grid.component';
 
 @Component({
@@ -27,19 +26,17 @@ import { Grid } from '../components/grid/grid.component';
 })
 
 export class HomeComponent implements OnInit {
-  key: any;
-  keyName: string;
-  uploadAccessKeyUrl: string;
-  preloadModalInterval: any;
   uploadAccessUserKeyFormInvalid: boolean;
   createTempls: any;
   shapes: any;
   emrTempls: any;
-
-
+  uploadKey: any;
+  userAccessKeyUploaded: boolean;
+  uploadAccessKeyLabel: string;
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
+  @ViewChild('createAnalyticalModal') createAnalyticalModal;
   @ViewChild(Grid) refresh:Grid ;
 
   // -------------------------------------------------------------------------
@@ -50,15 +47,14 @@ export class HomeComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private userAccessKeyService: UserAccessKeyService,
     private userResourceService: UserResourceService,
-    private appRoutingService : AppRoutingService,
-    private http: Http
+    private appRoutingService : AppRoutingService
   ) {
+    this.userAccessKeyUploaded = false;
     this.uploadAccessUserKeyFormInvalid = true;
-    this.uploadAccessKeyUrl = this.userAccessKeyService.getAccessKeyUrl();
   }
 
   ngOnInit() {
-    this.checkInfrastructureCreationProgress();
+    this.checkInfrastructureCreationProgress(true);
     this.initAnalyticSelectors();
   }
 
@@ -73,20 +69,33 @@ export class HomeComponent implements OnInit {
       () => this.appRoutingService.redirectToLoginPage());
   }
 
+
   uploadUserAccessKey_btnClick(event) {
-    this.preloadModalInterval = setInterval(function() {
-      this.checkInfrastructureCreationProgress();
-    }.bind(this), 10000);
-    event.preventDefault()
+
+    let formData = new FormData();
+    formData.append("file", this.uploadKey);
+
+    this.userResourceService.uploadKey(formData)
+    .subscribe(
+      status => {
+        if(status === 200)
+          this.checkInfrastructureCreationProgress(false);
+      },
+      error => console.log(error)
+     );
+
+     event.preventDefault();
   }
 
   uploadUserAccessKey_onChange($event) {
+    this.uploadAccessKeyLabel = "";
+
     if($event.target.files.length > 0)
     {
       let fileName = $event.target.files[0].name;
       this.uploadAccessUserKeyFormInvalid = !fileName.toLowerCase().endsWith(".pub");
-      if(!this.uploadAccessUserKeyFormInvalid)
-        this.keyName = fileName;
+      this.uploadKey = $event.target.files[0];
+      this.uploadAccessKeyLabel = this.uploadAccessUserKeyFormInvalid ? ".pub file is required." : fileName;
     }
   }
 
@@ -98,23 +107,26 @@ export class HomeComponent implements OnInit {
   // Private Methods
   //
 
-  private checkInfrastructureCreationProgress() {
+  private checkInfrastructureCreationProgress(callOnce: boolean) {
     this.userAccessKeyService.checkUserAccessKey()
       .subscribe(
       status => {
         if(status == 200)
         {
+          this.userAccessKeyUploaded = true;
           if (this.preloaderModal.isOpened) {
             this.preloaderModal.close();
-            clearInterval(this.preloadModalInterval);
           }
-        } else if (status == 201)
+        } else if (status == 202)
         {
           if (this.keyUploadModal.isOpened)
             this.keyUploadModal.close();
 
           if (!this.preloaderModal.isOpened)
             this.preloaderModal.open({ isHeader: false, isFooter: false });
+
+          if(!callOnce)
+            setTimeout(() => this.checkInfrastructureCreationProgress(false), 10000)
         }
       },
       err => {
@@ -122,23 +134,15 @@ export class HomeComponent implements OnInit {
         {
           if (!this.keyUploadModal.isOpened)
             this.keyUploadModal.open({ isFooter: false });
+
+          if(!callOnce)
+            setTimeout(() => this.checkInfrastructureCreationProgress(false), 10000)
+        }
+        else {
+            console.error(err);
         }
       }
       );
-  }
-
-
-  logout() {
-    this.authenticationService.logout().subscribe(
-      data => data,
-      error => console.log(error),
-      () => this.appRoutingService.redirectToLoginPage());
-  }
-
-  uploadUserAccessKey($event) {
-    this.preloadModalInterval = setInterval(function() {
-      this.checkInfrastructureCreationProgress();
-    }.bind(this), 10000);
   }
 
   initAnalyticSelectors() {
@@ -162,6 +166,7 @@ export class HomeComponent implements OnInit {
         },
         error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
+
     this.userResourceService.getEmrTmpl()
       .subscribe(
         data => {
@@ -182,10 +187,10 @@ export class HomeComponent implements OnInit {
         },
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
+
     this.userResourceService.getShapes()
       .subscribe(
         data => {
-          console.log("shapes !!!", data);
           this.shapes = data
         },
         error => this.shapes = [{shape_name: 'M4.large'}, {shape_name: 'M4.large'}]
@@ -197,12 +202,16 @@ export class HomeComponent implements OnInit {
       .createUsernotebook({
         name: name,
         shape: shape,
-        image: this.createTempls[tmplIndex].image,
+        // image: this.createTempls[tmplIndex].image,
         version: this.createTempls[tmplIndex].version
       })
       .subscribe((result) => {
         console.log('result: ', result);
 
+        if (this.createAnalyticalModal.isOpened) {
+         this.createAnalyticalModal.close();
+       }
+       this.refresh.buildGrid();
       });
       return false;
   };
