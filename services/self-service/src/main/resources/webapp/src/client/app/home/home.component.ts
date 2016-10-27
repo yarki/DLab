@@ -228,12 +228,4 @@ export class HomeComponent implements OnInit {
       });
   };
 
-  createEmr(template, name, shape){
-    this.userResourceService
-      .createUsernotebook({"image": name.value})
-      .subscribe((result) => {
-        console.log('result: ', result);
-      });
-    return false;
-  };
 }
