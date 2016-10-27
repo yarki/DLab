@@ -25,6 +25,7 @@ export class UserResourceService {
     createNotebook: 'exploratory/create',
     startNotebook: 'exploratory/start',
     stopNotebook: 'exploratory/stop',
+    terminateNotebook: 'exploratory/terminate',
     createEmr: 'emr/create',
     gridData: 'userlist',
     keyloader: 'keyloader'
@@ -89,6 +90,15 @@ export class UserResourceService {
     let body = JSON.stringify(data);
     let requestHeader = this.webRequestHelper.getJsonHeader();
       return this.http.post(this.getResourceUrl('stopNotebook'), body, { headers: requestHeader })
+        .map((res) => {
+          return res;
+      });
+  }
+
+  terminateUsernotebook(data) {
+    let body = JSON.stringify(data);
+    let requestHeader = this.webRequestHelper.getJsonHeader();
+      return this.http.post(this.getResourceUrl('terminateNotebook'), body, { headers: requestHeader })
         .map((res) => {
           return res;
       });
