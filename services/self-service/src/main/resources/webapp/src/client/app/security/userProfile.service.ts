@@ -72,6 +72,7 @@ export class UserProfileService {
               return true;
             }
 
+          this.clearAuthToken();
           this.appRoutingService.redirectToLoginPage();
           return false;
         }, this);

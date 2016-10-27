@@ -100,6 +100,11 @@ public class EmrResource implements EmrAPI {
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
         LOGGER.debug("terminating emr {} for user {}", formDTO.getClusterName(), userInfo.getName());
+        userListDAO.updateComputationalStatus(new EMRStatusDTO()
+                .withUser(userInfo.getName())
+                .withName(formDTO.getNotebookName())
+                .withResourceName(formDTO.getClusterName())
+                .withStatus(UserInstanceStatus.TERMINATING.getStatus()));
         EMRTerminateDTO dto = new EMRTerminateDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withEdgeUserName(userInfo.getName())
