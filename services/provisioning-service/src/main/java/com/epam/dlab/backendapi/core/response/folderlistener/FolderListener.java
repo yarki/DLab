@@ -65,8 +65,12 @@ public class FolderListener implements Runnable {
                 }
                 pollFile();
             }
-        } else if (errorFileHandler != null && !success) {
-            errorFileHandler.handle();
+        } else if (!success) {
+            if (errorFileHandler != null) {
+                errorFileHandler.handle();
+            } else {
+                LOGGER.warn("docker returned no result, silently ignored");
+            }
         }
     }
 
