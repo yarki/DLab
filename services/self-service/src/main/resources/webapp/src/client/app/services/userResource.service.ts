@@ -23,6 +23,8 @@ export class UserResourceService {
     emrTmpls: 'userlist/computational',
     shapes: 'userlist/shape',
     createNotebook: 'exploratory/create',
+    startNotebook: 'exploratory/start',
+    stopNotebook: 'exploratory/stop',
     createEmr: 'emr/create',
     gridData: 'userlist',
     keyloader: 'keyloader'
@@ -69,6 +71,24 @@ export class UserResourceService {
     let body = JSON.stringify(data);
     let requestHeader = this.webRequestHelper.getJsonHeader();
       return this.http.post(this.getResourceUrl('createNotebook'), body, { headers: requestHeader })
+        .map((res) => {
+          return res;
+      });
+  }
+
+  startUsernotebook(data) {
+    let body = JSON.stringify(data);
+    let requestHeader = this.webRequestHelper.getJsonHeader();
+      return this.http.post(this.getResourceUrl('startNotebook'), body, { headers: requestHeader })
+        .map((res) => {
+          return res;
+      });
+  }
+
+  stopUsernotebook(data) {
+    let body = JSON.stringify(data);
+    let requestHeader = this.webRequestHelper.getJsonHeader();
+      return this.http.post(this.getResourceUrl('stopNotebook'), body, { headers: requestHeader })
         .map((res) => {
           return res;
       });
