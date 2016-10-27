@@ -41,6 +41,7 @@ export class HomeComponent implements OnInit {
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
+  @ViewChild('createAnalyticalModal') createAnalyticalModal;
   @ViewChild(Grid) refresh:Grid ;
 
   // -------------------------------------------------------------------------
@@ -89,13 +90,13 @@ export class HomeComponent implements OnInit {
             this.checkInfrastructureCreationProgress();
           }.bind(this), 10000);
         }
-       
+
       },
       error => console.log(error)
      );
 
-    
-     
+
+
      event.preventDefault();
   }
 
@@ -214,12 +215,16 @@ export class HomeComponent implements OnInit {
       .createUsernotebook({
         name: name,
         shape: shape,
-        image: this.createTempls[tmplIndex].image,
+        // image: this.createTempls[tmplIndex].image,
         version: this.createTempls[tmplIndex].version
       })
       .subscribe((result) => {
         console.log('result: ', result);
 
+        if (this.createAnalyticalModal.isOpened) {
+         this.createAnalyticalModal.close();
+       }
+       this.refresh.buildGrid();
       });
       return false;
   };
