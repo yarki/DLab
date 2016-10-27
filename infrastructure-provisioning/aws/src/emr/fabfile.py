@@ -32,7 +32,7 @@ def run():
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
     emr_conf['service_base_name'] = os.environ['conf_service_base_name']
     emr_conf['key_name'] = os.environ['creds_key_name']
-    emr_conf['subnet_cidr'] = os.environ['edge_subnet_cidr']
+    #emr_conf['subnet_cidr'] = os.environ['edge_subnet_cidr']
     emr_conf['region'] = os.environ['creds_region']
     emr_conf['release_label'] = os.environ['emr_version']
     emr_conf['master_instance_type'] = os.environ['emr_master_instance_type']
@@ -48,6 +48,9 @@ def run():
                        + ', Notebook=' + os.environ['notebook_name']
     emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-' + str(index)
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-edge-bucket').lower().replace('_', '-')
+
+    tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
+    emr_conf['subnet_cidr'] = get_subnet_by_tag(tag)
 
     try:
         emr_conf['emr_timeout'] = os.environ['emr_timeout']
