@@ -83,6 +83,13 @@ export class Grid implements OnInit {
           console.log('stopUsernotebook result: ', result);
           this.buildGrid();
         });
+    } else if (action === 'terminate') {
+      this.userResourceService
+        .terminateUsernotebook({ notebook_instance_name: data.name })
+        .subscribe((result) => {
+          console.log('terminateUsernotebook result: ', result);
+          this.buildGrid();
+        });
     }
   }
 
