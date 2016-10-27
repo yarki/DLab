@@ -53,6 +53,7 @@ def configure_mongo():
         if not exists("/lib/systemd/system/mongod.service"):
             local('scp -i {} /root/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
             sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
+        local('scp -i {} /root/templates/instance_shapes.lst {}:/tmp/instance_shapes.lst'.format(args.keyfile, env.host_string))
         local('scp -i {} /root/scripts/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
         sudo('python /tmp/configure_mongo.py --region {} --base_name {} --sg {}'.format(os.environ['creds_region'], os.environ['conf_service_base_name'], os.environ['creds_security_groups_ids']))
         return True

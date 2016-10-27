@@ -15,7 +15,7 @@
 from pymongo import MongoClient
 import random
 import string
-import yaml
+import yaml, json
 import subprocess
 import time
 import argparse
@@ -72,6 +72,12 @@ if __name__ == "__main__":
     mongo_ip = read_yml_conf(path,'net','bindIp')
     mongo_port = read_yml_conf(path,'net','port')
 
+    try:
+        with open('/tmp/instance_shapes.lst', 'r') as source_shapes:
+            shapes = json.load(source_shapes)
+    except:
+        shapes = []
+
     # Setting up admin's password and enabling security
     client = MongoClient(mongo_ip + ':' + str(mongo_port))
     pass_upd = True
@@ -84,6 +90,7 @@ if __name__ == "__main__":
         client.dlabdb.settings.insert_one({"_id": "aws_region", "value": args.region})
         client.dlabdb.settings.insert_one({"_id": "service_base_name", "value": args.base_name})
         client.dlabdb.settings.insert_one({"_id": "security_groups_ids", "value": args.sg})
+        client.dlabdb.shapes.insert(shapes)
         if add_2_yml_config(path,'security','authorization','enabled'):
             command = ['service', 'mongod', 'restart']
             subprocess.call(command, shell=False)
