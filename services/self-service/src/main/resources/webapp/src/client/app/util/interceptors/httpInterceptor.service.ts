@@ -44,7 +44,7 @@ export class HttpInterceptor extends Http {
         this.router.navigate(['/login']);
         return Observable.of(err);
       } else {
-        return Observable.of(err);
+        return Observable.throw(err);
       }
     });
   }
