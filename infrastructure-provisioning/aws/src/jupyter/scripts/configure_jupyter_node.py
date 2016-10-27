@@ -72,6 +72,9 @@ def ensure_python3_kernel():
         try:
             sudo('apt-get install python3-setuptools')
             sudo('apt install -y python3-pip')
+            sudo('add-apt-repository ppa:fkrull/deadsnakes')
+            sudo('apt update')
+            sudo('apt install python3.4')
             sudo('pip3 install ipython ipykernel')
             sudo('python3 -m ipykernel install')
             sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')

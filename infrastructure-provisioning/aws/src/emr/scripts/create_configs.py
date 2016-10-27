@@ -48,7 +48,7 @@ def jars(args):
     print "Downloading jars..."
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
-    local('tar -zhxvf /tmp/jars.tar.gz -C ' + emr_dir)
+    local('tar -zxvf /tmp/jars.tar.gz -C ' + emr_dir)
 
 
 def yarn(args):
@@ -70,17 +70,31 @@ def pyspark_kernel(args):
                         '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
     with open(kernel_path, 'w') as f:
         f.write(text)
-    local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
-    kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
-    template_file = "/tmp/py3spark_emr_template.json"
-    with open(template_file, 'r') as f:
-        text = f.read()
-    text = text.replace('CLUSTER', args.cluster_name)
-    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('SPARK_PATH',
-                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
-    with open(kernel_path, 'w') as f:
-        f.write(text)
+    #if args.emr_version == 'emr-4.3.0':
+    #    local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
+    #    kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
+    #    template_file = "/tmp/py3spark_emr_template.json"
+    #    with open(template_file, 'r') as f:
+    #        text = f.read()
+    #    text = text.replace('CLUSTER', args.cluster_name)
+    #    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+    #    text = text.replace('SPARK_PATH',
+    #                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    #    with open(kernel_path, 'w') as f:
+    #        f.write(text)
+    if args.emr_version == 'emr-4.8.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-5.0.0':
+        local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
+        kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
+        template_file = "/tmp/py3spark_emr_template.json"
+        with open(template_file, 'r') as f:
+            text = f.read()
+        text = text.replace('CLUSTER', args.cluster_name)
+        text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+        text = text.replace('SPARK_PATH',
+                            '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+        text = text.replace('3.5', '3.4')
+        with open(kernel_path, 'w') as f:
+            f.write(text)
 
 
 def toree_kernel(args):
@@ -111,12 +125,13 @@ def get_files(s3client, s3resource, dist, bucket, local):
 
 
 def spark_defaults(args):
-    missed_jar_path = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/client/*'
+    missed_jar_path1 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/client/*'
+    missed_jar_path2 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/*'
     spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
     local('touch /tmp/spark-defaults-temporary.conf')
-    local('cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR|" | sed "s|\(.*\)\ |\\1|" > /tmp/spark-defaults-temporary.conf')
+    local('cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR1|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" > /tmp/spark-defaults-temporary.conf')
     local('printf "\\n"')
     local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> /tmp/spark-defaults-temporary.conf')
     #local('sudo mv /tmp/spark-defaults-temporary.conf ' + spark_def_path)
@@ -124,7 +139,8 @@ def spark_defaults(args):
     with open(template_file, 'r') as f:
         text = f.read()
     text = text.replace('EMRVERSION', args.emr_version)
-    text = text.replace('MISSEDJAR', missed_jar_path)
+    text = text.replace('MISSEDJAR1', missed_jar_path1)
+    text = text.replace('MISSEDJAR2', missed_jar_path2)
     with open(spark_def_path, 'w') as f:
         f.write(text)
     # with open(spark_def_path, 'w') as out:
