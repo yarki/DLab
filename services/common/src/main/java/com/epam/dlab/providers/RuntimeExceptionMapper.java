@@ -12,9 +12,6 @@
 
 package com.epam.dlab.providers;
 
-import com.epam.dlab.exceptions.DlabApplicationException;
-import com.epam.dlab.exceptions.DlabException;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
