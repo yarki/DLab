@@ -78,7 +78,7 @@ def pyspark_kernel(args):
     local(
         "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
     local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-    if args.emr_version != 'emr-4.3.0' and args.emr_version != 'emr-4.6.0' and args.emr_version != 'emr-4.8.0' and args.emr_version != 'emr-5.0.0':
+    if args.emr_version != 'emr-4.3.0' and args.emr_version != 'emr-4.6.0' and args.emr_version != 'emr-4.8.0' and args.emr_version != 'emr-5.0.0' and args.emr_version != 'emr-5.0.3':
         local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
         kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
         template_file = "/tmp/py3spark_emr_template.json"
