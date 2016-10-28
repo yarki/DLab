@@ -70,6 +70,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookUserName(userInfo.getName())
                     .withNotebookSubnet(keyDao.findSubnet(userInfo.getName()))
+                    .withNotebookInstanceType(formDTO.getShape())
                     .withRegion(settingsDAO.getAwsRegion())
                     .withSecurityGroupIds(settingsDAO.getSecurityGroup());
             LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
