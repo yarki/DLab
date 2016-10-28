@@ -16,7 +16,6 @@ import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
 import {AppRoutingService} from "../routing/appRouting.service";
 import { Grid } from '../components/grid/grid.component';
-import {AuthenticationService} from "../../../../dist/tmp/app/security/authentication.service";
 import {ApplicationSecurityService} from "../services/applicationSecurity.service";
 
 @Component({
