@@ -11,115 +11,77 @@
  *****************************************************************************************************/
 
 import { Injectable } from '@angular/core';
-import {Http, Response} from '@angular/http';
-import { WebRequestHelper } from './../util/webRequestHelper.service'
-import {ApplicationSecurityService} from "./applicationSecurity.service";
+import {Response} from '@angular/http';
+import {ApplicationServiceFacade} from "./applicationServiceFacade.service";
 
 @Injectable()
 export class UserResourceService {
-  url = {
-    createTmpls: 'userlist/exploratory',
-    emrTmpls: 'userlist/computational',
-    shapes: 'userlist/shape',
-    createNotebook: 'exploratory/create',
-    startNotebook: 'exploratory/start',
-    stopNotebook: 'exploratory/stop',
-    terminateNotebook: 'exploratory/terminate',
-    createEmr: 'emr/create',
-    terminateEmr: 'emr/terminate',
-    gridData: 'userlist',
-    keyloader: 'keyloader'
-  };
-
-  constructor(private applicationSecurityService: ApplicationSecurityService,
-              private http : Http,
-              private webRequestHelper : WebRequestHelper) {
+  constructor(private applicationServiceFacade: ApplicationServiceFacade) {
   }
 
-  getResourceUrl(resource: string) {
-   return `/api/${this.url[resource]}?access_token=${this.applicationSecurityService.getAuthToken()}`;
-  }
-
-  getCreateTmpl()
+  getExploratoryEnvironmentTemplates()
   {
-    return this.http.get(this.getResourceUrl('createTmpls'))
+    return this.applicationServiceFacade
+      .buildGetExploratoryEnvironmentTemplatesRequest()
       .map(( res:Response ) => res.json())
       .catch((error: any) => error);
   }
 
-  getEmrTmpl()
+  getComputationalResourcesTemplates()
   {
-    return this.http.get(this.getResourceUrl('emrTmpls'))
+    return this.applicationServiceFacade
+      .buildGetComputationalResourcesTemplatesRequest()
       .map(( res:Response ) => res.json())
       .catch((error: any) => error);
   }
 
-  getShapes()
+  getSupportedResourcesShapes()
   {
-    return this.http.get(this.getResourceUrl('shapes'))
+    return this.applicationServiceFacade
+      .buildGetSupportedComputationalResourcesShapesRequest()
       .map(( res:Response ) => res.json())
       .catch((error: any) => error);
   }
 
-  getGridData() {
-    return this.http.get(this.getResourceUrl('gridData'))
-      .map(( res:Response ) => res.json())
+  getUserProvisionedResources() {
+    return this.applicationServiceFacade
+      .buildGetUserProvisionedResourcesRequest()
+      .map((response:Response ) => response.json())
       .catch((error: any) => error);
   }
 
-  createUsernotebook(data)
-  {
+  createExploratoryEnvironment(data) {
     let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('createNotebook'), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
+    return this.applicationServiceFacade
+      .buildCreateExploratoryEnvironmentRequest(body)
+      .map((response:Response ) => response);
   }
 
-  startUsernotebook(data) {
+  runExploratoryEnvironment(data) {
     let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('startNotebook'), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
+    return this.applicationServiceFacade
+      .buildRunExploratoryEnvironmentRequest(body)
+      .map((response:Response ) => response);
   }
 
-  stopUsernotebook(data) {
+  suspendExploratoryEnvironment(data) {
     let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('stopNotebook'), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
+    return this.applicationServiceFacade
+      .buildSuspendExploratoryEnvironmentRequest(body)
+      .map((response:Response ) => response);
   }
 
-  terminateUsernotebook(data) {
+  createComputationalResource(data) {
     let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('terminateNotebook'), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
+    return this.applicationServiceFacade
+      .buildCreateComputationalResourcesRequest(body)
+      .map((response:Response ) => response);
   }
 
-  createEmr(data)
-  {
+  suspendComputationalResource(data) {
     let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('createEmr'), body, { headers: requestHeader })
-        .map(res => res.json());
+    return this.applicationServiceFacade
+      .buildDeleteComputationalResourcesRequest(body)
+      .map((response:Response ) => response);
   }
-
-  terminateEmr(data) {
-    let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('terminateEmr'), body, { headers: requestHeader })
-        .map((res: Response) => {
-          return res.status;
-        });
-  }
-
-
 }

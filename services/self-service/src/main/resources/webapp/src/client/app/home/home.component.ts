@@ -165,7 +165,7 @@ export class HomeComponent implements OnInit {
   }
 
   initAnalyticSelectors() {
-    this.userResourceService.getCreateTmpl()
+    this.userResourceService.getExploratoryEnvironmentTemplates()
       .subscribe(
         data => {
           let arr = [];
@@ -186,7 +186,7 @@ export class HomeComponent implements OnInit {
         error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
 
-    this.userResourceService.getEmrTmpl()
+    this.userResourceService.getComputationalResourcesTemplates()
       .subscribe(
         data => {
           let arr = [];
@@ -207,7 +207,7 @@ export class HomeComponent implements OnInit {
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
 
-    this.userResourceService.getShapes()
+    this.userResourceService.getSupportedResourcesShapes()
       .subscribe(
         data => {
           this.shapes = data
@@ -228,7 +228,7 @@ export class HomeComponent implements OnInit {
 
 
     this.userResourceService
-      .createUsernotebook({
+      .createExploratoryEnvironment({
         name: name.value,
         shape: shape.value,
         version: this.createTempls[tmplIndex].version

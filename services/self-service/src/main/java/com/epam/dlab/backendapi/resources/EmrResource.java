@@ -31,16 +31,13 @@ import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
-@Path("/emr")
+@Path("/api/infrastructure_provision/computational_resources")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class EmrResource implements EmrAPI {
@@ -54,8 +51,7 @@ public class EmrResource implements EmrAPI {
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
-    @POST
-    @Path("/create")
+    @PUT
     public Response create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) {
         LOGGER.debug("creating emr {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = userListDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
@@ -93,8 +89,7 @@ public class EmrResource implements EmrAPI {
         return Response.ok().build();
     }
 
-    @POST
-    @Path("/terminate")
+    @DELETE
     public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
         LOGGER.debug("terminating emr {} for user {}", formDTO.getClusterName(), userInfo.getName());
         userListDAO.updateComputationalStatus(new EMRStatusDTO()
