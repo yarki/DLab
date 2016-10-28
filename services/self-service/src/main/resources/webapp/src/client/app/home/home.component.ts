@@ -1,22 +1,23 @@
 /******************************************************************************************************
 
-Copyright (c) 2016 EPAM Systems Inc.
+ Copyright (c) 2016 EPAM Systems Inc.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-*****************************************************************************************************/
+ *****************************************************************************************************/
 
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
 import {AppRoutingService} from "../routing/appRouting.service";
 import { Grid } from '../components/grid/grid.component';
 import {ApplicationSecurityService} from "../services/applicationSecurity.service";
+
 
 @Component({
   moduleId: module.id,
@@ -27,13 +28,14 @@ import {ApplicationSecurityService} from "../services/applicationSecurity.servic
 })
 
 export class HomeComponent implements OnInit {
-  uploadAccessUserKeyFormInvalid: boolean;
+  userUploadAccessKeyState : number;
+  newAccessKeyForUpload: any;
+  uploadAccessKeyLabel: string;
+  uploadAccessUserKeyFormValid: boolean;
   createTempls: any;
   shapes: any;
   emrTempls: any;
-  uploadKey: any;
-  userAccessKeyUploaded: boolean;
-  uploadAccessKeyLabel: string;
+
   notebookExist: boolean = false;
 
 
@@ -52,18 +54,23 @@ export class HomeComponent implements OnInit {
     private userResourceService: UserResourceService,
     private appRoutingService : AppRoutingService
   ) {
-    this.userAccessKeyUploaded = false;
-    this.uploadAccessUserKeyFormInvalid = true;
+    this.userUploadAccessKeyState = 404;
+    this.uploadAccessUserKeyFormValid = false;
   }
 
   ngOnInit() {
-    this.checkInfrastructureCreationProgress(true);
+    this.checkInfrastructureCreationProgress();
     this.initAnalyticSelectors();
   }
 
   //
   // Handlers
   //
+
+  createNotebook_btnClick()
+  {
+    this.processAccessKeyStatus(this.userUploadAccessKeyState, true);
+  }
 
   logout_btnClick() {
     this.applicationSecurityService.logout().subscribe(
@@ -74,31 +81,34 @@ export class HomeComponent implements OnInit {
 
 
   uploadUserAccessKey_btnClick(event) {
-
     let formData = new FormData();
-    formData.append("file", this.uploadKey);
+    formData.append("file", this.newAccessKeyForUpload);
 
     this.userAccessKeyService.uploadUserAccessKey(formData)
-    .subscribe(
-      response => {
-        if(response.status === 200)
-          this.checkInfrastructureCreationProgress(false);
-      },
-      error => console.log(error)
-     );
+      .subscribe(
+        response => {
+          if(response.status === 200)
+            this.checkInfrastructureCreationProgress();
+        },
+        error => console.log(error)
+      );
 
-     event.preventDefault();
+    event.preventDefault();
   }
 
   uploadUserAccessKey_onChange($event) {
     this.uploadAccessKeyLabel = "";
+    this.newAccessKeyForUpload = null;
+    this.uploadAccessUserKeyFormValid = false;
 
     if($event.target.files.length > 0)
     {
-      let fileName = $event.target.files[0].name;
-      this.uploadAccessUserKeyFormInvalid = !fileName.toLowerCase().endsWith(".pub");
-      this.uploadKey = $event.target.files[0];
-      this.uploadAccessKeyLabel = this.uploadAccessUserKeyFormInvalid ? ".pub file is required." : fileName;
+      let fileToUpload = $event.target.files[0];
+      this.uploadAccessUserKeyFormValid = fileToUpload.name.toLowerCase().endsWith(".pub");
+      if(this.uploadAccessUserKeyFormValid)
+        this.newAccessKeyForUpload = $event.target.files[0];
+
+      this.uploadAccessKeyLabel = this.newAccessKeyForUpload ? ".pub file is required." : fileToUpload.name;
     }
   }
 
@@ -110,42 +120,48 @@ export class HomeComponent implements OnInit {
   // Private Methods
   //
 
-  private checkInfrastructureCreationProgress(callOnce: boolean) {
+  private checkInfrastructureCreationProgress() {
     this.userAccessKeyService.checkUserAccessKey()
       .subscribe(
-      response => {
-        if(response.status == 200)
-        {
-          this.userAccessKeyUploaded = true;
-          if (this.preloaderModal.isOpened) {
-            this.preloaderModal.close();
-          }
-        } else if (response.status == 202)
-        {
-          if (this.keyUploadModal.isOpened)
-            this.keyUploadModal.close();
-
-          if (!this.preloaderModal.isOpened)
-            this.preloaderModal.open({ isHeader: false, isFooter: false });
-
-          if(!callOnce)
-            setTimeout(() => this.checkInfrastructureCreationProgress(false), 10000)
-        }
-      },
-      err => {
-        if (err.status == 404) // key haven't been uploaded
-        {
-          if (!this.keyUploadModal.isOpened)
-            this.keyUploadModal.open({ isFooter: false });
-
-          if(!callOnce)
-            setTimeout(() => this.checkInfrastructureCreationProgress(false), 10000)
-        }
-        else {
-            console.error(err);
-        }
-      }
+        response => this.processAccessKeyStatus(response.status, false),
+        error =>  this.processAccessKeyStatus(error.status, false)
       );
+  }
+
+  private toggleDialogs(keyUploadDialogToggle, preloaderDialogToggle)
+  {
+
+    if(keyUploadDialogToggle) {
+      if(!this.keyUploadModal.isOpened)
+        this.keyUploadModal.open({ isFooter: false });
+    }
+    else {
+      if (this.keyUploadModal.isOpened)
+        this.keyUploadModal.close();
+    }
+
+    if(preloaderDialogToggle) {
+      if (!this.preloaderModal.isOpened)
+        this.preloaderModal.open({ isHeader: false, isFooter: false });
+    }
+    else {
+      if (this.preloaderModal.isOpened)
+        this.preloaderModal.close();
+    }
+  }
+
+  private processAccessKeyStatus(status : number, forceShowKeyUploadDialog: boolean)
+  {
+    this.userUploadAccessKeyState = status;
+
+    if(status == 200) // Key uploaded
+      this.toggleDialogs(false, false);
+    else if (status == 202) { // Key uploading
+      this.toggleDialogs(false, true);
+      setTimeout(() => this.checkInfrastructureCreationProgress(), 10000)
+    }
+    else if (status == 404 || forceShowKeyUploadDialog) // key haven't been uploaded
+      this.toggleDialogs(true, false);
   }
 
   initAnalyticSelectors() {
@@ -156,7 +172,7 @@ export class HomeComponent implements OnInit {
           let str = JSON.stringify(data);
           let dataArr = JSON.parse(str);
           dataArr.forEach((obj, index) => {
-           let versions = obj.templates.map((versionObj, index) => {
+            let versions = obj.templates.map((versionObj, index) => {
               return versionObj.version;
             });
             delete obj.templates;
@@ -221,12 +237,11 @@ export class HomeComponent implements OnInit {
         console.log('result: ', result);
 
         if (this.createAnalyticalModal.isOpened) {
-         this.createAnalyticalModal.close();
-       }
-       this.grid.buildGrid();
-       name.value = "";
-       this.notebookExist = false;
+          this.createAnalyticalModal.close();
+        }
+        this.grid.buildGrid();
+        name.value = "";
+        this.notebookExist = false;
       });
   };
-
 }
