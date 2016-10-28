@@ -19,6 +19,7 @@ import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.dto.emr.EMRCreateDTO;
 import com.epam.dlab.dto.emr.EMRTerminateDTO;
+import com.epam.dlab.exceptions.DlabException;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 @Path("/emr")
@@ -49,20 +51,24 @@ public class EmrResource implements DockerCommands {
     public String create(EMRCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create emr cluster");
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withInteractive()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withEc2Role(configuration.getEmrEC2RoleDefault())
-                                .withServiceRole(configuration.getEmrServiceRoleDefault())
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withActionCreate(configuration.getEmrImage()),
-                        dto
-                )
-        );
+        try {
+            commandExecuter.executeAsync(
+                    commandBuilder.buildCommand(
+                            new RunDockerCommand()
+                                    .withInteractive()
+                                    .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                    .withVolumeForResponse(configuration.getImagesDirectory())
+                                    .withRequestId(uuid)
+                                    .withEc2Role(configuration.getEmrEC2RoleDefault())
+                                    .withServiceRole(configuration.getEmrServiceRoleDefault())
+                                    .withCredsKeyName(configuration.getAdminKey())
+                                    .withActionCreate(configuration.getEmrImage()),
+                            dto
+                    )
+            );
+        } catch (Throwable t) {
+            throw new DlabException("Could not create EMR cluster", t);
+        }
         return uuid;
     }
 
@@ -71,18 +77,22 @@ public class EmrResource implements DockerCommands {
     public String terminate(EMRTerminateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("terminate emr cluster");
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withInteractive()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withActionTerminate(configuration.getEmrImage()),
-                        dto
-                )
-        );
+        try {
+            commandExecuter.executeAsync(
+                    commandBuilder.buildCommand(
+                            new RunDockerCommand()
+                                    .withInteractive()
+                                    .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                    .withVolumeForResponse(configuration.getImagesDirectory())
+                                    .withRequestId(uuid)
+                                    .withCredsKeyName(configuration.getAdminKey())
+                                    .withActionTerminate(configuration.getEmrImage()),
+                            dto
+                    )
+            );
+        } catch (Throwable t) {
+            throw new DlabException("Could not terminate EMR cluster", t);
+        }
         return uuid;
     }
 }

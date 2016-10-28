@@ -18,4 +18,8 @@ public class DlabException extends RuntimeException {
         super(message);
     }
 
+    public DlabException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

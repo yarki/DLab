@@ -10,24 +10,22 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.providers;
+package com.epam.dlab.exceptions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 
-abstract public class GenericExceptionMapper<E extends Throwable> implements ExceptionMapper<E> {
-    final static Logger LOGGER = LoggerFactory.getLogger(GenericExceptionMapper.class);
+public class DlabApplicationException extends WebApplicationException {
 
-    @Override
-    public Response toResponse(E exception) {
-        LOGGER.error("Uncaught exception in application", exception);
+    public DlabApplicationException() {
+        super(Response.Status.INTERNAL_SERVER_ERROR);
+    }
 
-        return Response
-                .serverError()
-                .entity(exception.getMessage())
-                .build();
+    public DlabApplicationException(String message) {
+        super(message, Response.Status.INTERNAL_SERVER_ERROR);
+    }
+
+    public DlabApplicationException(String message, Throwable cause) {
+        super(message, cause, Response.Status.INTERNAL_SERVER_ERROR);
     }
 }

@@ -25,6 +25,8 @@ import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.emr.EMRCreateDTO;
 import com.epam.dlab.dto.emr.EMRStatusDTO;
 import com.epam.dlab.dto.emr.EMRTerminateDTO;
+import com.epam.dlab.exceptions.DlabApplicationException;
+import com.epam.dlab.exceptions.DlabException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
