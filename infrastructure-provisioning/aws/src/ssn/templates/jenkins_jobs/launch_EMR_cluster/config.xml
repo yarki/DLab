@@ -137,6 +137,7 @@
                             <string>emr-4.6.0</string>
                             <string>emr-4.8.0</string>
                             <string>emr-5.0.0</string>
+                            <string>emr-5.0.3</string>
                         </a>
                     </choices>
                 </hudson.model.ChoiceParameterDefinition>
