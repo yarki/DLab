@@ -32,7 +32,6 @@ def configure_notebook():
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
     put(templates_dir + 'pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
-    put(templates_dir + 'py3spark_emr_template.json', '/tmp/py3spark_emr_template.json')
     put(templates_dir + 'spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
     put(templates_dir + 'toree_emr_template.json','/tmp/toree_emr_template.json')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')

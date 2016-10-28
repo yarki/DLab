@@ -78,22 +78,6 @@ def pyspark_kernel(args):
     local(
         "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
     local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-    if args.emr_version != 'emr-4.3.0' and args.emr_version != 'emr-4.6.0' and args.emr_version != 'emr-4.8.0' and args.emr_version != 'emr-5.0.0' and args.emr_version != 'emr-5.0.3':
-        local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
-        kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
-        template_file = "/tmp/py3spark_emr_template.json"
-        with open(template_file, 'r') as f:
-            text = f.read()
-        text = text.replace('CLUSTER', args.cluster_name)
-        text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-        text = text.replace('SPARK_PATH',
-                            '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
-        with open(kernel_path, 'w') as f:
-            f.write(text)
-        local('touch /tmp/kernel_var.json')
-        local(
-            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
-        local('sudo mv /tmp/kernel_var.json ' + kernel_path)
 
 
 def toree_kernel(args):
