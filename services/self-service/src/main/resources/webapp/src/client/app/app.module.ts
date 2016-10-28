@@ -33,6 +33,7 @@ import {UserAccessKeyService} from "./services/userAccessKey.service";
 import {AppRoutingService} from "./routing/appRouting.service";
 import {UserResourceService} from "./services/userResource.service";
 import {HttpInterceptor} from "./util/interceptors/httpInterceptor.service";
+import {ApplicationServiceFacade} from "./services/applicationServiceFacade.service";
 
 @NgModule({
   imports: [BrowserModule, HttpModule, RouterModule.forRoot(routes, { useHash: true }), LoginModule, HomeModule, FormsModule],
@@ -54,7 +55,8 @@ import {HttpInterceptor} from "./util/interceptors/httpInterceptor.service";
     UserProfileService,
     UserAccessKeyService,
     AppRoutingService,
-    UserResourceService
+    UserResourceService,
+    ApplicationServiceFacade
     ],
   bootstrap: [AppComponent]
 })
