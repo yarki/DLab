@@ -44,6 +44,7 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
 
     @Override
     protected void configure() {
+        super.configure();
         bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
         bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
                 .toInstance(createAuthenticationService());
