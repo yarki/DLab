@@ -10,8 +10,8 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.core.response;
+package com.epam.dlab.backendapi.core.response.folderlistener.handler;
 
-public interface FileHandler {
-    boolean handle(String fileName, byte[] content) throws Exception;
+public interface ErrorFileHandler {
+    void handle();
 }

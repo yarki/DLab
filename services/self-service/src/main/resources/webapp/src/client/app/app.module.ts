@@ -22,18 +22,17 @@ import {
   HashLocationStrategy
 } from '@angular/common';
 
-import { AuthenticationService} from './security/authentication.service'
 import { AuthorizationGuard } from './security/authorization.guard';
 import { LoginModule } from './login/login.module';
 import { HomeModule } from './home/home.module';
 import {WebRequestHelper} from "./util/webRequestHelper.service";
-import {UserProfileService} from "./security/userProfile.service";
 import {FormsModule} from "@angular/forms";
 import {UserAccessKeyService} from "./services/userAccessKey.service";
 import {AppRoutingService} from "./routing/appRouting.service";
 import {UserResourceService} from "./services/userResource.service";
 import {HttpInterceptor} from "./util/interceptors/httpInterceptor.service";
 import {ApplicationServiceFacade} from "./services/applicationServiceFacade.service";
+import {ApplicationSecurityService} from "./services/applicationSecurity.service";
 
 @NgModule({
   imports: [BrowserModule, HttpModule, RouterModule.forRoot(routes, { useHash: true }), LoginModule, HomeModule, FormsModule],
@@ -49,10 +48,9 @@ import {ApplicationServiceFacade} from "./services/applicationServiceFacade.serv
       return new HttpInterceptor(backend, defaultOptions, router);
     },
     deps: [ XHRBackend, RequestOptions, Router]},
-    AuthenticationService,
     AuthorizationGuard,
     WebRequestHelper,
-    UserProfileService,
+    ApplicationSecurityService,
     UserAccessKeyService,
     AppRoutingService,
     UserResourceService,

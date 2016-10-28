@@ -17,6 +17,6 @@ REGION=$3
 SPARK_DEF_PATH="/usr/lib/spark/conf/spark-defaults.conf"
 SPARK_DEF_PATH_LINE1=`cat $SPARK_DEF_PATH | grep spark.driver.extraClassPath | awk '{print $2}' | sed 's/^:// ; s~jar:~jar ~g; s~/\*:~/\* ~g; s~:~/\* ~g'`
 SPARK_DEF_PATH_LINE2=`cat $SPARK_DEF_PATH | grep spark.driver.extraLibraryPath | awk '{print $2}' | sed 's/^:// ; s~jar:~jar ~g; s~/\*:~/\* ~g; s~:\|$~/\* ~g'`
-/bin/tar -zhcvf /tmp/jars.tar.gz --no-recursion --absolute-names $SPARK_DEF_PATH_LINE1 $SPARK_DEF_PATH_LINE2 /usr/lib/hadoop/client/*
+/bin/tar -zhcvf /tmp/jars.tar.gz --no-recursion --absolute-names --ignore-failed-read /usr/lib/hadoop/* $SPARK_DEF_PATH_LINE1 $SPARK_DEF_PATH_LINE2 /usr/lib/hadoop/client/*
 aws s3 cp /tmp/jars.tar.gz s3://$BUCKET_NAME/jars/$EMR_VERSION/ --endpoint-url https://s3-$REGION.amazonaws.com --region $REGION
 aws s3 cp $SPARK_DEF_PATH s3://$BUCKET_NAME/ --endpoint-url https://s3-$REGION.amazonaws.com --region $REGION

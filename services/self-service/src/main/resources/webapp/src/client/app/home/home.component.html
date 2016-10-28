@@ -36,12 +36,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <div class="sub_nav">
   <div class="container-fluid">
-    <button class="btn btn_create" [disabled]="!userAccessKeyUploaded" (click)="createAnalyticalModal.open({isFooter: false})">
+    <button class="btn btn_create" [disabled]="userUploadAccessKeyState == 202" (click)="createNotebook_btnClick()">
       <span class="glyphicon glyphicon glyphicon-plus" ></span> Create new
     </button>
     <button class="btn btn_refresh pull-right" (click)="refreshGrid()">
       <span class="glyphicon glyphicon-refresh"></span> Refresh
     </button>
+    <span *ngIf="userUploadAccessKeyState == 500" class="alert alert-danger">Error happened during user access key upload. Please try to reupload the key.</span>
   </div>
 </div>
 
@@ -98,7 +99,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   </modal-content>
 </modal>
 
-<modal #keyUploadModal modalClass="modal-sm" [hideCloseButton]="true" [closeOnEscape]="false" [closeOnOutsideClick]="false">
+<modal #keyUploadModal modalClass="modal-sm" [hideCloseButton]="false" [closeOnEscape]="false" [closeOnOutsideClick]="false">
   <modal-header>
     <h4 class="modal-title">Create initial infrastructure</h4>
   </modal-header>
@@ -116,11 +117,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             <span class="upload-icon" ></span> Browse
             <input (change)="uploadUserAccessKey_onChange($event)" type="file" name="file" accept=".pub" />
           </span>
-          <div class="text-right" [class.danger_color]="uploadAccessUserKeyFormInvalid">{{uploadAccessKeyLabel}}</div>
+          <div class="text-right" [class.danger_color]="!uploadAccessUserKeyFormValid">{{uploadAccessKeyLabel}}</div>
         </div>
       </div>
       <div class="text-right">
-        <button [disabled]="uploadAccessUserKeyFormInvalid" type="submit" class="btn btn-success">Create</button>
+        <button [disabled]="!uploadAccessUserKeyFormValid" type="submit" class="btn btn-success">Create</button>
       </div>
     </form>
   </modal-content>

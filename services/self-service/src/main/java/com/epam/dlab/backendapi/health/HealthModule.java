@@ -10,8 +10,33 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.core.response;
+package com.epam.dlab.backendapi.health;
 
-public interface ErrorFileHandler {
-    void handle();
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+
+import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
+import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
+
+public class HealthModule extends AbstractModule{
+
+    @Override
+    protected void configure() {
+    }
+
+    @Provides
+    @Singleton
+    @Named(MONGO_HEALTH_CHECKER)
+    public HealthChecker mongoHealthChecker() {
+        return new MongoHealthChecker();
+    }
+
+    @Provides
+    @Singleton
+    @Named(PROVISIONING_HEALTH_CHECKER)
+    public HealthChecker provisioningHealthChecker() {
+        return new ProvisioningHealthChecker();
+    }
 }

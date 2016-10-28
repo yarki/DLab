@@ -16,10 +16,6 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.dto.keyload.UserKeyDTO;
-import com.epam.dlab.exceptions.DlabException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
@@ -42,22 +38,10 @@ public class KeyDAO extends BaseDAO {
         insertOne(USER_AWS_CREDENTIALS, credential, user);
     }
 
-    public Optional<UserAWSCredentialDTO> findCredential(String user) {
-        return find(USER_AWS_CREDENTIALS, eq(ID, user), UserAWSCredentialDTO.class);
-    }
-
     public KeyLoadStatus findKeyStatus(UserInfo userInfo) {
         return find(USER_KEYS, eq(ID, userInfo.getName()), UserKeyDTO.class)
                 .map(UserKeyDTO::getStatus)
                 .map(KeyLoadStatus::findByStatus)
                 .orElse(KeyLoadStatus.NONE);
-    }
-
-    public String findSubnet(String user) {
-        Optional<String> subnet = this.findCredential(user).map(UserAWSCredentialDTO::getNotebookSubnet);
-        if (subnet.isPresent()) {
-            return subnet.get();
-        }
-        throw new DlabException("No notebook subnet set for user '" + user + "'");
     }
 }

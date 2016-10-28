@@ -10,24 +10,8 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.core.guice;
+package com.epam.dlab.backendapi.core.response.folderlistener.handler;
 
-import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.health.HealthModule;
-import com.google.inject.AbstractModule;
-import io.dropwizard.setup.Environment;
-
-abstract class BaseModule extends AbstractModule {
-    protected SelfServiceApplicationConfiguration configuration;
-    protected Environment environment;
-
-    public BaseModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
-        this.configuration = configuration;
-        this.environment = environment;
-    }
-
-    @Override
-    protected void configure() {
-        install(new HealthModule());
-    }
+public interface FileHandler {
+    boolean handle(String fileName, byte[] content) throws Exception;
 }

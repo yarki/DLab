@@ -14,7 +14,6 @@ package com.epam.dlab.backendapi.health;
 
 import com.epam.dlab.client.restclient.RESTService;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +21,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
-import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
 
-@Singleton
-@javax.inject.Named(PROVISIONING_HEALTH_CHECKER)
 public class ProvisioningHealthChecker implements HealthChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningHealthChecker.class);
 

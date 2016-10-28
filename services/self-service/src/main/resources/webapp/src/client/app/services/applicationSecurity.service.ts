@@ -11,64 +11,86 @@
  *****************************************************************************************************/
 
 import { Injectable } from '@angular/core';
-import {Http, Headers, Response} from '@angular/http';
-import { WebRequestHelper } from './../util/webRequestHelper.service'
+import {Response} from '@angular/http';
 import {Observable} from "rxjs";
+import {ApplicationServiceFacade} from "./applicationServiceFacade.service";
 import {AppRoutingService} from "../routing/appRouting.service";
-import {ApplicationServiceFacade} from "../services/applicationServiceFacade.service";
 
 @Injectable()
-export class UserProfileService {
+export class ApplicationSecurityService {
   private accessTokenKey : string = "access_token";
   private userNameKey : string = "user_name";
-  constructor(private serviceFacade : ApplicationServiceFacade, private appRoutingService : AppRoutingService) {}
 
-  setUserName(userName)
-  {
-    localStorage.setItem(this.userNameKey, userName);
+  constructor(private serviceFacade : ApplicationServiceFacade, private appRoutingService : AppRoutingService) {
   }
 
-  getCurrentUserName() : string {
+  public login(userName, password) : Observable<boolean> {
+    let body = JSON.stringify({'username': userName, 'password': password, 'access_token': ''});
+
+    return this.serviceFacade.buildLoginRequest(body).map((response : Response) => {
+      if (response.status === 200) {
+        this.setAuthToken(response.text());
+        this.setUserName(userName);
+
+        return true;
+      }
+      return false;
+    }, this);
+  }
+
+  public logout() : Observable<boolean> {
+    let authToken = this.getAuthToken();
+
+    if(!!authToken)
+    {
+      this.clearAuthToken();
+      return this.serviceFacade.buildLogoutRequest("").map((response: Response) => {
+        return response.status === 200;
+      }, this)
+    }
+
+    return Observable.of(false);
+  }
+
+  public getCurrentUserName() : string {
     return localStorage.getItem(this.userNameKey);
   }
 
-  setAuthToken(accessToken){
-    let encodedToken = accessToken;
-    localStorage.setItem(this.accessTokenKey, encodedToken);
-  }
-
-  clearAuthToken(){
-    localStorage.removeItem(this.accessTokenKey);
-  }
-
-  getAuthToken() : string {
+  public getAuthToken() : string {
     return localStorage.getItem(this.accessTokenKey);
   }
 
-  appendBasicAuthHeader (header : Headers) : Headers
-  {
-    let authToken = this.getAuthToken();
-    header.append("Authorization", "Bearer " + authToken);
-    return header;
-  }
-
-  isLoggedIn() : Observable<boolean> {
+  public isLoggedIn() : Observable<boolean> {
     let authToken = this.getAuthToken();
     let currentUser = this.getCurrentUserName();
 
     if(authToken && currentUser)
     {
       return this.serviceFacade.buildAuthorizeRequest(currentUser).map((response : Response) => {
-          if(response.status === 200)
-            return true;
+        if(response.status === 200)
+          return true;
 
-          this.clearAuthToken();
-          this.appRoutingService.redirectToLoginPage();
-          return false;
+        this.clearAuthToken();
+        this.appRoutingService.redirectToLoginPage();
+        return false;
       }, this);
     }
 
     this.appRoutingService.redirectToLoginPage();
     return Observable.of(false);
+  }
+
+  private setUserName(userName)
+  {
+    localStorage.setItem(this.userNameKey, userName);
+  }
+
+  private setAuthToken(accessToken){
+    let encodedToken = accessToken;
+    localStorage.setItem(this.accessTokenKey, encodedToken);
+  }
+
+  private clearAuthToken(){
+    localStorage.removeItem(this.accessTokenKey);
   }
 }

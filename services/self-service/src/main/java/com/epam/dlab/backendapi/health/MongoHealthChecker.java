@@ -23,8 +23,6 @@ import javax.inject.Named;
 
 import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
 
-@Singleton
-@Named(MONGO_HEALTH_CHECKER)
 public class MongoHealthChecker implements HealthChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoHealthChecker.class);
 
