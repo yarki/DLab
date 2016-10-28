@@ -49,8 +49,6 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
-    private KeyDAO keyDao;
-    @Inject
     private UserListDAO userListDAO;
     @Inject
     @Named(PROVISIONING_SERVICE)
@@ -69,7 +67,6 @@ public class ExploratoryResource implements ExploratoryAPI {
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookUserName(userInfo.getName())
-                    .withNotebookSubnet(keyDao.findSubnet(userInfo.getName()))
                     .withNotebookInstanceType(formDTO.getShape())
                     .withRegion(settingsDAO.getAwsRegion())
                     .withSecurityGroupIds(settingsDAO.getSecurityGroup());
