@@ -11,7 +11,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 *****************************************************************************************************/
 
 import { Component, EventEmitter, Input, Output, ViewChild, OnInit } from "@angular/core";
-import { EnvironmentsService } from './../../services/environments.service';
 import { UserResourceService } from "./../../services/userResource.service";
 import { GridRowModel } from './grid.model';
 
@@ -34,7 +33,6 @@ export class Grid implements OnInit {
 
 
   constructor(
-    private environmentsService: EnvironmentsService,
     private userResourceService: UserResourceService
     ) { }
 
@@ -83,6 +81,13 @@ export class Grid implements OnInit {
         .stopUsernotebook({ notebook_instance_name: data.name })
         .subscribe((result) => {
           console.log('stopUsernotebook result: ', result);
+          this.buildGrid();
+        });
+    } else if (action === 'terminate') {
+      this.userResourceService
+        .terminateUsernotebook({ notebook_instance_name: data.name })
+        .subscribe((result) => {
+          console.log('terminateUsernotebook result: ', result);
           this.buildGrid();
         });
     }

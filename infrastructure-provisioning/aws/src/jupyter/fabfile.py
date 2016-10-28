@@ -51,7 +51,7 @@ def run():
     notebook_config = dict()
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
     notebook_config['instance_type'] = os.environ['notebook_instance_type']
-    notebook_config['subnet_cidr'] = os.environ['notebook_subnet_cidr']
+    #notebook_config['subnet_cidr'] = os.environ['notebook_subnet_cidr']
     notebook_config['key_name'] = os.environ['creds_key_name']
     notebook_config['user_keyname'] = os.environ['notebook_user_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
@@ -71,6 +71,9 @@ def run():
     else:
         print 'No preconfigured image found. Using default one: ' + os.environ['notebook_ami_id']
         notebook_config['ami_id'] = os.environ['notebook_ami_id']
+
+    tag = {"Key": notebook_config['tag_name'], "Value": "{}-{}-subnet".format(notebook_config['service_base_name'], os.environ['notebook_user_name'])}
+    notebook_config['subnet_cidr'] = get_subnet_by_tag(tag)
 
     # launching instance for notebook server
     try:

@@ -26,11 +26,13 @@ if __name__ == "__main__":
         service_name = 'com.amazonaws.{}.s3'.format(args.region)
         print 'Vars are: {}, {}, {}'.format(args.vpc_id, service_name, json.dumps(tag))
         try:
-            route_table.append(ec2.create_route_table(
-                VpcId = args.vpc_id
-            )['RouteTable']['RouteTableId'])
-            print 'Created Route-Table with ID: {}'.format(route_table)
-            create_tag(route_table, json.dumps(tag))
+            route_table = get_route_tables(args.vpc_id, json.dumps(tag))
+            if not route_table:
+                route_table.append(ec2.create_route_table(
+                    VpcId = args.vpc_id
+                )['RouteTable']['RouteTableId'])
+                print 'Created Route-Table with ID: {}'.format(route_table)
+                create_tag(route_table, json.dumps(tag))
             endpoints = get_vpc_endpoints(args.vpc_id)
             if not endpoints:
                 print 'Creating EP'

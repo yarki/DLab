@@ -13,6 +13,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .modal-dialog {
   width: 525px;
 }
+.modal-lg.modal-dialog {
+  width: 575px;
+}
 .loading_modal {
   text-align: center;
 }
@@ -27,11 +30,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   margin-bottom: 0;
 }
 .modal-header {
+  padding: 13px 22px;
   background: #f6fafe;
   border-bottom: 1px solid #edf1f5;
 }
 .modal-body {
-  padding: 35px 15px;
+  padding: 35px 47px;
 }
 .modal-header .modal-title {
   font-weight: 600;
@@ -51,6 +55,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .modal .form-group small {
   font-size: 12px;
   color: #9cadbe;
+  display: inline-block;
+  margin-top: 6px;
 }
 .modal .btn-success {
   margin-left: 40px;
@@ -125,6 +131,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   margin-top: 10px;
   margin-bottom: 10px;
   display: inline-block;
+  border: 1px solid #35afd5;
+  color: #35afd5;
+  padding: 6px 29px 6px 23px
+}
+.upload-icon {
+  background: url(../assets/img/upload-icon.png) no-repeat;
+  background-size: 100%;
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  margin-right: 8px;
+  position: relative;
+  top: 2px;
+}
+.glyphicon-question-sign {
+  font-size: 12px;
 }
 .modal .btn-file input[type=file] {
   width: 100%;
@@ -141,6 +163,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   background: white;
   cursor: inherit;
   display: block;
+}
+.modal-dialog {
+  margin: 10% auto;
 }
 
 modal-content {
