@@ -10,32 +10,39 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.client.mongo;
+package com.epam.dlab.backendapi.health;
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MongoService {
-    private MongoClient client;
-    private String database;
+public class HealthStatusDTO {
+    @JsonProperty("mongo_alive")
+    private boolean mongoAlive;
+    @JsonProperty("provisioning_alive")
+    private boolean provisioningAlive;
 
-    private static final Document PING = new Document("ping", "1");
-
-    public MongoService(MongoClient client, String database) {
-        this.client = client;
-        this.database = database;
+    public boolean isMongoAlive() {
+        return mongoAlive;
     }
 
-    public MongoCollection<Document> getCollection(String name) {
-        return client.getDatabase(database).getCollection(name, Document.class);
+    public void setMongoAlive(boolean mongoAlive) {
+        this.mongoAlive = mongoAlive;
     }
 
-    public <T> MongoCollection<T> getCollection(String name, Class<T> c) {
-        return client.getDatabase(database).getCollection(name, c);
+    public HealthStatusDTO withMongoAlive(boolean mongoAlive) {
+        setMongoAlive(mongoAlive);
+        return this;
     }
 
-    public Document ping() {
-        return client.getDatabase(database).runCommand(PING);
+    public boolean isProvisioningAlive() {
+        return provisioningAlive;
+    }
+
+    public void setProvisioningAlive(boolean provisioningAlive) {
+        this.provisioningAlive = provisioningAlive;
+    }
+
+    public HealthStatusDTO withProvisioningAlive(boolean provisioningAlive) {
+        setProvisioningAlive(provisioningAlive);
+        return this;
     }
 }

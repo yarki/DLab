@@ -10,32 +10,33 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.client.mongo;
+package com.epam.dlab.backendapi.health;
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
+import com.epam.dlab.client.mongo.MongoService;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.mongodb.MongoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class MongoService {
-    private MongoClient client;
-    private String database;
+import javax.inject.Named;
 
-    private static final Document PING = new Document("ping", "1");
+import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
 
-    public MongoService(MongoClient client, String database) {
-        this.client = client;
-        this.database = database;
-    }
+public class MongoHealthChecker implements HealthChecker {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MongoHealthChecker.class);
 
-    public MongoCollection<Document> getCollection(String name) {
-        return client.getDatabase(database).getCollection(name, Document.class);
-    }
+    @Inject
+    private MongoService mongoService;
 
-    public <T> MongoCollection<T> getCollection(String name, Class<T> c) {
-        return client.getDatabase(database).getCollection(name, c);
-    }
-
-    public Document ping() {
-        return client.getDatabase(database).runCommand(PING);
+    @Override
+    public boolean isAlive() {
+        try {
+            mongoService.ping();
+            return true;
+        } catch (MongoException e) {
+            LOGGER.error("Mongo is not available");
+            return false;
+        }
     }
 }

@@ -10,8 +10,38 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.core.response;
+package com.epam.dlab.backendapi.resources;
 
-public interface FileHandler {
-    boolean handle(String fileName, byte[] content) throws Exception;
+import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.backendapi.health.HealthChecker;
+import com.epam.dlab.backendapi.health.HealthStatusDTO;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import io.dropwizard.auth.Auth;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
+import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
+
+@Path("/infrastructure")
+@Produces(MediaType.APPLICATION_JSON)
+public class InfrasctructureResource {
+    @Inject
+    @Named(MONGO_HEALTH_CHECKER)
+    private HealthChecker mongoHealthChecker;
+    @Inject
+    @Named(PROVISIONING_HEALTH_CHECKER)
+    private HealthChecker provisioningHealthChecker;
+
+    @GET
+    @Path("/status")
+    public HealthStatusDTO status(@Auth UserInfo userInfo) {
+        return new HealthStatusDTO()
+                .withMongoAlive(mongoHealthChecker.isAlive())
+                .withProvisioningAlive(provisioningHealthChecker.isAlive());
+    }
 }

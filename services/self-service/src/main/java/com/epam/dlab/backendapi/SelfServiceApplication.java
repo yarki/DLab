@@ -54,5 +54,6 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
         jersey.register(injector.getInstance(UserListResource.class));
         jersey.register(injector.getInstance(EmrResource.class));
         jersey.register(injector.getInstance(ExploratoryResource.class));
+        jersey.register(injector.getInstance(InfrasctructureResource.class));
     }
 }

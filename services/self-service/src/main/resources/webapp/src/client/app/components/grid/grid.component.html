@@ -8,7 +8,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-------------------------------------------------------------------------------------------------------------->
+----------------------------------------------------------------------------------------------------------- -->
 
 <table class="dashboard_table">
   <tr>
@@ -113,3 +113,40 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     </form>
   </modal-content>
 </modal>
+
+
+
+<!-- <button (click)="confirmationDialog.open({isFooter: false})">confirmationDialog</button> -->
+<modal #confirmationDialog  modalClass="confirmation-dialog">
+  <modal-header>
+    <h4 class="modal-title">Jupiter box</h4>
+  </modal-header>
+  <modal-content>
+      <div class="row">
+        <div class="col-xs-12">
+          <p>Notebook server  will be stopped and all connected EMR instances will be terminated.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-5">
+          <p>Computational resources:</p>
+        </div>
+        <div class="col-xs-7">
+          <ul class="list-unstyled">
+            <li>EMR cluster 5 nodes</li>
+            <li>EMR cluster 20 nodes</li>
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-5">
+          <p>Do you want to proceed?</p>
+        </div>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-default">No</button>
+        <button type="button" class="btn btn-success">Ok</button>
+      </div>
+  </modal-content>
+</modal>
+

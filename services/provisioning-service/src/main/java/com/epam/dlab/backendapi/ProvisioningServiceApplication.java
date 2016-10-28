@@ -15,10 +15,7 @@ package com.epam.dlab.backendapi;
 import com.epam.dlab.backendapi.core.response.DirectoriesCreator;
 import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
-import com.epam.dlab.backendapi.resources.DockerResource;
-import com.epam.dlab.backendapi.resources.EmrResource;
-import com.epam.dlab.backendapi.resources.ExploratoryResource;
-import com.epam.dlab.backendapi.resources.KeyLoaderResource;
+import com.epam.dlab.backendapi.resources.*;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.providers.JsonProcessingExceptionMapper;
 import com.epam.dlab.providers.RuntimeExceptionMapper;
@@ -49,6 +46,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         jersey.register(injector.getInstance(KeyLoaderResource.class));
         jersey.register(injector.getInstance(ExploratoryResource.class));
         jersey.register(injector.getInstance(EmrResource.class));
+        jersey.register(injector.getInstance(InfrastructureResource.class));
     }
 
     private Injector createInjector(ProvisioningServiceApplicationConfiguration configuration, Environment environment) {

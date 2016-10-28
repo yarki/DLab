@@ -10,32 +10,33 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.client.mongo;
+package com.epam.dlab.backendapi.health;
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
-public class MongoService {
-    private MongoClient client;
-    private String database;
+import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
+import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
 
-    private static final Document PING = new Document("ping", "1");
+public class HealthModule extends AbstractModule{
 
-    public MongoService(MongoClient client, String database) {
-        this.client = client;
-        this.database = database;
+    @Override
+    protected void configure() {
     }
 
-    public MongoCollection<Document> getCollection(String name) {
-        return client.getDatabase(database).getCollection(name, Document.class);
+    @Provides
+    @Singleton
+    @Named(MONGO_HEALTH_CHECKER)
+    public HealthChecker mongoHealthChecker() {
+        return new MongoHealthChecker();
     }
 
-    public <T> MongoCollection<T> getCollection(String name, Class<T> c) {
-        return client.getDatabase(database).getCollection(name, c);
-    }
-
-    public Document ping() {
-        return client.getDatabase(database).runCommand(PING);
+    @Provides
+    @Singleton
+    @Named(PROVISIONING_HEALTH_CHECKER)
+    public HealthChecker provisioningHealthChecker() {
+        return new ProvisioningHealthChecker();
     }
 }

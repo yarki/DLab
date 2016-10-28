@@ -33,7 +33,7 @@ import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 
-@Path("/")
+@Path("/user")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class SecurityResource implements MongoCollections, SecurityAPI {

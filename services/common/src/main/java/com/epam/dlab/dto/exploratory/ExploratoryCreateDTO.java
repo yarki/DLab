@@ -15,21 +15,21 @@ package com.epam.dlab.dto.exploratory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDTO> {
-    @JsonProperty("notebook_subnet_cidr")
-    private String notebookSubnet;
+    @JsonProperty("notebook_instance_type")
+    private String notebookInstanceType;
     @JsonProperty("creds_security_groups_ids")
     private String securityGroupIds;
 
-    public String getNotebookSubnet() {
-        return notebookSubnet;
+    public String getNotebookInstanceType() {
+        return notebookInstanceType;
     }
 
-    public void setNotebookSubnet(String notebookSubnet) {
-        this.notebookSubnet = notebookSubnet;
+    public void setNotebookInstanceType(String notebookInstanceType) {
+        this.notebookInstanceType = notebookInstanceType;
     }
 
-    public ExploratoryCreateDTO withNotebookSubnet(String notebookSubnet) {
-        setNotebookSubnet(notebookSubnet);
+    public ExploratoryCreateDTO withNotebookInstanceType(String notebookInstanceType) {
+        setNotebookInstanceType(notebookInstanceType);
         return this;
     }
 
@@ -45,5 +45,4 @@ public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDT
         setSecurityGroupIds(securityGroupIds);
         return this;
     }
-
 }

@@ -10,32 +10,37 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.client.mongo;
+package com.epam.dlab.backendapi.health;
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
+import com.epam.dlab.client.restclient.RESTService;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class MongoService {
-    private MongoClient client;
-    private String database;
+import javax.ws.rs.core.Response;
 
-    private static final Document PING = new Document("ping", "1");
+import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
-    public MongoService(MongoClient client, String database) {
-        this.client = client;
-        this.database = database;
-    }
+public class ProvisioningHealthChecker implements HealthChecker {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningHealthChecker.class);
 
-    public MongoCollection<Document> getCollection(String name) {
-        return client.getDatabase(database).getCollection(name, Document.class);
-    }
+    @Inject
+    @Named(PROVISIONING_SERVICE)
+    private RESTService provisioningService;
 
-    public <T> MongoCollection<T> getCollection(String name, Class<T> c) {
-        return client.getDatabase(database).getCollection(name, c);
-    }
-
-    public Document ping() {
-        return client.getDatabase(database).runCommand(PING);
+    @Override
+    public boolean isAlive() {
+        try {
+            Response response = provisioningService.get("/infrastructure/status", Response.class);
+            boolean alive = response.getStatusInfo() == Response.Status.OK;
+            if (!alive) {
+                LOGGER.error("Provisioning service is not available");
+            }
+            return alive;
+        } catch (Throwable t) {
+            LOGGER.error("Provisioning service is not available", t);
+            return false;
+        }
     }
 }
