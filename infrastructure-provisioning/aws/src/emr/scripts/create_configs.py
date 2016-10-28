@@ -121,7 +121,6 @@ def spark_defaults(args):
     local('cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR1|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" > /tmp/spark-defaults-temporary.conf')
     local('printf "\\n"')
     local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> /tmp/spark-defaults-temporary.conf')
-    #local('sudo mv /tmp/spark-defaults-temporary.conf ' + spark_def_path)
     template_file = "/tmp/spark-defaults-temporary.conf"
     with open(template_file, 'r') as f:
         text = f.read()
@@ -130,10 +129,6 @@ def spark_defaults(args):
     text = text.replace('MISSEDJAR2', missed_jar_path2)
     with open(spark_def_path, 'w') as f:
         f.write(text)
-    # with open(spark_def_path, 'w') as out:
-    #     with open(template_file) as tpl:
-    #         for line in tpl:
-    #             out.write(line.replace('EMRVERSION', args.emr_version))
 
 if __name__ == "__main__":
     if args.dry_run == 'true':
