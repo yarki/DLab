@@ -48,7 +48,7 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withInteractive(){
+    public RunDockerCommand withInteractive() {
         options.add("-i");
         return this;
     }
