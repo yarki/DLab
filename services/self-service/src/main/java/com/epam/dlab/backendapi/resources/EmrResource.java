@@ -37,7 +37,7 @@ import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
-@Path("/api/infrastructure_provision/computational_resources")
+@Path("/infrastructure_provision/computational_resources")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class EmrResource implements EmrAPI {

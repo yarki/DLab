@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
-@Path("/api/infrastructure_provision")
+@Path("/infrastructure_provision")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class UserListResource implements DockerAPI {

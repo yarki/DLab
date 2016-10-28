@@ -37,7 +37,7 @@ import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
-@Path("infrastructure_provision/exploratory_environment")
+@Path("/infrastructure_provision/exploratory_environment")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements ExploratoryAPI {
