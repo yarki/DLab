@@ -12,17 +12,16 @@
 
 import { Component } from '@angular/core';
 
-import { AuthenticationService } from './../security/authentication.service';
-import { UserProfileService } from "../security/userProfile.service";
 import { LoginModel } from "./loginModel";
 import {AppRoutingService} from "../routing/appRouting.service";
+import {ApplicationSecurityService} from "../services/applicationSecurity.service";
 
 @Component({
   moduleId: module.id,
   selector: 'sd-login',
   templateUrl: 'login.component.html',
   styleUrls: ['./login.component.css'],
-  providers: [AuthenticationService, UserProfileService]
+  providers: [ApplicationSecurityService]
 })
 
 export class LoginComponent {
@@ -34,10 +33,10 @@ export class LoginComponent {
   // Override
   //
 
-  constructor(private authenticationService: AuthenticationService, private userProfileService : UserProfileService, private appRoutingService : AppRoutingService) {}
+  constructor(private applicationSecurityService: ApplicationSecurityService, private appRoutingService : AppRoutingService) {}
 
   ngOnInit() {
-    this.userProfileService.isLoggedIn().subscribe(result => {
+    this.applicationSecurityService.isLoggedIn().subscribe(result => {
       if (result)
         this.appRoutingService.redirectToHomePage();
     });
@@ -51,7 +50,7 @@ export class LoginComponent {
     this.error = '';
     this.loading = true;
 
-    this.authenticationService
+    this.applicationSecurityService
       .login(this.model.username, this.model.password)
       .subscribe((result) => {
         if (result) {

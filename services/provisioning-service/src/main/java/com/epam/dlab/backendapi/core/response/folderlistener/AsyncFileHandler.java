@@ -13,7 +13,7 @@
 
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
-import com.epam.dlab.backendapi.core.response.FileHandler;
+import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +30,13 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
 
     private final String fileName;
     private final String directory;
-    private final FileHandler fileHandler;
+    private final FileHandlerCallback fileHandlerCallback;
     private final Duration fileLengthCheckDelay;
 
-    public AsyncFileHandler(String fileName, String directory, FileHandler fileHandler, Duration fileLengthCheckDelay) {
+    public AsyncFileHandler(String fileName, String directory, FileHandlerCallback fileHandlerCallback, Duration fileLengthCheckDelay) {
         this.fileName = fileName;
         this.directory = directory;
-        this.fileHandler = fileHandler;
+        this.fileHandlerCallback = fileHandlerCallback;
         this.fileLengthCheckDelay = fileLengthCheckDelay;
     }
 
@@ -44,10 +44,9 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
     public Boolean get() {
         Path path = Paths.get(directory, fileName);
         try {
-            if (fileHandler.handle(fileName, readBytes(path))) {
-                Files.delete(path);
-                return true;
-            }
+            fileHandlerCallback.handle(fileName, readBytes(path));
+            Files.delete(path);
+            return true;
         } catch (Exception e) {
             LOGGER.debug("handle file async", e);
         }

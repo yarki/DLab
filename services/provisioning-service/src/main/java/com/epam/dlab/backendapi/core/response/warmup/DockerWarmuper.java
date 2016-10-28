@@ -16,8 +16,9 @@ import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.backendapi.core.response.FileHandler;
+import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
+import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -38,15 +39,17 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecutor commandExecuter;
+    private CommandExecutor commandExecutor;
     private Map<String, String> uuids = new ConcurrentHashMap<>();
     private Set<ImageMetadataDTO> metadatas = new ConcurrentHashSet<>();
 
     @Override
     public void start() throws Exception {
         LOGGER.debug("docker warm up start");
-        folderListenerExecutor.start(configuration.getWarmupDirectory(), configuration.getWarmupPollTimeout(), getMetadataHandler());
-        List<String> images = commandExecuter.executeSync(GET_IMAGES);
+        folderListenerExecutor.start(configuration.getWarmupDirectory(),
+                configuration.getWarmupPollTimeout(),
+                getFileHandlerCallback());
+        List<String> images = commandExecutor.executeSync(GET_IMAGES);
         for (String image : images) {
             LOGGER.debug("image: {}", image);
             String uuid = UUID.randomUUID().toString();
@@ -57,21 +60,34 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
                     .withRequestId(uuid)
                     .withActionDescribe(image)
                     .toCMD();
-            commandExecuter.executeAsync(command);
+            commandExecutor.executeAsync(command);
         }
     }
 
-    FileHandler getMetadataHandler() {
-        return (fileName, content) -> {
-            String uuid = DockerCommands.extractUUID(fileName);
-            if (uuids.containsKey(uuid)) {
-                LOGGER.debug("handle file {}", fileName);
-                ImageMetadataDTO metadata = MAPPER.readValue(content, ImageMetadataDTO.class);
-                metadata.setImage(uuids.get(uuid));
-                metadatas.add(metadata);
-                return true;
+    FileHandlerCallback getFileHandlerCallback() {
+        return new FileHandlerCallback() {
+            @Override
+            public boolean checkUUID(String uuid) {
+                return uuids.containsKey(uuid);
             }
-            return false;
+
+            @Override
+            public boolean handle(String fileName, byte[] content) throws Exception {
+                String uuid = DockerCommands.extractUUID(fileName);
+                if (uuids.containsKey(uuid)) {
+                    LOGGER.debug("handle file {}", fileName);
+                    ImageMetadataDTO metadata = MAPPER.readValue(content, ImageMetadataDTO.class);
+                    metadata.setImage(uuids.get(uuid));
+                    metadatas.add(metadata);
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void handleError() {
+                LOGGER.warn("docker warmuper returned no result");
+            }
         };
     }
 

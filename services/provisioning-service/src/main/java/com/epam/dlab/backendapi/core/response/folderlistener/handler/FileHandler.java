@@ -10,19 +10,8 @@
 
  *****************************************************************************************************/
 
-import { Injectable } from '@angular/core';
-import {Response} from '@angular/http';
-import {Observable} from "rxjs";
-import {ApplicationServiceFacade} from "./applicationServiceFacade.service";
+package com.epam.dlab.backendapi.core.response.folderlistener.handler;
 
-@Injectable()
-export class UserAccessKeyService {
-  constructor(private applicationServiceFacace: ApplicationServiceFacade) {
-  }
-
-  checkUserAccessKey() : Observable<Response> {
-    return this.applicationServiceFacace
-      .buildCheckUserAccessKeyRequest()
-      .map(response => response);
-  }
+public interface FileHandler {
+    boolean handle(String fileName, byte[] content) throws Exception;
 }

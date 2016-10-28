@@ -11,18 +11,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 *****************************************************************************************************/
 
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { AuthenticationService } from './../security/authentication.service';
+
 import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
 import {AppRoutingService} from "../routing/appRouting.service";
 import { Grid } from '../components/grid/grid.component';
+import {AuthenticationService} from "../../../../dist/tmp/app/security/authentication.service";
+import {ApplicationSecurityService} from "../services/applicationSecurity.service";
 
 @Component({
   moduleId: module.id,
   selector: 'sd-home',
   templateUrl: 'home.component.html',
   styleUrls: ['./home.component.css'],
-  providers: [AuthenticationService]
+  providers: [ApplicationSecurityService]
 })
 
 export class HomeComponent implements OnInit {
@@ -46,7 +48,7 @@ export class HomeComponent implements OnInit {
   // --
 
   constructor(
-    private authenticationService: AuthenticationService,
+    private applicationSecurityService: ApplicationSecurityService,
     private userAccessKeyService: UserAccessKeyService,
     private userResourceService: UserResourceService,
     private appRoutingService : AppRoutingService
@@ -65,7 +67,7 @@ export class HomeComponent implements OnInit {
   //
 
   logout_btnClick() {
-    this.authenticationService.logout().subscribe(
+    this.applicationSecurityService.logout().subscribe(
       () => this.appRoutingService.redirectToLoginPage(),
       error => console.log(error),
       () => this.appRoutingService.redirectToLoginPage());
@@ -112,14 +114,14 @@ export class HomeComponent implements OnInit {
   private checkInfrastructureCreationProgress(callOnce: boolean) {
     this.userAccessKeyService.checkUserAccessKey()
       .subscribe(
-      status => {
-        if(status == 200)
+      response => {
+        if(response.status == 200)
         {
           this.userAccessKeyUploaded = true;
           if (this.preloaderModal.isOpened) {
             this.preloaderModal.close();
           }
-        } else if (status == 202)
+        } else if (response.status == 202)
         {
           if (this.keyUploadModal.isOpened)
             this.keyUploadModal.close();
@@ -208,7 +210,7 @@ export class HomeComponent implements OnInit {
         return false;
       }
     }, this);
-    
+
 
     this.userResourceService
       .createUsernotebook({

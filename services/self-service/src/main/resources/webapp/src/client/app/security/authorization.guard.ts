@@ -12,13 +12,13 @@
 
 import { Injectable } from '@angular/core';
 import {Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
-import { UserProfileService } from './userProfile.service'
+import {ApplicationSecurityService} from "../services/applicationSecurity.service";
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
-  constructor(private userProfileService : UserProfileService, private router: Router) {}
+  constructor(private applicationSecurityService : ApplicationSecurityService, private router: Router) {}
 
   canActivate(next:ActivatedRouteSnapshot, state:RouterStateSnapshot)  {
-    return this.userProfileService.isLoggedIn();
+    return this.applicationSecurityService.isLoggedIn();
   }
 }

@@ -13,14 +13,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoginComponent } from './login.component';
-import { AuthenticationService } from './../security/authentication.service';
 import {FormsModule} from "@angular/forms";
+import {ApplicationSecurityService} from "../services/applicationSecurity.service";
 
 @NgModule({
     imports: [CommonModule, FormsModule],
     declarations: [LoginComponent],
     exports: [LoginComponent],
-    providers: [AuthenticationService]
+    providers: [ApplicationSecurityService]
 })
 
 export class LoginModule { }
