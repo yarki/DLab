@@ -167,7 +167,7 @@ def get_emr_info(id, key = ''):
 def get_emr_list(tag_name, type='Key'):
     emr = boto3.client('emr')
     clusters = emr.list_clusters(
-        ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING']
+        ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING', 'TERMINATING']
     )
     clusters = clusters.get('Clusters')
     clusters_list = []
