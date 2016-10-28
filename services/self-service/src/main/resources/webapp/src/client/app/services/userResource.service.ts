@@ -121,12 +121,5 @@ export class UserResourceService {
         });
   }
 
-  uploadKey(data)
-  {
-    let body = data;
-      return this.http.post(this.getResourceUrl('keyloader'), body)
-        .map((res: Response) => {
-          return res.status;
-        });
-  }
+
 }

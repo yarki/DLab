@@ -79,10 +79,10 @@ export class HomeComponent implements OnInit {
     let formData = new FormData();
     formData.append("file", this.uploadKey);
 
-    this.userResourceService.uploadKey(formData)
+    this.userAccessKeyService.uploadUserAccessKey(formData)
     .subscribe(
-      status => {
-        if(status === 200)
+      response => {
+        if(response.status === 200)
           this.checkInfrastructureCreationProgress(false);
       },
       error => console.log(error)
