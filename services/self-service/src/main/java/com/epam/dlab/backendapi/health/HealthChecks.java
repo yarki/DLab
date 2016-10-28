@@ -10,32 +10,9 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.client.mongo;
+package com.epam.dlab.backendapi.health;
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
-
-public class MongoService {
-    private MongoClient client;
-    private String database;
-
-    private static final Document PING = new Document("ping", "1");
-
-    public MongoService(MongoClient client, String database) {
-        this.client = client;
-        this.database = database;
-    }
-
-    public MongoCollection<Document> getCollection(String name) {
-        return client.getDatabase(database).getCollection(name, Document.class);
-    }
-
-    public <T> MongoCollection<T> getCollection(String name, Class<T> c) {
-        return client.getDatabase(database).getCollection(name, c);
-    }
-
-    public Document ping() {
-        return client.getDatabase(database).runCommand(PING);
-    }
+public class HealthChecks {
+    public static final String MONGO_HEALTH_CHECKER = "mongoHealthChecker";
+    public static final String PROVISIONING_HEALTH_CHECKER = "provisioningHealthChecker";
 }

@@ -11,16 +11,17 @@
  *****************************************************************************************************/
 
 import { Injectable } from '@angular/core';
-import {Http, Headers} from '@angular/http';
+import {Http, Headers, Response} from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
 import {Observable} from "rxjs";
 import {AppRoutingService} from "../routing/appRouting.service";
+import {ApplicationServiceFacade} from "../services/applicationServiceFacade.service";
 
 @Injectable()
 export class UserProfileService {
   private accessTokenKey : string = "access_token";
   private userNameKey : string = "user_name";
-  constructor(private http: Http, private webRequestHelper : WebRequestHelper, private appRoutingService : AppRoutingService) {}
+  constructor(private serviceFacade : ApplicationServiceFacade, private appRoutingService : AppRoutingService) {}
 
   setUserName(userName)
   {
@@ -57,25 +58,14 @@ export class UserProfileService {
 
     if(authToken && currentUser)
     {
-      let requestHeader = this.webRequestHelper.getJsonHeader();
-      requestHeader = this.appendBasicAuthHeader(requestHeader);
-
-      return this.http
-        .post(
-          '/api/authorize',
-          currentUser,
-          { headers: requestHeader }
-        )
-        .map((response) => {
-            if(response && response.status == 200)
-            {
-              return true;
-            }
+      return this.serviceFacade.buildAuthorizeRequest(currentUser).map((response : Response) => {
+          if(response.status === 200)
+            return true;
 
           this.clearAuthToken();
           this.appRoutingService.redirectToLoginPage();
           return false;
-        }, this);
+      }, this);
     }
 
     this.appRoutingService.redirectToLoginPage();
