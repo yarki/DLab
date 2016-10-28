@@ -13,8 +13,17 @@
 package com.epam.dlab.backendapi.core.guice;
 
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.health.HealthChecker;
+import com.epam.dlab.backendapi.health.MongoHealthChecker;
+import com.epam.dlab.backendapi.health.ProvisioningHealthChecker;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import io.dropwizard.setup.Environment;
+
+import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
+import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
 
 abstract class BaseModule extends AbstractModule {
     protected SelfServiceApplicationConfiguration configuration;
@@ -23,5 +32,19 @@ abstract class BaseModule extends AbstractModule {
     public BaseModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
         this.configuration = configuration;
         this.environment = environment;
+    }
+
+    @Provides
+    @Singleton
+    @Named(MONGO_HEALTH_CHECKER)
+    public HealthChecker mongoHealthChecker() {
+        return new MongoHealthChecker();
+    }
+
+    @Provides
+    @Singleton
+    @Named(PROVISIONING_HEALTH_CHECKER)
+    public HealthChecker provisioningHealthChecker() {
+        return new ProvisioningHealthChecker();
     }
 }
