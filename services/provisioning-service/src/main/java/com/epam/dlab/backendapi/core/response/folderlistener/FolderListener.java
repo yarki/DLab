@@ -30,18 +30,14 @@ public class FolderListener implements Runnable {
 
     private final String directory;
     private final Duration timeout;
-    private final FileChecker fileChecker;
-    private final FileHandler fileHandler;
-    private final ErrorFileHandler errorFileHandler;
+    private final FileHandlerCallback fileHandlerCallback;
     private final Duration fileLengthCheckDelay;
     private volatile boolean success;
 
-    public FolderListener(String directory, Duration timeout, FileChecker fileChecker, FileHandler fileHandler, ErrorFileHandler errorFileHandler, Duration fileLengthCheckDelay) {
+    public FolderListener(String directory, Duration timeout, FileHandlerCallback fileHandlerCallback, Duration fileLengthCheckDelay) {
         this.directory = directory;
         this.timeout = timeout;
-        this.fileChecker = fileChecker;
-        this.fileHandler = fileHandler;
-        this.errorFileHandler = errorFileHandler;
+        this.fileHandlerCallback = fileHandlerCallback;
         this.fileLengthCheckDelay = fileLengthCheckDelay;
     }
 
@@ -63,23 +59,19 @@ public class FolderListener implements Runnable {
             List<WatchEvent<?>> events = watchKey.pollEvents();
             for (WatchEvent event : events) {
                 String fileName = event.context().toString();
-                if (fileChecker.checkUUID(DockerCommands.extractUUID(fileName))) {
+                if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
                     handleFileAsync(fileName);
                 }
                 pollFile();
             }
         } else if (!success) {
-            if (errorFileHandler != null) {
-                errorFileHandler.handle();
-            } else {
-                LOGGER.warn("docker returned no result, silently ignored");
-            }
+            fileHandlerCallback.handleError();
         }
     }
 
     private void handleFileAsync(String fileName) {
         CompletableFuture
-                .supplyAsync(new AsyncFileHandler(fileName, directory, fileHandler, fileLengthCheckDelay))
+                .supplyAsync(new AsyncFileHandler(fileName, directory, fileHandlerCallback, fileLengthCheckDelay))
                 .thenAccept(result -> success = success || result);
     }
 }

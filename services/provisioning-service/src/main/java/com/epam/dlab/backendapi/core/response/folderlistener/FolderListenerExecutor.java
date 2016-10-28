@@ -28,11 +28,7 @@ public class FolderListenerExecutor {
     private ProvisioningServiceApplicationConfiguration configuration;
 
 
-    public void start(String directory, Duration timeout, FileChecker fileChecker, FileHandler fileHandler) {
-        start(directory, timeout, fileChecker, fileHandler, null);
-    }
-
-    public void start(String directory, Duration timeout, FileChecker fileChecker, FileHandler fileHandler, ErrorFileHandler errorFileHandler) {
-        CompletableFuture.runAsync(new FolderListener(directory, timeout, fileChecker, fileHandler, errorFileHandler, configuration.getFileLengthCheckDelay()));
+    public void start(String directory, Duration timeout, FileHandlerCallback fileHandlerCallback) {
+        CompletableFuture.runAsync(new FolderListener(directory, timeout, fileHandlerCallback, configuration.getFileLengthCheckDelay()));
     }
 }

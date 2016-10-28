@@ -17,6 +17,7 @@ import com.epam.dlab.backendapi.client.rest.SelfAPI;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
+import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.core.response.folderlistener.handler.ErrorFileHandler;
 import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
@@ -57,9 +58,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getKeyLoaderDirectory(),
                 configuration.getKeyLoaderPollTimeout(),
-                uuid::equals,
-                getResultHandler(dto.getUser(), uuid),
-                getErrorHandler(dto.getUser()));
+                getFileHandlerCallback(dto.getUser(), uuid));
         commandExecuter.executeAsync(
                 new RunDockerCommand()
                         .withVolumeForRootKeys(configuration.getKeyDirectory())
@@ -81,21 +80,31 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         Files.write(Paths.get(configuration.getKeyDirectory(), dto.getUser() + KEY_EXTENTION), dto.getContent().getBytes());
     }
 
-    private FileHandler getResultHandler(String user, String uuid) {
-        return (fileName, content) -> {
-            LOGGER.debug("get file {} actually waited for {}", fileName, uuid);
-            JsonNode document = MAPPER.readTree(content);
-            UploadFileResultDTO result = new UploadFileResultDTO(user);
-            if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
-                result.setSuccessAndCredential(extractCredential(document));
+    private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid) {
+        return new FileHandlerCallback() {
+            @Override
+            public boolean checkUUID(String uuid) {
+                return originalUuid.equals(uuid);
             }
-            selfService.post(KEY_LOADER, result, UploadFileResultDTO.class);
-            return true;
-        };
-    }
 
-    private ErrorFileHandler getErrorHandler(String user) {
-        return () -> selfService.post(KEY_LOADER, new UploadFileResultDTO(user), UploadFileResultDTO.class);
+            @Override
+            public boolean handle(String fileName, byte[] content) throws Exception {
+                LOGGER.debug("get file {} actually waited for {}", fileName, originalUuid);
+                JsonNode document = MAPPER.readTree(content);
+                UploadFileResultDTO result = new UploadFileResultDTO(user);
+                if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
+                    result.setSuccessAndCredential(extractCredential(document));
+                }
+                selfService.post(KEY_LOADER, result, UploadFileResultDTO.class);
+                return true;
+            }
+
+            @Override
+            public void handleError() {
+                selfService.post(KEY_LOADER, new UploadFileResultDTO(user), UploadFileResultDTO.class);
+            }
+        };
+
     }
 
     private UserAWSCredentialDTO extractCredential(JsonNode document) throws IOException {

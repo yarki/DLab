@@ -16,6 +16,7 @@ import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
+import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
@@ -47,8 +48,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
         LOGGER.debug("docker warm up start");
         folderListenerExecutor.start(configuration.getWarmupDirectory(),
                 configuration.getWarmupPollTimeout(),
-                uuids::containsKey,
-                getMetadataHandler());
+                getFileHandlerCallback());
         List<String> images = commandExecutor.executeSync(GET_IMAGES);
         for (String image : images) {
             LOGGER.debug("image: {}", image);
@@ -64,17 +64,30 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
         }
     }
 
-    FileHandler getMetadataHandler() {
-        return (fileName, content) -> {
-            String uuid = DockerCommands.extractUUID(fileName);
-            if (uuids.containsKey(uuid)) {
-                LOGGER.debug("handle file {}", fileName);
-                ImageMetadataDTO metadata = MAPPER.readValue(content, ImageMetadataDTO.class);
-                metadata.setImage(uuids.get(uuid));
-                metadatas.add(metadata);
-                return true;
+    FileHandlerCallback getFileHandlerCallback() {
+        return new FileHandlerCallback() {
+            @Override
+            public boolean checkUUID(String uuid) {
+                return uuids.containsKey(uuid);
             }
-            return false;
+
+            @Override
+            public boolean handle(String fileName, byte[] content) throws Exception {
+                String uuid = DockerCommands.extractUUID(fileName);
+                if (uuids.containsKey(uuid)) {
+                    LOGGER.debug("handle file {}", fileName);
+                    ImageMetadataDTO metadata = MAPPER.readValue(content, ImageMetadataDTO.class);
+                    metadata.setImage(uuids.get(uuid));
+                    metadatas.add(metadata);
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void handleError() {
+                LOGGER.warn("docker warmuper returned no result");
+            }
         };
     }
 
