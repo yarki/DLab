@@ -13,8 +13,7 @@
 import { Injectable } from '@angular/core';
 import {Http, Response} from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
-import { UserProfileService } from './../security/userProfile.service'
-import {Headers} from "@angular/http";
+import {ApplicationSecurityService} from "./applicationSecurity.service";
 
 @Injectable()
 export class UserResourceService {
@@ -32,13 +31,13 @@ export class UserResourceService {
     keyloader: 'keyloader'
   };
 
-  constructor(private http: Http,
-              private webRequestHelper : WebRequestHelper,
-              private userProfileService : UserProfileService) {
+  constructor(private applicationSecurityService: ApplicationSecurityService,
+              private http : Http,
+              private webRequestHelper : WebRequestHelper) {
   }
 
   getResourceUrl(resource: string) {
-   return `/api/${this.url[resource]}?access_token=${this.userProfileService.getAuthToken()}`;
+   return `/api/${this.url[resource]}?access_token=${this.applicationSecurityService.getAuthToken()}`;
   }
 
   getCreateTmpl()
