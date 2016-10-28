@@ -25,4 +25,11 @@ export class UserAccessKeyService {
       .buildCheckUserAccessKeyRequest()
       .map(response => response);
   }
+
+  uploadUserAccessKey(data) : Observable<Response>
+  {
+    return this.applicationServiceFacace
+      .buildUploadUserAccessKeyRequest(data)
+      .map((response : Response) => response);
+  }
 }

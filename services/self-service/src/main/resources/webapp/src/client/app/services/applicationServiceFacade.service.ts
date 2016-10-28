@@ -40,7 +40,7 @@ export class ApplicationServiceFacade {
     this.requestRegistry.Add(ApplicationServiceFacade.LOGIN, "/api/user/login");
     this.requestRegistry.Add(ApplicationServiceFacade.LOGOUT, "/api/user/logout");
     this.requestRegistry.Add(ApplicationServiceFacade.AUTHORIZE, "/api/user/authorize");
-    this.requestRegistry.Add(ApplicationServiceFacade.ACCESS_KEY, "/api/keyloader");
+    this.requestRegistry.Add(ApplicationServiceFacade.ACCESS_KEY, "/api/user/access_key");
 
     // Exploratory Environment
 
@@ -61,18 +61,12 @@ export class ApplicationServiceFacade {
     else return this.http.get(url, opt);
   }
 
-  private getJsonRequestOptions() : RequestOptions
-  {
+  private getRequestOptions(json:boolean, auth:boolean) : RequestOptions {
     let headers = new Headers();
-    headers.append('Content-type', 'application/json; charset=utf-8');
-    let reqOpt = new RequestOptions({ headers: headers });
-    return reqOpt;
-  }
-
-  private getAuthRequestOptions() : RequestOptions {
-    let headers = new Headers();
-    headers.append('Content-type', 'application/json; charset=utf-8');
-    headers.append("Authorization", "Bearer " + localStorage.getItem(this.accessTokenKey));
+    if(json)
+      headers.append('Content-type', 'application/json; charset=utf-8');
+    if(auth)
+      headers.append("Authorization", "Bearer " + localStorage.getItem(this.accessTokenKey));
     let reqOpt = new RequestOptions({ headers: headers });
     return reqOpt;
   }
@@ -81,27 +75,34 @@ export class ApplicationServiceFacade {
     return this.buildRequest(RequestMethod.Post,
       this.requestRegistry.Item(ApplicationServiceFacade.LOGIN),
       body,
-      this.getJsonRequestOptions());
+      this.getRequestOptions(true, false));
   }
 
   buildLogoutRequest(body: any) : Observable<Response>  {
     return this.buildRequest(RequestMethod.Post,
       this.requestRegistry.Item(ApplicationServiceFacade.LOGOUT),
       body,
-      this.getAuthRequestOptions());
+      this.getRequestOptions(true, true));
   }
 
-  buildAuthorizeRequest(body:any) : Observable<Response>  {
+  buildAuthorizeRequest(body:any) : Observable<Response> {
     return this.buildRequest(RequestMethod.Post,
       this.requestRegistry.Item(ApplicationServiceFacade.AUTHORIZE),
       body,
-      this.getAuthRequestOptions());
+      this.getRequestOptions(true, true));
   }
 
-  buildCheckUserAccessKeyRequest() :Observable<Response>{
+  buildCheckUserAccessKeyRequest() : Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
       this.requestRegistry.Item(ApplicationServiceFacade.ACCESS_KEY),
       null,
-      this.getAuthRequestOptions());
+      this.getRequestOptions(true, true));
+  }
+
+  buildUploadUserAccessKeyRequest(body: any) : Observable<Response> {
+    return this.buildRequest(RequestMethod.Post,
+      this.requestRegistry.Item(ApplicationServiceFacade.ACCESS_KEY),
+      body,
+      this.getRequestOptions(false, true));
   }
 }
