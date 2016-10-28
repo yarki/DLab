@@ -25,8 +25,6 @@ public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
     private String version;
     @JsonProperty("notebook_name")
     private String notebookName;
-    @JsonProperty("edge_subnet_cidr")
-    private String edgeSubnet;
 
     public String getInstanceCount() {
         return instanceCount;
@@ -92,18 +90,4 @@ public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
         setNotebookName(notebookName);
         return this;
     }
-
-    public String getEdgeSubnet() {
-        return edgeSubnet;
-    }
-
-    public void setEdgeSubnet(String edgeSubnet) {
-        this.edgeSubnet = edgeSubnet;
-    }
-
-    public EMRCreateDTO withEdgeSubnet(String edgeSubnet) {
-        setEdgeSubnet(edgeSubnet);
-        return this;
-    }
-
 }

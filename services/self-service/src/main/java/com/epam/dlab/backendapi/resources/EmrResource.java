@@ -49,8 +49,6 @@ public class EmrResource implements EmrAPI {
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
-    private KeyDAO keyDao;
-    @Inject
     private UserListDAO userListDAO;
     @Inject
     @Named(PROVISIONING_SERVICE)
@@ -76,7 +74,6 @@ public class EmrResource implements EmrAPI {
                     .withVersion(formDTO.getVersion())
                     .withNotebookName(formDTO.getNotebookName())
                     .withEdgeUserName(userInfo.getName())
-                    .withEdgeSubnet(keyDao.findSubnet(userInfo.getName()))
                     .withRegion(settingsDAO.getAwsRegion());
             LOGGER.debug("created emr {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
