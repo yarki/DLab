@@ -245,15 +245,15 @@ if __name__ == "__main__":
     else:
         upload_jars_parser(args)
         out = open(logpath, 'a')
+        nbs_id = get_instance_by_ip(args.nbs_ip)
+        out.write('Notebook server "{}" IP is "{}"\n'.format(nbs_id, args.nbs_ip))
+        current_sg = nbs_id.security_groups
+        out.write('Current Notebooks SGs: {}\n'.format(current_sg))
         out.write('[BUILDING NEW CLUSTER - {}\n]'.format(args.name))
         cluster_id = build_emr_cluster(args)
         out.write('Cluster ID: {}\n'.format(cluster_id))
         if wait_emr(args.s3_bucket, args.name, args.emr_timeout):
             # Append Cluster's SGs to the Notebook server to grant access
-            nbs_id = get_instance_by_ip(args.nbs_ip)
-            out.write('Notebook server "{}" IP is "{}"\n'.format(nbs_id, args.nbs_ip))
-            current_sg = nbs_id.security_groups
-            out.write('Current Notebooks SGs: {}\n'.format(current_sg))
             sg_list=[]
             for i in current_sg:
                 sg_list.append(i['GroupId'])
