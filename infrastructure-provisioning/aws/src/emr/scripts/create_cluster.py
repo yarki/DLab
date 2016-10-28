@@ -58,11 +58,11 @@ args = parser.parse_args()
 cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/config/{1}/hive-site.xml --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/config/{1} --recursive --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=/bin/tar -zcvf /tmp/jars.tar.gz /usr/lib/hadoop/ /usr/lib/hadoop-lzo/lib/ /usr/lib/hadoop-yarn/ /usr/share/aws/aws-java-sdk/ /usr/share/aws/emr/emrfs/lib/ /usr/share/aws/emr/emrfs/auxlib/ /usr/lib/spark/lib/ /usr/lib/hadoop/client/, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
     args.s3_bucket, args.name, args.nbs_user, args.region)
 
-cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp /tmp/jars.tar.gz s3://{0}/jars/{1}/ --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region)
+cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/jars_parser.sh /tmp/jars_parser.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
+          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label)
 
 logfile = '{}_creation.log'.format(args.name)
 logpath = '/response/' + logfile
@@ -83,6 +83,11 @@ def get_object_count(bucket, prefix):
         print prefix + " still not exist. Waiting..."
         count = 0
     return count
+
+
+def upload_jars_parser(args):
+    s3 = boto3.resource('s3')
+    s3.meta.client.upload_file('/root/scripts/jars_parser.sh', args.s3_bucket, 'jars_parser.sh')
 
 
 def get_instance_by_ip(ip):
@@ -235,8 +240,10 @@ if __name__ == "__main__":
         parser.print_help()
     elif args.dry_run:
         # get_emr_state(args.id)
+        upload_jars_parser(args)
         build_emr_cluster(args)
     else:
+        upload_jars_parser(args)
         out = open(logpath, 'a')
         out.write('[BUILDING NEW CLUSTER - {}\n]'.format(args.name))
         cluster_id = build_emr_cluster(args)

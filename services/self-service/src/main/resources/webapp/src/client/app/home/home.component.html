@@ -36,7 +36,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <div class="sub_nav">
   <div class="container-fluid">
-    <button class="btn btn_create" (click)="createAnalyticalModal.open({isFooter: false})">
+    <button class="btn btn_create" [disabled]="!userAccessKeyUploaded" (click)="createAnalyticalModal.open({isFooter: false})">
       <span class="glyphicon glyphicon glyphicon-plus" ></span> Create new
     </button>
     <button class="btn btn_refresh pull-right" (click)="refreshGrid()">
@@ -47,12 +47,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <ng-grid [emrTempls]="emrTempls" [shapes]="shapes"></ng-grid>
 
-<modal #createAnalyticalModal>
+<modal #createAnalyticalModal modalClass="modal-lg">
   <modal-header>
     <h4 class="modal-title" id="myModalLabel">Create analytical tool</h4>
   </modal-header>
   <modal-content>
-  <form>
+  <form (submit)="createUsernotebook($event ,createTmpl_tmplIndex.value, createTmpl_name, createTmpl_shape)">
     <div class="form-group row">
       <div  class="col-xs-4">
         <label class="control-label">Select template</label>
@@ -77,6 +77,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="col-xs-8">
         <input type="text" class="form-control" placeholder="Enter Name" required #createTmpl_name>
+        <span class="danger_color" *ngIf="notebookExist">This name already exist.</span>
       </div>
     </div>
     <div class="form-group row">
@@ -91,31 +92,31 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     </div>
     <div class="text-right">
       <button type="button" class="btn btn-default" (click)="createAnalyticalModal.close()">Cancel</button>
-      <button type="button" class="btn btn-success" (click)="createUsernotebook(createTmpl_tmplIndex.value, createTmpl_name.value, createTmpl_shape.value)">Create</button>
+      <button type="submit" class="btn btn-success">Create</button>
     </div>
   </form>
   </modal-content>
 </modal>
 
-<!-- <button  (click)="keyUploadModal.open({isFooter: false})">keyUploadModal</button> -->
-<modal #keyUploadModal modalClass="modal-lg" [hideCloseButton]="true" [closeOnEscape]="false" [closeOnOutsideClick]="false">
+<modal #keyUploadModal modalClass="modal-md" [hideCloseButton]="false" [closeOnEscape]="false" [closeOnOutsideClick]="false">
   <modal-header>
     <h4 class="modal-title">Create initial infrastructure</h4>
   </modal-header>
   <modal-content>
-    <form (submit)="uploadUserAccessKey_btnClick($event)" method="POST" action="{{uploadAccessKeyUrl}}" enctype="multipart/form-data">
+    <form (submit)="uploadUserAccessKey_btnClick($event)" novalidate>
       <div class="form-group row">
         <div  class="col-xs-7">
           <label class="control-label">Upload public key start environment creation</label>
           <div>
-            <small><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Where can I get public key?</small>
+            <small><span class="glyphicon glyphicon-question-sign" ></span> Where can I get public key?</small>
           </div>
         </div>
         <div class="col-xs-5 text-right">
           <span class="btn btn-default btn-file">
-            <span class="glyphicon glyphicon-upload"></span> Browse <input type="file" name="file" accept=".pub" (change)="uploadUserAccessKey_onChange($event)"/>
+            <span class="upload-icon" ></span> Browse
+            <input (change)="uploadUserAccessKey_onChange($event)" type="file" name="file" accept=".pub" />
           </span>
-          <div class="text-right">{{keyName}}</div>
+          <div class="text-right" [class.danger_color]="uploadAccessUserKeyFormInvalid">{{uploadAccessKeyLabel}}</div>
         </div>
       </div>
       <div class="text-right">

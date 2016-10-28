@@ -46,12 +46,9 @@ def prepare():
 
 def jars(args):
     print "Downloading jars..."
-    s3client = boto3.client('s3')
-    s3resource = boto3.resource('s3')
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
-    local('tar -zxvf /tmp/jars.tar.gz -C ' + emr_dir)
-    #get_files(s3client, s3resource, 'jars/', args.bucket, '/opt/')
+    local('tar -zhxvf /tmp/jars.tar.gz -C ' + emr_dir)
 
 
 def yarn(args):
@@ -113,13 +110,27 @@ def get_files(s3client, s3resource, dist, bucket, local):
                 s3resource.meta.client.download_file(bucket, file.get('Key'), local + os.sep + file.get('Key'))
 
 
-def spark_defaults():
+def spark_defaults(args):
+    missed_jar_path = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/client/*'
     spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
-    template_file = "/tmp/spark-defaults_template.conf"
-    with open(spark_def_path, 'w') as out:
-        with open(template_file) as tpl:
-            for line in tpl:
-                out.write(line.replace('EMRVERSION', args.emr_version))
+    s3_client = boto3.client('s3')
+    s3_client.download_file(args.bucket, 'spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
+    local('touch /tmp/spark-defaults-temporary.conf')
+    local('cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR|" | sed "s|\(.*\)\ |\\1|" > /tmp/spark-defaults-temporary.conf')
+    local('printf "\\n"')
+    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> /tmp/spark-defaults-temporary.conf')
+    #local('sudo mv /tmp/spark-defaults-temporary.conf ' + spark_def_path)
+    template_file = "/tmp/spark-defaults-temporary.conf"
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('EMRVERSION', args.emr_version)
+    text = text.replace('MISSEDJAR', missed_jar_path)
+    with open(spark_def_path, 'w') as f:
+        f.write(text)
+    # with open(spark_def_path, 'w') as out:
+    #     with open(template_file) as tpl:
+    #         for line in tpl:
+    #             out.write(line.replace('EMRVERSION', args.emr_version))
 
 if __name__ == "__main__":
     if args.dry_run == 'true':
@@ -132,4 +143,4 @@ if __name__ == "__main__":
         install_emr_spark(args)
         pyspark_kernel(args)
         toree_kernel(args)
-        spark_defaults()
+        spark_defaults(args)

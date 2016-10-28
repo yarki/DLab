@@ -25,6 +25,7 @@ def run():
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
+    instance = 'ssn'
     try:
         logging.info('[CREATE AWS CONFIG FILE]')
         print '[CREATE AWS CONFIG FILE]'
@@ -63,6 +64,10 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        try:
+            remove_role(instance)
+        except:
+            sys.exit(1)
         sys.exit(1)
 
     try:
@@ -78,6 +83,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_role(instance)
         sys.exit(1)
 
     try:
@@ -94,7 +100,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role('ssn')
+        remove_role(instance)
         sys.exit(1)
 
     try:
@@ -114,8 +120,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role('ssn')
-        remove_s3('ssn')
+        remove_role(instance)
+        remove_s3(instance)
         sys.exit(1)
 
     try:
@@ -136,8 +142,8 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role('ssn')
-        remove_s3('ssn')
+        remove_role(instance)
+        remove_s3(instance)
         sys.exit(1)
 
     try:
@@ -159,8 +165,8 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role('ssn')
-        remove_s3('ssn')
+        remove_role(instance)
+        remove_s3(instance)
         sys.exit(1)
 
     try:
@@ -182,8 +188,8 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role('ssn')
-        remove_s3('ssn')
+        remove_role(instance)
+        remove_s3(instance)
         sys.exit(1)
 
     try:
@@ -202,8 +208,8 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role('ssn')
-        remove_s3('ssn')
+        remove_role(instance)
+        remove_s3(instance)
         sys.exit(1)
 
     try:
@@ -219,8 +225,8 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role('ssn')
-        remove_s3('ssn')
+        remove_role(instance)
+        remove_s3(instance)
         sys.exit(1)
 
     try:
@@ -246,6 +252,6 @@ def run():
             run_routine('finalize', params)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role('ssn')
-        remove_s3('ssn')
+        remove_role(instance)
+        remove_s3(instance)
         sys.exit(1)

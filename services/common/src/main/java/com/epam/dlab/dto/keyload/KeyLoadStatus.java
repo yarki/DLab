@@ -19,7 +19,7 @@ public enum KeyLoadStatus {
     NONE("none", null, Response.Status.NOT_FOUND),
     NEW("new", null, Response.Status.ACCEPTED),
     SUCCESS("success", "ok", Response.Status.OK),
-    ERROR("error", "err", Response.Status.OK);
+    ERROR("error", "err", Response.Status.INTERNAL_SERVER_ERROR);
 
     private String status;
     private String value;

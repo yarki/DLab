@@ -11,30 +11,25 @@
  *****************************************************************************************************/
 
 import { Injectable } from '@angular/core';
-import {Http, Response} from '@angular/http';
-import { WebRequestHelper } from './../util/webRequestHelper.service'
-import { UserProfileService } from './../security/userProfile.service'
+import {Response} from '@angular/http';
 import {Observable} from "rxjs";
+import {ApplicationServiceFacade} from "./applicationServiceFacade.service";
 
 @Injectable()
 export class UserAccessKeyService {
-  constructor(private http: Http,
-              private webRequestHelper : WebRequestHelper,
-              private userProfileService : UserProfileService) {
+  constructor(private applicationServiceFacace: ApplicationServiceFacade) {
   }
 
-  getAccessKeyUrl() : string
+  checkUserAccessKey() : Observable<Response> {
+    return this.applicationServiceFacace
+      .buildCheckUserAccessKeyRequest()
+      .map(response => response);
+  }
+
+  uploadUserAccessKey(data) : Observable<Response>
   {
-    return `/api/keyloader?access_token=${this.userProfileService.getAuthToken()}`;
-  }
-
-  checkUserAccessKey() : Observable<number> {
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-    requestHeader = this.userProfileService.appendBasicAuthHeader(requestHeader);
-
-    return this.http.get
-      (this.getAccessKeyUrl(),
-      {headers : requestHeader})
-      .map((response:Response) => response.status);
+    return this.applicationServiceFacace
+      .buildUploadUserAccessKeyRequest(data)
+      .map((response : Response) => response);
   }
 }

@@ -12,32 +12,32 @@
 
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
-import com.epam.dlab.backendapi.core.Constants;
 import com.epam.dlab.backendapi.core.DockerCommands;
-import com.epam.dlab.backendapi.core.response.FileHandler;
+import com.epam.dlab.backendapi.core.response.folderlistener.handler.ErrorFileHandler;
+import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileChecker;
+import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public final class FolderListener implements Runnable {
+public class FolderListener implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
 
     private final String directory;
     private final Duration timeout;
-    private final FileHandler fileHandler;
+    private final FileHandlerCallback fileHandlerCallback;
     private final Duration fileLengthCheckDelay;
+    private volatile boolean success;
 
-    public FolderListener(String directory, Duration timeout, FileHandler fileHandler, Duration fileLengthCheckDelay) {
+    public FolderListener(String directory, Duration timeout, FileHandlerCallback fileHandlerCallback, Duration fileLengthCheckDelay) {
         this.directory = directory;
         this.timeout = timeout;
-        this.fileHandler = fileHandler;
+        this.fileHandlerCallback = fileHandlerCallback;
         this.fileLengthCheckDelay = fileLengthCheckDelay;
     }
 
@@ -59,15 +59,19 @@ public final class FolderListener implements Runnable {
             List<WatchEvent<?>> events = watchKey.pollEvents();
             for (WatchEvent event : events) {
                 String fileName = event.context().toString();
-                if (fileName.endsWith(Constants.JSON_EXTENSION)) {
+                if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
                     handleFileAsync(fileName);
                 }
                 pollFile();
             }
+        } else if (!success) {
+            fileHandlerCallback.handleError();
         }
     }
 
     private void handleFileAsync(String fileName) {
-        CompletableFuture.runAsync(new AsyncFileHandler(fileName, directory, fileHandler, fileLengthCheckDelay));
+        CompletableFuture
+                .supplyAsync(new AsyncFileHandler(fileName, directory, fileHandlerCallback, fileLengthCheckDelay))
+                .thenAccept(result -> success = success || result);
     }
 }

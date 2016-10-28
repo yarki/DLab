@@ -33,12 +33,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 .login_page .content {
   max-width: 280px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  height: auto;
+  margin: 60px auto 0 auto;
 }
 
 .login_page .form-control {
@@ -48,23 +43,35 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .login_page .input-group {
   margin-bottom: 20px;
 }
+.form_wrap .btn {
+  margin-top: 20px;
+} 
 
 .login_page .form-control,
 .login_page .input-group-addon {
   background: #fff;
   border: 1px solid #31b0d5;
 }
-
+.login-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url(../assets/img/login-icons.png);
+  background-size: 48px;
+}
+.icon-username {
+  background-position: top left;
+}
+.icon-password {
+  background-position: top right;
+}
 .login_page .input-group-addon {
   border-right: 0;
+  padding: 6px 7px;
 }
-
-.login_page .input-group-addon .glyphicon {
-  color: #31b0d5;
-}
-
 .login_page .form-control {
   font-size: 14px;
+  padding: 6px 19px;
 }
 
 .validation-block {

@@ -44,7 +44,7 @@ public class DockerWarmuperTest {
     @Test
     public void warmupSuccess() throws Exception {
         warmuper.start();
-        warmuper.getMetadataHandler().handle(getFileName(), "{}".getBytes());
+        warmuper.getFileHandlerCallback().handle(getFileName(), "{}".getBytes());
         assertEquals(metadata, warmuper.getMetadatas().toArray(new ImageMetadataDTO[1])[0]);
     }
 

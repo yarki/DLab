@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
-@Path("/keyloader")
+@Path("/user/access_key")
 @Produces(MediaType.APPLICATION_JSON)
 public class KeyUploaderResource implements KeyLoaderAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);

@@ -13,6 +13,7 @@
 package com.epam.dlab.backendapi.core.guice;
 
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.health.HealthModule;
 import com.google.inject.AbstractModule;
 import io.dropwizard.setup.Environment;
 
@@ -23,5 +24,10 @@ abstract class BaseModule extends AbstractModule {
     public BaseModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
         this.configuration = configuration;
         this.environment = environment;
+    }
+
+    @Override
+    protected void configure() {
+        install(new HealthModule());
     }
 }

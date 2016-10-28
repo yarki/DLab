@@ -11,6 +11,7 @@
 # ****************************************************************************************************/
 
 import boto3
+import json
 
 
 def get_instance_hostname(instance_name):
@@ -27,6 +28,35 @@ def get_instance_hostname(instance_name):
             return private
 
 
+def get_vpc_endpoints(vpc_id):
+    # Returns LIST of Endpoint DICTIONARIES
+    ec2 = boto3.client('ec2')
+    endpoints = ec2.describe_vpc_endpoints(
+        Filters=[{
+            'Name':'vpc-id',
+            'Values':[vpc_id]
+        }]
+    ).get('VpcEndpoints')
+    return endpoints
+
+
+def get_route_tables(vpc, tags):
+    ec2 = boto3.client('ec2')
+    tag_name = json.loads(tags).get('Key')
+    tag_value = json.loads(tags).get('Value')
+    rts = []
+    result = ec2.describe_route_tables(
+        Filters=[
+            {'Name': 'vpc-id', 'Values': [vpc]},
+            {'Name': 'tag-key', 'Values': [tag_name]},
+            {'Name': 'tag-value', 'Values': [tag_value]}
+        ]
+    ).get('RouteTables')
+    for i in result:
+        rts.append(i.get('RouteTableId'))
+    return rts
+
+
 def get_bucket_by_name(bucket_name):
     s3 = boto3.resource('s3')
     for bucket in s3.buckets.all():
@@ -40,6 +70,7 @@ def get_instance_ip_address(instance_name):
     instances = ec2.instances.filter(
         Filters=[{'Name': 'tag:Name', 'Values': [instance_name]},
                  {'Name': 'instance-state-name', 'Values': ['running']}])
+    ips = {}
     for instance in instances:
         public = getattr(instance, 'public_ip_address')
         private = getattr(instance, 'private_ip_address')
@@ -99,6 +130,16 @@ def get_subnet_by_cidr(cidr):
     ec2 = boto3.resource('ec2')
     for subnet in ec2.subnets.filter(Filters=[{'Name': 'cidrBlock', 'Values': [cidr]}]):
         return subnet.id
+    return ''
+
+
+def get_subnet_by_tag(tag):
+    ec2 = boto3.resource('ec2')
+    for subnet in ec2.subnets.filter(Filters=[
+        {'Name': 'tag-key', 'Values': [tag.get('Key')]},
+        {'Name': 'tag-value', 'Values': [tag.get('Value')]}
+    ]):
+        return subnet.cidr_block
     return ''
 
 

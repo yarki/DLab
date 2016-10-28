@@ -17,8 +17,10 @@ import com.epam.dlab.backendapi.client.rest.SelfAPI;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.backendapi.core.response.FileHandler;
+import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
+import com.epam.dlab.backendapi.core.response.folderlistener.handler.ErrorFileHandler;
+import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
@@ -54,8 +56,9 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     public String uploadKey(UploadFileDTO dto) throws IOException, InterruptedException {
         saveKeyToFile(dto);
         String uuid = DockerCommands.generateUUID();
-        folderListenerExecutor.start(configuration.getKeyLoaderDirectory(), configuration.getKeyLoaderPollTimeout(),
-                getResultHandler(dto.getUser(), uuid));
+        folderListenerExecutor.start(configuration.getKeyLoaderDirectory(),
+                configuration.getKeyLoaderPollTimeout(),
+                getFileHandlerCallback(dto.getUser(), uuid));
         commandExecuter.executeAsync(
                 new RunDockerCommand()
                         .withVolumeForRootKeys(configuration.getKeyDirectory())
@@ -77,10 +80,16 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         Files.write(Paths.get(configuration.getKeyDirectory(), dto.getUser() + KEY_EXTENTION), dto.getContent().getBytes());
     }
 
-    private FileHandler getResultHandler(String user, String uuid) {
-        return (fileName, content) -> {
-            LOGGER.debug("get file {} actually waited for {}", fileName, uuid);
-            if (uuid.equals(DockerCommands.extractUUID(fileName))) {
+    private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid) {
+        return new FileHandlerCallback() {
+            @Override
+            public boolean checkUUID(String uuid) {
+                return originalUuid.equals(uuid);
+            }
+
+            @Override
+            public boolean handle(String fileName, byte[] content) throws Exception {
+                LOGGER.debug("get file {} actually waited for {}", fileName, originalUuid);
                 JsonNode document = MAPPER.readTree(content);
                 UploadFileResultDTO result = new UploadFileResultDTO(user);
                 if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
@@ -89,8 +98,13 @@ public class KeyLoader implements DockerCommands, SelfAPI {
                 selfService.post(KEY_LOADER, result, UploadFileResultDTO.class);
                 return true;
             }
-            return false;
+
+            @Override
+            public void handleError() {
+                selfService.post(KEY_LOADER, new UploadFileResultDTO(user), UploadFileResultDTO.class);
+            }
         };
+
     }
 
     private UserAWSCredentialDTO extractCredential(JsonNode document) throws IOException {
