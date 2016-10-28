@@ -33,6 +33,7 @@ spark_version = "1.6.2"
 hadoop_version = "2.6"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
 py3spark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/py3spark_local/'
+s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 
 
@@ -78,6 +79,19 @@ def ensure_python3_kernel():
             sys.exit(1)
 
 
+def ensure_s3_kernel():
+    if not exists('/home/ubuntu/.ensure_dir/s3_kernel_ensured'):
+        try:
+            sudo('mkdir -p ' + s3_jars_dir)
+            put(templates_dir + 'jars/local_jars.tar.gz', '/tmp/local_jars.tar.gz')
+            sudo('tar -xzf /tmp/local_jars.tar.gz -C ' + s3_jars_dir)
+            put(templates_dir + 'spark-defaults_local.conf', '/tmp/spark-defaults_local.conf')
+            sudo('\cp /tmp/spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
+            sudo('touch /home/ubuntu/.ensure_dir/s3_kernel_ensured')
+        except:
+            sys.exit(1)
+
+
 def configure_notebook_server(notebook_name):
     try:
         sudo('pip install jupyter')
@@ -103,6 +117,8 @@ def configure_notebook_server(notebook_name):
         sys.exit(1)
 
     ensure_python3_kernel()
+
+    ensure_s3_kernel()
 
 
 ##############

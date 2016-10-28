@@ -15,7 +15,7 @@ package com.epam.dlab.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-abstract public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
+public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @JsonProperty
     private String user;
     @JsonProperty

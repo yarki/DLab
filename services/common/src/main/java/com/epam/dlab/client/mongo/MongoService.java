@@ -20,6 +20,8 @@ public class MongoService {
     private MongoClient client;
     private String database;
 
+    private static final Document PING = new Document("ping", "1");
+
     public MongoService(MongoClient client, String database) {
         this.client = client;
         this.database = database;
@@ -29,8 +31,11 @@ public class MongoService {
         return client.getDatabase(database).getCollection(name, Document.class);
     }
 
-    public <T> MongoCollection<T> getCollection(String name,Class<T> c) {
+    public <T> MongoCollection<T> getCollection(String name, Class<T> c) {
         return client.getDatabase(database).getCollection(name, c);
     }
 
+    public Document ping() {
+        return client.getDatabase(database).runCommand(PING);
+    }
 }

@@ -13,17 +13,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home.component';
-import { AuthenticationService } from './../security/authentication.service';
-
-import { EnvironmentsService } from './../services/environments.service';
-
 import { ModalModule } from './../components/modal/index';
 import { GridModule } from './../components/grid/index';
+import {ApplicationSecurityService} from "../services/applicationSecurity.service";
 
 @NgModule({
   imports: [CommonModule, ModalModule, GridModule],
   declarations: [HomeComponent],
   exports: [HomeComponent],
-  providers: [AuthenticationService, EnvironmentsService]
+  providers: [ApplicationSecurityService]
 })
 export class HomeModule { }

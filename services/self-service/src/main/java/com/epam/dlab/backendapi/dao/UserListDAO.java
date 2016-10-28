@@ -53,6 +53,13 @@ public class UserListDAO extends BaseDAO {
         update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(ENVIRONMENT_NAME, dto.getName())), set(STATUS, dto.getStatus()));
     }
 
+    public void updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
+        find(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(ENVIRONMENT_NAME, dto.getName())), UserInstanceDTO.class)
+                .ifPresent(instance -> instance.getResources().forEach(resource -> {
+                    updateComputationalStatus(dto, resource.getResourceName());
+                }));
+    }
+
     public boolean addComputational(String user, String name, UserComputationalResourceDTO resourceDTO) {
         Optional<UserInstanceDTO> optional = find(USER_INSTANCES, and(eq(USER, user), eq(ENVIRONMENT_NAME, name)), UserInstanceDTO.class);
         if (optional.isPresent()) {
@@ -72,8 +79,16 @@ public class UserListDAO extends BaseDAO {
     }
 
     public void updateComputationalStatus(EMRStatusDTO dto) {
-        update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(ENVIRONMENT_NAME, dto.getName())
-                , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + RESOURCE_NAME, dto.getResourceName())),
-                set(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, dto.getStatus()));
+        updateComputationalStatus(dto.getUser(), dto.getName(), dto.getResourceName(), dto.getStatus());
+    }
+
+    private void updateComputationalStatus(StatusBaseDTO dto, String resourceName) {
+        updateComputationalStatus(dto.getUser(), dto.getName(), resourceName, dto.getStatus());
+    }
+
+    private void updateComputationalStatus(String user, String name, String resourceName, String status) {
+        update(USER_INSTANCES, and(eq(USER, user), eq(ENVIRONMENT_NAME, name)
+                , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + RESOURCE_NAME, resourceName)),
+                set(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, status));
     }
 }

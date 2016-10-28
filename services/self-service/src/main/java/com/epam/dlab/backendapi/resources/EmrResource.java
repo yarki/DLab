@@ -49,8 +49,6 @@ public class EmrResource implements EmrAPI {
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
-    private KeyDAO keyDao;
-    @Inject
     private UserListDAO userListDAO;
     @Inject
     @Named(PROVISIONING_SERVICE)
@@ -76,7 +74,6 @@ public class EmrResource implements EmrAPI {
                     .withVersion(formDTO.getVersion())
                     .withNotebookName(formDTO.getNotebookName())
                     .withEdgeUserName(userInfo.getName())
-                    .withEdgeSubnet(keyDao.findSubnet(userInfo.getName()))
                     .withRegion(settingsDAO.getAwsRegion());
             LOGGER.debug("created emr {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
@@ -100,6 +97,11 @@ public class EmrResource implements EmrAPI {
     @Path("/terminate")
     public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
         LOGGER.debug("terminating emr {} for user {}", formDTO.getClusterName(), userInfo.getName());
+        userListDAO.updateComputationalStatus(new EMRStatusDTO()
+                .withUser(userInfo.getName())
+                .withName(formDTO.getNotebookName())
+                .withResourceName(formDTO.getClusterName())
+                .withStatus(UserInstanceStatus.TERMINATING.getStatus()));
         EMRTerminateDTO dto = new EMRTerminateDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withEdgeUserName(userInfo.getName())
