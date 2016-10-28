@@ -10,44 +10,41 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.keyload;
+package com.epam.dlab.backendapi.health;
+
+import com.epam.dlab.client.restclient.RESTService;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
 
-public enum KeyLoadStatus {
-    NONE("none", null, Response.Status.NOT_FOUND),
-    NEW("new", null, Response.Status.ACCEPTED),
-    SUCCESS("success", "ok", Response.Status.OK),
-    ERROR("error", "err", Response.Status.INTERNAL_SERVER_ERROR);
+import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
+import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
 
-    private String status;
-    private String value;
-    private Response.Status httpStatus;
+@Singleton
+@javax.inject.Named(PROVISIONING_HEALTH_CHECKER)
+public class ProvisioningHealthChecker implements HealthChecker {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningHealthChecker.class);
 
-    KeyLoadStatus(String status, String value, Response.Status httpStatus) {
-        this.status = status;
-        this.value = value;
-        this.httpStatus = httpStatus;
-    }
+    @Inject
+    @Named(PROVISIONING_SERVICE)
+    private RESTService provisioningService;
 
-    public String getStatus() {
-        return status;
-    }
-
-    public Response.Status getHttpStatus() {
-        return httpStatus;
-    }
-
-    public static boolean isSuccess(String value) {
-        return SUCCESS.value.equals(value);
-    }
-
-    public static String getStatus(boolean successed) {
-        return successed ? SUCCESS.status : ERROR.status;
-    }
-
-    public static KeyLoadStatus findByStatus(String status) {
-        return Arrays.stream(values()).reduce(NONE, (result, next) -> next.status.equals(status) ? next : result);
+    @Override
+    public boolean isAlive() {
+        try {
+            Response response = provisioningService.get("/infrastructure/status", Response.class);
+            boolean alive = response.getStatusInfo() == Response.Status.OK;
+            if (!alive) {
+                LOGGER.error("Provisioning service is not available");
+            }
+            return alive;
+        } catch (Throwable t) {
+            LOGGER.error("Provisioning service is not available", t);
+            return false;
+        }
     }
 }

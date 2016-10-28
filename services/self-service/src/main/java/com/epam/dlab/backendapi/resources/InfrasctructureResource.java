@@ -10,32 +10,38 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.client.mongo;
+package com.epam.dlab.backendapi.resources;
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
+import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.backendapi.health.HealthChecker;
+import com.epam.dlab.backendapi.health.HealthStatusDTO;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import io.dropwizard.auth.Auth;
 
-public class MongoService {
-    private MongoClient client;
-    private String database;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-    private static final Document PING = new Document("ping", "1");
+import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
+import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
 
-    public MongoService(MongoClient client, String database) {
-        this.client = client;
-        this.database = database;
-    }
+@Path("/infrastructure")
+@Produces(MediaType.APPLICATION_JSON)
+public class InfrasctructureResource {
+    @Inject
+    @Named(MONGO_HEALTH_CHECKER)
+    private HealthChecker mongoHealthChecker;
+    @Inject
+    @Named(PROVISIONING_HEALTH_CHECKER)
+    private HealthChecker provisioningHealthChecker;
 
-    public MongoCollection<Document> getCollection(String name) {
-        return client.getDatabase(database).getCollection(name, Document.class);
-    }
-
-    public <T> MongoCollection<T> getCollection(String name, Class<T> c) {
-        return client.getDatabase(database).getCollection(name, c);
-    }
-
-    public Document ping() {
-        return client.getDatabase(database).runCommand(PING);
+    @GET
+    @Path("/status")
+    public HealthStatusDTO status(@Auth UserInfo userInfo) {
+        return new HealthStatusDTO()
+                .withMongoAlive(mongoHealthChecker.isAlive())
+                .withProvisioningAlive(provisioningHealthChecker.isAlive());
     }
 }

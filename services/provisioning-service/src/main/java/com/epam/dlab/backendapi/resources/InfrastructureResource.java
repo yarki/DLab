@@ -10,32 +10,23 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.client.mongo;
+package com.epam.dlab.backendapi.resources;
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
 
-public class MongoService {
-    private MongoClient client;
-    private String database;
-
-    private static final Document PING = new Document("ping", "1");
-
-    public MongoService(MongoClient client, String database) {
-        this.client = client;
-        this.database = database;
-    }
-
-    public MongoCollection<Document> getCollection(String name) {
-        return client.getDatabase(database).getCollection(name, Document.class);
-    }
-
-    public <T> MongoCollection<T> getCollection(String name, Class<T> c) {
-        return client.getDatabase(database).getCollection(name, c);
-    }
-
-    public Document ping() {
-        return client.getDatabase(database).runCommand(PING);
+@Path("/infrastructure")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public class InfrastructureResource {
+    @GET
+    @Path("/status")
+    public Response status() throws IOException, InterruptedException {
+        return Response.status(Response.Status.OK).build();
     }
 }

@@ -15,49 +15,36 @@ import {Http, Response} from '@angular/http';
 import { WebRequestHelper } from './../util/webRequestHelper.service'
 import { UserProfileService } from './userProfile.service'
  import {Observable} from "rxjs";
+import {ApplicationServiceFacade} from "../services/applicationServiceFacade.service";
 
 @Injectable()
 export class AuthenticationService {
-  constructor(private http: Http, private webRequestHelper : WebRequestHelper,
-              private userProfileService : UserProfileService) {
+  constructor(private serviceFacade : ApplicationServiceFacade, private userProfileService : UserProfileService) {
   }
 
-  login(userName, password) : Observable<Boolean> {
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-    return this.http
-      .post(
-        '/api/login', JSON.stringify({'username': userName, 'password': password, 'access_token': ''}), { headers: requestHeader }
-      )
-      .map((res : Response) => {
-          if (res.status == 200) {
-            this.userProfileService.setAuthToken(res.text())
-            this.userProfileService.setUserName(userName);
-            return true;
-          }
-          return false;
-      }, this);
+  login(userName, password) : Observable<boolean> {
+    let body = JSON.stringify({'username': userName, 'password': password, 'access_token': ''});
+
+    return this.serviceFacade.buildLoginRequest(body).map((response : Response) => {
+      if (response.status === 200) {
+        this.userProfileService.setAuthToken(response.text());
+        this.userProfileService.setUserName(userName);
+
+        return true;
+      }
+      return false;
+    }, this);
   }
 
-  logout() : Observable<Boolean> {
-    let requestHeader = this.webRequestHelper.getJsonHeader();
+  logout() : Observable<boolean> {
     let authToken = this.userProfileService.getAuthToken();
 
     if(!!authToken)
     {
-      requestHeader = this.userProfileService.appendBasicAuthHeader(requestHeader);
-
       this.userProfileService.clearAuthToken();
-      return this.http
-        .post(
-          '/api/logout',
-          JSON.stringify({accessTokenKey: authToken}),
-          { headers: requestHeader }
-      ).map((res) => {
-            if (res.status == 200) {
-              return true;
-            }
-            return false;
-          }, this);
+      return this.serviceFacade.buildLogoutRequest("").map((response: Response) => {
+        return response.status === 200;
+      }, this)
     }
 
     return Observable.of(false);
