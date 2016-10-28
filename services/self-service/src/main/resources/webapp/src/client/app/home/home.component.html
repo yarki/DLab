@@ -127,13 +127,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   </modal-content>
 </modal>
 
-<modal #preloaderModal modalClass="modal-xs">
-  <modal-header></modal-header>
-  <modal-content class="text-center">
-    <div class="spinner_wrap">
-      <img src="assets/img/spinner.gif" alt="">
-    </div>
-    <p>Initial infrastructure is being created, <br/>please, wait...</p>
-  </modal-content>
-  <modal-footer class="text-right"></modal-footer>
-</modal>
+<progress-dialog #preloaderModal [configs]="progressDialogConfig" [theBoundCallback]="progressDialogCallback"></progress-dialog>

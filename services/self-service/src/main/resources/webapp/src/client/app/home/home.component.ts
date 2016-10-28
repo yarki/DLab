@@ -38,6 +38,8 @@ export class HomeComponent implements OnInit {
 
   notebookExist: boolean = false;
 
+  progressDialogConfig: any;
+  progressDialogCallback: Function;
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
@@ -61,7 +63,13 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.checkInfrastructureCreationProgress();
     this.initAnalyticSelectors();
+
+    this.progressDialogConfig = this.setProgressDialogConfiguration();
+    this.progressDialogCallback = this.testCallback;
   }
+
+  // FIXIT: need to replace. Added to avoid error messages
+  testCallback() {}
 
   //
   // Handlers
@@ -244,4 +252,14 @@ export class HomeComponent implements OnInit {
         this.notebookExist = false;
       });
   };
+
+  setProgressDialogConfiguration() {
+    return {
+      message: 'Initial infrastructure is being created, <br/>please, wait...',
+      content: '<img src="assets/img/gif-spinner.gif" alt="">',
+      modal_size: 'modal-xs',
+      text_style: 'info-label',
+      aligning: 'text-center'
+    }
+  }
 }

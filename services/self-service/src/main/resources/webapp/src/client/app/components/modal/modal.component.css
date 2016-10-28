@@ -17,6 +17,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .header-white .modal-header {
   background: #fff;
 }
+.modal .info-label {
+  font-size: 16px;
+  margin-top: 20px;
+}
 .loading_modal {
   text-align: center;
 }
@@ -196,7 +200,7 @@ modal-content {
 }
 .detail-header-wrap {
   margin: 0 -47px 40px -47px;
-} 
+}
 .detail-header {
   width: 100%;
 }
@@ -217,4 +221,3 @@ modal-content {
 .detail-dialog .glyphicon-question-sign {
   margin-right: 5px;
 }
-
