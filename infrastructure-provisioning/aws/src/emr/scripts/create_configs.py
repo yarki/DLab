@@ -29,7 +29,10 @@ args = parser.parse_args()
 emr_dir = '/opt/' + args.emr_version + '/jars/'
 kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
 yarn_dir = '/srv/hadoopconf/'
-hadoop_version = args.hadoop_version
+if args.emr_version == 'emr-4.3.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-4.8.0':
+    hadoop_version = '2.6'
+else:
+    hadoop_version = args.hadoop_version
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 
 
@@ -49,7 +52,7 @@ def jars(args):
     print "Downloading jars..."
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
-    local('tar -zxvf /tmp/jars.tar.gz -C ' + emr_dir)
+    local('tar -zhxvf /tmp/jars.tar.gz -C ' + emr_dir)
 
 
 def yarn(args):
@@ -75,23 +78,7 @@ def pyspark_kernel(args):
     local(
         "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
     local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-    #if args.emr_version == 'emr-4.3.0':
-    #    local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
-    #    kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
-    #    template_file = "/tmp/py3spark_emr_template.json"
-    #    with open(template_file, 'r') as f:
-    #        text = f.read()
-    #    text = text.replace('CLUSTER', args.cluster_name)
-    #    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    #    text = text.replace('SPARK_PATH',
-    #                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
-    #    with open(kernel_path, 'w') as f:
-    #        f.write(text)
-    # local('touch /tmp/kernel_var.json')
-    # local(
-    #    "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
-    # local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-    if args.emr_version == 'emr-4.8.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-5.0.0':
+    if args.emr_version != 'emr-4.3.0' and args.emr_version != 'emr-4.6.0' and args.emr_version != 'emr-4.8.0' and args.emr_version != 'emr-5.0.0':
         local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
         kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
         template_file = "/tmp/py3spark_emr_template.json"
@@ -101,7 +88,6 @@ def pyspark_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH',
                             '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
-        text = text.replace('3.5', '3.4')
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
