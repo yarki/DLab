@@ -13,8 +13,9 @@
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.response.ErrorFileHandler;
-import com.epam.dlab.backendapi.core.response.FileHandler;
+import com.epam.dlab.backendapi.core.response.folderlistener.handler.ErrorFileHandler;
+import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileChecker;
+import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.dropwizard.util.Duration;
@@ -27,11 +28,11 @@ public class FolderListenerExecutor {
     private ProvisioningServiceApplicationConfiguration configuration;
 
 
-    public void start(String directory, Duration timeout, FileHandler fileHandler) {
-        start(directory, timeout, fileHandler, null);
+    public void start(String directory, Duration timeout, FileChecker fileChecker, FileHandler fileHandler) {
+        start(directory, timeout, fileChecker, fileHandler, null);
     }
 
-    public void start(String directory, Duration timeout, FileHandler fileHandler, ErrorFileHandler errorFileHandler) {
-        CompletableFuture.runAsync(new FolderListener(directory, timeout, fileHandler, errorFileHandler, configuration.getFileLengthCheckDelay()));
+    public void start(String directory, Duration timeout, FileChecker fileChecker, FileHandler fileHandler, ErrorFileHandler errorFileHandler) {
+        CompletableFuture.runAsync(new FolderListener(directory, timeout, fileChecker, fileHandler, errorFileHandler, configuration.getFileLengthCheckDelay()));
     }
 }

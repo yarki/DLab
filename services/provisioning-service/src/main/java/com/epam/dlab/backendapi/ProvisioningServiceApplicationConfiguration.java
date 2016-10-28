@@ -96,7 +96,7 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     }
 
     public String getNotebookImage() {
-        return  notebookImage;
+        return notebookImage;
     }
 
     public String getEmrImage() {

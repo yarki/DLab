@@ -10,8 +10,8 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.core.response;
+package com.epam.dlab.backendapi.core.response.folderlistener.handler;
 
-public interface ErrorFileHandler {
-    void handle();
+public interface FileChecker {
+    boolean checkUUID(String uuid);
 }
