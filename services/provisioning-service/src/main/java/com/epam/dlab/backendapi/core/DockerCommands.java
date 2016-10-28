@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
-public interface DockerCommands {
+public interface DockerCommands extends Constants {
     String GET_IMAGES = new ImagesDockerCommand()
             .pipe(UnixCommand.awk("{print $1\":\"$2}"))
             .pipe(UnixCommand.sort())

@@ -5,6 +5,8 @@ package com.epam.dlab.backendapi.core.response.folderlistener;
  */
 public interface FileHandlerCallback {
     boolean checkUUID(String uuid);
+
     boolean handle(String fileName, byte[] content) throws Exception;
+
     void handleError();
 }
