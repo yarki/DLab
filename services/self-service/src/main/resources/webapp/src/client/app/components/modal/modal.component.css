@@ -14,23 +14,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .modal-md { width: 545px; }
 .modal-lg { width: 580px; }
 
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
 .header-white .modal-header {
   background: #fff;
 }
+
 .modal .info-label {
   font-size: 16px;
   margin-top: 20px;
 }
-.loading_modal {
-  text-align: center;
-}
-.modal .loading_modal p {
-  font-size: 14px;
-  color: #718ba6;
-  font-weight: 600;
-  margin-top: 20px;
-  margin-bottom: 0;
-}
+
 .modal-header {
   padding: 13px 22px;
   background: #f6fafe;
@@ -71,25 +67,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 }
 .modal-header .close {
   margin-top: 3px;
-}
-.modal .spinner_wrap {
-  overflow: hidden;
-  display: inline-block;
-  width: 130px;
-  height: 130px;
-  font-size: 0;
-  border-radius: 50%;
-  background: #96acc4;
-  position: relative;
-}
-.modal .spinner_wrap img {
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  margin-left: -50px;
-  margin-top: -50px;
 }
 
 /*
@@ -190,7 +167,6 @@ modal-content {
 .confirmation-dialog.modal-dialog {
   width: 550px;
 }
-
 
 .detail-dialog .modal-header {
   border-bottom: 0;

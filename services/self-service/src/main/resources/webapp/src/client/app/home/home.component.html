@@ -107,14 +107,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <form (submit)="uploadUserAccessKey_btnClick($event)" novalidate>
       <div class="form-group row">
         <div  class="col-xs-7">
-          <label class="control-label">Upload public key start environment creation</label>
+          <label class="control-label">Upload public key to start environment creation</label>
           <div>
             <small><span class="glyphicon glyphicon-question-sign" ></span> Where can I get public key?</small>
           </div>
         </div>
         <div class="col-xs-5 text-right">
           <span class="btn btn-default btn-file">
-            <span class="upload-icon" ></span> Browse
+            <span class="upload-icon" ></span> Upload
             <input (change)="uploadUserAccessKey_onChange($event)" type="file" name="file" accept=".pub" />
           </span>
           <div class="text-right" [class.danger_color]="!uploadAccessUserKeyFormValid">{{uploadAccessKeyLabel}}</div>
