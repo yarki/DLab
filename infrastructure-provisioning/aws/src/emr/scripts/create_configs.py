@@ -81,21 +81,47 @@ def pyspark_kernel(args):
 
 
 def toree_kernel(args):
-    local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
-    kernel_path = kernels_dir + "toree_" + args.cluster_name + "/kernel.json"
-    template_file = "/tmp/toree_emr_template.json"
-    with open(template_file, 'r') as f:
-        text = f.read()
-    text = text.replace('CLUSTER', args.cluster_name)
-    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('SPARK_PATH',
-                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
-    with open(kernel_path, 'w') as f:
-        f.write(text)
-    local('touch /tmp/kernel_var.json')
-    local(
-        "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
-    local('sudo mv /tmp/kernel_var.json ' + kernel_path)
+    if args.emr_version == 'emr-4.3.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-4.8.0':
+        local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
+        kernel_path = kernels_dir + "toree_" + args.cluster_name + "/kernel.json"
+        template_file = "/tmp/toree_emr_template.json"
+        with open(template_file, 'r') as f:
+            text = f.read()
+        text = text.replace('CLUSTER', args.cluster_name)
+        text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+        text = text.replace('SPARK_PATH',
+                            '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+        with open(kernel_path, 'w') as f:
+            f.write(text)
+        local('touch /tmp/kernel_var.json')
+        local(
+            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+        local('sudo mv /tmp/kernel_var.json ' + kernel_path)
+    else:
+        local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
+        local('tar zxvf /tmp/toree_kernel.tar.gz -C ' + kernels_dir + 'toree_' + args.cluster_name + '/')
+        kernel_path = kernels_dir + "toree_" + args.cluster_name + "/kernel.json"
+        template_file = "/tmp/toree_emr_templatev2.json"
+        with open(template_file, 'r') as f:
+            text = f.read()
+        text = text.replace('CLUSTER', args.cluster_name)
+        text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+        text = text.replace('SPARK_PATH',
+                            '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+        with open(kernel_path, 'w') as f:
+            f.write(text)
+        local('touch /tmp/kernel_var.json')
+        local(
+            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+        local('sudo mv /tmp/kernel_var.json ' + kernel_path)
+        run_sh_path = kernels_dir + "toree_" + args.cluster_name + "bin/run.sh"
+        template_sh_file = '/tmp/run_template.sh'
+        with open(template_sh_file, 'r') as f:
+            text = f.read()
+        text = text.replace('CLUSTER', args.cluster_name)
+        with open(run_sh_path, 'w') as f:
+            f.write(text)
+
 
 
 def get_files(s3client, s3resource, dist, bucket, local):
