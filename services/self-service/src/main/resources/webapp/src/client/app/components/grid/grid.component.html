@@ -93,7 +93,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <label class="control-label">Total Instance number</label>
         </div>
         <div class="col-xs-8">
-          <input type="number" #count (click)="validate(name, count)" class="form-control">
+          <input type="number" min="1" #count (click)="validate(name, count)" class="form-control">
         </div>
       </div>
       <div class="form-group row">
