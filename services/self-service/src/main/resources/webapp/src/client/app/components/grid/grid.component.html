@@ -84,7 +84,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div class="col-xs-8">
           <select class="form-control" #shape_master>
-            <option *ngFor="let shape of shapes">{{shape.shape_name}}</option>
+            <option *ngFor="let shape of shapes">{{shape.Type}}</option>
           </select>
         </div>
       </div>
@@ -102,7 +102,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div class="col-xs-8">
           <select class="form-control" #shape_slave>
-            <option *ngFor="let shape of shapes">{{shape.shape_name}}</option>
+            <option *ngFor="let shape of shapes">{{shape.Type}}</option>
           </select>
         </div>
       </div>
