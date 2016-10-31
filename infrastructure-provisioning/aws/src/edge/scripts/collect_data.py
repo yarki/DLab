@@ -73,5 +73,5 @@ if __name__ == "__main__":
     env['connection_attempts'] = 100
     env.key_filename = [args.keyfile]
     env.host_string = 'ubuntu@' + args.hostname
-    put('/root/' + filename, '/tmp/' + filename, mode=0644)
-    sudo('mv /tmp/' + filename + ' /home/ubuntu/' + filename)
+    #put('/root/' + filename, '/tmp/' + filename, mode=0644)
+    #sudo('mv /tmp/' + filename + ' /home/ubuntu/' + filename)

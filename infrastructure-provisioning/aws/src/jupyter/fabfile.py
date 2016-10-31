@@ -207,7 +207,8 @@ def run():
     with open("/root/result.json", 'w') as result:
         res = {"hostname": dns_name,
                "ip": ip_address,
-               "master_keyname": os.environ['creds_key_name']}
+               "master_keyname": os.environ['creds_key_name'],
+               "Action": "Create new notebook server"}
         result.write(json.dumps(res))
 
 
@@ -243,6 +244,18 @@ def terminate():
     except:
         sys.exit(1)
 
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"NBs_name": notebook_config['notebook_name'],
+                   "Tag_name": notebook_config['tag_name'],
+                   "user_own_bucket_name": notebook_config['bucket_name'],
+                   "Action": "Terminate notebook server"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)
+
 
 # Main function for stopping notebook server
 def stop():
@@ -276,6 +289,18 @@ def stop():
     except:
         sys.exit(1)
 
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"NBs_name": notebook_config['notebook_name'],
+                   "Tag_name": notebook_config['tag_name'],
+                   "user_own_bucket_name": notebook_config['bucket_name'],
+                   "Action": "Stop notebook server"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)
+
 
 # Main function for starting notebook server
 def start():
@@ -307,3 +332,14 @@ def start():
             sys.exit(1)
     except:
         sys.exit(1)
+
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"NBs_name": notebook_config['notebook_name'],
+                   "Tag_name": notebook_config['tag_name'],
+                   "Action": "Start up notebook server"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)

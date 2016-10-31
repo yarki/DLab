@@ -382,7 +382,8 @@ def run():
                    "notebook_profile": edge_conf['notebook_role_profile_name'],
                    "edge_sg": edge_conf['edge_security_group_name'],
                    "notebook_subnet": edge_conf['private_subnet_cidr'],
-                   "full_edge_conf": edge_conf}
+                   "full_edge_conf": edge_conf,
+                   "Action": "Create new EDGE server"}
             print json.dumps(res)
             result.write(json.dumps(res))
     except:
