@@ -116,7 +116,9 @@ export class HomeComponent implements OnInit {
       if(this.uploadAccessUserKeyFormValid)
         this.newAccessKeyForUpload = $event.target.files[0];
 
-      this.uploadAccessKeyLabel = this.newAccessKeyForUpload ? ".pub file is required." : fileToUpload.name;
+      this.uploadAccessKeyLabel = !this.uploadAccessUserKeyFormValid
+        ? ".pub file is required."
+        : fileToUpload.name;
     }
   }
 
