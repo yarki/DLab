@@ -18,9 +18,16 @@ import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.DockerAction;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
+import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
+import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
+import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
+import com.epam.dlab.dto.keyload.KeyLoadStatus;
+import com.epam.dlab.dto.keyload.UploadFileResultDTO;
+import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,19 +39,29 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
+import static com.epam.dlab.registry.ApiCallbacks.CALLBACK_URI;
+import static com.epam.dlab.registry.ApiCallbacks.CREATE_EXPLORATORY;
+
 @Path("/exploratory")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
 
+    private static final String STATUS_FIELD = "status";
+    private static final String RESPONSE_NODE = "response";
+    private static final String RESULT_NODE = "result";
+
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
     @Inject
+    private FolderListenerExecutor folderListenerExecutor;
+    @Inject
     private CommandExecutor commandExecuter;
-
     @Inject
     private CommandBuilder commandBuilder;
+    @Inject
+    private RESTService selfService;
 
 
     @Path("/create")
@@ -74,6 +91,9 @@ public class ExploratoryResource implements DockerCommands {
     private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException, InterruptedException {
         LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
+        folderListenerExecutor.start(configuration.getImagesDirectory(),
+                configuration.getKeyLoaderPollTimeout(),
+                getFileHandlerCallback(dto.getNotebookUserName(), uuid));
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
@@ -88,5 +108,36 @@ public class ExploratoryResource implements DockerCommands {
                 )
         );
         return uuid;
+    }
+
+    private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid) {
+        return new FileHandlerCallback() {
+            @Override
+            public boolean checkUUID(String uuid) {
+                return originalUuid.equals(uuid);
+            }
+
+            @Override
+            public boolean handle(String fileName, byte[] content) throws Exception {
+                LOGGER.debug("get file {} actually waited for {}", fileName, originalUuid);
+                JsonNode document = MAPPER.readTree(content);
+                UploadFileResultDTO result = new UploadFileResultDTO(user);
+                if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
+                    result.setSuccessAndCredential(extractCredential(document));
+                }
+                selfService.post(CREATE_EXPLORATORY+CALLBACK_URI, result, UploadFileResultDTO.class);
+                return result.isSuccess();
+            }
+
+            @Override
+            public void handleError() {
+                selfService.post(CREATE_EXPLORATORY+CALLBACK_URI, new UploadFileResultDTO(user), UploadFileResultDTO.class);
+            }
+        };
+    }
+
+    private UserAWSCredentialDTO extractCredential(JsonNode document) throws IOException {
+        JsonNode node = document.get(RESPONSE_NODE).get(RESULT_NODE);
+        return MAPPER.readValue(node.toString(), UserAWSCredentialDTO.class);
     }
 }

@@ -77,6 +77,14 @@ public class ExploratoryResource implements ExploratoryAPI {
     }
 
     @POST
+    @Path("/create/callback")
+    public Response loadKeyResponse(StatusBaseDTO result) {
+        LOGGER.debug("created exploratory environment {} for user {}", result.getName(), result.getUser());
+        userListDAO.updateExploratoryStatus(result);
+        return Response.ok().build();
+    }
+
+    @POST
     @Path("/status")
     public Response status(StatusBaseDTO dto) {
         LOGGER.debug("update status for exploratory environment {} for user {}", dto.getName(), dto.getUser());
