@@ -15,11 +15,12 @@ import {CommonModule} from "@angular/common";
 import {Grid} from "./grid.component";
 import { ResourcesModule } from './../list-of-resources/index';
 import { ModalModule } from './../modal/index';
+import { ConfirmationDialogModule } from './../confirmation-dialog/index';
 
 export * from "./grid.component";
 
 @NgModule({
-  imports: [CommonModule, ResourcesModule, ModalModule],
+  imports: [CommonModule, ResourcesModule, ModalModule, ConfirmationDialogModule],
   declarations: [Grid],
   exports: [Grid]
 })

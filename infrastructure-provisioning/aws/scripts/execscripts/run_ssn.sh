@@ -58,7 +58,7 @@ function run_docker {
         -v $KEY_DIR:/root/keys \
         -v $OVERWRITE_FILE:/root/conf/overwrite.ini \
         -v $RESPONSE_DIR:/response -e \
-        "request_id=$REQUEST_ID" $PROJECT_PREFIX-$DOCKER_IMAGE --action $ACTION | tee -a  $LOG_DIR/$REQUEST_ID_out.log
+        "request_id=$REQUEST_ID" $PROJECT_PREFIX-$DOCKER_IMAGE --action $ACTION | tee -a  $LOG_DIR/${REQUEST_ID}_out.log
 }
 
 function print_help {
