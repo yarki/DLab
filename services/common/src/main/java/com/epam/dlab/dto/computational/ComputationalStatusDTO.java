@@ -10,25 +10,25 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.api.instance;
+package com.epam.dlab.dto.computational;
 
-public enum UserInstanceStatus {
-    CREATING("creating"),
-    CREATED("created"),
-    RUNNING("running"),
-    STOPPING("stopping"),
-    STOPPED("stopped"),
-    TERMINATING("terminating"),
-    TERMINATED("terminated"),
-    FAILED("failed");
+import com.epam.dlab.dto.ResourceStatusDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private String status;
+public class ComputationalStatusDTO extends ResourceStatusDTO<ComputationalStatusDTO> {
+    @JsonProperty("emr_cluster_name")
+    private String clusterName;
 
-    UserInstanceStatus(String status) {
-        this.status = status;
+    public String getClusterName() {
+        return clusterName;
     }
 
-    public String getStatus() {
-        return status;
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    public ComputationalStatusDTO withClusterName(String clusterName) {
+        setClusterName(clusterName);
+        return this;
     }
 }

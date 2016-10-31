@@ -10,25 +10,25 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.api.instance;
+package com.epam.dlab.dto;
 
-public enum UserInstanceStatus {
-    CREATING("creating"),
-    CREATED("created"),
-    RUNNING("running"),
-    STOPPING("stopping"),
-    STOPPED("stopped"),
-    TERMINATING("terminating"),
-    TERMINATED("terminated"),
-    FAILED("failed");
+import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private String status;
+public class ResourceStatusDTO<T extends ResourceStatusDTO<?>> extends ProvisioningStatusDTO<T>{
+    @JsonProperty("environment_name")
+    private String environmentName;
 
-    UserInstanceStatus(String status) {
-        this.status = status;
+    public String getEnvironmentName() {
+        return environmentName;
     }
 
-    public String getStatus() {
-        return status;
+    public void setEnvironmentName(String environmentName) {
+        this.environmentName = environmentName;
+    }
+
+    public T withEnvironmentName(String environmentName) {
+        setEnvironmentName(environmentName);
+        return (T)this;
     }
 }

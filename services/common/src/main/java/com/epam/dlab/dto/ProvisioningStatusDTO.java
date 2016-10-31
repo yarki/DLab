@@ -10,25 +10,39 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.api.instance;
+package com.epam.dlab.dto;
 
-public enum UserInstanceStatus {
-    CREATING("creating"),
-    CREATED("created"),
-    RUNNING("running"),
-    STOPPING("stopping"),
-    STOPPED("stopped"),
-    TERMINATING("terminating"),
-    TERMINATED("terminated"),
-    FAILED("failed");
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private String status;
+public class ProvisioningStatusDTO<T extends ProvisioningStatusDTO<?>> {
+    @JsonProperty
+    private String user;
+    @JsonProperty
+    private boolean success;
 
-    UserInstanceStatus(String status) {
-        this.status = status;
+    public String getUser() {
+        return user;
     }
 
-    public String getStatus() {
-        return status;
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public T withUser(String user) {
+        setUser(user);
+        return (T)this;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public T withSuccess() {
+        setSuccess(true);
+        return (T)this;
     }
 }

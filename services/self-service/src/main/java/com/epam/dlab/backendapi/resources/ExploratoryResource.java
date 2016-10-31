@@ -24,6 +24,7 @@ import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -62,6 +63,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         if (isAdded) {
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withEnvironmentName(formDTO.getName())
                     .withNotebookUserName(userInfo.getName())
                     .withNotebookInstanceType(formDTO.getShape())
                     .withRegion(settingsDAO.getAwsRegion())
@@ -78,14 +80,20 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @POST
     @Path("/create/callback")
-    public Response loadKeyResponse(StatusBaseDTO result) {
-        LOGGER.debug("created exploratory environment {} for user {}", result.getName(), result.getUser());
-        userListDAO.updateExploratoryStatus(result);
+    public Response createCallback(ExploratoryStatusDTO result) {
+        LOGGER.debug("created exploratory environment {} for user {}", result.getEnvironmentName(), result.getUser());
+        UserInstanceStatus status = result.isSuccess() ? UserInstanceStatus.CREATED : UserInstanceStatus.FAILED;
+        StatusBaseDTO exploratoryStatus = new StatusBaseDTO()
+                .withName(result.getEnvironmentName())
+                .withUser(result.getUser())
+                .withStatus(status.getStatus());
+        userListDAO.updateExploratoryStatus(exploratoryStatus);
         return Response.ok().build();
     }
 
     @POST
     @Path("/status")
+    // TODO where do we trigger this one? looks similar to /create/callback method
     public Response status(StatusBaseDTO dto) {
         LOGGER.debug("update status for exploratory environment {} for user {}", dto.getName(), dto.getUser());
         userListDAO.updateExploratoryStatus(dto);

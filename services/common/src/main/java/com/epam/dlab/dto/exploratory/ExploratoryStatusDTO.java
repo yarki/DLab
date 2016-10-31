@@ -10,25 +10,25 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.api.instance;
+package com.epam.dlab.dto.exploratory;
 
-public enum UserInstanceStatus {
-    CREATING("creating"),
-    CREATED("created"),
-    RUNNING("running"),
-    STOPPING("stopping"),
-    STOPPED("stopped"),
-    TERMINATING("terminating"),
-    TERMINATED("terminated"),
-    FAILED("failed");
+import com.epam.dlab.dto.ResourceStatusDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private String status;
+public class ExploratoryStatusDTO extends ResourceStatusDTO<ExploratoryStatusDTO> {
+    @JsonProperty("notebook_instance_name")
+    private String notebookInstanceName;
 
-    UserInstanceStatus(String status) {
-        this.status = status;
+    public String getNotebookInstanceName() {
+        return notebookInstanceName;
     }
 
-    public String getStatus() {
-        return status;
+    public void setNotebookInstanceName(String notebookInstanceName) {
+        this.notebookInstanceName = notebookInstanceName;
+    }
+
+    public ExploratoryStatusDTO withNotebookInstanceName(String notebookInstanceName) {
+        setNotebookInstanceName(notebookInstanceName);
+        return this;
     }
 }

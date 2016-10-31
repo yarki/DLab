@@ -24,6 +24,7 @@ import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
@@ -110,6 +111,7 @@ public class ExploratoryResource implements DockerCommands {
         return uuid;
     }
 
+    // TODO this handler is shared between all the commands, status should be meaningful, or we have to add action to know whose status was it
     private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid) {
         return new FileHandlerCallback() {
             @Override
@@ -121,23 +123,24 @@ public class ExploratoryResource implements DockerCommands {
             public boolean handle(String fileName, byte[] content) throws Exception {
                 LOGGER.debug("get file {} actually waited for {}", fileName, originalUuid);
                 JsonNode document = MAPPER.readTree(content);
-                UploadFileResultDTO result = new UploadFileResultDTO(user);
+                ExploratoryStatusDTO result = new ExploratoryStatusDTO().withUser(user);
                 if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
-                    result.setSuccessAndCredential(extractCredential(document));
+                    // TODO improve this traversing, maybe having a DTO for response json format
+                    String instanceName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("notebook_instance_name").textValue();
+                    result = result.withSuccess()
+                            // TODO set proper value
+                            .withEnvironmentName(instanceName)
+                            .withNotebookInstanceName(instanceName);
                 }
-                selfService.post(CREATE_EXPLORATORY+CALLBACK_URI, result, UploadFileResultDTO.class);
+                selfService.post(CREATE_EXPLORATORY+CALLBACK_URI, result, ExploratoryStatusDTO.class);
                 return result.isSuccess();
             }
 
             @Override
             public void handleError() {
-                selfService.post(CREATE_EXPLORATORY+CALLBACK_URI, new UploadFileResultDTO(user), UploadFileResultDTO.class);
+                selfService.post(CREATE_EXPLORATORY+CALLBACK_URI, new ExploratoryStatusDTO().withUser(user), ExploratoryStatusDTO.class);
             }
         };
     }
 
-    private UserAWSCredentialDTO extractCredential(JsonNode document) throws IOException {
-        JsonNode node = document.get(RESPONSE_NODE).get(RESULT_NODE);
-        return MAPPER.readValue(node.toString(), UserAWSCredentialDTO.class);
-    }
 }
