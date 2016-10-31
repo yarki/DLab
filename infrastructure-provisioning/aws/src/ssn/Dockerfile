@@ -12,8 +12,6 @@
 
 FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
-MAINTAINER Victor Andreev (victor_andreev@epam.com)
-
 COPY ssn/ /root/
 RUN chmod 755 /root/fabfile.py; \
     chmod 755 /root/scripts/*; \
