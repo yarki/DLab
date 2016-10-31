@@ -71,21 +71,21 @@ export class Grid implements OnInit {
       this.createEmrModal.open({ isFooter: false });
     } else if (action === 'run') {
       this.userResourceService
-        .createExploratoryEnvironment({ notebook_instance_name: data.name, action: "create"})
+        .createExploratoryEnvironment({ notebook_instance_name: data.name, action: 'create'})
         .subscribe((result) => {
           console.log('startUsernotebook result: ', result);
           this.buildGrid();
         });
     } else if (action === 'stop') {
       this.userResourceService
-        .suspendExploratoryEnvironment({ notebook_instance_name: data.name, action: "stop" })
+        .suspendExploratoryEnvironment({ notebook_instance_name: data.name, action: 'stop' })
         .subscribe((result) => {
           console.log('stopUsernotebook result: ', result);
           this.buildGrid();
         });
     } else if (action === 'terminate') {
       this.userResourceService
-        .suspendExploratoryEnvironment({ notebook_instance_name: data.name, action: "terminate" })
+        .suspendExploratoryEnvironment({ notebook_instance_name: data.name, action: 'terminate' })
         .subscribe((result) => {
           console.log('terminateUsernotebook result: ', result);
           this.buildGrid();
@@ -97,7 +97,7 @@ export class Grid implements OnInit {
     this.userResourceService
       .createComputationalResource({
         name: name,
-        emr_instance_count: ++count,
+        emr_instance_count: count,
         emr_master_instance_type: shape_master,
         emr_slave_instance_type: shape_slave,
         emr_version: this.emrTempls[tmplIndex].version,
