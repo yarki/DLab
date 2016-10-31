@@ -19,7 +19,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <th class="th_actions">Actions</th>
   </tr>
 
-  <tr *ngIf="!environments" class="message_block">
+  <tr *ngIf="(!environments) || (environments.length == 0)" class="message_block">
     <td colspan="5">To start working, please, create new environment</td>
   </tr>
 
