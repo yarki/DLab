@@ -9,26 +9,24 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 *****************************************************************************************************/
+.modal-xs { width: 375px; }
+.modal-sm { width: 525px; }
+.modal-md { width: 545px; }
+.modal-lg { width: 580px; }
 
-.modal-dialog {
-  width: 525px;
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.1);
 }
-.modal-lg.modal-dialog {
-  width: 575px;
+
+.header-white .modal-header {
+  background: #fff;
 }
-.loading_modal {
-  text-align: center;
-}
-.loading_modal .modal-dialog {
-  width: 376px;
-}
-.modal .loading_modal p {
-  font-size: 14px;
-  color: #718ba6;
-  font-weight: 600;
+
+.modal .info-label {
+  font-size: 16px;
   margin-top: 20px;
-  margin-bottom: 0;
 }
+
 .modal-header {
   padding: 13px 22px;
   background: #f6fafe;
@@ -42,10 +40,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   color: #455c74;
   font-size: 18px;
 }
-.modal .control-label {
-  font-size: 14px;
-  font-weight: 600;
+.modal {
   color: #718ba6;
+  font-size: 14px;
+}
+.modal .control-label {
+  font-weight: 600;
   margin-top: 6px;
 }
 .modal .form-control {
@@ -67,25 +67,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 }
 .modal-header .close {
   margin-top: 3px;
-}
-.modal .spinner_wrap {
-  overflow: hidden;
-  display: inline-block;
-  width: 130px;
-  height: 130px;
-  font-size: 0;
-  border-radius: 50%;
-  background: #96acc4;
-  position: relative;
-}
-.modal .spinner_wrap img {
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  margin-left: -50px;
-  margin-top: -50px;
 }
 
 /*
@@ -185,4 +166,34 @@ modal-content {
 }
 .confirmation-dialog.modal-dialog {
   width: 550px;
+}
+
+.detail-dialog .modal-header {
+  border-bottom: 0;
+}
+.detail-dialog .modal-body {
+  padding-top: 0;
+}
+.detail-header-wrap {
+  margin: 0 -47px 40px -47px;
+}
+.detail-header {
+  width: 100%;
+}
+.detail-header td {
+  border: 1px solid #edf1f5;
+  padding: 17px 15px;
+  text-align: center;
+}
+.detail-header .modal-title {
+  background: #f6fafe;
+  font-size: 18px;
+  font-weight: 600;
+  color: #455c74;
+}
+.modal a {
+  color: #35afd5;
+}
+.detail-dialog .glyphicon-question-sign {
+  margin-right: 5px;
 }

@@ -41,7 +41,7 @@ export class Grid implements OnInit {
   }
 
   buildGrid() {
-    this.userResourceService.getGridData().subscribe((list) => {
+    this.userResourceService.getUserProvisionedResources().subscribe((list) => {
 
       this.list = list;
       this.environments = this.loadEnvironments();
@@ -71,21 +71,21 @@ export class Grid implements OnInit {
       this.createEmrModal.open({ isFooter: false });
     } else if (action === 'run') {
       this.userResourceService
-        .startUsernotebook({ notebook_instance_name: data.name })
+        .createExploratoryEnvironment({ notebook_instance_name: data.name, action: 'create'})
         .subscribe((result) => {
           console.log('startUsernotebook result: ', result);
           this.buildGrid();
         });
     } else if (action === 'stop') {
       this.userResourceService
-        .stopUsernotebook({ notebook_instance_name: data.name })
+        .suspendExploratoryEnvironment({ notebook_instance_name: data.name, action: 'stop' })
         .subscribe((result) => {
           console.log('stopUsernotebook result: ', result);
           this.buildGrid();
         });
     } else if (action === 'terminate') {
       this.userResourceService
-        .terminateUsernotebook({ notebook_instance_name: data.name })
+        .suspendExploratoryEnvironment({ notebook_instance_name: data.name, action: 'terminate' })
         .subscribe((result) => {
           console.log('terminateUsernotebook result: ', result);
           this.buildGrid();
@@ -95,9 +95,9 @@ export class Grid implements OnInit {
 
   createEmr(name, count, shape_master, shape_slave, tmplIndex){
     this.userResourceService
-      .createEmr({
+      .createComputationalResource({
         name: name,
-        emr_instance_count: ++count,
+        emr_instance_count: count,
         emr_master_instance_type: shape_master,
         emr_slave_instance_type: shape_slave,
         emr_version: this.emrTempls[tmplIndex].version,

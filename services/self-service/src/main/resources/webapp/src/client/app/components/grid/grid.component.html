@@ -19,7 +19,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <th class="th_actions">Actions</th>
   </tr>
 
-  <tr *ngIf="!environments" class="message_block">
+  <tr *ngIf="(!environments) || (environments.length == 0)" class="message_block">
     <td colspan="5">To start working, please, create new environment</td>
   </tr>
 
@@ -90,7 +90,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="form-group row">
         <div  class="col-xs-4">
-          <label class="control-label">Slave Instance number</label>
+          <label class="control-label">Total Instance number</label>
         </div>
         <div class="col-xs-8">
           <input type="number" #count class="form-control">
@@ -117,7 +117,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 <!-- <button (click)="confirmationDialog.open({isFooter: false})">confirmationDialog</button> -->
-<modal #confirmationDialog  modalClass="confirmation-dialog">
+<modal #confirmationDialog  modalClass="confirmation-dialog modal-md">
   <modal-header>
     <h4 class="modal-title">Jupiter box</h4>
   </modal-header>
@@ -144,9 +144,40 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
       </div>
       <div class="text-center">
-        <button type="button" class="btn btn-default">No</button>
+        <button type="button" class="btn btn-default" (click)="detailModal.close()">No</button>
         <button type="button" class="btn btn-success">Ok</button>
       </div>
   </modal-content>
 </modal>
 
+<!-- <button (click)="detailModal.open({isFooter: false})">detailModal</button> -->
+<modal #detailModal  modalClass="detail-dialog modal-sm header-white">
+  <modal-header></modal-header>
+  <modal-content>
+    <div class="detail-header-wrap">
+      <table class="detail-header">
+        <tr>
+          <td class="modal-title">Jupiter box</td>
+          <td class="success_color">Running</td>
+          <td>M4.xlarge</td>
+        </tr>
+      </table>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <p>Up time 18 hours since Mon 12:00 EST, Sept 5, 2016</p>
+          <p>Open in your browser  <a href="#">http://10.0.15.1:8080</a> to access this box after creating a tunnel.</p>
+          <br/>
+          <p>
+            <a href="#">
+              <small><span class="glyphicon glyphicon-question-sign"></span>Read instruction how to create the tunnel</small>
+            </a>
+          </p>
+        </div>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-default" (click)="detailModal.close()">No</button>
+        <button type="button" class="btn btn-success">Ok</button>
+      </div>
+  </modal-content>
+</modal>

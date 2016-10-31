@@ -15,7 +15,7 @@ package com.epam.dlab.backendapi.dao;
 public enum MongoSetting {
     SERIVICE_BASE_NAME("service_base_name"),
     AWS_REGION("aws_region"),
-    SECURITY_GROUP("security_group");
+    SECURITY_GROUPS("security_groups_ids");
 
     private String id;
 

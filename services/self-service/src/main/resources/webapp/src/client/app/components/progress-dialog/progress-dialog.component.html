@@ -1,4 +1,4 @@
-/******************************************************************************************************
+<!------------------------------------------------------------------------------------------------------------
 
 Copyright (c) 2016 EPAM Systems Inc.
 
@@ -8,8 +8,14 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-*****************************************************************************************************/
+------------------------------------------------------------------------------------------------------------->
 
-.btn_refresh {
-  outline: none;
-}
+<modal #bindDialog modalClass="{{configs.modal_size || ''}}">
+  <modal-header></modal-header>
+  <modal-content ngClass="{{configs.aligning || ''}}">
+    <div [innerHTML]="configs.content"></div>
+
+    <div [innerHTML]="configs.message" ngClass="{{configs.text_style || ''}}"></div>
+  </modal-content>
+  <modal-footer></modal-footer>
+</modal>

@@ -18,7 +18,6 @@ import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
-import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
@@ -31,19 +30,17 @@ import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
-@Path("/exploratory")
+@Path("/infrastructure_provision/exploratory_environment")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements ExploratoryAPI {
+    public static final String TERMINATE = "terminate";
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
 
     @Inject
@@ -54,8 +51,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
-    @POST
-    @Path("/create")
+    @PUT
     public Response create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) {
         LOGGER.debug("creating exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = userListDAO.insertExploratory(new UserInstanceDTO()
@@ -69,7 +65,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookUserName(userInfo.getName())
                     .withNotebookInstanceType(formDTO.getShape())
                     .withRegion(settingsDAO.getAwsRegion())
-                    .withSecurityGroupIds(settingsDAO.getSecurityGroup());
+                    .withSecurityGroupIds(settingsDAO.getSecurityGroups());
             LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EXPLORATORY_CREATE, dto, String.class))
@@ -89,26 +85,22 @@ public class ExploratoryResource implements ExploratoryAPI {
     }
 
     @POST
-    @Path("/start")
     public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
         return action(userInfo, formDTO, EXPLORATORY_START, UserInstanceStatus.RUNNING);
     }
 
-    @POST
-    @Path("/terminate")
+    @DELETE
     public String terminate(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
-        LOGGER.debug("terminating exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        UserInstanceStatus status = UserInstanceStatus.TERMINATING;
-        userListDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, formDTO, status));
-        return action(userInfo, formDTO, EXPLORATORY_TERMINATE, status);
-    }
-
-    @POST
-    @Path("/stop")
-    public String stop(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
-        LOGGER.debug("stopping exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        return action(userInfo, formDTO, EXPLORATORY_STOP, UserInstanceStatus.STOPPING);
+        if (TERMINATE.equals(formDTO.getNotebookAction())) {
+            LOGGER.debug("terminating exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
+            UserInstanceStatus status = UserInstanceStatus.TERMINATING;
+            userListDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, formDTO, status));
+            return action(userInfo, formDTO, EXPLORATORY_TERMINATE, status);
+        } else {
+            LOGGER.debug("stopping exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
+            return action(userInfo, formDTO, EXPLORATORY_STOP, UserInstanceStatus.STOPPING);
+        }
     }
 
     private String action(UserInfo userInfo, ExploratoryActionFormDTO formDTO, String action, UserInstanceStatus status) {

@@ -10,14 +10,28 @@
 
  *****************************************************************************************************/
 
-import { Injectable } from '@angular/core';
-import {Headers} from "@angular/http";
+ import { Component, OnInit, ViewChild, Input } from '@angular/core';
+ import { Modal } from './../modal/modal.component';
 
-@Injectable()
-export class WebRequestHelper {
-  getJsonHeader() : Headers {
-    let result = new Headers();
-    result.append('Content-type', 'application/json; charset=utf-8');
-    return result;
-  }
-}
+ @Component({
+   moduleId: module.id,
+   selector: 'progress-dialog',
+   templateUrl: 'progress-dialog.component.html'
+ })
+
+ export class progressDialog implements OnInit{
+   @Input() configs: string;
+   @Input() theBoundCallback: Function;
+
+   @ViewChild('bindDialog') bindDialog;
+
+   open(params) {
+     this.bindDialog.open(params);
+   }
+
+   ngOnInit() {
+     if(this.theBoundCallback)
+      this.theBoundCallback();
+   }
+
+ }

@@ -2,9 +2,12 @@ import {ConnectionBackend, RequestOptions, Http, Request, RequestOptionsArgs, Re
 import {Router} from "@angular/router";
 import {Observable} from "rxjs";
 import {AppRoutingService} from "../../routing/appRouting.service";
+import {ApplicationSecurityService} from "../../services/applicationSecurity.service";
 
 export class HttpInterceptor extends Http {
-  constructor(backend: ConnectionBackend, defaultOptions: RequestOptions, private router: Router) {
+  constructor(backend: ConnectionBackend,
+              defaultOptions: RequestOptions,
+              private router: Router) {
     super(backend, defaultOptions);
   }
 
@@ -40,7 +43,8 @@ export class HttpInterceptor extends Http {
 
   intercept(observable: Observable<Response>): Observable<Response> {
     return observable.catch((err, source) => {
-      if (err.status  == 403 && !err.url.toString().endsWith("login")) {
+      if ((err.status  == 403 || err.status == 401) && !err.url.toString().endsWith("login")) {
+        localStorage.removeItem('access_token');
         this.router.navigate(['/login']);
         return Observable.of(err);
       } else {

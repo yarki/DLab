@@ -23,12 +23,11 @@ abstract public class GenericExceptionMapper<E extends Throwable> implements Exc
 
     @Override
     public Response toResponse(E exception) {
-        Response response500 = Response
-                .serverError()
-                .build();
-
         LOGGER.error("Uncaught exception in application", exception);
 
-        return response500;
+        return Response
+                .serverError()
+                .entity(exception.getMessage())
+                .build();
     }
 }

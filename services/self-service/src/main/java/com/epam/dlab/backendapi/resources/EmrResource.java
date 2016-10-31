@@ -18,7 +18,6 @@ import com.epam.dlab.backendapi.api.form.EMRTerminateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.EmrAPI;
-import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
@@ -31,16 +30,13 @@ import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
-@Path("/emr")
+@Path("/infrastructure_provision/computational_resources")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class EmrResource implements EmrAPI {
@@ -54,10 +50,9 @@ public class EmrResource implements EmrAPI {
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
-    @POST
-    @Path("/create")
+    @PUT
     public Response create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) {
-        LOGGER.debug("creating emr {} for user {}", formDTO.getName(), userInfo.getName());
+        LOGGER.debug("creating computational resource {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = userListDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
                         .withResourceName(formDTO.getName())
@@ -75,12 +70,12 @@ public class EmrResource implements EmrAPI {
                     .withNotebookName(formDTO.getNotebookName())
                     .withEdgeUserName(userInfo.getName())
                     .withRegion(settingsDAO.getAwsRegion());
-            LOGGER.debug("created emr {} for user {}", formDTO.getName(), userInfo.getName());
+            LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EMR_CREATE, dto, String.class))
                     .build();
         } else {
-            LOGGER.debug("used existing emr {} for user {}", formDTO.getName(), userInfo.getName());
+            LOGGER.debug("used existing computational resource {} for user {}", formDTO.getName(), userInfo.getName());
             return Response.status(Response.Status.FOUND).build();
         }
     }
@@ -88,15 +83,14 @@ public class EmrResource implements EmrAPI {
     @POST
     @Path("/status")
     public Response create(EMRStatusDTO dto) {
-        LOGGER.debug("update status for emr {} for user {}", dto.getResourceName(), dto.getUser());
+        LOGGER.debug("updating status for computational resource {} for user {}", dto.getResourceName(), dto.getUser());
         userListDAO.updateComputationalStatus(dto);
         return Response.ok().build();
     }
 
-    @POST
-    @Path("/terminate")
+    @DELETE
     public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
-        LOGGER.debug("terminating emr {} for user {}", formDTO.getClusterName(), userInfo.getName());
+        LOGGER.debug("terminating computational resource {} for user {}", formDTO.getClusterName(), userInfo.getName());
         userListDAO.updateComputationalStatus(new EMRStatusDTO()
                 .withUser(userInfo.getName())
                 .withName(formDTO.getNotebookName())
