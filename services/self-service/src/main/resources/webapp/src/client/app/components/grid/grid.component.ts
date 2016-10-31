@@ -23,6 +23,7 @@ import { GridRowModel } from './grid.model';
 
 export class Grid implements OnInit {
 
+  isFilled: boolean = false;
   list: any;
   environments: Array<GridRowModel>;
   notebookName: any;
@@ -103,4 +104,8 @@ export class Grid implements OnInit {
       });
       return false;
   };
+
+  validate(name, count) {
+    this.isFilled = (name.value.length > 1) && (+count.value > 0);
+  }
 }

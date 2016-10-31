@@ -54,7 +54,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <h4 class="modal-title">Create computational resource</h4>
   </modal-header>
   <modal-content>
-    <form>
+    <form (keyup)="validate(name, count)">
       <div class="form-group row">
         <div  class="col-xs-4">
           <label class="control-label">Select template</label>
@@ -93,7 +93,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <label class="control-label">Total Instance number</label>
         </div>
         <div class="col-xs-8">
-          <input type="number" #count class="form-control">
+          <input type="number" #count (click)="validate(name, count)" class="form-control">
         </div>
       </div>
       <div class="form-group row">
@@ -108,7 +108,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="text-right">
         <button type="button" (click)="createEmrModal.close()" class="btn btn-default">Cancel</button>
-        <button type="button"  (click)="createEmr(name.value, count.value, shape_master.value, shape_slave.value, tmplIndex.value)" class="btn btn-success">Create</button>
+        <button type="button" [disabled]="!isFilled" (click)="createEmr(name.value, count.value, shape_master.value, shape_slave.value, tmplIndex.value)" class="btn btn-success">Create</button>
       </div>
     </form>
   </modal-content>
