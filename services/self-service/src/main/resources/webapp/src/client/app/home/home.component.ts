@@ -63,13 +63,8 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.checkInfrastructureCreationProgress();
     this.initAnalyticSelectors();
-
     this.progressDialogConfig = this.setProgressDialogConfiguration();
-    this.progressDialogCallback = this.testCallback;
   }
-
-  // FIXIT: need to replace. Added to avoid error messages
-  testCallback() {}
 
   //
   // Handlers
