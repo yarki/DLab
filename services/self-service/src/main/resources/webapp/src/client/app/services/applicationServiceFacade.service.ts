@@ -170,7 +170,7 @@ export class ApplicationServiceFacade {
   }
 
   buildDeleteComputationalResourcesRequest(data) : Observable<Response> {
-    return this.buildRequest(RequestMethod.Put,
+    return this.buildRequest(RequestMethod.Delete,
       this.requestRegistry.Item(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES),
       data,
       this.getRequestOptions(true, true));
