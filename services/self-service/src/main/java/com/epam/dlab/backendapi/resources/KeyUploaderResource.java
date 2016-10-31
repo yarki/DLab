@@ -83,7 +83,10 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         } catch (Exception e) {
             LOGGER.debug("uploading file exception", e);
             keyDAO.deleteKey(userInfo.getName());
+
+            return Response.serverError().build();
         }
+
         return Response.ok().build();
     }
 
