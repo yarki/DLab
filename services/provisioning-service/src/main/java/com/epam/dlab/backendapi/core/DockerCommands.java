@@ -19,7 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
-public interface DockerCommands extends Constants {
+import static com.epam.dlab.backendapi.core.Constants.JSON_EXTENSION;
+
+public interface DockerCommands {
     String GET_IMAGES = new ImagesDockerCommand()
             .pipe(UnixCommand.awk("{print $1\":\"$2}"))
             .pipe(UnixCommand.sort())
@@ -38,6 +40,6 @@ public interface DockerCommands extends Constants {
     }
 
     static String extractUUID(String fileName) {
-        return fileName.replace(Constants.JSON_EXTENSION, "");
+        return fileName.replace(JSON_EXTENSION, "");
     }
 }

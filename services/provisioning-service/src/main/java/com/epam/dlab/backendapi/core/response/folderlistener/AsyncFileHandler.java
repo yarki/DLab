@@ -13,7 +13,6 @@
 
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
-import com.epam.dlab.backendapi.core.Constants;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
 
-public final class AsyncFileHandler implements Supplier<Boolean>, Constants {
+import static com.epam.dlab.backendapi.core.Constants.JSON_EXTENSION;
+import static com.epam.dlab.backendapi.core.Constants.LOG_EXTENSION;
+
+public final class AsyncFileHandler implements Supplier<Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
 

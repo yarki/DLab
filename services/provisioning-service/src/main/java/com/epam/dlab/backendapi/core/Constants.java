@@ -12,7 +12,7 @@
 
 package com.epam.dlab.backendapi.core;
 
-public interface Constants {
-    String JSON_EXTENSION = ".json";
-    String LOG_EXTENSION = ".log";
+public class Constants {
+    public static final String JSON_EXTENSION = ".json";
+    public static final String LOG_EXTENSION = ".log";
 }
