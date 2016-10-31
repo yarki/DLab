@@ -92,7 +92,7 @@ public class UserListDAO extends BaseDAO {
                     , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + RESOURCE_NAME, resourceName)),
                     set(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, status));
         } catch (Throwable t) {
-            throw new DlabException("Could not update ERM status", t);
+            throw new DlabException("Could not update computational resource status", t);
         }
     }
 }

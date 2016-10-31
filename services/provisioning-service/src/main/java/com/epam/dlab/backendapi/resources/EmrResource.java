@@ -49,7 +49,7 @@ public class EmrResource implements DockerCommands {
     @Path("/create")
     @POST
     public String create(EMRCreateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("create emr cluster");
+        LOGGER.debug("create computational resources cluster");
         String uuid = DockerCommands.generateUUID();
         try {
             commandExecuter.executeAsync(
@@ -67,7 +67,7 @@ public class EmrResource implements DockerCommands {
                     )
             );
         } catch (Throwable t) {
-            throw new DlabException("Could not create EMR cluster", t);
+            throw new DlabException("Could not create computational resources cluster", t);
         }
         return uuid;
     }
@@ -75,7 +75,7 @@ public class EmrResource implements DockerCommands {
     @Path("/terminate")
     @POST
     public String terminate(EMRTerminateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("terminate emr cluster");
+        LOGGER.debug("terminate computational resources cluster");
         String uuid = DockerCommands.generateUUID();
         try {
             commandExecuter.executeAsync(
@@ -91,7 +91,7 @@ public class EmrResource implements DockerCommands {
                     )
             );
         } catch (Throwable t) {
-            throw new DlabException("Could not terminate EMR cluster", t);
+            throw new DlabException("Could not terminate computational resources cluster", t);
         }
         return uuid;
     }
