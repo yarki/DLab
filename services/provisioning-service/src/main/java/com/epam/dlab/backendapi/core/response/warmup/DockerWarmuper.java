@@ -18,7 +18,6 @@ import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
-import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
