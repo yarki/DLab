@@ -13,5 +13,5 @@
 package com.epam.dlab.backendapi.client.rest;
 
 public interface SelfAPI {
-    String KEY_LOADER = "api/keyloader/callback";
+    String KEY_LOADER = "api/user/access_key/callback";
 }

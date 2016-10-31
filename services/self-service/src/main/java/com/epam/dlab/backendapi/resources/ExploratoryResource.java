@@ -18,7 +18,6 @@ import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
-import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
@@ -41,6 +40,7 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements ExploratoryAPI {
+    public static final String TERMINATE = "terminate";
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
 
     @Inject
@@ -92,15 +92,12 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @DELETE
     public String terminate(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
-        if(formDTO.getNotebookAction() == "terminate")
-        {
+        if (TERMINATE.equals(formDTO.getNotebookAction())) {
             LOGGER.debug("terminating exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
             UserInstanceStatus status = UserInstanceStatus.TERMINATING;
             userListDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, formDTO, status));
             return action(userInfo, formDTO, EXPLORATORY_TERMINATE, status);
-        }
-        else
-        {
+        } else {
             LOGGER.debug("stopping exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
             return action(userInfo, formDTO, EXPLORATORY_STOP, UserInstanceStatus.STOPPING);
         }
