@@ -65,7 +65,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookUserName(userInfo.getName())
                     .withNotebookInstanceType(formDTO.getShape())
                     .withRegion(settingsDAO.getAwsRegion())
-                    .withSecurityGroupIds(settingsDAO.getSecurityGroup());
+                    .withSecurityGroupIds(settingsDAO.getSecurityGroups());
             LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EXPLORATORY_CREATE, dto, String.class))
