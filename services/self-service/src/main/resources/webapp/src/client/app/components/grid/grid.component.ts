@@ -28,6 +28,7 @@ export class Grid implements OnInit {
   notebookName: any;
 
   @ViewChild('createEmrModal') createEmrModal;
+  @ViewChild('confirmationDialog') confirmationDialog;
   @Input() emrTempls;
   @Input() shapes;
 
@@ -42,7 +43,6 @@ export class Grid implements OnInit {
 
   buildGrid() {
     this.userResourceService.getUserProvisionedResources().subscribe((list) => {
-
       this.list = list;
       this.environments = this.loadEnvironments();
       console.log('models ', this.environments);
@@ -76,20 +76,10 @@ export class Grid implements OnInit {
           console.log('startUsernotebook result: ', result);
           this.buildGrid();
         });
-    } else if (action === 'stop') {
-      this.userResourceService
-        .suspendExploratoryEnvironment({ notebook_instance_name: data.name, action: 'stop' })
-        .subscribe((result) => {
-          console.log('stopUsernotebook result: ', result);
-          this.buildGrid();
-        });
+    } else if (action === 'stop') {      
+      this.confirmationDialog.open({ isFooter: false }, data, 'stop');
     } else if (action === 'terminate') {
-      this.userResourceService
-        .suspendExploratoryEnvironment({ notebook_instance_name: data.name, action: 'terminate' })
-        .subscribe((result) => {
-          console.log('terminateUsernotebook result: ', result);
-          this.buildGrid();
-        });
+      this.confirmationDialog.open({ isFooter: false }, data, 'terminate');
     }
   }
 
