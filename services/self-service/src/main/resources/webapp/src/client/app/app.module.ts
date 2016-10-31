@@ -25,7 +25,6 @@ import {
 import { AuthorizationGuard } from './security/authorization.guard';
 import { LoginModule } from './login/login.module';
 import { HomeModule } from './home/home.module';
-import {WebRequestHelper} from "./util/webRequestHelper.service";
 import {FormsModule} from "@angular/forms";
 import {UserAccessKeyService} from "./services/userAccessKey.service";
 import {AppRoutingService} from "./routing/appRouting.service";
@@ -49,7 +48,6 @@ import {ApplicationSecurityService} from "./services/applicationSecurity.service
     },
     deps: [ XHRBackend, RequestOptions, Router]},
     AuthorizationGuard,
-    WebRequestHelper,
     ApplicationSecurityService,
     UserAccessKeyService,
     AppRoutingService,

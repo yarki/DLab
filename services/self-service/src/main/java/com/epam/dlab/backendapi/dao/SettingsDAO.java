@@ -27,8 +27,8 @@ public class SettingsDAO extends BaseDAO {
         return getSetting(AWS_REGION);
     }
 
-    public String getSecurityGroup() {
-        return getSetting(SECURITY_GROUP);
+    public String getSecurityGroups() {
+        return getSetting(SECURITY_GROUPS);
     }
 
     private String getSetting(MongoSetting setting) {

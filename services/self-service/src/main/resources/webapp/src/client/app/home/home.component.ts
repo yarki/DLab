@@ -14,7 +14,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 
 import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
-import {AppRoutingService} from "../routing/appRouting.service";
 import { Grid } from '../components/grid/grid.component';
 import {ApplicationSecurityService} from "../services/applicationSecurity.service";
 
@@ -53,8 +52,7 @@ export class HomeComponent implements OnInit {
   constructor(
     private applicationSecurityService: ApplicationSecurityService,
     private userAccessKeyService: UserAccessKeyService,
-    private userResourceService: UserResourceService,
-    private appRoutingService : AppRoutingService
+    private userResourceService: UserResourceService
   ) {
     this.userUploadAccessKeyState = 404;
     this.uploadAccessUserKeyFormValid = false;
@@ -63,13 +61,8 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.checkInfrastructureCreationProgress();
     this.initAnalyticSelectors();
-
     this.progressDialogConfig = this.setProgressDialogConfiguration();
-    this.progressDialogCallback = this.testCallback;
   }
-
-  // FIXIT: need to replace. Added to avoid error messages
-  testCallback() {}
 
   //
   // Handlers
@@ -79,14 +72,6 @@ export class HomeComponent implements OnInit {
   {
     this.processAccessKeyStatus(this.userUploadAccessKeyState, true);
   }
-
-  logout_btnClick() {
-    this.applicationSecurityService.logout().subscribe(
-      () => this.appRoutingService.redirectToLoginPage(),
-      error => console.log(error),
-      () => this.appRoutingService.redirectToLoginPage());
-  }
-
 
   uploadUserAccessKey_btnClick(event) {
     let formData = new FormData();

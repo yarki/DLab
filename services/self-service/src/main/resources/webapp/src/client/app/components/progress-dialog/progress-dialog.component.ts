@@ -30,7 +30,8 @@
    }
 
    ngOnInit() {
-     this.theBoundCallback();
+     if(this.theBoundCallback)
+      this.theBoundCallback();
    }
 
  }

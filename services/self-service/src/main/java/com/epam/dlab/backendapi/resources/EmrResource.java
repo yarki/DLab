@@ -18,7 +18,6 @@ import com.epam.dlab.backendapi.api.form.EMRTerminateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.EmrAPI;
-import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.dao.UserListDAO;
 import com.epam.dlab.client.restclient.RESTService;
@@ -53,7 +52,7 @@ public class EmrResource implements EmrAPI {
 
     @PUT
     public Response create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) {
-        LOGGER.debug("creating emr {} for user {}", formDTO.getName(), userInfo.getName());
+        LOGGER.debug("creating computational resource {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = userListDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
                         .withResourceName(formDTO.getName())
@@ -71,12 +70,12 @@ public class EmrResource implements EmrAPI {
                     .withNotebookName(formDTO.getNotebookName())
                     .withEdgeUserName(userInfo.getName())
                     .withRegion(settingsDAO.getAwsRegion());
-            LOGGER.debug("created emr {} for user {}", formDTO.getName(), userInfo.getName());
+            LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EMR_CREATE, dto, String.class))
                     .build();
         } else {
-            LOGGER.debug("used existing emr {} for user {}", formDTO.getName(), userInfo.getName());
+            LOGGER.debug("used existing computational resource {} for user {}", formDTO.getName(), userInfo.getName());
             return Response.status(Response.Status.FOUND).build();
         }
     }
@@ -84,14 +83,14 @@ public class EmrResource implements EmrAPI {
     @POST
     @Path("/status")
     public Response create(EMRStatusDTO dto) {
-        LOGGER.debug("update status for emr {} for user {}", dto.getResourceName(), dto.getUser());
+        LOGGER.debug("updating status for computational resource {} for user {}", dto.getResourceName(), dto.getUser());
         userListDAO.updateComputationalStatus(dto);
         return Response.ok().build();
     }
 
     @DELETE
     public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
-        LOGGER.debug("terminating emr {} for user {}", formDTO.getClusterName(), userInfo.getName());
+        LOGGER.debug("terminating computational resource {} for user {}", formDTO.getClusterName(), userInfo.getName());
         userListDAO.updateComputationalStatus(new EMRStatusDTO()
                 .withUser(userInfo.getName())
                 .withName(formDTO.getNotebookName())

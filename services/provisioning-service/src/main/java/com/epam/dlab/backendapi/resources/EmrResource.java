@@ -19,6 +19,7 @@ import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.dto.emr.EMRCreateDTO;
 import com.epam.dlab.dto.emr.EMRTerminateDTO;
+import com.epam.dlab.exceptions.DlabException;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 @Path("/emr")
@@ -47,42 +49,50 @@ public class EmrResource implements DockerCommands {
     @Path("/create")
     @POST
     public String create(EMRCreateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("create emr cluster");
+        LOGGER.debug("create computational resources cluster");
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withInteractive()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withEc2Role(configuration.getEmrEC2RoleDefault())
-                                .withServiceRole(configuration.getEmrServiceRoleDefault())
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withActionCreate(configuration.getEmrImage()),
-                        dto
-                )
-        );
+        try {
+            commandExecuter.executeAsync(
+                    commandBuilder.buildCommand(
+                            new RunDockerCommand()
+                                    .withInteractive()
+                                    .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                    .withVolumeForResponse(configuration.getImagesDirectory())
+                                    .withRequestId(uuid)
+                                    .withEc2Role(configuration.getEmrEC2RoleDefault())
+                                    .withServiceRole(configuration.getEmrServiceRoleDefault())
+                                    .withCredsKeyName(configuration.getAdminKey())
+                                    .withActionCreate(configuration.getEmrImage()),
+                            dto
+                    )
+            );
+        } catch (Throwable t) {
+            throw new DlabException("Could not create computational resources cluster", t);
+        }
         return uuid;
     }
 
     @Path("/terminate")
     @POST
     public String terminate(EMRTerminateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("terminate emr cluster");
+        LOGGER.debug("terminate computational resources cluster");
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withInteractive()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withActionTerminate(configuration.getEmrImage()),
-                        dto
-                )
-        );
+        try {
+            commandExecuter.executeAsync(
+                    commandBuilder.buildCommand(
+                            new RunDockerCommand()
+                                    .withInteractive()
+                                    .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                    .withVolumeForResponse(configuration.getImagesDirectory())
+                                    .withRequestId(uuid)
+                                    .withCredsKeyName(configuration.getAdminKey())
+                                    .withActionTerminate(configuration.getEmrImage()),
+                            dto
+                    )
+            );
+        } catch (Throwable t) {
+            throw new DlabException("Could not terminate computational resources cluster", t);
+        }
         return uuid;
     }
 }

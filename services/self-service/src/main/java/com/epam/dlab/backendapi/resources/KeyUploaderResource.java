@@ -20,7 +20,6 @@ import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -75,7 +74,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
                     .withUser(userInfo.getName())
                     .withContent(content)
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
-                    .withSecurityGroup(settingsDAO.getSecurityGroup());
+                    .withSecurityGroup(settingsDAO.getSecurityGroups());
             Response response = provisioningService.post(KEY_LOADER, dto, Response.class);
             if (Response.Status.ACCEPTED.getStatusCode() != response.getStatus()) {
                 keyDAO.deleteKey(userInfo.getName());
@@ -83,7 +82,10 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         } catch (Exception e) {
             LOGGER.debug("uploading file exception", e);
             keyDAO.deleteKey(userInfo.getName());
+
+            return Response.serverError().build();
         }
+
         return Response.ok().build();
     }
 

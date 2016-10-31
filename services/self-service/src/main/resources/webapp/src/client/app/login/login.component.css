@@ -21,7 +21,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 }
 
 .login_page {
-  background: url(../assets/img/login-background.jpg) top center;
+  background: url(../assets/img/login-background.png) top center;
   background-size: cover;
   position: absolute;
   left: 0;
@@ -45,7 +45,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 }
 .form_wrap .btn {
   margin-top: 20px;
-} 
+}
 
 .login_page .form-control,
 .login_page .input-group-addon {

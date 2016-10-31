@@ -87,8 +87,12 @@ public class UserListDAO extends BaseDAO {
     }
 
     private void updateComputationalStatus(String user, String name, String resourceName, String status) {
-        update(USER_INSTANCES, and(eq(USER, user), eq(ENVIRONMENT_NAME, name)
-                , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + RESOURCE_NAME, resourceName)),
-                set(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, status));
+        try {
+            update(USER_INSTANCES, and(eq(USER, user), eq(ENVIRONMENT_NAME, name)
+                    , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + RESOURCE_NAME, resourceName)),
+                    set(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, status));
+        } catch (Throwable t) {
+            throw new DlabException("Could not update computational resource status", t);
+        }
     }
 }
