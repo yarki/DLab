@@ -38,6 +38,8 @@ export class HomeComponent implements OnInit {
 
   notebookExist: boolean = false;
 
+  progressDialogConfig: any;
+  progressDialogCallback: Function;
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
@@ -61,7 +63,13 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.checkInfrastructureCreationProgress();
     this.initAnalyticSelectors();
+
+    this.progressDialogConfig = this.setProgressDialogConfiguration();
+    this.progressDialogCallback = this.testCallback;
   }
+
+  // FIXIT: need to replace. Added to avoid error messages
+  testCallback() {}
 
   //
   // Handlers
@@ -165,7 +173,7 @@ export class HomeComponent implements OnInit {
   }
 
   initAnalyticSelectors() {
-    this.userResourceService.getCreateTmpl()
+    this.userResourceService.getExploratoryEnvironmentTemplates()
       .subscribe(
         data => {
           let arr = [];
@@ -186,7 +194,7 @@ export class HomeComponent implements OnInit {
         error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
 
-    this.userResourceService.getEmrTmpl()
+    this.userResourceService.getComputationalResourcesTemplates()
       .subscribe(
         data => {
           let arr = [];
@@ -207,7 +215,7 @@ export class HomeComponent implements OnInit {
         error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
       );
 
-    this.userResourceService.getShapes()
+    this.userResourceService.getSupportedResourcesShapes()
       .subscribe(
         data => {
           this.shapes = data
@@ -228,7 +236,7 @@ export class HomeComponent implements OnInit {
 
 
     this.userResourceService
-      .createUsernotebook({
+      .createExploratoryEnvironment({
         name: name.value,
         shape: shape.value,
         version: this.createTempls[tmplIndex].version
@@ -244,4 +252,14 @@ export class HomeComponent implements OnInit {
         this.notebookExist = false;
       });
   };
+
+  setProgressDialogConfiguration() {
+    return {
+      message: 'Initial infrastructure is being created, <br/>please, wait...',
+      content: '<img src="assets/img/gif-spinner.gif" alt="">',
+      modal_size: 'modal-xs',
+      text_style: 'info-label',
+      aligning: 'text-center'
+    }
+  }
 }

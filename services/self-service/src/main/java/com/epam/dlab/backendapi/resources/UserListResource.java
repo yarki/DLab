@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
-@Path("/userlist")
+@Path("/infrastructure_provision")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class UserListResource implements DockerAPI {
@@ -48,27 +48,28 @@ public class UserListResource implements DockerAPI {
     private RESTService provisioningService;
 
     @GET
+    @Path("/provisioned_user_resources")
     public Iterable<Document> getList(@Auth UserInfo userInfo) {
         LOGGER.debug("loading notebooks for user {}", userInfo.getName());
         return dao.find(userInfo.getName());
     }
 
     @GET
-    @Path("/shape")
+    @Path("/computational_resources_shapes")
     public Iterable<Document> getShapes(@Auth UserInfo userInfo) {
         LOGGER.debug("loading shapes for user {}", userInfo.getName());
         return dao.findShapes();
     }
 
     @GET
-    @Path("/computational")
+    @Path("/computational_resources_templates")
     public Iterable<ImageMetadataDTO> getComputationalTemplates(@Auth UserInfo userInfo) {
         LOGGER.debug("loading computational templates for user {}", userInfo.getName());
         return getTemplates(ImageType.COMPUTATIONAL);
     }
 
     @GET
-    @Path("/exploratory")
+    @Path("/exploratory_environment_templates")
     public Iterable<ImageMetadataDTO> getExploratoryTemplates(@Auth UserInfo userInfo) {
         LOGGER.debug("loading exploratory templates for user {}", userInfo.getName());
         return getTemplates(ImageType.EXPLORATORY);

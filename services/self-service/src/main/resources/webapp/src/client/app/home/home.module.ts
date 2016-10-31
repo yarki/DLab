@@ -15,10 +15,11 @@ import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home.component';
 import { ModalModule } from './../components/modal/index';
 import { GridModule } from './../components/grid/index';
-import {ApplicationSecurityService} from "../services/applicationSecurity.service";
+import { ProgressDialogModule } from './../components/progress-dialog/index';
+import { ApplicationSecurityService } from "../services/applicationSecurity.service";
 
 @NgModule({
-  imports: [CommonModule, ModalModule, GridModule],
+  imports: [CommonModule, ModalModule, GridModule, ProgressDialogModule],
   declarations: [HomeComponent],
   exports: [HomeComponent],
   providers: [ApplicationSecurityService]

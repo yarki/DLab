@@ -10,22 +10,27 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.api.form;
+ import { Component, OnInit, ViewChild, Input } from '@angular/core';
+ import { Modal } from './../modal/modal.component';
 
-import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
-import com.fasterxml.jackson.annotation.JsonProperty;
+ @Component({
+   moduleId: module.id,
+   selector: 'progress-dialog',
+   templateUrl: 'progress-dialog.component.html'
+ })
 
-public class ExploratoryActionFormDTO extends ExploratoryBaseDTO<ExploratoryActionFormDTO> {
-    @JsonProperty("notebook_instance_name")
-    private String notebookInstanceName;
+ export class progressDialog implements OnInit{
+   @Input() configs: string;
+   @Input() theBoundCallback: Function;
 
-    @JsonProperty("action")
-    private String action;
+   @ViewChild('bindDialog') bindDialog;
 
-    public String getNotebookInstanceName() {
-        return notebookInstanceName;
-    }
-    public String getNotebookAction() {
-        return action;
-    }
-}
+   open(params) {
+     this.bindDialog.open(params);
+   }
+
+   ngOnInit() {
+     this.theBoundCallback();
+   }
+
+ }

@@ -40,7 +40,7 @@ export class ResourcesList {
 
   terminateEmr(parent_obj, resource){
     this.userResourceService
-      .terminateEmr({
+      .suspendComputationalResource({
         // notebook_name: parent_obj.name,
         emr_cluster_name: resource.resource_name
       })
