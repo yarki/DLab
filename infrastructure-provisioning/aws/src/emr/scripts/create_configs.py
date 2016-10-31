@@ -114,7 +114,7 @@ def toree_kernel(args):
         local(
             "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-        run_sh_path = kernels_dir + "toree_" + args.cluster_name + "bin/run.sh"
+        run_sh_path = kernels_dir + "toree_" + args.cluster_name + "/bin/run.sh"
         template_sh_file = '/tmp/run_template.sh'
         with open(template_sh_file, 'r') as f:
             text = f.read()
