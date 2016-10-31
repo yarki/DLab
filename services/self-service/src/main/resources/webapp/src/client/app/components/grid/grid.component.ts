@@ -71,12 +71,12 @@ export class Grid implements OnInit {
       this.createEmrModal.open({ isFooter: false });
     } else if (action === 'run') {
       this.userResourceService
-        .createExploratoryEnvironment({ notebook_instance_name: data.name, action: 'create'})
+        .runExploratoryEnvironment({notebook_instance_name: data.name})
         .subscribe((result) => {
           console.log('startUsernotebook result: ', result);
           this.buildGrid();
         });
-    } else if (action === 'stop') {      
+    } else if (action === 'stop') {
       this.confirmationDialog.open({ isFooter: false }, data, 'stop');
     } else if (action === 'terminate') {
       this.confirmationDialog.open({ isFooter: false }, data, 'terminate');
