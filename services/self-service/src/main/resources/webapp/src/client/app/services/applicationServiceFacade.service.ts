@@ -62,7 +62,7 @@ export class ApplicationServiceFacade {
     if(method == RequestMethod.Post)
       return this.http.post(url, body, opt);
       else if (method == RequestMethod.Delete)
-        return this.http.delete(url, opt);
+        return this.http.delete(body ? url+body : url, opt);
       else if(method == RequestMethod.Put)
         return this.http.put(url, body, opt);
     else return this.http.get(url, opt);
@@ -170,7 +170,7 @@ export class ApplicationServiceFacade {
   }
 
   buildDeleteComputationalResourcesRequest(data) : Observable<Response> {
-    return this.buildRequest(RequestMethod.Put,
+    return this.buildRequest(RequestMethod.Delete,
       this.requestRegistry.Item(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES),
       data,
       this.getRequestOptions(true, true));

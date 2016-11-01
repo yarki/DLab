@@ -23,11 +23,14 @@ import { GridRowModel } from './grid.model';
 
 export class Grid implements OnInit {
 
+  isFilled: boolean = false;
   list: any;
   environments: Array<GridRowModel>;
   notebookName: any;
 
   @ViewChild('createEmrModal') createEmrModal;
+  @ViewChild('confirmationDialog') confirmationDialog;
+  @ViewChild('detailDialog') detailDialog;
   @Input() emrTempls;
   @Input() shapes;
 
@@ -42,7 +45,6 @@ export class Grid implements OnInit {
 
   buildGrid() {
     this.userResourceService.getUserProvisionedResources().subscribe((list) => {
-
       this.list = list;
       this.environments = this.loadEnvironments();
       console.log('models ', this.environments);
@@ -61,7 +63,7 @@ export class Grid implements OnInit {
    }
 
   printDetailEnvironmentModal(data) {
-    console.log(data);
+    this.detailDialog.open({ isFooter: false }, data);
   }
 
   mathAction(data, action) {
@@ -71,25 +73,15 @@ export class Grid implements OnInit {
       this.createEmrModal.open({ isFooter: false });
     } else if (action === 'run') {
       this.userResourceService
-        .createExploratoryEnvironment({ notebook_instance_name: data.name, action: 'create'})
+        .runExploratoryEnvironment({notebook_instance_name: data.name})
         .subscribe((result) => {
           console.log('startUsernotebook result: ', result);
           this.buildGrid();
         });
     } else if (action === 'stop') {
-      this.userResourceService
-        .suspendExploratoryEnvironment({ notebook_instance_name: data.name, action: 'stop' })
-        .subscribe((result) => {
-          console.log('stopUsernotebook result: ', result);
-          this.buildGrid();
-        });
+      this.confirmationDialog.open({ isFooter: false }, data, 'stop');
     } else if (action === 'terminate') {
-      this.userResourceService
-        .suspendExploratoryEnvironment({ notebook_instance_name: data.name, action: 'terminate' })
-        .subscribe((result) => {
-          console.log('terminateUsernotebook result: ', result);
-          this.buildGrid();
-        });
+      this.confirmationDialog.open({ isFooter: false }, data, 'terminate');
     }
   }
 
@@ -113,4 +105,8 @@ export class Grid implements OnInit {
       });
       return false;
   };
+
+  validate(name, count) {
+    this.isFilled = (name.value.length > 1) && (+count.value > 0);
+  }
 }

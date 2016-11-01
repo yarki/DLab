@@ -79,7 +79,7 @@ def run():
     # Edge config
     edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
     edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
-    edge_conf['bucket_name'] = (edge_conf['instance_name'] + '-bucket').lower().replace('_', '-')
+    edge_conf['bucket_name'] = (edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-bucket').lower().replace('_', '-')
     edge_conf['role_name'] = edge_conf['instance_name'] + '-Role'
     edge_conf['role_profile_name'] = edge_conf['instance_name'] + '-Profile'
     edge_conf['policy_name'] = edge_conf['instance_name'] + '-Policy'

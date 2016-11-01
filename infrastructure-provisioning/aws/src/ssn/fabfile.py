@@ -48,7 +48,7 @@ def run():
         policy_name = service_base_name + '-ssn-Policy'
         user_bucket_name = (service_base_name + '-ssn-bucket').lower().replace('_', '-')
         tag_name = service_base_name + '-Tag'
-        instance_name = service_base_name + '-ssn-instance'
+        instance_name = service_base_name + '-ssn'
         region = os.environ['creds_region']
 
         logging.info('[CREATE ROLES]')
