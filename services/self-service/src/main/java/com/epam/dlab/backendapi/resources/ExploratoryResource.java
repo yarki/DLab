@@ -18,8 +18,8 @@ import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
-import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
+import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
@@ -87,36 +87,39 @@ public class ExploratoryResource implements ExploratoryAPI {
     @POST
     public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        return action(userInfo, formDTO, EXPLORATORY_START, UserInstanceStatus.RUNNING);
+        return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, UserInstanceStatus.RUNNING);
     }
 
     @DELETE
-    public String terminate(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
-        if (TERMINATE.equals(formDTO.getNotebookAction())) {
-            LOGGER.debug("terminating exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-            UserInstanceStatus status = UserInstanceStatus.TERMINATING;
-            infrastructureProvisionDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, formDTO, status));
-            return action(userInfo, formDTO, EXPLORATORY_TERMINATE, status);
-        } else {
-            LOGGER.debug("stopping exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-            return action(userInfo, formDTO, EXPLORATORY_STOP, UserInstanceStatus.STOPPING);
-        }
+    @Path("/{name}/stop")
+    public String stop(@Auth UserInfo userInfo, @PathParam("name") String name) {
+        LOGGER.debug("stopping exploratory environment {} for user {}", name, userInfo.getName());
+        return action(userInfo, name, EXPLORATORY_STOP, UserInstanceStatus.STOPPING);
     }
 
-    private String action(UserInfo userInfo, ExploratoryActionFormDTO formDTO, String action, UserInstanceStatus status) {
-        infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo, formDTO, status));
+    @DELETE
+    @Path("/{name}/terminate")
+    public String terminate(@Auth UserInfo userInfo, @PathParam("name") String name) {
+        LOGGER.debug("terminating exploratory environment {} for user {}", name, userInfo.getName());
+        UserInstanceStatus status = UserInstanceStatus.TERMINATING;
+        infrastructureProvisionDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, name, status));
+        return action(userInfo, name, EXPLORATORY_TERMINATE, status);
+    }
+
+    private String action(UserInfo userInfo, String name, String action, UserInstanceStatus status) {
+        infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo, name, status));
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withNotebookUserName(userInfo.getName())
-                .withNotebookInstanceName(formDTO.getNotebookInstanceName())
+                .withNotebookInstanceName(name)
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(action, dto, String.class);
     }
 
-    private StatusBaseDTO createStatusDTO(UserInfo userInfo, ExploratoryActionFormDTO formDTO, UserInstanceStatus status) {
+    private StatusBaseDTO createStatusDTO(UserInfo userInfo, String name, UserInstanceStatus status) {
         return new StatusBaseDTO()
                 .withUser(userInfo.getName())
-                .withName(formDTO.getNotebookInstanceName())
+                .withName(name)
                 .withStatus(status.getStatus());
     }
 }
