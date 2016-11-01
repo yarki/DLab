@@ -215,6 +215,7 @@ def run():
                "ip": ip_address,
                "master_keyname": os.environ['creds_key_name'],
                "exploratory_name": notebook_config['exploratory_name'],
+               "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server"}
         result.write(json.dumps(res))
 
@@ -258,7 +259,7 @@ def terminate():
 
     try:
         with open("/root/result.json", 'w') as result:
-            res = {"NBs_name": notebook_config['notebook_name'],
+            res = {"Notebook_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
                    "user_own_bucket_name": notebook_config['bucket_name'],
                    "exploratory_name": notebook_config['exploratory_name'],
@@ -309,7 +310,7 @@ def stop():
 
     try:
         with open("/root/result.json", 'w') as result:
-            res = {"NBs_name": notebook_config['notebook_name'],
+            res = {"Notebook_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
                    "user_own_bucket_name": notebook_config['bucket_name'],
                    "exploratory_name": notebook_config['exploratory_name'],
