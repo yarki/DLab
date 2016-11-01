@@ -10,25 +10,9 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.computational;
-
-import com.epam.dlab.dto.StatusBaseDTO;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class ComputationalStatusDTO extends StatusBaseDTO<ComputationalStatusDTO> {
-    @JsonProperty("computational_name")
-    private String computationalName;
-
-    public String getComputationalName() {
-        return computationalName;
-    }
-
-    public void setComputationalName(String computationalName) {
-        this.computationalName = computationalName;
-    }
-
-    public ComputationalStatusDTO withComputationalName(String computationalName) {
-        setComputationalName(computationalName);
-        return this;
-    }
+export class CreateEmrModel {
+  constructor(
+    public name : string,
+    public count: string
+  ) {  }
 }

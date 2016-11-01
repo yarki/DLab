@@ -54,7 +54,7 @@ public class ComputationalResource implements ComputationalAPI {
         LOGGER.debug("creating computational resource {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
-                        .withResourceName(formDTO.getName())
+                        .withComputationalName(formDTO.getName())
                         .withStatus(UserInstanceStatus.CREATING.getStatus())
                         .withMasterShape(formDTO.getMasterInstanceType())
                         .withSlaveShape(formDTO.getSlaveInstanceType())
@@ -83,7 +83,7 @@ public class ComputationalResource implements ComputationalAPI {
     @POST
     @Path("/status")
     public Response status(ComputationalStatusDTO dto) {
-        LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getName(), dto.getUser(), dto.getStatus());
+        LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateComputationalStatus(dto);
         return Response.ok().build();
     }
@@ -94,8 +94,8 @@ public class ComputationalResource implements ComputationalAPI {
         LOGGER.debug("terminating computational resource {} for user {}", computationalName, userInfo.getName());
         infrastructureProvisionDAO.updateComputationalStatus(new ComputationalStatusDTO()
                 .withUser(userInfo.getName())
-                .withName(exploratoryName)
-                .withResourceName(computationalName)
+                .withExploratoryName(exploratoryName)
+                .withComputationalName(computationalName)
                 .withStatus(UserInstanceStatus.TERMINATING.getStatus()));
         ComputationalTerminateDTO dto = new ComputationalTerminateDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())

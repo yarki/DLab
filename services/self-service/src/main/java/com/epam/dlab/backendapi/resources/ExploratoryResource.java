@@ -56,7 +56,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         LOGGER.debug("creating exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
-                .withEnvironmentName(formDTO.getName())
+                .withExploratoryName(formDTO.getName())
                 .withStatus(UserInstanceStatus.CREATING.getStatus())
                 .withShape(formDTO.getShape()));
         if (isAdded) {
@@ -80,7 +80,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @POST
     @Path("/status")
     public Response status(ExploratoryStatusDTO dto) {
-        LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getName(), dto.getUser(), dto.getStatus());
+        LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getExploratoryName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateExploratoryStatusAndName(dto);
         return Response.ok().build();
     }
@@ -121,7 +121,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     private StatusBaseDTO createStatusDTO(UserInfo userInfo, String name, UserInstanceStatus status) {
         return new ExploratoryStatusDTO()
                 .withUser(userInfo.getName())
-                .withName(name)
+                .withExploratoryName(name)
                 .withStatus(status.getStatus());
     }
 

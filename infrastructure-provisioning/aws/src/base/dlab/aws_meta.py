@@ -112,7 +112,7 @@ def get_instance_by_name(instance_name):
     ec2 = boto3.resource('ec2')
     instances = ec2.instances.filter(
         Filters=[{'Name': 'tag:Name', 'Values': [instance_name]},
-                 {'Name': 'instance-state-name', 'Values': ['running']}])
+                 {'Name': 'instance-state-name', 'Values': ['running','pending','stopping','stopped']}])
     for instance in instances:
         return instance.id
     return ''

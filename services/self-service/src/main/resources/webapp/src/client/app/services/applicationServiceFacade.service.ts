@@ -62,7 +62,7 @@ export class ApplicationServiceFacade {
     if(method == RequestMethod.Post)
       return this.http.post(url, body, opt);
       else if (method == RequestMethod.Delete)
-        return this.http.delete(body ? url+body : url, opt);
+        return this.http.delete(body ? url + JSON.parse(body) : url, opt);
       else if(method == RequestMethod.Put)
         return this.http.put(url, body, opt);
     else return this.http.get(url, opt);
