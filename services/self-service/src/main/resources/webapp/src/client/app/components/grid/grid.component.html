@@ -34,7 +34,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <div class="dropdown">
         <span data-toggle="dropdown"
               class="glyphicon glyphicon-cog"
-              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating'}">
+              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating' ||
+                                      env.status.toLowerCase() == 'terminating' ||
+                                      env.status.toLowerCase() == 'terminated'}">
         </span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">
@@ -42,7 +44,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             <li (click)="mathAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped'">Stop</li>
             <li (click)="mathAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped'">Run</li>
             <li (click)="mathAction(env, 'terminate')">Terminate</li>
-            <li (click)="mathAction(env, 'deploy')">Deploy EMR</li>
+            <li (click)="mathAction(env, 'deploy')" *ngIf="env.status != 'stopping' && env.status != 'stopped'">Deploy EMR</li>
           </ul>
         </div>
       </div>
