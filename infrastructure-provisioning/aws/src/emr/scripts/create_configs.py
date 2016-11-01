@@ -72,6 +72,7 @@ def pyspark_kernel(args):
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
     text = text.replace('SPARK_PATH',
                         '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    text = text.replace('PY_VER', '2.7')
     with open(kernel_path, 'w') as f:
         f.write(text)
     local('touch /tmp/kernel_var.json')
@@ -93,7 +94,7 @@ def pyspark_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH',
                             '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
-        text = text.replace('2.7', '3.4')
+        text = text.replace('PY_VER', '3.4')
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
@@ -110,7 +111,7 @@ def pyspark_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH',
                             '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
-        text = text.replace('2.7', '3.5')
+        text = text.replace('PY_VER', '3.5')
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
