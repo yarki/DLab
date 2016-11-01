@@ -120,7 +120,7 @@ public class ComputationalResource implements DockerCommands {
         return new ResourceCallbackHandler<ComputationalStatusDTO>(selfService, user, originalUuid, action) {
             @Override
             protected String getCallbackURI() {
-                return COMPUTATIONAL+ STATUS_URI;
+                return COMPUTATIONAL+STATUS_URI;
             }
 
             @Override

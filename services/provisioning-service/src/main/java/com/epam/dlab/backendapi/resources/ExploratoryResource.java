@@ -65,6 +65,9 @@ public class ExploratoryResource implements DockerCommands {
     public String create(ExploratoryCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create exploratory environment");
         String uuid = DockerCommands.generateUUID();
+        folderListenerExecutor.start(configuration.getImagesDirectory(),
+                configuration.getResourceStatusPollTimeout(),
+                getFileHandlerCallback(dto.getNotebookUserName(), uuid, DockerAction.CREATE));
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
@@ -129,7 +132,7 @@ public class ExploratoryResource implements DockerCommands {
         return new ResourceCallbackHandler<ExploratoryStatusDTO>(selfService, user, originalUuid, action) {
             @Override
             protected String getCallbackURI() {
-                return EXPLORATORY+ STATUS_URI;
+                return EXPLORATORY+STATUS_URI;
             }
 
             @Override
