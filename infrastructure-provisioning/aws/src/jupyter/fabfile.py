@@ -208,6 +208,7 @@ def run():
         res = {"hostname": dns_name,
                "ip": ip_address,
                "master_keyname": os.environ['creds_key_name'],
+               "environment_name": os.environ['environment_name'],
                "Action": "Create new notebook server"}
         result.write(json.dumps(res))
 
@@ -249,6 +250,7 @@ def terminate():
             res = {"NBs_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
                    "user_own_bucket_name": notebook_config['bucket_name'],
+                   "environment_name": os.environ['environment_name'],
                    "Action": "Terminate notebook server"}
             print json.dumps(res)
             result.write(json.dumps(res))
@@ -294,6 +296,7 @@ def stop():
             res = {"NBs_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
                    "user_own_bucket_name": notebook_config['bucket_name'],
+                   "environment_name": os.environ['environment_name'],
                    "Action": "Stop notebook server"}
             print json.dumps(res)
             result.write(json.dumps(res))
@@ -337,6 +340,7 @@ def start():
         with open("/root/result.json", 'w') as result:
             res = {"NBs_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
+                   "environment_name": os.environ['environment_name'],
                    "Action": "Start up notebook server"}
             print json.dumps(res)
             result.write(json.dumps(res))
