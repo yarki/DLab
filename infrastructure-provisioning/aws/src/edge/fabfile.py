@@ -204,7 +204,7 @@ def run():
         logging.info('[CREATE SECURITY GROUP FOR PRIVATE SUBNET]')
         print '[CREATE SECURITY GROUP FOR PRIVATE SUBNET]'
         edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
-        sg_list = edge_conf['sg_ids'].split(',')
+        sg_list = edge_conf['sg_ids'].replace(" ", "").split(',')
         rules_list = []
         for i in sg_list:
             rules_list.append({"GroupId": i})
