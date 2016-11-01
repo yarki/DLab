@@ -37,10 +37,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <p>Do you want to proceed?</p>
         </div>
       </div>
-      <div class="text-center">
+      <div class="text-right">
         <button type="button" class="btn btn-default" (click)="bindDialog.close()">No</button>
-        <button type="button" class="btn btn-success" *ngIf="action === 'stop'" (click)="stop()">Ok</button>
-        <button type="button" class="btn btn-success" *ngIf="action === 'terminate'" (click)="terminate()">Ok</button>
+        <button type="button" class="btn btn-success" *ngIf="action === 'stop'" (click)="stop()">Yes</button>
+        <button type="button" class="btn btn-success" *ngIf="action === 'terminate'" (click)="terminate()">Yes</button>
       </div>
   </modal-content>
 </modal>
