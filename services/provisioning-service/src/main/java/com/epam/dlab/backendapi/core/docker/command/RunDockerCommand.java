@@ -53,6 +53,11 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withDetached() {
+        options.add("-d");
+        return this;
+    }
+
     public RunDockerCommand withPseudoTTY() {
         options.add("-t");
         return this;

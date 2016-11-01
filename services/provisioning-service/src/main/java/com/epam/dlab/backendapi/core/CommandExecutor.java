@@ -56,6 +56,6 @@ public class CommandExecutor {
     }
 
     private String[] createCommand(String command) {
-        return new String[]{"bash", "-c", command};
+        return new String[]{"bash", "-x", command};
     }
 }

@@ -78,6 +78,7 @@ public class ExploratoryResource implements DockerCommands {
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withInteractive()
+                                .withDetached()
                                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                                 .withVolumeForResponse(configuration.getImagesDirectory())
                                 .withRequestId(uuid)
