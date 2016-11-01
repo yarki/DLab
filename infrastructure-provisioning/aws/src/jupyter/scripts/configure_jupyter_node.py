@@ -74,6 +74,10 @@ def ensure_python3_kernel():
             sudo('apt install -y python3-pip')
             sudo('pip3 install ipython ipykernel')
             sudo('python3 -m ipykernel install')
+            sudo('add-apt-repository -y ppa:fkrull/deadsnakes')
+            sudo('apt update')
+            sudo('apt install -y python3.4')
+            sudo('python3.4 -m pip install ipython ipykernel  --upgrade')
             sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
         except:
             sys.exit(1)
@@ -113,6 +117,11 @@ def configure_notebook_server(notebook_name):
         sudo("sleep 5; for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
         sudo("sleep 5; screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py; "
              "sleep 5;")
+        # for further start up when system boots
+        sudo("sed -i '/exit 0/d' /etc/rc.local")
+        sudo("bash -c 'echo sudo screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py\ >> /etc/rc.local'")
+        sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
+
     except:
         sys.exit(1)
 
