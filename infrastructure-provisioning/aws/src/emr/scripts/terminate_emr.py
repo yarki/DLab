@@ -15,7 +15,6 @@
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import boto3
-from fabric.api import *
 import argparse
 import sys
 
@@ -27,30 +26,6 @@ parser.add_argument('--nb_tag_value', type=str)
 parser.add_argument('--ssh_user', type=str)
 parser.add_argument('--key_path', type=str)
 args = parser.parse_args()
-
-
-# Function for removing notebook's local kernels
-def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
-    ec2 = boto3.resource('ec2')
-    inst = ec2.instances.filter(
-        Filters=[{'Name': 'instance-state-name', 'Values': ['running']},
-                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
-    instances = list(inst)
-    if instances:
-        for instance in instances:
-            try:
-                private = getattr(instance, 'private_dns_name')
-                env.hosts = "{}".format(private)
-                env.user = "{}".format(ssh_user)
-                env.key_filename = "{}".format(key_path)
-                env.host_string = env.user + "@" + env.hosts
-                sudo('rm -rf /srv/hadoopconf/config/{}'.format(emr_name))
-                sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
-                print "Notebook's " + env.hosts + " kernels were removed"
-            except:
-                sys.exit(1)
-    else:
-        print "There are no notebooks to clean kernels."
 
 
 ##############
@@ -77,5 +52,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print "Removing EMR kernels from notebook"
-    remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path)
-
+    try:
+        remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path)
+    except:
+        sys.exit(1)
