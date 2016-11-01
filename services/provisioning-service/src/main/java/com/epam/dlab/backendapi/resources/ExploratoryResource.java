@@ -114,10 +114,12 @@ public class ExploratoryResource implements DockerCommands {
             }
 
             @Override
-            protected void parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO statusResult) {
+            protected ExploratoryStatusDTO parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO statusResult) {
                 String userExploratoryName = resultNode.get(USER_EXPLORATORY_NAME_FIELD).textValue();
                 String exploratoryName = resultNode.get(EXPLORATORY_NAME_FIELD).textValue();
-                statusResult.withUserExploratoryName(userExploratoryName).withExploratoryName(exploratoryName);
+                return statusResult
+                        .withUserExploratoryName(userExploratoryName)
+                        .withExploratoryName(exploratoryName);
             }
         };
     }

@@ -67,7 +67,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         T result = (T) resultType.newInstance().withUser(user).withStatus(status.getStatus());
         if (isSuccess(document)) {
             JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
-            parseOutResponse(resultNode, result);
+            result = parseOutResponse(resultNode, result);
         }
         selfService.post(getCallbackURI(), result, resultType);
         return !UserInstanceStatus.FAILED.equals(status);
@@ -83,7 +83,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     }
 
     abstract protected String getCallbackURI();
-    abstract protected void parseOutResponse(JsonNode document, T statusResult);
+    abstract protected T parseOutResponse(JsonNode document, T statusResult);
 
     private boolean isSuccess(JsonNode document) {
         return OK_STATUS.equals(document.get(STATUS_FIELD).textValue());

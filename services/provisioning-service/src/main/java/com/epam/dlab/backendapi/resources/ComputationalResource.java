@@ -124,11 +124,14 @@ public class ComputationalResource implements DockerCommands {
             }
 
             @Override
-            protected void parseOutResponse(JsonNode resultNode, ComputationalStatusDTO statusResult) {
+            protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO statusResult) {
                 String userExploratoryName = resultNode.get(USER_EXPLORATORY_NAME_FIELD).textValue();
                 String userComputationalName = resultNode.get(USER_COMPUTATIONAL_NAME_FIELD).textValue();
                 String computationalName = resultNode.get(COMPUTATIONAL_NAME_FIELD).textValue();
-                statusResult.withUserExploratoryName(userExploratoryName).withUserComputationalName(userComputationalName).withComputationalName(computationalName);
+                return statusResult
+                        .withUserExploratoryName(userExploratoryName)
+                        .withUserComputationalName(userComputationalName)
+                        .withComputationalName(computationalName);
             }
         };
     }
