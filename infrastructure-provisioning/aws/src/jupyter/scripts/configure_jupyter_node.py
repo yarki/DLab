@@ -114,8 +114,10 @@ def configure_notebook_server(notebook_name):
         sudo("sleep 5; screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py; "
              "sleep 5;")
         # for further start up when system boots
-        sudo("bash -c 'echo \"#!/usr/bin/env bash\" > /etc/profile.d/jupyter_startup.sh'")
-        sudo("bash -c 'echo \"sudo screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py\" > /etc/profile.d/jupyter_startup.sh'")
+        run('touch /tmp/jupyter.sh')
+        run('echo "# !/usr/bin/env bash" > /tmp/jupyter.sh')
+        run('echo "sudo screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py" >> /tmp/jupyter.sh')
+        sudo('mv /tmp/jupyter.sh /etc/profile.d/jupyter.sh')
     except:
         sys.exit(1)
 
