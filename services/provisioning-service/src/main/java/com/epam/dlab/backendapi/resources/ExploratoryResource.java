@@ -41,7 +41,7 @@ public class ExploratoryResource implements DockerCommands {
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
     @Inject
-    private CommandExecutor commandExecuter;
+    private CommandExecutor commandExecutor;
 
     @Inject
     private CommandBuilder commandBuilder;
@@ -52,7 +52,7 @@ public class ExploratoryResource implements DockerCommands {
     public String create(ExploratoryCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create exploratory environment");
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(
+        commandExecutor.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withDetached()
@@ -93,7 +93,7 @@ public class ExploratoryResource implements DockerCommands {
     private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException, InterruptedException {
         LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(
+        commandExecutor.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withInteractive()
