@@ -19,7 +19,7 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @JsonProperty
     private String user;
     @JsonProperty
-    private String name;
+    private String exploratoryName;
     @JsonProperty
     private String status;
 
@@ -37,17 +37,18 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
         return (T) this;
     }
 
-    public String getName() {
-        return name;
+
+    public String getExploratoryName() {
+        return exploratoryName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setExploratoryName(String exploratoryName) {
+        this.exploratoryName = exploratoryName;
     }
 
     @SuppressWarnings("unchecked")
-    public T withName(String name) {
-        setName(name);
+    public T withExploratoryName(String exploratoryName) {
+        setExploratoryName(exploratoryName);
         return (T) this;
     }
 
