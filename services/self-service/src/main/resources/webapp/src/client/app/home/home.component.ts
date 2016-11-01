@@ -38,6 +38,8 @@ export class HomeComponent implements OnInit {
   notebookExist: boolean = false;
 
   progressDialogConfig: any;
+  keyUploadDialogConfig: any;
+
   progressDialogCallback: Function;
 
   @ViewChild('keyUploadModal') keyUploadModal;
@@ -61,15 +63,16 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.checkInfrastructureCreationProgress();
     this.initAnalyticSelectors();
+
     this.progressDialogConfig = this.setProgressDialogConfiguration();
+    this.keyUploadDialogConfig = this.setKeyUploadDialogConfiguration();
   }
 
   //
   // Handlers
   //
 
-  createNotebook_btnClick()
-  {
+  createNotebook_btnClick() {
     this.processAccessKeyStatus(this.userUploadAccessKeyState, true);
   }
 
@@ -247,6 +250,16 @@ export class HomeComponent implements OnInit {
       modal_size: 'modal-xs',
       text_style: 'info-label',
       aligning: 'text-center'
+    }
+  }
+
+  setKeyUploadDialogConfiguration() {
+    return {
+      header_title: 'Create initial infrastructure',
+      // content: '<img src="assets/img/gif-spinner.gif" alt="">',
+      modal_size: 'modal-sm',
+      // text_style: 'info-label',
+      // aligning: 'text-center'
     }
   }
 }

@@ -77,33 +77,5 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   </modal-content>
 </modal>
 
-<modal #keyUploadModal modalClass="modal-sm" [hideCloseButton]="false" [closeOnEscape]="false" [closeOnOutsideClick]="false">
-  <modal-header>
-    <h4 class="modal-title">Create initial infrastructure</h4>
-  </modal-header>
-  <modal-content>
-    <form (submit)="uploadUserAccessKey_btnClick($event)" novalidate>
-      <div class="form-group row">
-        <div  class="col-xs-7">
-          <label class="control-label">Upload public key to start environment creation</label>
-          <div>
-            <small><span class="glyphicon glyphicon-question-sign" ></span> Where can I get public key?</small>
-          </div>
-        </div>
-        <div class="col-xs-5 text-right">
-          <span class="btn btn-default btn-file">
-            <span class="upload-icon" ></span> Upload
-            <input (change)="uploadUserAccessKey_onChange($event)" type="file" name="file" accept=".pub" />
-          </span>
-          <div class="text-right" [class.danger_color]="!uploadAccessUserKeyFormValid">{{uploadAccessKeyLabel}}</div>
-        </div>
-      </div>
-      <div class="text-right">
-        <button type="button" class="btn btn-default" (click)="keyUploadModal.close()">Cancel</button>
-        <button [disabled]="!uploadAccessUserKeyFormValid" type="submit" class="btn btn-success">Create</button>
-      </div>
-    </form>
-  </modal-content>
-</modal>
-
+<key-upload-dialog #keyUploadModal [configs]="keyUploadDialogConfig"></key-upload-dialog>
 <progress-dialog #preloaderModal [configs]="progressDialogConfig"></progress-dialog>
