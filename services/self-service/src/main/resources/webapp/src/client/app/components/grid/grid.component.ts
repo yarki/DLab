@@ -13,6 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import { Component, EventEmitter, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 import { GridRowModel } from './grid.model';
+import { CreateEmrModel } from "./createEmrModel";
 
 @Component({
   moduleId: module.id,
@@ -23,6 +24,7 @@ import { GridRowModel } from './grid.model';
 
 export class Grid implements OnInit {
 
+  model = new CreateEmrModel ('', '');
   isFilled: boolean = false;
   list: any;
   environments: Array<GridRowModel>;
