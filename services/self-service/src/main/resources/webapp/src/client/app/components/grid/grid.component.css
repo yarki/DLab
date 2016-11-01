@@ -59,14 +59,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   padding: 11px 15px;
   font-size: 12px;
 }
+
 .dashboard_table .running {
   color: #49af38;
 }
-.dashboard_table .stopped {
+.dashboard_table .stopped,
+.dashboard_table .stopping {
   color: #f7b500;
 }
 .dashboard_table .creating {
   color: #35AFD5;
+}
+.dashboard_table .terminated,
+.dashboard_table .terminating {
+  color: #918B8D;
 }
 .dashboard_table .glyphicon-cog {
   font-size: 16px;
