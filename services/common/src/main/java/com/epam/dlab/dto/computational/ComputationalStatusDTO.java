@@ -12,23 +12,26 @@
 
 package com.epam.dlab.dto.computational;
 
-import com.epam.dlab.dto.ResourceStatusDTO;
+import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ComputationalStatusDTO extends ResourceStatusDTO<ComputationalStatusDTO> {
-    @JsonProperty("emr_cluster_name")
-    private String clusterName;
+/**
+ * Created by Alexey Suprun
+ */
+public class ComputationalStatusDTO extends StatusBaseDTO<ComputationalStatusDTO> {
+    @JsonProperty("resource_name")
+    private String resourceName;
 
-    public String getClusterName() {
-        return clusterName;
+    public String getResourceName() {
+        return resourceName;
     }
 
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
-    public ComputationalStatusDTO withClusterName(String clusterName) {
-        setClusterName(clusterName);
+    public ComputationalStatusDTO withResourceName(String resourceName) {
+        setResourceName(resourceName);
         return this;
     }
 }

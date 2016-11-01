@@ -14,7 +14,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 
 import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
-import {AppRoutingService} from "../routing/appRouting.service";
 import { Grid } from '../components/grid/grid.component';
 import {ApplicationSecurityService} from "../services/applicationSecurity.service";
 
@@ -53,8 +52,7 @@ export class HomeComponent implements OnInit {
   constructor(
     private applicationSecurityService: ApplicationSecurityService,
     private userAccessKeyService: UserAccessKeyService,
-    private userResourceService: UserResourceService,
-    private appRoutingService : AppRoutingService
+    private userResourceService: UserResourceService
   ) {
     this.userUploadAccessKeyState = 404;
     this.uploadAccessUserKeyFormValid = false;
@@ -74,14 +72,6 @@ export class HomeComponent implements OnInit {
   {
     this.processAccessKeyStatus(this.userUploadAccessKeyState, true);
   }
-
-  logout_btnClick() {
-    this.applicationSecurityService.logout().subscribe(
-      () => this.appRoutingService.redirectToLoginPage(),
-      error => console.log(error),
-      () => this.appRoutingService.redirectToLoginPage());
-  }
-
 
   uploadUserAccessKey_btnClick(event) {
     let formData = new FormData();
@@ -133,7 +123,7 @@ export class HomeComponent implements OnInit {
       );
   }
 
-  private toggleDialogs(keyUploadDialogToggle, preloaderDialogToggle)
+  private toggleDialogs(keyUploadDialogToggle, preloaderDialogToggle, createAnalyticalToolDialogToggle)
   {
 
     if(keyUploadDialogToggle) {
@@ -153,20 +143,32 @@ export class HomeComponent implements OnInit {
       if (this.preloaderModal.isOpened)
         this.preloaderModal.close();
     }
+
+    if(createAnalyticalToolDialogToggle)
+    {
+      if (!this.createAnalyticalModal.isOpened)
+        this.createAnalyticalModal.open({ isFooter: false });
+    }
+    else {
+      if (this.createAnalyticalModal.isOpened)
+        this.createAnalyticalModal.close();
+    }
   }
 
   private processAccessKeyStatus(status : number, forceShowKeyUploadDialog: boolean)
   {
     this.userUploadAccessKeyState = status;
 
-    if(status == 200) // Key uploaded
-      this.toggleDialogs(false, false);
+    if (status == 404) // key haven't been uploaded
+      this.toggleDialogs(true, false, false);
     else if (status == 202) { // Key uploading
-      this.toggleDialogs(false, true);
+      this.toggleDialogs(false, true, false);
       setTimeout(() => this.checkInfrastructureCreationProgress(), 10000)
-    }
-    else if (status == 404 || forceShowKeyUploadDialog) // key haven't been uploaded
-      this.toggleDialogs(true, false);
+    } else if(status == 200 && forceShowKeyUploadDialog)
+      this.toggleDialogs(false, false, true);
+    else if(status == 200) // Key uploaded
+      this.toggleDialogs(false, false, false);
+
   }
 
   initAnalyticSelectors() {

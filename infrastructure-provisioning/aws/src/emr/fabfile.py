@@ -47,7 +47,7 @@ def run():
                        + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index)\
                        + ', Notebook=' + os.environ['notebook_name']
     emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index)
-    emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-edge-bucket').lower().replace('_', '-')
+    emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
 
     tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
     emr_conf['subnet_cidr'] = get_subnet_by_tag(tag)
@@ -162,12 +162,17 @@ def run():
     except:
         sys.exit(1)
 
-    with open("/root/result.json", 'w') as result:
-        res = {"hostname": cluster_name,
-               "key_name": emr_conf['key_name'],
-               "user_own_bucket_name": emr_conf['bucket_name']}
-        print json.dumps(res)
-        result.write(json.dumps(res))
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"hostname": cluster_name,
+                   "key_name": emr_conf['key_name'],
+                   "user_own_bucket_name": emr_conf['bucket_name'],
+                   "Action": "Create new EMR cluster"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)
 
     sys.exit(0)
 
@@ -206,3 +211,15 @@ def terminate():
             sys.exit(1)
     except:
         sys.exit(1)
+
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"EMR_name": emr_conf['emr_name'],
+                   "NBs_name": emr_conf['notebook_name'],
+                   "user_own_bucket_name": emr_conf['bucket_name'],
+                   "Action": "Terminate EMR cluster"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)

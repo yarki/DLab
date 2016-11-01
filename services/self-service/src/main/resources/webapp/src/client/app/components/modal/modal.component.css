@@ -13,11 +13,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .modal-sm { width: 525px; }
 .modal-md { width: 545px; }
 .modal-lg { width: 580px; }
-
 .modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.1);
+  transition: 0.3s ease-in-out;
 }
-
 .header-white .modal-header {
   background: #fff;
 }
@@ -68,37 +66,25 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .modal-header .close {
   margin-top: 3px;
 }
-
-/*
 .modal {
+  display: block;
+  visibility: hidden;
+}
+.modal.in {
+  visibility: visible;
+}
+
+.modal .modal-dialog {
+  transition: 0.3s ease-in-out;
   opacity: 0;
-  background-color: rgba(0,0,0,0.5);
-  display: block!important;
-  padding-left: 0px!important;
-  -webkit-transform: scale(0);
-  transform: scale(0);
-  -webkit-transition: opacity .15s linear;
-  transition: opacity .15s linear;
+  -webkit-transform: translateY(-20px);
+  transform: translateY(-20px);
 }
-.modal-open .modal {
-  -webkit-transform: scale(1);
-  transform: scale(1);
+.modal.in .modal-dialog {
   opacity: 1;
-  background-color: rgba(0,0,0,0.5);
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
 }
-
-.modal-dialog {
-  -webkit-transition: opacity .15s linear;
-  transition: opacity .15s linear;
-  -webkit-transform: scale(0);
-  transform: scale(0);
-}
-.modal-open .modal-dialog {
-  -webkit-transform: scale(1);
-  transform: scale(1);
-}
-*/
-
 .modal .btn {
   padding: 6px 15px;
   min-width: 140px;

@@ -37,7 +37,7 @@ if __name__ == "__main__":
         with open("/root/result.json") as f:
             reply['response']['result'] = json.loads(f.read())
     except:
-        reply['response']['result'] = {"error": "Failed to open result itself. Bad sign."}
+        reply['response']['result'] = {"error": "Failed to open result.json"}
         pass
 
     reply['response']['log'] = "/response/%s.log" % os.environ['request_id']

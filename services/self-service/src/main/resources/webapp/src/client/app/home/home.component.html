@@ -10,29 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ------------------------------------------------------------------------------------------------------------->
 
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button class="navbar-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-        <li><a href="#">Action</a></li>
-        <li><a href="#">Another action</a></li>
-        <li><a href="#">Something else here</a></li>
-        <li><a href="#">Separated link</a></li>
-      </ul>
-      <a class="navbar-logo" href="#">
-        <img src="assets/img/logo-nav.png" alt="">
-      </a>
-    </div>
-    <button class="btn btn-logout" (click)="logout_btnClick()">Log out</button>
-  </div>
-</nav>
+<sd-navbar></sd-navbar>
 
 <div class="sub_nav">
   <div class="container-fluid">
@@ -64,7 +42,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <div class="col-xs-8">
         <select class="form-control" #createTmpl_tmplIndex>
           <option *ngFor="let template of createTempls; let i = index" value="{{i}}">
-            {{template.template_name}}, version - {{template.version}}
+            {{template.template_name}}
           </option>
         </select>
         <div class="hidden" >
@@ -87,7 +65,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="col-xs-8">
         <select class="form-control" #createTmpl_shape>
-          <option *ngFor="let shape of shapes">{{shape.shape_name}}</option>
+          <option *ngFor="let shape of shapes">{{shape.Type}}</option>
         </select>
       </div>
     </div>

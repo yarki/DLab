@@ -79,7 +79,7 @@ def run():
     # Edge config
     edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
     edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
-    edge_conf['bucket_name'] = (edge_conf['instance_name'] + '-bucket').lower().replace('_', '-')
+    edge_conf['bucket_name'] = (edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-bucket').lower().replace('_', '-')
     edge_conf['role_name'] = edge_conf['instance_name'] + '-Role'
     edge_conf['role_profile_name'] = edge_conf['instance_name'] + '-Profile'
     edge_conf['policy_name'] = edge_conf['instance_name'] + '-Policy'
@@ -361,6 +361,12 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        remove_role('edge', os.environ['edge_user_name'])
+        remove_role('notebook', os.environ['edge_user_name'])
+        remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
+        remove_sgroups(edge_conf['instance_name'])
+        remove_s3('edge', os.environ['edge_user_name'])
         sys.exit(1)
 
 
@@ -376,16 +382,12 @@ def run():
                    "notebook_profile": edge_conf['notebook_role_profile_name'],
                    "edge_sg": edge_conf['edge_security_group_name'],
                    "notebook_subnet": edge_conf['private_subnet_cidr'],
-                   "full_edge_conf": edge_conf}
+                   "full_edge_conf": edge_conf,
+                   "Action": "Create new EDGE server"}
             print json.dumps(res)
             result.write(json.dumps(res))
     except:
-        remove_role('edge', os.environ['edge_user_name'])
-        remove_role('notebook', os.environ['edge_user_name'])
-        remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
-        remove_sgroups(edge_conf['notebook_instance_name'])
-        remove_sgroups(edge_conf['instance_name'])
-        remove_s3('edge', os.environ['edge_user_name'])
-        sys.exit(1)
+        print "Failed writing results."
+        sys.exit(0)
 
     sys.exit(0)

@@ -178,7 +178,8 @@
     <concurrentBuild>false</concurrentBuild>
     <builders>
         <hudson.tasks.Shell>
-            <command>sudo docker run -i -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e &quot;edge_user_name=$User_name&quot; -e &quot;service_role=$Service_role&quot; -e &quot;ec2_role=$EMR_EC2_role&quot; -e &quot;emr_version=$Release_label&quot; -e &quot;emr_master_instance_type=$Master_node_size&quot; -e &quot;emr_slave_instance_type=$Slave_node_size&quot;  -e &quot;emr_instance_count=$Nodes_Count&quot; -e &quot;emr_timeout=$Timeout&quot; -e &quot;creds_region=$Region&quot; -e &quot;conf_service_base_name=$Service_base_name&quot; -e &quot;notebook_name=$Notebook_name&quot; -e &quot;creds_key_name=$SSH_Key_Name&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-emr --action create</command>
+            <command>rand=`openssl rand -hex 10`;
+                sudo docker run -i -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e "request_id=$rand" -e &quot;edge_user_name=$User_name&quot; -e &quot;service_role=$Service_role&quot; -e &quot;ec2_role=$EMR_EC2_role&quot; -e &quot;emr_version=$Release_label&quot; -e &quot;emr_master_instance_type=$Master_node_size&quot; -e &quot;emr_slave_instance_type=$Slave_node_size&quot;  -e &quot;emr_instance_count=$Nodes_Count&quot; -e &quot;emr_timeout=$Timeout&quot; -e &quot;creds_region=$Region&quot; -e &quot;conf_service_base_name=$Service_base_name&quot; -e &quot;notebook_name=$Notebook_name&quot; -e &quot;creds_key_name=$SSH_Key_Name&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-emr --action create</command>
         </hudson.tasks.Shell>
     </builders>
     <publishers/>

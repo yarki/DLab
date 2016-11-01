@@ -13,8 +13,6 @@
 
 FROM ubuntu:16.04
 
-MAINTAINER Victor Andreev (victor_andreev@epam.com)
-
 # Install any .deb dependecies
 RUN	apt-get update && \
     apt-get -y upgrade && \
