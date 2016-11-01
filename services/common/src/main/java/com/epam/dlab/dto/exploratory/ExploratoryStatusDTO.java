@@ -31,4 +31,5 @@ public class ExploratoryStatusDTO extends ResourceStatusDTO<ExploratoryStatusDTO
         setNotebookInstanceName(notebookInstanceName);
         return this;
     }
+
 }

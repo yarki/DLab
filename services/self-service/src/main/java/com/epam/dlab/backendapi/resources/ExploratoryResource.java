@@ -78,24 +78,15 @@ public class ExploratoryResource implements ExploratoryAPI {
     }
 
     @POST
-    @Path("/create/callback")
+    @Path("/status")
     public Response createCallback(ExploratoryStatusDTO result) {
-        LOGGER.debug("created exploratory environment {} for user {}", result.getEnvironmentName(), result.getUser());
-        UserInstanceStatus status = result.isSuccess() ? UserInstanceStatus.CREATED : UserInstanceStatus.FAILED;
+        String status = calcStatus(result).getStatus();
+        LOGGER.debug("{} exploratory environment {} for user {}", status, result.getEnvironmentName(), result.getUser());
         StatusBaseDTO exploratoryStatus = new StatusBaseDTO()
                 .withName(result.getEnvironmentName())
                 .withUser(result.getUser())
-                .withStatus(status.getStatus());
-        userListDAO.updateExploratoryStatus(exploratoryStatus);
-        return Response.ok().build();
-    }
-
-    @POST
-    @Path("/status")
-    // TODO where do we trigger this one? looks similar to /create/callback method
-    public Response status(StatusBaseDTO dto) {
-        LOGGER.debug("update status for exploratory environment {} for user {}", dto.getName(), dto.getUser());
-        infrastructureProvisionDAO.updateExploratoryStatus(dto);
+                .withStatus(status);
+        infrastructureProvisionDAO.updateExploratoryStatus(exploratoryStatus);
         return Response.ok().build();
     }
 
@@ -136,5 +127,17 @@ public class ExploratoryResource implements ExploratoryAPI {
                 .withUser(userInfo.getName())
                 .withName(name)
                 .withStatus(status.getStatus());
+    }
+
+    private UserInstanceStatus calcStatus(ExploratoryStatusDTO result) {
+        if (result.isSuccess()) {
+            switch (result.getAction()) {
+                case "create": return UserInstanceStatus.CREATED;
+                case "start": return UserInstanceStatus.RUNNING;
+                case "stop": return UserInstanceStatus.STOPPED;
+                case "terminate": return UserInstanceStatus.TERMINATED;
+            }
+        }
+        return UserInstanceStatus.FAILED;
     }
 }

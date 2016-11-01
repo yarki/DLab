@@ -12,12 +12,13 @@
 
 package com.epam.dlab.dto;
 
-import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ResourceStatusDTO<T extends ResourceStatusDTO<?>> extends ProvisioningStatusDTO<T>{
     @JsonProperty("environment_name")
     private String environmentName;
+    @JsonProperty
+    private String action;
 
     public String getEnvironmentName() {
         return environmentName;
@@ -29,6 +30,19 @@ public class ResourceStatusDTO<T extends ResourceStatusDTO<?>> extends Provision
 
     public T withEnvironmentName(String environmentName) {
         setEnvironmentName(environmentName);
+        return (T)this;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public T withAction(String action) {
+        setAction(action);
         return (T)this;
     }
 }

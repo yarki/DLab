@@ -15,9 +15,6 @@ package com.epam.dlab.dto.computational;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Created by Alexey Suprun
- */
 public class ComputationalStatusDTO extends StatusBaseDTO<ComputationalStatusDTO> {
     @JsonProperty("resource_name")
     private String resourceName;

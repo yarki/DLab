@@ -26,8 +26,6 @@ import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
-import com.epam.dlab.dto.keyload.UploadFileResultDTO;
-import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
@@ -41,7 +39,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
 import static com.epam.dlab.registry.ApiCallbacks.CALLBACK_URI;
-import static com.epam.dlab.registry.ApiCallbacks.CREATE_EXPLORATORY;
+import static com.epam.dlab.registry.ApiCallbacks.EXPLORATORY;
 
 @Path("/exploratory")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -94,7 +92,7 @@ public class ExploratoryResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getKeyLoaderPollTimeout(),
-                getFileHandlerCallback(dto.getNotebookUserName(), uuid));
+                getFileHandlerCallback(dto.getNotebookUserName(), uuid, action));
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
@@ -111,8 +109,7 @@ public class ExploratoryResource implements DockerCommands {
         return uuid;
     }
 
-    // TODO this handler is shared between all the commands, status should be meaningful, or we have to add action to know whose status was it
-    private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid) {
+    private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid, DockerAction action) {
         return new FileHandlerCallback() {
             @Override
             public boolean checkUUID(String uuid) {
@@ -123,22 +120,22 @@ public class ExploratoryResource implements DockerCommands {
             public boolean handle(String fileName, byte[] content) throws Exception {
                 LOGGER.debug("get file {} actually waited for {}", fileName, originalUuid);
                 JsonNode document = MAPPER.readTree(content);
-                ExploratoryStatusDTO result = new ExploratoryStatusDTO().withUser(user);
+                ExploratoryStatusDTO result = new ExploratoryStatusDTO().withUser(user).withAction(action.toString());
                 if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
-                    // TODO improve this traversing, maybe having a DTO for response json format
+                    // TODO improve this traversing, maybe having a DTO for response json format + proper path to env_name
+                    String envName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("environment_name").textValue();
                     String instanceName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("notebook_instance_name").textValue();
                     result = result.withSuccess()
-                            // TODO set proper value
-                            .withEnvironmentName(instanceName)
+                            .withEnvironmentName(envName)
                             .withNotebookInstanceName(instanceName);
                 }
-                selfService.post(CREATE_EXPLORATORY+CALLBACK_URI, result, ExploratoryStatusDTO.class);
+                selfService.post(EXPLORATORY+CALLBACK_URI, result, ExploratoryStatusDTO.class);
                 return result.isSuccess();
             }
 
             @Override
             public void handleError() {
-                selfService.post(CREATE_EXPLORATORY+CALLBACK_URI, new ExploratoryStatusDTO().withUser(user), ExploratoryStatusDTO.class);
+                selfService.post(EXPLORATORY+CALLBACK_URI, new ExploratoryStatusDTO().withUser(user), ExploratoryStatusDTO.class);
             }
         };
     }
