@@ -19,19 +19,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Created by Alexey Suprun
  */
 public class ComputationalStatusDTO extends StatusBaseDTO<ComputationalStatusDTO> {
-    @JsonProperty("computational_name")
-    private String computationalName;
+    @JsonProperty("resource_name")
+    private String resourceName;
 
-    public String getComputationalName() {
-        return computationalName;
+    public String getResourceName() {
+        return resourceName;
     }
 
-    public void setComputationalName(String computationalName) {
-        this.computationalName = computationalName;
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
-    public ComputationalStatusDTO withComputationalName(String computationalName) {
-        setComputationalName(computationalName);
+    public ComputationalStatusDTO withResourceName(String resourceName) {
+        setResourceName(resourceName);
         return this;
     }
 }

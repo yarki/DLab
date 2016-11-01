@@ -24,8 +24,8 @@ public class UserInstanceDTO {
     private String id;
     @JsonProperty
     private String user;
-    @JsonProperty("exploratory_name")
-    private String exploratoryName;
+    @JsonProperty("environment_name")
+    private String environmentName;
     @JsonProperty
     private String status;
     @JsonProperty
@@ -54,16 +54,16 @@ public class UserInstanceDTO {
         return this;
     }
 
-    public String getExploratoryName() {
-        return exploratoryName;
+    public String getEnvironmentName() {
+        return environmentName;
     }
 
-    public void setExploratoryName(String exploratoryName) {
-        this.exploratoryName = exploratoryName;
+    public void setEnvironmentName(String environmentName) {
+        this.environmentName = environmentName;
     }
 
-    public UserInstanceDTO withExploratoryName(String exploratoryName) {
-        setExploratoryName(exploratoryName);
+    public UserInstanceDTO withEnvironmentName(String environmentName) {
+        setEnvironmentName(environmentName);
         return this;
     }
 
