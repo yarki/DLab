@@ -245,8 +245,8 @@ def terminate():
     try:
         logging.info('[TERMINATE NOTEBOOK]')
         print '[TERMINATE NOTEBOOK]'
-        params = "--bucket_name %s --tag_name %s --nb_tag_value %s --request_id %s" % \
-                 (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], os.environ['request_id'])
+        params = "--bucket_name %s --tag_name %s --nb_tag_value %s" % \
+                 (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'])
         if not run_routine('terminate_notebook', params):
             logging.info('Failed to terminate notebook')
             with open("/root/result.json", 'w') as result:
