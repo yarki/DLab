@@ -68,8 +68,7 @@ export class HomeComponent implements OnInit {
   // Handlers
   //
 
-  createNotebook_btnClick()
-  {
+  createNotebook_btnClick() {
     this.processAccessKeyStatus(this.userUploadAccessKeyState, true);
   }
 
@@ -135,14 +134,10 @@ export class HomeComponent implements OnInit {
         this.keyUploadModal.close();
     }
 
-    if(preloaderDialogToggle) {
-      if (!this.preloaderModal.isOpened)
+    if(preloaderDialogToggle)
         this.preloaderModal.open({ isHeader: false, isFooter: false });
-    }
-    else {
-      if (this.preloaderModal.isOpened)
+    else
         this.preloaderModal.close();
-    }
 
     if(createAnalyticalToolDialogToggle)
     {
@@ -224,15 +219,13 @@ export class HomeComponent implements OnInit {
   }
 
   createUsernotebook(event, tmplIndex, name, shape){
+    this.notebookExist = false;
     event.preventDefault();
 
-    this.grid.list.forEach(function(notebook){
-      if(name.value.toLowerCase() === notebook.environment_name.toLowerCase()) {
-        this.notebookExist = true;
-        return false;
-      }
-    }, this);
-
+    if(this.grid.containsNotebook(name.value)) {
+      this.notebookExist = true;
+      return false;
+    }
 
     this.userResourceService
       .createExploratoryEnvironment({

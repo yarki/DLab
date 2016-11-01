@@ -25,13 +25,18 @@
 
    @ViewChild('bindDialog') bindDialog;
 
-   open(params) {
-     this.bindDialog.open(params);
-   }
-
    ngOnInit() {
      if(this.theBoundCallback)
       this.theBoundCallback();
    }
 
+   open(params) {
+     if(!this.bindDialog.isOpened)
+        this.bindDialog.open(params);
+   }
+
+   close() {
+      if(this.bindDialog.isOpened)
+        this.bindDialog.close();
+   }
  }

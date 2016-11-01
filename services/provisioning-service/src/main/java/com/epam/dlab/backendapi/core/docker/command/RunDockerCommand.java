@@ -53,6 +53,11 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withDetached() {
+        options.add("-d");
+        return this;
+    }
+
     public RunDockerCommand withPseudoTTY() {
         options.add("-t");
         return this;
@@ -166,6 +171,11 @@ public class RunDockerCommand implements DockerCommand {
 
     public RunDockerCommand withNotebookUserName(String notebookUserName) {
         options.add(String.format("-e \"notebook_user_name=%s\"", notebookUserName));
+        return this;
+    }
+
+    public RunDockerCommand withNotebookInstanceType(String notebookInstanceType) {
+        options.add(String.format("-e \"notebook_instance_type=%s\"", notebookInstanceType));
         return this;
     }
 
