@@ -204,9 +204,13 @@ def run():
         logging.info('[CREATE SECURITY GROUP FOR PRIVATE SUBNET]')
         print '[CREATE SECURITY GROUP FOR PRIVATE SUBNET]'
         edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
+        sg_list = edge_conf['sg_ids'].split(',')
+        rules_list = []
+        for i in sg_list:
+            rules_list.append({"GroupId": i})
         ingress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
-            {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_conf['sg_ids']}], "PrefixListIds": []}
+            {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": rules_list, "PrefixListIds": []}
         ]
         egress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}
