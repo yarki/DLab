@@ -31,6 +31,7 @@ def ensure_matplot():
             sudo('apt-get build-dep -y python-matplotlib')
             sudo('pip install matplotlib')
             sudo('pip3 install matplotlib')
+            sudo('python3.4 -m pip install matplotlib  --upgrade')
             sudo('touch /home/ubuntu/.ensure_dir/matplot_ensured')
         except:
             sys.exit(1)
@@ -65,7 +66,9 @@ def ensure_libraries_py3():
     if not exists('/home/ubuntu/.ensure_dir/ensure_libraries_py3_installed'):
         try:
             sudo('pip3 install boto boto3')
+            sudo('python3.4 -m pip install boto boto3 --upgrade')
             sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
+            sudo('python3.4 -m pip install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --upgrade')
             sudo('touch /home/ubuntu/.ensure_dir/ensure_libraries_py3_installed')
         except:
             sys.exit(1)
