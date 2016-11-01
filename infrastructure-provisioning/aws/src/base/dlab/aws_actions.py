@@ -228,7 +228,7 @@ def remove_s3(bucket_type, scientist=''):
     if bucket_type == 'ssn':
         bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     elif bucket_type == 'edge':
-        bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-edge-bucket').lower().replace('_', '-')
+        bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
     bucket = s3.Bucket("{}".format(bucket_name))
     try:
         list_obj = client.list_objects(Bucket=bucket.name)
