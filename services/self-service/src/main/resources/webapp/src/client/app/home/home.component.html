@@ -55,7 +55,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <label class="control-label">Name</label>
       </div>
       <div class="col-xs-8">
-        <input type="text" class="form-control" placeholder="Enter Name" required #createTmpl_name>
+        <input [class.danger_field]="notebookExist" type="text" class="form-control" placeholder="Enter Name" required #createTmpl_name>
         <span class="danger_color" *ngIf="notebookExist">This name already exist.</span>
       </div>
     </div>
