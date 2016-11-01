@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ComputationalStatusDTO extends StatusBaseDTO<ComputationalStatusDTO> {
     @JsonProperty("computational_name")
     private String computationalName;
+    @JsonProperty("user_computational_name")
+    private String userComputationalName;
 
     public String getComputationalName() {
         return computationalName;
@@ -29,6 +31,19 @@ public class ComputationalStatusDTO extends StatusBaseDTO<ComputationalStatusDTO
 
     public ComputationalStatusDTO withComputationalName(String computationalName) {
         setComputationalName(computationalName);
+        return this;
+    }
+
+    public String getUserComputationalName() {
+        return userComputationalName;
+    }
+
+    public void setUserComputationalName(String userComputationalName) {
+        this.userComputationalName = userComputationalName;
+    }
+
+    public ComputationalStatusDTO withUserComputationalName(String userComputationalName) {
+        setUserComputationalName(userComputationalName);
         return this;
     }
 }

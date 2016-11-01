@@ -62,7 +62,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         if (isAdded) {
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
-                    .withEnvironmentName(formDTO.getName())
+                    .withUserExploratoryName(formDTO.getName())
                     .withNotebookUserName(userInfo.getName())
                     .withNotebookInstanceType(formDTO.getShape())
                     .withRegion(settingsDAO.getAwsRegion())
@@ -80,7 +80,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @POST
     @Path("/status")
     public Response status(ExploratoryStatusDTO dto) {
-        LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getExploratoryName(), dto.getUser(), dto.getStatus());
+        LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getUserExploratoryName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateExploratoryStatusAndName(dto);
         return Response.ok().build();
     }
@@ -109,11 +109,12 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     private String action(UserInfo userInfo, String name, String action, UserInstanceStatus status) {
         infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo, name, status));
-        String notebookName = infrastructureProvisionDAO.fetchNotebookInstanceName(userInfo.getName(), name);
+        String exploratoryName = infrastructureProvisionDAO.fetchExploratoryName(userInfo.getName(), name);
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
+                .withUserExploratoryName(name)
                 .withNotebookUserName(userInfo.getName())
-                .withNotebookInstanceName(notebookName)
+                .withNotebookInstanceName(exploratoryName)
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(action, dto, String.class);
     }

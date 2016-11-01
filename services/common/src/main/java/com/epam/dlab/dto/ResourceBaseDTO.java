@@ -12,7 +12,6 @@
 
 package com.epam.dlab.dto;
 
-import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
@@ -20,8 +19,8 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     private String serviceBaseName;
     @JsonProperty("creds_region")
     private String region;
-    @JsonProperty("environment_name")
-    private String environmentName;
+    @JsonProperty("exploratory_name")
+    private String userExploratoryName;
 
     public String getServiceBaseName() {
         return serviceBaseName;
@@ -51,17 +50,17 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
         return (T) this;
     }
 
-    public String getEnvironmentName() {
-        return environmentName;
+    public String getUserExploratoryName() {
+        return userExploratoryName;
     }
 
-    public void setEnvironmentName(String environmentName) {
-        this.environmentName = environmentName;
+    public void setUserExploratoryName(String userExploratoryName) {
+        this.userExploratoryName = userExploratoryName;
     }
 
     @SuppressWarnings("unchecked")
-    public T withEnvironmentName(String environmentName) {
-        setEnvironmentName(environmentName);
+    public T withUserExploratoryName(String userExploratoryName) {
+        setUserExploratoryName(userExploratoryName);
         return (T) this;
     }
 }

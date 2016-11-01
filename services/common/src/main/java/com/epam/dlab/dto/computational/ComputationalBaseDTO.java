@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 abstract public class ComputationalBaseDTO<T extends ComputationalBaseDTO<?>> extends ResourceBaseDTO<T> {
     @JsonProperty("edge_user_name")
     private String edgeUserName;
+    @JsonProperty("computational_name")
+    private String userComputationalName;
 
     public String getEdgeUserName() {
         return edgeUserName;
@@ -33,4 +35,17 @@ abstract public class ComputationalBaseDTO<T extends ComputationalBaseDTO<?>> ex
         return (T) this;
     }
 
+    public String getUserComputationalName() {
+        return userComputationalName;
+    }
+
+    public void setUserComputationalName(String userComputationalName) {
+        this.userComputationalName = userComputationalName;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withUserComputationalName(String userComputationalName) {
+        setUserComputationalName(userComputationalName);
+        return (T) this;
+    }
 }

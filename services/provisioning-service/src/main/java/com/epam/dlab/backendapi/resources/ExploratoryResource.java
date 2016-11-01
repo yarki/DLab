@@ -117,9 +117,9 @@ public class ExploratoryResource implements DockerCommands {
             @Override
             protected void parseOutResponse(JsonNode document, ExploratoryStatusDTO statusResult) {
                 // TODO improve this traversing, maybe having a DTO for response json format + proper path to env_name
-                String envName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("environment_name").textValue();
-                String instanceName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("notebook_instance_name").textValue();
-                statusResult.withName(envName).withNotebookInstanceName(instanceName);
+                String userExploratoryName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("exploratory_name").textValue();
+                String exploratoryName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("notebook_instance_name").textValue();
+                statusResult.withUserExploratoryName(userExploratoryName).withExploratoryName(exploratoryName);
             }
         };
     }

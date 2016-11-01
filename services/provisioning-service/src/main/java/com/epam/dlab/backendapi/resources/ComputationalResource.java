@@ -126,9 +126,10 @@ public class ComputationalResource implements DockerCommands {
             @Override
             protected void parseOutResponse(JsonNode document, ComputationalStatusDTO statusResult) {
                 // TODO improve this traversing, maybe having a DTO for response json format + proper path to env_name
-                String envName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("environment_name").textValue();
-                String clusterName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("emr_cluster_name").textValue();
-                statusResult.withName(envName).withResourceName(clusterName);
+                String userExploratoryName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("exploratory_name").textValue();
+                String userComputationalName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("computational_name").textValue();
+                String computationalName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("hostname").textValue();
+                statusResult.withUserExploratoryName(userExploratoryName).withUserComputationalName(userComputationalName).withComputationalName(computationalName);
             }
         };
     }

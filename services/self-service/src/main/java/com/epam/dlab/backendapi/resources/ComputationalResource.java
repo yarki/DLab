@@ -62,12 +62,12 @@ public class ComputationalResource implements ComputationalAPI {
         if (isAdded) {
             ComputationalCreateDTO dto = new ComputationalCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
-                    .withEnvironmentName(formDTO.getName())
+                    .withUserExploratoryName(formDTO.getNotebookName())
+                    .withUserComputationalName(formDTO.getName())
                     .withInstanceCount(formDTO.getInstanceCount())
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                     .withVersion(formDTO.getVersion())
-                    .withNotebookName(formDTO.getNotebookName())
                     .withEdgeUserName(userInfo.getName())
                     .withRegion(settingsDAO.getAwsRegion());
             LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
@@ -84,24 +84,26 @@ public class ComputationalResource implements ComputationalAPI {
     @Path("/status")
     public Response status(ComputationalStatusDTO dto) {
         LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
-        infrastructureProvisionDAO.updateComputationalStatus(dto);
+        infrastructureProvisionDAO.updateComputationalStatusAndName(dto);
         return Response.ok().build();
     }
 
     @DELETE
     @Path("/{exploratoryName}/{computationalName}/terminate")
-    public String terminate(@Auth UserInfo userInfo, @PathParam("exploratoryName") String exploratoryName, @PathParam("computationalName") String computationalName) {
-        LOGGER.debug("terminating computational resource {} for user {}", computationalName, userInfo.getName());
+    public String terminate(@Auth UserInfo userInfo, @PathParam("exploratoryName") String userExploratoryName, @PathParam("computationalName") String userComputationalName) {
+        LOGGER.debug("terminating computational resource {} for user {}", userComputationalName, userInfo.getName());
         infrastructureProvisionDAO.updateComputationalStatus(new ComputationalStatusDTO()
                 .withUser(userInfo.getName())
-                .withExploratoryName(exploratoryName)
-                .withComputationalName(computationalName)
+                .withUserExploratoryName(userExploratoryName)
+                .withUserComputationalName(userComputationalName)
                 .withStatus(UserInstanceStatus.TERMINATING.getStatus()));
+        String computationalName = infrastructureProvisionDAO.fetchComputationalName(userInfo.getName(), userExploratoryName, userComputationalName);
         ComputationalTerminateDTO dto = new ComputationalTerminateDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
-                .withEnvironmentName(exploratoryName)
-                .withEdgeUserName(userInfo.getName())
+                .withUserExploratoryName(userExploratoryName)
+                .withUserComputationalName(userComputationalName)
                 .withClusterName(computationalName)
+                .withEdgeUserName(userInfo.getName())
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }
