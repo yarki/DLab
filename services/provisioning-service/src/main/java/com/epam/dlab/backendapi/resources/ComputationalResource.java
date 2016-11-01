@@ -17,8 +17,8 @@ import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.dto.emr.EMRCreateDTO;
-import com.epam.dlab.dto.emr.EMRTerminateDTO;
+import com.epam.dlab.dto.computational.ComputationalCreateDTO;
+import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
@@ -29,14 +29,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 
-@Path("/emr")
+@Path("/computational")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class EmrResource implements DockerCommands {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmrResource.class);
+public class ComputationalResource implements DockerCommands {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ComputationalResource.class);
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
@@ -48,7 +47,7 @@ public class EmrResource implements DockerCommands {
 
     @Path("/create")
     @POST
-    public String create(EMRCreateDTO dto) throws IOException, InterruptedException {
+    public String create(ComputationalCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create computational resources cluster");
         String uuid = DockerCommands.generateUUID();
         try {
@@ -74,7 +73,7 @@ public class EmrResource implements DockerCommands {
 
     @Path("/terminate")
     @POST
-    public String terminate(EMRTerminateDTO dto) throws IOException, InterruptedException {
+    public String terminate(ComputationalTerminateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("terminate computational resources cluster");
         String uuid = DockerCommands.generateUUID();
         try {

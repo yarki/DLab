@@ -10,21 +10,25 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.api.form;
+package com.epam.dlab.dto.computational;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class EMRTerminateFormDTO {
-    @JsonProperty("notebook_name")
-    private String notebookName;
+public class ComputationalTerminateDTO extends ComputationalBaseDTO<ComputationalTerminateDTO> {
     @JsonProperty("emr_cluster_name")
     private String clusterName;
-
-    public String getNotebookName() {
-        return notebookName;
-    }
 
     public String getClusterName() {
         return clusterName;
     }
+
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    public ComputationalTerminateDTO withClusterName(String clusterName) {
+        setClusterName(clusterName);
+        return this;
+    }
+
 }

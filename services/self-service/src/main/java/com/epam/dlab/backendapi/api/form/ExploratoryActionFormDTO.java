@@ -19,13 +19,7 @@ public class ExploratoryActionFormDTO extends ExploratoryBaseDTO<ExploratoryActi
     @JsonProperty("notebook_instance_name")
     private String notebookInstanceName;
 
-    @JsonProperty("action")
-    private String action;
-
     public String getNotebookInstanceName() {
         return notebookInstanceName;
-    }
-    public String getNotebookAction() {
-        return action;
     }
 }

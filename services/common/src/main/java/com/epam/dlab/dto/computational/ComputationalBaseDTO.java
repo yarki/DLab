@@ -10,25 +10,26 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.emr;
+package com.epam.dlab.dto.computational;
 
+import com.epam.dlab.dto.ResourceBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class EMRTerminateDTO extends EMRBaseDTO<EMRTerminateDTO> {
-    @JsonProperty("emr_cluster_name")
-    private String clusterName;
+abstract public class ComputationalBaseDTO<T extends ComputationalBaseDTO<?>> extends ResourceBaseDTO<T> {
+    @JsonProperty("edge_user_name")
+    private String edgeUserName;
 
-    public String getClusterName() {
-        return clusterName;
+    public String getEdgeUserName() {
+        return edgeUserName;
     }
 
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
+    public void setEdgeUserName(String edgeUserName) {
+        this.edgeUserName = edgeUserName;
     }
 
-    public EMRTerminateDTO withClusterName(String clusterName) {
-        setClusterName(clusterName);
-        return this;
+    @SuppressWarnings("unchecked")
+    public T withEdgeUserName(String edgeUserName) {
+        setEdgeUserName(edgeUserName);
+        return (T) this;
     }
-
 }

@@ -10,11 +10,11 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.emr;
+package com.epam.dlab.dto.computational;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
+public class ComputationalCreateDTO extends ComputationalBaseDTO<ComputationalCreateDTO> {
     @JsonProperty("emr_instance_count")
     private String instanceCount;
     @JsonProperty("emr_master_instance_type")
@@ -34,7 +34,7 @@ public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
         this.instanceCount = instanceCount;
     }
 
-    public EMRCreateDTO withInstanceCount(String instanceCount) {
+    public ComputationalCreateDTO withInstanceCount(String instanceCount) {
         setInstanceCount(instanceCount);
         return this;
     }
@@ -47,7 +47,7 @@ public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
         this.masterInstanceType = masterInstanceType;
     }
 
-    public EMRCreateDTO withMasterInstanceType(String masterInstanceType) {
+    public ComputationalCreateDTO withMasterInstanceType(String masterInstanceType) {
         setMasterInstanceType(masterInstanceType);
         return this;
     }
@@ -60,7 +60,7 @@ public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
         this.slaveInstanceType = slaveInstanceType;
     }
 
-    public EMRCreateDTO withSlaveInstanceType(String slaveInstanceType) {
+    public ComputationalCreateDTO withSlaveInstanceType(String slaveInstanceType) {
         setSlaveInstanceType(slaveInstanceType);
         return this;
     }
@@ -73,7 +73,7 @@ public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
         this.version = version;
     }
 
-    public EMRCreateDTO withVersion(String version) {
+    public ComputationalCreateDTO withVersion(String version) {
         setVersion(version);
         return this;
     }
@@ -86,7 +86,7 @@ public class EMRCreateDTO extends EMRBaseDTO<EMRCreateDTO> {
         this.notebookName = notebookName;
     }
 
-    public EMRCreateDTO withNotebookName(String notebookName) {
+    public ComputationalCreateDTO withNotebookName(String notebookName) {
         setNotebookName(notebookName);
         return this;
     }

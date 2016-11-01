@@ -61,8 +61,8 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response post(@Auth UserInfo userInfo,
-                       @FormDataParam("file") InputStream uploadedInputStream,
-                       @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
+                         @FormDataParam("file") InputStream uploadedInputStream,
+                         @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
         LOGGER.debug("upload key for user {}", userInfo.getName());
         String content = "";
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {

@@ -10,28 +10,10 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.emr;
+package com.epam.dlab.backendapi.client.rest;
 
-import com.epam.dlab.dto.StatusBaseDTO;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-/**
- * Created by Alexey Suprun
- */
-public class EMRStatusDTO extends StatusBaseDTO<EMRStatusDTO> {
-    @JsonProperty("resource_name")
-    private String resourceName;
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
-    }
-
-    public EMRStatusDTO withResourceName(String resourceName) {
-        setResourceName(resourceName);
-        return this;
-    }
+public interface ComputationalAPI {
+    String EMR = "computational";
+    String EMR_CREATE = EMR + "/create";
+    String EMR_TERMINATE = EMR + "/terminate";
 }

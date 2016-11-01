@@ -20,7 +20,7 @@ import com.google.inject.name.Named;
 import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
 import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
 
-public class HealthModule extends AbstractModule{
+public class HealthModule extends AbstractModule {
 
     @Override
     protected void configure() {
