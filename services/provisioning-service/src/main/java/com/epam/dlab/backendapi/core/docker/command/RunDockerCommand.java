@@ -174,6 +174,11 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withNotebookInstanceType(String notebookInstanceType) {
+        options.add(String.format("-e \"notebook_instance_type=%s\"", notebookInstanceType));
+        return this;
+    }
+
     public RunDockerCommand withNotebookSubnetCidr(String notebookSubnetCidr) {
         options.add(String.format("-e \"notebook_subnet_cidr=%s\"", notebookSubnetCidr));
         return this;
