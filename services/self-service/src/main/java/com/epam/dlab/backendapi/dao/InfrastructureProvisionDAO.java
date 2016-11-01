@@ -15,7 +15,7 @@ package com.epam.dlab.backendapi.dao;
 import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.dto.StatusBaseDTO;
-import com.epam.dlab.dto.emr.EMRStatusDTO;
+import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
 import org.bson.Document;
@@ -27,7 +27,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
 
-public class UserListDAO extends BaseDAO {
+public class InfrastructureProvisionDAO extends BaseDAO {
     public static final String ENVIRONMENT_NAME = "environment_name";
     public static final String COMPUTATIONAL_RESOURCES = "computational_resources";
     public static final String RESOURCE_NAME = "resource_name";
@@ -78,7 +78,7 @@ public class UserListDAO extends BaseDAO {
         }
     }
 
-    public void updateComputationalStatus(EMRStatusDTO dto) {
+    public void updateComputationalStatus(ComputationalStatusDTO dto) {
         updateComputationalStatus(dto.getUser(), dto.getName(), dto.getResourceName(), dto.getStatus());
     }
 

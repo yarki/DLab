@@ -10,45 +10,28 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.api.form;
+package com.epam.dlab.dto.computational;
 
+import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class EMRCreateFormDTO {
-    @JsonProperty
-    private String name;
-    @JsonProperty("emr_instance_count")
-    private String instanceCount;
-    @JsonProperty("emr_master_instance_type")
-    private String masterInstanceType;
-    @JsonProperty("emr_slave_instance_type")
-    private String slaveInstanceType;
-    @JsonProperty("emr_version")
-    private String version;
-    @JsonProperty("notebook_name")
-    private String notebookName;
+/**
+ * Created by Alexey Suprun
+ */
+public class ComputationalStatusDTO extends StatusBaseDTO<ComputationalStatusDTO> {
+    @JsonProperty("resource_name")
+    private String resourceName;
 
-    public String getName() {
-        return name;
+    public String getResourceName() {
+        return resourceName;
     }
 
-    public String getInstanceCount() {
-        return instanceCount;
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
-    public String getMasterInstanceType() {
-        return masterInstanceType;
-    }
-
-    public String getSlaveInstanceType() {
-        return slaveInstanceType;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public String getNotebookName() {
-        return notebookName;
+    public ComputationalStatusDTO withResourceName(String resourceName) {
+        setResourceName(resourceName);
+        return this;
     }
 }

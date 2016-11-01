@@ -10,26 +10,45 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.emr;
+package com.epam.dlab.backendapi.api.form;
 
-import com.epam.dlab.dto.ResourceBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-abstract public class EMRBaseDTO<T extends EMRBaseDTO<?>> extends ResourceBaseDTO<T> {
-    @JsonProperty("edge_user_name")
-    private String edgeUserName;
+public class ComputationalCreateFormDTO {
+    @JsonProperty
+    private String name;
+    @JsonProperty("emr_instance_count")
+    private String instanceCount;
+    @JsonProperty("emr_master_instance_type")
+    private String masterInstanceType;
+    @JsonProperty("emr_slave_instance_type")
+    private String slaveInstanceType;
+    @JsonProperty("emr_version")
+    private String version;
+    @JsonProperty("notebook_name")
+    private String notebookName;
 
-    public String getEdgeUserName() {
-        return edgeUserName;
+    public String getName() {
+        return name;
     }
 
-    public void setEdgeUserName(String edgeUserName) {
-        this.edgeUserName = edgeUserName;
+    public String getInstanceCount() {
+        return instanceCount;
     }
 
-    @SuppressWarnings("unchecked")
-    public T withEdgeUserName(String edgeUserName) {
-        setEdgeUserName(edgeUserName);
-        return (T) this;
+    public String getMasterInstanceType() {
+        return masterInstanceType;
+    }
+
+    public String getSlaveInstanceType() {
+        return slaveInstanceType;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getNotebookName() {
+        return notebookName;
     }
 }

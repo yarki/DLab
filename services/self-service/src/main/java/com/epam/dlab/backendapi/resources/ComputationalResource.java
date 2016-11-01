@@ -13,17 +13,17 @@
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.api.form.EMRCreateFormDTO;
-import com.epam.dlab.backendapi.api.form.EMRTerminateFormDTO;
+import com.epam.dlab.backendapi.api.form.ComputationalCreateFormDTO;
+import com.epam.dlab.backendapi.api.form.ComputationalTerminateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
-import com.epam.dlab.backendapi.client.rest.EmrAPI;
+import com.epam.dlab.backendapi.client.rest.ComputationalAPI;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
-import com.epam.dlab.backendapi.dao.UserListDAO;
+import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.dto.emr.EMRCreateDTO;
-import com.epam.dlab.dto.emr.EMRStatusDTO;
-import com.epam.dlab.dto.emr.EMRTerminateDTO;
+import com.epam.dlab.dto.computational.ComputationalCreateDTO;
+import com.epam.dlab.dto.computational.ComputationalStatusDTO;
+import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -39,21 +39,21 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
 @Path("/infrastructure_provision/computational_resources")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class EmrResource implements EmrAPI {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmrResource.class);
+public class ComputationalResource implements ComputationalAPI {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ComputationalResource.class);
 
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
-    private UserListDAO userListDAO;
+    private InfrastructureProvisionDAO infrastructureProvisionDAO;
     @Inject
     @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
 
     @PUT
-    public Response create(@Auth UserInfo userInfo, EMRCreateFormDTO formDTO) {
+    public Response create(@Auth UserInfo userInfo, ComputationalCreateFormDTO formDTO) {
         LOGGER.debug("creating computational resource {} for user {}", formDTO.getName(), userInfo.getName());
-        boolean isAdded = userListDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
+        boolean isAdded = infrastructureProvisionDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
                         .withResourceName(formDTO.getName())
                         .withStatus(UserInstanceStatus.CREATING.getStatus())
@@ -61,7 +61,7 @@ public class EmrResource implements EmrAPI {
                         .withSlaveShape(formDTO.getSlaveInstanceType())
                         .withSlaveNumber(formDTO.getInstanceCount()));
         if (isAdded) {
-            EMRCreateDTO dto = new EMRCreateDTO()
+            ComputationalCreateDTO dto = new ComputationalCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withInstanceCount(formDTO.getInstanceCount())
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
@@ -82,21 +82,21 @@ public class EmrResource implements EmrAPI {
 
     @POST
     @Path("/status")
-    public Response create(EMRStatusDTO dto) {
+    public Response create(ComputationalStatusDTO dto) {
         LOGGER.debug("updating status for computational resource {} for user {}", dto.getResourceName(), dto.getUser());
-        userListDAO.updateComputationalStatus(dto);
+        infrastructureProvisionDAO.updateComputationalStatus(dto);
         return Response.ok().build();
     }
 
     @DELETE
-    public String terminate(@Auth UserInfo userInfo, EMRTerminateFormDTO formDTO) {
+    public String terminate(@Auth UserInfo userInfo, ComputationalTerminateFormDTO formDTO) {
         LOGGER.debug("terminating computational resource {} for user {}", formDTO.getClusterName(), userInfo.getName());
-        userListDAO.updateComputationalStatus(new EMRStatusDTO()
+        infrastructureProvisionDAO.updateComputationalStatus(new ComputationalStatusDTO()
                 .withUser(userInfo.getName())
                 .withName(formDTO.getNotebookName())
                 .withResourceName(formDTO.getClusterName())
                 .withStatus(UserInstanceStatus.TERMINATING.getStatus()));
-        EMRTerminateDTO dto = new EMRTerminateDTO()
+        ComputationalTerminateDTO dto = new ComputationalTerminateDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withEdgeUserName(userInfo.getName())
                 .withClusterName(formDTO.getClusterName())

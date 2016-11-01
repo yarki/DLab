@@ -10,10 +10,21 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.client.rest;
+package com.epam.dlab.backendapi.api.form;
 
-public interface EmrAPI {
-    String EMR = "emr";
-    String EMR_CREATE = EMR + "/create";
-    String EMR_TERMINATE = EMR + "/terminate";
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ComputationalTerminateFormDTO {
+    @JsonProperty("notebook_name")
+    private String notebookName;
+    @JsonProperty("emr_cluster_name")
+    private String clusterName;
+
+    public String getNotebookName() {
+        return notebookName;
+    }
+
+    public String getClusterName() {
+        return clusterName;
+    }
 }

@@ -16,7 +16,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.IndexOptions;
 import io.dropwizard.lifecycle.Managed;
 
-import static com.epam.dlab.backendapi.dao.UserListDAO.ENVIRONMENT_NAME;
+import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.ENVIRONMENT_NAME;
 
 public class IndexCreator extends BaseDAO implements Managed {
     @Override
