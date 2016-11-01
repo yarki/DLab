@@ -42,8 +42,10 @@
    }
 
    stop() {
+     let url = "/" + this.notebook.name + "/stop";
+
      this.userResourceService
-        .suspendExploratoryEnvironment({ notebook_instance_name: this.notebook.name, action: "stop" })
+        .suspendExploratoryEnvironment(url)
         .subscribe((result) => {
           console.log('stopUsernotebook result: ', result);
           this.buildGrid.emit();
@@ -51,8 +53,10 @@
    }
 
    terminate(){
+     let url = "/" + this.notebook.name + "/terminate";
+
      this.userResourceService
-        .suspendExploratoryEnvironment({ notebook_instance_name: this.notebook.name, action: "terminate" })
+        .suspendExploratoryEnvironment(url)
         .subscribe((result) => {
           console.log('terminateUsernotebook result: ', result);
           this.buildGrid.emit();
