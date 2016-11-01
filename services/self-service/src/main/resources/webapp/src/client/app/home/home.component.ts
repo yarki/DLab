@@ -135,14 +135,10 @@ export class HomeComponent implements OnInit {
         this.keyUploadModal.close();
     }
 
-    if(preloaderDialogToggle) {
-      if (!this.preloaderModal.isOpened)
+    if(preloaderDialogToggle)
         this.preloaderModal.open({ isHeader: false, isFooter: false });
-    }
-    else {
-      if (this.preloaderModal.isOpened)
+    else
         this.preloaderModal.close();
-    }
 
     if(createAnalyticalToolDialogToggle)
     {
