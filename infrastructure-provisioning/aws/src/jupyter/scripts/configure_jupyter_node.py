@@ -117,6 +117,11 @@ def configure_notebook_server(notebook_name):
         sudo("sleep 5; for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
         sudo("sleep 5; screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py; "
              "sleep 5;")
+        # for further start up when system boots
+        sudo("sed -i '/exit 0/d' /etc/rc.local")
+        sudo("bash -c 'echo sudo screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py\ >> /etc/rc.local'")
+        sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
+
     except:
         sys.exit(1)
 
