@@ -30,6 +30,7 @@ export class Grid implements OnInit {
 
   @ViewChild('createEmrModal') createEmrModal;
   @ViewChild('confirmationDialog') confirmationDialog;
+  @ViewChild('detailDialog') detailDialog;
   @Input() emrTempls;
   @Input() shapes;
 
@@ -62,7 +63,7 @@ export class Grid implements OnInit {
    }
 
   printDetailEnvironmentModal(data) {
-    console.log(data);
+    this.detailDialog.open({ isFooter: false }, data);
   }
 
   mathAction(data, action) {

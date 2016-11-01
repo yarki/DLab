@@ -12,18 +12,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import {NgModule, Component} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {Grid} from "./grid.component";
-import { ResourcesModule } from './../list-of-resources/index';
-import { ModalModule } from './../modal/index';
-import { ConfirmationDialogModule } from './../confirmation-dialog/index';
-import { DetailDialogModule } from './../detail-dialog/index';
+import {ModalModule} from './../modal/index';
+import {DetailDialog} from "./detail-dialog.component";
 
-export * from "./grid.component";
+export * from "./detail-dialog.component";
 
 @NgModule({
-  imports: [CommonModule, ResourcesModule, ModalModule, ConfirmationDialogModule, DetailDialogModule],
-  declarations: [Grid],
-  exports: [Grid]
+  imports: [CommonModule, ModalModule],
+  declarations: [DetailDialog],
+  exports: [DetailDialog],
 })
 
-export class GridModule { }
+export class DetailDialogModule { }
