@@ -32,4 +32,5 @@ abstract public class ComputationalBaseDTO<T extends ComputationalBaseDTO<?>> ex
         setEdgeUserName(edgeUserName);
         return (T) this;
     }
+
 }

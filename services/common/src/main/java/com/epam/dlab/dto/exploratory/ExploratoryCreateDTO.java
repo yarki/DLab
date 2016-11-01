@@ -19,9 +19,6 @@ public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDT
     private String notebookInstanceType;
     @JsonProperty("creds_security_groups_ids")
     private String securityGroupIds;
-    @JsonProperty("environment_name")
-    private String environmentName;
-
 
     public String getNotebookInstanceType() {
         return notebookInstanceType;
@@ -49,16 +46,4 @@ public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDT
         return this;
     }
 
-    public String getEnvironmentName() {
-        return environmentName;
-    }
-
-    public void setEnvironmentName(String environmentName) {
-        this.environmentName = environmentName;
-    }
-
-    public ExploratoryCreateDTO withEnvironmentName(String environmentName) {
-        setEnvironmentName(environmentName);
-        return this;
-    }
 }

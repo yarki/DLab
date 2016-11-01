@@ -22,6 +22,7 @@ import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
+import com.epam.dlab.dto.computational.ComputationalStatusDTO2;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -62,6 +63,7 @@ public class ComputationalResource implements ComputationalAPI {
         if (isAdded) {
             ComputationalCreateDTO dto = new ComputationalCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withEnvironmentName(formDTO.getName())
                     .withInstanceCount(formDTO.getInstanceCount())
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
@@ -81,7 +83,7 @@ public class ComputationalResource implements ComputationalAPI {
 
     @POST
     @Path("/status")
-    public Response create(ComputationalStatusDTO dto) {
+    public Response status(ComputationalStatusDTO dto) {
         LOGGER.debug("updating status for computational resource {} for user {}", dto.getResourceName(), dto.getUser());
         infrastructureProvisionDAO.updateComputationalStatus(dto);
         return Response.ok().build();
@@ -98,6 +100,7 @@ public class ComputationalResource implements ComputationalAPI {
                 .withStatus(UserInstanceStatus.TERMINATING.getStatus()));
         ComputationalTerminateDTO dto = new ComputationalTerminateDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
+                .withEnvironmentName(exploratoryName)
                 .withEdgeUserName(userInfo.getName())
                 .withClusterName(computationalName)
                 .withRegion(settingsDAO.getAwsRegion());

@@ -28,6 +28,7 @@ public class ProvisioningStatusDTO<T extends ProvisioningStatusDTO<?>> {
         this.user = user;
     }
 
+    @SuppressWarnings("unchecked")
     public T withUser(String user) {
         setUser(user);
         return (T)this;
@@ -41,6 +42,7 @@ public class ProvisioningStatusDTO<T extends ProvisioningStatusDTO<?>> {
         this.success = success;
     }
 
+    @SuppressWarnings("unchecked")
     public T withSuccess() {
         setSuccess(true);
         return (T)this;

@@ -135,7 +135,7 @@ public class ExploratoryResource implements DockerCommands {
 
             @Override
             public void handleError() {
-                selfService.post(EXPLORATORY+CALLBACK_URI, new ExploratoryStatusDTO().withUser(user), ExploratoryStatusDTO.class);
+                selfService.post(EXPLORATORY+CALLBACK_URI, new ExploratoryStatusDTO().withUser(user).withAction(action.toString()), ExploratoryStatusDTO.class);
             }
         };
     }

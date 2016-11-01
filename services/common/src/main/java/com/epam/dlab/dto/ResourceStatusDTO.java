@@ -28,6 +28,7 @@ public class ResourceStatusDTO<T extends ResourceStatusDTO<?>> extends Provision
         this.environmentName = environmentName;
     }
 
+    @SuppressWarnings("unchecked")
     public T withEnvironmentName(String environmentName) {
         setEnvironmentName(environmentName);
         return (T)this;
@@ -41,6 +42,7 @@ public class ResourceStatusDTO<T extends ResourceStatusDTO<?>> extends Provision
         this.action = action;
     }
 
+    @SuppressWarnings("unchecked")
     public T withAction(String action) {
         setAction(action);
         return (T)this;
