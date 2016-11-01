@@ -16,11 +16,11 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.api.form.ExploratoryActionFormDTO;
 import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
-import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
@@ -79,14 +79,9 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @POST
     @Path("/status")
-    public Response createCallback(ExploratoryStatusDTO result) {
-        String status = calcStatus(result).getStatus();
-        LOGGER.debug("{} exploratory environment {} for user {}", status, result.getEnvironmentName(), result.getUser());
-        StatusBaseDTO exploratoryStatus = new StatusBaseDTO()
-                .withName(result.getEnvironmentName())
-                .withUser(result.getUser())
-                .withStatus(status);
-        infrastructureProvisionDAO.updateExploratoryStatus(exploratoryStatus);
+    public Response status(ExploratoryStatusDTO dto) {
+        LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getName(), dto.getUser(), dto.getStatus());
+        infrastructureProvisionDAO.updateExploratoryStatus(dto);
         return Response.ok().build();
     }
 
@@ -129,15 +124,4 @@ public class ExploratoryResource implements ExploratoryAPI {
                 .withStatus(status.getStatus());
     }
 
-    private UserInstanceStatus calcStatus(ExploratoryStatusDTO result) {
-        if (result.isSuccess()) {
-            switch (result.getAction()) {
-                case "create": return UserInstanceStatus.CREATED;
-                case "start": return UserInstanceStatus.RUNNING;
-                case "stop": return UserInstanceStatus.STOPPED;
-                case "terminate": return UserInstanceStatus.TERMINATED;
-            }
-        }
-        return UserInstanceStatus.FAILED;
-    }
 }

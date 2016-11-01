@@ -10,25 +10,25 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.computational;
+package com.epam.dlab.constants;
 
-import com.epam.dlab.dto.ResourceStatusDTO;
-import com.fasterxml.jackson.annotation.JsonProperty;
+public enum UserInstanceStatus {
+    CREATING("creating"),
+    CREATED("created"),
+    RUNNING("running"),
+    STOPPING("stopping"),
+    STOPPED("stopped"),
+    TERMINATING("terminating"),
+    TERMINATED("terminated"),
+    FAILED("failed");
 
-public class ComputationalStatusDTO2 extends ResourceStatusDTO<ComputationalStatusDTO2> {
-    @JsonProperty("emr_cluster_name")
-    private String clusterName;
+    private String status;
 
-    public String getClusterName() {
-        return clusterName;
+    UserInstanceStatus(String status) {
+        this.status = status;
     }
 
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
-    }
-
-    public ComputationalStatusDTO2 withClusterName(String clusterName) {
-        setClusterName(clusterName);
-        return this;
+    public String getStatus() {
+        return status;
     }
 }

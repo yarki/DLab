@@ -20,9 +20,11 @@ import com.epam.dlab.backendapi.core.docker.command.DockerAction;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
+import com.epam.dlab.backendapi.resources.handler.ResourceCallbackHandler;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
-import com.epam.dlab.dto.computational.ComputationalStatusDTO2;
+import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.exceptions.DlabException;
@@ -47,10 +49,6 @@ import static com.epam.dlab.registry.ApiCallbacks.COMPUTATIONAL;
 public class ComputationalResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(ComputationalResource.class);
 
-    private static final String STATUS_FIELD = "status";
-    private static final String RESPONSE_NODE = "response";
-    private static final String RESULT_NODE = "result";
-
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
     @Inject
@@ -68,7 +66,7 @@ public class ComputationalResource implements DockerCommands {
         LOGGER.debug("create computational resources cluster");
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
-                configuration.getKeyLoaderPollTimeout(),
+                configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(dto.getEdgeUserName(), uuid, DockerAction.CREATE));
         try {
             commandExecuter.executeAsync(
@@ -97,7 +95,7 @@ public class ComputationalResource implements DockerCommands {
         LOGGER.debug("terminate computational resources cluster");
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
-                configuration.getKeyLoaderPollTimeout(),
+                configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(dto.getEdgeUserName(), uuid, DockerAction.TERMINATE));
         try {
             commandExecuter.executeAsync(
@@ -119,33 +117,20 @@ public class ComputationalResource implements DockerCommands {
     }
 
     private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid, DockerAction action) {
-        return new FileHandlerCallback() {
+        return new ResourceCallbackHandler<ComputationalStatusDTO>(selfService, user, originalUuid, action) {
             @Override
-            public boolean checkUUID(String uuid) {
-                return originalUuid.equals(uuid);
+            protected String getCallbackURI() {
+                return COMPUTATIONAL+CALLBACK_URI;
             }
 
             @Override
-            public boolean handle(String fileName, byte[] content) throws Exception {
-                LOGGER.debug("get file {} actually waited for {}", fileName, originalUuid);
-                JsonNode document = MAPPER.readTree(content);
-                ComputationalStatusDTO2 result = new ComputationalStatusDTO2().withUser(user).withAction(action.toString());
-                if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
-                    // TODO improve this traversing, maybe having a DTO for response json format + proper path to env_name
-                    String envName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("environment_name").textValue();
-                    String clusterName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("emr_cluster_name").textValue();
-                    result = result.withSuccess()
-                            .withEnvironmentName(envName)
-                            .withClusterName(clusterName);
-                }
-                selfService.post(COMPUTATIONAL+CALLBACK_URI, result, ComputationalStatusDTO2.class);
-                return result.isSuccess();
-            }
-
-            @Override
-            public void handleError() {
-                selfService.post(COMPUTATIONAL+CALLBACK_URI, new ComputationalStatusDTO2().withUser(user).withAction(action.toString()) , ComputationalStatusDTO2.class);
+            protected void parseOutResponse(JsonNode document, ComputationalStatusDTO statusResult) {
+                // TODO improve this traversing, maybe having a DTO for response json format + proper path to env_name
+                String envName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("environment_name").textValue();
+                String clusterName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("emr_cluster_name").textValue();
+                statusResult.withName(envName).withResourceName(clusterName);
             }
         };
     }
+
 }

@@ -12,10 +12,10 @@
 
 package com.epam.dlab.dto.exploratory;
 
-import com.epam.dlab.dto.ResourceStatusDTO;
+import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExploratoryStatusDTO extends ResourceStatusDTO<ExploratoryStatusDTO> {
+public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
     @JsonProperty("notebook_instance_name")
     private String notebookInstanceName;
 

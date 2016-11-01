@@ -20,7 +20,9 @@ import com.epam.dlab.backendapi.core.docker.command.DockerAction;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
+import com.epam.dlab.backendapi.resources.handler.ResourceCallbackHandler;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
@@ -46,10 +48,6 @@ import static com.epam.dlab.registry.ApiCallbacks.EXPLORATORY;
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
-
-    private static final String STATUS_FIELD = "status";
-    private static final String RESPONSE_NODE = "response";
-    private static final String RESULT_NODE = "result";
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
@@ -91,7 +89,7 @@ public class ExploratoryResource implements DockerCommands {
         LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
-                configuration.getKeyLoaderPollTimeout(),
+                configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(dto.getNotebookUserName(), uuid, action));
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
@@ -110,32 +108,18 @@ public class ExploratoryResource implements DockerCommands {
     }
 
     private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid, DockerAction action) {
-        return new FileHandlerCallback() {
+        return new ResourceCallbackHandler<ExploratoryStatusDTO>(selfService, user, originalUuid, action) {
             @Override
-            public boolean checkUUID(String uuid) {
-                return originalUuid.equals(uuid);
+            protected String getCallbackURI() {
+                return EXPLORATORY+CALLBACK_URI;
             }
 
             @Override
-            public boolean handle(String fileName, byte[] content) throws Exception {
-                LOGGER.debug("get file {} actually waited for {}", fileName, originalUuid);
-                JsonNode document = MAPPER.readTree(content);
-                ExploratoryStatusDTO result = new ExploratoryStatusDTO().withUser(user).withAction(action.toString());
-                if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
-                    // TODO improve this traversing, maybe having a DTO for response json format + proper path to env_name
-                    String envName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("environment_name").textValue();
-                    String instanceName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("notebook_instance_name").textValue();
-                    result = result.withSuccess()
-                            .withEnvironmentName(envName)
-                            .withNotebookInstanceName(instanceName);
-                }
-                selfService.post(EXPLORATORY+CALLBACK_URI, result, ExploratoryStatusDTO.class);
-                return result.isSuccess();
-            }
-
-            @Override
-            public void handleError() {
-                selfService.post(EXPLORATORY+CALLBACK_URI, new ExploratoryStatusDTO().withUser(user).withAction(action.toString()), ExploratoryStatusDTO.class);
+            protected void parseOutResponse(JsonNode document, ExploratoryStatusDTO statusResult) {
+                // TODO improve this traversing, maybe having a DTO for response json format + proper path to env_name
+                String envName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("environment_name").textValue();
+                String instanceName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("notebook_instance_name").textValue();
+                statusResult.withName(envName).withNotebookInstanceName(instanceName);
             }
         };
     }

@@ -15,14 +15,13 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.api.form.ComputationalCreateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
-import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.ComputationalAPI;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
-import com.epam.dlab.dto.computational.ComputationalStatusDTO2;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -84,7 +83,7 @@ public class ComputationalResource implements ComputationalAPI {
     @POST
     @Path("/status")
     public Response status(ComputationalStatusDTO dto) {
-        LOGGER.debug("updating status for computational resource {} for user {}", dto.getResourceName(), dto.getUser());
+        LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateComputationalStatus(dto);
         return Response.ok().build();
     }
