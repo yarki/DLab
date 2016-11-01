@@ -233,7 +233,7 @@ def terminate():
     notebook_config = dict()
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
     notebook_config['notebook_name'] = os.environ['notebook_instance_name']
-    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-' + os.environ['notebook_user_name'] + '-bucket').lower().replace('_', '-')
+    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
     try:
@@ -284,7 +284,7 @@ def stop():
     notebook_config = dict()
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
     notebook_config['notebook_name'] = os.environ['notebook_instance_name']
-    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-' + os.environ['notebook_user_name'] + '-bucket').lower().replace('_', '-')
+    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
     try:
