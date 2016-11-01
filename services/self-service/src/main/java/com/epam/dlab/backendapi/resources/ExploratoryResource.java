@@ -81,7 +81,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/status")
     public Response status(ExploratoryStatusDTO dto) {
         LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getName(), dto.getUser(), dto.getStatus());
-        infrastructureProvisionDAO.updateExploratoryStatus(dto);
+        infrastructureProvisionDAO.updateExploratoryStatusAndName(dto);
         return Response.ok().build();
     }
 
@@ -104,21 +104,22 @@ public class ExploratoryResource implements ExploratoryAPI {
         LOGGER.debug("terminating exploratory environment {} for user {}", name, userInfo.getName());
         UserInstanceStatus status = UserInstanceStatus.TERMINATING;
         infrastructureProvisionDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, name, status));
-        return action(userInfo, name, EXPLORATORY_TERMINATE, status);
+        return action(userInfo, name, EXPLORATORY_TERMINATE, UserInstanceStatus.TERMINATING);
     }
 
     private String action(UserInfo userInfo, String name, String action, UserInstanceStatus status) {
         infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo, name, status));
+        String notebookName = infrastructureProvisionDAO.fetchNotebookInstanceName(userInfo.getName(), name);
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withNotebookUserName(userInfo.getName())
-                .withNotebookInstanceName(name)
+                .withNotebookInstanceName(notebookName)
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(action, dto, String.class);
     }
 
     private StatusBaseDTO createStatusDTO(UserInfo userInfo, String name, UserInstanceStatus status) {
-        return new StatusBaseDTO()
+        return new ExploratoryStatusDTO()
                 .withUser(userInfo.getName())
                 .withName(name)
                 .withStatus(status.getStatus());

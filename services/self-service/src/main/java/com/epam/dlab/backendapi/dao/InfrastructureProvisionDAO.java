@@ -16,6 +16,7 @@ import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
 import org.bson.Document;
@@ -23,14 +24,17 @@ import org.bson.Document;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public class InfrastructureProvisionDAO extends BaseDAO {
     public static final String ENVIRONMENT_NAME = "environment_name";
     public static final String COMPUTATIONAL_RESOURCES = "computational_resources";
     public static final String RESOURCE_NAME = "resource_name";
+    private static final String NOTEBOOK_INSTANCE_NAME = "notebook_instance_name";
 
     public Iterable<Document> find(String user) {
         return mongoService.getCollection(USER_INSTANCES).find(eq(USER, user));
@@ -38,6 +42,12 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     public Iterable<Document> findShapes() {
         return mongoService.getCollection(SHAPES).find();
+    }
+
+    public String fetchNotebookInstanceName(String user, String environmentName) {
+        return mongoService.getCollection(USER_INSTANCES)
+                .find(and(eq(USER, user), eq(ENVIRONMENT_NAME, environmentName))).first()
+                .getOrDefault(NOTEBOOK_INSTANCE_NAME, EMPTY).toString();
     }
 
     public boolean insertExploratory(UserInstanceDTO dto) {
@@ -51,6 +61,11 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     public void updateExploratoryStatus(StatusBaseDTO dto) {
         update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(ENVIRONMENT_NAME, dto.getName())), set(STATUS, dto.getStatus()));
+    }
+
+    public void updateExploratoryStatusAndName(ExploratoryStatusDTO dto) {
+        update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(ENVIRONMENT_NAME, dto.getName())),
+                combine(set(STATUS, dto.getStatus()), set(NOTEBOOK_INSTANCE_NAME, dto.getNotebookInstanceName())));
     }
 
     public void updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
