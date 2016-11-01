@@ -167,6 +167,7 @@ def run():
             res = {"hostname": cluster_name,
                    "key_name": emr_conf['key_name'],
                    "user_own_bucket_name": emr_conf['bucket_name'],
+                   "environment_name": os.environ['environment_name'],
                    "Action": "Create new EMR cluster"}
             print json.dumps(res)
             result.write(json.dumps(res))
@@ -217,6 +218,7 @@ def terminate():
             res = {"EMR_name": emr_conf['emr_name'],
                    "NBs_name": emr_conf['notebook_name'],
                    "user_own_bucket_name": emr_conf['bucket_name'],
+                   "environment_name": os.environ['environment_name'],
                    "Action": "Terminate EMR cluster"}
             print json.dumps(res)
             result.write(json.dumps(res))
