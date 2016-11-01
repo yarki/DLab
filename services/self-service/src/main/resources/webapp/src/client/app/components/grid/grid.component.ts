@@ -53,6 +53,16 @@ export class Grid implements OnInit {
     });
   }
 
+  containsNotebook(notebook_name):boolean {
+
+    if(notebook_name)
+      for (var index = 0; index < this.environments.length; index++)
+        if(notebook_name.toLowerCase() ==  this.environments[index].name.toString().toLowerCase())
+          return true;
+
+        return false;
+  }
+
   loadEnvironments(): Array<any> {
      if (this.list) {
        return this.list.map((value) => {
