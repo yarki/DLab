@@ -14,7 +14,7 @@ package com.epam.dlab.registry;
 
 public class ApiCallbacks {
     public static final String API = "/api";
-    public static final String COMPUTATIONAL = API + "/computational";
-    public static final String EXPLORATORY = API + "/exploratory";
-    public static final String CALLBACK_URI = "/status";
+    public static final String COMPUTATIONAL = API + "/infrastructure_provision/computational_resources";
+    public static final String EXPLORATORY = API + "/infrastructure_provision/exploratory_environment";
+    public static final String STATUS_URI = "/status";
 }

@@ -25,6 +25,7 @@ import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
+import com.epam.dlab.registry.ApiCallbacks;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -78,7 +79,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     }
 
     @POST
-    @Path("/status")
+    @Path(ApiCallbacks.STATUS_URI)
     public Response status(ExploratoryStatusDTO dto) {
         LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getUserExploratoryName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateExploratoryStatusAndName(dto);

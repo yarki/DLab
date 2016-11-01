@@ -22,12 +22,10 @@ import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.resources.handler.ResourceCallbackHandler;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
-import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
@@ -40,7 +38,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
-import static com.epam.dlab.registry.ApiCallbacks.CALLBACK_URI;
+import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 import static com.epam.dlab.registry.ApiCallbacks.EXPLORATORY;
 
 @Path("/exploratory")
@@ -48,6 +46,7 @@ import static com.epam.dlab.registry.ApiCallbacks.EXPLORATORY;
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
+    private static final String EXPLORATORY_NAME_FIELD = "notebook_name";
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
@@ -111,14 +110,13 @@ public class ExploratoryResource implements DockerCommands {
         return new ResourceCallbackHandler<ExploratoryStatusDTO>(selfService, user, originalUuid, action) {
             @Override
             protected String getCallbackURI() {
-                return EXPLORATORY+CALLBACK_URI;
+                return EXPLORATORY+ STATUS_URI;
             }
 
             @Override
-            protected void parseOutResponse(JsonNode document, ExploratoryStatusDTO statusResult) {
-                // TODO improve this traversing, maybe having a DTO for response json format + proper path to env_name
-                String userExploratoryName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("exploratory_name").textValue();
-                String exploratoryName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("full_edge_conf").get("notebook_instance_name").textValue();
+            protected void parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO statusResult) {
+                String userExploratoryName = resultNode.get(USER_EXPLORATORY_NAME_FIELD).textValue();
+                String exploratoryName = resultNode.get(EXPLORATORY_NAME_FIELD).textValue();
                 statusResult.withUserExploratoryName(userExploratoryName).withExploratoryName(exploratoryName);
             }
         };

@@ -22,11 +22,9 @@ import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.resources.handler.ResourceCallbackHandler;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
-import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.exceptions.DlabException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
@@ -40,7 +38,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
-import static com.epam.dlab.registry.ApiCallbacks.CALLBACK_URI;
+import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 import static com.epam.dlab.registry.ApiCallbacks.COMPUTATIONAL;
 
 @Path("/computational")
@@ -48,6 +46,8 @@ import static com.epam.dlab.registry.ApiCallbacks.COMPUTATIONAL;
 @Produces(MediaType.APPLICATION_JSON)
 public class ComputationalResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(ComputationalResource.class);
+    private static final String USER_COMPUTATIONAL_NAME_FIELD = "computational_name";
+    private static final String COMPUTATIONAL_NAME_FIELD = "hostname";
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
@@ -120,15 +120,14 @@ public class ComputationalResource implements DockerCommands {
         return new ResourceCallbackHandler<ComputationalStatusDTO>(selfService, user, originalUuid, action) {
             @Override
             protected String getCallbackURI() {
-                return COMPUTATIONAL+CALLBACK_URI;
+                return COMPUTATIONAL+ STATUS_URI;
             }
 
             @Override
-            protected void parseOutResponse(JsonNode document, ComputationalStatusDTO statusResult) {
-                // TODO improve this traversing, maybe having a DTO for response json format + proper path to env_name
-                String userExploratoryName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("exploratory_name").textValue();
-                String userComputationalName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("computational_name").textValue();
-                String computationalName = document.get(RESPONSE_NODE).get(RESULT_NODE).get("hostname").textValue();
+            protected void parseOutResponse(JsonNode resultNode, ComputationalStatusDTO statusResult) {
+                String userExploratoryName = resultNode.get(USER_EXPLORATORY_NAME_FIELD).textValue();
+                String userComputationalName = resultNode.get(USER_COMPUTATIONAL_NAME_FIELD).textValue();
+                String computationalName = resultNode.get(COMPUTATIONAL_NAME_FIELD).textValue();
                 statusResult.withUserExploratoryName(userExploratoryName).withUserComputationalName(userComputationalName).withComputationalName(computationalName);
             }
         };

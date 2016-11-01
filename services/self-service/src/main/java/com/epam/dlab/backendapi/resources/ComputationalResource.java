@@ -23,6 +23,7 @@ import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
+import com.epam.dlab.registry.ApiCallbacks;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -81,7 +82,7 @@ public class ComputationalResource implements ComputationalAPI {
     }
 
     @POST
-    @Path("/status")
+    @Path(ApiCallbacks.STATUS_URI)
     public Response status(ComputationalStatusDTO dto) {
         LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateComputationalStatusAndName(dto);

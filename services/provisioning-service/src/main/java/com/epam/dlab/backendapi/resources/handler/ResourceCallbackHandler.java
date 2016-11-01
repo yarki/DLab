@@ -17,7 +17,6 @@ import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
-import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.exceptions.DlabException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,11 +30,13 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
     private ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
-    protected static final String STATUS_FIELD = "status";
-    protected static final String RESPONSE_NODE = "response";
-    protected static final String RESULT_NODE = "result";
-    protected static final String OK_STATUS = "ok";
-    protected static final String ERROR_STATUR = "err";
+    private static final String STATUS_FIELD = "status";
+    private static final String RESPONSE_NODE = "response";
+    private static final String RESULT_NODE = "result";
+    protected static final String USER_EXPLORATORY_NAME_FIELD = "exploratory_name";
+
+    private static final String OK_STATUS = "ok";
+    private static final String ERROR_STATUR = "err";
 
     private RESTService selfService;
     private String user;
@@ -65,7 +66,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         @SuppressWarnings("unchecked")
         T result = (T) resultType.newInstance().withUser(user).withStatus(status.getStatus());
         if (isSuccess(document)) {
-            parseOutResponse(document, result);
+            JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
+            parseOutResponse(resultNode, result);
         }
         selfService.post(getCallbackURI(), result, resultType);
         return !UserInstanceStatus.FAILED.equals(status);
