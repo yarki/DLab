@@ -40,7 +40,6 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements ExploratoryAPI {
-    public static final String TERMINATE = "terminate";
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
 
     @Inject
