@@ -40,6 +40,9 @@
      this.notebook = notebook;
      this.action = action;
    }
+   close() {
+     this.bindDialog.close();
+   }
 
    stop() {
      let url = "/" + this.notebook.name + "/stop";
@@ -48,6 +51,8 @@
         .suspendExploratoryEnvironment(url)
         .subscribe((result) => {
           console.log('stopUsernotebook result: ', result);
+
+          this.close();
           this.buildGrid.emit();
         });
    }
@@ -59,6 +64,8 @@
         .suspendExploratoryEnvironment(url)
         .subscribe((result) => {
           console.log('terminateUsernotebook result: ', result);
+
+          this.close();
           this.buildGrid.emit();
         });
    }
