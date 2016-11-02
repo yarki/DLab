@@ -22,7 +22,7 @@ import static com.epam.dlab.registry.ApiCallbacks.EXPLORATORY;
 import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 
 public class ExploratoryCallbackHandler extends ResourceCallbackHandler<ExploratoryStatusDTO> {
-    private static final String EXPLORATORY_ID_FIELD = "Notebook_name";
+    private static final String EXPLORATORY_ID_FIELD = "notebook_name";
 
     private String exploratoryName;
 

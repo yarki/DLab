@@ -64,11 +64,6 @@ def run():
         'notebook_user_name'] + "-nb-SG"
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
-    try:
-        notebook_config['exploratory_name'] = os.environ['exploratory_name']
-    except:
-        notebook_config['exploratory_name'] = ''
-
     print 'Searching preconfigured images'
     ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
     if ami_id != '':
@@ -214,7 +209,6 @@ def run():
         res = {"hostname": dns_name,
                "ip": ip_address,
                "master_keyname": os.environ['creds_key_name'],
-               "exploratory_name": notebook_config['exploratory_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server"}
         result.write(json.dumps(res))
@@ -238,11 +232,6 @@ def terminate():
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
     try:
-        notebook_config['exploratory_name'] = os.environ['exploratory_name']
-    except:
-        notebook_config['exploratory_name'] = ''
-
-    try:
         logging.info('[TERMINATE NOTEBOOK]')
         print '[TERMINATE NOTEBOOK]'
         params = "--bucket_name %s --tag_name %s --nb_tag_value %s" % \
@@ -259,10 +248,9 @@ def terminate():
 
     try:
         with open("/root/result.json", 'w') as result:
-            res = {"Notebook_name": notebook_config['notebook_name'],
+            res = {"notebook_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
                    "user_own_bucket_name": notebook_config['bucket_name'],
-                   "exploratory_name": notebook_config['exploratory_name'],
                    "Action": "Terminate notebook server"}
             print json.dumps(res)
             result.write(json.dumps(res))
@@ -291,11 +279,6 @@ def stop():
     notebook_config['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
 
     try:
-        notebook_config['exploratory_name'] = os.environ['exploratory_name']
-    except:
-        notebook_config['exploratory_name'] = ''
-
-    try:
         logging.info('[STOP NOTEBOOK]')
         print '[STOP NOTEBOOK]'
         params = "--bucket_name %s --tag_name %s --nb_tag_value %s --ssh_user %s --key_path %s" % \
@@ -312,10 +295,9 @@ def stop():
 
     try:
         with open("/root/result.json", 'w') as result:
-            res = {"Notebook_name": notebook_config['notebook_name'],
+            res = {"notebook_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
                    "user_own_bucket_name": notebook_config['bucket_name'],
-                   "exploratory_name": notebook_config['exploratory_name'],
                    "Action": "Stop notebook server"}
             print json.dumps(res)
             result.write(json.dumps(res))
@@ -341,11 +323,6 @@ def start():
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
     try:
-        notebook_config['exploratory_name'] = os.environ['exploratory_name']
-    except:
-        notebook_config['exploratory_name'] = ''
-
-    try:
         logging.info('[START NOTEBOOK]')
         print '[START NOTEBOOK]'
         params = "--tag_name %s --nb_tag_value %s" % \
@@ -364,7 +341,6 @@ def start():
         with open("/root/result.json", 'w') as result:
             res = {"NBs_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
-                   "exploratory_name": notebook_config['exploratory_name'],
                    "Action": "Start up notebook server"}
             print json.dumps(res)
             result.write(json.dumps(res))
