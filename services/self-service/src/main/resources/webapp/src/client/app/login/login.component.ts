@@ -29,7 +29,7 @@ export class LoginComponent {
   model = new LoginModel ('', '');
   error = '';
   loading = false;
-  userPattern = "/S+";
+  userPattern = "\\w+";
   //
   // Override
   //
