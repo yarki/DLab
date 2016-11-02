@@ -25,7 +25,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
   <tr *ngFor="let env of environments">
     <td (click)="printDetailEnvironmentModal(env)">{{env.name}}</td>
-    <td class="{{env.status.toLowerCase()}}">{{env.status}}</td>
+    <td class="status" ngClass="{{env.status.toLowerCase() || ''}}">{{env.status}}</td>
     <td>{{env.shape}}</td>
     <td>
       <expanded-grid [resources]="env.resources" [environment]="env"></expanded-grid>
@@ -34,14 +34,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <div class="dropdown">
         <span data-toggle="dropdown"
               class="glyphicon glyphicon-cog"
-              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating'}">
+              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating' ||
+                                      env.status.toLowerCase() == 'terminating' ||
+                                      env.status.toLowerCase() == 'terminated'}">
         </span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">
-            <li (click)="mathAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped'">Stop</li>
-            <li (click)="mathAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped'">Run</li>
+            <li class="dropdown-close"></li>
+            <li (click)="mathAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped' &&
+                                                         env.status != 'stopping'">Stop</li>
+            <li (click)="mathAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped' ||
+                                                        env.status == 'stopping'">Run</li>
             <li (click)="mathAction(env, 'terminate')">Terminate</li>
-            <li (click)="mathAction(env, 'deploy')">Deploy EMR</li>
+            <li (click)="mathAction(env, 'deploy')" *ngIf="env.status != 'stopping' && env.status != 'stopped'">Deploy EMR</li>
           </ul>
         </div>
       </div>
