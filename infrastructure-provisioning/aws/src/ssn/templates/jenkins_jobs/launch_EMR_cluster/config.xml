@@ -21,6 +21,7 @@
                     <description></description>
                     <choices class="java.util.Arrays$ArrayList">
                         <a class="string-array">
+                            <string>t2.medium</string>
                             <string>m3.xlarge</string>
                             <string>m3.2xlarge</string>
                             <string>m4.large</string>
@@ -72,6 +73,7 @@
                     <description></description>
                     <choices class="java.util.Arrays$ArrayList">
                         <a class="string-array">
+                            <string>t2.medium</string>
                             <string>m3.xlarge</string>
                             <string>m3.2xlarge</string>
                             <string>m4.large</string>
