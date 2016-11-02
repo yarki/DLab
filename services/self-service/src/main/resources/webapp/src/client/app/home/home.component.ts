@@ -37,6 +37,7 @@ export class HomeComponent implements OnInit {
   emrTempls: any;
   notebookExist: boolean = false;
   progressDialogConfig: any;
+  namePattern = "\\w+";
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
