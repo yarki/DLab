@@ -46,7 +46,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         return mongoService.getCollection(SHAPES).find();
     }
 
-    public String fetchExploratoryName(String user, String exploratoryName) {
+    public String fetchExploratoryId(String user, String exploratoryName) {
         return mongoService.getCollection(USER_INSTANCES)
                 .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first()
                 .getOrDefault(EXPLORATORY_ID, EMPTY).toString();
@@ -65,7 +65,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())), set(STATUS, dto.getStatus()));
     }
 
-    public void updateExploratoryStatusAndName(ExploratoryStatusDTO dto) {
+    public void updateExploratoryStatusAndId(ExploratoryStatusDTO dto) {
         Document updates = new Document(SET, new Document(STATUS, dto.getStatus()).append(EXPLORATORY_ID, dto.getExploratoryId()));
         update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())), updates);
     }
@@ -95,7 +95,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
     }
 
-    public String fetchComputationalName(String user, String exploratoryName, String computationalName) {
+    public String fetchComputationalId(String user, String exploratoryName, String computationalName) {
         return mongoService.getCollection(USER_INSTANCES)
                 .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName),
                         eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName))).first()
@@ -103,7 +103,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     }
 
     public void updateComputationalStatus(ComputationalStatusDTO dto) {
-        updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), dto.getComputationalId(), dto.getStatus());
+        updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), dto.getComputationalName(), dto.getStatus());
     }
 
     private void updateComputationalStatus(StatusBaseDTO dto, String computationalName) {
@@ -120,7 +120,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
     }
 
-    public void updateComputationalStatusAndName(ComputationalStatusDTO dto) {
+    public void updateComputationalStatusAndId(ComputationalStatusDTO dto) {
         try {
             Document updates = new Document(SET, new Document(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, dto.getStatus())
                     .append(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + COMPUTATIONAL_ID, dto.getComputationalId()));

@@ -63,7 +63,6 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         JsonNode document = MAPPER.readTree(content);
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
-        @SuppressWarnings("unchecked")
         T result = getBaseStatusDTO(status);
         if (success) {
             JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
@@ -85,7 +84,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     }
 
     abstract protected String getCallbackURI();
-    abstract protected T parseOutResponse(JsonNode document, T statusResult);
+    abstract protected T parseOutResponse(JsonNode document, T baseStatus);
 
     @SuppressWarnings("unchecked")
     protected T getBaseStatusDTO(UserInstanceStatus status) {

@@ -31,4 +31,5 @@ public enum UserInstanceStatus {
     public String getStatus() {
         return status;
     }
+
 }

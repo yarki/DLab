@@ -85,25 +85,25 @@ public class ComputationalResource implements ComputationalAPI {
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(ComputationalStatusDTO dto) {
         LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalId(), dto.getUser(), dto.getStatus());
-        infrastructureProvisionDAO.updateComputationalStatusAndName(dto);
+        infrastructureProvisionDAO.updateComputationalStatusAndId(dto);
         return Response.ok().build();
     }
 
     @DELETE
     @Path("/{exploratoryName}/{computationalName}/terminate")
-    public String terminate(@Auth UserInfo userInfo, @PathParam("exploratoryName") String userExploratoryName, @PathParam("computationalName") String userComputationalName) {
-        LOGGER.debug("terminating computational resource {} for user {}", userComputationalName, userInfo.getName());
+    public String terminate(@Auth UserInfo userInfo, @PathParam("exploratoryName") String exploratoryName, @PathParam("computationalName") String computationalName) {
+        LOGGER.debug("terminating computational resource {} for user {}", computationalName, userInfo.getName());
         infrastructureProvisionDAO.updateComputationalStatus(new ComputationalStatusDTO()
                 .withUser(userInfo.getName())
-                .withExploratoryName(userExploratoryName)
-                .withComputationalName(userComputationalName)
+                .withExploratoryName(exploratoryName)
+                .withComputationalName(computationalName)
                 .withStatus(UserInstanceStatus.TERMINATING.getStatus()));
-        String computationalName = infrastructureProvisionDAO.fetchComputationalName(userInfo.getName(), userExploratoryName, userComputationalName);
+        String computationalId = infrastructureProvisionDAO.fetchComputationalId(userInfo.getName(), exploratoryName, computationalName);
         ComputationalTerminateDTO dto = new ComputationalTerminateDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
-                .withExploratoryName(userExploratoryName)
-                .withComputationalName(userComputationalName)
-                .withClusterName(computationalName)
+                .withExploratoryName(exploratoryName)
+                .withComputationalName(computationalName)
+                .withClusterName(computationalId)
                 .withEdgeUserName(userInfo.getName())
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(EMR_TERMINATE, dto, String.class);

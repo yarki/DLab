@@ -82,7 +82,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(ExploratoryStatusDTO dto) {
         LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getExploratoryName(), dto.getUser(), dto.getStatus());
-        infrastructureProvisionDAO.updateExploratoryStatusAndName(dto);
+        infrastructureProvisionDAO.updateExploratoryStatusAndId(dto);
         return Response.ok().build();
     }
 
@@ -110,12 +110,12 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     private String action(UserInfo userInfo, String name, String action, UserInstanceStatus status) {
         infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo, name, status));
-        String exploratoryName = infrastructureProvisionDAO.fetchExploratoryName(userInfo.getName(), name);
+        String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withExploratoryName(name)
                 .withNotebookUserName(userInfo.getName())
-                .withNotebookInstanceName(exploratoryName)
+                .withNotebookInstanceName(exploratoryId)
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(action, dto, String.class);
     }

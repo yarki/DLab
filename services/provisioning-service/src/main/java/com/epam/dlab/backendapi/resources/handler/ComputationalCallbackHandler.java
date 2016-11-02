@@ -22,7 +22,7 @@ import static com.epam.dlab.registry.ApiCallbacks.COMPUTATIONAL;
 import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 
 public class ComputationalCallbackHandler extends ResourceCallbackHandler<ComputationalStatusDTO> {
-    private static final String COMPUTATIONAL_NAME_FIELD = "hostname";
+    private static final String COMPUTATIONAL_ID_FIELD = "hostname";
 
     private String exploratoryName;
     private String computationalName;
@@ -40,9 +40,9 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     }
 
     @Override
-    protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO statusResult) {
-        String computationalName = resultNode.get(COMPUTATIONAL_NAME_FIELD).textValue();
-        return statusResult.withComputationalName(computationalName);
+    protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO baseStatus) {
+        String computationalName = resultNode.get(COMPUTATIONAL_ID_FIELD).textValue();
+        return baseStatus.withComputationalName(computationalName);
     }
 
     @Override

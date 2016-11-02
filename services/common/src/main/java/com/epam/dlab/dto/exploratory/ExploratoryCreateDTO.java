@@ -45,5 +45,4 @@ public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDT
         setSecurityGroupIds(securityGroupIds);
         return this;
     }
-
 }

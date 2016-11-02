@@ -42,8 +42,6 @@ import java.io.IOException;
 @Produces(MediaType.APPLICATION_JSON)
 public class ComputationalResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(ComputationalResource.class);
-    private static final String USER_COMPUTATIONAL_NAME_FIELD = "computational_name";
-    private static final String COMPUTATIONAL_NAME_FIELD = "hostname";
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;

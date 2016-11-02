@@ -41,7 +41,6 @@ import java.io.IOException;
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
-    private static final String EXPLORATORY_NAME_FIELD = "Notebook_name";
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
