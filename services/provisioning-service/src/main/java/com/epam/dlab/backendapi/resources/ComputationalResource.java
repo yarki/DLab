@@ -20,13 +20,11 @@ import com.epam.dlab.backendapi.core.docker.command.DockerAction;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
-import com.epam.dlab.backendapi.resources.handler.ResourceCallbackHandler;
+import com.epam.dlab.backendapi.resources.handler.ComputationalCallbackHandler;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
-import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.exceptions.DlabException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +35,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-
-import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
-import static com.epam.dlab.registry.ApiCallbacks.COMPUTATIONAL;
 
 @Path("/computational")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -67,7 +62,7 @@ public class ComputationalResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(dto.getEdgeUserName(), uuid, DockerAction.CREATE));
+                getFileHandlerCallback(dto.getEdgeUserName(), uuid, DockerAction.CREATE, dto.getUserExploratoryName(), dto.getUserComputationalName()));
         try {
             commandExecuter.executeAsync(
                     commandBuilder.buildCommand(
@@ -96,7 +91,7 @@ public class ComputationalResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(dto.getEdgeUserName(), uuid, DockerAction.TERMINATE));
+                getFileHandlerCallback(dto.getEdgeUserName(), uuid, DockerAction.TERMINATE, dto.getUserExploratoryName(), dto.getUserComputationalName()));
         try {
             commandExecuter.executeAsync(
                     commandBuilder.buildCommand(
@@ -116,24 +111,8 @@ public class ComputationalResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid, DockerAction action) {
-        return new ResourceCallbackHandler<ComputationalStatusDTO>(selfService, user, originalUuid, action) {
-            @Override
-            protected String getCallbackURI() {
-                return COMPUTATIONAL+STATUS_URI;
-            }
-
-            @Override
-            protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO statusResult) {
-                String userExploratoryName = resultNode.get(USER_EXPLORATORY_NAME_FIELD).textValue();
-                String userComputationalName = resultNode.get(USER_COMPUTATIONAL_NAME_FIELD).textValue();
-                String computationalName = resultNode.get(COMPUTATIONAL_NAME_FIELD).textValue();
-                return statusResult
-                        .withUserExploratoryName(userExploratoryName)
-                        .withUserComputationalName(userComputationalName)
-                        .withComputationalName(computationalName);
-            }
-        };
+    private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid, DockerAction action, String userExploratoryName, String userComputationalName) {
+        return new ComputationalCallbackHandler(selfService, user, originalUuid, action, userExploratoryName, userComputationalName);
     }
 
 }

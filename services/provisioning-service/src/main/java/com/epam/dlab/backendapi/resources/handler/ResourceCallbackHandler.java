@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
 
 abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implements FileHandlerCallback {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
@@ -66,7 +65,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
         @SuppressWarnings("unchecked")
-        T result = (T) resultType.newInstance().withUser(user).withStatus(status.getStatus());
+        T result = getBaseStatusDTO(status);
         if (success) {
             JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
             result = parseOutResponse(resultNode, result);
@@ -80,7 +79,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     @Override
     public void handleError() {
         try {
-            selfService.post(getCallbackURI(), resultType.newInstance().withUser(user).withStatus(UserInstanceStatus.FAILED.getStatus()), resultType);
+            selfService.post(getCallbackURI(), getBaseStatusDTO(UserInstanceStatus.FAILED), resultType);
         } catch (Throwable t) {
             throw new DlabException("Could not send status update for request " + originalUuid + ", user " + user, t);
         }
@@ -88,6 +87,15 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
 
     abstract protected String getCallbackURI();
     abstract protected T parseOutResponse(JsonNode document, T statusResult);
+
+    @SuppressWarnings("unchecked")
+    protected T getBaseStatusDTO(UserInstanceStatus status) {
+        try {
+            return (T) resultType.newInstance().withUser(user).withStatus(status.getStatus());
+        } catch (Throwable t) {
+            throw new DlabException("Something went wrong", t);
+        }
+    };
 
     private boolean isSuccess(JsonNode document) {
         return OK_STATUS.equals(document.get(STATUS_FIELD).textValue());
