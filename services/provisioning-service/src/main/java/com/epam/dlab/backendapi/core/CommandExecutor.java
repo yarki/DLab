@@ -16,19 +16,21 @@ import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class CommandExecutor {
+    private static final File NULL_FILE = new File("/dev/null");
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
 
-    public List<String> executeSync(String command) throws IOException {
-        Process process = execute(command);
+    public List<String> executeSync(String command) throws IOException, InterruptedException {
+        return readImages(execute(command, false));
+    }
+
+    private List<String> readImages(Process process) throws IOException {
         List<String> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             String line;
@@ -40,16 +42,18 @@ public class CommandExecutor {
     }
 
     public void executeAsync(final String command) {
-        CompletableFuture.runAsync(() -> execute(command));
+        CompletableFuture.runAsync(() -> execute(command, true));
     }
 
-    private Process execute(String command) {
+    private Process execute(String command, boolean skipInput) {
         Process process = null;
         try {
             LOGGER.debug("Execute command: {}", command);
-            process = Runtime.getRuntime().exec(createCommand(command));
-            process.waitFor();
-
+            ProcessBuilder builder = new ProcessBuilder(createCommand(command));
+            if (skipInput) {
+                builder.redirectInput(NULL_FILE);
+            }
+            process = builder.start();
         } catch (Exception e) {
             LOGGER.error("execute command:", e);
         }
