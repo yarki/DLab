@@ -80,7 +80,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <label class="control-label">Cluster Alias</label>
         </div>
         <div class="col-xs-8">
-            <input type="text" class="form-control" id="name" (pattern)="namePattern" name="cluster_alias" [(ngModel)]="model.name" #name="ngModel" />
+            <input type="text" class="form-control" id="name" [pattern]="namePattern" name="cluster_alias" [(ngModel)]="model.name" #name="ngModel" />
         </div>
       </div>
       <div class="form-group row">
