@@ -62,7 +62,7 @@ public class ExploratoryResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(dto.getNotebookUserName(), uuid, DockerAction.CREATE, dto.getUserExploratoryName()));
+                getFileHandlerCallback(DockerAction.CREATE, uuid, dto));
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
@@ -106,7 +106,7 @@ public class ExploratoryResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(dto.getNotebookUserName(), uuid, action, dto.getUserExploratoryName()));
+                getFileHandlerCallback(action, uuid, dto));
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
@@ -123,8 +123,8 @@ public class ExploratoryResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid, DockerAction action, String userExploratoryName) {
-        return new ExploratoryCallbackHandler(selfService, user, originalUuid, action, userExploratoryName);
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ExploratoryBaseDTO dto) {
+        return new ExploratoryCallbackHandler(selfService, action, originalUuid, dto.getNotebookUserName(), dto.getUserExploratoryName());
     }
 
 }

@@ -28,7 +28,7 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     private String userComputationalName;
 
     @SuppressWarnings("unchecked")
-    public ComputationalCallbackHandler(RESTService selfService, String user, String originalUuid, DockerAction action, String userExploratoryName, String userComputationalName) {
+    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String userExploratoryName, String userComputationalName) {
         super(selfService, user, originalUuid, action);
         this.userExploratoryName = userExploratoryName;
         this.userComputationalName = userComputationalName;

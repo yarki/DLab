@@ -22,6 +22,8 @@ import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.resources.handler.ComputationalCallbackHandler;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.dto.ResourceBaseDTO;
+import com.epam.dlab.dto.computational.ComputationalBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.exceptions.DlabException;
@@ -62,7 +64,7 @@ public class ComputationalResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(dto.getEdgeUserName(), uuid, DockerAction.CREATE, dto.getUserExploratoryName(), dto.getUserComputationalName()));
+                getFileHandlerCallback(DockerAction.CREATE, uuid, dto));
         try {
             commandExecuter.executeAsync(
                     commandBuilder.buildCommand(
@@ -91,7 +93,7 @@ public class ComputationalResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(dto.getEdgeUserName(), uuid, DockerAction.TERMINATE, dto.getUserExploratoryName(), dto.getUserComputationalName()));
+                getFileHandlerCallback(DockerAction.TERMINATE, uuid, dto));
         try {
             commandExecuter.executeAsync(
                     commandBuilder.buildCommand(
@@ -111,8 +113,8 @@ public class ComputationalResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid, DockerAction action, String userExploratoryName, String userComputationalName) {
-        return new ComputationalCallbackHandler(selfService, user, originalUuid, action, userExploratoryName, userComputationalName);
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO dto) {
+        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getEdgeUserName(), dto.getUserExploratoryName(), dto.getUserComputationalName());
     }
 
 }

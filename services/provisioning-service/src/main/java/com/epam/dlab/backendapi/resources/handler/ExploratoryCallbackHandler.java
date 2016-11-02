@@ -27,7 +27,7 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     private String userExploratoryName;
 
     @SuppressWarnings("unchecked")
-    public ExploratoryCallbackHandler(RESTService selfService, String user, String originalUuid, DockerAction action, String userExploratoryName) {
+    public ExploratoryCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String userExploratoryName) {
         super(selfService, user, originalUuid, action);
         this.userExploratoryName = userExploratoryName;
     }
