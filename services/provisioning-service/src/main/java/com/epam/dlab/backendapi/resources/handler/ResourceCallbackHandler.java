@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 
 abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implements FileHandlerCallback {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
@@ -61,13 +62,16 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
         LOGGER.debug("get file {} actually waited for {}", fileName, originalUuid);
-        UserInstanceStatus status = calcStatus(action, true);
         JsonNode document = MAPPER.readTree(content);
+        boolean success = isSuccess(document);
+        UserInstanceStatus status = calcStatus(action, success);
         @SuppressWarnings("unchecked")
         T result = (T) resultType.newInstance().withUser(user).withStatus(status.getStatus());
-        if (isSuccess(document)) {
+        if (success) {
             JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
             result = parseOutResponse(resultNode, result);
+        } else {
+            LOGGER.error("Could not {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, Arrays.toString(content));
         }
         selfService.post(getCallbackURI(), result, resultType);
         return !UserInstanceStatus.FAILED.equals(status);

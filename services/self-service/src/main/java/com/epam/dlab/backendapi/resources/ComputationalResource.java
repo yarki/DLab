@@ -55,7 +55,7 @@ public class ComputationalResource implements ComputationalAPI {
         LOGGER.debug("creating computational resource {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
-                        .withComputationalName(formDTO.getName())
+                        .withUserComputationalName(formDTO.getName())
                         .withStatus(UserInstanceStatus.CREATING.getStatus())
                         .withMasterShape(formDTO.getMasterInstanceType())
                         .withSlaveShape(formDTO.getSlaveInstanceType())

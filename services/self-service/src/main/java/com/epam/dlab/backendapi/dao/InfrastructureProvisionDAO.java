@@ -72,7 +72,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     public void updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
         find(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(USER_EXPLORATORY_NAME, dto.getUserExploratoryName())), UserInstanceDTO.class)
                 .ifPresent(instance -> instance.getResources().forEach(resource -> {
-                    updateComputationalStatus(dto, resource.getComputationalName());
+                    updateComputationalStatus(dto, resource.getUserComputationalName());
                 }));
     }
 
@@ -81,7 +81,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         if (optional.isPresent()) {
             UserInstanceDTO dto = optional.get();
             long count = dto.getResources().stream()
-                    .filter(i -> computationalDTO.getComputationalName().equals(i.getComputationalName()))
+                    .filter(i -> computationalDTO.getUserComputationalName().equals(i.getUserComputationalName()))
                     .count();
             if (count == 0) {
                 update(USER_INSTANCES, eq(ID, dto.getId()), push(COMPUTATIONAL_RESOURCES, convertToBson(computationalDTO)));

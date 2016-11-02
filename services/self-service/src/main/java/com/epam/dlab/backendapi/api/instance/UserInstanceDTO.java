@@ -24,6 +24,8 @@ public class UserInstanceDTO {
     private String id;
     @JsonProperty
     private String user;
+    @JsonProperty("user_exploratory_name")
+    private String userExploratoryName;
     @JsonProperty("exploratory_name")
     private String exploratoryName;
     @JsonProperty
@@ -51,6 +53,19 @@ public class UserInstanceDTO {
 
     public UserInstanceDTO withUser(String user) {
         setUser(user);
+        return this;
+    }
+
+    public String getUserExploratoryName() {
+        return userExploratoryName;
+    }
+
+    public void setUserExploratoryName(String userExploratoryName) {
+        this.userExploratoryName = userExploratoryName;
+    }
+
+    public UserInstanceDTO withUserExploratoryName(String userExploratoryName) {
+        setUserExploratoryName(userExploratoryName);
         return this;
     }
 
