@@ -13,13 +13,14 @@
 import { Injectable } from '@angular/core';
 import {Response} from '@angular/http';
 import {ApplicationServiceFacade} from "./applicationServiceFacade.service";
+import {Observable} from "rxjs";
 
 @Injectable()
 export class UserResourceService {
   constructor(private applicationServiceFacade: ApplicationServiceFacade) {
   }
 
-  getExploratoryEnvironmentTemplates()
+  public getExploratoryEnvironmentTemplates() : Observable<any>
   {
     return this.applicationServiceFacade
       .buildGetExploratoryEnvironmentTemplatesRequest()
@@ -27,7 +28,7 @@ export class UserResourceService {
       .catch((error: any) => error);
   }
 
-  getComputationalResourcesTemplates()
+  public getComputationalResourcesTemplates() : Observable<any>
   {
     return this.applicationServiceFacade
       .buildGetComputationalResourcesTemplatesRequest()
@@ -35,7 +36,7 @@ export class UserResourceService {
       .catch((error: any) => error);
   }
 
-  getSupportedResourcesShapes()
+  public getSupportedResourcesShapes() : Observable<any>
   {
     return this.applicationServiceFacade
       .buildGetSupportedComputationalResourcesShapesRequest()
@@ -43,42 +44,42 @@ export class UserResourceService {
       .catch((error: any) => error);
   }
 
-  getUserProvisionedResources() {
+  public getUserProvisionedResources() : Observable<any> {
     return this.applicationServiceFacade
       .buildGetUserProvisionedResourcesRequest()
       .map((response:Response ) => response.json())
       .catch((error: any) => error);
   }
 
-  createExploratoryEnvironment(data) {
+  public createExploratoryEnvironment(data) : Observable<Response> {
     let body = JSON.stringify(data);
     return this.applicationServiceFacade
       .buildCreateExploratoryEnvironmentRequest(body)
       .map((response:Response ) => response);
   }
 
-  runExploratoryEnvironment(data) {
+  public runExploratoryEnvironment(data) : Observable<Response>  {
     let body = JSON.stringify(data);
     return this.applicationServiceFacade
       .buildRunExploratoryEnvironmentRequest(body)
       .map((response:Response ) => response);
   }
 
-  suspendExploratoryEnvironment(data) {
+  public suspendExploratoryEnvironment(data) : Observable<Response> {
     let body = JSON.stringify(data);
     return this.applicationServiceFacade
       .buildSuspendExploratoryEnvironmentRequest(body)
       .map((response:Response ) => response);
   }
 
-  createComputationalResource(data) {
+  public createComputationalResource(data) : Observable<Response> {
     let body = JSON.stringify(data);
     return this.applicationServiceFacade
       .buildCreateComputationalResourcesRequest(body)
       .map((response:Response ) => response);
   }
 
-  suspendComputationalResource(data) {
+  public suspendComputationalResource(data) : Observable<Response> {
     let body = JSON.stringify(data);
     return this.applicationServiceFacade
       .buildDeleteComputationalResourcesRequest(body)
