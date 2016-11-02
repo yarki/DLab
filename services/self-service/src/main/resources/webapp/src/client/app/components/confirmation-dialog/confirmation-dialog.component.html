@@ -28,7 +28,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div class="col-xs-7">
           <ul class="list-unstyled" *ngIf="notebook">
-            <li *ngFor="let resource of notebook.resources">{{resource.resource_name}}</li>
+            <li *ngFor="let resource of notebook.resources">{{resource.computational_name}}</li>
           </ul>
         </div>
       </div>
@@ -37,10 +37,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <p>Do you want to proceed?</p>
         </div>
       </div>
-      <div class="text-center">
+      <div class="text-right">
         <button type="button" class="btn btn-default" (click)="bindDialog.close()">No</button>
-        <button type="button" class="btn btn-success" *ngIf="action === 'stop'" (click)="stop()">Ok</button>
-        <button type="button" class="btn btn-success" *ngIf="action === 'terminate'" (click)="terminate()">Ok</button>
+        <button type="button" class="btn btn-success" *ngIf="action === 'stop'" (click)="stop()">Yes</button>
+        <button type="button" class="btn btn-success" *ngIf="action === 'terminate'" (click)="terminate()">Yes</button>
       </div>
   </modal-content>
 </modal>
