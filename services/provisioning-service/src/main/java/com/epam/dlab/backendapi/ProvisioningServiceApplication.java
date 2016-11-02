@@ -45,7 +45,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         jersey.register(injector.getInstance(KeyLoaderResource.class));
         jersey.register(injector.getInstance(KeyLoaderResource.class));
         jersey.register(injector.getInstance(ExploratoryResource.class));
-        jersey.register(injector.getInstance(EmrResource.class));
+        jersey.register(injector.getInstance(ComputationalResource.class));
         jersey.register(injector.getInstance(InfrastructureResource.class));
     }
 

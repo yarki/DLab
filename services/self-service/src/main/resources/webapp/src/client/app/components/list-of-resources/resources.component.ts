@@ -38,15 +38,11 @@ export class ResourcesList {
     console.log(data);
   }
 
-  terminateEmr(parent_obj, resource){
+  terminateEmr(notebook, resource){
     this.userResourceService
-      .suspendComputationalResource({
-        // notebook_name: parent_obj.name,
-        emr_cluster_name: resource.resource_name
-      })
+      .suspendComputationalResource(notebook.name, resource.computational_name)
       .subscribe((result) => {
         console.log('terminateEmr ', result);
-        console.log('Computational resources ' + resource.resource_name + ' nodes ' +  ' will be decommisioned. (ENVIRONMENT: ' + parent_obj.name + ')');
       });
       return false;
   };

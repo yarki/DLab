@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class CommandExecutor {
@@ -39,7 +40,7 @@ public class CommandExecutor {
     }
 
     public void executeAsync(final String command) {
-        new Thread(() -> execute(command)).start();
+        CompletableFuture.runAsync(() -> execute(command));
     }
 
     private Process execute(String command) {

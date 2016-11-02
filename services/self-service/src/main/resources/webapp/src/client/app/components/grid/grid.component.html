@@ -25,7 +25,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
   <tr *ngFor="let env of environments">
     <td (click)="printDetailEnvironmentModal(env)">{{env.name}}</td>
-    <td class="{{env.status.toLowerCase()}}">{{env.status}}</td>
+    <td class="status" ngClass="{{env.status.toLowerCase() || ''}}">{{env.status}}</td>
     <td>{{env.shape}}</td>
     <td>
       <expanded-grid [resources]="env.resources" [environment]="env"></expanded-grid>
@@ -34,14 +34,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <div class="dropdown">
         <span data-toggle="dropdown"
               class="glyphicon glyphicon-cog"
-              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating'}">
+              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating' ||
+                                      env.status.toLowerCase() == 'terminating' ||
+                                      env.status.toLowerCase() == 'terminated'}">
         </span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">
-            <li (click)="mathAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped'">Stop</li>
-            <li (click)="mathAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped'">Run</li>
+            <li class="dropdown-close"></li>
+            <li (click)="mathAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped' &&
+                                                         env.status != 'stopping'">Stop</li>
+            <li (click)="mathAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped' ||
+                                                        env.status == 'stopping'">Run</li>
             <li (click)="mathAction(env, 'terminate')">Terminate</li>
-            <li (click)="mathAction(env, 'deploy')">Deploy EMR</li>
+            <li (click)="mathAction(env, 'deploy')" *ngIf="env.status != 'stopping' && env.status != 'stopped'">Deploy EMR</li>
           </ul>
         </div>
       </div>
@@ -54,18 +59,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <h4 class="modal-title">Create computational resource</h4>
   </modal-header>
   <modal-content>
-    <form>
+    <form #createEmrForm="ngForm" novalidate>
       <div class="form-group row">
         <div  class="col-xs-4">
           <label class="control-label">Select template</label>
           <div>
-            <small>Template discription .. <br/>EMR 5.0 Spark 2.0</small>
+            <small>Template description .. <br/>EMR 5.0 Spark 2.0</small>
           </div>
         </div>
         <div class="col-xs-8">
           <select class="form-control" #tmplIndex>
             <option *ngFor="let template of emrTempls; let i = index" value="{{i}}">
-              {{template.template_name}}, version - {{template.version}}
+              {{template.template_name}}
             </option>
           </select>
         </div>
@@ -75,7 +80,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <label class="control-label">Cluster Alias</label>
         </div>
         <div class="col-xs-8">
-          <input type="text" class="form-control" #name placeholder="Enter Cluster Alias">
+            <input type="text" class="form-control" id="name" (pattern)="namePattern" name="cluster_alias" [(ngModel)]="model.name" #name="ngModel" />
         </div>
       </div>
       <div class="form-group row">
@@ -84,16 +89,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div class="col-xs-8">
           <select class="form-control" #shape_master>
-            <option *ngFor="let shape of shapes">{{shape.shape_name}}</option>
+            <option *ngFor="let shape of shapes">{{shape.Type}}</option>
           </select>
         </div>
       </div>
       <div class="form-group row">
         <div  class="col-xs-4">
-          <label class="control-label">Slave Instance number</label>
+          <label class="control-label">Total Instance number</label>
         </div>
         <div class="col-xs-8">
-          <input type="number" #count class="form-control">
+          <input type="number" class="form-control" [(ngModel)]="model.count" min="1" max="999" name="node_count" #count="ngModel" required/>
         </div>
       </div>
       <div class="form-group row">
@@ -102,82 +107,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div class="col-xs-8">
           <select class="form-control" #shape_slave>
-            <option *ngFor="let shape of shapes">{{shape.shape_name}}</option>
+            <option *ngFor="let shape of shapes">{{shape.Type}}</option>
           </select>
         </div>
       </div>
       <div class="text-right">
         <button type="button" (click)="createEmrModal.close()" class="btn btn-default">Cancel</button>
-        <button type="button"  (click)="createEmr(name.value, count.value, shape_master.value, shape_slave.value, tmplIndex.value)" class="btn btn-success">Create</button>
+        <button type="submit" [disabled]="!count.valid || !name.valid"  (click)="createEmr(name.value, count.value, shape_master.value, shape_slave.value, tmplIndex.value)" class="btn btn-success">Create</button>
       </div>
     </form>
   </modal-content>
 </modal>
 
+<confirmation-dialog #confirmationDialog (buildGrid)="buildGrid($event)"></confirmation-dialog>
 
-
-<!-- <button (click)="confirmationDialog.open({isFooter: false})">confirmationDialog</button> -->
-<modal #confirmationDialog  modalClass="confirmation-dialog modal-md">
-  <modal-header>
-    <h4 class="modal-title">Jupiter box</h4>
-  </modal-header>
-  <modal-content>
-      <div class="row">
-        <div class="col-xs-12">
-          <p>Notebook server  will be stopped and all connected EMR instances will be terminated.</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-5">
-          <p>Computational resources:</p>
-        </div>
-        <div class="col-xs-7">
-          <ul class="list-unstyled">
-            <li>EMR cluster 5 nodes</li>
-            <li>EMR cluster 20 nodes</li>
-          </ul>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-5">
-          <p>Do you want to proceed?</p>
-        </div>
-      </div>
-      <div class="text-center">
-        <button type="button" class="btn btn-default" (click)="detailModal.close()">No</button>
-        <button type="button" class="btn btn-success">Ok</button>
-      </div>
-  </modal-content>
-</modal>
-
-<!-- <button (click)="detailModal.open({isFooter: false})">detailModal</button> -->
-<modal #detailModal  modalClass="detail-dialog modal-sm header-white">
-  <modal-header></modal-header>
-  <modal-content>
-    <div class="detail-header-wrap">
-      <table class="detail-header">
-        <tr>
-          <td class="modal-title">Jupiter box</td>
-          <td class="success_color">Running</td>
-          <td>M4.xlarge</td>
-        </tr>
-      </table>
-      </div>
-      <div class="row">
-        <div class="col-xs-12">
-          <p>Up time 18 hours since Mon 12:00 EST, Sept 5, 2016</p>
-          <p>Open in your browser  <a href="#">http://10.0.15.1:8080</a> to access this box after creating a tunnel.</p>
-          <br/>
-          <p>
-            <a href="#">
-              <small><span class="glyphicon glyphicon-question-sign"></span>Read instruction how to create the tunnel</small>
-            </a>
-          </p>
-        </div>
-      </div>
-      <div class="text-center">
-        <button type="button" class="btn btn-default" (click)="detailModal.close()">No</button>
-        <button type="button" class="btn btn-success">Ok</button>
-      </div>
-  </modal-content>
-</modal>
+<detail-dialog #detailDialog></detail-dialog>
