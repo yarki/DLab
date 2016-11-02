@@ -71,7 +71,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
             JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
             result = parseOutResponse(resultNode, result);
         } else {
-            LOGGER.error("Could not {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, Arrays.toString(content));
+            LOGGER.error("Could not {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
         }
         selfService.post(getCallbackURI(), result, resultType);
         return !UserInstanceStatus.FAILED.equals(status);
