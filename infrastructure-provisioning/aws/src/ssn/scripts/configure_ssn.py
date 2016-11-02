@@ -22,7 +22,7 @@ import crypt
 import sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--hostname', type=str, default='edge')
+parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
@@ -135,7 +135,6 @@ def configure_jenkins():
             sudo('mkdir -p /var/lib/jenkins/jobs/')
             sudo('chown -R ubuntu:ubuntu /var/lib/jenkins/')
             put('/root/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
-            #local('scp -r -q -i {} /root/templates/jenkins_jobs/* {}:/var/lib/jenkins/jobs/'.format(args.keyfile, env.host_string))
             sudo('chown -R jenkins:jenkins /var/lib/jenkins')
             sudo('/etc/init.d/jenkins stop; sleep 5')
             sudo('sysv-rc-conf jenkins on')

@@ -19,12 +19,12 @@
         <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
           <description>Key name at AWS to be used for accessing Edge</description>
-          <defaultValue>BDCC-DSS-POC</defaultValue>
+          <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SSN_SG_ids</name>
           <description>The ID of the SSN Security Group to be accessible</description>
-          <defaultValue>sg-e338c89a</defaultValue>
+          <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>Action</name>
