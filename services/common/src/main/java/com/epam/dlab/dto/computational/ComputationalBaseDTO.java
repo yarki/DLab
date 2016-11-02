@@ -19,7 +19,7 @@ abstract public class ComputationalBaseDTO<T extends ComputationalBaseDTO<?>> ex
     @JsonProperty("edge_user_name")
     private String edgeUserName;
     @JsonProperty("computational_name")
-    private String userComputationalName;
+    private String computationalName;
 
     public String getEdgeUserName() {
         return edgeUserName;
@@ -35,17 +35,17 @@ abstract public class ComputationalBaseDTO<T extends ComputationalBaseDTO<?>> ex
         return (T) this;
     }
 
-    public String getUserComputationalName() {
-        return userComputationalName;
+    public String getComputationalName() {
+        return computationalName;
     }
 
-    public void setUserComputationalName(String userComputationalName) {
-        this.userComputationalName = userComputationalName;
+    public void setComputationalName(String computationalName) {
+        this.computationalName = computationalName;
     }
 
     @SuppressWarnings("unchecked")
-    public T withUserComputationalName(String userComputationalName) {
-        setUserComputationalName(userComputationalName);
+    public T withComputationalName(String computationalName) {
+        setComputationalName(computationalName);
         return (T) this;
     }
 }

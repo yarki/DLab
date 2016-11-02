@@ -16,19 +16,19 @@ import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
-    @JsonProperty("exploratory_name")
-    private String exploratoryName;
+    @JsonProperty("exploratory_id")
+    private String exploratoryId;
 
-    public String getExploratoryName() {
-        return exploratoryName;
+    public String getExploratoryId() {
+        return exploratoryId;
     }
 
-    public void setExploratoryName(String exploratoryName) {
-        this.exploratoryName = exploratoryName;
+    public void setExploratoryId(String exploratoryId) {
+        this.exploratoryId = exploratoryId;
     }
 
-    public ExploratoryStatusDTO withExploratoryName(String exploratoryName) {
-        setExploratoryName(exploratoryName);
+    public ExploratoryStatusDTO withExploratoryId(String exploratoryId) {
+        setExploratoryId(exploratoryId);
         return this;
     }
 

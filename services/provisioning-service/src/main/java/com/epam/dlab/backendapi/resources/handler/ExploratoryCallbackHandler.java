@@ -24,12 +24,12 @@ import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 public class ExploratoryCallbackHandler extends ResourceCallbackHandler<ExploratoryStatusDTO> {
     private static final String EXPLORATORY_NAME_FIELD = "Notebook_name";
 
-    private String userExploratoryName;
+    private String exploratoryName;
 
     @SuppressWarnings("unchecked")
-    public ExploratoryCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String userExploratoryName) {
+    public ExploratoryCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String exploratoryName) {
         super(selfService, user, originalUuid, action);
-        this.userExploratoryName = userExploratoryName;
+        this.exploratoryName = exploratoryName;
     }
 
     protected String getCallbackURI() {
@@ -42,7 +42,7 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     }
 
     protected ExploratoryStatusDTO getBaseStatusDTO(UserInstanceStatus status) {
-        return super.getBaseStatusDTO(status).withUserExploratoryName(userExploratoryName);
+        return super.getBaseStatusDTO(status).withExploratoryName(exploratoryName);
     }
 
 }

@@ -33,7 +33,6 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     private static final String STATUS_FIELD = "status";
     private static final String RESPONSE_NODE = "response";
     private static final String RESULT_NODE = "result";
-    protected static final String USER_EXPLORATORY_NAME_FIELD = "exploratory_name";
 
     private static final String OK_STATUS = "ok";
     private static final String ERROR_STATUR = "err";

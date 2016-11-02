@@ -15,10 +15,10 @@ package com.epam.dlab.backendapi.api.instance;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserComputationalResourceDTO {
-    @JsonProperty("user_computational_name")
-    private String userComputationalName;
     @JsonProperty("computational_name")
     private String computationalName;
+    @JsonProperty("computational_id")
+    private String computationalId;
     @JsonProperty
     private String status;
     @JsonProperty("up_time_since")
@@ -30,19 +30,6 @@ public class UserComputationalResourceDTO {
     @JsonProperty("slave_instance_number")
     private String slaveNumber;
 
-    public String getUserComputationalName() {
-        return userComputationalName;
-    }
-
-    public void setUserComputationalName(String userComputationalName) {
-        this.userComputationalName = userComputationalName;
-    }
-
-    public UserComputationalResourceDTO withUserComputationalName(String userComputationalName) {
-        setUserComputationalName(userComputationalName);
-        return this;
-    }
-
     public String getComputationalName() {
         return computationalName;
     }
@@ -53,6 +40,19 @@ public class UserComputationalResourceDTO {
 
     public UserComputationalResourceDTO withComputationalName(String computationalName) {
         setComputationalName(computationalName);
+        return this;
+    }
+
+    public String getComputationalId() {
+        return computationalId;
+    }
+
+    public void setComputationalId(String computationalId) {
+        this.computationalId = computationalId;
+    }
+
+    public UserComputationalResourceDTO withComputationalId(String computationalId) {
+        setComputationalId(computationalId);
         return this;
     }
 

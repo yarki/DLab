@@ -57,13 +57,13 @@ public class ExploratoryResource implements ExploratoryAPI {
         LOGGER.debug("creating exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
-                .withUserExploratoryName(formDTO.getName())
+                .withExploratoryName(formDTO.getName())
                 .withStatus(UserInstanceStatus.CREATING.getStatus())
                 .withShape(formDTO.getShape()));
         if (isAdded) {
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
-                    .withUserExploratoryName(formDTO.getName())
+                    .withExploratoryName(formDTO.getName())
                     .withNotebookUserName(userInfo.getName())
                     .withNotebookInstanceType(formDTO.getShape())
                     .withRegion(settingsDAO.getAwsRegion())
@@ -81,7 +81,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @POST
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(ExploratoryStatusDTO dto) {
-        LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getUserExploratoryName(), dto.getUser(), dto.getStatus());
+        LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getExploratoryName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateExploratoryStatusAndName(dto);
         return Response.ok().build();
     }
@@ -113,7 +113,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         String exploratoryName = infrastructureProvisionDAO.fetchExploratoryName(userInfo.getName(), name);
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
-                .withUserExploratoryName(name)
+                .withExploratoryName(name)
                 .withNotebookUserName(userInfo.getName())
                 .withNotebookInstanceName(exploratoryName)
                 .withRegion(settingsDAO.getAwsRegion());

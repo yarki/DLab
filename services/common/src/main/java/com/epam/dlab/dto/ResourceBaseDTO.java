@@ -20,7 +20,7 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     @JsonProperty("creds_region")
     private String region;
     @JsonProperty("exploratory_name")
-    private String userExploratoryName;
+    private String exploratoryName;
 
     public String getServiceBaseName() {
         return serviceBaseName;
@@ -50,17 +50,17 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
         return (T) this;
     }
 
-    public String getUserExploratoryName() {
-        return userExploratoryName;
+    public String getExploratoryName() {
+        return exploratoryName;
     }
 
-    public void setUserExploratoryName(String userExploratoryName) {
-        this.userExploratoryName = userExploratoryName;
+    public void setExploratoryName(String exploratoryName) {
+        this.exploratoryName = exploratoryName;
     }
 
     @SuppressWarnings("unchecked")
-    public T withUserExploratoryName(String userExploratoryName) {
-        setUserExploratoryName(userExploratoryName);
+    public T withExploratoryName(String exploratoryName) {
+        setExploratoryName(exploratoryName);
         return (T) this;
     }
 }

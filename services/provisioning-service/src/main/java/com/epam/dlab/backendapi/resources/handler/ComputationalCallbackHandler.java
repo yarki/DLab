@@ -24,14 +24,14 @@ import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 public class ComputationalCallbackHandler extends ResourceCallbackHandler<ComputationalStatusDTO> {
     private static final String COMPUTATIONAL_NAME_FIELD = "hostname";
 
-    private String userExploratoryName;
-    private String userComputationalName;
+    private String exploratoryName;
+    private String computationalName;
 
     @SuppressWarnings("unchecked")
-    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String userExploratoryName, String userComputationalName) {
+    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String exploratoryName, String computationalName) {
         super(selfService, user, originalUuid, action);
-        this.userExploratoryName = userExploratoryName;
-        this.userComputationalName = userComputationalName;
+        this.exploratoryName = exploratoryName;
+        this.computationalName = computationalName;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
 
     @Override
     protected ComputationalStatusDTO getBaseStatusDTO(UserInstanceStatus status) {
-        return super.getBaseStatusDTO(status).withUserExploratoryName(userExploratoryName).withUserComputationalName(userComputationalName);
+        return super.getBaseStatusDTO(status).withExploratoryName(exploratoryName).withComputationalName(computationalName);
     }
 
 }

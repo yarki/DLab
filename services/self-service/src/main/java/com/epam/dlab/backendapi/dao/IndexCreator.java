@@ -16,12 +16,12 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.IndexOptions;
 import io.dropwizard.lifecycle.Managed;
 
-import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.USER_EXPLORATORY_NAME;
+import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.EXPLORATORY_NAME;
 
 public class IndexCreator extends BaseDAO implements Managed {
     @Override
     public void start() throws Exception {
-        mongoService.getCollection(USER_INSTANCES).createIndex(new BasicDBObject(USER, 1).append(USER_EXPLORATORY_NAME, 2),
+        mongoService.getCollection(USER_INSTANCES).createIndex(new BasicDBObject(USER, 1).append(EXPLORATORY_NAME, 2),
                 new IndexOptions().unique(true));
     }
 

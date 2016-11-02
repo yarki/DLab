@@ -18,8 +18,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @JsonProperty
     private String user;
-    @JsonProperty("user_exploratory_name")
-    private String userExploratoryName;
+    @JsonProperty("exploratory_name")
+    private String exploratoryName;
     @JsonProperty
     private String status;
 
@@ -38,17 +38,17 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     }
 
 
-    public String getUserExploratoryName() {
-        return userExploratoryName;
+    public String getExploratoryName() {
+        return exploratoryName;
     }
 
-    public void setUserExploratoryName(String userExploratoryName) {
-        this.userExploratoryName = userExploratoryName;
+    public void setExploratoryName(String exploratoryName) {
+        this.exploratoryName = exploratoryName;
     }
 
     @SuppressWarnings("unchecked")
-    public T withUserExploratoryName(String userExploratoryName) {
-        setUserExploratoryName(userExploratoryName);
+    public T withExploratoryName(String exploratoryName) {
+        setExploratoryName(exploratoryName);
         return (T) this;
     }
 

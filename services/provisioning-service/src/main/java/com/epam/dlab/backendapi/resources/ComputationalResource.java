@@ -22,7 +22,6 @@ import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.resources.handler.ComputationalCallbackHandler;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.dto.ResourceBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
@@ -114,7 +113,7 @@ public class ComputationalResource implements DockerCommands {
     }
 
     private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO dto) {
-        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getEdgeUserName(), dto.getUserExploratoryName(), dto.getUserComputationalName());
+        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getEdgeUserName(), dto.getExploratoryName(), dto.getComputationalName());
     }
 
 }

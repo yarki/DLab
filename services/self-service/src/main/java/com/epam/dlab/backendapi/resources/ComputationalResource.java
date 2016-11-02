@@ -55,7 +55,7 @@ public class ComputationalResource implements ComputationalAPI {
         LOGGER.debug("creating computational resource {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
-                        .withUserComputationalName(formDTO.getName())
+                        .withComputationalName(formDTO.getName())
                         .withStatus(UserInstanceStatus.CREATING.getStatus())
                         .withMasterShape(formDTO.getMasterInstanceType())
                         .withSlaveShape(formDTO.getSlaveInstanceType())
@@ -63,8 +63,8 @@ public class ComputationalResource implements ComputationalAPI {
         if (isAdded) {
             ComputationalCreateDTO dto = new ComputationalCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
-                    .withUserExploratoryName(formDTO.getNotebookName())
-                    .withUserComputationalName(formDTO.getName())
+                    .withExploratoryName(formDTO.getNotebookName())
+                    .withComputationalName(formDTO.getName())
                     .withInstanceCount(formDTO.getInstanceCount())
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
@@ -84,7 +84,7 @@ public class ComputationalResource implements ComputationalAPI {
     @POST
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(ComputationalStatusDTO dto) {
-        LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
+        LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalId(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateComputationalStatusAndName(dto);
         return Response.ok().build();
     }
@@ -95,14 +95,14 @@ public class ComputationalResource implements ComputationalAPI {
         LOGGER.debug("terminating computational resource {} for user {}", userComputationalName, userInfo.getName());
         infrastructureProvisionDAO.updateComputationalStatus(new ComputationalStatusDTO()
                 .withUser(userInfo.getName())
-                .withUserExploratoryName(userExploratoryName)
-                .withUserComputationalName(userComputationalName)
+                .withExploratoryName(userExploratoryName)
+                .withComputationalName(userComputationalName)
                 .withStatus(UserInstanceStatus.TERMINATING.getStatus()));
         String computationalName = infrastructureProvisionDAO.fetchComputationalName(userInfo.getName(), userExploratoryName, userComputationalName);
         ComputationalTerminateDTO dto = new ComputationalTerminateDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
-                .withUserExploratoryName(userExploratoryName)
-                .withUserComputationalName(userComputationalName)
+                .withExploratoryName(userExploratoryName)
+                .withComputationalName(userComputationalName)
                 .withClusterName(computationalName)
                 .withEdgeUserName(userInfo.getName())
                 .withRegion(settingsDAO.getAwsRegion());
