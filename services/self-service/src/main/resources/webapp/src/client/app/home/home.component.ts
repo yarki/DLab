@@ -37,6 +37,7 @@ export class HomeComponent implements OnInit {
   emrTempls: any;
   notebookExist: boolean = false;
   progressDialogConfig: any;
+  templateDescription: string;
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
@@ -250,5 +251,9 @@ export class HomeComponent implements OnInit {
       text_style: 'info-label',
       aligning: 'text-center'
     }
+  }
+
+  showDescription(value){
+    this.templateDescription = this.createTempls[value].description;
   }
 }
