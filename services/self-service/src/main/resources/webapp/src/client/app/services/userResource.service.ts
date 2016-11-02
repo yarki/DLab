@@ -65,10 +65,11 @@ export class UserResourceService {
       .map((response:Response ) => response);
   }
 
-  public suspendExploratoryEnvironment(data) : Observable<Response> {
-    let body = JSON.stringify(data);
+  public suspendExploratoryEnvironment(notebook : any, action) : Observable<Response> {
+    let url = "/" + notebook.name + "/" + action;
+
     return this.applicationServiceFacade
-      .buildSuspendExploratoryEnvironmentRequest(body)
+      .buildSuspendExploratoryEnvironmentRequest(JSON.stringify(url))
       .map((response:Response ) => response);
   }
 

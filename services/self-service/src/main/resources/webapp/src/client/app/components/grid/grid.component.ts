@@ -10,10 +10,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import { Component, EventEmitter, Input, Output, ViewChild, OnInit } from "@angular/core";
+import { Component, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 import { GridRowModel } from './grid.model';
 import { CreateEmrModel } from "./createEmrModel";
+import {ConfirmationDialogType} from "../confirmation-dialog/confirmation-dialog-type.enum";
 
 @Component({
   moduleId: module.id,
@@ -93,9 +94,9 @@ export class Grid implements OnInit {
           this.buildGrid();
         });
     } else if (action === 'stop') {
-      this.confirmationDialog.open({ isFooter: false }, data, 'stop');
+      this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.StopExploratory);
     } else if (action === 'terminate') {
-      this.confirmationDialog.open({ isFooter: false }, data, 'terminate');
+      this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.TerminateExploratory);
     }
   }
 
@@ -120,8 +121,4 @@ export class Grid implements OnInit {
       });
       return false;
   };
-
-  validate(name, count) {
-    this.isFilled = (name.value.length > 1) && (+count.value > 0);
-  }
 }
