@@ -60,6 +60,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   font-size: 12px;
 }
 
+.dashboard_table .status {
+  text-transform: capitalize;
+}
 .dashboard_table .running {
   color: #49af38;
 }
@@ -71,8 +74,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   color: #35AFD5;
 }
 .dashboard_table .terminated,
-.dashboard_table .terminating {
-  color: #918B8D;
+.dashboard_table .terminating,
+.dashboard_table .failed {
+  color: #f1696e;
 }
 .dashboard_table .glyphicon-cog {
   font-size: 16px;
