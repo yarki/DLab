@@ -35,8 +35,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <div class="form-group row">
       <div  class="col-xs-4">
         <label class="control-label">Select template</label>
-        <div>
-          <small *ngIf="createTempls">{{createTempls[0].description}}</small>
+        <div *ngIf="createTempls">
+          <small *ngIf="!templateDescription">{{createTempls[0].description}}</small>
+          <small *ngIf="templateDescription">{{templateDescription}}</small>
         </div>
       </div>
       <div class="col-xs-8">
