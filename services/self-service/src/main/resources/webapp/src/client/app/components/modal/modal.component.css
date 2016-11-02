@@ -150,6 +150,7 @@ modal-content {
 .confirmation-dialog li {
   font-size: 14px;
   color: #9cadbe;
+  word-wrap: break-word;
 }
 .confirmation-dialog.modal-dialog {
   width: 550px;
