@@ -24,11 +24,13 @@ import { CreateEmrModel } from "./createEmrModel";
 
 export class Grid implements OnInit {
 
-  model = new CreateEmrModel ('', '');
   isFilled: boolean = false;
   list: any;
   environments: Array<GridRowModel>;
   notebookName: any;
+
+  model = new CreateEmrModel('', '');
+  namePattern = "/S+";
 
   @ViewChild('createEmrModal') createEmrModal;
   @ViewChild('confirmationDialog') confirmationDialog;
@@ -66,7 +68,7 @@ export class Grid implements OnInit {
   loadEnvironments(): Array<any> {
      if (this.list) {
        return this.list.map((value) => {
-         return new GridRowModel(value.environment_name,
+         return new GridRowModel(value.exploratory_name,
            value.status,
            value.shape,
            value.computational_resources);
@@ -98,6 +100,7 @@ export class Grid implements OnInit {
   }
 
   createEmr(name, count, shape_master, shape_slave, tmplIndex){
+
     this.userResourceService
       .createComputationalResource({
         name: name,

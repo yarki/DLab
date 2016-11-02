@@ -31,7 +31,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   border-bottom: 1px solid #edf1f5;
 }
 .modal-body {
-  padding: 35px 47px;
+  padding: 25px 40px;
 }
 .modal-header .modal-title {
   font-weight: 600;
@@ -88,6 +88,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .modal .btn {
   padding: 6px 15px;
   min-width: 140px;
+  font-weight: 600;
 }
 .modal-footer .btn {
   margin-top: 0;
@@ -182,4 +183,11 @@ modal-content {
 }
 .detail-dialog .glyphicon-question-sign {
   margin-right: 5px;
+}
+.modal-content .danger_color {
+  padding-left: 14px;
+  font-size: 12px;
+}
+.modal-content .danger_field {
+  border-color: #d9534f;
 }

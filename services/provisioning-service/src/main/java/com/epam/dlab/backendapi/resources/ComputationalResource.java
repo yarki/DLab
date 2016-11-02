@@ -84,7 +84,7 @@ public class ComputationalResource implements DockerCommands {
                     )
             );
         } catch (Throwable t) {
-            throw new DlabException("Could not create computational resources cluster", t);
+            throw new DlabException("Could not create computational resource cluster", t);
         }
         return uuid;
     }
