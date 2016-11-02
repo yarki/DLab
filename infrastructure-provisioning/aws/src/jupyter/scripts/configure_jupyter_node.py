@@ -119,7 +119,10 @@ def configure_notebook_server(notebook_name):
              "sleep 5;")
         # for further start up when system boots
         sudo("sed -i '/exit 0/d' /etc/rc.local")
-        sudo("bash -c 'echo sudo screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py\ >> /etc/rc.local'")
+        sudo("sed -i '/screen/d' /etc/rc.local")
+        sudo("chmod 757 /etc/rc.local")
+        sudo("""echo "cd /home/ubuntu; runuser -l ubuntu -c 'sudo screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py'" >> /etc/rc.local""")
+        sudo("chmod 755 /etc/rc.local")
         sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
 
     except:

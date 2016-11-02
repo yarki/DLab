@@ -287,6 +287,8 @@ def stop():
     notebook_config['notebook_name'] = os.environ['notebook_instance_name']
     notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
+    notebook_config['ssh_user'] = os.environ['notebook_ssh_user']
+    notebook_config['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
 
     try:
         notebook_config['exploratory_name'] = os.environ['exploratory_name']
@@ -296,8 +298,8 @@ def stop():
     try:
         logging.info('[STOP NOTEBOOK]')
         print '[STOP NOTEBOOK]'
-        params = "--bucket_name %s --tag_name %s --nb_tag_value %s" % \
-                 (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'])
+        params = "--bucket_name %s --tag_name %s --nb_tag_value %s --ssh_user %s --key_path %s" % \
+                 (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], notebook_config['ssh_user'], notebook_config['key_path'])
         if not run_routine('stop_notebook', params):
             logging.info('Failed to stop notebook')
             with open("/root/result.json", 'w') as result:
