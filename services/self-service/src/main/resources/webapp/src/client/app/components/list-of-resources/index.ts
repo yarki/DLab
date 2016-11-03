@@ -13,11 +13,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import {ResourcesList} from "./resources.component";
 import {NgModule, Component} from "@angular/core";
 import {CommonModule} from "@angular/common";
+import { ModalModule } from './../modal/index';
+import { ConfirmationEmrModule } from './../confirmation-emr/index';
 
 export * from "./resources.component";
 
 @NgModule({
-  imports: [CommonModule,],
+  imports: [CommonModule, ModalModule, ConfirmationEmrModule],
   declarations: [ResourcesList],
   exports: [ResourcesList],
 })

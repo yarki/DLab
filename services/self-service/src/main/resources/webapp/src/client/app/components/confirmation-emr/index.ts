@@ -10,36 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import {Component, Input, Output, ViewChild} from "@angular/core";
-import { UserResourceService } from "./../../services/userResource.service";
+import {ConfirmationEmr} from "./confirmation-emr.component";
+import {NgModule, Component} from "@angular/core";
+import {CommonModule} from "@angular/common";
+import {ModalModule} from './../modal/index';
 
-@Component({
-    moduleId: module.id,
-    selector: 'expanded-grid',
-    templateUrl: 'resources.component.html',
-    styleUrls: ['./resources.component.css']
+export * from "./confirmation-emr.component";
+
+@NgModule({
+  imports: [ModalModule, CommonModule],
+  declarations: [ConfirmationEmr],
+  exports: [ConfirmationEmr],
 })
 
-export class ResourcesList {
-  @ViewChild('confirmationEmr') confirmationEmr;
-  @Input() resources: any[];
-  @Input() environment: any[];
-
-  collapse: boolean = false;
-
-  constructor(
-    private userResourceService: UserResourceService
-    ) { }
-
-  toggleResourceList() {
-    this.collapse = !this.collapse;
-  }
-
-  printDetailResourceModal(data) {
-    console.log(data);
-  }
-
-  terminateConfirmate(notebook, resource) {
-    this.confirmationEmr.open({ isFooter: false }, notebook, resource);
-  }
-}
+export class ConfirmationEmrModule { }
