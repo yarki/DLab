@@ -38,6 +38,7 @@ export class HomeComponent implements OnInit {
   notebookExist: boolean = false;
   progressDialogConfig: any;
   templateDescription: string;
+  namePattern = "\\w+.*\\w+";
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;

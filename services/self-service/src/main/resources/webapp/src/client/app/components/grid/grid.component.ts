@@ -31,7 +31,7 @@ export class Grid implements OnInit {
   notebookName: any;
 
   model = new CreateEmrModel('', '');
-  namePattern = "/S+";
+  namePattern = "\\w+.*\\w+";
 
   @ViewChild('createEmrModal') createEmrModal;
   @ViewChild('confirmationDialog') confirmationDialog;
