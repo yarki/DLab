@@ -34,16 +34,10 @@ export class ComputationalResourcesList {
     this.collapse = !this.collapse;
   }
 
-  printDetailResourceModal(data) {
-    console.log(data);
-  }
-
-  terminateEmr(notebook, resource){
+  terminateComputationalResource(notebook, resource){
     this.userResourceService
       .suspendComputationalResource(notebook.name, resource.computational_name)
-      .subscribe((result) => {
-        console.log('terminateEmr ', result);
-      });
+      .subscribe((result) => {});
       return false;
   };
 }

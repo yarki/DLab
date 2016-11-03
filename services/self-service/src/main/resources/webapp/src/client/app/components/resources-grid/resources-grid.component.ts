@@ -12,7 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import { Component, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
-import { GridRowModel } from './resources-grid.model';
+import { ResourcesGridRowModel } from './resources-grid.model';
 import { CreateEmrModel } from "./createEmrModel";
 import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dialog-type.enum";
 
@@ -26,37 +26,36 @@ import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dial
 export class ResourcesGrid implements OnInit {
 
   isFilled: boolean = false;
-  list: any;
-  environments: Array<GridRowModel>;
-  notebookName: any;
-
+  environments: Array<ResourcesGridRowModel>;
+  notebookName: string;
+  namePattern: string = "\\w+.*\\w+";
   model = new CreateEmrModel('', '');
-  namePattern = "\\w+.*\\w+";
 
   @ViewChild('createEmrModal') createEmrModal;
   @ViewChild('confirmationDialog') confirmationDialog;
   @ViewChild('detailDialog') detailDialog;
+
   @Input() emrTempls;
   @Input() shapes;
 
-
   constructor(
     private userResourceService: UserResourceService
-    ) { }
+  ) { }
 
-  ngOnInit() {
+  ngOnInit() : void {
     this.buildGrid();
   }
 
-  buildGrid() {
-    this.userResourceService.getUserProvisionedResources().subscribe((list) => {
-      this.list = list;
-      this.environments = this.loadEnvironments();
-      console.log('models ', this.environments);
-    });
+  buildGrid() : void {
+    this.userResourceService.getUserProvisionedResources()
+      .subscribe((result) => {
+        this.environments = this.loadEnvironments(result);
+
+        console.log('models ', this.environments);
+      });
   }
 
-  containsNotebook(notebook_name):boolean {
+  containsNotebook(notebook_name: string) : boolean {
 
     if(notebook_name)
       for (var index = 0; index < this.environments.length; index++)
@@ -66,10 +65,10 @@ export class ResourcesGrid implements OnInit {
         return false;
   }
 
-  loadEnvironments(): Array<any> {
-     if (this.list) {
-       return this.list.map((value) => {
-         return new GridRowModel(value.exploratory_name,
+  loadEnvironments(exploratoryList: Array<any>) : Array<ResourcesGridRowModel> {
+     if (exploratoryList) {
+       return exploratoryList.map((value) => {
+         return new ResourcesGridRowModel(value.exploratory_name,
            value.status,
            value.shape,
            value.computational_resources,
@@ -79,11 +78,11 @@ export class ResourcesGrid implements OnInit {
      }
    }
 
-  printDetailEnvironmentModal(data) {
+  printDetailEnvironmentModal(data) : void {
     this.detailDialog.open({ isFooter: false }, data);
   }
 
-  exploratoryAction(data, action) {
+  exploratoryAction(data, action:string) {
     console.log('action ' + action, data);
     if (action === 'deploy') {
       this.notebookName = data.name
@@ -102,7 +101,7 @@ export class ResourcesGrid implements OnInit {
     }
   }
 
-  createEmr(name, count, shape_master, shape_slave, tmplIndex){
+  createEmr(name, count, shape_master, shape_slave, tmplIndex) {
 
     this.userResourceService
       .createComputationalResource({

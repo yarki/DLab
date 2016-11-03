@@ -10,7 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-export class GridRowModel {
+export class ResourcesGridRowModel {
   constructor(public name:Array<any>,
               public status: string,
               public shape: string,
