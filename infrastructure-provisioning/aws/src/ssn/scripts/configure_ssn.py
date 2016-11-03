@@ -146,29 +146,6 @@ def configure_jenkins():
         return False
 
 
-def configure_proxy_server(config):
-    try:
-        if not exists('/tmp/proxy_ensured'):
-            with settings(warn_only=True):
-                sudo('apt-get -y install squid')
-            template_file = config['squid_template_file']
-            proxy_port = config['proxy_port']
-            proxy_subnet = config['proxy_subnet']
-            with open("/tmp/tmpsquid.conf", 'w') as out:
-                with open(template_file) as tpl:
-                    for line in tpl:
-                        out.write(line.replace('PROXY_SUBNET', proxy_subnet)
-                                  .replace('PROXY_PORT', proxy_port))
-            put('/tmp/tmpsquid.conf', '/tmp/squid.conf')
-            sudo('\cp /tmp/squid.conf /etc/squid/squid.conf')
-            sudo('service squid reload')
-            sudo('sysv-rc-conf squid on')
-            sudo('touch /tmp/proxy_ensured')
-        return True
-    except:
-        return False
-
-
 ##############
 # Run script #
 ##############
@@ -188,10 +165,6 @@ if __name__ == "__main__":
 
     print "Configuring nginx."
     if not configure_nginx(deeper_config):
-        sys.exit(1)
-
-    print "Installing proxy for notebooks."
-    if not configure_proxy_server(deeper_config):
         sys.exit(1)
 
     print "Installing jenkins."

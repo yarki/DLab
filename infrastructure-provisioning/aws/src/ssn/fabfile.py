@@ -149,10 +149,7 @@ def run():
     try:
         logging.info('[CONFIGURE SSN INSTANCE]')
         print('[CONFIGURE SSN INSTANCE]')
-        additional_config = {"nginx_template_dir": "/root/templates/",
-                             "squid_template_file": "/root/templates/squid.conf",
-                             "proxy_port": os.environ["ssn_proxy_port"],
-                             "proxy_subnet": os.environ["ssn_proxy_subnet"]}
+        additional_config = {"nginx_template_dir": "/root/templates/"}
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
 
