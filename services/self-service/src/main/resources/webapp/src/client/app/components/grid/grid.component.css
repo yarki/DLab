@@ -63,7 +63,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .dashboard_table .status {
   text-transform: capitalize;
 }
-.dashboard_table .running {
+.dashboard_table .running,
+.dashboard_table .starting {
   color: #49af38;
 }
 .dashboard_table .stopped,
