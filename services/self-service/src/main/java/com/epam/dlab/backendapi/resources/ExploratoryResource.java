@@ -16,14 +16,16 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.api.form.ExploratoryActionFormDTO;
 import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
-import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
+import com.epam.dlab.registry.ApiCallbacks;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -61,6 +63,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         if (isAdded) {
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withExploratoryName(formDTO.getName())
                     .withNotebookUserName(userInfo.getName())
                     .withNotebookInstanceType(formDTO.getShape())
                     .withRegion(settingsDAO.getAwsRegion())
@@ -76,17 +79,17 @@ public class ExploratoryResource implements ExploratoryAPI {
     }
 
     @POST
-    @Path("/status")
-    public Response create(StatusBaseDTO dto) {
-        LOGGER.debug("update status for exploratory environment {} for user {}", dto.getExploratoryName(), dto.getUser());
-        infrastructureProvisionDAO.updateExploratoryStatus(dto);
+    @Path(ApiCallbacks.STATUS_URI)
+    public Response status(ExploratoryStatusDTO dto) {
+        LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getExploratoryName(), dto.getUser(), dto.getStatus());
+        infrastructureProvisionDAO.updateExploratoryStatusAndId(dto);
         return Response.ok().build();
     }
 
     @POST
     public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, UserInstanceStatus.RUNNING);
+        return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, UserInstanceStatus.STARTING);
     }
 
     @DELETE
@@ -102,23 +105,26 @@ public class ExploratoryResource implements ExploratoryAPI {
         LOGGER.debug("terminating exploratory environment {} for user {}", name, userInfo.getName());
         UserInstanceStatus status = UserInstanceStatus.TERMINATING;
         infrastructureProvisionDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, name, status));
-        return action(userInfo, name, EXPLORATORY_TERMINATE, status);
+        return action(userInfo, name, EXPLORATORY_TERMINATE, UserInstanceStatus.TERMINATING);
     }
 
     private String action(UserInfo userInfo, String name, String action, UserInstanceStatus status) {
         infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo, name, status));
+        String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
+                .withExploratoryName(name)
                 .withNotebookUserName(userInfo.getName())
-                .withNotebookInstanceName(name)
+                .withNotebookInstanceName(exploratoryId)
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(action, dto, String.class);
     }
 
     private StatusBaseDTO createStatusDTO(UserInfo userInfo, String name, UserInstanceStatus status) {
-        return new StatusBaseDTO()
+        return new ExploratoryStatusDTO()
                 .withUser(userInfo.getName())
                 .withExploratoryName(name)
                 .withStatus(status.getStatus());
     }
+
 }

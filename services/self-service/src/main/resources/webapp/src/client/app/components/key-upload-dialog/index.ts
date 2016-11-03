@@ -10,29 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { HomeComponent } from './home.component';
-import { ModalModule } from './../components/modal/index';
-import { GridModule } from './../components/grid/index';
+import {NgModule, Component} from "@angular/core";
+import {CommonModule} from "@angular/common";
+import {ModalModule} from './../modal/index';
+import {UploadKeyDialog} from "./key-upload-dialog.component";
 
-import { ProgressDialogModule } from './../components/progress-dialog/index';
-import { UploadKeyDialogModule } from './../components/key-upload-dialog/index';
-
-import { NavbarModule } from './../shared/navbar/index';
-import { ApplicationSecurityService } from "../services/applicationSecurity.service";
+export * from "./key-upload-dialog.component";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    ModalModule,
-    GridModule,
-    ProgressDialogModule,
-    UploadKeyDialogModule,
-    NavbarModule
-  ],
-  declarations: [HomeComponent],
-  exports: [HomeComponent],
-  providers: [ApplicationSecurityService]
+  imports: [CommonModule, ModalModule],
+  declarations: [UploadKeyDialog],
+  exports: [UploadKeyDialog]
 })
-export class HomeModule { }
+
+export class UploadKeyDialogModule { }
