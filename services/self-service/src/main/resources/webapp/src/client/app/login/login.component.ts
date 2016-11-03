@@ -15,6 +15,7 @@ import { Component } from '@angular/core';
 import { LoginModel } from "./loginModel";
 import {AppRoutingService} from "../routing/appRouting.service";
 import {ApplicationSecurityService} from "../services/applicationSecurity.service";
+import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
   moduleId: module.id,
@@ -28,15 +29,17 @@ export class LoginComponent {
   model = new LoginModel ('', '');
   error = '';
   loading = false;
-  userPattern = "/S+";
+  userPattern = "\\w+";
   //
   // Override
   //
 
-  constructor(private applicationSecurityService: ApplicationSecurityService, private appRoutingService : AppRoutingService) {}
+  constructor(private applicationSecurityService: ApplicationSecurityService,
+              private appRoutingService : AppRoutingService) {}
 
   ngOnInit() {
-    this.applicationSecurityService.isLoggedIn().subscribe(result => {
+    this.applicationSecurityService.isLoggedIn()
+      .subscribe(result => {
       if (result)
         this.appRoutingService.redirectToHomePage();
     });
@@ -51,7 +54,7 @@ export class LoginComponent {
     this.loading = true;
 
     this.applicationSecurityService
-      .login(this.model.username, this.model.password)
+      .login(this.model)
       .subscribe((result) => {
         if (result) {
           this.appRoutingService.redirectToHomePage();
@@ -60,7 +63,7 @@ export class LoginComponent {
 
         return false;
       }, (err) => {
-          if(err.status == 401){
+          if(err.status == HTTP_STATUS_CODES.UNAUTHORIZED){
             this.error = 'Username or password is incorrect.';
             this.loading = false;
           }

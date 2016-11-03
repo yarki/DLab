@@ -39,10 +39,8 @@ export class ResourcesList {
   }
 
   terminateEmr(notebook, resource){
-    let url = '/' + notebook.name + '/' + resource.computational_name + '/terminate';
-
     this.userResourceService
-      .suspendComputationalResource(url)
+      .suspendComputationalResource(notebook.name, resource.computational_name)
       .subscribe((result) => {
         console.log('terminateEmr ', result);
       });
