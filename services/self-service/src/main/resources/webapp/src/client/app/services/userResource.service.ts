@@ -80,8 +80,8 @@ export class UserResourceService {
       .map((response:Response ) => response);
   }
 
-  public suspendComputationalResource(data) : Observable<Response> {
-    let body = JSON.stringify(data);
+  public suspendComputationalResource(notebookName : string, computationalResourceName : string) : Observable<Response> {
+    let body = JSON.stringify('/' + notebookName + '/' + computationalResourceName + '/terminate');
     return this.applicationServiceFacade
       .buildDeleteComputationalResourcesRequest(body)
       .map((response:Response ) => response);
