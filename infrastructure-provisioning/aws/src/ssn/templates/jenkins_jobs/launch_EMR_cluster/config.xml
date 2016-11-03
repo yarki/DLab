@@ -21,49 +21,49 @@
                     <description></description>
                     <choices class="java.util.Arrays$ArrayList">
                         <a class="string-array">
-                            <string>m3.xlarge</string>
-                            <string>m3.2xlarge</string>
+                            <!--<string>m3.xlarge</string>
+                            <string>m3.2xlarge</string>-->
                             <string>m4.large</string>
                             <string>m4.xlarge</string>
                             <string>m4.2xlarge</string>
                             <string>m4.4xlarge</string>
                             <string>m4.10xlarge</string>
-                            <string>m1.small</string>
+                            <!--<string>m1.small</string>
                             <string>m1.medium</string>
                             <string>m1.large</string>
                             <string>m1.xlarge</string>
                             <string>c3.xlarge</string>
                             <string>c3.2xlarge</string>
                             <string>c3.4xlarge</string>
-                            <string>c3.8xlarge</string>
+                            <string>c3.8xlarge</string>-->
                             <string>c4.large</string>
                             <string>c4.xlarge</string>
                             <string>c4.2xlarge</string>
                             <string>c4.4xlarge</string>
                             <string>c4.8xlarge</string>
-                            <string>c1.medium</string>
+                            <!--<string>c1.medium</string>
                             <string>c1.xlarge</string>
                             <string>cc2.8xlarge</string>
                             <string>g2.2xlarge</string>
-                            <string>cg1.4xlarge</string>
+                            <string>cg1.4xlarge</string>-->
                             <string>r3.xlarge</string>
                             <string>r3.2xlarge</string>
                             <string>r3.4xlarge</string>
                             <string>r3.8xlarge</string>
-                            <string>m2.xlarge</string>
+                            <!--<string>m2.xlarge</string>
                             <string>m2.2xlarge</string>
                             <string>m2.4xlarge</string>
-                            <string>cr1.8xlarge</string>
+                            <string>cr1.8xlarge</string>-->
                             <string>i2.xlarge</string>
                             <string>i2.2xlarge</string>
                             <string>i2.4xlarge</string>
                             <string>i2.8xlarge</string>
-                            <string>d2.xlarge</string>
+                            <!--<string>d2.xlarge</string>
                             <string>d2.2xlarge</string>
                             <string>d2.4xlarge</string>
                             <string>d2.8xlarge</string>
                             <string>hi1.4xlarge</string>
-                            <string>hs1.8xlarge</string>
+                            <string>hs1.8xlarge</string>-->
                         </a>
                     </choices>
                 </hudson.model.ChoiceParameterDefinition>
