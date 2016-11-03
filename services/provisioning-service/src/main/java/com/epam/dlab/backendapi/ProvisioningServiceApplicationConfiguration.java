@@ -37,7 +37,7 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     private Duration warmupPollTimeout = Duration.seconds(3);
 
     @JsonProperty
-    private Duration resourceStatusPollTimeout = Duration.seconds(3);
+    private Duration resourceStatusPollTimeout = Duration.minutes(3);
 
     @JsonProperty
     private Duration keyLoaderPollTimeout = Duration.minutes(2);

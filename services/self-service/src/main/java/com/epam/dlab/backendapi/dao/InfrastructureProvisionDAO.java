@@ -66,7 +66,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     }
 
     public void updateExploratoryStatusAndId(ExploratoryStatusDTO dto) {
-        Document updates = new Document(SET, new Document(STATUS, dto.getStatus()).append(EXPLORATORY_ID, dto.getExploratoryId()));
+        Document updates = new Document(SET, new Document(STATUS, dto.getStatus()));
+        if (dto.getExploratoryId() != null) {
+            updates.append(EXPLORATORY_ID, dto.getExploratoryId());
+        }
         update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())), updates);
     }
 
@@ -122,8 +125,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     public void updateComputationalStatusAndId(ComputationalStatusDTO dto) {
         try {
-            Document updates = new Document(SET, new Document(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, dto.getStatus())
-                    .append(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + COMPUTATIONAL_ID, dto.getComputationalId()));
+            Document updates = new Document(SET, new Document(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, dto.getStatus()));
+            if (dto.getComputationalId() != null) {
+                updates.append(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + COMPUTATIONAL_ID, dto.getComputationalId());
+            }
             update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())
                     , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, dto.getComputationalName())),
                     updates);

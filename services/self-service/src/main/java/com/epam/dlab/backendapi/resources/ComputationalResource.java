@@ -61,10 +61,12 @@ public class ComputationalResource implements ComputationalAPI {
                         .withSlaveShape(formDTO.getSlaveInstanceType())
                         .withSlaveNumber(formDTO.getInstanceCount()));
         if (isAdded) {
+            String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), formDTO.getNotebookName());
             ComputationalCreateDTO dto = new ComputationalCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withExploratoryName(formDTO.getNotebookName())
                     .withComputationalName(formDTO.getName())
+                    .withNotebookName(exploratoryId)
                     .withInstanceCount(formDTO.getInstanceCount())
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
@@ -98,11 +100,13 @@ public class ComputationalResource implements ComputationalAPI {
                 .withExploratoryName(exploratoryName)
                 .withComputationalName(computationalName)
                 .withStatus(UserInstanceStatus.TERMINATING.getStatus()));
+        String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), exploratoryName);
         String computationalId = infrastructureProvisionDAO.fetchComputationalId(userInfo.getName(), exploratoryName, computationalName);
         ComputationalTerminateDTO dto = new ComputationalTerminateDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withExploratoryName(exploratoryName)
                 .withComputationalName(computationalName)
+                .withNotebookInstanceName(exploratoryId)
                 .withClusterName(computationalId)
                 .withEdgeUserName(userInfo.getName())
                 .withRegion(settingsDAO.getAwsRegion());

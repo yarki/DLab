@@ -1,7 +1,7 @@
 keyDirectory: /home/ubuntu/keys
 responseDirectory: /tmp/dlab
 warmupPollTimeout: 10s
-resourceStatusPollTimeout: 10s
+resourceStatusPollTimeout: 30m
 keyLoaderPollTimeout: 20m
 adminKey: BDCC-DSS-POC
 edgeImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-edge
