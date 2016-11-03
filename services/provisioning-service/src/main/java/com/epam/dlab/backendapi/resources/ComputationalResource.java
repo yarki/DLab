@@ -73,6 +73,7 @@ public class ComputationalResource implements DockerCommands {
                                     .withEc2Role(configuration.getEmrEC2RoleDefault())
                                     .withServiceRole(configuration.getEmrServiceRoleDefault())
                                     .withCredsKeyName(configuration.getAdminKey())
+                                    .withCredsSecurityGroupsIds(dto.getSecurityGroupIds())
                                     .withActionCreate(configuration.getEmrImage()),
                             dto
                     )

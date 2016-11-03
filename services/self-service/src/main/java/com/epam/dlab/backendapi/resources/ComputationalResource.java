@@ -72,7 +72,8 @@ public class ComputationalResource implements ComputationalAPI {
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                     .withVersion(formDTO.getVersion())
                     .withEdgeUserName(userInfo.getName())
-                    .withRegion(settingsDAO.getAwsRegion());
+                    .withRegion(settingsDAO.getAwsRegion())
+                    .withSecurityGroupIds(settingsDAO.getSecurityGroups());;
             LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EMR_CREATE, dto, String.class))
