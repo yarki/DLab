@@ -102,7 +102,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     private UserInstanceStatus calcStatus(DockerAction action, boolean success) {
         if (success) {
             switch (action) {
-                case CREATE: return UserInstanceStatus.CREATED;
+                case CREATE: return UserInstanceStatus.RUNNING;
                 case START: return UserInstanceStatus.RUNNING;
                 case STOP: return UserInstanceStatus.STOPPED;
                 case TERMINATE: return UserInstanceStatus.TERMINATED;

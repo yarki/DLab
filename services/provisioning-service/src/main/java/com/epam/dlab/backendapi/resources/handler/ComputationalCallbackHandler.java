@@ -41,8 +41,8 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
 
     @Override
     protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO baseStatus) {
-        String computationalName = resultNode.get(COMPUTATIONAL_ID_FIELD).textValue();
-        return baseStatus.withComputationalName(computationalName);
+        String computationalId = resultNode.get(COMPUTATIONAL_ID_FIELD).textValue();
+        return baseStatus.withComputationalId(computationalId);
     }
 
     @Override
