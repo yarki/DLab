@@ -42,26 +42,6 @@ public class AwsTest {
     @Test
     @Ignore
     public void test1(){
-        /*
-            AWS account
-            575405009735
-            AKIAJOA3U4W6PYOHNQ4Q
-Secret Access Key:
-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
-        */
-//        AWSCredentials cr = new BasicAWSCredentials("AKIAJOA3U4W6PYOHNQ4Q","1oDSAJZJR6kncn5d+tkyG7o6GrPrMW8ewhPkF4oQ");
-        AWSCredentials cr = new BasicAWSCredentials("AKIAJOA3U4W6PYOHNQ4Q","1oDSAJZJR6kncn5d+tkyG7o6GrPrMW8ewhPkF4oQ");
-        AmazonIdentityManagement aim = new AmazonIdentityManagementClient(cr);
-        //"dmytro_liaskovskyi@epam.com" "mikhail_teplitskiy@epam.com"
-        GetUserRequest r = new GetUserRequest().withUserName("dmytro_liaskovskyi@epam.com");
-        //r.setUserName("mikhail_teplitskiy@epam.com");
-        GetUserResult ur = aim.getUser(r);
-
-        ListUsersResult lur = aim.listUsers();
-
-        System.out.println("UR:"+ur.getUser().getUserName());
-
-        System.out.println("Users:"+lur.getUsers());
     }
 
 }

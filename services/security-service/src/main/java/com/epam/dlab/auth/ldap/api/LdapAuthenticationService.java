@@ -12,8 +12,7 @@
 
 package com.epam.dlab.auth.ldap.api;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.PropertiesFileCredentialsProvider;
 import com.amazonaws.services.identitymanagement.model.User;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.UserInfoDAO;
@@ -38,7 +37,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.TimeUnit;
 
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -59,8 +57,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			this.userInfoDao = new UserInfoDAODumbImpl();
 		}
 		if(config.isAwsUserIdentificationEnabled()) {
-			AWSCredentials cr = new BasicAWSCredentials("AKIAJOA3U4W6PYOHNQ4Q","1oDSAJZJR6kncn5d+tkyG7o6GrPrMW8ewhPkF4oQ");
-			awsUserDAO = new AwsUserDAOImpl(cr);
+			PropertiesFileCredentialsProvider provider = new PropertiesFileCredentialsProvider( config.getAwsCredentialsPath() );
+			awsUserDAO = new AwsUserDAOImpl(provider.getCredentials());
 		} else {
 			awsUserDAO = null;
 		}

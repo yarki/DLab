@@ -43,6 +43,9 @@ public class SecurityServiceConfiguration extends Configuration {
 
 	@JsonProperty
 	private boolean awsUserIdentificationEnabled = false;
+
+	@JsonProperty
+	private String awsCredentialsPath = "~/.aws/credentials";
 	
 	@JsonProperty
 	private long inactiveUserTimeoutMillSec;
@@ -98,5 +101,9 @@ public class SecurityServiceConfiguration extends Configuration {
 
 	public boolean isAwsUserIdentificationEnabled() {
 		return awsUserIdentificationEnabled;
+	}
+
+	public String getAwsCredentialsPath() {
+		return awsCredentialsPath;
 	}
 }
