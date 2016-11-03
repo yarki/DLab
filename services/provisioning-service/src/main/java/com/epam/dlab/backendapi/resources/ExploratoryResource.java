@@ -57,29 +57,6 @@ public class ExploratoryResource implements DockerCommands {
     @Path("/create")
     @POST
     public String create(ExploratoryCreateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("create exploratory environment");
-        String uuid = DockerCommands.generateUUID();
-        folderListenerExecutor.start(configuration.getImagesDirectory(),
-                configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(DockerAction.CREATE, uuid, dto));
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withDetached()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withConfServiceBaseName(dto.getServiceBaseName())
-                                .withNotebookUserName(dto.getNotebookUserName())
-                                .withNotebookInstanceType(dto.getNotebookInstanceType())
-                                .withCredsRegion(dto.getRegion())
-                                .withCredsSecurityGroupsIds(dto.getSecurityGroupIds())
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withImage(configuration.getNotebookImage())
-                                .withAction(DockerAction.CREATE)
-                )
-        );
-        return uuid;
         return action(dto, DockerAction.CREATE);
     }
 
