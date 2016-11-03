@@ -70,7 +70,7 @@ def run():
     edge_conf['policy_arn'] = os.environ['conf_policy_arn']
     edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
     edge_conf['vpc_id'] = os.environ['edge_vpc_id']
-    edge_conf['region'] = os.environ['edge_region']
+    edge_conf['region'] = os.environ['creds_region']
     edge_conf['ami_id'] = os.environ['edge_ami_id']
     edge_conf['instance_size'] = os.environ['edge_instance_size']
     edge_conf['sg_ids'] = os.environ['creds_security_groups_ids']
