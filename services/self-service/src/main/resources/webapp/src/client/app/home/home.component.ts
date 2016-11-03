@@ -29,16 +29,12 @@ export class HomeComponent implements OnInit {
   private readonly CHECK_ACCESS_KEY_TIMEOUT : number = 10000;
 
   userUploadAccessKeyState: number;
-  newAccessKeyForUpload: any;
-  uploadAccessKeyLabel: string;
-  uploadAccessUserKeyFormValid: boolean;
   createTempls: any;
   shapes: any;
   emrTempls: any;
   notebookExist: boolean = false;
   progressDialogConfig: any;
 
-  keyUploadDialogConfig: any;
   templateDescription: string;
 
   @ViewChild('keyUploadModal') keyUploadModal;
@@ -55,7 +51,6 @@ export class HomeComponent implements OnInit {
     private userResourceService: UserResourceService
   ) {
     this.userUploadAccessKeyState = HTTP_STATUS_CODES.NOT_FOUND;
-    this.uploadAccessUserKeyFormValid = false;
   }
 
   ngOnInit() {
@@ -63,57 +58,15 @@ export class HomeComponent implements OnInit {
     this.initAnalyticSelectors();
 
     this.progressDialogConfig = this.setProgressDialogConfiguration();
-    this.keyUploadDialogConfig = this.setKeyUploadDialogConfiguration();
   }
-
-  //
-  // Handlers
-  //
 
   createNotebook_btnClick() {
     this.processAccessKeyStatus(this.userUploadAccessKeyState, true);
   }
 
-  uploadUserAccessKey_btnClick(event) {
-    let formData = new FormData();
-    formData.append("file", this.newAccessKeyForUpload);
-
-    this.userAccessKeyService.uploadUserAccessKey(formData)
-      .subscribe(
-      response => {
-        if (response.status === HTTP_STATUS_CODES.OK)
-          this.checkInfrastructureCreationProgress();
-      },
-      error => console.log(error)
-      );
-
-    event.preventDefault();
-  }
-
-  uploadUserAccessKey_onChange($event) {
-    this.uploadAccessKeyLabel = "";
-    this.newAccessKeyForUpload = null;
-    this.uploadAccessUserKeyFormValid = false;
-
-    if ($event.target.files.length > 0) {
-      let fileToUpload = $event.target.files[0];
-      this.uploadAccessUserKeyFormValid = fileToUpload.name.toLowerCase().endsWith(".pub");
-      if (this.uploadAccessUserKeyFormValid)
-        this.newAccessKeyForUpload = $event.target.files[0];
-
-      this.uploadAccessKeyLabel = !this.uploadAccessUserKeyFormValid
-        ? ".pub file is required."
-        : fileToUpload.name;
-    }
-  }
-
   refreshGrid() {
     this.grid.buildGrid();
   }
-
-  //
-  // Private Methods
-  //
 
   private checkInfrastructureCreationProgress() {
     this.userAccessKeyService.checkUserAccessKey()
@@ -252,16 +205,6 @@ export class HomeComponent implements OnInit {
       aligning: 'text-center'
     }
   }
-
-  //   setKeyUploadDialogConfiguration() {
-  //     return {
-  //       header_title: 'Create initial infrastructure',
-  //       // content: '<img src="assets/img/gif-spinner.gif" alt="">',
-  //       modal_size: 'modal-sm',
-  //       // text_style: 'info-label',
-  //       // aligning: 'text-center'
-  //     }
-  // }
 
   showDescription(value) {
     this.templateDescription = this.createTempls[value].description;

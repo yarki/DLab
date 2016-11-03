@@ -17,7 +17,7 @@ import { ModalModule } from './../components/modal/index';
 import { GridModule } from './../components/grid/index';
 
 import { ProgressDialogModule } from './../components/progress-dialog/index';
-import { UploadKeyDialogModule } from './../components/upload-key-dialog/index';
+import { UploadKeyDialogModule } from './../components/key-upload-dialog/index';
 
 import { NavbarModule } from './../shared/navbar/index';
 import { ApplicationSecurityService } from "../services/applicationSecurity.service";
