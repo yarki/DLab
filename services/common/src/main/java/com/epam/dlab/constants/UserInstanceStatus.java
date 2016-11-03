@@ -15,6 +15,7 @@ package com.epam.dlab.constants;
 public enum UserInstanceStatus {
     CREATING("creating"),
     CREATED("created"),
+    STARTING("starting"),
     RUNNING("running"),
     STOPPING("stopping"),
     STOPPED("stopped"),

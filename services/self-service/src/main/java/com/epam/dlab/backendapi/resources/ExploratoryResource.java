@@ -89,7 +89,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @POST
     public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, UserInstanceStatus.RUNNING);
+        return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, UserInstanceStatus.STARTING);
     }
 
     @DELETE
