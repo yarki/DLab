@@ -33,6 +33,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     private static final String STATUS_FIELD = "status";
     private static final String RESPONSE_NODE = "response";
     private static final String RESULT_NODE = "result";
+    private static final String CONF_NODE = "conf";
 
     private static final String OK_STATUS = "ok";
     private static final String ERROR_STATUR = "err";
@@ -59,17 +60,20 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
 
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
-        LOGGER.debug("get file {} actually waited for {}", fileName, originalUuid);
+        LOGGER.debug("Got file {} while waiting for {}", fileName, originalUuid);
         JsonNode document = MAPPER.readTree(content);
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
         T result = getBaseStatusDTO(status);
+        JsonNode resultNode;
         if (success) {
-            JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
-            result = parseOutResponse(resultNode, result);
+            resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
+            LOGGER.debug("Did {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
         } else {
+            resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE).get(CONF_NODE);
             LOGGER.error("Could not {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
         }
+        result = parseOutResponse(resultNode, result);
         selfService.post(getCallbackURI(), result, resultType);
         return !UserInstanceStatus.FAILED.equals(status);
     }
