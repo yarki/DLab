@@ -13,15 +13,14 @@
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { UserResourceService } from "./../../services/userResource.service";
 import {Response} from "@angular/http";
-import HTTP_STATUS_CODES from 'http-status-enum';
 
  @Component({
    moduleId: module.id,
-   selector: 'confirmation-emr',
-   templateUrl: 'confirmation-emr.component.html'
+   selector: 'confirmation-computational-resources',
+   templateUrl: 'confirmation-computational-resources.component.html'
  })
 
- export class ConfirmationEmr {
+ export class ConfirmationComputationalResources {
    notebook: Object;
    resource: Object;
 

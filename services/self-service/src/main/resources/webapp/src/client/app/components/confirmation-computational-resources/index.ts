@@ -10,17 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import {ConfirmationEmr} from "./confirmation-emr.component";
+import {ConfirmationComputationalResources} from "./confirmation-computational-resources.component";
 import {NgModule, Component} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {ModalModule} from './../modal/index';
 
-export * from "./confirmation-emr.component";
+export * from "./confirmation-computational-resources.component";
 
 @NgModule({
   imports: [ModalModule, CommonModule],
-  declarations: [ConfirmationEmr],
-  exports: [ConfirmationEmr],
+  declarations: [ConfirmationComputationalResources],
+  exports: [ConfirmationComputationalResources],
 })
 
-export class ConfirmationEmrModule { }
+export class ConfirmationComputationalResourcesModule { }

@@ -14,12 +14,12 @@ import {ResourcesList} from "./resources.component";
 import {NgModule, Component} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import { ModalModule } from './../modal/index';
-import { ConfirmationEmrModule } from './../confirmation-emr/index';
+import { ConfirmationComputationalResourcesModule } from './../confirmation-computational-resources/index';
 
 export * from "./resources.component";
 
 @NgModule({
-  imports: [CommonModule, ModalModule, ConfirmationEmrModule],
+  imports: [CommonModule, ModalModule, ConfirmationComputationalResourcesModule],
   declarations: [ResourcesList],
   exports: [ResourcesList],
 })
