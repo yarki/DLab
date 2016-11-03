@@ -15,6 +15,7 @@ export class GridRowModel {
               public status: string,
               public shape: string,
               public resources:Array<any>,
-              public time:string
+              public time:string,
+              public url:string
             ){}
 }

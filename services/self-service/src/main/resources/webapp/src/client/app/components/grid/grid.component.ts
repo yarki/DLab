@@ -73,7 +73,8 @@ export class Grid implements OnInit {
            value.status,
            value.shape,
            value.computational_resources,
-           value.up_time_since);
+           value.up_time_since,
+           value.url);
        });
      }
    }
