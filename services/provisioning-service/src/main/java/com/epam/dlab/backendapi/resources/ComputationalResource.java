@@ -100,6 +100,7 @@ public class ComputationalResource implements DockerCommands {
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withRequestId(uuid)
+                                    .withEmrClusterName(dto.getClusterName())
                                     .withCredsKeyName(configuration.getAdminKey())
                                     .withActionTerminate(configuration.getEmrImage()),
                             dto
