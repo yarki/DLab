@@ -13,7 +13,6 @@
 package com.epam.dlab.backendapi.health;
 
 import com.epam.dlab.client.mongo.MongoService;
-import com.google.inject.Inject;
 import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
