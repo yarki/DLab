@@ -11,10 +11,9 @@
  *****************************************************************************************************/
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-
-import {UserAccessKeyService} from "../services/userAccessKey.service";
-import {UserResourceService} from "../services/userResource.service";
-import { Grid } from '../components/grid/grid.component';
+import { UserAccessKeyService } from "../services/userAccessKey.service";
+import { UserResourceService } from "../services/userResource.service";
+import { ResourcesGrid } from '../components/resources-grid/resources-grid.component';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
@@ -41,7 +40,7 @@ export class HomeComponent implements OnInit {
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
   @ViewChild('createAnalyticalModal') createAnalyticalModal;
-  @ViewChild(Grid) grid: Grid;
+  @ViewChild(ResourcesGrid) resourcesGrid: ResourcesGrid;
 
   // -------------------------------------------------------------------------
   // Overrides
@@ -66,7 +65,7 @@ export class HomeComponent implements OnInit {
   }
 
   refreshGrid() {
-    this.grid.buildGrid();
+    this.resourcesGrid.buildGrid();
   }
 
   private checkInfrastructureCreationProgress() {
@@ -174,7 +173,7 @@ export class HomeComponent implements OnInit {
     this.notebookExist = false;
     event.preventDefault();
 
-    if (this.grid.containsNotebook(name.value)) {
+    if (this.resourcesGrid.containsNotebook(name.value)) {
       this.notebookExist = true;
       return false;
     }
@@ -191,7 +190,7 @@ export class HomeComponent implements OnInit {
         if (this.createAnalyticalModal.isOpened) {
           this.createAnalyticalModal.close();
         }
-        this.grid.buildGrid();
+        this.resourcesGrid.buildGrid();
         name.value = "";
         this.notebookExist = false;
       });

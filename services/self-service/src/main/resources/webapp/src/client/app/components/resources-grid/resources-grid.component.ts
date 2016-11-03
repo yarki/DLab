@@ -12,18 +12,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import { Component, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
-import { GridRowModel } from './grid.model';
+import { GridRowModel } from './resources-grid.model';
 import { CreateEmrModel } from "./createEmrModel";
-import {ConfirmationDialogType} from "../confirmation-dialog/confirmation-dialog-type.enum";
+import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dialog-type.enum";
 
 @Component({
   moduleId: module.id,
-  selector: 'ng-grid',
-  templateUrl: 'grid.component.html',
-  styleUrls: ['./grid.component.css']
+  selector: 'resources-grid',
+  templateUrl: 'resources-grid.component.html',
+  styleUrls: ['./resources-grid.component.css']
 })
 
-export class Grid implements OnInit {
+export class ResourcesGrid implements OnInit {
 
   isFilled: boolean = false;
   list: any;
