@@ -83,7 +83,7 @@ export class Grid implements OnInit {
     this.detailDialog.open({ isFooter: false }, data);
   }
 
-  mathAction(data, action) {
+  exploratoryAction(data, action) {
     console.log('action ' + action, data);
     if (action === 'deploy') {
       this.notebookName = data.name
