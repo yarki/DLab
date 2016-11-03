@@ -21,8 +21,11 @@ import org.slf4j.LoggerFactory;
 public class MongoHealthChecker implements HealthChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoHealthChecker.class);
 
-    @Inject
     private MongoService mongoService;
+
+    public MongoHealthChecker(MongoService mongoService) {
+        this.mongoService = mongoService;
+    }
 
     @Override
     public boolean isAlive() {

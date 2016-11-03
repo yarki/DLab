@@ -25,9 +25,11 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
 public class ProvisioningHealthChecker implements HealthChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningHealthChecker.class);
 
-    @Inject
-    @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
+
+    public ProvisioningHealthChecker(RESTService provisioningService) {
+        this.provisioningService = provisioningService;
+    }
 
     @Override
     public boolean isAlive() {
