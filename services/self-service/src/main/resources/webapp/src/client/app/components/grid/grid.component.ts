@@ -72,7 +72,8 @@ export class Grid implements OnInit {
          return new GridRowModel(value.exploratory_name,
            value.status,
            value.shape,
-           value.computational_resources);
+           value.computational_resources,
+           value.up_time_since);
        });
      }
    }
