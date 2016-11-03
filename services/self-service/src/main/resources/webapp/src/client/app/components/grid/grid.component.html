@@ -41,12 +41,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <div class="dropdown-menu">
           <ul class="list-unstyled">
             <li class="dropdown-close"></li>
-            <li (click)="mathAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped' &&
+            <li (click)="exploratoryAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped' &&
                                                          env.status != 'stopping'">Stop</li>
-            <li (click)="mathAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped' ||
+            <li (click)="exploratoryAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped' ||
                                                         env.status == 'stopping'">Run</li>
-            <li (click)="mathAction(env, 'terminate')">Terminate</li>
-            <li (click)="mathAction(env, 'deploy')" *ngIf="env.status != 'stopping' && env.status != 'stopped'">Deploy EMR</li>
+            <li (click)="exploratoryAction(env, 'terminate')">Terminate</li>
+            <li (click)="exploratoryAction(env, 'deploy')" *ngIf="env.status != 'stopping' && env.status != 'stopped'">Deploy EMR</li>
           </ul>
         </div>
       </div>
@@ -80,7 +80,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <label class="control-label">Cluster Alias</label>
         </div>
         <div class="col-xs-8">
-            <input type="text" class="form-control" id="name" (pattern)="namePattern" name="cluster_alias" [(ngModel)]="model.name" #name="ngModel" />
+            <input type="text" class="form-control" id="name" [pattern]="namePattern" name="cluster_alias" [(ngModel)]="model.name" #name="ngModel" />
         </div>
       </div>
       <div class="form-group row">

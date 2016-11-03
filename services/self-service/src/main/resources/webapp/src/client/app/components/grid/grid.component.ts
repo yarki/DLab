@@ -31,7 +31,7 @@ export class Grid implements OnInit {
   notebookName: any;
 
   model = new CreateEmrModel('', '');
-  namePattern = "/S+";
+  namePattern = "\\w+.*\\w+";
 
   @ViewChild('createEmrModal') createEmrModal;
   @ViewChild('confirmationDialog') confirmationDialog;
@@ -72,7 +72,9 @@ export class Grid implements OnInit {
          return new GridRowModel(value.exploratory_name,
            value.status,
            value.shape,
-           value.computational_resources);
+           value.computational_resources,
+           value.up_time_since,
+           value.url);
        });
      }
    }
@@ -81,7 +83,7 @@ export class Grid implements OnInit {
     this.detailDialog.open({ isFooter: false }, data);
   }
 
-  mathAction(data, action) {
+  exploratoryAction(data, action) {
     console.log('action ' + action, data);
     if (action === 'deploy') {
       this.notebookName = data.name

@@ -18,15 +18,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <table class="detail-header">
           <tr>
             <td class="modal-title">{{notebook.name}}</td>
-            <td class="success_color">{{notebook.status}}</td>
+              <td>
+                <span class="status"
+                  [ngClass]="{
+                  'danger_color': notebook.status === 'terminating', 
+                  'success_color': notebook.status === 'stopped'}">
+                  {{notebook.status}}
+                </span>
+              </td>
             <td>{{notebook.shape}}</td>
           </tr>
         </table>
       </div>
       <div class="row">
         <div class="col-xs-12">
-          <p>Up time 18 hours since Mon 12:00 EST, Sept 5, 2016</p>
-          <p>Open in your browser  <a href="http://10.0.15.1:8080" target="_blank">http://10.0.15.1:8080</a> to access this box after creating a tunnel.</p>
+          <p>Up time {{notebook.time + ""}}</p>
+          <p>Open in your browser  <a href="{{notebook.url + ''}}" target="_blank">{{notebook.url+ ''}}</a> to access this box after creating a tunnel.</p>
           <br/>
           <p>
             <a href="#" target="_blank">

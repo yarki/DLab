@@ -192,3 +192,7 @@ modal-content {
 .modal-content .danger_field {
   border-color: #d9534f;
 }
+.detail-dialog .status {
+  font-size: 14px;
+  text-transform: capitalize;
+}

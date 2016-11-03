@@ -29,4 +29,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 .source {
   line-height: 30px;
+  position: relative;
+}
+.arrow_icon {
+  position: absolute;
+  right: 0;
+  top: 8px;
+}
+.emt_status {
+  color: #bdc9d5;
+  float: right;
+  margin-right: 30px;
+  width: 100px;
+  text-transform: capitalize;
 }

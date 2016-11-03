@@ -20,7 +20,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       {{resources[0].computational_name}}
       <span *ngIf="resources[0].nodes_number">{{resources[0].nodes_number}} nodes</span>
     </a>
-    <span *ngIf="resources.length > 1" class="glyphicon pull-right" [ngClass]="{'glyphicon-triangle-bottom': !collapse, 'glyphicon-triangle-top': collapse}" (click)="toggleResourceList()"></span>
+    <span *ngIf="resources.length > 1" class="glyphicon arrow_icon" [ngClass]="{'glyphicon-triangle-bottom': !collapse, 'glyphicon-triangle-top': collapse}" (click)="toggleResourceList()"></span>
+    <span class="emt_status">{{resources[0].status}}</span>
   </div>
 </div>
 
@@ -31,5 +32,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       {{resource.computational_name}}
       <span *ngIf="resource.nodes_number">{{resource.nodes_number}} nodes</span>
     </a>
+    <span class="emt_status">{{resource.status}}</span>
   </div>
 </div>
