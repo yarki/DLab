@@ -66,11 +66,11 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     }
 
     public void updateExploratoryStatusAndId(ExploratoryStatusDTO dto) {
-        Document updates = new Document(SET, new Document(STATUS, dto.getStatus()));
+        Document values = new Document(STATUS, dto.getStatus());
         if (dto.getExploratoryId() != null) {
-            updates.append(EXPLORATORY_ID, dto.getExploratoryId());
+            values.append(EXPLORATORY_ID, dto.getExploratoryId());
         }
-        update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())), updates);
+        update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())),  new Document(SET, values));
     }
 
     public void updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
@@ -125,13 +125,13 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     public void updateComputationalStatusAndId(ComputationalStatusDTO dto) {
         try {
-            Document updates = new Document(SET, new Document(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, dto.getStatus()));
+            Document values = new Document(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, dto.getStatus());
             if (dto.getComputationalId() != null) {
-                updates.append(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + COMPUTATIONAL_ID, dto.getComputationalId());
+                values.append(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + COMPUTATIONAL_ID, dto.getComputationalId());
             }
             update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())
                     , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, dto.getComputationalName())),
-                    updates);
+                    new Document(SET, values));
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);
         }
