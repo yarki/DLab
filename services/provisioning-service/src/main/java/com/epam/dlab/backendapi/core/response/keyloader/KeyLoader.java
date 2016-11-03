@@ -19,8 +19,6 @@ import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
-import com.epam.dlab.backendapi.core.response.folderlistener.handler.ErrorFileHandler;
-import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
@@ -96,7 +94,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
                     result.setSuccessAndCredential(extractCredential(document));
                 }
                 selfService.post(KEY_LOADER, result, UploadFileResultDTO.class);
-                return true;
+                return result.isSuccess();
             }
 
             @Override

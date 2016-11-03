@@ -66,7 +66,7 @@ class BaseDAO implements MongoCollections {
         try {
             return Document.parse(MAPPER.writeValueAsString(object));
         } catch (IOException e) {
-            throw new DlabException("error converting to bson");
+            throw new DlabException("error converting to bson", e);
         }
     }
 
@@ -79,7 +79,7 @@ class BaseDAO implements MongoCollections {
         try {
             return MAPPER.readValue(document.toJson(), clazz);
         } catch (IOException e) {
-            throw new DlabException("error converting from document with id " + document.get(ID));
+            throw new DlabException("error converting from document with id " + document.get(ID), e);
         }
     }
 

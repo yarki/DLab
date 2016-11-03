@@ -12,15 +12,18 @@
 
 package com.epam.dlab.backendapi.health;
 
+import com.epam.dlab.client.mongo.MongoService;
+import com.epam.dlab.client.restclient.RESTService;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
 import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
 
-public class HealthModule extends AbstractModule{
+public class HealthModule extends AbstractModule {
 
     @Override
     protected void configure() {
@@ -29,14 +32,14 @@ public class HealthModule extends AbstractModule{
     @Provides
     @Singleton
     @Named(MONGO_HEALTH_CHECKER)
-    public HealthChecker mongoHealthChecker() {
-        return new MongoHealthChecker();
+    public HealthChecker mongoHealthChecker(MongoService mongoService) {
+        return new MongoHealthChecker(mongoService);
     }
 
     @Provides
     @Singleton
     @Named(PROVISIONING_HEALTH_CHECKER)
-    public HealthChecker provisioningHealthChecker() {
-        return new ProvisioningHealthChecker();
+    public HealthChecker provisioningHealthChecker(@Named(PROVISIONING_SERVICE) RESTService provisioningService) {
+        return new ProvisioningHealthChecker(provisioningService);
     }
 }

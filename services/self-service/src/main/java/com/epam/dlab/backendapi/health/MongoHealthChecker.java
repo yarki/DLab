@@ -13,21 +13,18 @@
 package com.epam.dlab.backendapi.health;
 
 import com.epam.dlab.client.mongo.MongoService;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
-
-import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
-
 public class MongoHealthChecker implements HealthChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoHealthChecker.class);
 
-    @Inject
     private MongoService mongoService;
+
+    public MongoHealthChecker(MongoService mongoService) {
+        this.mongoService = mongoService;
+    }
 
     @Override
     public boolean isAlive() {

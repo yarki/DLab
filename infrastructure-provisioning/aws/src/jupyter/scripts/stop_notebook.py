@@ -22,6 +22,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--bucket_name', type=str)
 parser.add_argument('--tag_name', type=str)
 parser.add_argument('--nb_tag_value', type=str)
+parser.add_argument('--ssh_user', type=str)
+parser.add_argument('--key_path', type=str)
 args = parser.parse_args()
 
 
@@ -43,6 +45,8 @@ if __name__ == "__main__":
                 print "The bucket " + args.bucket_name + " has been cleaned successfully"
                 terminate_emr(cluster_id)
                 print "The EMR cluster " + emr_name + " has been terminated successfully"
+                remove_kernels(emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path)
+                print emr_name + " kernels have been removed from notebook successfully"
         else:
             print "There are no EMR clusters to terminate."
     except:

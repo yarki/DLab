@@ -17,18 +17,18 @@ import {ApplicationServiceFacade} from "./applicationServiceFacade.service";
 
 @Injectable()
 export class UserAccessKeyService {
-  constructor(private applicationServiceFacace: ApplicationServiceFacade) {
+  constructor(private applicationServiceFacade: ApplicationServiceFacade) {
   }
 
-  checkUserAccessKey() : Observable<Response> {
-    return this.applicationServiceFacace
+  public checkUserAccessKey() : Observable<Response> {
+    return this.applicationServiceFacade
       .buildCheckUserAccessKeyRequest()
       .map(response => response);
   }
 
-  uploadUserAccessKey(data) : Observable<Response>
+  public uploadUserAccessKey(data) : Observable<Response>
   {
-    return this.applicationServiceFacace
+    return this.applicationServiceFacade
       .buildUploadUserAccessKeyRequest(data)
       .map((response : Response) => response);
   }

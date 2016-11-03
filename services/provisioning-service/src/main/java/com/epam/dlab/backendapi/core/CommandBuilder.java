@@ -24,18 +24,24 @@ import org.slf4j.LoggerFactory;
 public class CommandBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandBuilder.class);
 
-    public String buildCommand(RunDockerCommand runDockerCommand, ResourceBaseDTO resourceBaseDTO) throws JsonProcessingException {
-        StringBuilder sb = new StringBuilder("echo -e '");
-        try {
-            sb.append(new JsonGenerator().generateJson(resourceBaseDTO));
-        } catch (JsonProcessingException e) {
-            LOGGER.error("ERROR generating json from dockerRunParameters: " + e.getMessage());
-            throw e;
-        }
-        sb.append('\'');
-        sb.append(" | ");
-        sb.append(runDockerCommand.toCMD());
+    public String buildCommand(RunDockerCommand runDockerCommand) throws JsonProcessingException {
+        return buildCommand(runDockerCommand, null);
+    }
 
-        return sb.toString();
+    public String buildCommand(RunDockerCommand runDockerCommand, ResourceBaseDTO resourceBaseDTO) throws JsonProcessingException {
+        StringBuilder builder = new StringBuilder();
+        if (resourceBaseDTO != null) {
+            builder.append("echo -e '");
+            try {
+                builder.append(new JsonGenerator().generateJson(resourceBaseDTO));
+            } catch (JsonProcessingException e) {
+                LOGGER.error("ERROR generating json from dockerRunParameters: " + e.getMessage());
+                throw e;
+            }
+            builder.append('\'');
+            builder.append(" | ");
+        }
+        builder.append(runDockerCommand.toCMD());
+        return builder.toString();
     }
 }

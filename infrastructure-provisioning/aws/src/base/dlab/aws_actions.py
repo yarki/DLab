@@ -15,6 +15,7 @@ import time
 import sys
 import os
 import json
+from fabric.api import *
 
 
 def put_to_bucket(bucket_name, local_file, destination_file):
@@ -228,7 +229,7 @@ def remove_s3(bucket_type, scientist=''):
     if bucket_type == 'ssn':
         bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     elif bucket_type == 'edge':
-        bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-edge-bucket').lower().replace('_', '-')
+        bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
     bucket = s3.Bucket("{}".format(bucket_name))
     try:
         list_obj = client.list_objects(Bucket=bucket.name)
@@ -294,3 +295,23 @@ def terminate_emr(id):
     emr.terminate_job_flows(
         JobFlowIds=[id]
     )
+
+
+def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
+    ec2 = boto3.resource('ec2')
+    inst = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running']},
+                 {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(nb_tag_value)]}])
+    instances = list(inst)
+    if instances:
+        for instance in instances:
+            private = getattr(instance, 'private_dns_name')
+            env.hosts = "{}".format(private)
+            env.user = "{}".format(ssh_user)
+            env.key_filename = "{}".format(key_path)
+            env.host_string = env.user + "@" + env.hosts
+            sudo('rm -rf /srv/hadoopconf/config/{}'.format(emr_name))
+            sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
+            print "Notebook's " + env.hosts + " kernels were removed"
+    else:
+        print "There are no notebooks to clean kernels."

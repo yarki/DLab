@@ -13,9 +13,6 @@
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.response.folderlistener.handler.ErrorFileHandler;
-import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileChecker;
-import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.dropwizard.util.Duration;

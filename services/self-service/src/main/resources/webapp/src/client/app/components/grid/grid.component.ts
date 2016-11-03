@@ -10,9 +10,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import { Component, EventEmitter, Input, Output, ViewChild, OnInit } from "@angular/core";
+import { Component, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 import { GridRowModel } from './grid.model';
+import { CreateEmrModel } from "./createEmrModel";
+import {ConfirmationDialogType} from "../confirmation-dialog/confirmation-dialog-type.enum";
 
 @Component({
   moduleId: module.id,
@@ -23,11 +25,17 @@ import { GridRowModel } from './grid.model';
 
 export class Grid implements OnInit {
 
+  isFilled: boolean = false;
   list: any;
   environments: Array<GridRowModel>;
   notebookName: any;
 
+  model = new CreateEmrModel('', '');
+  namePattern = "\\w+.*\\w+";
+
   @ViewChild('createEmrModal') createEmrModal;
+  @ViewChild('confirmationDialog') confirmationDialog;
+  @ViewChild('detailDialog') detailDialog;
   @Input() emrTempls;
   @Input() shapes;
 
@@ -41,63 +49,65 @@ export class Grid implements OnInit {
   }
 
   buildGrid() {
-    this.userResourceService.getGridData().subscribe((list) => {
-
+    this.userResourceService.getUserProvisionedResources().subscribe((list) => {
       this.list = list;
       this.environments = this.loadEnvironments();
       console.log('models ', this.environments);
     });
   }
 
+  containsNotebook(notebook_name):boolean {
+
+    if(notebook_name)
+      for (var index = 0; index < this.environments.length; index++)
+        if(notebook_name.toLowerCase() ==  this.environments[index].name.toString().toLowerCase())
+          return true;
+
+        return false;
+  }
+
   loadEnvironments(): Array<any> {
      if (this.list) {
        return this.list.map((value) => {
-         return new GridRowModel(value.environment_name,
+         return new GridRowModel(value.exploratory_name,
            value.status,
            value.shape,
-           value.computational_resources);
+           value.computational_resources,
+           value.up_time_since,
+           value.url);
        });
      }
    }
 
   printDetailEnvironmentModal(data) {
-    console.log(data);
+    this.detailDialog.open({ isFooter: false }, data);
   }
 
-  mathAction(data, action) {
+  exploratoryAction(data, action) {
     console.log('action ' + action, data);
     if (action === 'deploy') {
       this.notebookName = data.name
       this.createEmrModal.open({ isFooter: false });
     } else if (action === 'run') {
       this.userResourceService
-        .startUsernotebook({ notebook_instance_name: data.name })
+        .runExploratoryEnvironment({notebook_instance_name: data.name})
         .subscribe((result) => {
           console.log('startUsernotebook result: ', result);
           this.buildGrid();
         });
     } else if (action === 'stop') {
-      this.userResourceService
-        .stopUsernotebook({ notebook_instance_name: data.name })
-        .subscribe((result) => {
-          console.log('stopUsernotebook result: ', result);
-          this.buildGrid();
-        });
+      this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.StopExploratory);
     } else if (action === 'terminate') {
-      this.userResourceService
-        .terminateUsernotebook({ notebook_instance_name: data.name })
-        .subscribe((result) => {
-          console.log('terminateUsernotebook result: ', result);
-          this.buildGrid();
-        });
+      this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.TerminateExploratory);
     }
   }
 
   createEmr(name, count, shape_master, shape_slave, tmplIndex){
+
     this.userResourceService
-      .createEmr({
+      .createComputationalResource({
         name: name,
-        emr_instance_count: ++count,
+        emr_instance_count: count,
         emr_master_instance_type: shape_master,
         emr_slave_instance_type: shape_slave,
         emr_version: this.emrTempls[tmplIndex].version,

@@ -10,13 +10,38 @@
 
  *****************************************************************************************************/
 
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation, OnInit} from '@angular/core';
+import { ApplicationSecurityService } from "../../services/applicationSecurity.service";
+import { AppRoutingService } from "../../routing/appRouting.service";
 
 @Component({
   moduleId: module.id,
   selector: 'sd-navbar',
   templateUrl: 'navbar.component.html',
-  styleUrls: ['navbar.component.css'],
+  styleUrls: ['./navbar.component.css'],
+  encapsulation : ViewEncapsulation.None
 })
 
-export class NavbarComponent {}
+export class NavbarComponent implements OnInit{
+  currentUserName: String;
+
+  constructor(
+    private applicationSecurityService: ApplicationSecurityService,
+    private appRoutingService : AppRoutingService
+  ) {}
+
+  ngOnInit() {
+    this.currentUserName = this.getUserName();
+  }
+
+  getUserName() {
+    return this.applicationSecurityService.getCurrentUserName() || '';
+  }
+
+  logout_btnClick() {
+    this.applicationSecurityService.logout().subscribe(
+      () => this.appRoutingService.redirectToLoginPage(),
+      error => console.log(error),
+      () => this.appRoutingService.redirectToLoginPage());
+  }
+}

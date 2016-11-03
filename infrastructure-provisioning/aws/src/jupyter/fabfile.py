@@ -63,6 +63,7 @@ def run():
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + "-nb-SG"
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
+
     print 'Searching preconfigured images'
     ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
     if ami_id != '':
@@ -200,6 +201,10 @@ def run():
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')
     dns_name = get_instance_hostname(notebook_config['instance_name'])
+    jupyter_ip_url = "http://" + ip_address + ":8888/" + notebook_config['instance_name'] + "/"
+    jupyter_dns_url = "http://" + dns_name + ":8888/" + notebook_config['instance_name'] + "/"
+    print "Jupyter URL: " + jupyter_ip_url
+    print "Jupyter URL: " + jupyter_dns_url
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
         'key_name'] + '.pem ubuntu@' + ip_address
     print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ubuntu@' + dns_name
@@ -207,7 +212,9 @@ def run():
     with open("/root/result.json", 'w') as result:
         res = {"hostname": dns_name,
                "ip": ip_address,
-               "master_keyname": os.environ['creds_key_name']}
+               "master_keyname": os.environ['creds_key_name'],
+               "notebook_name": notebook_config['instance_name'],
+               "Action": "Create new notebook server"}
         result.write(json.dumps(res))
 
 
@@ -225,7 +232,7 @@ def terminate():
     notebook_config = dict()
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
     notebook_config['notebook_name'] = os.environ['notebook_instance_name']
-    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-' + os.environ['notebook_user_name'] + '-edge-bucket').lower().replace('_', '-')
+    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
     try:
@@ -243,6 +250,18 @@ def terminate():
     except:
         sys.exit(1)
 
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"notebook_name": notebook_config['notebook_name'],
+                   "Tag_name": notebook_config['tag_name'],
+                   "user_own_bucket_name": notebook_config['bucket_name'],
+                   "Action": "Terminate notebook server"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)
+
 
 # Main function for stopping notebook server
 def stop():
@@ -258,14 +277,16 @@ def stop():
     notebook_config = dict()
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
     notebook_config['notebook_name'] = os.environ['notebook_instance_name']
-    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-' + os.environ['notebook_user_name'] + '-edge-bucket').lower().replace('_', '-')
+    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
+    notebook_config['ssh_user'] = os.environ['notebook_ssh_user']
+    notebook_config['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
 
     try:
         logging.info('[STOP NOTEBOOK]')
         print '[STOP NOTEBOOK]'
-        params = "--bucket_name %s --tag_name %s --nb_tag_value %s" % \
-                 (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'])
+        params = "--bucket_name %s --tag_name %s --nb_tag_value %s --ssh_user %s --key_path %s" % \
+                 (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], notebook_config['ssh_user'], notebook_config['key_path'])
         if not run_routine('stop_notebook', params):
             logging.info('Failed to stop notebook')
             with open("/root/result.json", 'w') as result:
@@ -275,6 +296,18 @@ def stop():
             sys.exit(1)
     except:
         sys.exit(1)
+
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"notebook_name": notebook_config['notebook_name'],
+                   "Tag_name": notebook_config['tag_name'],
+                   "user_own_bucket_name": notebook_config['bucket_name'],
+                   "Action": "Stop notebook server"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)
 
 
 # Main function for starting notebook server
@@ -307,3 +340,14 @@ def start():
             sys.exit(1)
     except:
         sys.exit(1)
+
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"NBs_name": notebook_config['notebook_name'],
+                   "Tag_name": notebook_config['tag_name'],
+                   "Action": "Start up notebook server"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)

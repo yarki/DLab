@@ -32,10 +32,12 @@ def configure_notebook():
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
     put(templates_dir + 'pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
-    put(templates_dir + 'py3spark_emr_template.json', '/tmp/py3spark_emr_template.json')
     put(templates_dir + 'spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
     put(templates_dir + 'toree_emr_template.json','/tmp/toree_emr_template.json')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
+    put(templates_dir + 'toree_kernel.tar.gz', '/tmp/toree_kernel.tar.gz')
+    put(templates_dir + 'toree_emr_templatev2.json', '/tmp/toree_emr_templatev2.json')
+    put(templates_dir + 'run_template.sh', '/tmp/run_template.sh')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
     sudo('chmod 755 /usr/local/bin/create_configs.py')
 
@@ -54,6 +56,20 @@ def get_spark_version():
                     spark_version = j.get("Version")
     return spark_version
 
+def get_hadoop_version():
+    hadoop_version = ''
+    emr = boto3.client('emr')
+    clusters = emr.list_clusters(ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING'])
+    clusters = clusters.get('Clusters')
+    for i in clusters:
+        response = emr.describe_cluster(ClusterId=i.get('Id'))
+        if response.get("Cluster").get("Name") == args.cluster_name:
+            response =  response.get("Cluster").get("Applications")
+            for j in response:
+                if j.get("Name") == 'Hadoop':
+                    hadoop_version = j.get("Version")
+    return hadoop_version[0:3]
+
 
 if __name__ == "__main__":
     env.hosts = "{}".format(args.notebook_ip)
@@ -62,4 +78,5 @@ if __name__ == "__main__":
     env.host_string = env.user + "@" + env.hosts
     configure_notebook()
     spark_version = get_spark_version()
-    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version)
+    hadoop_version = get_hadoop_version()
+    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version + ' --hadoop_version ' + hadoop_version)

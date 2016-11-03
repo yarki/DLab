@@ -13,9 +13,6 @@
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import com.epam.dlab.backendapi.core.DockerCommands;
-import com.epam.dlab.backendapi.core.response.folderlistener.handler.ErrorFileHandler;
-import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileChecker;
-import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

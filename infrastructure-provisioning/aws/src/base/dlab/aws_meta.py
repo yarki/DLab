@@ -112,7 +112,7 @@ def get_instance_by_name(instance_name):
     ec2 = boto3.resource('ec2')
     instances = ec2.instances.filter(
         Filters=[{'Name': 'tag:Name', 'Values': [instance_name]},
-                 {'Name': 'instance-state-name', 'Values': ['running']}])
+                 {'Name': 'instance-state-name', 'Values': ['running','pending','stopping','stopped']}])
     for instance in instances:
         return instance.id
     return ''
@@ -164,11 +164,16 @@ def get_emr_info(id, key = ''):
     return result
 
 
-def get_emr_list(tag_name, type='Key'):
+def get_emr_list(tag_name, type='Key', emr_count=False):
     emr = boto3.client('emr')
-    clusters = emr.list_clusters(
-        ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING']
-    )
+    if emr_count:
+        clusters = emr.list_clusters(
+            ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING', 'TERMINATING']
+        )
+    else:
+        clusters = emr.list_clusters(
+            ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING']
+        )
     clusters = clusters.get('Clusters')
     clusters_list = []
     for i in clusters:
@@ -196,7 +201,7 @@ def get_ec2_list(tag_name, value=''):
 def provide_index(resource_type, tag_name):
     ids = []
     if resource_type == 'EMR':
-        list = get_emr_list(tag_name)
+        list = get_emr_list(tag_name, 'Key', True)
         emr = boto3.client('emr')
         for i in list:
             response = emr.describe_cluster(ClusterId=i)

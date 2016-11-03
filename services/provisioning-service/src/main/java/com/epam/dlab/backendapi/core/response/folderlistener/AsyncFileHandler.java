@@ -13,7 +13,6 @@
 
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
-import com.epam.dlab.backendapi.core.response.folderlistener.handler.FileHandler;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +24,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
 
+import static com.epam.dlab.backendapi.core.Constants.JSON_EXTENSION;
+import static com.epam.dlab.backendapi.core.Constants.LOG_EXTENSION;
+
 public final class AsyncFileHandler implements Supplier<Boolean> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
+
 
     private final String fileName;
     private final String directory;
@@ -44,13 +48,19 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
     public Boolean get() {
         Path path = Paths.get(directory, fileName);
         try {
-            fileHandlerCallback.handle(fileName, readBytes(path));
-            Files.delete(path);
+            if (fileHandlerCallback.handle(fileName, readBytes(path))) {
+                Files.deleteIfExists(path);
+                Files.deleteIfExists(getLogFile());
+            }
             return true;
         } catch (Exception e) {
             LOGGER.debug("handle file async", e);
         }
         return false;
+    }
+
+    private Path getLogFile() {
+        return Paths.get(directory, fileName.replaceAll(JSON_EXTENSION, LOG_EXTENSION));
     }
 
     private byte[] readBytes(Path path) throws IOException, InterruptedException {

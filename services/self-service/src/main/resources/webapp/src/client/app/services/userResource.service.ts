@@ -11,115 +11,79 @@
  *****************************************************************************************************/
 
 import { Injectable } from '@angular/core';
-import {Http, Response} from '@angular/http';
-import { WebRequestHelper } from './../util/webRequestHelper.service'
-import {ApplicationSecurityService} from "./applicationSecurity.service";
+import {Response} from '@angular/http';
+import {ApplicationServiceFacade} from "./applicationServiceFacade.service";
+import {Observable} from "rxjs";
 
 @Injectable()
 export class UserResourceService {
-  url = {
-    createTmpls: 'userlist/exploratory',
-    emrTmpls: 'userlist/computational',
-    shapes: 'userlist/shape',
-    createNotebook: 'exploratory/create',
-    startNotebook: 'exploratory/start',
-    stopNotebook: 'exploratory/stop',
-    terminateNotebook: 'exploratory/terminate',
-    createEmr: 'emr/create',
-    terminateEmr: 'emr/terminate',
-    gridData: 'userlist',
-    keyloader: 'keyloader'
-  };
-
-  constructor(private applicationSecurityService: ApplicationSecurityService,
-              private http : Http,
-              private webRequestHelper : WebRequestHelper) {
+  constructor(private applicationServiceFacade: ApplicationServiceFacade) {
   }
 
-  getResourceUrl(resource: string) {
-   return `/api/${this.url[resource]}?access_token=${this.applicationSecurityService.getAuthToken()}`;
-  }
-
-  getCreateTmpl()
+  public getExploratoryEnvironmentTemplates() : Observable<any>
   {
-    return this.http.get(this.getResourceUrl('createTmpls'))
+    return this.applicationServiceFacade
+      .buildGetExploratoryEnvironmentTemplatesRequest()
       .map(( res:Response ) => res.json())
       .catch((error: any) => error);
   }
 
-  getEmrTmpl()
+  public getComputationalResourcesTemplates() : Observable<any>
   {
-    return this.http.get(this.getResourceUrl('emrTmpls'))
+    return this.applicationServiceFacade
+      .buildGetComputationalResourcesTemplatesRequest()
       .map(( res:Response ) => res.json())
       .catch((error: any) => error);
   }
 
-  getShapes()
+  public getSupportedResourcesShapes() : Observable<any>
   {
-    return this.http.get(this.getResourceUrl('shapes'))
+    return this.applicationServiceFacade
+      .buildGetSupportedComputationalResourcesShapesRequest()
       .map(( res:Response ) => res.json())
       .catch((error: any) => error);
   }
 
-  getGridData() {
-    return this.http.get(this.getResourceUrl('gridData'))
-      .map(( res:Response ) => res.json())
+  public getUserProvisionedResources() : Observable<any> {
+    return this.applicationServiceFacade
+      .buildGetUserProvisionedResourcesRequest()
+      .map((response:Response ) => response.json())
       .catch((error: any) => error);
   }
 
-  createUsernotebook(data)
-  {
+  public createExploratoryEnvironment(data) : Observable<Response> {
     let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('createNotebook'), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
+    return this.applicationServiceFacade
+      .buildCreateExploratoryEnvironmentRequest(body)
+      .map((response:Response ) => response);
   }
 
-  startUsernotebook(data) {
+  public runExploratoryEnvironment(data) : Observable<Response>  {
     let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('startNotebook'), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
+    return this.applicationServiceFacade
+      .buildRunExploratoryEnvironmentRequest(body)
+      .map((response:Response ) => response);
   }
 
-  stopUsernotebook(data) {
-    let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('stopNotebook'), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
+  public suspendExploratoryEnvironment(notebook : any, action) : Observable<Response> {
+    let url = "/" + notebook.name + "/" + action;
+
+    return this.applicationServiceFacade
+      .buildSuspendExploratoryEnvironmentRequest(JSON.stringify(url))
+      .map((response:Response ) => response);
   }
 
-  terminateUsernotebook(data) {
+  public createComputationalResource(data) : Observable<Response> {
     let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('terminateNotebook'), body, { headers: requestHeader })
-        .map((res) => {
-          return res;
-      });
+    return this.applicationServiceFacade
+      .buildCreateComputationalResourcesRequest(body)
+      .map((response:Response ) => response);
   }
 
-  createEmr(data)
-  {
-    let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('createEmr'), body, { headers: requestHeader })
-        .map(res => res.json());
+  public suspendComputationalResource(notebookName : string, computationalResourceName : string) : Observable<Response> {
+    let body = JSON.stringify('/' + notebookName + '/' + computationalResourceName + '/terminate');
+    return this.applicationServiceFacade
+      .buildDeleteComputationalResourcesRequest(body)
+      .map((response:Response ) => response);
   }
-
-  terminateEmr(data) {
-    let body = JSON.stringify(data);
-    let requestHeader = this.webRequestHelper.getJsonHeader();
-      return this.http.post(this.getResourceUrl('terminateEmr'), body, { headers: requestHeader })
-        .map((res: Response) => {
-          return res.status;
-        });
-  }
-
-
 }

@@ -13,7 +13,7 @@
 package com.epam.dlab.backendapi.core;
 
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.dto.emr.EMRCreateDTO;
+import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ public class CommandBuilderTest {
                 .withActionDescribe(toDescribe);
 
 
-        EMRCreateDTO emrCreateDTO = new EMRCreateDTO().withServiceBaseName("someName");
+        ComputationalCreateDTO computationalCreateDTO = new ComputationalCreateDTO().withServiceBaseName("someName");
 
      /*   CreateEMRClusterParameters createEMRClusterParameters = CreateEMRClusterParameters.newCreateEMRClusterParameters()
                 .confServiceBaseName("someName")
@@ -45,7 +45,7 @@ public class CommandBuilderTest {
                 .build();*/
 
         CommandBuilder commandBuilder = new CommandBuilder();
-        String command = commandBuilder.buildCommand(dockerBaseCommand, emrCreateDTO);
+        String command = commandBuilder.buildCommand(dockerBaseCommand, computationalCreateDTO);
         System.out.println(command);
 
         assertEquals("echo -e '{\"conf_service_base_name\":\"someName\"}' | docker run -i -a STDIN -v rkv:/root/keys -v rv:/response -e \"request_id=rID\" ubuntu --action describe",
