@@ -15,4 +15,9 @@ export class LoginModel {
     public username : string,
     public password: string
   ) {  }
+
+  toJsonString() : string
+  {
+    return JSON.stringify({'username': this.username, 'password': this.password, 'access_token': ''});
+  }
 }

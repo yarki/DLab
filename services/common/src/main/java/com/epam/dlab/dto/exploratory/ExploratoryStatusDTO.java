@@ -10,24 +10,26 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.api.instance;
+package com.epam.dlab.dto.exploratory;
 
-public enum UserInstanceStatus {
-    CREATING("creating"),
-    CREATED("created"),
-    RUNNING("running"),
-    STOPPING("stopping"),
-    STOPPED("stopped"),
-    TERMINATING("terminating"),
-    TERMINATED("terminated");
+import com.epam.dlab.dto.StatusBaseDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private String status;
+public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
+    @JsonProperty("exploratory_id")
+    private String exploratoryId;
 
-    UserInstanceStatus(String status) {
-        this.status = status;
+    public String getExploratoryId() {
+        return exploratoryId;
     }
 
-    public String getStatus() {
-        return status;
+    public void setExploratoryId(String exploratoryId) {
+        this.exploratoryId = exploratoryId;
     }
+
+    public ExploratoryStatusDTO withExploratoryId(String exploratoryId) {
+        setExploratoryId(exploratoryId);
+        return this;
+    }
+
 }

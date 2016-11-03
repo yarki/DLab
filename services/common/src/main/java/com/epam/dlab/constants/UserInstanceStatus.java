@@ -10,36 +10,27 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.health;
+package com.epam.dlab.constants;
 
-import com.epam.dlab.client.mongo.MongoService;
-import com.epam.dlab.client.restclient.RESTService;
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+public enum UserInstanceStatus {
+    CREATING("creating"),
+    CREATED("created"),
+    STARTING("starting"),
+    RUNNING("running"),
+    STOPPING("stopping"),
+    STOPPED("stopped"),
+    TERMINATING("terminating"),
+    TERMINATED("terminated"),
+    FAILED("failed");
 
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
-import static com.epam.dlab.backendapi.health.HealthChecks.MONGO_HEALTH_CHECKER;
-import static com.epam.dlab.backendapi.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
+    private String status;
 
-public class HealthModule extends AbstractModule {
-
-    @Override
-    protected void configure() {
+    UserInstanceStatus(String status) {
+        this.status = status;
     }
 
-    @Provides
-    @Singleton
-    @Named(MONGO_HEALTH_CHECKER)
-    public HealthChecker mongoHealthChecker(MongoService mongoService) {
-        return new MongoHealthChecker(mongoService);
+    public String getStatus() {
+        return status;
     }
 
-    @Provides
-    @Singleton
-    @Named(PROVISIONING_HEALTH_CHECKER)
-    public HealthChecker provisioningHealthChecker(@Named(PROVISIONING_SERVICE) RESTService provisioningService) {
-        return new ProvisioningHealthChecker(provisioningService);
-    }
 }

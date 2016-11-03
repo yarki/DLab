@@ -16,6 +16,7 @@ import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
 import org.bson.Document;
@@ -26,11 +27,16 @@ import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public class InfrastructureProvisionDAO extends BaseDAO {
     public static final String EXPLORATORY_NAME = "exploratory_name";
-    public static final String COMPUTATIONAL_RESOURCES = "computational_resources";
-    public static final String COMPUTATIONAL_NAME = "computational_name";
+    private static final String EXPLORATORY_ID = "exploratory_id";
+    private static final String COMPUTATIONAL_RESOURCES = "computational_resources";
+    private static final String COMPUTATIONAL_NAME = "computational_name";
+    private static final String COMPUTATIONAL_ID = "computational_id";
+
+    private static final String SET = "$set";
 
     public Iterable<Document> find(String user) {
         return mongoService.getCollection(USER_INSTANCES).find(eq(USER, user));
@@ -38,6 +44,12 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     public Iterable<Document> findShapes() {
         return mongoService.getCollection(SHAPES).find();
+    }
+
+    public String fetchExploratoryId(String user, String exploratoryName) {
+        return mongoService.getCollection(USER_INSTANCES)
+                .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first()
+                .getOrDefault(EXPLORATORY_ID, EMPTY).toString();
     }
 
     public boolean insertExploratory(UserInstanceDTO dto) {
@@ -51,6 +63,14 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     public void updateExploratoryStatus(StatusBaseDTO dto) {
         update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())), set(STATUS, dto.getStatus()));
+    }
+
+    public void updateExploratoryStatusAndId(ExploratoryStatusDTO dto) {
+        Document values = new Document(STATUS, dto.getStatus());
+        if (dto.getExploratoryId() != null) {
+            values.append(EXPLORATORY_ID, dto.getExploratoryId());
+        }
+        update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())),  new Document(SET, values));
     }
 
     public void updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
@@ -78,6 +98,13 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
     }
 
+    public String fetchComputationalId(String user, String exploratoryName, String computationalName) {
+        return mongoService.getCollection(USER_INSTANCES)
+                .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName),
+                        eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName))).first()
+                .getOrDefault(COMPUTATIONAL_ID, EMPTY).toString();
+    }
+
     public void updateComputationalStatus(ComputationalStatusDTO dto) {
         updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), dto.getComputationalName(), dto.getStatus());
     }
@@ -91,6 +118,20 @@ public class InfrastructureProvisionDAO extends BaseDAO {
             update(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)
                     , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)),
                     set(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, status));
+        } catch (Throwable t) {
+            throw new DlabException("Could not update computational resource status", t);
+        }
+    }
+
+    public void updateComputationalStatusAndId(ComputationalStatusDTO dto) {
+        try {
+            Document values = new Document(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, dto.getStatus());
+            if (dto.getComputationalId() != null) {
+                values.append(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + COMPUTATIONAL_ID, dto.getComputationalId());
+            }
+            update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())
+                    , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, dto.getComputationalName())),
+                    new Document(SET, values));
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);
         }

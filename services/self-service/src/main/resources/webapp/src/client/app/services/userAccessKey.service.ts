@@ -20,13 +20,13 @@ export class UserAccessKeyService {
   constructor(private applicationServiceFacade: ApplicationServiceFacade) {
   }
 
-  checkUserAccessKey() : Observable<Response> {
+  public checkUserAccessKey() : Observable<Response> {
     return this.applicationServiceFacade
       .buildCheckUserAccessKeyRequest()
       .map(response => response);
   }
 
-  uploadUserAccessKey(data) : Observable<Response>
+  public uploadUserAccessKey(data) : Observable<Response>
   {
     return this.applicationServiceFacade
       .buildUploadUserAccessKeyRequest(data)

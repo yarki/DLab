@@ -15,14 +15,15 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.api.form.ComputationalCreateFormDTO;
 import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
-import com.epam.dlab.backendapi.api.instance.UserInstanceStatus;
 import com.epam.dlab.backendapi.client.rest.ComputationalAPI;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
+import com.epam.dlab.registry.ApiCallbacks;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -60,15 +61,19 @@ public class ComputationalResource implements ComputationalAPI {
                         .withSlaveShape(formDTO.getSlaveInstanceType())
                         .withSlaveNumber(formDTO.getInstanceCount()));
         if (isAdded) {
+            String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), formDTO.getNotebookName());
             ComputationalCreateDTO dto = new ComputationalCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withExploratoryName(formDTO.getNotebookName())
+                    .withComputationalName(formDTO.getName())
+                    .withNotebookName(exploratoryId)
                     .withInstanceCount(formDTO.getInstanceCount())
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                     .withVersion(formDTO.getVersion())
-                    .withNotebookName(formDTO.getNotebookName())
                     .withEdgeUserName(userInfo.getName())
-                    .withRegion(settingsDAO.getAwsRegion());
+                    .withRegion(settingsDAO.getAwsRegion())
+                    .withSecurityGroupIds(settingsDAO.getSecurityGroups());;
             LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
                     .ok(provisioningService.post(EMR_CREATE, dto, String.class))
@@ -80,10 +85,10 @@ public class ComputationalResource implements ComputationalAPI {
     }
 
     @POST
-    @Path("/status")
-    public Response create(ComputationalStatusDTO dto) {
-        LOGGER.debug("updating status for computational resource {} for user {}", dto.getComputationalName(), dto.getUser());
-        infrastructureProvisionDAO.updateComputationalStatus(dto);
+    @Path(ApiCallbacks.STATUS_URI)
+    public Response status(ComputationalStatusDTO dto) {
+        LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
+        infrastructureProvisionDAO.updateComputationalStatusAndId(dto);
         return Response.ok().build();
     }
 
@@ -96,10 +101,15 @@ public class ComputationalResource implements ComputationalAPI {
                 .withExploratoryName(exploratoryName)
                 .withComputationalName(computationalName)
                 .withStatus(UserInstanceStatus.TERMINATING.getStatus()));
+        String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), exploratoryName);
+        String computationalId = infrastructureProvisionDAO.fetchComputationalId(userInfo.getName(), exploratoryName, computationalName);
         ComputationalTerminateDTO dto = new ComputationalTerminateDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
+                .withExploratoryName(exploratoryName)
+                .withComputationalName(computationalName)
+                .withNotebookInstanceName(exploratoryId)
+                .withClusterName(computationalId)
                 .withEdgeUserName(userInfo.getName())
-                .withClusterName(computationalName)
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }
