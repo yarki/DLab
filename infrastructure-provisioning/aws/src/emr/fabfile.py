@@ -38,8 +38,8 @@ def run():
     emr_conf['slave_instance_type'] = os.environ['emr_slave_instance_type']
     emr_conf['instance_count'] = os.environ['emr_instance_count']
     emr_conf['notebook_ip'] = get_instance_ip_address(os.environ['notebook_name']).get('Private')
-    emr_conf['role_service_name'] = os.environ['service_role']
-    emr_conf['role_ec2_name'] = os.environ['ec2_role']
+    emr_conf['role_service_name'] = os.environ['emr_service_role']
+    emr_conf['role_ec2_name'] = os.environ['emr_ec2_role']
 
     emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index) + ', ' \
                        + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index)\
