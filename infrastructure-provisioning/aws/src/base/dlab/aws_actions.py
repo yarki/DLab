@@ -10,7 +10,9 @@
 #
 # ****************************************************************************************************/
 
-import boto3, boto, botocore
+import boto3
+import boto
+import botocore
 import time
 import sys
 import os

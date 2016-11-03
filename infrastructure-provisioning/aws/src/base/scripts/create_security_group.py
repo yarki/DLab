@@ -24,8 +24,8 @@ parser.add_argument('--name', type=str, default='')
 parser.add_argument('--vpc_id', type=str, default='')
 parser.add_argument('--security_group_rules', type=str, default='[]')
 parser.add_argument('--egress', type=str, default='[]')
-parser.add_argument('--infra_tag_name', type=str, default='BDCC-DSA-test-infra')
-parser.add_argument('--infra_tag_value', type=str, default='tmp')
+parser.add_argument('--infra_tag_name', type=str, default='')
+parser.add_argument('--infra_tag_value', type=str, default='')
 args = parser.parse_args()
 
 

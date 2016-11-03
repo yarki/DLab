@@ -19,7 +19,7 @@ import json
 import sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--hostname', type=str, default='edge')
+parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
