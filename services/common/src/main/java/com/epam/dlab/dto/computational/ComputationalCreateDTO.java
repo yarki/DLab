@@ -25,6 +25,9 @@ public class ComputationalCreateDTO extends ComputationalBaseDTO<ComputationalCr
     private String version;
     @JsonProperty("notebook_name")
     private String notebookName;
+    @JsonProperty("creds_security_groups_ids")
+    private String securityGroupIds;
+
 
     public String getInstanceCount() {
         return instanceCount;
@@ -88,6 +91,19 @@ public class ComputationalCreateDTO extends ComputationalBaseDTO<ComputationalCr
 
     public ComputationalCreateDTO withNotebookName(String notebookName) {
         setNotebookName(notebookName);
+        return this;
+    }
+
+    public String getSecurityGroupIds() {
+        return securityGroupIds;
+    }
+
+    public void setSecurityGroupIds(String securityGroupIds) {
+        this.securityGroupIds = securityGroupIds;
+    }
+
+    public ComputationalCreateDTO withSecurityGroupIds(String securityGroupIds) {
+        setSecurityGroupIds(securityGroupIds);
         return this;
     }
 }
