@@ -27,7 +27,7 @@ public class UserComputationalResourceDTO {
     private String masterShape;
     @JsonProperty("slave_node_shape")
     private String slaveShape;
-    @JsonProperty("slave_instance_number")
+    @JsonProperty("total_instance_number")
     private String slaveNumber;
 
     public String getComputationalName() {
