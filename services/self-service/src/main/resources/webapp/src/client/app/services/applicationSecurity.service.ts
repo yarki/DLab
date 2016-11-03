@@ -15,6 +15,8 @@ import {Response} from '@angular/http';
 import {Observable} from "rxjs";
 import {ApplicationServiceFacade} from "./applicationServiceFacade.service";
 import {AppRoutingService} from "../routing/appRouting.service";
+import {LoginModel} from "../login/loginModel";
+import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Injectable()
 export class ApplicationSecurityService {
@@ -24,13 +26,13 @@ export class ApplicationSecurityService {
   constructor(private serviceFacade : ApplicationServiceFacade, private appRoutingService : AppRoutingService) {
   }
 
-  public login(userName, password) : Observable<boolean> {
-    let body = JSON.stringify({'username': userName, 'password': password, 'access_token': ''});
-
-    return this.serviceFacade.buildLoginRequest(body).map((response : Response) => {
-      if (response.status === 200) {
+  public login(loginModel : LoginModel) : Observable<boolean> {
+    return this.serviceFacade
+      .buildLoginRequest(loginModel.toJsonString())
+      .map((response : Response) => {
+      if (response.status === HTTP_STATUS_CODES.OK) {
         this.setAuthToken(response.text());
-        this.setUserName(userName);
+        this.setUserName(loginModel.username);
 
         return true;
       }
@@ -44,8 +46,10 @@ export class ApplicationSecurityService {
     if(!!authToken)
     {
       this.clearAuthToken();
-      return this.serviceFacade.buildLogoutRequest("").map((response: Response) => {
-        return response.status === 200;
+      return this.serviceFacade
+        .buildLogoutRequest()
+        .map((response: Response) => {
+        return response.status === HTTP_STATUS_CODES.OK;
       }, this)
     }
 
@@ -66,8 +70,10 @@ export class ApplicationSecurityService {
 
     if(authToken && currentUser)
     {
-      return this.serviceFacade.buildAuthorizeRequest(currentUser).map((response : Response) => {
-        if(response.status === 200)
+      return this.serviceFacade
+        .buildAuthorizeRequest(currentUser)
+        .map((response : Response) => {
+        if(response.status === HTTP_STATUS_CODES.OK)
           return true;
 
         this.clearAuthToken();
@@ -80,17 +86,17 @@ export class ApplicationSecurityService {
     return Observable.of(false);
   }
 
-  private setUserName(userName)
+  private setUserName(userName) : void
   {
     localStorage.setItem(this.userNameKey, userName);
   }
 
-  private setAuthToken(accessToken){
+  private setAuthToken(accessToken) : void {
     let encodedToken = accessToken;
     localStorage.setItem(this.accessTokenKey, encodedToken);
   }
 
-  private clearAuthToken(){
+  private clearAuthToken() : void {
     localStorage.removeItem(this.accessTokenKey);
   }
 }

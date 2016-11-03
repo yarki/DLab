@@ -15,18 +15,19 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import {UserAccessKeyService} from "../services/userAccessKey.service";
 import {UserResourceService} from "../services/userResource.service";
 import { Grid } from '../components/grid/grid.component';
-import {ApplicationSecurityService} from "../services/applicationSecurity.service";
-
+import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
   moduleId: module.id,
   selector: 'sd-home',
   templateUrl: 'home.component.html',
   styleUrls: ['./home.component.css'],
-  providers: [ApplicationSecurityService]
+  providers: []
 })
 
 export class HomeComponent implements OnInit {
+  private readonly CHECK_ACCESS_KEY_TIMEOUT : number = 10000;
+
   userUploadAccessKeyState : number;
   newAccessKeyForUpload: any;
   uploadAccessKeyLabel: string;
@@ -34,11 +35,10 @@ export class HomeComponent implements OnInit {
   createTempls: any;
   shapes: any;
   emrTempls: any;
-
   notebookExist: boolean = false;
-
   progressDialogConfig: any;
-  progressDialogCallback: Function;
+  templateDescription: string;
+  namePattern = "\\w+.*\\w+";
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
@@ -50,11 +50,10 @@ export class HomeComponent implements OnInit {
   // --
 
   constructor(
-    private applicationSecurityService: ApplicationSecurityService,
     private userAccessKeyService: UserAccessKeyService,
     private userResourceService: UserResourceService
   ) {
-    this.userUploadAccessKeyState = 404;
+    this.userUploadAccessKeyState = HTTP_STATUS_CODES.NOT_FOUND;
     this.uploadAccessUserKeyFormValid = false;
   }
 
@@ -79,7 +78,7 @@ export class HomeComponent implements OnInit {
     this.userAccessKeyService.uploadUserAccessKey(formData)
       .subscribe(
         response => {
-          if(response.status === 200)
+          if(response.status === HTTP_STATUS_CODES.OK)
             this.checkInfrastructureCreationProgress();
         },
         error => console.log(error)
@@ -154,14 +153,14 @@ export class HomeComponent implements OnInit {
   {
     this.userUploadAccessKeyState = status;
 
-    if (status == 404) // key haven't been uploaded
+    if (status == HTTP_STATUS_CODES.NOT_FOUND) // key haven't been uploaded
       this.toggleDialogs(true, false, false);
-    else if (status == 202) { // Key uploading
+    else if (status == HTTP_STATUS_CODES.ACCEPTED) { // Key uploading
       this.toggleDialogs(false, true, false);
-      setTimeout(() => this.checkInfrastructureCreationProgress(), 10000)
-    } else if(status == 200 && forceShowKeyUploadDialog)
+      setTimeout(() => this.checkInfrastructureCreationProgress(), this.CHECK_ACCESS_KEY_TIMEOUT)
+    } else if(status == HTTP_STATUS_CODES.OK && forceShowKeyUploadDialog)
       this.toggleDialogs(false, false, true);
-    else if(status == 200) // Key uploaded
+    else if(status == HTTP_STATUS_CODES.OK) // Key uploaded
       this.toggleDialogs(false, false, false);
 
   }
@@ -185,7 +184,7 @@ export class HomeComponent implements OnInit {
           });
           this.createTempls = arr;
         },
-        error => this.createTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
+        error => this.createTempls = []
       );
 
     this.userResourceService.getComputationalResourcesTemplates()
@@ -206,7 +205,7 @@ export class HomeComponent implements OnInit {
           });
           this.emrTempls = arr;
         },
-        error => this.emrTempls = [{template_name: "Jupiter box"}, {template_name: "Jupiter box"}]
+        error => this.emrTempls = []
       );
 
     this.userResourceService.getSupportedResourcesShapes()
@@ -214,7 +213,7 @@ export class HomeComponent implements OnInit {
         data => {
           this.shapes = data
         },
-        error => this.shapes = [{shape_name: 'M4.large'}, {shape_name: 'M4.large'}]
+        error => this.shapes = []
       );
   }
 
@@ -253,5 +252,9 @@ export class HomeComponent implements OnInit {
       text_style: 'info-label',
       aligning: 'text-center'
     }
+  }
+
+  showDescription(value){
+    this.templateDescription = this.createTempls[value].description;
   }
 }
