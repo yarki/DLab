@@ -51,7 +51,7 @@ def create_s3_bucket(bucket_name, tag, region):
         tagging.put(Tagging={'TagSet': [tag]})
         tagging.reload()
         return bucket.name
-    except botocore.exceptions as err:
+    except Exception as err:
         logging.info("Unable to create bucket: " + err)
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to create bucket", "error_message": err}
