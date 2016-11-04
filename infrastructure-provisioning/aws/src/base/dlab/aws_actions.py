@@ -155,10 +155,11 @@ def create_iam_role(role_name, role_profile):
         conn.create_instance_profile(role_profile)
         conn.add_role_to_instance_profile(role_profile, role_name)
         time.sleep(10)
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to create IAM role: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        print err
+        logging.info("Unable to create IAM role: " + err)
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create IAM role", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to create IAM role", "error_code": err}
             print json.dumps(res)
             result.write(json.dumps(res))
 
