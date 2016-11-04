@@ -151,6 +151,12 @@ modal-content {
   font-size: 14px;
   color: #9cadbe;
   word-wrap: break-word;
+  width: 90%;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  text-overflow: ellipsis;
 }
 .confirmation-dialog.modal-dialog {
   width: 550px;

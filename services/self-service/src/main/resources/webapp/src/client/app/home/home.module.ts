@@ -14,7 +14,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home.component';
 import { ModalModule } from './../components/modal/index';
-import { GridModule } from './../components/grid/index';
+import { ResourcesGridModule } from './../components/resources-grid/index';
 
 import { ProgressDialogModule } from './../components/progress-dialog/index';
 import { UploadKeyDialogModule } from './../components/key-upload-dialog/index';
@@ -26,7 +26,7 @@ import { ApplicationSecurityService } from "../services/applicationSecurity.serv
   imports: [
     CommonModule,
     ModalModule,
-    GridModule,
+    ResourcesGridModule,
     ProgressDialogModule,
     UploadKeyDialogModule,
     NavbarModule

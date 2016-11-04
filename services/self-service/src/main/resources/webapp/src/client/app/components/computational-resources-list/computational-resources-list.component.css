@@ -25,6 +25,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   color: #333;
   cursor: pointer;
   text-decoration: none;
+  width: 60%;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  text-overflow: ellipsis;
 }
 
 .source {

@@ -38,21 +38,21 @@ export class ConfirmationDialogModel {
     switch (confirmationType)
     {
       case ConfirmationDialogType.StopExploratory: {
-        this.title = "Notebook server and all connected EMR instances will be terminated.";
+        this.title = "Exploratory Environment will be stopped and all connected computational resources will be terminated.";
         this.notebook = notebook;
         this.confirmAction = () => this.stopExploratory()
           .subscribe((response : Response) => fnProcessResults(response));
       }
       break;
       case ConfirmationDialogType.TerminateExploratory: {
-        this.title = "Notebook server and all connected EMR instances will be terminated.";
+        this.title = "Exploratory Environment and all connected computational resources will be terminated.";
         this.notebook = notebook;
         this.confirmAction = () => this.terminateExploratory()
           .subscribe((response : Response) => fnProcessResults(response));
       }
       break;
       default: {
-        this.title = "Notebook server and all connected EMR instances will be terminated.";
+        this.title = "Exploratory Environment and all connected computational resources will be terminated.";
         this.notebook = notebook;
         this.confirmAction = () => this.stopExploratory()
           .subscribe((response : Response) => fnProcessResults(response),
