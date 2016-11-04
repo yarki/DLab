@@ -29,13 +29,17 @@ def put_to_bucket(bucket_name, local_file, destination_file):
 
 
 def create_s3_bucket(bucket_name, tag, region):
-    s3 = boto3.resource('s3')
-    bucket = s3.create_bucket(Bucket=bucket_name,
-                              CreateBucketConfiguration={'LocationConstraint': region})
-    tagging = bucket.Tagging()
-    tagging.put(Tagging={'TagSet': [tag]})
-    tagging.reload()
-    return bucket.name
+    try:
+        s3 = boto3.resource('s3')
+        bucket = s3.create_bucket(Bucket=bucket_name,
+                                  CreateBucketConfiguration={'LocationConstraint': region})
+        tagging = bucket.Tagging()
+        tagging.put(Tagging={'TagSet': [tag]})
+        tagging.reload()
+        return bucket.name
+    except botocore.exceptions.ClientError as e:
+        print "Error code: " + e.response['Error']['Code']
+        print "Error message: " + e.response['Error']['Message']
 
 
 def create_vpc(vpc_cidr, tag):
@@ -101,7 +105,6 @@ def create_iam_role(role_name, role_profile):
     conn.create_instance_profile(role_profile)
     conn.add_role_to_instance_profile(role_profile, role_name)
     time.sleep(10)
-    return "IAM ROLE TEST MESSAGE"
 
 
 def attach_policy(policy_arn, role_name):
