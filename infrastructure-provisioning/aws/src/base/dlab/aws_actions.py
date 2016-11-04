@@ -297,6 +297,8 @@ def terminate_emr(id):
     emr.terminate_job_flows(
         JobFlowIds=[id]
     )
+    waiter = emr.get_waiter('cluster_terminated')
+    waiter.wait(ClusterId=id)
 
 
 def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):

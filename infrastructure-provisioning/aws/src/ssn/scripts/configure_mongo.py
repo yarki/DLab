@@ -67,7 +67,8 @@ def add_2_yml_config(path,section,param,value):
         return False
 
 if __name__ == "__main__":
-    mongo_passwd = id_generator()
+    # mongo_passwd = id_generator()
+    mongo_passwd = "XS3ms9R3tP"
     mongo_ip = read_yml_conf(path,'net','bindIp')
     mongo_port = read_yml_conf(path,'net','port')
 
