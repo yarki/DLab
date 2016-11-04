@@ -40,29 +40,28 @@ public class FolderListener implements Runnable {
 
     @Override
     public void run() {
-        try {
-            pollFile();
-        } catch (Exception e) {
-            LOGGER.error("FolderListenerExecutor exception", e);
-        }
+        pollFile();
     }
 
-    private void pollFile() throws Exception {
+    private void pollFile() {
         Path directoryPath = Paths.get(directory);
-        WatchService watcher = directoryPath.getFileSystem().newWatchService();
-        directoryPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
-        WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
-        if (watchKey != null) {
-            List<WatchEvent<?>> events = watchKey.pollEvents();
-            for (WatchEvent event : events) {
-                String fileName = event.context().toString();
-                if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
-                    handleFileAsync(fileName);
+        try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
+            directoryPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
+            WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
+            if (watchKey != null) {
+                List<WatchEvent<?>> events = watchKey.pollEvents();
+                for (WatchEvent event : events) {
+                    String fileName = event.context().toString();
+                    if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
+                        handleFileAsync(fileName);
+                    }
+                    pollFile();
                 }
-                pollFile();
+            } else if (!success) {
+                fileHandlerCallback.handleError();
             }
-        } else if (!success) {
-            fileHandlerCallback.handleError();
+        } catch (Exception e) {
+            LOGGER.error("FolderListenerExecutor exception", e);
         }
     }
 
