@@ -16,6 +16,7 @@ import sys
 import os
 import json
 from fabric.api import *
+import logging
 
 local_log_filename = "%s.log" % os.environ['request_id']
 local_log_filepath = "/response/" + local_log_filename
