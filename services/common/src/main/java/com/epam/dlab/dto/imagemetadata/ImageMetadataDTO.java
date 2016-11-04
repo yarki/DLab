@@ -12,9 +12,8 @@
 
 package com.epam.dlab.dto.imagemetadata;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ImageMetadataDTO {
     @JsonProperty
@@ -29,11 +28,14 @@ public class ImageMetadataDTO {
     private List<TemplateDTO> templates;
     @JsonProperty(value = "request_id")
     private String requestId;
+    @JsonProperty(value = "computation_resources_shapes")
+    private List<ComputationalResourceShapesDto> computationResourceShapes;
 
     public ImageMetadataDTO() {
     }
 
-    public ImageMetadataDTO(String image, String templateName, String description, String requestId, String type, List<TemplateDTO> templates) {
+    public ImageMetadataDTO(String image, String templateName, String description, String requestId, String type,
+                            List<TemplateDTO> templates) {
         this.image = image;
         this.templateName = templateName;
         this.description = description;
@@ -94,19 +96,57 @@ public class ImageMetadataDTO {
         this.requestId = requestId;
     }
 
+    public List<ComputationalResourceShapesDto> getComputationResourceShapes() {
+        return computationResourceShapes;
+    }
+
+    public void setComputationResourceShapes(List<ComputationalResourceShapesDto> computationResourceShapes) {
+        this.computationResourceShapes = computationResourceShapes;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        ImageMetadataDTO metadata = (ImageMetadataDTO) o;
+        ImageMetadataDTO that = (ImageMetadataDTO) o;
 
-        return image != null ? image.equals(metadata.image) : metadata.image == null;
+        if (image != null ? !image.equals(that.image) : that.image != null) {
+            return false;
+        }
+        if (templateName != null ? !templateName.equals(that.templateName) : that.templateName != null) {
+            return false;
+        }
+        if (description != null ? !description.equals(that.description) : that.description != null) {
+            return false;
+        }
+        if (type != null ? !type.equals(that.type) : that.type != null) {
+            return false;
+        }
+        if (templates != null ? !templates.equals(that.templates) : that.templates != null) {
+            return false;
+        }
+        if (requestId != null ? !requestId.equals(that.requestId) : that.requestId != null) {
+            return false;
+        }
+        return computationResourceShapes != null ? computationResourceShapes.equals(that.computationResourceShapes)
+                : that.computationResourceShapes == null;
 
     }
 
     @Override
     public int hashCode() {
-        return image != null ? image.hashCode() : 0;
+        int result = image != null ? image.hashCode() : 0;
+        result = 31 * result + (templateName != null ? templateName.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (templates != null ? templates.hashCode() : 0);
+        result = 31 * result + (requestId != null ? requestId.hashCode() : 0);
+        result = 31 * result + (computationResourceShapes != null ? computationResourceShapes.hashCode() : 0);
+        return result;
     }
 }
