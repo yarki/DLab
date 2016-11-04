@@ -13,12 +13,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <modal #bindDialog modalClass="confirmation-dialog modal-md">
   <modal-header>
-    <h4 class="modal-title">{{model.title}}</h4>
+    <h4 class="modal-title">Exploratory Environment: {{model.notebook.name}}</h4>
   </modal-header>
   <modal-content>
       <div class="row">
         <div class="col-xs-12">
-          <p>{{model.notebook.name}}</p>
+          <p>{{model.title}}</p>
         </div>
       </div>
       <div class="row">
@@ -26,9 +26,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <p>Computational resources:</p>
         </div>
         <div class="col-xs-7">
-          <ul class="list-unstyled">
+          <ul class="list-unstyled" *ngIf="model.notebook.resources && model.notebook.resources.length > 0">
             <li *ngFor="let resource of model.notebook.resources">{{resource.computational_name}}</li>
           </ul>
+          <span *ngIf="!model.notebook.resources || model.notebook.resources.length === 0">none</span>
         </div>
       </div>
       <div class="row">
