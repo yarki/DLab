@@ -25,23 +25,28 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
   <tr *ngFor="let env of environments">
     <td (click)="printDetailEnvironmentModal(env)">{{env.name}}</td>
-    <td class="{{env.status.toLowerCase()}}">{{env.status}}</td>
+    <td class="status" ngClass="{{env.status.toLowerCase() || ''}}">{{env.status}}</td>
     <td>{{env.shape}}</td>
     <td>
-      <expanded-grid [resources]="env.resources" [environment]="env"></expanded-grid>
+      <computational-resources-list [resources]="env.resources" [environment]="env"></computational-resources-list>
     </td>
     <td>
       <div class="dropdown">
         <span data-toggle="dropdown"
               class="glyphicon glyphicon-cog"
-              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating'}">
+              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating' ||
+                                      env.status.toLowerCase() == 'terminating' ||
+                                      env.status.toLowerCase() == 'terminated'}">
         </span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">
-            <li (click)="mathAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped'">Stop</li>
-            <li (click)="mathAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped'">Run</li>
-            <li (click)="mathAction(env, 'terminate')">Terminate</li>
-            <li (click)="mathAction(env, 'deploy')">Deploy EMR</li>
+            <li class="dropdown-close"></li>
+            <li (click)="exploratoryAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped' &&
+                                                         env.status != 'stopping'">Stop</li>
+            <li (click)="exploratoryAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped' ||
+                                                        env.status == 'stopping'">Run</li>
+            <li (click)="exploratoryAction(env, 'terminate')">Terminate</li>
+            <li (click)="exploratoryAction(env, 'deploy')" *ngIf="env.status != 'stopping' && env.status != 'stopped'">Deploy EMR</li>
           </ul>
         </div>
       </div>
@@ -75,7 +80,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <label class="control-label">Cluster Alias</label>
         </div>
         <div class="col-xs-8">
-            <input type="text" class="form-control" id="name" (pattern)="namePattern" name="cluster_alias" [(ngModel)]="model.name" #name="ngModel" />
+            <input type="text" class="form-control" id="name" [pattern]="namePattern" name="cluster_alias" [(ngModel)]="model.name" #name="ngModel" />
+        </div>
+      </div>
+      <div class="form-group row">
+        <div  class="col-xs-4">
+          <label class="control-label">Total Instance number</label>
+        </div>
+        <div class="col-xs-8">
+          <input type="number" class="form-control" [(ngModel)]="model.count" min="1" max="999" name="node_count" #count="ngModel" required/>
         </div>
       </div>
       <div class="form-group row">
@@ -86,14 +99,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <select class="form-control" #shape_master>
             <option *ngFor="let shape of shapes">{{shape.Type}}</option>
           </select>
-        </div>
-      </div>
-      <div class="form-group row">
-        <div  class="col-xs-4">
-          <label class="control-label">Total Instance number</label>
-        </div>
-        <div class="col-xs-8">
-          <input type="number" class="form-control" [(ngModel)]="model.count" min="1" max="999" name="node_count" #count="ngModel" required/>
         </div>
       </div>
       <div class="form-group row">

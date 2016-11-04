@@ -14,14 +14,23 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home.component';
 import { ModalModule } from './../components/modal/index';
-import { GridModule } from './../components/grid/index';
+import { ResourcesGridModule } from './../components/resources-grid/index';
+
 import { ProgressDialogModule } from './../components/progress-dialog/index';
+import { UploadKeyDialogModule } from './../components/key-upload-dialog/index';
 
 import { NavbarModule } from './../shared/navbar/index';
 import { ApplicationSecurityService } from "../services/applicationSecurity.service";
 
 @NgModule({
-  imports: [CommonModule, ModalModule, GridModule, ProgressDialogModule, NavbarModule],
+  imports: [
+    CommonModule,
+    ModalModule,
+    ResourcesGridModule,
+    ProgressDialogModule,
+    UploadKeyDialogModule,
+    NavbarModule
+  ],
   declarations: [HomeComponent],
   exports: [HomeComponent],
   providers: [ApplicationSecurityService]

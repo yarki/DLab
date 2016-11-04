@@ -24,10 +24,6 @@ import org.slf4j.LoggerFactory;
 public class CommandBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandBuilder.class);
 
-    public String buildCommand(RunDockerCommand runDockerCommand) throws JsonProcessingException {
-        return buildCommand(runDockerCommand, null);
-    }
-
     public String buildCommand(RunDockerCommand runDockerCommand, ResourceBaseDTO resourceBaseDTO) throws JsonProcessingException {
         StringBuilder builder = new StringBuilder();
         if (resourceBaseDTO != null) {

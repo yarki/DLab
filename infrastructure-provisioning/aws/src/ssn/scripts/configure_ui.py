@@ -47,7 +47,7 @@ def ensure_mongo():
     except:
         return False
 
-# os.environ['creds_security_groups_ids']
+
 def configure_mongo():
     try:
         if not exists("/lib/systemd/system/mongod.service"):

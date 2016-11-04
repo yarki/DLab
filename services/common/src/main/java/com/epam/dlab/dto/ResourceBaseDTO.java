@@ -19,6 +19,8 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     private String serviceBaseName;
     @JsonProperty("creds_region")
     private String region;
+    @JsonProperty("exploratory_name")
+    private String exploratoryName;
 
     public String getServiceBaseName() {
         return serviceBaseName;
@@ -45,6 +47,20 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     @SuppressWarnings("unchecked")
     public T withRegion(String region) {
         setRegion(region);
+        return (T) this;
+    }
+
+    public String getExploratoryName() {
+        return exploratoryName;
+    }
+
+    public void setExploratoryName(String exploratoryName) {
+        this.exploratoryName = exploratoryName;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withExploratoryName(String exploratoryName) {
+        setExploratoryName(exploratoryName);
         return (T) this;
     }
 }
