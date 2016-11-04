@@ -23,14 +23,28 @@ import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class CommandExecutor {
-    private static final File NULL_FILE = new File("/dev/null");
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
 
     public List<String> executeSync(String command) throws IOException, InterruptedException {
-        return readImages(execute(command, false));
+        return execute(command);
     }
 
-    private List<String> readImages(Process process) throws IOException {
+    public void executeAsync(final String command) {
+        CompletableFuture.runAsync(() -> execute(command));
+    }
+
+    private List<String> execute(String command) {
+        try {
+            LOGGER.debug("Execute command: {}", command);
+            Process process = new ProcessBuilder(createCommand(command)).start();
+            return readInputLines(process);
+        } catch (Exception e) {
+            LOGGER.error("execute command:", e);
+        }
+        return new ArrayList<>();
+    }
+
+    private List<String> readInputLines(Process process) throws IOException {
         List<String> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             String line;
@@ -39,25 +53,6 @@ public class CommandExecutor {
             }
         }
         return result;
-    }
-
-    public void executeAsync(final String command) {
-        CompletableFuture.runAsync(() -> execute(command, true));
-    }
-
-    private Process execute(String command, boolean skipInput) {
-        Process process = null;
-        try {
-            LOGGER.debug("Execute command: {}", command);
-            ProcessBuilder builder = new ProcessBuilder(createCommand(command));
-            if (skipInput) {
-                builder.redirectInput(NULL_FILE);
-            }
-            process = builder.start();
-        } catch (Exception e) {
-            LOGGER.error("execute command:", e);
-        }
-        return process;
     }
 
     private String[] createCommand(String command) {
