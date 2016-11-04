@@ -52,10 +52,9 @@ def create_s3_bucket(bucket_name, tag, region):
         tagging.reload()
         return bucket.name
     except Exception as err:
-        print err
-        logging.info("Unable to create bucket: " + err)
+        logging.info("Unable to create bucket: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create bucket", "error_message": err}
+            res = {"error": "Unable to create bucket", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
     #except botocore.exceptions.ClientError as err:
@@ -156,7 +155,6 @@ def create_iam_role(role_name, role_profile):
         conn.add_role_to_instance_profile(role_profile, role_name)
         time.sleep(10)
     except Exception as err:
-        #print err
         logging.info("Unable to create IAM role: " + str(err))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to create IAM role", "error_code": str(err)}
