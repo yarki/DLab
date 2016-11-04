@@ -8,32 +8,32 @@
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>Service_base_name</name>
-          <description>Base name of your services</description>
+          <description>unique infrastructure value that previously was used when ssn being provisioned</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>Username</name>
-          <description>Name of the scientist</description>
+          <description>name of the scientist</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
-          <description>Key name at AWS to be used for accessing Jupyter</description>
-          <defaultValue></defaultValue>
+          <description>name of the uploaded ssh key file (without ".pem")</description>
+          <defaultValue>BDCC-DSS-POC</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SSN_SG_ids</name>
           <description>The ID of the SSN Security Group to be accessible</description>
-          <defaultValue></defaultValue>
+          <defaultValue>sg-e338c89a</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>ami_id</name>
-          <description></description>
-          <defaultValue></defaultValue>
+          <description>id of the default image with Ubuntu 16.04</description>
+          <defaultValue>ami-746aba14</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>instance_shape</name>
-          <description></description>
+          <description>value of the EDGE EC2 instance shape</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
               <string>t2.medium</string>
@@ -42,7 +42,7 @@
         </hudson.model.ChoiceParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>Region</name>
-          <description></description>
+          <description>aws region where infrastructure was deployed</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
               <string>us-west-2</string>

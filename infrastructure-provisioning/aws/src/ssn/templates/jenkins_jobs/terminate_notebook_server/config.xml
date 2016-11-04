@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>This job terminates notebook server and all EMRs which are linked to it</description>
+  <description>This job terminates notebook server and all EMRs linked to it, cleans up s3 buckets</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>Service_base_name</name>
-          <description>Base name of your services</description>
+          <description>unique infrastructure value that previously was used when ssn being provisioned</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -23,16 +23,17 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
-          <description>Key name at AWS to be used for accessing Jupyter</description>
-          <defaultValue></defaultValue>
+          <description>name of the uploaded ssh key file (without ".pem")</description>
+          <defaultValue>BDCC-DSS-POC</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>Region</name>
-          <description></description>
+          <description>aws region where infrastructure was deployed</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
               <string>us-west-2</string>
               <string>us-west-1</string>
+              <string>eu-west-1</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
