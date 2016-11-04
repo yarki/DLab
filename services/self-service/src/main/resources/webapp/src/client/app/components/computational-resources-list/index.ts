@@ -15,7 +15,6 @@ import { NgModule, Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ModalModule } from './../modal/index';
 import { ConfirmationComputationalResourcesModule } from './../confirmation-computational-resources/index';
->>>>>>> v1.0-Dev:services/self-service/src/main/resources/webapp/src/client/app/components/computational-resources-list/index.ts
 
 export * from "./computational-resources-list.component";
 

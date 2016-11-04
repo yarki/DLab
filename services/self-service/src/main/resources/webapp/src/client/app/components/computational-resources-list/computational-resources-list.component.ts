@@ -38,8 +38,8 @@ export class ComputationalResourcesList {
   printDetailResourceModal(data) {
     console.log(data);
   }
-  
-  terminateComputationalResource(notebook, resource){
+
+  terminateComputationalResources(notebook, resource){
     this.terminateConfirmateResource.open({ isFooter: false }, notebook, resource);
   };
 }

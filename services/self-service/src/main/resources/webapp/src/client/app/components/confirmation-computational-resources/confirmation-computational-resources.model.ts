@@ -16,6 +16,7 @@ import {UserResourceService} from "../../services/userResource.service";
 export class ComputationalResourcesModel {
   private notebook: any;
   private resource: any;
+  private confirmAction : Function;
   private userResourceService : UserResourceService;
   constructor(notebook: any,
    			      resource: any,
@@ -30,8 +31,8 @@ export class ComputationalResourcesModel {
   terminateComputationalResource(notebook: any, resource: any,  fnProcessResults : any, fnProcessErrors: any){
     this.notebook = notebook;
     this.resource = resource;
-    this.userResourceService
+    this.confirmAction = () => this.userResourceService
       .suspendComputationalResource(notebook.name, resource.computational_name)
       .subscribe((response : Response) => fnProcessResults(response), (response: Response) => fnProcessErrors(response));
-   };
+    };
 }

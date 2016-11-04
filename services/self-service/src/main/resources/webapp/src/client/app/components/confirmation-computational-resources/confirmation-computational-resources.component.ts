@@ -30,18 +30,16 @@ import { ComputationalResourcesModel } from "./confirmation-computational-resour
     ) { }
 
    open(option, notebook, resource) {
-     this.bindDialog.open(option);
      this.model = new ComputationalResourcesModel(notebook, resource, (response: Response) => {
-       this.bindDialog.open(option);
+       console.log(response);
      },
      (response : Response) => console.error(response.status),
      this.userResourceService);
+     if(!this.bindDialog.isOpened){
+       this.bindDialog.open(option);  
+     }
    }
-   // open(option, notebook, resource) {
-   //   this.notebook = notebook;
-   //   this.resource = resource;
-   //   this.bindDialog.open(option);
-   // }
+
    close() {
      this.bindDialog.close();
    }
