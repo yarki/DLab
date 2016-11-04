@@ -85,11 +85,7 @@ if __name__ == "__main__":
                     varname = "%s_%s" % (section, option)
                     os.environ[varname] = config.get(section, option)
 
-    # Pre-execution steps: dumping config to stdout and checking for dry running
-    print "[FULL DOCKER CONFIGURATION OPTIONS]"
-    for item in os.environ:
-        print "%s  =  %s\n" % (item, os.environ[item])
-
+    # Pre-execution steps: checking for dry running
     dry_run = False
     try:
         if os.environ['dry_run'] == 'true':

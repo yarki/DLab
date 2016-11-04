@@ -10,42 +10,42 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import {Component, Input, Output} from "@angular/core";
-import { UserResourceService } from "./../../services/userResource.service";
+.glyphicon-remove {
+  color: #f05141;
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: -5px;
+}
 
-@Component({
-    moduleId: module.id,
-    selector: 'expanded-grid',
-    templateUrl: 'resources.component.html',
-    styleUrls: ['./resources.component.css']
-})
+.no_details {
+  color: #bdc9d5;
+}
 
-export class ResourcesList {
-  @Input() resources: any[];
-  @Input() environment: any[];
+.detailed-link {
+  color: #333;
+  cursor: pointer;
+  text-decoration: none;
+  width: 60%;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  text-overflow: ellipsis;
+}
 
-  collapse: boolean = false;
-
-  constructor(
-    private userResourceService: UserResourceService
-    ) { }
-
-  toggleResourceList() {
-    this.collapse = !this.collapse;
-  }
-
-  printDetailResourceModal(data) {
-    console.log(data);
-  }
-
-  terminateEmr(notebook, resource){
-    let url = '/' + notebook.name + '/' + resource.computational_name + '/terminate';
-
-    this.userResourceService
-      .suspendComputationalResource(url)
-      .subscribe((result) => {
-        console.log('terminateEmr ', result);
-      });
-      return false;
-  };
+.source {
+  line-height: 30px;
+  position: relative;
+}
+.arrow_icon {
+  position: absolute;
+  right: 0;
+  top: 8px;
+}
+.emt_status {
+  color: #bdc9d5;
+  float: right;
+  margin-right: 30px;
+  width: 100px;
+  text-transform: capitalize;
 }

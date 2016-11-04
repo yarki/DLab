@@ -10,16 +10,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import {ResourcesList} from "./resources.component";
-import {NgModule, Component} from "@angular/core";
-import {CommonModule} from "@angular/common";
-
-export * from "./resources.component";
-
-@NgModule({
-  imports: [CommonModule,],
-  declarations: [ResourcesList],
-  exports: [ResourcesList],
-})
-
-export class ResourcesModule { }
+export class ResourcesGridRowModel {
+  constructor(public name:Array<any>,
+              public status: string,
+              public shape: string,
+              public resources:Array<any>,
+              public time:string,
+              public url:string
+            ){}
+}

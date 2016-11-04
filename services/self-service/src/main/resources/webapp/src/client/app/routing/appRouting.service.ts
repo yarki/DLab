@@ -19,13 +19,13 @@ export class AppRoutingService {
   constructor(private http: Http, private router: Router) {
   }
 
-  redirectToLoginPage()
+  redirectToLoginPage() : void
   {
     if(this.router.url != "/login")
       this.router.navigate(['/login']);
   }
 
-  redirectToHomePage()
+  redirectToHomePage() : void
   {
     this.router.navigate(['/dashboard']);
   }

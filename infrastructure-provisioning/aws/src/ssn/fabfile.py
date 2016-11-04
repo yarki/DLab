@@ -228,9 +228,7 @@ def run():
 
     try:
         jenkins_url = "http://%s/jenkins" % get_instance_hostname(instance_name)
-        web_app_url = "http://{}/".format(get_instance_hostname(instance_name))
         print "Jenkins URL: " + jenkins_url
-        print "WebApp URL: " + web_app_url
         try:
             with open('jenkins_crids.txt') as f:
                 print f.read()

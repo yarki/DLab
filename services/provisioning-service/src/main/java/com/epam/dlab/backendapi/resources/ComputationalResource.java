@@ -16,7 +16,13 @@ import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.backendapi.core.docker.command.DockerAction;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
+import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
+import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
+import com.epam.dlab.backendapi.resources.handler.ComputationalCallbackHandler;
+import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.dto.computational.ComputationalBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.exceptions.DlabException;
@@ -40,16 +46,22 @@ public class ComputationalResource implements DockerCommands {
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
     @Inject
+    private FolderListenerExecutor folderListenerExecutor;
+    @Inject
     private CommandExecutor commandExecuter;
-
     @Inject
     private CommandBuilder commandBuilder;
+    @Inject
+    private RESTService selfService;
 
     @Path("/create")
     @POST
     public String create(ComputationalCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create computational resources cluster");
         String uuid = DockerCommands.generateUUID();
+        folderListenerExecutor.start(configuration.getImagesDirectory(),
+                configuration.getResourceStatusPollTimeout(),
+                getFileHandlerCallback(DockerAction.CREATE, uuid, dto));
         try {
             commandExecuter.executeAsync(
                     commandBuilder.buildCommand(
@@ -61,6 +73,7 @@ public class ComputationalResource implements DockerCommands {
                                     .withEc2Role(configuration.getEmrEC2RoleDefault())
                                     .withServiceRole(configuration.getEmrServiceRoleDefault())
                                     .withCredsKeyName(configuration.getAdminKey())
+                                    .withCredsSecurityGroupsIds(dto.getSecurityGroupIds())
                                     .withActionCreate(configuration.getEmrImage()),
                             dto
                     )
@@ -76,6 +89,9 @@ public class ComputationalResource implements DockerCommands {
     public String terminate(ComputationalTerminateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("terminate computational resources cluster");
         String uuid = DockerCommands.generateUUID();
+        folderListenerExecutor.start(configuration.getImagesDirectory(),
+                configuration.getResourceStatusPollTimeout(),
+                getFileHandlerCallback(DockerAction.TERMINATE, uuid, dto));
         try {
             commandExecuter.executeAsync(
                     commandBuilder.buildCommand(
@@ -84,6 +100,7 @@ public class ComputationalResource implements DockerCommands {
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withRequestId(uuid)
+                                    .withEmrClusterName(dto.getClusterName())
                                     .withCredsKeyName(configuration.getAdminKey())
                                     .withActionTerminate(configuration.getEmrImage()),
                             dto
@@ -94,4 +111,9 @@ public class ComputationalResource implements DockerCommands {
         }
         return uuid;
     }
+
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO dto) {
+        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getEdgeUserName(), dto.getExploratoryName(), dto.getComputationalName());
+    }
+
 }
