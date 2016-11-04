@@ -13,21 +13,19 @@
 package com.epam.dlab.backendapi.health;
 
 import com.epam.dlab.client.restclient.RESTService;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
-
 public class ProvisioningHealthChecker implements HealthChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningHealthChecker.class);
 
-    @Inject
-    @Named(PROVISIONING_SERVICE)
     private RESTService provisioningService;
+
+    public ProvisioningHealthChecker(RESTService provisioningService) {
+        this.provisioningService = provisioningService;
+    }
 
     @Override
     public boolean isAlive() {

@@ -26,6 +26,8 @@ public class UserInstanceDTO {
     private String user;
     @JsonProperty("exploratory_name")
     private String exploratoryName;
+    @JsonProperty("exploratory_id")
+    private String exploratoryId;
     @JsonProperty
     private String status;
     @JsonProperty
@@ -64,6 +66,19 @@ public class UserInstanceDTO {
 
     public UserInstanceDTO withExploratoryName(String exploratoryName) {
         setExploratoryName(exploratoryName);
+        return this;
+    }
+
+    public String getExploratoryId() {
+        return exploratoryId;
+    }
+
+    public void setExploratoryId(String exploratoryId) {
+        this.exploratoryId = exploratoryId;
+    }
+
+    public UserInstanceDTO withExploratoryId(String exploratoryId) {
+        setExploratoryId(exploratoryId);
         return this;
     }
 

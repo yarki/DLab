@@ -52,12 +52,13 @@ sd-navbar {
 
 .navbar-logo {
   display: inline-block;
-  vertical-align: middle;
+  vertical-align: super;
   font-size: 0;
   margin-top: -7px;
 }
 .navbar-logo img {
   width: 65px;
+  vertical-align: auto;
 }
 .btn-logout {
   position: absolute;

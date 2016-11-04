@@ -10,9 +10,26 @@
 
  *****************************************************************************************************/
 
-export class CreateEmrModel {
-  constructor(
-    public name : string,
-    public count: string
-  ) {  }
+package com.epam.dlab.dto.exploratory;
+
+import com.epam.dlab.dto.StatusBaseDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
+    @JsonProperty("exploratory_id")
+    private String exploratoryId;
+
+    public String getExploratoryId() {
+        return exploratoryId;
+    }
+
+    public void setExploratoryId(String exploratoryId) {
+        this.exploratoryId = exploratoryId;
+    }
+
+    public ExploratoryStatusDTO withExploratoryId(String exploratoryId) {
+        setExploratoryId(exploratoryId);
+        return this;
+    }
+
 }

@@ -57,13 +57,6 @@ def run():
     except:
         emr_conf['emr_timeout'] = "1200"
 
-    try:
-        emr_conf['exploratory_name'] = os.environ['exploratory_name']
-        emr_conf['computational_name'] = os.environ['computational_name']
-    except:
-        emr_conf['exploratory_name'] = ''
-        emr_conf['computational_name'] = ''
-
         # TBD
     #    emr_conf['emr_security_group_name'] = emr_conf['instance_name'] + '-SG'
     #    emr_conf['isolated_security_group_name'] = emr_conf['instance_name'] + '-isolated-SG'
@@ -170,12 +163,22 @@ def run():
         sys.exit(1)
 
     try:
+        logging.info('[SUMMARY]')
+        print '[SUMMARY]'
+        print "Service base name: " + emr_conf['service_base_name']
+        print "Cluster name: " + emr_conf['cluster_name']
+        print "Key name: " + emr_conf['key_name']
+        print "Region: " + emr_conf['region']
+        print "EMR version: " + emr_conf['release_label']
+        print "EMR master node shape: " + emr_conf['master_instance_type']
+        print "EMR slave node shape: " + emr_conf['slave_instance_type']
+        print "Instance count: " + emr_conf['instance_count']
+        print "Notebook IP address: " + emr_conf['notebook_ip']
+        print "Bucket name: " + emr_conf['bucket_name']
         with open("/root/result.json", 'w') as result:
             res = {"hostname": cluster_name,
                    "key_name": emr_conf['key_name'],
                    "user_own_bucket_name": emr_conf['bucket_name'],
-                   "exploratory_name": emr_conf['exploratory_name'],
-                   "computational_name": emr_conf['computational_name'],
                    "Action": "Create new EMR cluster"}
             print json.dumps(res)
             result.write(json.dumps(res))
@@ -206,13 +209,6 @@ def terminate():
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
 
     try:
-        emr_conf['exploratory_name'] = os.environ['exploratory_name']
-        emr_conf['computational_name'] = os.environ['computational_name']
-    except:
-        emr_conf['exploratory_name'] = ''
-        emr_conf['computational_name'] = ''
-
-    try:
         logging.info('[TERMINATE EMR CLUSTER]')
         print '[TERMINATE EMR CLUSTER]'
         params = "--emr_name %s --bucket_name %s --key_path %s --ssh_user %s --tag_name %s --nb_tag_value %s" % \
@@ -233,8 +229,6 @@ def terminate():
             res = {"EMR_name": emr_conf['emr_name'],
                    "NBs_name": emr_conf['notebook_name'],
                    "user_own_bucket_name": emr_conf['bucket_name'],
-                   "exploratory_name": emr_conf['exploratory_name'],
-                   "computational_name": emr_conf['computational_name'],
                    "Action": "Terminate EMR cluster"}
             print json.dumps(res)
             result.write(json.dumps(res))

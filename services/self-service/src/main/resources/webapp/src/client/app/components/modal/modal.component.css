@@ -31,7 +31,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   border-bottom: 1px solid #edf1f5;
 }
 .modal-body {
-  padding: 25px 40px;
+  padding: 25px 50px;
 }
 .modal-header .modal-title {
   font-weight: 600;
@@ -150,6 +150,13 @@ modal-content {
 .confirmation-dialog li {
   font-size: 14px;
   color: #9cadbe;
+  word-wrap: break-word;
+  width: 90%;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  text-overflow: ellipsis;
 }
 .confirmation-dialog.modal-dialog {
   width: 550px;
@@ -169,7 +176,7 @@ modal-content {
 }
 .detail-header td {
   border: 1px solid #edf1f5;
-  padding: 17px 15px;
+  padding: 18px 15px;
   text-align: center;
 }
 .detail-header .modal-title {
@@ -177,6 +184,9 @@ modal-content {
   font-size: 18px;
   font-weight: 600;
   color: #455c74;
+}
+.detail-info p {
+  font-weight: 600;
 }
 .modal a {
   color: #35afd5;

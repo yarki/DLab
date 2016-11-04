@@ -230,10 +230,26 @@ def run():
         sys.exit(1)
 
     try:
+        logging.info('[SUMMARY]')
+        print('[SUMMARY]')
+        print "Service base name: " + service_base_name
+        print "SSN Name: " + instance_name
+        print "SSN Hostname: " + instance_hostname
+        print "Role name: " + role_name
+        print "Role profile name: " + role_profile_name
+        print "Policy name: " + policy_name
+        print "Key name: " + os.environ['creds_key_name']
+        print "Policies: " + os.environ['conf_policy_arn']
+        print "VPC ID: " + os.environ['creds_vpc_id']
+        print "Subnet ID: " + os.environ['creds_subnet_id']
+        print "Security IDs: " + os.environ['creds_security_groups_ids']
+        print "SSN instance shape: " + os.environ['ssn_instance_size']
+        print "SSN AMI ID: " + os.environ['ssn_ami_id']
+        print "SSN bucket name: " + user_bucket_name
+        print "Region: " + region
+
         jenkins_url = "http://%s/jenkins" % get_instance_hostname(instance_name)
-        web_app_url = "http://{}/".format(get_instance_hostname(instance_name))
         print "Jenkins URL: " + jenkins_url
-        print "WebApp URL: " + web_app_url
         try:
             with open('jenkins_crids.txt') as f:
                 print f.read()
