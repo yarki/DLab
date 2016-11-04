@@ -10,10 +10,34 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-export class GridRowModel {
-  constructor(public name:Array<any>,
-              public status: string,
-              public shape: string,
-              public resources:Array<any>
-            ){}
+import {Component, Input, Output} from "@angular/core";
+import { UserResourceService } from "./../../services/userResource.service";
+
+@Component({
+    moduleId: module.id,
+    selector: 'computational-resources-list',
+    templateUrl: 'computational-resources-list.component.html',
+    styleUrls: ['./computational-resources-list.component.css']
+})
+
+export class ComputationalResourcesList {
+  @Input() resources: any[];
+  @Input() environment: any[];
+
+  collapse: boolean = false;
+
+  constructor(
+    private userResourceService: UserResourceService
+    ) { }
+
+  toggleResourceList() {
+    this.collapse = !this.collapse;
+  }
+
+  terminateComputationalResource(notebook, resource){
+    this.userResourceService
+      .suspendComputationalResource(notebook.name, resource.computational_name)
+      .subscribe((result) => {});
+      return false;
+  };
 }

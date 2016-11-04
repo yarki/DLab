@@ -18,6 +18,10 @@ import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.DockerAction;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
+import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
+import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
+import com.epam.dlab.backendapi.resources.handler.ExploratoryCallbackHandler;
+import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
@@ -41,10 +45,13 @@ public class ExploratoryResource implements DockerCommands {
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
     @Inject
-    private CommandExecutor commandExecutor;
-
+    private FolderListenerExecutor folderListenerExecutor;
+    @Inject
+    private CommandExecutor commandExecuter;
     @Inject
     private CommandBuilder commandBuilder;
+    @Inject
+    private RESTService selfService;
 
 
     @Path("/create")
@@ -52,7 +59,10 @@ public class ExploratoryResource implements DockerCommands {
     public String create(ExploratoryCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create exploratory environment");
         String uuid = DockerCommands.generateUUID();
-        commandExecutor.executeAsync(
+        folderListenerExecutor.start(configuration.getImagesDirectory(),
+                configuration.getResourceStatusPollTimeout(),
+                getFileHandlerCallback(DockerAction.CREATE, uuid, dto));
+        commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withDetached()
@@ -93,7 +103,10 @@ public class ExploratoryResource implements DockerCommands {
     private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException, InterruptedException {
         LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
-        commandExecutor.executeAsync(
+        folderListenerExecutor.start(configuration.getImagesDirectory(),
+                configuration.getResourceStatusPollTimeout(),
+                getFileHandlerCallback(action, uuid, dto));
+        commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withInteractive()
@@ -108,4 +121,9 @@ public class ExploratoryResource implements DockerCommands {
         );
         return uuid;
     }
+
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ExploratoryBaseDTO dto) {
+        return new ExploratoryCallbackHandler(selfService, action, originalUuid, dto.getNotebookUserName(), dto.getExploratoryName());
+    }
+
 }

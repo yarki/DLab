@@ -17,6 +17,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ComputationalTerminateDTO extends ComputationalBaseDTO<ComputationalTerminateDTO> {
     @JsonProperty("emr_cluster_name")
     private String clusterName;
+    @JsonProperty("notebook_instance_name")
+    private String notebookInstanceName;
 
     public String getClusterName() {
         return clusterName;
@@ -31,4 +33,16 @@ public class ComputationalTerminateDTO extends ComputationalBaseDTO<Computationa
         return this;
     }
 
+    public String getNotebookInstanceName() {
+        return notebookInstanceName;
+    }
+
+    public void setNotebookInstanceName(String notebookInstanceName) {
+        this.notebookInstanceName = notebookInstanceName;
+    }
+
+    public ComputationalTerminateDTO withNotebookInstanceName(String notebookInstanceName) {
+        setNotebookInstanceName(notebookInstanceName);
+        return this;
+    }
 }

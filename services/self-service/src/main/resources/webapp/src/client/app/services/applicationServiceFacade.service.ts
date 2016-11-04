@@ -78,98 +78,98 @@ export class ApplicationServiceFacade {
     return reqOpt;
   }
 
-  buildLoginRequest(body: any) : Observable<Response> {
+  public buildLoginRequest(body: any) : Observable<Response> {
     return this.buildRequest(RequestMethod.Post,
       this.requestRegistry.Item(ApplicationServiceFacade.LOGIN),
       body,
       this.getRequestOptions(true, false));
   }
 
-  buildLogoutRequest(body: any) : Observable<Response>  {
+  public buildLogoutRequest() : Observable<Response>  {
     return this.buildRequest(RequestMethod.Post,
       this.requestRegistry.Item(ApplicationServiceFacade.LOGOUT),
-      body,
+      "",
       this.getRequestOptions(true, true));
   }
 
-  buildAuthorizeRequest(body:any) : Observable<Response> {
+  public buildAuthorizeRequest(body:any) : Observable<Response> {
     return this.buildRequest(RequestMethod.Post,
       this.requestRegistry.Item(ApplicationServiceFacade.AUTHORIZE),
       body,
       this.getRequestOptions(true, true));
   }
 
-  buildCheckUserAccessKeyRequest() : Observable<Response> {
+  public buildCheckUserAccessKeyRequest() : Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
       this.requestRegistry.Item(ApplicationServiceFacade.ACCESS_KEY),
       null,
       this.getRequestOptions(true, true));
   }
 
-  buildUploadUserAccessKeyRequest(body: any) : Observable<Response> {
+  public buildUploadUserAccessKeyRequest(body: any) : Observable<Response> {
     return this.buildRequest(RequestMethod.Post,
       this.requestRegistry.Item(ApplicationServiceFacade.ACCESS_KEY),
       body,
       this.getRequestOptions(false, true));
   }
 
-  buildGetUserProvisionedResourcesRequest() : Observable<Response> {
+  public buildGetUserProvisionedResourcesRequest() : Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
       this.requestRegistry.Item(ApplicationServiceFacade.PROVISIONED_RESOURCES),
       null,
       this.getRequestOptions(true, true));
   }
 
-  buildGetSupportedComputationalResourcesShapesRequest() : Observable<Response> {
+  public buildGetSupportedComputationalResourcesShapesRequest() : Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
       this.requestRegistry.Item(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES_SHAPES),
       null,
       this.getRequestOptions(true, true));
   }
 
-  buildGetExploratoryEnvironmentTemplatesRequest() : Observable<Response> {
+  public buildGetExploratoryEnvironmentTemplatesRequest() : Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
       this.requestRegistry.Item(ApplicationServiceFacade.EXPLORATORY_ENVIRONMENT_TEMPLATES),
       null,
       this.getRequestOptions(true, true));
   }
 
-  buildGetComputationalResourcesTemplatesRequest() : Observable<Response> {
+  public buildGetComputationalResourcesTemplatesRequest() : Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
       this.requestRegistry.Item(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES_TEMLATES),
       null,
       this.getRequestOptions(true, true));
   }
 
-  buildCreateExploratoryEnvironmentRequest(data) : Observable<Response> {
+  public buildCreateExploratoryEnvironmentRequest(data) : Observable<Response> {
     return this.buildRequest(RequestMethod.Put,
       this.requestRegistry.Item(ApplicationServiceFacade.EXPLORATORY_ENVIRONMENT),
       data,
       this.getRequestOptions(true, true));
   }
 
-  buildRunExploratoryEnvironmentRequest(data) : Observable<Response> {
+  public buildRunExploratoryEnvironmentRequest(data) : Observable<Response> {
     return this.buildRequest(RequestMethod.Post,
       this.requestRegistry.Item(ApplicationServiceFacade.EXPLORATORY_ENVIRONMENT),
       data,
       this.getRequestOptions(true, true));
   }
 
-  buildSuspendExploratoryEnvironmentRequest(data) : Observable<Response> {
+  public buildSuspendExploratoryEnvironmentRequest(data) : Observable<Response> {
     return this.buildRequest(RequestMethod.Delete,
       this.requestRegistry.Item(ApplicationServiceFacade.EXPLORATORY_ENVIRONMENT),
       data,
       this.getRequestOptions(true, true));
   }
 
-  buildCreateComputationalResourcesRequest(data) : Observable<Response> {
+  public buildCreateComputationalResourcesRequest(data) : Observable<Response> {
     return this.buildRequest(RequestMethod.Put,
       this.requestRegistry.Item(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES),
       data,
       this.getRequestOptions(true, true));
   }
 
-  buildDeleteComputationalResourcesRequest(data) : Observable<Response> {
+  public buildDeleteComputationalResourcesRequest(data) : Observable<Response> {
     return this.buildRequest(RequestMethod.Delete,
       this.requestRegistry.Item(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES),
       data,

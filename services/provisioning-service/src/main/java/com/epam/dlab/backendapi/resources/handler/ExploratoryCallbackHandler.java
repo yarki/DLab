@@ -10,59 +10,39 @@
 
  *****************************************************************************************************/
 
+package com.epam.dlab.backendapi.resources.handler;
 
-package com.epam.dlab.dto;
+import com.epam.dlab.backendapi.core.docker.command.DockerAction;
+import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.UserInstanceStatus;
+import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
+import com.fasterxml.jackson.databind.JsonNode;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import static com.epam.dlab.registry.ApiCallbacks.EXPLORATORY;
+import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 
-public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
-    @JsonProperty
-    private String user;
-    @JsonProperty("exploratory_name")
+public class ExploratoryCallbackHandler extends ResourceCallbackHandler<ExploratoryStatusDTO> {
+    private static final String EXPLORATORY_ID_FIELD = "notebook_name";
+
     private String exploratoryName;
-    @JsonProperty
-    private String status;
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
 
     @SuppressWarnings("unchecked")
-    public T withUser(String user) {
-        setUser(user);
-        return (T) this;
-    }
-
-
-    public String getExploratoryName() {
-        return exploratoryName;
-    }
-
-    public void setExploratoryName(String exploratoryName) {
+    public ExploratoryCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String exploratoryName) {
+        super(selfService, user, originalUuid, action);
         this.exploratoryName = exploratoryName;
     }
 
-    @SuppressWarnings("unchecked")
-    public T withExploratoryName(String exploratoryName) {
-        setExploratoryName(exploratoryName);
-        return (T) this;
+    protected String getCallbackURI() {
+        return EXPLORATORY+STATUS_URI;
     }
 
-    public String getStatus() {
-        return status;
+    protected ExploratoryStatusDTO parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO baseStatus) {
+        String exploratoryId = resultNode.get(EXPLORATORY_ID_FIELD).textValue();
+        return baseStatus.withExploratoryId(exploratoryId);
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    protected ExploratoryStatusDTO getBaseStatusDTO(UserInstanceStatus status) {
+        return super.getBaseStatusDTO(status).withExploratoryName(exploratoryName);
     }
 
-    @SuppressWarnings("unchecked")
-    public T withStatus(String status) {
-        setStatus(status);
-        return (T) this;
-    }
 }

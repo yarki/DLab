@@ -150,6 +150,13 @@ modal-content {
 .confirmation-dialog li {
   font-size: 14px;
   color: #9cadbe;
+  word-wrap: break-word;
+  width: 90%;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  text-overflow: ellipsis;
 }
 .confirmation-dialog.modal-dialog {
   width: 550px;
@@ -190,4 +197,8 @@ modal-content {
 }
 .modal-content .danger_field {
   border-color: #d9534f;
+}
+.detail-dialog .status {
+  font-size: 14px;
+  text-transform: capitalize;
 }

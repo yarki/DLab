@@ -10,23 +10,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-.glyphicon-remove {
-  color: #f05141;
-  display: inline-block;
-  vertical-align: middle;
-  margin-top: -5px;
-}
+import { NgModule, Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { ResourcesGrid } from "./resources-grid.component";
+import { ComputationalResourcesModule } from './../computational-resources-list/index';
+import { ModalModule } from './../modal/index';
+import { ConfirmationDialogModule } from './../confirmation-dialog/index';
+import { DetailDialogModule } from './../detail-dialog/index';
 
-.no_details {
-  color: #bdc9d5;
-}
+export * from "./resources-grid.component";
 
-.detailed-link {
-  color: #333;
-  cursor: pointer;
-  text-decoration: none;
-}
+@NgModule({
+  imports: [CommonModule, ComputationalResourcesModule, ModalModule, ConfirmationDialogModule, DetailDialogModule, FormsModule],
+  declarations: [ResourcesGrid],
+  exports: [ResourcesGrid]
+})
 
-.source {
-  line-height: 30px;
-}
+export class ResourcesGridModule { }
