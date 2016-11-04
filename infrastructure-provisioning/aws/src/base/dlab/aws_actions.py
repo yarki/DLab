@@ -17,6 +17,11 @@ import os
 import json
 from fabric.api import *
 
+local_log_filename = "%s.log" % os.environ['request_id']
+local_log_filepath = "/response/" + local_log_filename
+logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                    level=logging.DEBUG,
+                    filename=local_log_filepath)
 
 def put_to_bucket(bucket_name, local_file, destination_file):
     try:
@@ -38,8 +43,11 @@ def create_s3_bucket(bucket_name, tag, region):
         tagging.reload()
         return bucket.name
     except botocore.exceptions.ClientError as e:
-        print "Error code: " + e.response['Error']['Code']
-        print "Error message: " + e.response['Error']['Message']
+        logging.info("Unable to create bucket: " + e.response['Error']['Code'] + "Error message: " + e.response['Error']['Message'])
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to create bucket", "error_code": e.response['Error']['Code'], "error_message": e.response['Error']['Message']}
+            print json.dumps(res)
+            result.write(json.dumps(res))
 
 
 def create_vpc(vpc_cidr, tag):
