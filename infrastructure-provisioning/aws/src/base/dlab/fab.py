@@ -55,8 +55,9 @@ def run_routine(routine_name, params):
     try:
         with settings(abort_exception=RoutineException):
             logging.info("~/scripts/%s.py %s" % (routine_name, params))
-            local("~/scripts/%s.py %s" % (routine_name, params))
+            message = local("~/scripts/%s.py %s" % (routine_name, params))
             success = True
+            print message
     except RoutineException:
         success = False
     return success
