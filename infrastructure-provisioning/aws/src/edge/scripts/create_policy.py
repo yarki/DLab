@@ -30,7 +30,7 @@ if __name__ == "__main__":
         try:
             handler = open('/root/templates/s3_policy.json', 'r')
             policy = handler.read()
-            policy.replace('BUCKET_NAME', args.bucket_name)
+            policy = policy.replace('BUCKET_NAME', args.bucket_name)
         except OSError:
             print "Failed to open policy template"
             success = False
@@ -47,7 +47,8 @@ if __name__ == "__main__":
                 print e.response['Error']['Message']
                 success = False
             # success = True # This should be removed when goes PROD
-        except:
+        except Exception as ex:
+            print ex
             success = False
     else:
         parser.print_help()
