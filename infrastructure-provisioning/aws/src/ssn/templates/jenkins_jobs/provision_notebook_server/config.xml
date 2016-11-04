@@ -19,17 +19,17 @@
         <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
           <description>name of the uploaded ssh key file (without ".pem")</description>
-          <defaultValue>BDCC-DSS-POC</defaultValue>
+          <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SSN_SG_ids</name>
           <description>The ID of the SSN Security Group to be accessible</description>
-          <defaultValue>sg-e338c89a</defaultValue>
+          <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>ami_id</name>
           <description>id of the default image with Ubuntu 16.04</description>
-          <defaultValue>ami-746aba14</defaultValue>
+          <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>instance_shape</name>

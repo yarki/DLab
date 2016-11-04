@@ -29,7 +29,7 @@
         <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
           <description>name of the uploaded ssh key file (without ".pem")</description>
-          <defaultValue>BDCC-DSS-POC</defaultValue>
+          <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>Region</name>

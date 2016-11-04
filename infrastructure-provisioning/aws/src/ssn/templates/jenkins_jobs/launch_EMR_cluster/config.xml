@@ -154,18 +154,24 @@
                 <hudson.model.StringParameterDefinition>
                     <name>SSH_Key_Name</name>
                     <description></description>
-                    <defaultValue>BDCC-DSS-POC</defaultValue>
+                    <defaultValue></defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.StringParameterDefinition>
                     <name>Timeout</name>
                     <description>Timeout for EMR during build. Not mandatory</description>
                     <defaultValue>1500</defaultValue>
                 </hudson.model.StringParameterDefinition>
-                <hudson.model.StringParameterDefinition>
+                <hudson.model.ChoiceParameterDefinition>
                     <name>Region</name>
-                    <description></description>
-                    <defaultValue>us-west-2</defaultValue>
-                </hudson.model.StringParameterDefinition>
+                    <description>aws region where infrastructure was deployed</description>
+                    <choices class="java.util.Arrays$ArrayList">
+                        <a class="string-array">
+                            <string>us-west-2</string>
+                            <string>us-west-1</string>
+                            <string>eu-west-1</string>
+                        </a>
+                    </choices>
+                </hudson.model.ChoiceParameterDefinition>
             </parameterDefinitions>
         </hudson.model.ParametersDefinitionProperty>
     </properties>
