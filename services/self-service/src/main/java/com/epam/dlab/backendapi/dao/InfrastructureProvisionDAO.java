@@ -22,6 +22,8 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
 import org.bson.Document;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.and;
@@ -101,15 +103,16 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public String fetchComputationalId(String user, String exploratoryName, String computationalName) {
-        return ((Document) (Optional.ofNullable(
+        Map<String, Object> resources = (Map)Optional.ofNullable(
                 mongoService.getCollection(USER_INSTANCES)
                         .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName),
                                 eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)))
                         .projection(elemMatch(COMPUTATIONAL_RESOURCES, eq(COMPUTATIONAL_NAME, computationalName))).first())
                 .orElse(new Document())
-                .getOrDefault(COMPUTATIONAL_RESOURCES, new Document())))
-                .getOrDefault(COMPUTATIONAL_ID, EMPTY).toString();
+                .getOrDefault(COMPUTATIONAL_RESOURCES, Collections.emptyMap());
+        return resources.getOrDefault(COMPUTATIONAL_ID, EMPTY).toString();
     }
 
     public void updateComputationalStatus(ComputationalStatusDTO dto) {
