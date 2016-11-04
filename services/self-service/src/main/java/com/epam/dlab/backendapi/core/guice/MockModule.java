@@ -117,7 +117,7 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         List<ExploratoryEnvironmentVersion> eevList = new ArrayList<>();
         eevList.add(new ExploratoryEnvironmentVersion("Jupyter 1.5", "Base image with jupyter node creation routines",
                                                       "type", "jupyter-1.6", "AWS"));
-
+        imageMetadataDTO.setType(ImageType.EXPLORATORY.getType());
         imageMetadataDTO.setExploratoryEnvironmentShapes(crsList);
         imageMetadataDTO.setExploratoryEnvironmentVersions(eevList);
 
