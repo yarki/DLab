@@ -4,7 +4,6 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient;
 import com.amazonaws.services.identitymanagement.model.*;
-import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient;
 import com.epam.dlab.auth.ldap.core.filter.AwsUserDAO;
 import com.epam.dlab.auth.rest.ExpirableContainer;
 import org.slf4j.Logger;

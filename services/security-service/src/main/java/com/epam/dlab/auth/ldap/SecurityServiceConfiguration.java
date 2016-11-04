@@ -35,9 +35,6 @@ public class SecurityServiceConfiguration extends Configuration {
 
 	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-//	@JsonProperty
-//	private String awsCredentialsPath;
-
 	public SecurityServiceConfiguration() {
 		super();
 	}
@@ -102,8 +99,4 @@ public class SecurityServiceConfiguration extends Configuration {
 	public boolean isAwsUserIdentificationEnabled() {
 		return awsUserIdentificationEnabled;
 	}
-
-//	public String getAwsCredentialsPath() {
-//		return awsCredentialsPath;
-//	}
 }

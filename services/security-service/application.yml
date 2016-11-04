@@ -14,10 +14,10 @@
 #
 inactiveUserTimeoutMillSec: 3600000
 ldapConnectionConfig:
-  ldapHost: localhost
-#  ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
-  ldapPort: 3890
-#  ldapPort: 389
+#  ldapHost: localhost
+  ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
+#  ldapPort: 3890
+  ldapPort: 389
   name: cn=admin,dc=example,dc=com
   credentials: ldap
 ldapBindTemplate: uid=%s,ou=People,dc=example,dc=com
@@ -96,7 +96,7 @@ userInfoPersistenceEnabled: true
 awsUserIdentificationEnabled: true
 
 mongo:
-  host: localhost
+  host: ec2-35-162-18-194.us-west-2.compute.amazonaws.com
   port: 27017
   username: admin
   password: XS3ms9R3tP
