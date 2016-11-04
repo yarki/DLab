@@ -31,7 +31,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <div class="col-xs-5 text-right">
           <span class="btn btn-default btn-file">
             <span class="upload-icon"></span> Upload
-            <input (change)="uploadUserAccessKey_onChange($event)" type="file" name="file" accept=".pub" />
+            <input #userAccessKeyUploadControl (change)="uploadUserAccessKey_onChange($event)" type="file" name="file" accept=".pub" />
           </span>
           <div class="text-right" [class.danger_color]="!model.accessKeyFormValid">{{model.accessKeyLabel}}</div>
         </div>

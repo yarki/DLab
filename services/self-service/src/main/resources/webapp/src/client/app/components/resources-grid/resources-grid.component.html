@@ -85,20 +85,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="form-group row">
         <div  class="col-xs-4">
+          <label class="control-label">Total Instance number</label>
+        </div>
+        <div class="col-xs-8">
+          <input type="number" class="form-control" [(ngModel)]="model.count" min="1" max="999" name="node_count" #count="ngModel" required/>
+        </div>
+      </div>
+      <div class="form-group row">
+        <div  class="col-xs-4">
           <label class="control-label">Master Instance shape</label>
         </div>
         <div class="col-xs-8">
           <select class="form-control" #shape_master>
             <option *ngFor="let shape of shapes">{{shape.Type}}</option>
           </select>
-        </div>
-      </div>
-      <div class="form-group row">
-        <div  class="col-xs-4">
-          <label class="control-label">Total Instance number</label>
-        </div>
-        <div class="col-xs-8">
-          <input type="number" class="form-control" [(ngModel)]="model.count" min="1" max="999" name="node_count" #count="ngModel" required/>
         </div>
       </div>
       <div class="form-group row">

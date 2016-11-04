@@ -203,6 +203,7 @@ export class HomeComponent implements OnInit {
   }
 
   showDescription(value) {
-    this.templateDescription = this.createTempls[value].description;
+    if(this.createTempls && this.createTempls[value])
+      this.templateDescription = this.createTempls[value].description;
   }
 }

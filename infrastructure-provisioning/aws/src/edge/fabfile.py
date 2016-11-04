@@ -395,8 +395,19 @@ def run():
         remove_s3('edge', os.environ['edge_user_name'])
         sys.exit(1)
 
-
     try:
+        print '[SUMMARY]'
+        logging.info('[SUMMARY]')
+        print "Instance name: " + edge_conf['instance_name']
+        print "Hostname: " + instance_hostname
+        print "Public IP: " + public_ip_address
+        print "Private IP: " + ip_address
+        print "Key name: " + edge_conf['key_name']
+        print "Bucket name: " + edge_conf['bucket_name']
+        print "Notebook SG: " + edge_conf['notebook_security_group_name']
+        print "Notebook profiles: " + edge_conf['notebook_role_profile_name']
+        print "Edge SG: " + edge_conf['edge_security_group_name']
+        print "Notebook subnet: " + edge_conf['private_subnet_cidr']
         with open("/root/result.json", 'w') as result:
             res = {"hostname": instance_hostname,
                    "public_ip": public_ip_address,
