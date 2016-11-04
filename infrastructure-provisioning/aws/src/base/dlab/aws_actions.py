@@ -53,6 +53,9 @@ def create_s3_bucket(bucket_name, tag, region):
         with open("/root/result.json", 'r') as f:
             text = f.read()
         print "ROOT RESULT =============" + text
+        with open(local_log_filepath, 'r') as f:
+            text2 = f.read()
+        print "REQUEST LOG FILE============" + text2
 
 
 def create_vpc(vpc_cidr, tag):
