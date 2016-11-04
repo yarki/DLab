@@ -10,12 +10,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-export class GridRowModel {
-  constructor(public name:Array<any>,
-              public status: string,
-              public shape: string,
-              public resources:Array<any>,
-              public time:string,
-              public url:string
-            ){}
-}
+import { ComputationalResourcesList } from "./computational-resources-list.component";
+import { NgModule, Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ModalModule } from './../modal/index';
+import { ConfirmationComputationalResourcesModule } from './../confirmation-computational-resources/index';
+>>>>>>> v1.0-Dev:services/self-service/src/main/resources/webapp/src/client/app/components/computational-resources-list/index.ts
+
+export * from "./computational-resources-list.component";
+
+@NgModule({
+  imports: [CommonModule, ModalModule, ConfirmationComputationalResourcesModule],
+  declarations: [ComputationalResourcesList],
+  exports: [ComputationalResourcesList],
+})
+
+export class ComputationalResourcesModule { }

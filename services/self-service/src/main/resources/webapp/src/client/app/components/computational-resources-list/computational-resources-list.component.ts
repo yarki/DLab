@@ -10,36 +10,36 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-.glyphicon-remove {
-  color: #f05141;
-  display: inline-block;
-  vertical-align: middle;
-  margin-top: -5px;
-}
+import {Component, Input, Output, ViewChild} from "@angular/core";
+import { UserResourceService } from "./../../services/userResource.service";
 
-.no_details {
-  color: #bdc9d5;
-}
+@Component({
+    moduleId: module.id,
+    selector: 'computational-resources-list',
+    templateUrl: 'computational-resources-list.component.html',
+    styleUrls: ['./computational-resources-list.component.css']
+})
 
-.detailed-link {
-  color: #333;
-  cursor: pointer;
-  text-decoration: none;
-}
+export class ComputationalResourcesList {
+  @ViewChild('terminateConfirmateResource') terminateConfirmateResource;
+  @Input() resources: any[];
+  @Input() environment: any[];
 
-.source {
-  line-height: 30px;
-  position: relative;
-}
-.arrow_icon {
-  position: absolute;
-  right: 0;
-  top: 8px;
-}
-.emt_status {
-  color: #bdc9d5;
-  float: right;
-  margin-right: 30px;
-  width: 100px;
-  text-transform: capitalize;
+  collapse: boolean = false;
+
+  constructor(
+    private userResourceService: UserResourceService
+    ) { }
+
+  toggleResourceList() {
+    this.collapse = !this.collapse;
+  }
+
+  printDetailResourceModal(data) {
+    console.log(data);
+  }
+  
+  terminateComputationalResource(notebook, resource){
+    this.terminateConfirmateResource.open({ isFooter: false }, notebook, resource);
+  };
 }
