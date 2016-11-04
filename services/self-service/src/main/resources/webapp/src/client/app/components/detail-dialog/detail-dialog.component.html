@@ -19,10 +19,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <tr>
             <td class="modal-title">{{notebook.name}}</td>
               <td>
-                <span class="status"
-                  [ngClass]="{
-                  'danger_color': notebook.status === 'terminating', 
-                  'success_color': notebook.status === 'stopped'}">
+                <span class="status"ngClass="{{notebook.status || ''}}">
                   {{notebook.status}}
                 </span>
               </td>
@@ -31,9 +28,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </table>
       </div>
       <div class="row">
-        <div class="col-xs-12">
+        <div class="col-xs-12 detail-info">
+          <p>Edge Node IP Address {{notebook.ip}}</p>
+
           <p>Up time {{notebook.time + ""}}</p>
-          <p>Open in your browser  <a href="{{notebook.url + ''}}" target="_blank">{{notebook.url+ ''}}</a> to access this box after creating a tunnel.</p>
+          <p>Open in your browser  <a href="{{notebook.url}}" target="_blank">{{notebook.url}}</a> to access this box after creating a tunnel.</p>
           <br/>
           <p>
             <a href="#" target="_blank">
