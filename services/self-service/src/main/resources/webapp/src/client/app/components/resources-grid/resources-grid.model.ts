@@ -16,6 +16,7 @@ export class ResourcesGridRowModel {
               public shape: string,
               public resources:Array<any>,
               public time:string,
-              public url:string
+              public url:string,
+              public ip:string
             ){}
 }
