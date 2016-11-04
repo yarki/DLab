@@ -34,7 +34,10 @@ public class SecurityServiceConfiguration extends Configuration {
 	private static final String MONGO = "mongo";
 
 	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
-	
+
+//	@JsonProperty
+//	private String awsCredentialsPath;
+
 	public SecurityServiceConfiguration() {
 		super();
 	}
@@ -43,9 +46,6 @@ public class SecurityServiceConfiguration extends Configuration {
 
 	@JsonProperty
 	private boolean awsUserIdentificationEnabled = false;
-
-	@JsonProperty
-	private String awsCredentialsPath = "~/.aws/credentials";
 	
 	@JsonProperty
 	private long inactiveUserTimeoutMillSec;
@@ -103,7 +103,7 @@ public class SecurityServiceConfiguration extends Configuration {
 		return awsUserIdentificationEnabled;
 	}
 
-	public String getAwsCredentialsPath() {
-		return awsCredentialsPath;
-	}
+//	public String getAwsCredentialsPath() {
+//		return awsCredentialsPath;
+//	}
 }

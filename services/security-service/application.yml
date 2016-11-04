@@ -94,8 +94,7 @@ server:
 
 userInfoPersistenceEnabled: true
 awsUserIdentificationEnabled: true
-awsCredentialsPath: \Users\Mikhail_Teplitskiy\.awscredentials
-#Linux: ~/.aws/credentials
+
 mongo:
   host: localhost
   port: 27017

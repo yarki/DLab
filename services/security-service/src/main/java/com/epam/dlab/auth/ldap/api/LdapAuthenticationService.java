@@ -12,8 +12,10 @@
 
 package com.epam.dlab.auth.ldap.api;
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.PropertiesFileCredentialsProvider;
 import com.amazonaws.services.identitymanagement.model.User;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.UserInfoDAO;
 import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
@@ -57,8 +59,10 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			this.userInfoDao = new UserInfoDAODumbImpl();
 		}
 		if(config.isAwsUserIdentificationEnabled()) {
-			PropertiesFileCredentialsProvider provider = new PropertiesFileCredentialsProvider( config.getAwsCredentialsPath() );
-			awsUserDAO = new AwsUserDAOImpl(provider.getCredentials());
+			AWSSecurityTokenServiceClient tss = new AWSSecurityTokenServiceClient();
+			//PropertiesFileCredentialsProvider provider = new PropertiesFileCredentialsProvider( config.getAwsCredentialsPath() );
+			DefaultAWSCredentialsProviderChain providerChain = DefaultAWSCredentialsProviderChain.getInstance();
+			awsUserDAO = new AwsUserDAOImpl(providerChain.getCredentials());
 		} else {
 			awsUserDAO = null;
 		}

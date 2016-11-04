@@ -4,6 +4,7 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient;
 import com.amazonaws.services.identitymanagement.model.*;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient;
 import com.epam.dlab.auth.ldap.core.filter.AwsUserDAO;
 import com.epam.dlab.auth.rest.ExpirableContainer;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class AwsUserDAOImpl implements AwsUserDAO {
     private final AmazonIdentityManagement aim;
 
     public AwsUserDAOImpl(AWSCredentials credentials) {
+
         this.credentials = credentials;
         this.aim = new AmazonIdentityManagementClient(credentials);
         try {

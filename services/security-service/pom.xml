@@ -61,7 +61,12 @@
 			<artifactId>conveyor</artifactId>
 			<version>1.0.16</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sts</artifactId>
+            <version>1.11.48</version>
+        </dependency>
+    </dependencies>
 	<build>
 		<plugins>
 			<plugin>
