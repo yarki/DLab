@@ -45,7 +45,7 @@ def run():
         service_base_name = os.environ['conf_service_base_name']
         role_name = service_base_name + '-ssn-Role'
         role_profile_name = service_base_name + '-ssn-Profile'
-        policy_name = service_base_name + '-ssn-Poli!cy'
+        policy_name = service_base_name + '-ssn-Policy'
         user_bucket_name = (service_base_name + '-ssn-bucket').lower().replace('_', '-')
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn'
