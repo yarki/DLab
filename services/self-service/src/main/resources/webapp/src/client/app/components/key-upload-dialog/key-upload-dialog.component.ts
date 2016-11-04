@@ -27,6 +27,7 @@ export class UploadKeyDialog {
   model: KeyUploadDialogModel;
 
   @ViewChild('bindDialog') bindDialog;
+  @ViewChild('userAccessKeyUploadControl') userAccessKeyUploadControl;
   @Output() checkInfrastructureCreationProgress: EventEmitter<{}> = new EventEmitter();
   constructor(private userAccessKeyService : UserAccessKeyService) {
     this.model = KeyUploadDialogModel.getDefault();
@@ -61,6 +62,7 @@ export class UploadKeyDialog {
   }
 
   close() {
+    this.userAccessKeyUploadControl.nativeElement.value = "";
     if(this.bindDialog.isOpened)
       this.bindDialog.close();
   }
