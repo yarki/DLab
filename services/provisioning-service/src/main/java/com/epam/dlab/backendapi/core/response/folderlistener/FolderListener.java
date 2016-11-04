@@ -13,6 +13,7 @@
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.exceptions.DlabException;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,7 @@ public class FolderListener implements Runnable {
                 fileHandlerCallback.handleError();
             }
         } catch (Exception e) {
-            LOGGER.error("FolderListenerExecutor exception", e);
+            throw new DlabException("FolderListenerExecutor exception", e);
         }
     }
 
