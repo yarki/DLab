@@ -51,12 +51,18 @@ def create_s3_bucket(bucket_name, tag, region):
         tagging.put(Tagging={'TagSet': [tag]})
         tagging.reload()
         return bucket.name
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to create bucket: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except botocore.exceptions as err:
+        logging.info("Unable to create bucket: " + err)
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create bucket", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to create bucket", "error_message": err}
             print json.dumps(res)
             result.write(json.dumps(res))
+    #except botocore.exceptions.ClientError as err:
+    #    logging.info("Unable to create bucket: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    #    with open("/root/result.json", 'w') as result:
+    #        res = {"error": "Unable to create bucket", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+    #        print json.dumps(res)
+    #        result.write(json.dumps(res))
 
 
 def create_vpc(vpc_cidr, tag):
