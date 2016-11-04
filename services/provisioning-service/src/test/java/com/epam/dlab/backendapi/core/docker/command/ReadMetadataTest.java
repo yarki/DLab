@@ -13,6 +13,8 @@ import static com.epam.dlab.backendapi.core.DockerCommands.MAPPER;
  */
 public class ReadMetadataTest {
     private static final String METADATA_DESCRIPTION_JSON = "/metadata/description.json";
+    private static final String METADATA_DESCRIPTION_JSON_1 = "/metadata/description_1.json";
+
 
     @Test
     public void readMetadataTest() throws IOException {
@@ -20,6 +22,14 @@ public class ReadMetadataTest {
                 readTestResource(METADATA_DESCRIPTION_JSON),
                 ImageMetadataDTO.class);
 
+        Assert.assertNotNull(imageMetadataDTO);
+    }
+
+    @Test
+    public void readMetadataTest_1() throws IOException {
+        ImageMetadataDTO imageMetadataDTO = MAPPER.readValue(
+                readTestResource(METADATA_DESCRIPTION_JSON_1),
+                ImageMetadataDTO.class);
         Assert.assertNotNull(imageMetadataDTO);
     }
 

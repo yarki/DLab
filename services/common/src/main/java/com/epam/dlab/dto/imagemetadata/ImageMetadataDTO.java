@@ -13,8 +13,10 @@
 package com.epam.dlab.dto.imagemetadata;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ImageMetadataDTO {
     @JsonProperty
     private String image;
@@ -29,9 +31,17 @@ public class ImageMetadataDTO {
     @JsonProperty(value = "request_id")
     private String requestId;
     @JsonProperty(value = "computation_resources_shapes")
-    private List<ComputationalResourceShapesDto> computationResourceShapes;
+    private List<ComputationalResourceShapeDto> computationResourceShapes;
+    @JsonProperty(value = "exploratory_environment_versions")
+    private List<ExploratoryEnvironmentVersion> exploratoryEnvironmentVersions;
+    @JsonProperty(value = "exploratory_environment_shapes")
+    private List<ComputationalResourceShapeDto> exploratoryEnvironmentShapes;
 
     public ImageMetadataDTO() {
+    }
+
+    public ImageMetadataDTO(String image) {
+        this.image = image;
     }
 
     public ImageMetadataDTO(String image, String templateName, String description, String requestId, String type,
@@ -44,8 +54,23 @@ public class ImageMetadataDTO {
         this.templates = templates;
     }
 
-    public ImageMetadataDTO(String image) {
-        this.image = image;
+
+    public List<ExploratoryEnvironmentVersion> getExploratoryEnvironmentVersions() {
+        return exploratoryEnvironmentVersions;
+    }
+
+    public void setExploratoryEnvironmentVersions(
+            List<ExploratoryEnvironmentVersion> exploratoryEnvironmentVersions) {
+        this.exploratoryEnvironmentVersions = exploratoryEnvironmentVersions;
+    }
+
+    public List<ComputationalResourceShapeDto> getExploratoryEnvironmentShapes() {
+        return exploratoryEnvironmentShapes;
+    }
+
+    public void setExploratoryEnvironmentShapes(
+            List<ComputationalResourceShapeDto> exploratoryEnvironmentShapes) {
+        this.exploratoryEnvironmentShapes = exploratoryEnvironmentShapes;
     }
 
     public String getImage() {
@@ -96,11 +121,11 @@ public class ImageMetadataDTO {
         this.requestId = requestId;
     }
 
-    public List<ComputationalResourceShapesDto> getComputationResourceShapes() {
+    public List<ComputationalResourceShapeDto> getComputationResourceShapes() {
         return computationResourceShapes;
     }
 
-    public void setComputationResourceShapes(List<ComputationalResourceShapesDto> computationResourceShapes) {
+    public void setComputationResourceShapes(List<ComputationalResourceShapeDto> computationResourceShapes) {
         this.computationResourceShapes = computationResourceShapes;
     }
 

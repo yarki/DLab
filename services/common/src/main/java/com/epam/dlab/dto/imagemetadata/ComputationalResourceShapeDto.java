@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Viktor Chukhra <Viktor_Chukhra@epam.com>
  */
-public class ComputationalResourceShapesDto {
+public class ComputationalResourceShapeDto {
     @JsonProperty(value = "Type")
     private String type;
     @JsonProperty(value = "Ram")
@@ -13,6 +13,14 @@ public class ComputationalResourceShapesDto {
     @JsonProperty(value = "Cpu")
     private int cpu;
 
+    public ComputationalResourceShapeDto(){
+    }
+
+    public ComputationalResourceShapeDto(String type, String ram, int cpu) {
+        this.type = type;
+        this.ram = ram;
+        this.cpu = cpu;
+    }
 
     public String getType() {
         return type;
@@ -47,7 +55,7 @@ public class ComputationalResourceShapesDto {
             return false;
         }
 
-        ComputationalResourceShapesDto that = (ComputationalResourceShapesDto) o;
+        ComputationalResourceShapeDto that = (ComputationalResourceShapeDto) o;
 
         if (cpu != that.cpu) {
             return false;
