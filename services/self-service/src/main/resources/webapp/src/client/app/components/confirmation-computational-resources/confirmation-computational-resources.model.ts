@@ -9,37 +9,29 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 *****************************************************************************************************/
+import {Observable} from "rxjs";
+import {Response} from "@angular/http";
+import {UserResourceService} from "../../services/userResource.service";
 
-import {Component, Input, Output, ViewChild} from "@angular/core";
-import { UserResourceService } from "./../../services/userResource.service";
-
-@Component({
-    moduleId: module.id,
-    selector: 'expanded-grid',
-    templateUrl: 'resources.component.html',
-    styleUrls: ['./resources.component.css']
-})
-
-export class ResourcesList {
-  @ViewChild('terminateConfirmateResource') terminateConfirmateResource;
-  @Input() resources: any[];
-  @Input() environment: any[];
-
-  collapse: boolean = false;
-
-  constructor(
-    private userResourceService: UserResourceService
-    ) { }
-
-  toggleResourceList() {
-    this.collapse = !this.collapse;
+export class ComputationalResourcesModel {
+  private notebook: any;
+  private resource: any;
+  private userResourceService : UserResourceService;
+  constructor(notebook: any,
+   			      resource: any,
+              fnProcessResults: any,
+              fnProcessErrors: any,
+              userResourceService : UserResourceService
+   			  ){
+    this.userResourceService = userResourceService;
+  	this.terminateComputationalResource(notebook, resource, fnProcessResults, fnProcessErrors);
   }
 
-  printDetailResourceModal(data) {
-    console.log(data);
-  }
-
-  terminateConfirmate(notebook, resource) {
-    this.terminateConfirmateResource.open({ isFooter: false }, notebook, resource);
-  }
+  terminateComputationalResource(notebook: any, resource: any,  fnProcessResults : any, fnProcessErrors: any){
+    this.notebook = notebook;
+    this.resource = resource;
+    this.userResourceService
+      .suspendComputationalResource(notebook.name, resource.computational_name)
+      .subscribe((response : Response) => fnProcessResults(response), (response: Response) => fnProcessErrors(response));
+   };
 }

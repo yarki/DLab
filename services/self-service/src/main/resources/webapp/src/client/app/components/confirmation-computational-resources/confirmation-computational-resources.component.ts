@@ -11,8 +11,9 @@
  *****************************************************************************************************/
 
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { UserResourceService } from "./../../services/userResource.service";
-import {Response} from "@angular/http";
+import { Response } from "@angular/http";
+import { UserResourceService } from "../../services/userResource.service";
+import { ComputationalResourcesModel } from "./confirmation-computational-resources.model";
 
  @Component({
    moduleId: module.id,
@@ -21,29 +22,28 @@ import {Response} from "@angular/http";
  })
 
  export class ConfirmationComputationalResources {
-   notebook: Object;
-   resource: Object;
+   model : ComputationalResourcesModel;
 
    @ViewChild('bindDialog') bindDialog;
    constructor(
-    private userResourceService: UserResourceService
+     private userResourceService: UserResourceService
     ) { }
 
    open(option, notebook, resource) {
-     this.notebook = notebook;
-     this.resource = resource;
      this.bindDialog.open(option);
+     this.model = new ComputationalResourcesModel(notebook, resource, (response: Response) => {
+       this.bindDialog.open(option);
+     },
+     (response : Response) => console.error(response.status),
+     this.userResourceService);
    }
+   // open(option, notebook, resource) {
+   //   this.notebook = notebook;
+   //   this.resource = resource;
+   //   this.bindDialog.open(option);
+   // }
    close() {
      this.bindDialog.close();
    }
-   terminateEmr(notebook, resource){
-    this.userResourceService
-      .suspendComputationalResource(notebook.name, resource.computational_name)
-      .subscribe((result) => {
-        console.log('terminateEmr ', result);
-        this.bindDialog.close();
-      });
-      return false;
-   };
+   
  }

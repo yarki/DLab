@@ -13,10 +13,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <modal #bindDialog modalClass="confirmation-dialog modal-md">
   <modal-header></modal-header>
-  <modal-content *ngIf="resource">
+  <modal-content *ngIf="model">
       <div class="row">
         <div class="col-xs-12">
-          <p>Computational resource <strong>{{resource.computational_name}}</strong> be decommissioned.</p>
+          <p>Computational resource <strong>{{model.resource.computational_name}}</strong> be decommissioned.</p>
         </div>
       </div>
       <div class="row">
@@ -26,7 +26,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="text-right">
         <button type="button" class="btn btn-default" (click)="bindDialog.close()">No</button>
-        <button type="button" class="btn btn-success" (click)="terminateEmr(notebook, resource)">Yes</button>
+        <button type="button" class="btn btn-success" (click)="terminateComputationalResource(notebook, resource)">Yes</button>
       </div>
   </modal-content>
 </modal>
