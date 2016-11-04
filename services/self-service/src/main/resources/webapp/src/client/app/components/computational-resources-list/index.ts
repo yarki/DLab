@@ -10,40 +10,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import {Component, Input, Output} from "@angular/core";
-import { UserResourceService } from "./../../services/userResource.service";
+import { ComputationalResourcesList } from "./computational-resources-list.component";
+import { NgModule, Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
 
-@Component({
-    moduleId: module.id,
-    selector: 'expanded-grid',
-    templateUrl: 'resources.component.html',
-    styleUrls: ['./resources.component.css']
+export * from "./computational-resources-list.component";
+
+@NgModule({
+  imports: [CommonModule,],
+  declarations: [ComputationalResourcesList],
+  exports: [ComputationalResourcesList],
 })
 
-export class ResourcesList {
-  @Input() resources: any[];
-  @Input() environment: any[];
-
-  collapse: boolean = false;
-
-  constructor(
-    private userResourceService: UserResourceService
-    ) { }
-
-  toggleResourceList() {
-    this.collapse = !this.collapse;
-  }
-
-  printDetailResourceModal(data) {
-    console.log(data);
-  }
-
-  terminateEmr(notebook, resource){
-    this.userResourceService
-      .suspendComputationalResource(notebook.name, resource.computational_name)
-      .subscribe((result) => {
-        console.log('terminateEmr ', result);
-      });
-      return false;
-  };
-}
+export class ComputationalResourcesModule { }
