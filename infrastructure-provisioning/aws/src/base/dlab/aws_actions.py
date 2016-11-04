@@ -31,14 +31,12 @@ def put_to_bucket(bucket_name, local_file, destination_file):
         with open(local_file, 'rb') as data:
             s3.upload_fileobj(data, bucket_name, destination_file)
         return True
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to upload file to bucket: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to upload files to S3 bucket: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to upload file to bucket", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to upload files to S3 bucket", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
-        return False
-    except:
         return False
 
 
@@ -52,17 +50,11 @@ def create_s3_bucket(bucket_name, tag, region):
         tagging.reload()
         return bucket.name
     except Exception as err:
-        logging.info("Unable to create bucket: " + str(err))
+        logging.info("Unable to create S3 bucket: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create bucket", "error_message": str(err)}
+            res = {"error": "Unable to create S3 bucket", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
-    #except botocore.exceptions.ClientError as err:
-    #    logging.info("Unable to create bucket: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
-    #    with open("/root/result.json", 'w') as result:
-    #        res = {"error": "Unable to create bucket", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
-    #        print json.dumps(res)
-    #        result.write(json.dumps(res))
 
 
 def create_vpc(vpc_cidr, tag):
@@ -71,10 +63,10 @@ def create_vpc(vpc_cidr, tag):
         vpc = ec2.create_vpc(CidrBlock=vpc_cidr)
         vpc.create_tags(Tags=[tag])
         return vpc.id
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to create vpc: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to create VPC: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create vpc", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to create VPC", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -88,10 +80,10 @@ def create_tag(resource, tag):
                 json.loads(tag)
             ]
         )
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to create tag: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to create Tag: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create tag", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to create Tag", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -103,10 +95,10 @@ def create_subnet(vpc_id, subnet, tag):
         subnet.create_tags(Tags=[tag])
         subnet.reload()
         return subnet.id
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to create vpc: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to create Subnet: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create vpc", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to create Subnet", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -139,10 +131,10 @@ def create_instance(definitions, instance_tag):
             instance.create_tags(Tags=[{'Key': 'Name', 'Value': definitions.node_name}, instance_tag])
             return instance.id
         return ''
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to create EC2 instance: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to create EC2: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create EC2 instance", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to create EC2", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -157,7 +149,7 @@ def create_iam_role(role_name, role_profile):
     except Exception as err:
         logging.info("Unable to create IAM role: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create IAM role", "error_code": str(err)}
+            res = {"error": "Unable to create IAM role", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -166,10 +158,10 @@ def attach_policy(policy_arn, role_name):
     try:
         conn = boto.connect_iam()
         conn.attach_role_policy(policy_arn, role_name)
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to attach policy: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to attach Policy: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to attach policy", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to attach Policy", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -180,10 +172,10 @@ def create_attach_policy(policy_name, role_name, file_path):
         with open(file_path, 'r') as myfile:
             json_file = myfile.read()
         conn.put_role_policy(role_name, policy_name, json_file)
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to attach policy: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to attach Policy: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to attach policy", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to attach Policy", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -204,10 +196,10 @@ def remove_ec2(tag_name, tag_value):
                 print "The instance " + tag_value + " has been terminated successfully"
         else:
             print "There are no instances with " + tag_value + " name to terminate"
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to remove EC2: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to remove EC2: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove EC2", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to EC2", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -228,10 +220,10 @@ def stop_ec2(tag_name, tag_value):
                 print "The instance " + tag_value + " has been stopped successfully"
         else:
             print "There are no instances with " + tag_value + " name to stop"
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to stop EC2: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to stop EC2: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to stop EC2", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to stop EC2", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -252,10 +244,10 @@ def start_ec2(tag_name, tag_value):
                 print "The instance " + tag_value + " has been started successfully"
         else:
             print "There are no instances with " + tag_value + " name to start"
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to start EC2: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to start EC2: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to start EC2", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to start EC2", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -284,10 +276,10 @@ def remove_role(instance_type, scientist=''):
         client.delete_instance_profile(InstanceProfileName=profile)
         client.delete_role(RoleName=role)
         print "The IAM role " + role + " has been deleted successfully"
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to remove role: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to remove role: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove role", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to remove role", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -299,10 +291,10 @@ def s3_cleanup(bucket, cluster_name):
         prefix = "config/" + cluster_name + "/"
         for i in resource.objects.filter(Prefix=prefix):
             s3_res.Object(resource.name, i.key).delete()
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to delete files in S3 bucket: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to clean S3 bucket: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to delete files in S3 bucket", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to clean S3 bucket", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -329,10 +321,10 @@ def remove_s3(bucket_type, scientist=''):
                 print "The S3 bucket " + bucket.name + " has been cleaned"
         client.delete_bucket(Bucket=bucket.name)
         print "The S3 bucket " + bucket.name + " has been deleted successfully"
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to remove S3 bucket: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to remove S3 bucket: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove S3 bucket", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to remove S3 bucket", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -349,10 +341,10 @@ def remove_subnets(subnet_id):
         #    print subnet.id
         client.delete_subnet(SubnetId=subnet_id)
         #    print "The subnet " + subnet.id + " has been deleted successfully"
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to remove subnet: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to remove subnet: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove subnet", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to remove subnet", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -369,10 +361,10 @@ def remove_sgroups(tag_value):
             print sg.id
             client.delete_security_group(GroupId=sg.id)
             print "The security group " + sg.id + " has been deleted successfully"
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to remove SG: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to remove SG: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove SG", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to remove SG", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -386,10 +378,10 @@ def deregister_image(scientist):
         images_list = response.get('Images')
         for i in images_list:
             client.deregister_image(ImageId=i.get('ImageId'))
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to de-register image: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to de-register image: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to de-register image", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to de-register image", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -400,10 +392,10 @@ def terminate_emr(id):
         emr.terminate_job_flows(
             JobFlowIds=[id]
         )
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to terminate EMR: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to remove EMR: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to terminate EMR", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
+            res = {"error": "Unable to remove EMR", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
 
@@ -427,15 +419,9 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
                 print "Notebook's " + env.hosts + " kernels were removed"
         else:
             print "There are no notebooks to clean kernels."
-    except botocore.exceptions.ClientError as err:
-        logging.info("Unable to remove kernels: " + err.response['Error']['Code'] + "Error message: " + err.response['Error']['Message'])
+    except Exception as err:
+        logging.info("Unable to remove kernels on Notebook: " + str(err))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove kernels", "error_code": err.response['Error']['Code'], "error_message": err.response['Error']['Message']}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-    except:
-        logging.info("Unable to remove kernels")
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove kernels"}
+            res = {"error": "Unable to remove kernels on Notebook", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
