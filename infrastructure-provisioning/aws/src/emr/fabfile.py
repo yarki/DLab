@@ -163,6 +163,18 @@ def run():
         sys.exit(1)
 
     try:
+        logging.info('[SUMMARY]')
+        print '[SUMMARY]'
+        print "Service base name: " + emr_conf['service_base_name']
+        print "Cluster name: " + emr_conf['cluster_name']
+        print "Key name: " + emr_conf['key_name']
+        print "Region: " + emr_conf['region']
+        print "EMR version: " + emr_conf['release_label']
+        print "EMR master node shape: " + emr_conf['master_instance_type']
+        print "EMR slave node shape: " + emr_conf['slave_instance_type']
+        print "Instance count: " + emr_conf['instance_count']
+        print "Notebook IP address: " + emr_conf['notebook_ip']
+        print "Bucket name: " + emr_conf['bucket_name']
         with open("/root/result.json", 'w') as result:
             res = {"hostname": cluster_name,
                    "key_name": emr_conf['key_name'],
