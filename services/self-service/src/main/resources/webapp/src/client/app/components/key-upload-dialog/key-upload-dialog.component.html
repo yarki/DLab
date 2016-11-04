@@ -8,38 +8,39 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
------------------------------------------------------------------------------------------------------------ -->
+------------------------------------------------------------------------------------------------------------->
 
-
-<modal #bindDialog modalClass="confirmation-dialog modal-md">
+<modal #bindDialog modalClass="modal-sm">
   <modal-header>
-    <h4 class="modal-title">Exploratory Environment: {{model.notebook.name}}</h4>
+    <h4 class="modal-title">Create initial infrastructure</h4>
   </modal-header>
   <modal-content>
-      <div class="row">
-        <div class="col-xs-12">
-          <p>{{model.title}}</p>
+    <form (submit)="uploadUserAccessKey_btnClick($event)" novalidate>
+      <div class="form-group row">
+        <div  class="col-xs-7">
+          <label class="control-label">
+            Upload public key to start environment creation
+          </label>
+          <div>
+            <small>
+              <span class="glyphicon glyphicon-question-sign"></span>
+               Where can I get public key?
+             </small>
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-5">
-          <p>Computational resources:</p>
-        </div>
-        <div class="col-xs-7">
-          <ul class="list-unstyled" *ngIf="model.notebook.resources && model.notebook.resources.length > 0">
-            <li *ngFor="let resource of model.notebook.resources">{{resource.computational_name}}</li>
-          </ul>
-          <span *ngIf="!model.notebook.resources || model.notebook.resources.length === 0">none</span>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-5">
-          <p>Do you want to proceed?</p>
+        <div class="col-xs-5 text-right">
+          <span class="btn btn-default btn-file">
+            <span class="upload-icon"></span> Upload
+            <input #userAccessKeyUploadControl (change)="uploadUserAccessKey_onChange($event)" type="file" name="file" accept=".pub" />
+          </span>
+          <div class="text-right" [class.danger_color]="!model.accessKeyFormValid">{{model.accessKeyLabel}}</div>
         </div>
       </div>
       <div class="text-right">
-        <button type="button" class="btn btn-default" (click)="bindDialog.close()">No</button>
-        <button type="button" class="btn btn-success" (click)="model.confirmAction()">Yes</button>
+        <button type="button" class="btn btn-default" (click)="close()">Cancel</button>
+        <button type="submit" class="btn btn-success" [disabled]="!model.accessKeyFormValid">Create</button>
       </div>
+    </form>
   </modal-content>
+  <modal-footer></modal-footer>
 </modal>

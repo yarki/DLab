@@ -11,10 +11,9 @@
  *****************************************************************************************************/
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-
-import {UserAccessKeyService} from "../services/userAccessKey.service";
-import {UserResourceService} from "../services/userResource.service";
-import { Grid } from '../components/grid/grid.component';
+import { UserAccessKeyService } from "../services/userAccessKey.service";
+import { UserResourceService } from "../services/userResource.service";
+import { ResourcesGrid } from '../components/resources-grid/resources-grid.component';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
@@ -28,22 +27,20 @@ import HTTP_STATUS_CODES from 'http-status-enum';
 export class HomeComponent implements OnInit {
   private readonly CHECK_ACCESS_KEY_TIMEOUT : number = 10000;
 
-  userUploadAccessKeyState : number;
-  newAccessKeyForUpload: any;
-  uploadAccessKeyLabel: string;
-  uploadAccessUserKeyFormValid: boolean;
+  userUploadAccessKeyState: number;
   createTempls: any;
   shapes: any;
   emrTempls: any;
   notebookExist: boolean = false;
   progressDialogConfig: any;
+
   templateDescription: string;
   namePattern = "\\w+.*\\w+";
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
   @ViewChild('createAnalyticalModal') createAnalyticalModal;
-  @ViewChild(Grid) grid:Grid ;
+  @ViewChild(ResourcesGrid) resourcesGrid: ResourcesGrid;
 
   // -------------------------------------------------------------------------
   // Overrides
@@ -54,92 +51,44 @@ export class HomeComponent implements OnInit {
     private userResourceService: UserResourceService
   ) {
     this.userUploadAccessKeyState = HTTP_STATUS_CODES.NOT_FOUND;
-    this.uploadAccessUserKeyFormValid = false;
   }
 
   ngOnInit() {
     this.checkInfrastructureCreationProgress();
     this.initAnalyticSelectors();
+
     this.progressDialogConfig = this.setProgressDialogConfiguration();
   }
-
-  //
-  // Handlers
-  //
 
   createNotebook_btnClick() {
     this.processAccessKeyStatus(this.userUploadAccessKeyState, true);
   }
 
-  uploadUserAccessKey_btnClick(event) {
-    let formData = new FormData();
-    formData.append("file", this.newAccessKeyForUpload);
-
-    this.userAccessKeyService.uploadUserAccessKey(formData)
-      .subscribe(
-        response => {
-          if(response.status === HTTP_STATUS_CODES.OK)
-            this.checkInfrastructureCreationProgress();
-        },
-        error => console.log(error)
-      );
-
-    event.preventDefault();
-  }
-
-  uploadUserAccessKey_onChange($event) {
-    this.uploadAccessKeyLabel = "";
-    this.newAccessKeyForUpload = null;
-    this.uploadAccessUserKeyFormValid = false;
-
-    if($event.target.files.length > 0)
-    {
-      let fileToUpload = $event.target.files[0];
-      this.uploadAccessUserKeyFormValid = fileToUpload.name.toLowerCase().endsWith(".pub");
-      if(this.uploadAccessUserKeyFormValid)
-        this.newAccessKeyForUpload = $event.target.files[0];
-
-      this.uploadAccessKeyLabel = !this.uploadAccessUserKeyFormValid
-        ? ".pub file is required."
-        : fileToUpload.name;
-    }
-  }
-
   refreshGrid() {
-    this.grid.buildGrid();
+    this.resourcesGrid.buildGrid();
   }
-
-  //
-  // Private Methods
-  //
 
   private checkInfrastructureCreationProgress() {
     this.userAccessKeyService.checkUserAccessKey()
       .subscribe(
-        response => this.processAccessKeyStatus(response.status, false),
-        error =>  this.processAccessKeyStatus(error.status, false)
+      response => this.processAccessKeyStatus(response.status, false),
+      error => this.processAccessKeyStatus(error.status, false)
       );
   }
 
-  private toggleDialogs(keyUploadDialogToggle, preloaderDialogToggle, createAnalyticalToolDialogToggle)
-  {
+  private toggleDialogs(keyUploadDialogToggle, preloaderDialogToggle, createAnalyticalToolDialogToggle) {
 
-    if(keyUploadDialogToggle) {
-      if(!this.keyUploadModal.isOpened)
+    if (keyUploadDialogToggle)
         this.keyUploadModal.open({ isFooter: false });
-    }
-    else {
-      if (this.keyUploadModal.isOpened)
-        this.keyUploadModal.close();
-    }
-
-    if(preloaderDialogToggle)
-        this.preloaderModal.open({ isHeader: false, isFooter: false });
     else
-        this.preloaderModal.close();
+        this.keyUploadModal.close();
 
-    if(createAnalyticalToolDialogToggle)
-    {
+    if (preloaderDialogToggle)
+      this.preloaderModal.open({ isHeader: false, isFooter: false });
+    else
+      this.preloaderModal.close();
+
+    if (createAnalyticalToolDialogToggle) {
       if (!this.createAnalyticalModal.isOpened)
         this.createAnalyticalModal.open({ isFooter: false });
     }
@@ -149,8 +98,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  private processAccessKeyStatus(status : number, forceShowKeyUploadDialog: boolean)
-  {
+  private processAccessKeyStatus(status: number, forceShowKeyUploadDialog: boolean) {
     this.userUploadAccessKeyState = status;
 
     if (status == HTTP_STATUS_CODES.NOT_FOUND) // key haven't been uploaded
@@ -158,9 +106,9 @@ export class HomeComponent implements OnInit {
     else if (status == HTTP_STATUS_CODES.ACCEPTED) { // Key uploading
       this.toggleDialogs(false, true, false);
       setTimeout(() => this.checkInfrastructureCreationProgress(), this.CHECK_ACCESS_KEY_TIMEOUT)
-    } else if(status == HTTP_STATUS_CODES.OK && forceShowKeyUploadDialog)
+    } else if (status == HTTP_STATUS_CODES.OK && forceShowKeyUploadDialog)
       this.toggleDialogs(false, false, true);
-    else if(status == HTTP_STATUS_CODES.OK) // Key uploaded
+    else if (status == HTTP_STATUS_CODES.OK) // Key uploaded
       this.toggleDialogs(false, false, false);
 
   }
@@ -168,60 +116,60 @@ export class HomeComponent implements OnInit {
   initAnalyticSelectors() {
     this.userResourceService.getExploratoryEnvironmentTemplates()
       .subscribe(
-        data => {
-          let arr = [];
-          let str = JSON.stringify(data);
-          let dataArr = JSON.parse(str);
-          dataArr.forEach((obj, index) => {
-            let versions = obj.templates.map((versionObj, index) => {
-              return versionObj.version;
-            });
-            delete obj.templates;
-            versions.forEach((version, index) => {
-              arr.push(Object.assign({}, obj))
-              arr[index].version = version;
-            })
+      data => {
+        let arr = [];
+        let str = JSON.stringify(data);
+        let dataArr = JSON.parse(str);
+        dataArr.forEach((obj, index) => {
+          let versions = obj.templates.map((versionObj, index) => {
+            return versionObj.version;
           });
-          this.createTempls = arr;
-        },
-        error => this.createTempls = []
+          delete obj.templates;
+          versions.forEach((version, index) => {
+            arr.push(Object.assign({}, obj))
+            arr[index].version = version;
+          })
+        });
+        this.createTempls = arr;
+      },
+      error => this.createTempls = []
       );
 
     this.userResourceService.getComputationalResourcesTemplates()
       .subscribe(
-        data => {
-          let arr = [];
-          let str = JSON.stringify(data);
-          let dataArr = JSON.parse(str);
-          dataArr.forEach((obj, index) => {
-            let versions = obj.templates.map((versionObj, index) => {
-              return versionObj.version;
-            });
-            delete obj.templates;
-            versions.forEach((version, index) => {
-              arr.push(Object.assign({}, obj))
-              arr[index].version = version;
-            })
+      data => {
+        let arr = [];
+        let str = JSON.stringify(data);
+        let dataArr = JSON.parse(str);
+        dataArr.forEach((obj, index) => {
+          let versions = obj.templates.map((versionObj, index) => {
+            return versionObj.version;
           });
-          this.emrTempls = arr;
-        },
-        error => this.emrTempls = []
+          delete obj.templates;
+          versions.forEach((version, index) => {
+            arr.push(Object.assign({}, obj))
+            arr[index].version = version;
+          })
+        });
+        this.emrTempls = arr;
+      },
+      error => this.emrTempls = []
       );
 
     this.userResourceService.getSupportedResourcesShapes()
       .subscribe(
-        data => {
-          this.shapes = data
-        },
-        error => this.shapes = []
+      data => {
+        this.shapes = data
+      },
+      error => this.shapes = []
       );
   }
 
-  createUsernotebook(event, tmplIndex, name, shape){
+  createUsernotebook(event, tmplIndex, name, shape) {
     this.notebookExist = false;
     event.preventDefault();
 
-    if(this.grid.containsNotebook(name.value)) {
+    if (this.resourcesGrid.containsNotebook(name.value)) {
       this.notebookExist = true;
       return false;
     }
@@ -238,7 +186,7 @@ export class HomeComponent implements OnInit {
         if (this.createAnalyticalModal.isOpened) {
           this.createAnalyticalModal.close();
         }
-        this.grid.buildGrid();
+        this.resourcesGrid.buildGrid();
         name.value = "";
         this.notebookExist = false;
       });
@@ -254,7 +202,8 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  showDescription(value){
-    this.templateDescription = this.createTempls[value].description;
+  showDescription(value) {
+    if(this.createTempls && this.createTempls[value])
+      this.templateDescription = this.createTempls[value].description;
   }
 }
