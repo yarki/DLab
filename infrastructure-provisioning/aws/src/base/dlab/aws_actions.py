@@ -48,6 +48,7 @@ def create_s3_bucket(bucket_name, tag, region):
             res = {"error": "Unable to create bucket", "error_code": e.response['Error']['Code'], "error_message": e.response['Error']['Message']}
             print json.dumps(res)
             result.write(json.dumps(res))
+            print "ROOT RESULT FILE CONTENT:==========" + result
 
 
 def create_vpc(vpc_cidr, tag):
