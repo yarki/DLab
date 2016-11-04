@@ -76,7 +76,7 @@ def ensure_python3_kernel():
             sudo('python3 -m ipykernel install')
             sudo('add-apt-repository -y ppa:fkrull/deadsnakes')
             sudo('apt update')
-            sudo('apt install -y python3.4')
+            sudo('apt install -y python3.4 python3.4-dev')
             sudo('python3.4 -m pip install ipython ipykernel  --upgrade')
             sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
         except:

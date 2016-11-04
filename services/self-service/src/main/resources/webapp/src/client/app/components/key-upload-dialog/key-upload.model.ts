@@ -69,6 +69,5 @@ export class KeyUploadDialogModel {
       this.newAccessKeyForUpload = accessKey;
       this.accessKeyLabel = this.getLabel(this.newAccessKeyForUpload)
     }
-
   }
 }

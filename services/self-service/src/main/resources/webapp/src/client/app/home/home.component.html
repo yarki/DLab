@@ -24,7 +24,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   </div>
 </div>
 
-<ng-grid [emrTempls]="emrTempls" [shapes]="shapes"></ng-grid>
+<resources-grid [emrTempls]="emrTempls" [shapes]="shapes"></resources-grid>
 
 <modal #createAnalyticalModal modalClass="modal-lg">
   <modal-header>
@@ -36,7 +36,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <div  class="col-xs-4">
         <label class="control-label">Select template</label>
         <div *ngIf="createTempls">
-          <small *ngIf="!templateDescription">{{createTempls[0].description}}</small>
+          <small *ngIf="createTempls && createTempls.length > 0 && !templateDescription">{{createTempls[0].description}}</small>
           <small *ngIf="templateDescription">{{templateDescription}}</small>
         </div>
       </div>
