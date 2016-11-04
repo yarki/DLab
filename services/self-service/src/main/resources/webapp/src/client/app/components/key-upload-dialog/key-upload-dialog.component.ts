@@ -24,7 +24,6 @@ import HTTP_STATUS_CODES from 'http-status-enum';
 })
 
 export class UploadKeyDialog {
-
   model: KeyUploadDialogModel;
 
   @ViewChild('bindDialog') bindDialog;
@@ -46,18 +45,23 @@ export class UploadKeyDialog {
   }
 
   open(params) {
-    this.model = new KeyUploadDialogModel(null, (response: Response) => {
-      if (response.status === HTTP_STATUS_CODES.OK) {
+    if(!this.bindDialog.isOpened)
+    {
+      this.model = new KeyUploadDialogModel(null, (response: Response) => {
+          if (response.status === HTTP_STATUS_CODES.OK) {
+            this.close();
+            this.checkInfrastructureCreationProgress.emit();
+          }
+        },
+        (response: Response) => console.error(response.status),
+        this.userAccessKeyService);
 
-        this.close();
-        this.checkInfrastructureCreationProgress.emit();
-      }
-    }, (response: Response) => console.error(response.status),
-    this.userAccessKeyService);
-
-    this.bindDialog.open(params);
+      this.bindDialog.open(params);
+    }
   }
+
   close() {
-    this.bindDialog.close();
+    if(this.bindDialog.isOpened)
+      this.bindDialog.close();
   }
 }

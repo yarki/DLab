@@ -78,14 +78,10 @@ export class HomeComponent implements OnInit {
 
   private toggleDialogs(keyUploadDialogToggle, preloaderDialogToggle, createAnalyticalToolDialogToggle) {
 
-    if (keyUploadDialogToggle) {
-      if (!this.keyUploadModal.isOpened)
+    if (keyUploadDialogToggle)
         this.keyUploadModal.open({ isFooter: false });
-    }
-    else {
-      if (this.keyUploadModal.isOpened)
+    else
         this.keyUploadModal.close();
-    }
 
     if (preloaderDialogToggle)
       this.preloaderModal.open({ isHeader: false, isFooter: false });
