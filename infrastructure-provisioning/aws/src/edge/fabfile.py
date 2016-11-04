@@ -259,8 +259,8 @@ def run():
     try:
         logging.info('[CREATING BUCKET POLICY FOR CURRENT USER]')
         print('[CREATING BUCKET POLICY FOR CURRENT USER]')
-        params = "--bucket_name %s --user_name %s --service_base_name %s" % \
-                 (edge_conf['bucket_name'], os.environ['edge_user_name'], edge_conf['service_base_name'])
+        params = "--bucket_name %s --iam_user %s --service_base_name %s" % \
+                 (edge_conf['bucket_name'], os.environ['creds_iam_user'], edge_conf['service_base_name'])
         if not run_routine('create_policy', params):
             logging.info('Failed creating bucket policy')
             with open("/root/result.json", 'w') as result:
