@@ -18,12 +18,6 @@ import json
 from fabric.api import *
 import logging
 
-local_log_filename = "%s.log" % os.environ['request_id']
-local_log_filepath = "/response/" + local_log_filename
-logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                    level=logging.DEBUG,
-                    filename=local_log_filepath)
-
 def put_to_bucket(bucket_name, local_file, destination_file):
     try:
         s3 = boto3.client('s3')
@@ -35,11 +29,6 @@ def put_to_bucket(bucket_name, local_file, destination_file):
 
 
 def create_s3_bucket(bucket_name, tag, region):
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
-    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                        level=logging.DEBUG,
-                        filename=local_log_filepath)
     try:
         s3 = boto3.resource('s3')
         bucket = s3.create_bucket(Bucket=bucket_name,
@@ -54,7 +43,9 @@ def create_s3_bucket(bucket_name, tag, region):
             res = {"error": "Unable to create bucket", "error_code": e.response['Error']['Code'], "error_message": e.response['Error']['Message']}
             print json.dumps(res)
             result.write(json.dumps(res))
-            print "ROOT RESULT FILE CONTENT:==========" + result
+        with open("/root/result.json", 'r') as f:
+            text = f.read()
+        print "ROOT RESULT =============" + text
 
 
 def create_vpc(vpc_cidr, tag):
