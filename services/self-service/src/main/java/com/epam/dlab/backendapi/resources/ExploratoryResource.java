@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
+import static com.epam.dlab.constants.UserInstanceStatus.TERMINATING;
 
 @Path("/infrastructure_provision/exploratory_environment")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -81,8 +82,12 @@ public class ExploratoryResource implements ExploratoryAPI {
     @POST
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(ExploratoryStatusDTO dto) {
-        LOGGER.debug("updating status for exploratory environment {} for user {}: {}", dto.getExploratoryName(), dto.getUser(), dto.getStatus());
+        String currentStatus = infrastructureProvisionDAO.fetchExploratoryStatus(dto.getUser(), dto.getExploratoryName());
+        LOGGER.debug("updating status for exploratory environment {} for user {}: was {}, now {}", dto.getExploratoryName(), dto.getUser(), currentStatus, dto.getStatus());
         infrastructureProvisionDAO.updateExploratoryStatusAndId(dto);
+        if (TERMINATING.getStatus().equals(currentStatus)) {
+            infrastructureProvisionDAO.updateComputationalStatusesForExploratory(dto);
+        }
         return Response.ok().build();
     }
 
@@ -103,9 +108,9 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/{name}/terminate")
     public String terminate(@Auth UserInfo userInfo, @PathParam("name") String name) {
         LOGGER.debug("terminating exploratory environment {} for user {}", name, userInfo.getName());
-        UserInstanceStatus status = UserInstanceStatus.TERMINATING;
+        UserInstanceStatus status = TERMINATING;
         infrastructureProvisionDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, name, status));
-        return action(userInfo, name, EXPLORATORY_TERMINATE, UserInstanceStatus.TERMINATING);
+        return action(userInfo, name, EXPLORATORY_TERMINATE, TERMINATING);
     }
 
     private String action(UserInfo userInfo, String name, String action, UserInstanceStatus status) {
