@@ -52,6 +52,7 @@ def create_s3_bucket(bucket_name, tag, region):
         tagging.reload()
         return bucket.name
     except Exception as err:
+        print err
         logging.info("Unable to create bucket: " + err)
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to create bucket", "error_message": err}
