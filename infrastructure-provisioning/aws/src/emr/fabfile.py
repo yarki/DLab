@@ -168,7 +168,7 @@ def run():
         print "Service base name: " + emr_conf['service_base_name']
         print "Cluster name: " + emr_conf['cluster_name']
         print "Key name: " + emr_conf['key_name']
-        print "Region" + emr_conf['region']
+        print "Region: " + emr_conf['region']
         print "EMR version: " + emr_conf['release_label']
         print "EMR master node shape: " + emr_conf['master_instance_type']
         print "EMR slave node shape: " + emr_conf['slave_instance_type']
