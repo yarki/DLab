@@ -26,58 +26,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <resources-grid [emrTempls]="emrTempls" [shapes]="shapes"></resources-grid>
 
-<modal #createAnalyticalModal modalClass="modal-lg">
-  <modal-header>
-    <h4 class="modal-title" id="myModalLabel">Create analytical tool</h4>
-  </modal-header>
-  <modal-content>
-  <form (submit)="createUsernotebook($event ,createTmpl_tmplIndex.value, createTmpl_name, createTmpl_shape)">
-    <div class="form-group row">
-      <div  class="col-xs-4">
-        <label class="control-label">Select template</label>
-        <div *ngIf="createTempls">
-          <small *ngIf="createTempls && createTempls.length > 0 && !templateDescription">{{createTempls[0].description}}</small>
-          <small *ngIf="templateDescription">{{templateDescription}}</small>
-        </div>
-      </div>
-      <div class="col-xs-8">
-        <select class="form-control" (change)="showDescription($event.target.value)" #createTmpl_tmplIndex>
-          <option *ngFor="let template of createTempls; let i = index" value="{{i}}">
-            {{template.template_name}}
-          </option>
-        </select>
-        <div class="hidden" >
-          <input type="hidden" #createTmpl_image>
-        </div>
-      </div>
-    </div>
-    <div class="form-group row">
-      <div  class="col-xs-4">
-        <label class="control-label">Name</label>
-      </div>
-      <div class="col-xs-8">
-        <input [class.danger_field]="notebookExist" type="text" class="form-control" placeholder="Enter Name" [pattern]="namePattern" required #createTmpl_name>
-        <span class="danger_color" *ngIf="notebookExist">This name already exists.</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <div  class="col-xs-4">
-        <label class="control-label">Instance shape</label>
-      </div>
-      <div class="col-xs-8">
-        <select class="form-control" #createTmpl_shape>
-          <option *ngFor="let shape of shapes">{{shape.Type}}</option>
-        </select>
-      </div>
-    </div>
-    <div class="text-right">
-      <button type="button" class="btn btn-default" (click)="createAnalyticalModal.close()">Cancel</button>
-      <button type="submit" class="btn btn-success">Create</button>
-    </div>
-  </form>
-  </modal-content>
-</modal>
-
-
+<exploratory-environment-create-dialog #createAnalyticalModal [exploratoryEnvironmentShapes]="shapes" [exploratoryEnvironmentTemplates]="createTempls" (buildGrid)="refreshGrid($event)"></exploratory-environment-create-dialog>
 <key-upload-dialog #keyUploadModal (checkInfrastructureCreationProgress)="checkInfrastructureCreationProgress($event)"></key-upload-dialog>
 <progress-dialog #preloaderModal [configs]="progressDialogConfig"></progress-dialog>

@@ -3,4 +3,6 @@ import  { ComputationalResourceApplication } from "./computationalResourceApplic
 export class ComputationalResourceApplicationTemplate {
   version: string;
   applications: Array<ComputationalResourceApplication>
+
+  fromJSON() : void { }
 }

@@ -48,6 +48,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 }
 .modal .form-control {
   font-size: 16px;
+  height: 38px;
   color: #455c74;
 }
 .modal .form-group small {
