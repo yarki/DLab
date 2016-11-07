@@ -25,6 +25,7 @@ import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryStopDTO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class ExploratoryResource implements DockerCommands {
 
     @Path("/stop")
     @POST
-    public String stop(ExploratoryActionDTO dto) throws IOException, InterruptedException {
+    public String stop(ExploratoryStopDTO dto) throws IOException, InterruptedException {
         return action(dto, DockerAction.STOP);
     }
 
