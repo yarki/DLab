@@ -16,11 +16,16 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.dto.keyload.UserKeyDTO;
+import org.bson.Document;
+
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
 public class KeyDAO extends BaseDAO {
+    public static final String EDGE_IP = "ip";
+
     public void uploadKey(final String user, String content) {
         UserKeyDTO key = new UserKeyDTO().withContent(content).withStatus(KeyLoadStatus.NEW.getStatus());
         insertOne(USER_KEYS, key, user);
@@ -36,6 +41,12 @@ public class KeyDAO extends BaseDAO {
 
     public void saveCredential(String user, UserAWSCredentialDTO credential) {
         insertOne(USER_AWS_CREDENTIALS, credential, user);
+    }
+
+    public String getUserEdgeIP(String user) {
+        return find(USER_AWS_CREDENTIALS, eq(USER, user), UserAWSCredentialDTO.class)
+                .orElse(new UserAWSCredentialDTO())
+                .getPublicIp();
     }
 
     public KeyLoadStatus findKeyStatus(UserInfo userInfo) {
