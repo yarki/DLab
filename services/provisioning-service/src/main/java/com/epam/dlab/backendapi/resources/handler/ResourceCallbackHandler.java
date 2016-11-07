@@ -94,7 +94,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     @SuppressWarnings("unchecked")
     protected T getBaseStatusDTO(UserInstanceStatus status) {
         try {
-            return (T) resultType.newInstance().withUser(user).withStatus(status.getStatus()).withUptime(getUptime());
+            return (T) resultType.newInstance().withUser(user).withStatus(status.getStatus()).withUptime(getUptime(status));
         } catch (Throwable t) {
             throw new DlabException("Something went wrong", t);
         }
@@ -116,7 +116,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         return UserInstanceStatus.FAILED;
     }
 
-    protected Date getUptime() {
-        return DockerAction.CREATE == action || DockerAction.START == action ? new Date() : null;
+    protected Date getUptime(UserInstanceStatus status) {
+        return UserInstanceStatus.RUNNING == status ? new Date() : null;
     }
 }
