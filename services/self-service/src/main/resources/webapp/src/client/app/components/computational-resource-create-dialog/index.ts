@@ -12,20 +12,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import { NgModule, Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { ResourcesGrid } from "./resources-grid.component";
-import { ComputationalResourcesModule } from './../computational-resources-list/index';
 import { ModalModule } from './../modal/index';
-import { ComputationalResourceCreateDialogModule } from './../computational-resource-create-dialog/index';
-import { ConfirmationDialogModule } from './../confirmation-dialog/index';
-import { DetailDialogModule } from './../detail-dialog/index';
+import { ComputationalResourceCreateDialog } from "./computational-resource-create-dialog.component";
 
-export * from "./resources-grid.component";
+export * from "./computational-resource-create-dialog.component";
 
 @NgModule({
-  imports: [CommonModule, ComputationalResourcesModule, ModalModule, ConfirmationDialogModule, DetailDialogModule, FormsModule, ComputationalResourceCreateDialogModule],
-  declarations: [ResourcesGrid],
-  exports: [ResourcesGrid]
+  imports: [CommonModule, ModalModule],
+  declarations: [ComputationalResourceCreateDialog],
+  exports: [ComputationalResourceCreateDialog]
 })
 
-export class ResourcesGridModule { }
+export class ComputationalResourceCreateDialogModule { }

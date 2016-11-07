@@ -32,7 +32,7 @@ export class ResourcesGrid implements OnInit {
   namePattern: string = "\\w+.*\\w+";
   model = new CreateEmrModel('', '');
 
-  @ViewChild('createEmrModal') createEmrModal;
+  @ViewChild('computationalResourceModal') computationalResourceModal;
   @ViewChild('confirmationDialog') confirmationDialog;
   @ViewChild('detailDialog') detailDialog;
 
@@ -44,8 +44,6 @@ export class ResourcesGrid implements OnInit {
 
   ngOnInit() : void {
     this.buildGrid();
-    this.loadTemplates();
-
   }
 
   buildGrid() : void {
@@ -57,16 +55,7 @@ export class ResourcesGrid implements OnInit {
       });
   }
 
-  loadTemplates() {
-    this.userResourceService.getComputationalResourcesTemplates()
-      .subscribe( data => {
-        for(let parentIndex = 0; parentIndex < data.length; parentIndex ++)
-          this.computationalResourcesImages.push(new ComputationalResourceImage(data[parentIndex]));
-      }, error => this.computationalResourcesImages = []);
-  }
-
   containsNotebook(notebook_name: string) : boolean {
-
     if(notebook_name)
       for (var index = 0; index < this.environments.length; index++)
         if(notebook_name.toLowerCase() ==  this.environments[index].name.toString().toLowerCase())
@@ -97,7 +86,7 @@ export class ResourcesGrid implements OnInit {
     console.log('action ' + action, data);
     if (action === 'deploy') {
       this.notebookName = data.name;
-      this.createEmrModal.open({ isFooter: false });
+      this.computationalResourceModal.open({ isFooter: false });
     } else if (action === 'run') {
       this.userResourceService
         .runExploratoryEnvironment({notebook_instance_name: data.name})
@@ -111,26 +100,4 @@ export class ResourcesGrid implements OnInit {
       this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.TerminateExploratory);
     }
   }
-
-  createEmr(name, count, shape_master, shape_slave, version) {
-
-    this.userResourceService
-      .createComputationalResource({
-        name: name,
-        emr_instance_count: count,
-        emr_master_instance_type: shape_master,
-        emr_slave_instance_type: shape_slave,
-        emr_version: version,
-        notebook_name: this.notebookName
-      })
-      .subscribe((result) => {
-        console.log('result: ', result);
-
-        if (this.createEmrModal.isOpened) {
-         this.createEmrModal.close();
-       }
-       this.buildGrid();
-      });
-      return false;
-  };
 }
