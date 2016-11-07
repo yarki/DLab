@@ -37,7 +37,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     public static final String EXPLORATORY_NAME = "exploratory_name";
     private static final String EXPLORATORY_ID = "exploratory_id";
     private static final String EXPLORATORY_URL = "exploratory_url";
-    private static final String UPTIME = "uptime";
+    private static final String UPTIME = "up_time";
     private static final String COMPUTATIONAL_RESOURCES = "computational_resources";
     private static final String COMPUTATIONAL_NAME = "computational_name";
     private static final String COMPUTATIONAL_ID = "computational_id";

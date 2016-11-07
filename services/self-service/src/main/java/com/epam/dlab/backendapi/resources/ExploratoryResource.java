@@ -37,9 +37,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
-import static com.epam.dlab.constants.UserInstanceStatus.CREATING;
-import static com.epam.dlab.constants.UserInstanceStatus.STOPPING;
-import static com.epam.dlab.constants.UserInstanceStatus.TERMINATING;
+import static com.epam.dlab.constants.UserInstanceStatus.*;
 
 @Path("/infrastructure_provision/exploratory_environment")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -61,7 +59,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         boolean isAdded = infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
                 .withExploratoryName(formDTO.getName())
-                .withStatus(UserInstanceStatus.CREATING.getStatus())
+                .withStatus(CREATING.getStatus())
                 .withShape(formDTO.getShape()));
         if (isAdded) {
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
@@ -88,18 +86,14 @@ public class ExploratoryResource implements ExploratoryAPI {
         LOGGER.debug("updating status for exploratory environment {} for user {}: was {}, now {}", dto.getExploratoryName(), dto.getUser(), currentStatus, dto.getStatus());
         infrastructureProvisionDAO.updateExploratoryFields(dto);
         if (TERMINATING.getStatus().equals(currentStatus)) {
-            updateComputationalsStatus(dto);
+            updateComputationalStatuses(dto);
         } else if (STOPPING.getStatus().equals(currentStatus)) {
-            updateComputationalsStatus(new StatusBaseDTO()
-                    .withUser(dto.getUser())
-                    .withStatus(TERMINATING.getStatus())
-                    .withExploratoryName(dto.getExploratoryName()));
+            updateComputationalStatuses(createStatusDTO(dto.getUser(), dto.getExploratoryName(), TERMINATED));
         }
-
         return Response.ok().build();
     }
 
-    private void updateComputationalsStatus(StatusBaseDTO status) {
+    private void updateComputationalStatuses(StatusBaseDTO status) {
         LOGGER.debug("updating status for all computational resources of {} for user {}: {}", status.getExploratoryName(), status.getUser(), status.getStatus());
         infrastructureProvisionDAO.updateComputationalStatusesForExploratory(status);
     }
@@ -107,14 +101,14 @@ public class ExploratoryResource implements ExploratoryAPI {
     @POST
     public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
-        return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, UserInstanceStatus.STARTING);
+        return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, STARTING);
     }
 
     @DELETE
     @Path("/{name}/stop")
     public String stop(@Auth UserInfo userInfo, @PathParam("name") String name) {
         LOGGER.debug("stopping exploratory environment {} for user {}", name, userInfo.getName());
-        return action(userInfo, name, EXPLORATORY_STOP, UserInstanceStatus.STOPPING);
+        return action(userInfo, name, EXPLORATORY_STOP, STOPPING);
     }
 
     @DELETE
@@ -122,12 +116,12 @@ public class ExploratoryResource implements ExploratoryAPI {
     public String terminate(@Auth UserInfo userInfo, @PathParam("name") String name) {
         LOGGER.debug("terminating exploratory environment {} for user {}", name, userInfo.getName());
         UserInstanceStatus status = TERMINATING;
-        infrastructureProvisionDAO.updateComputationalStatusesForExploratory(createStatusDTO(userInfo, name, status));
-        return action(userInfo, name, EXPLORATORY_TERMINATE, TERMINATING);
+        updateComputationalStatuses(createStatusDTO(userInfo.getName(), name, status));
+        return action(userInfo, name, EXPLORATORY_TERMINATE, status);
     }
 
     private String action(UserInfo userInfo, String name, String action, UserInstanceStatus status) {
-        infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo, name, status));
+        infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo.getName(), name, status));
         String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
         ExploratoryActionDTO dto = new ExploratoryActionDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
@@ -138,9 +132,9 @@ public class ExploratoryResource implements ExploratoryAPI {
         return provisioningService.post(action, dto, String.class);
     }
 
-    private StatusBaseDTO createStatusDTO(UserInfo userInfo, String name, UserInstanceStatus status) {
+    private StatusBaseDTO createStatusDTO(String user, String name, UserInstanceStatus status) {
         return new ExploratoryStatusDTO()
-                .withUser(userInfo.getName())
+                .withUser(user)
                 .withExploratoryName(name)
                 .withStatus(status.getStatus());
     }
