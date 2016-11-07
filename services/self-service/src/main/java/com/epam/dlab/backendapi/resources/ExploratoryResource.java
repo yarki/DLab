@@ -27,7 +27,7 @@ import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStopDTO;
 import com.epam.dlab.registry.ApiCallbacks;
-import com.epam.dlab.utils.Utils;
+import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -67,7 +67,7 @@ public class ExploratoryResource implements ExploratoryAPI {
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withExploratoryName(formDTO.getName())
-                    .withNotebookUserName(Utils.removeDomain(userInfo.getName()))
+                    .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceType(formDTO.getShape())
                     .withRegion(settingsDAO.getAwsRegion())
@@ -116,7 +116,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         ExploratoryStopDTO dto = new ExploratoryStopDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withExploratoryName(name)
-                .withNotebookUserName(Utils.removeDomain(userInfo.getName()))
+                .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                 .withIamUserName(userInfo.getName())
                 .withNotebookInstanceName(exploratoryId)
                 .withKeyDir(settingsDAO.getCredsKeyDir())
@@ -140,7 +140,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         ExploratoryActionDTO dto = new ExploratoryActionDTO<>()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withExploratoryName(name)
-                .withNotebookUserName(Utils.removeDomain(userInfo.getName()))
+                .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                 .withIamUserName(userInfo.getName())
                 .withNotebookInstanceName(exploratoryId)
                 .withRegion(settingsDAO.getAwsRegion());

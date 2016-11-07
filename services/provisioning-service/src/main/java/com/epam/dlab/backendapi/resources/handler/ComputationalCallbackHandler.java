@@ -36,7 +36,7 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
 
     @Override
     protected String getCallbackURI() {
-        return COMPUTATIONAL+STATUS_URI;
+        return COMPUTATIONAL + STATUS_URI;
     }
 
     @Override

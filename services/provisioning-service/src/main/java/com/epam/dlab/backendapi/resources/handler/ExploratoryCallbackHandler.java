@@ -18,8 +18,6 @@ import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.Date;
-
 import static com.epam.dlab.registry.ApiCallbacks.EXPLORATORY;
 import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 
@@ -36,7 +34,7 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     }
 
     protected String getCallbackURI() {
-        return EXPLORATORY+STATUS_URI;
+        return EXPLORATORY + STATUS_URI;
     }
 
     protected ExploratoryStatusDTO parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO baseStatus) {
