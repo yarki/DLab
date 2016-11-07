@@ -23,8 +23,10 @@ import com.mongodb.client.FindIterable;
 import org.bson.Document;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.elemMatch;
@@ -117,14 +119,13 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     @SuppressWarnings("unchecked")
     public String fetchComputationalId(String user, String exploratoryName, String computationalName) {
-        Map<String, Object> resources = (Map) Optional.ofNullable(
-                mongoService.getCollection(USER_INSTANCES)
-                        .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName),
-                                eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)))
-                        .projection(elemMatch(COMPUTATIONAL_RESOURCES, eq(COMPUTATIONAL_NAME, computationalName))).first())
-                .orElse(new Document())
-                .getOrDefault(COMPUTATIONAL_RESOURCES, Collections.emptyMap());
-        return resources.getOrDefault(COMPUTATIONAL_ID, EMPTY).toString();
+        return find(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)), UserInstanceDTO.class)
+                .flatMap(exploratory -> exploratory.getResources()
+                        .stream()
+                        .filter(computational -> computationalName.equals(computational.getComputationalName()))
+                        .findFirst())
+                .flatMap(computational -> Optional.ofNullable(computational.getComputationalId()))
+                .orElse(EMPTY);
     }
 
     public void updateComputationalStatus(ComputationalStatusDTO dto) {
