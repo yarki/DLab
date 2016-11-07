@@ -40,9 +40,10 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     }
 
     protected ExploratoryStatusDTO parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO baseStatus) {
-        String exploratoryId = resultNode.get(EXPLORATORY_ID_FIELD).textValue();
-        String exploratoryUrl = resultNode.get(EXPLORATORY_URL_FIELD).textValue();
-        return baseStatus.withExploratoryId(exploratoryId).withExploratoryUrl(exploratoryUrl);
+        JsonNode url = resultNode.get(EXPLORATORY_URL_FIELD);
+        return baseStatus
+                .withExploratoryId(resultNode.get(EXPLORATORY_ID_FIELD).textValue())
+                .withExploratoryUrl(url != null ? url.textValue() : null);
     }
 
     protected ExploratoryStatusDTO getBaseStatusDTO(UserInstanceStatus status) {

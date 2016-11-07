@@ -24,8 +24,6 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
 public class KeyDAO extends BaseDAO {
-    public static final String EDGE_IP = "ip";
-
     public void uploadKey(final String user, String content) {
         UserKeyDTO key = new UserKeyDTO().withContent(content).withStatus(KeyLoadStatus.NEW.getStatus());
         insertOne(USER_KEYS, key, user);
@@ -44,7 +42,7 @@ public class KeyDAO extends BaseDAO {
     }
 
     public String getUserEdgeIP(String user) {
-        return find(USER_AWS_CREDENTIALS, eq(USER, user), UserAWSCredentialDTO.class)
+        return find(USER_AWS_CREDENTIALS, eq(ID, user), UserAWSCredentialDTO.class)
                 .orElse(new UserAWSCredentialDTO())
                 .getPublicIp();
     }

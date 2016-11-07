@@ -24,6 +24,7 @@ import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.registry.ApiCallbacks;
+import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -71,7 +72,7 @@ public class ComputationalResource implements ComputationalAPI {
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                     .withVersion(formDTO.getVersion())
-                    .withEdgeUserName(userInfo.getName())
+                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withRegion(settingsDAO.getAwsRegion())
                     .withSecurityGroupIds(settingsDAO.getSecurityGroups());;
             LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
@@ -109,7 +110,7 @@ public class ComputationalResource implements ComputationalAPI {
                 .withComputationalName(computationalName)
                 .withNotebookInstanceName(exploratoryId)
                 .withClusterName(computationalId)
-                .withEdgeUserName(userInfo.getName())
+                .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }
