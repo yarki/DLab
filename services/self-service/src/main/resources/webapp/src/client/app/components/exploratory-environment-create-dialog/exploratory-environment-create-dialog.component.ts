@@ -31,7 +31,7 @@ export class ExploratoryEnvironmentCreateDialog {
   notebookExist: boolean = false;
   templateDescription: string;
   namePattern = "\\w+.*\\w+";
-
+  resourceGrid: any;
 
   @ViewChild('bindDialog') bindDialog;
   @ViewChild('environment_name') environment_name;
@@ -45,13 +45,14 @@ export class ExploratoryEnvironmentCreateDialog {
   }
 
   createExploratoryEnvironment_btnClick($event, index, name, shape) {
+    this.notebookExist = false;
 
-    // if (this.containsEnviromnent.emit(name.value)) {
-    //   this.notebookExist = true;
-    // }
+    if (this.resourceGrid.containsNotebook(name)) {
+      this.notebookExist = true;
+      return false;
+    }
 
     this.model.setCreatingParams(this.model.exploratoryEnvironmentTemplates[index].version, name, shape);
-
     this.model.confirmAction();
     $event.preventDefault();
     return false;

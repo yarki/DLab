@@ -42,10 +42,6 @@ export class HomeComponent implements OnInit {
   @ViewChild('createAnalyticalModal') createAnalyticalModal;
   @ViewChild(ResourcesGrid) resourcesGrid: ResourcesGrid;
 
-  // -------------------------------------------------------------------------
-  // Overrides
-  // --
-
   constructor(
     private userAccessKeyService: UserAccessKeyService,
     private userResourceService: UserResourceService
@@ -55,9 +51,9 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.checkInfrastructureCreationProgress();
-    this.initAnalyticSelectors();
-
     this.progressDialogConfig = this.setProgressDialogConfiguration();
+
+    this.createAnalyticalModal.resourceGrid = this.resourcesGrid;
   }
 
   createNotebook_btnClick() {
@@ -111,39 +107,6 @@ export class HomeComponent implements OnInit {
     else if (status == HTTP_STATUS_CODES.OK) // Key uploaded
       this.toggleDialogs(false, false, false);
 
-  }
-
-  initAnalyticSelectors() {
-    this.userResourceService.getExploratoryEnvironmentTemplates()
-      .subscribe(
-      data => {
-        for(let parentIndex = 0; parentIndex < data.length; parentIndex ++) {
-
-          let shapeJson = data[parentIndex].exploratory_environment_shapes;
-          let exploratoryJson = data[parentIndex].exploratory_environment_versions;
-          let shapeArr = new Array<ResourceShapeModel>();
-
-          for (let index = 0; index < shapeJson.length; index++)
-            shapeArr.push(new ResourceShapeModel(shapeJson[index]));
-
-          for (let index = 0; index < exploratoryJson.length; index++)
-            this.exploratoryEnvironments.push(new ExploratoryEnvironmentVersionModel(exploratoryJson[index], shapeArr));
-
-        }
-      });
-
-    this.userResourceService.getComputationalResourcesTemplates()
-      .subscribe(
-      data => {
-
-        for(let parentIndex = 0; parentIndex < data.length; parentIndex ++)
-          this.computationalResources.push(new ComputationalResourceImage(data[parentIndex]));
-
-      }, error => this.computationalResources = []);
-  }
-
-  ifEnvironmentExist(name: string): boolean {
-    return this.resourcesGrid.containsNotebook(name);
   }
 
   setProgressDialogConfiguration() {
