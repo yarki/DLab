@@ -109,7 +109,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/{name}/stop")
     public String stop(@Auth UserInfo userInfo, @PathParam("name") String name) {
         LOGGER.debug("stopping exploratory environment {} for user {}", name, userInfo.getName());
-        infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo, name, UserInstanceStatus.STOPPING));
+        updateComputationalStatuses(createStatusDTO(userInfo.getName(), name, UserInstanceStatus.STOPPING));
         String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
         ExploratoryStopDTO dto = new ExploratoryStopDTO()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
