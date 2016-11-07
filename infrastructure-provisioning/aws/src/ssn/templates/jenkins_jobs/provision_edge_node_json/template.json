@@ -1,0 +1,11 @@
+{
+    "request_id":"RID",
+    "conf_service_base_name":"SBN",
+    "edge_user_name":"UN",
+    "creds_security_groups_ids":"SGI",
+    "creds_key_name":"KN",
+    "creds_region":"CREG",
+    "edge_vpc_id":"EVI",
+    "edge_ami_id":"EAI",
+    "edge_instance_size":"EIS"
+}
