@@ -9,11 +9,12 @@
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
  *****************************************************************************************************/
-package com.epam.dlab.auth;
+package com.epam.dlab.auth.ldap.core.filter;
 
-public interface UserInfoDAO {
-	public UserInfo getUserInfoByAccessToken(String accessToken);
-	public void updateUserInfoTTL(String accessToken, UserInfo ui);
-	public void deleteUserInfo(String accessToken);
-	public void saveUserInfo(UserInfo ui);
+import com.amazonaws.services.identitymanagement.model.User;
+
+public interface AwsUserDAO {
+
+    public User getAwsUser(String username);
+
 }
