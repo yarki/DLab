@@ -12,13 +12,23 @@
 
 package com.epam.dlab.backendapi.resources;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
-import com.epam.dlab.dto.imagemetadata.ImageType;
+import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -38,6 +48,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
+import io.dropwizard.auth.Auth;
 
 @Path("/infrastructure_provision")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -77,20 +88,25 @@ public class InfrastructureProvisionResource implements DockerAPI {
 
     @GET
     @Path("/computational_resources_templates")
-    public Iterable<ImageMetadataDTO> getComputationalTemplates(@Auth UserInfo userInfo) {
+    public Iterable<ComputationalMetadataDTO> getComputationalTemplates(@Auth UserInfo userInfo) {
         LOGGER.debug("loading computational templates for user {}", userInfo.getName());
-        return getTemplates(ImageType.COMPUTATIONAL);
+        return getComputationalTemplates();
     }
 
     @GET
     @Path("/exploratory_environment_templates")
-    public Iterable<ImageMetadataDTO> getExploratoryTemplates(@Auth UserInfo userInfo) {
+    public Iterable<ExploratoryMetadataDTO> getExploratoryTemplates(@Auth UserInfo userInfo) {
         LOGGER.debug("loading exploratory templates for user {}", userInfo.getName());
-        return getTemplates(ImageType.EXPLORATORY);
+        return getExploratoryTemplates();
     }
 
-    private Iterable<ImageMetadataDTO> getTemplates(ImageType type) {
-        return Stream.of(provisioningService.get(DOCKER, ImageMetadataDTO[].class))
-                .filter(i -> type.getType().equals(i.getType())).collect(Collectors.toSet());
+    private Iterable<ExploratoryMetadataDTO> getExploratoryTemplates() {
+        return Stream.of(provisioningService.get(DOCKER_EXPLORATORY, ExploratoryMetadataDTO[].class))
+                .collect(Collectors.toSet());
+    }
+
+    private Iterable<ComputationalMetadataDTO> getComputationalTemplates() {
+        return Stream.of(provisioningService.get(DOCKER_COMPUTATIONAL, ComputationalMetadataDTO[].class))
+                .collect(Collectors.toSet());
     }
 }
