@@ -17,9 +17,11 @@ import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
+import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -70,11 +72,20 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         }
         keyDAO.uploadKey(userInfo.getName(), content);
         try {
-            UploadFileDTO dto = new UploadFileDTO()
-                    .withUser(userInfo.getName())
-                    .withContent(content)
+            EdgeCreateDTO edge = new EdgeCreateDTO()
+                    .withIamUser(userInfo.getName())
+                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
-                    .withSecurityGroup(settingsDAO.getSecurityGroups());
+                    .withSecurityGroupIds(settingsDAO.getSecurityGroups())
+                    .withRegion(settingsDAO.getAwsRegion())
+                    // TODO hardcoded, should be taken from response.json and stored in mongo, then fetched here...
+                    .withVpcId("vpc-588a2c3d")
+                    .withAmiId("ami-746aba14")
+                    .withSubnetId("subnet-1e6c9347")
+                    .withInstanceSize("t2.medium");
+            UploadFileDTO dto = new UploadFileDTO()
+                    .withEdge(edge)
+                    .withContent(content);
             Response response = provisioningService.post(KEY_LOADER, dto, Response.class);
             if (Response.Status.ACCEPTED.getStatusCode() != response.getStatus()) {
                 keyDAO.deleteKey(userInfo.getName());

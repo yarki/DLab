@@ -14,6 +14,7 @@ package com.epam.dlab.backendapi.core.response.keyloader;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.SelfAPI;
+import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
@@ -50,6 +51,8 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     @Inject
     private CommandExecutor commandExecuter;
     @Inject
+    private CommandBuilder commandBuilder;
+    @Inject
     private RESTService selfService;
 
     public String uploadKey(UploadFileDTO dto) throws IOException, InterruptedException {
@@ -57,19 +60,17 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getKeyLoaderDirectory(),
                 configuration.getKeyLoaderPollTimeout(),
-                getFileHandlerCallback(dto.getUser(), uuid));
+                getFileHandlerCallback(dto.getEdge().getIamUser(), uuid));
         commandExecuter.executeAsync(
-                new RunDockerCommand()
-                        .withVolumeForRootKeys(configuration.getKeyDirectory())
-                        .withVolumeForResponse(configuration.getKeyLoaderDirectory())
-                        .withRequestId(uuid)
-                        .withConfServiceBaseName(dto.getServiceBaseName())
-                        .withCredsKeyName(configuration.getAdminKey())
-                        .withCredsSecurityGroupsIds(dto.getSecurityGroup())
-                        .withEdgeUserName(UsernameUtils.removeDomain(dto.getUser()))
-                        .withIamUserName(dto.getUser())
-                        .withActionCreate(configuration.getEdgeImage())
-                        .toCMD()
+                commandBuilder.buildCommand(
+                        new RunDockerCommand()
+                                .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                .withVolumeForResponse(configuration.getKeyLoaderDirectory())
+                                .withRequestId(uuid)
+                                .withCredsKeyName(configuration.getAdminKey())
+                                .withActionCreate(configuration.getEdgeImage()),
+                        dto.getEdge()
+                )
         );
 
         return uuid;
@@ -77,7 +78,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
 
     private void saveKeyToFile(UploadFileDTO dto) throws IOException {
         LOGGER.debug("save key");
-        Files.write(Paths.get(configuration.getKeyDirectory(), dto.getUser() + KEY_EXTENTION), dto.getContent().getBytes());
+        Files.write(Paths.get(configuration.getKeyDirectory(), dto.getEdge().getIamUser() + KEY_EXTENTION), dto.getContent().getBytes());
     }
 
     private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid) {
