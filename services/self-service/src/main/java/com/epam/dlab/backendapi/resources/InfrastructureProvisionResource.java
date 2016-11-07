@@ -43,7 +43,7 @@ import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVI
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class InfrastructureProvisionResource implements DockerAPI {
-    public static final String EDGE_IP = "edge_ip";
+    public static final String EDGE_IP = "edge_node_ip";
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
 
     @Inject
