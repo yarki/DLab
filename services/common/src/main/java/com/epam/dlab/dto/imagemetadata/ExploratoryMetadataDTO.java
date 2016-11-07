@@ -13,6 +13,8 @@ public class ExploratoryMetadataDTO extends ImageMetadataDTO {
     private List<ComputationalResourceShapeDto> exploratoryEnvironmentShapes;
     @JsonProperty
     protected String image;
+    @JsonProperty(value = "request_id")
+    private String requestId;
 
     public ExploratoryMetadataDTO(String imageName) {
         this.image = imageName;
@@ -50,6 +52,14 @@ public class ExploratoryMetadataDTO extends ImageMetadataDTO {
         this.exploratoryEnvironmentShapes = exploratoryEnvironmentShapes;
     }
 
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -72,7 +82,11 @@ public class ExploratoryMetadataDTO extends ImageMetadataDTO {
                 : that.exploratoryEnvironmentShapes != null) {
             return false;
         }
-        return image != null ? image.equals(that.image) : that.image == null;
+        if (image != null ? !image.equals(that.image) : that.image != null) {
+            return false;
+        }
+        return requestId != null ? requestId.equals(that.requestId)
+                : that.requestId == null;
     }
 
     @Override
@@ -82,6 +96,7 @@ public class ExploratoryMetadataDTO extends ImageMetadataDTO {
         result = 31 * result + (exploratoryEnvironmentShapes != null
                 ? exploratoryEnvironmentShapes.hashCode() : 0);
         result = 31 * result + (image != null ? image.hashCode() : 0);
+        result = 31 * result + (requestId != null ? requestId.hashCode() : 0);
         return result;
     }
 }

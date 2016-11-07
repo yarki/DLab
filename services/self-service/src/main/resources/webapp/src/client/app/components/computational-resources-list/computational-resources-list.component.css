@@ -10,13 +10,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-.glyphicon-remove {
-  color: #f05141;
-  display: inline-block;
-  vertical-align: middle;
-  margin-top: -5px;
-}
-
 .no_details {
   color: #bdc9d5;
 }
@@ -37,10 +30,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   line-height: 30px;
   position: relative;
 }
+.source .remove_butt {
+  color: #EF5C4B;
+  font-size: 21px;
+  font-weight: 600;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
 .arrow_icon {
   position: absolute;
   right: 0;
   top: 8px;
+  color: #748ba3;
+  cursor: pointer;
 }
 .emt_status {
   color: #bdc9d5;
