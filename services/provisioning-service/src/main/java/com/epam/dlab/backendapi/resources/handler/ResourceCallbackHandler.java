@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Date;
 
 abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implements FileHandlerCallback {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
@@ -93,7 +94,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     @SuppressWarnings("unchecked")
     protected T getBaseStatusDTO(UserInstanceStatus status) {
         try {
-            return (T) resultType.newInstance().withUser(user).withStatus(status.getStatus());
+            return (T) resultType.newInstance().withUser(user).withStatus(status.getStatus()).withUptime(getUptime());
         } catch (Throwable t) {
             throw new DlabException("Something went wrong", t);
         }
@@ -113,5 +114,9 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
             }
         }
         return UserInstanceStatus.FAILED;
+    }
+
+    protected Date getUptime() {
+        return DockerAction.CREATE == action || DockerAction.START == action ? new Date() : null;
     }
 }

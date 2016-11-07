@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
+import static com.epam.dlab.constants.UserInstanceStatus.CREATING;
 import static com.epam.dlab.constants.UserInstanceStatus.STOPPING;
 import static com.epam.dlab.constants.UserInstanceStatus.TERMINATING;
 
@@ -85,7 +86,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     public Response status(ExploratoryStatusDTO dto) {
         String currentStatus = infrastructureProvisionDAO.fetchExploratoryStatus(dto.getUser(), dto.getExploratoryName());
         LOGGER.debug("updating status for exploratory environment {} for user {}: was {}, now {}", dto.getExploratoryName(), dto.getUser(), currentStatus, dto.getStatus());
-        infrastructureProvisionDAO.updateExploratoryStatusAndId(dto);
+        infrastructureProvisionDAO.updateExploratoryFields(dto);
         if (TERMINATING.getStatus().equals(currentStatus)) {
             updateComputationalsStatus(dto);
         } else if (STOPPING.getStatus().equals(currentStatus)) {

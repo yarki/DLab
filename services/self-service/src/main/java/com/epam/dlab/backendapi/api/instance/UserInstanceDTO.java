@@ -35,7 +35,7 @@ public class UserInstanceDTO {
     @JsonProperty("exploratory_url")
     private String url;
     @JsonProperty("up_time")
-    private String upTime;
+    private String uptime;
     @JsonProperty("computational_resources")
     private List<UserComputationalResourceDTO> resources = new ArrayList<>();
 
@@ -121,16 +121,16 @@ public class UserInstanceDTO {
         return this;
     }
 
-    public String getUpTime() {
-        return upTime;
+    public String getUptime() {
+        return uptime;
     }
 
-    public void setUpTime(String upTime) {
-        this.upTime = upTime;
+    public void setUptime(String uptime) {
+        this.uptime = uptime;
     }
 
-    public UserInstanceDTO withUpTime(String upTime) {
-        setUpTime(upTime);
+    public UserInstanceDTO withUptime(String uptime) {
+        setUptime(uptime);
         return this;
     }
 
