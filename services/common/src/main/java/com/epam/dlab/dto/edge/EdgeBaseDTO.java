@@ -10,35 +10,26 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.resources;
+package com.epam.dlab.dto.edge;
 
-import com.epam.dlab.backendapi.core.response.keyloader.KeyLoader;
-import com.epam.dlab.dto.keyload.UploadFileDTO;
-import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.epam.dlab.dto.ResourceBaseDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
+public class EdgeBaseDTO<T extends EdgeBaseDTO<?>> extends ResourceBaseDTO<T> {
+    @JsonProperty("edge_user_name")
+    private String edgeUserName;
 
-@Path("/keyloader")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public class KeyLoaderResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(KeyLoaderResource.class);
+    public String getEdgeUserName() {
+        return edgeUserName;
+    }
 
-    @Inject
-    private KeyLoader keyLoader;
+    public void setEdgeUserName(String edgeUserName) {
+        this.edgeUserName = edgeUserName;
+    }
 
-    @POST
-    public Response loadKey(UploadFileDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("load key for user {}", dto.getEdge().getIamUser());
-        keyLoader.uploadKey(dto);
-        return Response.accepted().build();
+    @SuppressWarnings("unchecked")
+    public T withEdgeUserName(String edgeUserName) {
+        setEdgeUserName(edgeUserName);
+        return (T) this;
     }
 }

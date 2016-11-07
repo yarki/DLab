@@ -14,6 +14,7 @@ package com.epam.dlab.backendapi.core.response.keyloader;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.SelfAPI;
+import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
@@ -51,6 +52,8 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     @Inject
     private CommandExecutor commandExecuter;
     @Inject
+    private CommandBuilder commandBuilder;
+    @Inject
     private RESTService selfService;
 
     public String uploadKey(UploadFileDTO dto) throws IOException, InterruptedException {
@@ -58,26 +61,24 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getKeyLoaderDirectory(),
                 configuration.getKeyLoaderPollTimeout(),
-                getFileHandlerCallback(dto.getUser(), uuid));
+                getFileHandlerCallback(dto.getEdge().getIamUser(), uuid));
         commandExecuter.executeAsync(
-                new RunDockerCommand()
-                        .withVolumeForRootKeys(configuration.getKeyDirectory())
-                        .withVolumeForResponse(configuration.getKeyLoaderDirectory())
-                        .withRequestId(uuid)
-                        .withConfServiceBaseName(dto.getServiceBaseName())
-                        .withCredsKeyName(configuration.getAdminKey())
-                        .withCredsSecurityGroupsIds(dto.getSecurityGroup())
-                        .withEdgeUserName(UsernameUtils.removeDomain(dto.getUser()))
-                        .withIamUserName(dto.getUser())
-                        .withActionCreate(configuration.getEdgeImage())
-                        .toCMD()
+                commandBuilder.buildCommand(
+                        new RunDockerCommand()
+                                .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                .withVolumeForResponse(configuration.getKeyLoaderDirectory())
+                                .withRequestId(uuid)
+                                .withCredsKeyName(configuration.getAdminKey())
+                                .withActionCreate(configuration.getEdgeImage()),
+                        dto.getEdge()
+                )
         );
 
         return uuid;
     }
 
     private void saveKeyToFile(UploadFileDTO dto) throws IOException {
-        Path keyFilePath = Paths.get(configuration.getKeyDirectory(), UsernameUtils.removeDomain(dto.getUser()) + KEY_EXTENTION);
+        Path keyFilePath = Paths.get(configuration.getKeyDirectory(), dto.getEdge().getEdgeUserName() + KEY_EXTENTION);
         LOGGER.debug("saving key to {}", keyFilePath.toString());
         Files.write(keyFilePath, dto.getContent().getBytes());
     }
