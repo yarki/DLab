@@ -45,8 +45,8 @@ if __name__ == "__main__":
                     print "Policy {}-{}-strict_to_S3-Policy alredy exists. Reusing it.".format(args.service_base_name, args.iam_user)
                     list = iam.list_policies().get('Policies')
                     for i in list:
-                            if args.iam_user in i.get('Arn'):
-                                arn = i.get('Arn')
+                        if args.iam_user in i.get('Arn'):
+                            arn = i.get('Arn')
             try:
                 iam.attach_user_policy(UserName=args.iam_user, PolicyArn=arn)
                 print 'POLICY_NAME "{0}-{1}-strict_to_S3-Policy" has been attached to user "{1}"'.format(args.service_base_name, args.iam_user)
