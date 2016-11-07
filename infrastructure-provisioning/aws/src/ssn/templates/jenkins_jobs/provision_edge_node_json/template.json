@@ -5,6 +5,7 @@
     "creds_security_groups_ids":"SGI",
     "creds_key_name":"KN",
     "creds_region":"CREG",
+    "creds_subnet_id":"CSI",
     "edge_vpc_id":"EVI",
     "edge_ami_id":"EAI",
     "edge_instance_size":"EIS",
