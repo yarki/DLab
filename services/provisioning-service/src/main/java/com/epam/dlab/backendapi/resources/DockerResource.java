@@ -12,6 +12,17 @@
 
 package com.epam.dlab.backendapi.resources;
 
+import java.io.IOException;
+import java.util.Set;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
@@ -19,14 +30,8 @@ import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageType;
 import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.util.Set;
 
 @Path("/docker")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -45,9 +50,12 @@ public class DockerResource implements DockerCommands {
     private CommandBuilder commandBuilder;
 
     @GET
-    public Set<ImageMetadataDTO> getDockerImages() throws IOException, InterruptedException {
+    @Path("{type}")
+    public Set<ImageMetadataDTO> getDockerImages(@PathParam("type") String type) throws
+            IOException, InterruptedException {
         LOGGER.debug("docker statuses asked");
-        return metadataHolder.getMetadatas();
+        return metadataHolder
+                .getMetadatas(ImageType.valueOf(type.toUpperCase()));
     }
 
     @Path("/run")

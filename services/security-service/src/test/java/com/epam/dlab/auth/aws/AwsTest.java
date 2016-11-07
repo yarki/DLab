@@ -9,12 +9,30 @@
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
  *****************************************************************************************************/
+package com.epam.dlab.auth.aws;
 
-package com.epam.dlab.backendapi.client.rest;
+import org.junit.*;
 
-public interface DockerAPI {
-    String DOCKER = "docker";
-    String DOCKER_RUN = DOCKER + "/run";
-    String DOCKER_EXPLORATORY = DOCKER + "/exploratory";
-    String DOCKER_COMPUTATIONAL = DOCKER + "/computational";
+public class AwsTest {
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+    }
+
+    @Before
+    public void setUp() throws Exception {
+    }
+
+    @After
+    public void tearDown() throws Exception {
+    }
+
+    @Test
+    @Ignore
+    public void test1(){
+    }
+
 }
