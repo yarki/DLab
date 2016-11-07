@@ -16,7 +16,6 @@ import java.util.UUID;
 import com.epam.dlab.backendapi.core.docker.command.ImagesDockerCommand;
 import com.epam.dlab.backendapi.core.docker.command.UnixCommand;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static com.epam.dlab.backendapi.core.Constants.JSON_EXTENSION;
 
@@ -32,7 +31,7 @@ public interface DockerCommands {
             .pipe(UnixCommand.grep("edge", "-v"))
             .toCMD();
 
-    ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    ObjectMapper MAPPER = new ObjectMapper()
             .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
     static String generateUUID() {
