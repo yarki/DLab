@@ -55,7 +55,6 @@ export class ApplicationServiceFacade {
     // Computational Resources
     this.requestRegistry.Add(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES, "/api/infrastructure_provision/computational_resources");
     this.requestRegistry.Add(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES_TEMLATES, "/api/infrastructure_provision/computational_resources_templates");
-    this.requestRegistry.Add(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES_SHAPES, "/api/infrastructure_provision/computational_resources_shapes");
   }
 
   private buildRequest(method : RequestMethod, url : string, body : any, opt : RequestOptions) : Observable<Response> {
@@ -116,13 +115,6 @@ export class ApplicationServiceFacade {
   public buildGetUserProvisionedResourcesRequest() : Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
       this.requestRegistry.Item(ApplicationServiceFacade.PROVISIONED_RESOURCES),
-      null,
-      this.getRequestOptions(true, true));
-  }
-
-  public buildGetSupportedComputationalResourcesShapesRequest() : Observable<Response> {
-    return this.buildRequest(RequestMethod.Get,
-      this.requestRegistry.Item(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES_SHAPES),
       null,
       this.getRequestOptions(true, true));
   }

@@ -36,14 +36,6 @@ export class UserResourceService {
       .catch((error: any) => error);
   }
 
-  public getSupportedResourcesShapes() : Observable<any>
-  {
-    return this.applicationServiceFacade
-      .buildGetSupportedComputationalResourcesShapesRequest()
-      .map(( res:Response ) => res.json())
-      .catch((error: any) => error);
-  }
-
   public getUserProvisionedResources() : Observable<any> {
     return this.applicationServiceFacade
       .buildGetUserProvisionedResourcesRequest()

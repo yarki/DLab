@@ -15,7 +15,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <span *ngIf="!resources.length" class="no_details">no details</span>
   </div>
   <div *ngIf="resources.length">
-    <span class="glyphicon glyphicon-remove" (click)="terminateComputationalResources(environment, resources[0])"></span>
+    <span class="remove_butt" (click)="terminateComputationalResources(environment, resources[0])">&times;</span>
     <a class="detailed-link" (click)="printDetailResourceModal(resources[0])">
       {{resources[0].computational_name}}
       <span *ngIf="resources[0].nodes_number">{{resources[0].nodes_number}} nodes</span>
@@ -27,7 +27,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <div *ngIf="collapse" class="source">
   <div *ngFor="let resource of resources | slice:1">
-    <span class="glyphicon glyphicon-remove" (click)="terminateComputationalResources(environment, resource)"></span>
+    <span class="remove_butt" (click)="terminateComputationalResources(environment, resource)">&times;</span>
     <a class="detailed-link" (click)="printDetailResourceModal(resource)">
       {{resource.computational_name}}
       <span *ngIf="resource.nodes_number">{{resource.nodes_number}} nodes</span>
