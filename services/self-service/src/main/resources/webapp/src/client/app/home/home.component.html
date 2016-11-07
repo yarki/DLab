@@ -24,8 +24,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   </div>
 </div>
 
-<resources-grid [emrTempls]="emrTempls" [shapes]="shapes"></resources-grid>
+<resources-grid></resources-grid>
 
-<exploratory-environment-create-dialog #createAnalyticalModal [exploratoryEnvironmentShapes]="shapes" [exploratoryEnvironmentTemplates]="createTempls" (buildGrid)="refreshGrid($event)"></exploratory-environment-create-dialog>
+<exploratory-environment-create-dialog #createAnalyticalModal (buildGrid)="refreshGrid($event)"></exploratory-environment-create-dialog>
 <key-upload-dialog #keyUploadModal (checkInfrastructureCreationProgress)="checkInfrastructureCreationProgress($event)"></key-upload-dialog>
 <progress-dialog #preloaderModal [configs]="progressDialogConfig"></progress-dialog>

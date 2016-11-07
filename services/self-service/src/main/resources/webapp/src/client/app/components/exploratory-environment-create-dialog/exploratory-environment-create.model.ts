@@ -13,15 +13,23 @@
 import { Observable } from "rxjs";
 import { Response } from "@angular/http";
 import { UserResourceService } from "../../services/userResource.service";
+import { ExploratoryEnvironmentVersionModel } from "../../models/exploratoryEnvironmentVersion.model";
+import { ResourceShapeModel } from "../../models/resourceShape.model";
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 export class ExploratoryEnvironmentCreateModel {
 
   confirmAction: Function;
+  selectedItemChanged: Function;
+
   private environment_name: string;
   private environment_version: string;
   private environment_shape: string;
   private userResourceService: UserResourceService;
+  private continueWith: Function;
+
+  selectedItem: ExploratoryEnvironmentVersionModel = new ExploratoryEnvironmentVersionModel({}, []);
+  exploratoryEnvironmentTemplates: Array<ExploratoryEnvironmentVersionModel> = [];
 
   constructor(
     environment_name: string,
@@ -29,14 +37,23 @@ export class ExploratoryEnvironmentCreateModel {
     environment_shape: string,
     fnProcessResults: any,
     fnProcessErrors: any,
+    selectedItemChanged: Function,
+    continueWith: Function,
     userResourceService: UserResourceService
   ) {
     this.userResourceService = userResourceService;
+    this.selectedItemChanged = selectedItemChanged;
+    this.continueWith = continueWith;
     this.prepareModel(environment_name, environment_version, environment_shape, fnProcessResults, fnProcessErrors);
+    this.loadTemplates();
   }
 
-  static getDefault(): ExploratoryEnvironmentCreateModel {
-    return new ExploratoryEnvironmentCreateModel('', '', '', () => { }, () => { }, null);
+  static getDefault(userResourceService): ExploratoryEnvironmentCreateModel {
+    return new ExploratoryEnvironmentCreateModel('', '', '', () => { }, () => { }, null, null, userResourceService);
+  }
+
+  public setSelectedItem(item: ExploratoryEnvironmentVersionModel) {
+    this.selectedItem = item;
   }
 
   private createExploratoryEnvironment(): Observable<Response> {
@@ -59,5 +76,36 @@ export class ExploratoryEnvironmentCreateModel {
     this.environment_version = version;
     this.environment_name = name;
     this.environment_shape = shape;
+  }
+
+  loadTemplates() {
+    if(this.exploratoryEnvironmentTemplates.length == 0)
+      this.userResourceService.getExploratoryEnvironmentTemplates()
+        .subscribe(
+        data => {
+          for(let parentIndex = 0; parentIndex < data.length; parentIndex ++) {
+
+            let shapeJson = data[parentIndex].exploratory_environment_shapes;
+            let exploratoryJson = data[parentIndex].exploratory_environment_versions;
+            let shapeArr = new Array<ResourceShapeModel>();
+
+            for (let index = 0; index < shapeJson.length; index++)
+              shapeArr.push(new ResourceShapeModel(shapeJson[index]));
+
+            for (let index = 0; index < exploratoryJson.length; index++)
+              this.exploratoryEnvironmentTemplates.push(new ExploratoryEnvironmentVersionModel(exploratoryJson[index], shapeArr));
+          }
+          if(this.exploratoryEnvironmentTemplates.length > 0)
+            this.setSelectedTemplate(0);
+
+          if(this.continueWith)
+            this.continueWith();
+        });
+  }
+
+  setSelectedTemplate(value) {
+    this.selectedItem = this.exploratoryEnvironmentTemplates[value];
+    if(this.selectedItemChanged)
+      this.selectedItemChanged();
   }
 }

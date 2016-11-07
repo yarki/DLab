@@ -14,6 +14,7 @@ import { Component, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 import { ResourcesGridRowModel } from './resources-grid.model';
 import { CreateEmrModel } from "./createEmrModel";
+import { ComputationalResourceImage } from "../../models/computationalResourceImage.model";
 import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dialog-type.enum";
 
 @Component({
@@ -35,8 +36,7 @@ export class ResourcesGrid implements OnInit {
   @ViewChild('confirmationDialog') confirmationDialog;
   @ViewChild('detailDialog') detailDialog;
 
-  @Input() emrTempls;
-  @Input() shapes;
+  computationalResourcesImages: Array<ComputationalResourceImage> = [];
 
   constructor(
     private userResourceService: UserResourceService
@@ -44,6 +44,8 @@ export class ResourcesGrid implements OnInit {
 
   ngOnInit() : void {
     this.buildGrid();
+    this.loadTemplates();
+
   }
 
   buildGrid() : void {
@@ -53,6 +55,14 @@ export class ResourcesGrid implements OnInit {
 
         console.log('models ', this.environments);
       });
+  }
+
+  loadTemplates() {
+    this.userResourceService.getComputationalResourcesTemplates()
+      .subscribe( data => {
+        for(let parentIndex = 0; parentIndex < data.length; parentIndex ++)
+          this.computationalResourcesImages.push(new ComputationalResourceImage(data[parentIndex]));
+      }, error => this.computationalResourcesImages = []);
   }
 
   containsNotebook(notebook_name: string) : boolean {

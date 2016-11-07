@@ -20,14 +20,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <div class="form-group row">
       <div  class="col-xs-4">
         <label class="control-label">Select template</label>
-        <div *ngIf="exploratoryEnvironmentTemplates">
-          <small *ngIf="exploratoryEnvironmentTemplates && exploratoryEnvironmentTemplates.length > 0 && !templateDescription">{{exploratoryEnvironmentTemplates[0].description}}</small>
+        <div *ngIf="model.exploratoryEnvironmentTemplates">
+          <small *ngIf="model.exploratoryEnvironmentTemplates && model.exploratoryEnvironmentTemplates.length > 0 && !templateDescription">{{model.exploratoryEnvironmentTemplates[0].description}}</small>
           <small *ngIf="templateDescription">{{templateDescription}}</small>
         </div>
       </div>
       <div class="col-xs-8">
-        <select class="form-control" (change)="showDescription($event.target.value)" #envitonment_tmpl>
-          <option *ngFor="let template of exploratoryEnvironmentTemplates" value="{{template.version}}">
+        <select class="form-control" (change)="templateSelectionChanged($event.target.value)" #envitonment_tmpl>
+          <option *ngFor="let template of model.exploratoryEnvironmentTemplates; let i = index" value="{{i}}" >
             {{template.template_name}}
           </option>
         </select>
@@ -51,7 +51,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="col-xs-8">
         <select class="form-control" #environment_shape>
-          <option *ngFor="let shape of exploratoryEnvironmentShapes">{{shape.Type}}</option>
+          <option *ngFor="let shape of model.selectedItem.shapes">{{shape.type}}</option>
         </select>
       </div>
     </div>

@@ -17,6 +17,7 @@ import { ResourcesGrid } from '../components/resources-grid/resources-grid.compo
 
 import { ResourceShapeModel } from '../models/resourceShape.model';
 import { ExploratoryEnvironmentVersionModel } from '../models/exploratoryEnvironmentVersion.model';
+import { ComputationalResourceImage } from '../models/computationalResourceImage.model';
 
 import HTTP_STATUS_CODES from 'http-status-enum';
 
@@ -32,9 +33,8 @@ export class HomeComponent implements OnInit {
   private readonly CHECK_ACCESS_KEY_TIMEOUT : number = 10000;
 
   userUploadAccessKeyState: number;
-  createTempls: Array<ExploratoryEnvironmentVersionModel> = [];
-  shapes: Array<ResourceShapeModel> = [];
-  emrTempls: any;
+  exploratoryEnvironments: Array<ExploratoryEnvironmentVersionModel> = [];
+  computationalResources: Array<ComputationalResourceImage> = [];
   progressDialogConfig: any;
 
   @ViewChild('keyUploadModal') keyUploadModal;
@@ -117,26 +117,29 @@ export class HomeComponent implements OnInit {
     this.userResourceService.getExploratoryEnvironmentTemplates()
       .subscribe(
       data => {
-        let shapes = [], templates = [];
-        let dataArr = JSON.parse(JSON.stringify(data));
-        dataArr.forEach((obj) => {
-          shapes.push(obj.exploratory_environment_shapes);
-          templates.push(obj.exploratory_environment_versions);
-        });
-        this.shapes = [].concat.apply([], shapes);
-        this.createTempls = [].concat.apply([], templates);
-      }, error => this.createTempls = []);
+        for(let parentIndex = 0; parentIndex < data.length; parentIndex ++) {
+
+          let shapeJson = data[parentIndex].exploratory_environment_shapes;
+          let exploratoryJson = data[parentIndex].exploratory_environment_versions;
+          let shapeArr = new Array<ResourceShapeModel>();
+
+          for (let index = 0; index < shapeJson.length; index++)
+            shapeArr.push(new ResourceShapeModel(shapeJson[index]));
+
+          for (let index = 0; index < exploratoryJson.length; index++)
+            this.exploratoryEnvironments.push(new ExploratoryEnvironmentVersionModel(exploratoryJson[index], shapeArr));
+
+        }
+      });
 
     this.userResourceService.getComputationalResourcesTemplates()
       .subscribe(
       data => {
-        let templates = [];
-        let dataArr = JSON.parse(JSON.stringify(data));
-        dataArr.forEach((obj) => {
-          templates.push(obj.templates);
-        });
-        this.emrTempls = [].concat.apply([], templates);
-      }, error => this.emrTempls = []);
+
+        for(let parentIndex = 0; parentIndex < data.length; parentIndex ++)
+          this.computationalResources.push(new ComputationalResourceImage(data[parentIndex]));
+
+      }, error => this.computationalResources = []);
   }
 
   ifEnvironmentExist(name: string): boolean {

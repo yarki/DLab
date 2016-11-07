@@ -32,17 +32,16 @@ export class ExploratoryEnvironmentCreateDialog {
   templateDescription: string;
   namePattern = "\\w+.*\\w+";
 
-  @Input() exploratoryEnvironmentShapes: Array<ResourceShapeModel>;
-  @Input() exploratoryEnvironmentTemplates: Array<ExploratoryEnvironmentVersionModel>;
 
   @ViewChild('bindDialog') bindDialog;
   @ViewChild('environment_name') environment_name;
+  @ViewChild('environment_shape') environment_shape;
 
 
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
   constructor(private userResourceService: UserResourceService) {
-    this.model = ExploratoryEnvironmentCreateModel.getDefault();
+    this.model = ExploratoryEnvironmentCreateModel.getDefault(userResourceService);
   }
 
   createExploratoryEnvironment_btnClick($event, version, name, shape) {
@@ -58,10 +57,8 @@ export class ExploratoryEnvironmentCreateDialog {
     return false;
   }
 
-
-  showDescription(value) {
-    if (this.exploratoryEnvironmentTemplates && this.exploratoryEnvironmentTemplates[value])
-      this.templateDescription = this.exploratoryEnvironmentTemplates[value].description;
+  templateSelectionChanged(value) {
+      this.model.setSelectedTemplate(value);
   }
 
   open(params) {
@@ -73,9 +70,14 @@ export class ExploratoryEnvironmentCreateDialog {
         }
       },
         (response: Response) => console.error(response.status),
-        this.userResourceService)
+        () => {
+          this.templateDescription = this.model.selectedItem.description;
+        },
+        () => {
+          this.bindDialog.open(params);
+        },
+        this.userResourceService);
 
-      this.bindDialog.open(params);
     }
   }
 
