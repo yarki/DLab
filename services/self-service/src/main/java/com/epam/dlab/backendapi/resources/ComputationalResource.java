@@ -88,7 +88,7 @@ public class ComputationalResource implements ComputationalAPI {
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(ComputationalStatusDTO dto) {
         LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
-        infrastructureProvisionDAO.updateComputationalStatusAndId(dto);
+        infrastructureProvisionDAO.updateComputationalFields(dto);
         return Response.ok().build();
     }
 

@@ -34,7 +34,7 @@ import static com.mongodb.client.model.Updates.set;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public class InfrastructureProvisionDAO extends BaseDAO {
-    private static final String EXPLORATORY_NAME = "exploratory_name";
+    public static final String EXPLORATORY_NAME = "exploratory_name";
     private static final String EXPLORATORY_ID = "exploratory_id";
     private static final String EXPLORATORY_URL = "exploratory_url";
     private static final String UPTIME = "uptime";
@@ -145,11 +145,12 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
     }
 
-    public void updateComputationalStatusAndId(ComputationalStatusDTO dto) {
+    public void updateComputationalFields(ComputationalStatusDTO dto) {
         try {
-            Document values = new Document(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, dto.getStatus());
+            Document values = new Document(getComputationalSetPrefix() + STATUS, dto.getStatus())
+                    .append(getComputationalSetPrefix() + UPTIME, dto.getUptime());
             if (dto.getComputationalId() != null) {
-                values.append(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + COMPUTATIONAL_ID, dto.getComputationalId());
+                values.append(getComputationalSetPrefix() + COMPUTATIONAL_ID, dto.getComputationalId());
             }
             update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())
                     , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, dto.getComputationalName())),
@@ -157,5 +158,9 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);
         }
+    }
+
+    private String getComputationalSetPrefix() {
+        return COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER;
     }
 }
