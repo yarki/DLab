@@ -10,36 +10,38 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.dao;
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { Response } from "@angular/http";
+import { UserResourceService } from "../../services/userResource.service";
+import { ComputationalResourcesModel } from "./confirmation-computational-resources.model";
 
-import static com.epam.dlab.backendapi.dao.MongoSetting.*;
-import static com.mongodb.client.model.Filters.eq;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
+ @Component({
+   moduleId: module.id,
+   selector: 'confirmation-computational-resources',
+   templateUrl: 'confirmation-computational-resources.component.html'
+ })
 
-public class SettingsDAO extends BaseDAO {
-    private static final String VALUE = "value";
+ export class ConfirmationComputationalResources {
+   model : ComputationalResourcesModel;
 
-    public String getServiceBaseName() {
-        return getSetting(SERIVICE_BASE_NAME);
-    }
+   @ViewChild('bindDialog') bindDialog;
+   constructor(
+     private userResourceService: UserResourceService
+    ) { }
 
-    public String getAwsRegion() {
-        return getSetting(AWS_REGION);
-    }
+   open(option, notebook, resource) {
+     this.model = new ComputationalResourcesModel(notebook, resource, (response: Response) => {
+       console.log(response);
+     },
+     (response : Response) => console.error(response.status),
+     this.userResourceService);
+     if(!this.bindDialog.isOpened){
+       this.bindDialog.open(option);  
+     }
+   }
 
-    public String getSecurityGroups() {
-        return getSetting(SECURITY_GROUPS);
-    }
-
-    public String getExploratorySshUser() {
-        return getSetting(EXPLORATORY_SSH_USER);
-    }
-
-    public String getCredsKeyDir() {
-        return getSetting(CREDS_KEY_DIRECTORY);
-    }
-
-    private String getSetting(MongoSetting setting) {
-        return mongoService.getCollection(SETTINGS).find(eq(ID, setting.getId())).first().getOrDefault(VALUE, EMPTY).toString();
-    }
-}
+   close() {
+     this.bindDialog.close();
+   }
+   
+ }

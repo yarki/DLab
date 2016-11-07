@@ -57,6 +57,13 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 .getOrDefault(EXPLORATORY_ID, EMPTY).toString();
     }
 
+    public String fetchExploratoryStatus(String user, String exploratoryName) {
+        return Optional.ofNullable(mongoService.getCollection(USER_INSTANCES)
+                .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first())
+                .orElse(new Document())
+                .getOrDefault(STATUS, EMPTY).toString();
+    }
+
     public boolean insertExploratory(UserInstanceDTO dto) {
         try {
             insertOne(USER_INSTANCES, dto);
