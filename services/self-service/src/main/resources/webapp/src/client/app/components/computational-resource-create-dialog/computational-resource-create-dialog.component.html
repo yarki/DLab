@@ -57,7 +57,7 @@
       </div>
       <div class="text-right">
         <button type="button" (click)="createEmrModal.close()" class="btn btn-default">Cancel</button>
-        <button type="submit" [disabled]="!count.valid || !name.valid"  (click)="createComputationalResource_btnClick($event, name.value, count.value, shape_master.value, shape_slave.value)" class="btn btn-success">Create</button>
+        <button type="submit" (click)="createComputationalResource_btnClick($event, name.value, count.value, shape_master.value, shape_slave.value)" class="btn btn-success">Create</button>
       </div>
     </form>
   </modal-content>
