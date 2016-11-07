@@ -14,6 +14,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { UserAccessKeyService } from "../services/userAccessKey.service";
 import { UserResourceService } from "../services/userResource.service";
 import { ResourcesGrid } from '../components/resources-grid/resources-grid.component';
+
+import { ResourceShapeModel } from '../models/resourceShape.model';
+import { ExploratoryEnvironmentVersionModel } from '../models/exploratoryEnvironmentVersion.model';
+import { ComputationalResourceImage } from '../models/computationalResourceImage.model';
+
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
@@ -28,23 +33,14 @@ export class HomeComponent implements OnInit {
   private readonly CHECK_ACCESS_KEY_TIMEOUT : number = 10000;
 
   userUploadAccessKeyState: number;
-  createTempls: any;
-  shapes: any;
-  emrTempls: any;
-  notebookExist: boolean = false;
+  exploratoryEnvironments: Array<ExploratoryEnvironmentVersionModel> = [];
+  computationalResources: Array<ComputationalResourceImage> = [];
   progressDialogConfig: any;
-
-  templateDescription: string;
-  namePattern = "\\w+.*\\w+";
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
   @ViewChild('createAnalyticalModal') createAnalyticalModal;
   @ViewChild(ResourcesGrid) resourcesGrid: ResourcesGrid;
-
-  // -------------------------------------------------------------------------
-  // Overrides
-  // --
 
   constructor(
     private userAccessKeyService: UserAccessKeyService,
@@ -55,9 +51,9 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.checkInfrastructureCreationProgress();
-    this.initAnalyticSelectors();
-
     this.progressDialogConfig = this.setProgressDialogConfiguration();
+
+    this.createAnalyticalModal.resourceGrid = this.resourcesGrid;
   }
 
   createNotebook_btnClick() {
@@ -113,85 +109,6 @@ export class HomeComponent implements OnInit {
 
   }
 
-  initAnalyticSelectors() {
-    this.userResourceService.getExploratoryEnvironmentTemplates()
-      .subscribe(
-      data => {
-        let arr = [];
-        let str = JSON.stringify(data);
-        let dataArr = JSON.parse(str);
-        dataArr.forEach((obj, index) => {
-          let versions = obj.templates.map((versionObj, index) => {
-            return versionObj.version;
-          });
-          delete obj.templates;
-          versions.forEach((version, index) => {
-            arr.push(Object.assign({}, obj))
-            arr[index].version = version;
-          })
-        });
-        this.createTempls = arr;
-      },
-      error => this.createTempls = []
-      );
-
-    this.userResourceService.getComputationalResourcesTemplates()
-      .subscribe(
-      data => {
-        let arr = [];
-        let str = JSON.stringify(data);
-        let dataArr = JSON.parse(str);
-        dataArr.forEach((obj, index) => {
-          let versions = obj.templates.map((versionObj, index) => {
-            return versionObj.version;
-          });
-          delete obj.templates;
-          versions.forEach((version, index) => {
-            arr.push(Object.assign({}, obj))
-            arr[index].version = version;
-          })
-        });
-        this.emrTempls = arr;
-      },
-      error => this.emrTempls = []
-      );
-
-    this.userResourceService.getSupportedResourcesShapes()
-      .subscribe(
-      data => {
-        this.shapes = data
-      },
-      error => this.shapes = []
-      );
-  }
-
-  createUsernotebook(event, tmplIndex, name, shape) {
-    this.notebookExist = false;
-    event.preventDefault();
-
-    if (this.resourcesGrid.containsNotebook(name.value)) {
-      this.notebookExist = true;
-      return false;
-    }
-
-    this.userResourceService
-      .createExploratoryEnvironment({
-        name: name.value,
-        shape: shape.value,
-        version: this.createTempls[tmplIndex].version
-      })
-      .subscribe((result) => {
-        console.log('result: ', result);
-
-        if (this.createAnalyticalModal.isOpened) {
-          this.createAnalyticalModal.close();
-        }
-        this.resourcesGrid.buildGrid();
-        name.value = "";
-        this.notebookExist = false;
-      });
-  };
-
   setProgressDialogConfiguration() {
     return {
       message: 'Initial infrastructure is being created, <br/>please, wait...',
@@ -200,10 +117,5 @@ export class HomeComponent implements OnInit {
       text_style: 'info-label',
       aligning: 'text-center'
     }
-  }
-
-  showDescription(value) {
-    if(this.createTempls && this.createTempls[value])
-      this.templateDescription = this.createTempls[value].description;
   }
 }
