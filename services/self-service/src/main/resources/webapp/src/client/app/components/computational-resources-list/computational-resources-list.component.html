@@ -8,14 +8,14 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-------------------------------------------------------------------------------------------------------------->
+----------------------------------------------------------------------------------------------------------- -->
 
 <div class="source">
   <div *ngIf="!resources.length">
     <span *ngIf="!resources.length" class="no_details">no details</span>
   </div>
   <div *ngIf="resources.length">
-    <span class="glyphicon glyphicon-remove" (click)="terminateComputationalResource(environment, resources[0])"></span>
+    <span class="glyphicon glyphicon-remove" (click)="terminateComputationalResources(environment, resources[0])"></span>
     <a class="detailed-link" (click)="printDetailResourceModal(resources[0])">
       {{resources[0].computational_name}}
       <span *ngIf="resources[0].nodes_number">{{resources[0].nodes_number}} nodes</span>
@@ -27,7 +27,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <div *ngIf="collapse" class="source">
   <div *ngFor="let resource of resources | slice:1">
-    <span class="glyphicon glyphicon-remove" (click)="terminateComputationalResource(environment, resource)"></span>
+    <span class="glyphicon glyphicon-remove" (click)="terminateComputationalResources(environment, resource)"></span>
     <a class="detailed-link" (click)="printDetailResourceModal(resource)">
       {{resource.computational_name}}
       <span *ngIf="resource.nodes_number">{{resource.nodes_number}} nodes</span>
@@ -35,3 +35,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <span class="emt_status">{{resource.status}}</span>
   </div>
 </div>
+
+
+<confirmation-computational-resources #terminateConfirmateResource></confirmation-computational-resources>

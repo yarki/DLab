@@ -254,6 +254,26 @@ def run():
         sys.exit(1)
 
     try:
+        logging.info('[CREATING BUCKET POLICY FOR CURRENT USER]')
+        print('[CREATING BUCKET POLICY FOR CURRENT USER]')
+        params = '--bucket_name {} --iam_user "{}" --service_base_name {}'.format(
+            edge_conf['bucket_name'], os.environ['creds_iam_user'], edge_conf['service_base_name'])
+        if not run_routine('create_policy', params):
+            logging.info('Failed creating bucket policy')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to create bucket policy", "conf": edge_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        remove_role('edge', os.environ['edge_user_name'])
+        remove_role('notebook', os.environ['edge_user_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
+        remove_sgroups(edge_conf['instance_name'])
+        remove_s3('edge', os.environ['edge_user_name'])
+        sys.exit(1)
+
+    try:
         logging.info('[CREATE EDGE INSTANCE]')
         print '[CREATE EDGE INSTANCE]'
         params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
@@ -372,8 +392,19 @@ def run():
         remove_s3('edge', os.environ['edge_user_name'])
         sys.exit(1)
 
-
     try:
+        print '[SUMMARY]'
+        logging.info('[SUMMARY]')
+        print "Instance name: " + edge_conf['instance_name']
+        print "Hostname: " + instance_hostname
+        print "Public IP: " + public_ip_address
+        print "Private IP: " + ip_address
+        print "Key name: " + edge_conf['key_name']
+        print "Bucket name: " + edge_conf['bucket_name']
+        print "Notebook SG: " + edge_conf['notebook_security_group_name']
+        print "Notebook profiles: " + edge_conf['notebook_role_profile_name']
+        print "Edge SG: " + edge_conf['edge_security_group_name']
+        print "Notebook subnet: " + edge_conf['private_subnet_cidr']
         with open("/root/result.json", 'w') as result:
             res = {"hostname": instance_hostname,
                    "public_ip": public_ip_address,

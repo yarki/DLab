@@ -202,6 +202,17 @@ def run():
     dns_name = get_instance_hostname(notebook_config['instance_name'])
     jupyter_ip_url = "http://" + ip_address + ":8888/" + notebook_config['instance_name'] + "/"
     jupyter_dns_url = "http://" + dns_name + ":8888/" + notebook_config['instance_name'] + "/"
+    print '[SUMMARY]'
+    logging.info('[SUMMARY]')
+    print "Instance name: " + notebook_config['instance_name']
+    print "Private DNS: " + dns_name
+    print "Private IP: " + ip_address
+    print "Instance type: " + notebook_config['instance_type']
+    print "Key name: " + notebook_config['key_name']
+    print "User key name: " + notebook_config['user_keyname']
+    print "AMI name: " + notebook_config['expected_ami_name']
+    print "Profile name: " + notebook_config['role_profile_name']
+    print "SG name: " + notebook_config['security_group_name']
     print "Jupyter URL: " + jupyter_ip_url
     print "Jupyter URL: " + jupyter_dns_url
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
@@ -342,7 +353,7 @@ def start():
 
     try:
         with open("/root/result.json", 'w') as result:
-            res = {"NBs_name": notebook_config['notebook_name'],
+            res = {"notebook_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
                    "Action": "Start up notebook server"}
             print json.dumps(res)

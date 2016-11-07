@@ -10,34 +10,39 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.dto.exploratory;
 
-import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.dto.ResourceBaseDTO;
-import com.epam.dlab.generate_json.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Singleton
-public class CommandBuilder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandBuilder.class);
+public class ExploratoryStopDTO extends ExploratoryActionDTO<ExploratoryStopDTO> {
+    @JsonProperty("notebook_ssh_user")
+    private String sshUser;
+    @JsonProperty("creds_key_dir")
+    private String keyDir;
 
-    public String buildCommand(RunDockerCommand runDockerCommand, ResourceBaseDTO resourceBaseDTO) throws JsonProcessingException {
-        StringBuilder builder = new StringBuilder();
-        if (resourceBaseDTO != null) {
-            builder.append("echo -e '");
-            try {
-                builder.append(new JsonGenerator().generateJson(resourceBaseDTO));
-            } catch (JsonProcessingException e) {
-                LOGGER.error("ERROR generating json from dockerRunParameters: " + e.getMessage());
-                throw e;
-            }
-            builder.append('\'');
-            builder.append(" | ");
-        }
-        builder.append(runDockerCommand.toCMD());
-        return builder.toString();
+    public String getSshUser() {
+        return sshUser;
+    }
+
+    public void setSshUser(String sshUser) {
+        this.sshUser = sshUser;
+    }
+
+    public ExploratoryStopDTO withSshUser(String sshUser) {
+        setSshUser(sshUser);
+        return this;
+    }
+
+    public String getKeyDir() {
+        return keyDir;
+    }
+
+    public void setKeyDir(String keyDir) {
+        this.keyDir = keyDir;
+    }
+
+    public ExploratoryStopDTO withKeyDir(String keyDir) {
+        setKeyDir(keyDir);
+        return this;
     }
 }

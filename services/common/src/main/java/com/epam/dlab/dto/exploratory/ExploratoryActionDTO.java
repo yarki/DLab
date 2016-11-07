@@ -14,7 +14,7 @@ package com.epam.dlab.dto.exploratory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExploratoryActionDTO extends ExploratoryBaseDTO<ExploratoryActionDTO> {
+public class ExploratoryActionDTO<T extends ExploratoryActionDTO<?>> extends ExploratoryBaseDTO<T> {
     @JsonProperty("notebook_instance_name")
     private String notebookInstanceName;
 
@@ -26,8 +26,9 @@ public class ExploratoryActionDTO extends ExploratoryBaseDTO<ExploratoryActionDT
         this.notebookInstanceName = notebookInstanceName;
     }
 
-    public ExploratoryActionDTO withNotebookInstanceName(String notebookInstanceName) {
+    @SuppressWarnings("unchecked")
+    public T withNotebookInstanceName(String notebookInstanceName) {
         setNotebookInstanceName(notebookInstanceName);
-        return this;
+        return (T) this;
     }
 }

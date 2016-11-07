@@ -10,34 +10,38 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.core;
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { Response } from "@angular/http";
+import { UserResourceService } from "../../services/userResource.service";
+import { ComputationalResourcesModel } from "./confirmation-computational-resources.model";
 
-import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.dto.ResourceBaseDTO;
-import com.epam.dlab.generate_json.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+ @Component({
+   moduleId: module.id,
+   selector: 'confirmation-computational-resources',
+   templateUrl: 'confirmation-computational-resources.component.html'
+ })
 
-@Singleton
-public class CommandBuilder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandBuilder.class);
+ export class ConfirmationComputationalResources {
+   model : ComputationalResourcesModel;
 
-    public String buildCommand(RunDockerCommand runDockerCommand, ResourceBaseDTO resourceBaseDTO) throws JsonProcessingException {
-        StringBuilder builder = new StringBuilder();
-        if (resourceBaseDTO != null) {
-            builder.append("echo -e '");
-            try {
-                builder.append(new JsonGenerator().generateJson(resourceBaseDTO));
-            } catch (JsonProcessingException e) {
-                LOGGER.error("ERROR generating json from dockerRunParameters: " + e.getMessage());
-                throw e;
-            }
-            builder.append('\'');
-            builder.append(" | ");
-        }
-        builder.append(runDockerCommand.toCMD());
-        return builder.toString();
-    }
-}
+   @ViewChild('bindDialog') bindDialog;
+   constructor(
+     private userResourceService: UserResourceService
+    ) { }
+
+   open(option, notebook, resource) {
+     this.model = new ComputationalResourcesModel(notebook, resource, (response: Response) => {
+       console.log(response);
+     },
+     (response : Response) => console.error(response.status),
+     this.userResourceService);
+     if(!this.bindDialog.isOpened){
+       this.bindDialog.open(option);  
+     }
+   }
+
+   close() {
+     this.bindDialog.close();
+   }
+   
+ }
