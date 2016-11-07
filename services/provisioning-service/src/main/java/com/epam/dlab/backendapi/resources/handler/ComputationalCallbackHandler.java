@@ -18,6 +18,8 @@ import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.Date;
+
 import static com.epam.dlab.registry.ApiCallbacks.COMPUTATIONAL;
 import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 
@@ -42,7 +44,7 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     @Override
     protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO baseStatus) {
         String computationalId = resultNode.get(COMPUTATIONAL_ID_FIELD).textValue();
-        return baseStatus.withComputationalId(computationalId);
+        return baseStatus.withComputationalId(computationalId).withUptime(new Date());
     }
 
     @Override
