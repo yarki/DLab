@@ -44,13 +44,13 @@ export class ExploratoryEnvironmentCreateDialog {
     this.model = ExploratoryEnvironmentCreateModel.getDefault(userResourceService);
   }
 
-  createExploratoryEnvironment_btnClick($event, version, name, shape) {
+  createExploratoryEnvironment_btnClick($event, index, name, shape) {
 
     // if (this.containsEnviromnent.emit(name.value)) {
     //   this.notebookExist = true;
     // }
 
-    this.model.setCreatingParams(version, name, shape);
+    this.model.setCreatingParams(this.model.exploratoryEnvironmentTemplates[index].version, name, shape);
 
     this.model.confirmAction();
     $event.preventDefault();
