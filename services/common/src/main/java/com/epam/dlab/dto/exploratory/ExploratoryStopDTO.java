@@ -10,36 +10,39 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.dao;
+package com.epam.dlab.dto.exploratory;
 
-import static com.epam.dlab.backendapi.dao.MongoSetting.*;
-import static com.mongodb.client.model.Filters.eq;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SettingsDAO extends BaseDAO {
-    private static final String VALUE = "value";
+public class ExploratoryStopDTO extends ExploratoryActionDTO<ExploratoryStopDTO> {
+    @JsonProperty("notebook_ssh_user")
+    private String sshUser;
+    @JsonProperty("creds_key_dir")
+    private String keyDir;
 
-    public String getServiceBaseName() {
-        return getSetting(SERIVICE_BASE_NAME);
+    public String getSshUser() {
+        return sshUser;
     }
 
-    public String getAwsRegion() {
-        return getSetting(AWS_REGION);
+    public void setSshUser(String sshUser) {
+        this.sshUser = sshUser;
     }
 
-    public String getSecurityGroups() {
-        return getSetting(SECURITY_GROUPS);
+    public ExploratoryStopDTO withSshUser(String sshUser) {
+        setSshUser(sshUser);
+        return this;
     }
 
-    public String getExploratorySshUser() {
-        return getSetting(EXPLORATORY_SSH_USER);
+    public String getKeyDir() {
+        return keyDir;
     }
 
-    public String getCredsKeyDir() {
-        return getSetting(CREDS_KEY_DIRECTORY);
+    public void setKeyDir(String keyDir) {
+        this.keyDir = keyDir;
     }
 
-    private String getSetting(MongoSetting setting) {
-        return mongoService.getCollection(SETTINGS).find(eq(ID, setting.getId())).first().getOrDefault(VALUE, EMPTY).toString();
+    public ExploratoryStopDTO withKeyDir(String keyDir) {
+        setKeyDir(keyDir);
+        return this;
     }
 }

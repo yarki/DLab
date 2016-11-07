@@ -25,6 +25,7 @@ import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryStopDTO;
 import com.epam.dlab.registry.ApiCallbacks;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -113,7 +114,17 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Path("/{name}/stop")
     public String stop(@Auth UserInfo userInfo, @PathParam("name") String name) {
         LOGGER.debug("stopping exploratory environment {} for user {}", name, userInfo.getName());
-        return action(userInfo, name, EXPLORATORY_STOP, UserInstanceStatus.STOPPING);
+        infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo, name, UserInstanceStatus.STOPPING));
+        String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
+        ExploratoryStopDTO dto = new ExploratoryStopDTO()
+                .withServiceBaseName(settingsDAO.getServiceBaseName())
+                .withExploratoryName(name)
+                .withNotebookUserName(userInfo.getName())
+                .withNotebookInstanceName(exploratoryId)
+                .withKeyDir(settingsDAO.getCredsKeyDir())
+                .withSshUser(settingsDAO.getExploratorySshUser())
+                .withRegion(settingsDAO.getAwsRegion());
+        return provisioningService.post(EXPLORATORY_STOP, dto, String.class);
     }
 
     @DELETE
@@ -128,7 +139,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     private String action(UserInfo userInfo, String name, String action, UserInstanceStatus status) {
         infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo, name, status));
         String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
-        ExploratoryActionDTO dto = new ExploratoryActionDTO()
+        ExploratoryActionDTO dto = new ExploratoryActionDTO<>()
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withExploratoryName(name)
                 .withNotebookUserName(userInfo.getName())

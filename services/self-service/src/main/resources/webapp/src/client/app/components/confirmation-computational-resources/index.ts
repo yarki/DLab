@@ -10,36 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import {Component, Input, Output, ViewChild} from "@angular/core";
-import { UserResourceService } from "./../../services/userResource.service";
+import {ConfirmationComputationalResources} from "./confirmation-computational-resources.component";
+import {NgModule, Component} from "@angular/core";
+import {CommonModule} from "@angular/common";
+import {ModalModule} from './../modal/index';
 
-@Component({
-    moduleId: module.id,
-    selector: 'computational-resources-list',
-    templateUrl: 'computational-resources-list.component.html',
-    styleUrls: ['./computational-resources-list.component.css']
+export * from "./confirmation-computational-resources.component";
+
+@NgModule({
+  imports: [ModalModule, CommonModule],
+  declarations: [ConfirmationComputationalResources],
+  exports: [ConfirmationComputationalResources],
 })
 
-export class ComputationalResourcesList {
-  @ViewChild('terminateConfirmateResource') terminateConfirmateResource;
-  @Input() resources: any[];
-  @Input() environment: any[];
-
-  collapse: boolean = false;
-
-  constructor(
-    private userResourceService: UserResourceService
-    ) { }
-
-  toggleResourceList() {
-    this.collapse = !this.collapse;
-  }
-
-  printDetailResourceModal(data) {
-    console.log(data);
-  }
-
-  terminateComputationalResources(notebook, resource){
-    this.terminateConfirmateResource.open({ isFooter: false }, notebook, resource);
-  };
-}
+export class ConfirmationComputationalResourcesModule { }

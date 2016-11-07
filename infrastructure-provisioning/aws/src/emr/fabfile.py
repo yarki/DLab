@@ -227,7 +227,7 @@ def terminate():
     try:
         with open("/root/result.json", 'w') as result:
             res = {"EMR_name": emr_conf['emr_name'],
-                   "NBs_name": emr_conf['notebook_name'],
+                   "notebook_name": emr_conf['notebook_name'],
                    "user_own_bucket_name": emr_conf['bucket_name'],
                    "Action": "Terminate EMR cluster"}
             print json.dumps(res)
