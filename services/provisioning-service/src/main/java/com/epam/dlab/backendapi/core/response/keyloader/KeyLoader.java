@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Singleton
@@ -77,8 +78,9 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     }
 
     private void saveKeyToFile(UploadFileDTO dto) throws IOException {
-        LOGGER.debug("save key");
-        Files.write(Paths.get(configuration.getKeyDirectory(), dto.getEdge().getIamUser() + KEY_EXTENTION), dto.getContent().getBytes());
+        Path keyFilePath = Paths.get(configuration.getKeyDirectory(), dto.getEdge().getEdgeUserName() + KEY_EXTENTION);
+        LOGGER.debug("saving key to {}", keyFilePath.toString());
+        Files.write(keyFilePath, dto.getContent().getBytes());
     }
 
     private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid) {
