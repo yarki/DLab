@@ -15,9 +15,13 @@ package com.epam.dlab.dto.exploratory;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
+
 public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
     @JsonProperty("exploratory_id")
     private String exploratoryId;
+    @JsonProperty("exploratory_url")
+    private String exploratoryUrl;
 
     public String getExploratoryId() {
         return exploratoryId;
@@ -32,4 +36,16 @@ public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
         return this;
     }
 
+    public String getExploratoryUrl() {
+        return exploratoryUrl;
+    }
+
+    public void setExploratoryUrl(String exploratoryUrl) {
+        this.exploratoryUrl = exploratoryUrl;
+    }
+
+    public ExploratoryStatusDTO withExploratoryUrl(String exploratoryUrl) {
+        setExploratoryUrl(exploratoryUrl);
+        return this;
+    }
 }
