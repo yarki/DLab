@@ -13,11 +13,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import { ComputationalResourcesList } from "./computational-resources-list.component";
 import { NgModule, Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { ModalModule } from './../modal/index';
+import { ConfirmationComputationalResourcesModule } from './../confirmation-computational-resources/index';
 
 export * from "./computational-resources-list.component";
 
 @NgModule({
-  imports: [CommonModule,],
+  imports: [CommonModule, ModalModule, ConfirmationComputationalResourcesModule],
   declarations: [ComputationalResourcesList],
   exports: [ComputationalResourcesList],
 })

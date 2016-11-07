@@ -79,7 +79,25 @@ body {
   margin-right: 15px;
   float: right;
 }
-
+.status {
+  text-transform: capitalize;
+}
+.running,
+.starting {
+  color: #49af38;
+}
+.stopped,
+.stopping {
+  color: #f7b500;
+}
+.creating {
+  color: #35AFD5;
+}
+.terminated,
+.terminating,
+.failed {
+  color: #f1696e;
+}
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); }
   100% { -webkit-transform: rotate(360deg); }

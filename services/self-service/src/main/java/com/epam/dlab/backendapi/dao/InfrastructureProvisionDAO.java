@@ -19,11 +19,15 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import org.bson.Document;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.elemMatch;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
@@ -47,9 +51,17 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     }
 
     public String fetchExploratoryId(String user, String exploratoryName) {
-        return mongoService.getCollection(USER_INSTANCES)
-                .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first()
+        return Optional.ofNullable(mongoService.getCollection(USER_INSTANCES)
+                .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first())
+                .orElse(new Document())
                 .getOrDefault(EXPLORATORY_ID, EMPTY).toString();
+    }
+
+    public String fetchExploratoryStatus(String user, String exploratoryName) {
+        return Optional.ofNullable(mongoService.getCollection(USER_INSTANCES)
+                .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first())
+                .orElse(new Document())
+                .getOrDefault(STATUS, EMPTY).toString();
     }
 
     public boolean insertExploratory(UserInstanceDTO dto) {
@@ -70,7 +82,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         if (dto.getExploratoryId() != null) {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());
         }
-        update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())),  new Document(SET, values));
+        update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())), new Document(SET, values));
     }
 
     public void updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
@@ -98,11 +110,16 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public String fetchComputationalId(String user, String exploratoryName, String computationalName) {
-        return mongoService.getCollection(USER_INSTANCES)
-                .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName),
-                        eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName))).first()
-                .getOrDefault(COMPUTATIONAL_ID, EMPTY).toString();
+        Map<String, Object> resources = (Map)Optional.ofNullable(
+                mongoService.getCollection(USER_INSTANCES)
+                        .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName),
+                                eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)))
+                        .projection(elemMatch(COMPUTATIONAL_RESOURCES, eq(COMPUTATIONAL_NAME, computationalName))).first())
+                .orElse(new Document())
+                .getOrDefault(COMPUTATIONAL_RESOURCES, Collections.emptyMap());
+        return resources.getOrDefault(COMPUTATIONAL_ID, EMPTY).toString();
     }
 
     public void updateComputationalStatus(ComputationalStatusDTO dto) {

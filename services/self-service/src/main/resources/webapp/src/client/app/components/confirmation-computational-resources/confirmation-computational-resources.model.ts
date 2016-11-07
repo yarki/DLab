@@ -9,14 +9,30 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 *****************************************************************************************************/
+import {Observable} from "rxjs";
+import {Response} from "@angular/http";
+import {UserResourceService} from "../../services/userResource.service";
 
-export class ResourcesGridRowModel {
-  constructor(public name:Array<any>,
-              public status: string,
-              public shape: string,
-              public resources:Array<any>,
-              public time:string,
-              public url:string,
-              public ip:string
-            ){}
+export class ComputationalResourcesModel {
+  private notebook: any;
+  private resource: any;
+  private confirmAction : Function;
+  private userResourceService : UserResourceService;
+  constructor(notebook: any,
+   			      resource: any,
+              fnProcessResults: any,
+              fnProcessErrors: any,
+              userResourceService : UserResourceService
+   			  ){
+    this.userResourceService = userResourceService;
+  	this.terminateComputationalResource(notebook, resource, fnProcessResults, fnProcessErrors);
+  }
+
+  terminateComputationalResource(notebook: any, resource: any,  fnProcessResults : any, fnProcessErrors: any){
+    this.notebook = notebook;
+    this.resource = resource;
+    this.confirmAction = () => this.userResourceService
+      .suspendComputationalResource(notebook.name, resource.computational_name)
+      .subscribe((response : Response) => fnProcessResults(response), (response: Response) => fnProcessErrors(response));
+    };
 }

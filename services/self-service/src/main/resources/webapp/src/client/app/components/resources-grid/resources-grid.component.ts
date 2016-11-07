@@ -73,7 +73,8 @@ export class ResourcesGrid implements OnInit {
            value.shape,
            value.computational_resources,
            value.up_time_since,
-           value.url);
+           value.url,
+           value.ip);
        });
      }
    }

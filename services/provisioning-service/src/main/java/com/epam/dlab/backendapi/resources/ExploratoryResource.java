@@ -25,6 +25,7 @@ import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryStopDTO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,29 +58,7 @@ public class ExploratoryResource implements DockerCommands {
     @Path("/create")
     @POST
     public String create(ExploratoryCreateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("create exploratory environment");
-        String uuid = DockerCommands.generateUUID();
-        folderListenerExecutor.start(configuration.getImagesDirectory(),
-                configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(DockerAction.CREATE, uuid, dto));
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withDetached()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withConfServiceBaseName(dto.getServiceBaseName())
-                                .withNotebookUserName(dto.getNotebookUserName())
-                                .withNotebookInstanceType(dto.getNotebookInstanceType())
-                                .withCredsRegion(dto.getRegion())
-                                .withCredsSecurityGroupsIds(dto.getSecurityGroupIds())
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withImage(configuration.getNotebookImage())
-                                .withAction(DockerAction.CREATE)
-                )
-        );
-        return uuid;
+        return action(dto, DockerAction.CREATE);
     }
 
     @Path("/start")
@@ -96,7 +75,7 @@ public class ExploratoryResource implements DockerCommands {
 
     @Path("/stop")
     @POST
-    public String stop(ExploratoryActionDTO dto) throws IOException, InterruptedException {
+    public String stop(ExploratoryStopDTO dto) throws IOException, InterruptedException {
         return action(dto, DockerAction.STOP);
     }
 

@@ -354,7 +354,7 @@ def start():
 
     try:
         with open("/root/result.json", 'w') as result:
-            res = {"NBs_name": notebook_config['notebook_name'],
+            res = {"notebook_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
                    "Action": "Start up notebook server"}
             print json.dumps(res)

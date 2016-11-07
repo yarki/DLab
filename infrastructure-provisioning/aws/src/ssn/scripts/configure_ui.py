@@ -47,7 +47,7 @@ def ensure_mongo():
     except:
         return False
 
-# os.environ['creds_security_groups_ids']
+
 def configure_mongo():
     try:
         if not exists("/lib/systemd/system/mongod.service"):
@@ -81,9 +81,9 @@ def start_ss():
                     print json.dumps(res)
                     result.write(json.dumps(res))
                 sys.exit(1)
-            run('screen -d -m java -jar ' + web_path + 'self-service/self-service-1.0.jar server ' + web_path + 'self-service/application.yml; sleep 5')
-            run('screen -d -m java -jar ' + web_path + 'security-service/security-service-1.0.jar server ' + web_path + 'security-service/application.yml; sleep 5')
-            run('screen -d -m java -jar ' + web_path + 'provisioning-service/provisioning-service-1.0.jar server ' + web_path + 'provisioning-service/application.yml; sleep 5')
+            run('screen -d -m java -Xmx1024M -jar ' + web_path + 'self-service/self-service-1.0.jar server ' + web_path + 'self-service/application.yml; sleep 5')
+            run('screen -d -m java -Xmx1024M -jar ' + web_path + 'security-service/security-service-1.0.jar server ' + web_path + 'security-service/application.yml; sleep 5')
+            run('screen -d -m java -Xmx1024M -jar ' + web_path + 'provisioning-service/provisioning-service-1.0.jar server ' + web_path + 'provisioning-service/application.yml; sleep 5')
             sudo('service nginx restart')
             sudo('touch /tmp/ss_started')
         return True

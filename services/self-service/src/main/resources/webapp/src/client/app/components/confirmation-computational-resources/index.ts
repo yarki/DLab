@@ -10,13 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-export class ResourcesGridRowModel {
-  constructor(public name:Array<any>,
-              public status: string,
-              public shape: string,
-              public resources:Array<any>,
-              public time:string,
-              public url:string,
-              public ip:string
-            ){}
-}
+import {ConfirmationComputationalResources} from "./confirmation-computational-resources.component";
+import {NgModule, Component} from "@angular/core";
+import {CommonModule} from "@angular/common";
+import {ModalModule} from './../modal/index';
+
+export * from "./confirmation-computational-resources.component";
+
+@NgModule({
+  imports: [ModalModule, CommonModule],
+  declarations: [ConfirmationComputationalResources],
+  exports: [ConfirmationComputationalResources],
+})
+
+export class ConfirmationComputationalResourcesModule { }
