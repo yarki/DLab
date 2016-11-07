@@ -65,6 +65,8 @@ public class ExploratoryResource implements ExploratoryAPI {
                 .withShape(formDTO.getShape()));
         if (isAdded) {
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
+                    // TODO set notebook_ami_id, hardcoded for now. shall be taken either from mongo or from response.json.. TBD
+                    .withExploratoryAmiId("ami-746aba14")
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withExploratoryName(formDTO.getName())
                     .withNotebookUserName(userInfo.getName())
