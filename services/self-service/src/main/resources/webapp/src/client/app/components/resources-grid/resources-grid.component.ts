@@ -14,6 +14,7 @@ import { Component, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 import { ResourcesGridRowModel } from './resources-grid.model';
 import { CreateEmrModel } from "./createEmrModel";
+import { ComputationalResourceImage } from "../../models/computationalResourceImage.model";
 import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dialog-type.enum";
 
 @Component({
@@ -36,8 +37,7 @@ export class ResourcesGrid implements OnInit {
   @ViewChild('confirmationDialog') confirmationDialog;
   @ViewChild('detailDialog') detailDialog;
 
-  @Input() emrTempls;
-  @Input() shapes;
+  computationalResourcesImages: Array<ComputationalResourceImage> = [];
 
   constructor(
     private userResourceService: UserResourceService
@@ -45,6 +45,8 @@ export class ResourcesGrid implements OnInit {
 
   ngOnInit() : void {
     this.buildGrid();
+    this.loadTemplates();
+
   }
 
   buildGrid() : void {
@@ -54,6 +56,14 @@ export class ResourcesGrid implements OnInit {
 
         console.log('models ', this.environments);
       });
+  }
+
+  loadTemplates() {
+    this.userResourceService.getComputationalResourcesTemplates()
+      .subscribe( data => {
+        for(let parentIndex = 0; parentIndex < data.length; parentIndex ++)
+          this.computationalResourcesImages.push(new ComputationalResourceImage(data[parentIndex]));
+      }, error => this.computationalResourcesImages = []);
   }
 
   containsNotebook(notebook_name: string) : boolean {
@@ -87,7 +97,7 @@ export class ResourcesGrid implements OnInit {
   exploratoryAction(data, action:string) {
     console.log('action ' + action, data);
     if (action === 'deploy') {
-      this.notebookName = data.name
+      this.notebookName = data.name;
       this.createEmrModal.open({ isFooter: false });
     } else if (action === 'run') {
       this.userResourceService
@@ -103,7 +113,7 @@ export class ResourcesGrid implements OnInit {
     }
   }
 
-  createEmr(name, count, shape_master, shape_slave, tmplIndex) {
+  createEmr(name, count, shape_master, shape_slave, version) {
 
     this.userResourceService
       .createComputationalResource({
@@ -111,7 +121,7 @@ export class ResourcesGrid implements OnInit {
         emr_instance_count: count,
         emr_master_instance_type: shape_master,
         emr_slave_instance_type: shape_slave,
-        emr_version: this.emrTempls[tmplIndex].version,
+        emr_version: version,
         notebook_name: this.notebookName
       })
       .subscribe((result) => {

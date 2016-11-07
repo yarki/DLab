@@ -70,8 +70,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div class="col-xs-8">
           <select class="form-control" #tmplIndex>
-            <option *ngFor="let template of emrTempls; let i = index" value="{{i}}">
-              {{template.template_name}}
+            <option *ngFor="let template of emrTempls" value="{{template.version}}">
+              {{template.version}}
             </option>
           </select>
         </div>
@@ -81,7 +81,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <label class="control-label">Cluster Alias</label>
         </div>
         <div class="col-xs-8">
-            <input type="text" class="form-control" id="name" [pattern]="namePattern" name="cluster_alias" [(ngModel)]="model.name" #name="ngModel" />
+            <input type="text" class="form-control" id="name" placeholder="Enter Cluster Alias" [pattern]="namePattern" name="cluster_alias" [(ngModel)]="model.name" #name="ngModel" />
         </div>
       </div>
       <div class="form-group row">

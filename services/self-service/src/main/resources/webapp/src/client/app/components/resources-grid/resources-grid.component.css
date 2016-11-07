@@ -80,7 +80,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   right: 55px; 
 }
 .dropdown .disabled {
-  color: #d2d2d2;
+  opacity: .4;
   cursor: not-allowed;
 }
 .dashboard_table .dropdown-menu li {

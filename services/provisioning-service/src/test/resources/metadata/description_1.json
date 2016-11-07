@@ -31,6 +31,7 @@
     {"Type": "m2.xlarge","Ram": "17.1 GB","Cpu": "2"},
     {"Type": "m2.2xlarge","Ram": "34.2 GB","Cpu": "4"}
   ],
+  "request_id": "rId",
   "exploratory_environment_versions" :
   [
     {
