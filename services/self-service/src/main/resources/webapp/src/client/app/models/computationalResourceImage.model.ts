@@ -22,7 +22,7 @@ export class ComputationalResourceImage {
 
     if(jsonModel.templates && jsonModel.templates.length > 0)
       for (let index = 0; index < jsonModel.templates.length; index++)
-        this.application_templates.push(new ComputationalResourceApplicationTemplate(jsonModel.templates[index]));
+        this.application_templates.push(new ComputationalResourceApplicationTemplate(jsonModel.templates[index], this.shapes));
 
   }
 }
