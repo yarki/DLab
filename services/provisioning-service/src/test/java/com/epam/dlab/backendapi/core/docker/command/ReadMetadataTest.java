@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.junit.Assert;
 import org.junit.Test;
+import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import static com.epam.dlab.backendapi.core.DockerCommands.MAPPER;
 
@@ -20,7 +22,7 @@ public class ReadMetadataTest {
     public void readEmrMetadataTest() throws IOException {
         ImageMetadataDTO imageMetadataDTO = MAPPER.readValue(
                 readTestResource(EMR_METADATA_DESCRIPTION_JSON),
-                ImageMetadataDTO.class);
+                ComputationalMetadataDTO.class);
 
         Assert.assertNotNull(imageMetadataDTO);
     }
@@ -29,7 +31,7 @@ public class ReadMetadataTest {
     public void readJupiterMetadataTest() throws IOException {
         ImageMetadataDTO imageMetadataDTO = MAPPER.readValue(
                 readTestResource(JUPITER_METADATA_DESCRIPTION_JSON),
-                ImageMetadataDTO.class);
+                ExploratoryMetadataDTO.class);
         Assert.assertNotNull(imageMetadataDTO);
     }
 
