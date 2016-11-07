@@ -20,11 +20,6 @@ import com.epam.dlab.auth.rest.ExpirableContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
-/**
- * Created by Mikhail_Teplitskiy on 11/3/2016.
- */
 public class AwsUserDAOImpl implements AwsUserDAO {
 
     private final static Logger LOG = LoggerFactory.getLogger(AwsUserDAOImpl.class);

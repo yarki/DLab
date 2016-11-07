@@ -27,15 +27,12 @@ import org.apache.directory.ldap.client.api.ValidatingPoolableLdapConnectionFact
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-/**
- * Created by Mikhail_Teplitskiy on 11/3/2016.
- */
+
 public class LdapUserDAO {
 
     private final LdapConnectionConfig connConfig;
