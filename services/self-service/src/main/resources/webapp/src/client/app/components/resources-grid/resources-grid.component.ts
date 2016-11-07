@@ -30,6 +30,7 @@ export class ResourcesGrid implements OnInit {
   notebookName: string;
   namePattern: string = "\\w+.*\\w+";
   model = new CreateEmrModel('', '');
+  isOutscreenDropdown: boolean;
 
   @ViewChild('createEmrModal') createEmrModal;
   @ViewChild('confirmationDialog') confirmationDialog;
@@ -123,4 +124,9 @@ export class ResourcesGrid implements OnInit {
       });
       return false;
   };
+
+  dropdownPosition(event) {
+    let contentHeight = document.body.offsetHeight > window.outerHeight ? document.body.offsetHeight : window.outerHeight;
+    this.isOutscreenDropdown = event.pageY + 215 > contentHeight ? true : false;
+  }
 }

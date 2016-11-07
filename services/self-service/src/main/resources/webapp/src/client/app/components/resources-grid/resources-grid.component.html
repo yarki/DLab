@@ -23,7 +23,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <td colspan="5">To start working, please, create new environment</td>
   </tr>
 
-  <tr *ngFor="let env of environments">
+  <tr *ngFor="let env of environments;" [ngClass]="{'dropdown-outscreen': isOutscreenDropdown}">
     <td (click)="printDetailEnvironmentModal(env)">{{env.name}}</td>
     <td class="status" ngClass="{{env.status.toLowerCase() || ''}}">{{env.status}}</td>
     <td>{{env.shape}}</td>
@@ -34,6 +34,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <div class="dropdown">
         <span data-toggle="dropdown"
               class="glyphicon glyphicon-cog"
+              (click)="dropdownPosition($event)"
               [ngClass]="{'disabled': env.status.toLowerCase() == 'creating' ||
                                       env.status.toLowerCase() == 'terminating' ||
                                       env.status.toLowerCase() == 'terminated'}">
