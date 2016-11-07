@@ -1,4 +1,4 @@
-/******************************************************************************************************
+<!------------------------------------------------------------------------------------------------------------
 
 Copyright (c) 2016 EPAM Systems Inc.
 
@@ -8,20 +8,25 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-*****************************************************************************************************/
+------------------------------------------------------------------------------------------------------------->
 
-import { ComputationalResourcesList } from "./computational-resources-list.component";
-import { NgModule, Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { ModalModule } from './../modal/index';
-import { ConfirmationComputationalResourcesModule } from './../confirmation-computational-resources/index';
 
-export * from "./computational-resources-list.component";
-
-@NgModule({
-  imports: [CommonModule, ModalModule, ConfirmationComputationalResourcesModule],
-  declarations: [ComputationalResourcesList],
-  exports: [ComputationalResourcesList],
-})
-
-export class ComputationalResourcesModule { }
+<modal #bindDialog modalClass="confirmation-dialog modal-md">
+  <modal-header></modal-header>
+  <modal-content *ngIf="model">
+      <div class="row">
+        <div class="col-xs-12">
+          <p>Computational resource <strong>{{model.resource.computational_name}}</strong> be decommissioned.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-5">
+          <p>Do you want to proceed?</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <button type="button" class="btn btn-default" (click)="bindDialog.close()">No</button>
+        <button type="button" class="btn btn-success" (click)="model.confirmAction()">Yes</button>
+      </div>
+  </modal-content>
+</modal>
