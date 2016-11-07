@@ -18,6 +18,7 @@ import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.utils.Utils;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -116,7 +117,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         return UserInstanceStatus.FAILED;
     }
 
-    protected Date getUptime(UserInstanceStatus status) {
-        return UserInstanceStatus.RUNNING == status ? new Date() : null;
+    protected String getUptime(UserInstanceStatus status) {
+        return UserInstanceStatus.RUNNING == status ? Utils.DATE_FORMAT.format(new Date()) : null;
     }
 }

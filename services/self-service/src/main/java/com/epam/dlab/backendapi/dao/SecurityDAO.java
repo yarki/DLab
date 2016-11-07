@@ -13,7 +13,7 @@
 package com.epam.dlab.backendapi.dao;
 
 import com.epam.dlab.dto.UserCredentialDTO;
-import com.epam.dlab.utils.UsernameUtils;
+import com.epam.dlab.utils.Utils;
 import com.google.inject.Singleton;
 import org.bson.Document;
 
@@ -21,6 +21,6 @@ import org.bson.Document;
 public class SecurityDAO extends BaseDAO {
     public void writeLoginAttempt(UserCredentialDTO credentials) {
         insertOne(LOGIN_ATTEMPTS,
-                () -> new Document("login", credentials.getUsername()).append("iamlogin", UsernameUtils.removeDomain(credentials.getUsername())));
+                () -> new Document("login", credentials.getUsername()).append("iamlogin", Utils.removeDomain(credentials.getUsername())));
     }
 }
