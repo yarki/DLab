@@ -73,6 +73,7 @@ public class ComputationalResource implements ComputationalAPI {
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                     .withVersion(formDTO.getVersion())
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                    .withIamUserName(userInfo.getName())
                     .withRegion(settingsDAO.getAwsRegion())
                     .withSecurityGroupIds(settingsDAO.getSecurityGroups());;
             LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
@@ -111,6 +112,7 @@ public class ComputationalResource implements ComputationalAPI {
                 .withNotebookInstanceName(exploratoryId)
                 .withClusterName(computationalId)
                 .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                .withIamUserName(userInfo.getName())
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }

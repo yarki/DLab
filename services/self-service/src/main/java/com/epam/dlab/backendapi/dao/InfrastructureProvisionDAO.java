@@ -117,7 +117,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     @SuppressWarnings("unchecked")
     public String fetchComputationalId(String user, String exploratoryName, String computationalName) {
-        Map<String, Object> resources = (Map)Optional.ofNullable(
+        Map<String, Object> resources = (Map) Optional.ofNullable(
                 mongoService.getCollection(USER_INSTANCES)
                         .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName),
                                 eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)))

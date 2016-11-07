@@ -102,7 +102,7 @@ public class ExploratoryResource implements DockerCommands {
     }
 
     private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ExploratoryBaseDTO dto) {
-        return new ExploratoryCallbackHandler(selfService, action, originalUuid, dto.getNotebookUserName(), dto.getExploratoryName());
+        return new ExploratoryCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName());
     }
 
 }

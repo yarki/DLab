@@ -19,6 +19,7 @@ public class ExploratoryBaseDTO<T extends ExploratoryBaseDTO<?>> extends Resourc
     @JsonProperty("notebook_user_name")
     private String notebookUserName;
 
+
     public String getNotebookUserName() {
         return notebookUserName;
     }
