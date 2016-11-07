@@ -121,14 +121,16 @@ export class HomeComponent implements OnInit {
         let str = JSON.stringify(data);
         let dataArr = JSON.parse(str);
         dataArr.forEach((obj, index) => {
-          let versions = obj.templates.map((versionObj, index) => {
-            return versionObj.version;
-          });
-          delete obj.templates;
-          versions.forEach((version, index) => {
-            arr.push(Object.assign({}, obj))
-            arr[index].version = version;
-          })
+          if (obj.templates !== null) {
+            let versions = obj.templates.map((versionObj, index) => {
+              return versionObj.version;
+            });
+            delete obj.templates;
+            versions.forEach((version, index) => {
+              arr.push(Object.assign({}, obj))
+              arr[index].version = version;
+            })  
+          }
         });
         this.createTempls = arr;
       },
@@ -142,14 +144,16 @@ export class HomeComponent implements OnInit {
         let str = JSON.stringify(data);
         let dataArr = JSON.parse(str);
         dataArr.forEach((obj, index) => {
-          let versions = obj.templates.map((versionObj, index) => {
-            return versionObj.version;
-          });
-          delete obj.templates;
-          versions.forEach((version, index) => {
-            arr.push(Object.assign({}, obj))
-            arr[index].version = version;
-          })
+          if (obj.templates !== null) {
+            let versions = obj.templates.map((versionObj, index) => {
+              return versionObj.version;
+            });
+            delete obj.templates;
+            versions.forEach((version, index) => {
+              arr.push(Object.assign({}, obj))
+              arr[index].version = version;
+            })
+          }
         });
         this.emrTempls = arr;
       },
