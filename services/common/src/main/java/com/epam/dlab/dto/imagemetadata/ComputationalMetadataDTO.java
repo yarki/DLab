@@ -28,7 +28,7 @@ public class ComputationalMetadataDTO extends ImageMetadataDTO{
     }
 
     public ComputationalMetadataDTO() {
-        setImageType(ImageType.COMPUTATIONAL);
+        this("");
     }
 
 

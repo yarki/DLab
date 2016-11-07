@@ -14,10 +14,16 @@ package com.epam.dlab.dto.imagemetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Common parent for metadata DTO. Holds type information during
+ * runtime to make life easier when working with collection of metadatas or
+ * filtering by type. Shouldnt be used to hold common attributes for upstream
+ * hierarchy as it will requite type information to be serialized within json
+ * which is not we really want.
+ */
 public abstract class ImageMetadataDTO {
     @JsonIgnore
     protected ImageType imageType;
-
 
     public ImageType getImageType() {
         return imageType;
@@ -26,7 +32,6 @@ public abstract class ImageMetadataDTO {
     public void setImageType(ImageType imageType) {
         this.imageType = imageType;
     }
-
 
     public abstract void setImage(String image);
 

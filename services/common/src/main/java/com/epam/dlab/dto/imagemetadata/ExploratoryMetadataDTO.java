@@ -20,7 +20,7 @@ public class ExploratoryMetadataDTO extends ImageMetadataDTO {
     }
 
     public ExploratoryMetadataDTO() {
-        setImageType(ImageType.EXPLORATORY);
+        this("");
     }
 
     public String getImage() {
