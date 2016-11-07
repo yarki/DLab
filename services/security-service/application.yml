@@ -96,7 +96,7 @@ userInfoPersistenceEnabled: true
 awsUserIdentificationEnabled: true
 
 mongo:
-  host: ec2-35-162-18-194.us-west-2.compute.amazonaws.com
+  host: localhost
   port: 27017
   username: admin
   password: XS3ms9R3tP
