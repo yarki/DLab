@@ -107,7 +107,7 @@ export class HomeComponent implements OnInit {
       this.toggleDialogs(false, false, false);
 
   }
-
+  
   setProgressDialogConfiguration() {
     return {
       message: 'Initial infrastructure is being created, <br/>please, wait...',
