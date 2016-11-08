@@ -17,13 +17,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <div class="detail-header-wrap">
         <table class="detail-header">
           <tr>
-            <td class="modal-title">{{environment.name}}</td>
+            <td class="modal-title">{{resource.computational_name}}</td>
               <td>
                 <span class="status" [ngClass]="resource.status || ''">
                   {{resource.status}}
                 </span>
               </td>
-            <td>{{environment.shape}}</td>
+            <td>{{resource.master_node_shape}}</td>
           </tr>
         </table>
       </div>
@@ -33,20 +33,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
          <div class="col-xs-6"><span>{{resource.computational_name}}</span></div>
         </div>
         <div class="row">
-         <div class="col-xs-6"><p>Master instance shape:</p></div>
-         <div class="col-xs-6"><span>{{environment.shape}}</span></div>
+          <div class="col-xs-6"><p>Total Instance number:</p></div>
+          <div class="col-xs-6"><span>{{resource.total_instance_number}}</span></div>
         </div>
         <div class="row">
-         <div class="col-xs-6"><p>Slave Instance number:</p></div>
-         <div class="col-xs-6"><span>{{resource.slave_instance_number}}</span></div>
+         <div class="col-xs-6"><p>Master instance shape:</p></div>
+         <div class="col-xs-6"><span>{{resource.master_node_shape}}</span></div>
         </div>
         <div class="row">
          <div class="col-xs-6"><p>Slave Instance shape:</p></div>
-         <div class="col-xs-6"><span>{{environment.shape}}</span></div>
+         <div class="col-xs-6"><span>{{resource.slave_node_shape}}</span></div>
         </div>
         <div class="row">
           <div class="col-xs-12">
-            <p class="time_info">Up time {{resource.up_time_since || "not specified."}}</p>
+            <p class="time_info">Up time: {{resource.up_time_since || "not specified."}}</p>
           </div>
         </div>
       </div>
