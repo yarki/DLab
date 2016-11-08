@@ -9,11 +9,26 @@
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
  *****************************************************************************************************/
-package com.epam.dlab.auth;
 
-public interface UserInfoDAO {
-	public UserInfo getUserInfoByAccessToken(String accessToken);
-	public void updateUserInfoTTL(String accessToken, UserInfo ui);
-	public void deleteUserInfo(String accessToken);
-	public void saveUserInfo(UserInfo ui);
-}
+ import { Component, OnInit, ViewChild, Input } from '@angular/core';
+ import { Modal } from './../modal/modal.component';
+
+ @Component({
+   moduleId: module.id,
+   selector: 'detail-computational-resources',
+   templateUrl: 'detail-computational-resources.component.html'
+ })
+
+ export class DetailComputationalResources {
+ 	resource: any;
+ 	environment: any;
+ 	
+ 	@ViewChild('bindDialog') bindDialog;
+
+ 	open(param, environment, resource) {
+     this.resource = resource;
+     this.environment = environment;
+     this.bindDialog.open(param);
+   }
+ }
+

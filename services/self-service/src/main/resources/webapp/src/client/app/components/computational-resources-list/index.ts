@@ -15,11 +15,12 @@ import { NgModule, Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ModalModule } from './../modal/index';
 import { ConfirmationComputationalResourcesModule } from './../confirmation-computational-resources/index';
+import { DetailComputationalResourcesModule } from './../detail-computational-resources/index';
 
 export * from "./computational-resources-list.component";
 
 @NgModule({
-  imports: [CommonModule, ModalModule, ConfirmationComputationalResourcesModule],
+  imports: [CommonModule, ModalModule, ConfirmationComputationalResourcesModule, DetailComputationalResourcesModule],
   declarations: [ComputationalResourcesList],
   exports: [ComputationalResourcesList],
 })
