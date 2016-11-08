@@ -13,6 +13,8 @@
                 "iam:DeleteRole",
                 "iam:GetRole",
                 "iam:GetRolePolicy",
+                "iam:ListAttachedUserPolicies",
+                "iam:RemoveRoleFromInstanceProfile",
                 "iam:GetInstanceProfile"
             ],
             "Effect": "Allow",
