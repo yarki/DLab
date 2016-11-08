@@ -96,6 +96,18 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
                 "test computational image", "template", "description",
                 "request_id", ImageType.COMPUTATIONAL.getType(),
                 Arrays.asList(templateDTO, templateDTO1));
+
+        List<ComputationalResourceShapeDto> crsList = new ArrayList<>();
+        crsList.add(new ComputationalResourceShapeDto(
+                "cg1.4xlarge", "22.5 GB", 16));
+        crsList.add(new ComputationalResourceShapeDto(
+                "t2.medium", "4.0 GB", 2));
+        crsList.add(new ComputationalResourceShapeDto(
+                "t2.large", "8.0 GB", 2));
+        crsList.add(new ComputationalResourceShapeDto(
+                "t2.large", "8.0 GB", 2));
+
+        imageMetadataDTO.setComputationResourceShapes(crsList);
         return imageMetadataDTO;
     }
 

@@ -29,10 +29,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       </div>
       <div class="row">
         <div class="col-xs-12 detail-info">
-          <p>Edge Node IP Address {{notebook.edge_node_ip}}</p>
-
-          <p>Up time {{notebook.up_time + ""}}</p>
-          <p>Open in your browser  <a href="{{notebook.exploratory_url}}" target="_blank">{{notebook.exploratory_url}}</a> to access this box after creating a tunnel.</p>
+          <p>Edge Node IP Address {{notebook.ip}}</p>
+          <p>Up time {{upTimeInHours}} hours since {{notebook.time}}</p>
+          <p>Open in your browser  <a href="{{notebook.url}}" target="_blank">{{notebook.url}}</a> to access this box after creating a tunnel.</p>
           <br/>
           <p>
             <a href="#" target="_blank">
