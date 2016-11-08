@@ -12,7 +12,8 @@
                 "iam:DeleteRolePolicy",
                 "iam:DeleteRole",
                 "iam:GetRole",
-                "iam:GetRolePolicy"
+                "iam:GetRolePolicy",
+                "iam:GetInstanceProfile"
             ],
             "Effect": "Allow",
             "Resource": "*"
