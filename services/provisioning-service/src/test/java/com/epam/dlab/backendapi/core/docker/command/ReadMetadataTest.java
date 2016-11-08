@@ -1,13 +1,15 @@
 package com.epam.dlab.backendapi.core.docker.command;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import org.junit.Assert;
-import org.junit.Test;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import static com.epam.dlab.backendapi.core.DockerCommands.MAPPER;
 
 /**

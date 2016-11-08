@@ -70,6 +70,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withExploratoryName(formDTO.getName())
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                    .withIamUserName(userInfo.getName())
                     .withNotebookInstanceType(formDTO.getShape())
                     .withRegion(settingsDAO.getAwsRegion())
                     .withSecurityGroupIds(settingsDAO.getSecurityGroups());
@@ -118,6 +119,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withExploratoryName(name)
                 .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                .withIamUserName(userInfo.getName())
                 .withNotebookInstanceName(exploratoryId)
                 .withKeyDir(settingsDAO.getCredsKeyDir())
                 .withSshUser(settingsDAO.getExploratorySshUser())
@@ -141,6 +143,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                 .withServiceBaseName(settingsDAO.getServiceBaseName())
                 .withExploratoryName(name)
                 .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                .withIamUserName(userInfo.getName())
                 .withNotebookInstanceName(exploratoryId)
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(action, dto, String.class);
