@@ -34,7 +34,6 @@ export class ComputationalResourceCreateDialog {
   }
 
   createComputationalResource_btnClick($event, name: string, count: number, shape_master: string, shape_slave: string) {
-
     this.model.setCreatingParams(name, count, shape_master, shape_slave);
     this.model.confirmAction();
     $event.preventDefault();
@@ -45,9 +44,9 @@ export class ComputationalResourceCreateDialog {
       this.model.setSelectedTemplate(value);
   }
 
-  open(params) {
+  open(params, notebook_instance_name) {
     if (!this.bindDialog.isOpened) {
-      this.model = new ComputationalResourceCreateModel('', 0, '', '', (response: Response) => {
+      this.model = new ComputationalResourceCreateModel('', 0, '', '', notebook_instance_name, (response: Response) => {
         if (response.status === HTTP_STATUS_CODES.OK) {
           this.close();
           this.buildGrid.emit();
