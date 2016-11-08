@@ -15,7 +15,7 @@ package com.epam.dlab.backendapi.core.response.warmup;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
-import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -24,6 +24,7 @@ import io.dropwizard.util.Duration;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 import static junit.framework.TestCase.assertEquals;
@@ -34,18 +35,37 @@ import static org.mockito.Mockito.when;
 public class DockerWarmuperTest {
     @Inject
     private DockerWarmuper warmuper;
-    private ImageMetadataDTO metadata = new ImageMetadataDTO("executeResult");
+    private ExploratoryMetadataDTO exploratoryMetadata = new ExploratoryMetadataDTO(
+            "executeResult");
+    private ComputationalMetadataDTO computationalMetadata = new
+            ComputationalMetadataDTO("executeResult");
+    private static final String EXPLORATORY_TEST_JSON = "{\"exploratory_environment_shapes\" : [ {\"Type\":\"cg1.4xlarge\",\"Ram\": \"22.5 GB\",\"Cpu\": \"16\"}]}";
+    private static final String COMPUTATIONAL_TEST_JSON = "{\"template_name\":\"DLab AWS EMR\"}";
 
     @Before
     public void setup() {
         createInjector().injectMembers(this);
+        ComputationalResourceShapeDto computationalResourceShapeDto = new ComputationalResourceShapeDto();
+        computationalResourceShapeDto.setType("cg1.4xlarge");
+        computationalResourceShapeDto.setRam("22.5 GB");
+        computationalResourceShapeDto.setCpu(16);
+        ArrayList<ComputationalResourceShapeDto> metadataList = new ArrayList<>();
+        metadataList.add(computationalResourceShapeDto);
+        exploratoryMetadata.setExploratoryEnvironmentShapes(metadataList);
+        computationalMetadata.setTemplateName("DLab AWS EMR");
     }
 
     @Test
     public void warmupSuccess() throws Exception {
         warmuper.start();
-        warmuper.getFileHandlerCallback().handle(getFileName(), "{}".getBytes());
-        assertEquals(metadata, warmuper.getMetadatas().toArray(new ImageMetadataDTO[1])[0]);
+        warmuper.getFileHandlerCallback()
+                .handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
+        warmuper.getFileHandlerCallback()
+                .handle(getFileName(), COMPUTATIONAL_TEST_JSON.getBytes());
+        assertEquals(exploratoryMetadata, warmuper.getMetadatas(ImageType.EXPLORATORY)
+                .toArray(new ImageMetadataDTO[1])[0]);
+        assertEquals(computationalMetadata, warmuper.getMetadatas(ImageType.COMPUTATIONAL)
+                .toArray(new ImageMetadataDTO[1])[0]);
     }
 
     private String getFileName() {

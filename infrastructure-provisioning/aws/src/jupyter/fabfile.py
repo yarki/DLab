@@ -225,7 +225,8 @@ def run():
                "ip": ip_address,
                "master_keyname": os.environ['creds_key_name'],
                "notebook_name": notebook_config['instance_name'],
-               "Action": "Create new notebook server"}
+               "Action": "Create new notebook server",
+               "exploratory_url": jupyter_ip_url}
         result.write(json.dumps(res))
 
 
@@ -354,7 +355,7 @@ def start():
 
     try:
         with open("/root/result.json", 'w') as result:
-            res = {"NBs_name": notebook_config['notebook_name'],
+            res = {"notebook_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
                    "Action": "Start up notebook server"}
             print json.dumps(res)

@@ -15,4 +15,6 @@ package com.epam.dlab.backendapi.client.rest;
 public interface DockerAPI {
     String DOCKER = "docker";
     String DOCKER_RUN = DOCKER + "/run";
+    String DOCKER_EXPLORATORY = DOCKER + "/exploratory";
+    String DOCKER_COMPUTATIONAL = DOCKER + "/computational";
 }

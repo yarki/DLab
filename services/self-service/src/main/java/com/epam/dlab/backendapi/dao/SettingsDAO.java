@@ -31,6 +31,14 @@ public class SettingsDAO extends BaseDAO {
         return getSetting(SECURITY_GROUPS);
     }
 
+    public String getExploratorySshUser() {
+        return getSetting(EXPLORATORY_SSH_USER);
+    }
+
+    public String getCredsKeyDir() {
+        return getSetting(CREDS_KEY_DIRECTORY);
+    }
+
     private String getSetting(MongoSetting setting) {
         return mongoService.getCollection(SETTINGS).find(eq(ID, setting.getId())).first().getOrDefault(VALUE, EMPTY).toString();
     }

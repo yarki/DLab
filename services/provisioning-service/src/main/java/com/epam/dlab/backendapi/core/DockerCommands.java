@@ -33,7 +33,8 @@ public interface DockerCommands {
             .pipe(UnixCommand.grep("edge", "-v"))
             .toCMD();
 
-    ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+    ObjectMapper MAPPER = new ObjectMapper()
+            .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
     static String generateUUID() {
         return UUID.randomUUID().toString();

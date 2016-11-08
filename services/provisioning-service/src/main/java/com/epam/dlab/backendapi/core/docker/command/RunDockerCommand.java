@@ -164,6 +164,11 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withIamUserName(String edgeUserName) {
+        options.add(String.format("-e \"creds_iam_user=%s\"", edgeUserName));
+        return this;
+    }
+
     public RunDockerCommand withEmrClusterName(String emrClusterName) {
         options.add(String.format("-e \"emr_cluster_name=%s\"", emrClusterName));
         return this;

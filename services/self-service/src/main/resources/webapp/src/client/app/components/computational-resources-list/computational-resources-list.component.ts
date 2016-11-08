@@ -10,7 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import {Component, Input, Output} from "@angular/core";
+import {Component, Input, Output, ViewChild} from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 
 @Component({
@@ -21,6 +21,8 @@ import { UserResourceService } from "./../../services/userResource.service";
 })
 
 export class ComputationalResourcesList {
+  @ViewChild('terminateConfirmateResource') terminateConfirmateResource;
+  @ViewChild('detailComputationalResource') detailComputationalResource;
   @Input() resources: any[];
   @Input() environment: any[];
 
@@ -34,10 +36,15 @@ export class ComputationalResourcesList {
     this.collapse = !this.collapse;
   }
 
-  terminateComputationalResource(notebook, resource){
-    this.userResourceService
-      .suspendComputationalResource(notebook.name, resource.computational_name)
-      .subscribe((result) => {});
-      return false;
+  printDetailResourceModal(data) {
+    console.log(data);
+  }
+
+  terminateComputationalResources(notebook, resource){
+    this.terminateConfirmateResource.open({ isFooter: false }, notebook, resource);
+  };
+
+  detailComputationalResources(environment, resource){
+    this.detailComputationalResource.open({ isFooter: false }, environment, resource);
   };
 }

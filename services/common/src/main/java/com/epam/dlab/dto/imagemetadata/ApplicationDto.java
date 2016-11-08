@@ -11,6 +11,15 @@ public class ApplicationDto {
     @JsonProperty(value = "Name")
     private String name;
 
+    public ApplicationDto() {
+    }
+
+
+    public ApplicationDto(String version, String name) {
+        this.version = version;
+        this.name = name;
+    }
+
     public String getVersion() {
         return version;
     }
