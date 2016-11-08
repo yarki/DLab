@@ -10,41 +10,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import {Component, Input, Output, ViewChild} from "@angular/core";
-import { UserResourceService } from "./../../services/userResource.service";
+import { NgModule, Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ModalModule } from './../modal/index';
+import { ComputationalResourceCreateDialog } from "./computational-resource-create-dialog.component";
 
-@Component({
-    moduleId: module.id,
-    selector: 'computational-resources-list',
-    templateUrl: 'computational-resources-list.component.html',
-    styleUrls: ['./computational-resources-list.component.css']
+export * from "./computational-resource-create-dialog.component";
+
+@NgModule({
+  imports: [CommonModule, ModalModule],
+  declarations: [ComputationalResourceCreateDialog],
+  exports: [ComputationalResourceCreateDialog]
 })
 
-export class ComputationalResourcesList {
-  @ViewChild('terminateConfirmateResource') terminateConfirmateResource;
-  @ViewChild('detailComputationalResource') detailComputationalResource;
-  @Input() resources: any[];
-  @Input() environment: any[];
-
-  collapse: boolean = false;
-
-  constructor(
-    private userResourceService: UserResourceService
-    ) { }
-
-  toggleResourceList() {
-    this.collapse = !this.collapse;
-  }
-
-  printDetailResourceModal(data) {
-    console.log(data);
-  }
-
-  terminateComputationalResources(notebook, resource){
-    this.terminateConfirmateResource.open({ isFooter: false }, notebook, resource);
-  };
-
-  detailComputationalResources(environment, resource){
-    this.detailComputationalResource.open({ isFooter: false }, environment, resource);
-  };
-}
+export class ComputationalResourceCreateDialogModule { }

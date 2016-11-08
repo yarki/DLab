@@ -24,6 +24,7 @@ import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.registry.ApiCallbacks;
+import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -71,7 +72,7 @@ public class ComputationalResource implements ComputationalAPI {
                     .withMasterInstanceType(formDTO.getMasterInstanceType())
                     .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                     .withVersion(formDTO.getVersion())
-                    .withEdgeUserName(userInfo.getName())
+                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withRegion(settingsDAO.getAwsRegion());
             LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
             return Response
@@ -87,7 +88,7 @@ public class ComputationalResource implements ComputationalAPI {
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(ComputationalStatusDTO dto) {
         LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
-        infrastructureProvisionDAO.updateComputationalStatusAndId(dto);
+        infrastructureProvisionDAO.updateComputationalFields(dto);
         return Response.ok().build();
     }
 
@@ -110,7 +111,7 @@ public class ComputationalResource implements ComputationalAPI {
                 .withClusterName(computationalId)
                 .withKeyDir(settingsDAO.getCredsKeyDir())
                 .withSshUser(settingsDAO.getExploratorySshUser())
-                .withEdgeUserName(userInfo.getName())
+                .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                 .withRegion(settingsDAO.getAwsRegion());
         return provisioningService.post(EMR_TERMINATE, dto, String.class);
     }

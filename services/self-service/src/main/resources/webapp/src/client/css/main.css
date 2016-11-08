@@ -12,11 +12,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 @import 'https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800';
 
-html,
-body {
-  height: 100%;
-}
-
 button {
   font-family: 'Open Sans', sans-serif;
 }

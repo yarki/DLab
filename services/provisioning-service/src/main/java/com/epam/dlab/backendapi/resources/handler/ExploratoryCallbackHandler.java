@@ -18,11 +18,14 @@ import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.Date;
+
 import static com.epam.dlab.registry.ApiCallbacks.EXPLORATORY;
 import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 
 public class ExploratoryCallbackHandler extends ResourceCallbackHandler<ExploratoryStatusDTO> {
     private static final String EXPLORATORY_ID_FIELD = "notebook_name";
+    private static final String EXPLORATORY_URL_FIELD = "exploratory_url";
 
     private String exploratoryName;
 
@@ -37,12 +40,13 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     }
 
     protected ExploratoryStatusDTO parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO baseStatus) {
-        String exploratoryId = resultNode.get(EXPLORATORY_ID_FIELD).textValue();
-        return baseStatus.withExploratoryId(exploratoryId);
+        JsonNode url = resultNode.get(EXPLORATORY_URL_FIELD);
+        return baseStatus
+                .withExploratoryId(resultNode.get(EXPLORATORY_ID_FIELD).textValue())
+                .withExploratoryUrl(url != null ? url.textValue() : null);
     }
 
     protected ExploratoryStatusDTO getBaseStatusDTO(UserInstanceStatus status) {
         return super.getBaseStatusDTO(status).withExploratoryName(exploratoryName);
     }
-
 }
