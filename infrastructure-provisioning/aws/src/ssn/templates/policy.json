@@ -3,8 +3,9 @@
     "Statement": [
         {
             "Action": [
-                "iam:createRole",
-                "iam:attachRolePolicy",
+                "iam:CreateRole",
+                "iam:AttachRolePolicy",
+                "iam:DetachRolePolicy",
                 "iam:AddRoleToInstanceProfile",
                 "iam:CreateInstanceProfile",
                 "iam:DeleteInstanceProfile",
