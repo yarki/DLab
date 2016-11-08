@@ -12,17 +12,6 @@
 
 package com.epam.dlab.backendapi.core.response.warmup;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import org.eclipse.jetty.util.ConcurrentHashSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
@@ -37,6 +26,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.dropwizard.lifecycle.Managed;
+import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Singleton
 public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
@@ -123,6 +120,6 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
 
     public Set<ImageMetadataDTO> getMetadatas(ImageType type) {
         return metadataDTOs.stream().filter(m -> m.getImageType().equals(type))
-                           .collect(Collectors.toSet());
+                .collect(Collectors.toSet());
     }
 }

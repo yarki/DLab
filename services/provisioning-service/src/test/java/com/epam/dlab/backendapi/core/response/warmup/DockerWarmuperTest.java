@@ -12,23 +12,21 @@
 
 package com.epam.dlab.backendapi.core.response.warmup;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import org.junit.Before;
-import org.junit.Test;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
-import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
-import com.epam.dlab.dto.imagemetadata.ComputationalResourceShapeDto;
-import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
-import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
-import com.epam.dlab.dto.imagemetadata.ImageType;
+import com.epam.dlab.dto.imagemetadata.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import io.dropwizard.util.Duration;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -65,9 +63,9 @@ public class DockerWarmuperTest {
         warmuper.getFileHandlerCallback()
                 .handle(getFileName(), COMPUTATIONAL_TEST_JSON.getBytes());
         assertEquals(exploratoryMetadata, warmuper.getMetadatas(ImageType.EXPLORATORY)
-                                                  .toArray(new ImageMetadataDTO[1])[0]);
+                .toArray(new ImageMetadataDTO[1])[0]);
         assertEquals(computationalMetadata, warmuper.getMetadatas(ImageType.COMPUTATIONAL)
-                                                  .toArray(new ImageMetadataDTO[1])[0]);
+                .toArray(new ImageMetadataDTO[1])[0]);
     }
 
     private String getFileName() {

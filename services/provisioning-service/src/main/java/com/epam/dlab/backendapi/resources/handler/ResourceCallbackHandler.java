@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.Date;
+import java.time.Instant;
 
 abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implements FileHandlerCallback {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
@@ -51,7 +51,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         this.user = user;
         this.originalUuid = originalUuid;
         this.action = action;
-        this.resultType = (Class<T>)((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        this.resultType = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
     @Override
@@ -89,6 +89,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     }
 
     abstract protected String getCallbackURI();
+
     abstract protected T parseOutResponse(JsonNode document, T baseStatus);
 
     @SuppressWarnings("unchecked")
@@ -98,7 +99,9 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         } catch (Throwable t) {
             throw new DlabException("Something went wrong", t);
         }
-    };
+    }
+
+    ;
 
     private boolean isSuccess(JsonNode document) {
         return OK_STATUS.equals(document.get(STATUS_FIELD).textValue());
@@ -107,16 +110,20 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     private UserInstanceStatus calcStatus(DockerAction action, boolean success) {
         if (success) {
             switch (action) {
-                case CREATE: return UserInstanceStatus.RUNNING;
-                case START: return UserInstanceStatus.RUNNING;
-                case STOP: return UserInstanceStatus.STOPPED;
-                case TERMINATE: return UserInstanceStatus.TERMINATED;
+                case CREATE:
+                    return UserInstanceStatus.RUNNING;
+                case START:
+                    return UserInstanceStatus.RUNNING;
+                case STOP:
+                    return UserInstanceStatus.STOPPED;
+                case TERMINATE:
+                    return UserInstanceStatus.TERMINATED;
             }
         }
         return UserInstanceStatus.FAILED;
     }
 
-    protected Date getUptime(UserInstanceStatus status) {
-        return UserInstanceStatus.RUNNING == status ? new Date() : null;
+    protected String getUptime(UserInstanceStatus status) {
+        return UserInstanceStatus.RUNNING == status ? Instant.now().toString() : null;
     }
 }
