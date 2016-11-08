@@ -25,7 +25,6 @@ import {DateUtils} from './../../util/dateUtils'
  	notebook: any;
  	upTimeInHours: number;
 
-
  	@ViewChild('bindDialog') bindDialog;
 
  	open(param, notebook) {
@@ -35,4 +34,3 @@ import {DateUtils} from './../../util/dateUtils'
     this.bindDialog.open(param);
    }
  }
-
