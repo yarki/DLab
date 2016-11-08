@@ -86,7 +86,7 @@ export class ResourcesGrid implements OnInit {
     console.log('action ' + action, data);
     if (action === 'deploy') {
       this.notebookName = data.name;
-      this.computationalResourceModal.open({ isFooter: false });
+      this.computationalResourceModal.open({ isFooter: false },  data.name);
     } else if (action === 'run') {
       this.userResourceService
         .runExploratoryEnvironment({notebook_instance_name: data.name})
