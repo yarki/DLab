@@ -10,42 +10,25 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.dto.exploratory;
+ import { Component, OnInit, ViewChild, Input } from '@angular/core';
+ import { Modal } from './../modal/modal.component';
 
-import com.epam.dlab.dto.StatusBaseDTO;
-import com.fasterxml.jackson.annotation.JsonProperty;
+ @Component({
+   moduleId: module.id,
+   selector: 'detail-computational-resources',
+   templateUrl: 'detail-computational-resources.component.html'
+ })
 
-import java.util.Date;
+ export class DetailComputationalResources {
+ 	resource: any;
+ 	environment: any;
+ 	
+ 	@ViewChild('bindDialog') bindDialog;
 
-public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
-    @JsonProperty("exploratory_id")
-    private String exploratoryId;
-    @JsonProperty("exploratory_url")
-    private String exploratoryUrl;
+ 	open(param, environment, resource) {
+     this.resource = resource;
+     this.environment = environment;
+     this.bindDialog.open(param);
+   }
+ }
 
-    public String getExploratoryId() {
-        return exploratoryId;
-    }
-
-    public void setExploratoryId(String exploratoryId) {
-        this.exploratoryId = exploratoryId;
-    }
-
-    public ExploratoryStatusDTO withExploratoryId(String exploratoryId) {
-        setExploratoryId(exploratoryId);
-        return this;
-    }
-
-    public String getExploratoryUrl() {
-        return exploratoryUrl;
-    }
-
-    public void setExploratoryUrl(String exploratoryUrl) {
-        this.exploratoryUrl = exploratoryUrl;
-    }
-
-    public ExploratoryStatusDTO withExploratoryUrl(String exploratoryUrl) {
-        setExploratoryUrl(exploratoryUrl);
-        return this;
-    }
-}

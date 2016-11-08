@@ -19,6 +19,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserAWSCredentialDTO {
     @JsonProperty
     private String hostname;
+    @JsonProperty("public_ip")
+    private String publicIp;
     @JsonProperty
     private String ip;
     @JsonProperty("key_name")
@@ -38,43 +40,7 @@ public class UserAWSCredentialDTO {
     @JsonProperty("edge_sg")
     private String edgeSG;
 
-    public String getHostname() {
-        return hostname;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public String getKeyName() {
-        return keyName;
-    }
-
-    public String getUserOwnBicketName() {
-        return userOwnBicketName;
-    }
-
-    public String getTunnelPort() {
-        return tunnelPort;
-    }
-
-    public String getSocksPort() {
-        return socksPort;
-    }
-
-    public String getNotebookSg() {
-        return notebookSg;
-    }
-
-    public String getNotebookProfile() {
-        return notebookProfile;
-    }
-
-    public String getNotebookSubnet() {
-        return notebookSubnet;
-    }
-
-    public String getEdgeSG() {
-        return edgeSG;
+    public String getPublicIp() {
+        return publicIp;
     }
 }

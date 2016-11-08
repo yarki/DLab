@@ -11,60 +11,42 @@
  *****************************************************************************************************/
 
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { Response } from "@angular/http";
-import { ExploratoryEnvironmentCreateModel } from './exploratory-environment-create.model';
 import { UserResourceService } from "../../services/userResource.service";
-
-import { ResourceShapeModel } from '../../models/resourceShape.model';
-import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
-
+import { Response } from "@angular/http";
+import { ComputationalResourceCreateModel } from "./computational-resource-create.model";
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
   moduleId: module.id,
-  selector: 'exploratory-environment-create-dialog',
-  templateUrl: 'exploratory-environment-create-dialog.component.html'
+  selector: 'computational-resource-create-dialog',
+  templateUrl: 'computational-resource-create-dialog.component.html'
 })
 
-export class ExploratoryEnvironmentCreateDialog {
-  model: ExploratoryEnvironmentCreateModel;
-  notebookExist: boolean = false;
-  templateDescription: string;
-  namePattern = "\\w+.*\\w+";
-  resourceGrid: any;
+export class ComputationalResourceCreateDialog {
+
+  model: ComputationalResourceCreateModel;
 
   @ViewChild('bindDialog') bindDialog;
-  @ViewChild('environment_name') environment_name;
-  @ViewChild('environment_shape') environment_shape;
-
-
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
   constructor(private userResourceService: UserResourceService) {
-    this.model = ExploratoryEnvironmentCreateModel.getDefault(userResourceService);
+    this.model = ComputationalResourceCreateModel.getDefault(userResourceService);
   }
 
-  createExploratoryEnvironment_btnClick($event, index, name, shape) {
-    this.notebookExist = false;
-
-    if (this.resourceGrid.containsNotebook(name)) {
-      this.notebookExist = true;
-      return false;
-    }
-
-    this.model.setCreatingParams(this.model.exploratoryEnvironmentTemplates[index].version, name, shape);
+  createComputationalResource_btnClick($event, name: string, count: number, shape_master: string, shape_slave: string) {
+    this.model.setCreatingParams(name, count, shape_master, shape_slave);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
   }
 
-  templateSelectionChanged(value) {
+  templateSelectionChange(value) {
       this.model.setSelectedTemplate(value);
   }
 
-  open(params) {
+  open(params, notebook_instance_name) {
     if (!this.bindDialog.isOpened) {
-      this.model = new ExploratoryEnvironmentCreateModel('', '', '', (response: Response) => {
+      this.model = new ComputationalResourceCreateModel('', 0, '', '', notebook_instance_name, (response: Response) => {
         if (response.status === HTTP_STATUS_CODES.OK) {
           this.close();
           this.buildGrid.emit();
@@ -72,7 +54,7 @@ export class ExploratoryEnvironmentCreateDialog {
       },
         (response: Response) => console.error(response.status),
         () => {
-          this.templateDescription = this.model.selectedItem.description;
+          // this.templateDescription = this.model.selectedItem.description;
         },
         () => {
           this.bindDialog.open(params);
@@ -83,10 +65,7 @@ export class ExploratoryEnvironmentCreateDialog {
   }
 
   close() {
-    if (this.bindDialog.isOpened) {
-      this.environment_name.nativeElement.value = "";
+    if (this.bindDialog.isOpened)
       this.bindDialog.close();
-    }
-
   }
 }

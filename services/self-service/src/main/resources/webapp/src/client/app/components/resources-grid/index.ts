@@ -16,13 +16,14 @@ import { FormsModule } from "@angular/forms";
 import { ResourcesGrid } from "./resources-grid.component";
 import { ComputationalResourcesModule } from './../computational-resources-list/index';
 import { ModalModule } from './../modal/index';
+import { ComputationalResourceCreateDialogModule } from './../computational-resource-create-dialog/index';
 import { ConfirmationDialogModule } from './../confirmation-dialog/index';
 import { DetailDialogModule } from './../detail-dialog/index';
 
 export * from "./resources-grid.component";
 
 @NgModule({
-  imports: [CommonModule, ComputationalResourcesModule, ModalModule, ConfirmationDialogModule, DetailDialogModule, FormsModule],
+  imports: [CommonModule, ComputationalResourcesModule, ModalModule, ConfirmationDialogModule, DetailDialogModule, FormsModule, ComputationalResourceCreateDialogModule],
   declarations: [ResourcesGrid],
   exports: [ResourcesGrid]
 })
