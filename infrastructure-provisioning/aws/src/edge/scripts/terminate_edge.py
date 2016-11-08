@@ -82,9 +82,3 @@ if __name__ == "__main__":
         remove_sgroups(args.tag_value)
     except:
         sys.exit(1)
-
-    print "Removing routing table"
-    try:
-        remove_routing_tables(args.tag_value)
-    except:
-        sys.exit(1)
