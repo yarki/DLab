@@ -41,7 +41,7 @@ def status():
     try:
         logging.info('[COLLECT DATA]')
         print '[COLLECTING DATA]'
-        params = "--hostname '{}' --keyfile '{}' --base_name '{}' --username '{}'".format(instance_hostname, keyfile_name, edge_conf['service_base_name'], edge_conf['user_name'])
+        params = "--hostname '{}' --keyfile '{}' --service_base_name '{}' --user_name '{}' --request_id {}".format(instance_hostname, keyfile_name, edge_conf['service_base_name'], edge_conf['user_name'], os.environ['request_id'])
         if not run_routine('collect_data', params):
             logging.info('Failed collecting data')
             with open("/root/result.json", 'w') as result:
