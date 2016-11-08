@@ -89,7 +89,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 					if(awsUser != null) {
 						ui.setAwsUser(true);
 					} else {
-						throw new DlabException("AWS User "+username+" was not found.");
+						ui.setAwsUser(false);
+						log.warn("AWS User '{}' was not found. ",username);
 					}
 				}
 			} catch (Exception e) {
