@@ -24,7 +24,8 @@
           <label class="control-label">Cluster Alias</label>
         </div>
         <div class="col-xs-8">
-            <input type="text" class="form-control" id="name" placeholder="Enter Cluster Alias" [pattern]="namePattern" name="cluster_alias" #name />
+            <input [class.danger_field]="computationalResourceExist" type="text" class="form-control" placeholder="Enter Cluster Alias" [pattern]="clusterNamePattern" required #name />
+            <span class="danger_color" *ngIf="computationalResourceExist">This cluster name already exists.</span>
         </div>
       </div>
       <div class="form-group row">

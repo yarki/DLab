@@ -29,7 +29,6 @@ export class ResourcesGrid implements OnInit {
   isFilled: boolean = false;
   environments: Array<ResourcesGridRowModel>;
   notebookName: string;
-  namePattern: string = "\\w+.*\\w+";
   model = new CreateEmrModel('', '');
   isOutscreenDropdown: boolean;
 
@@ -87,7 +86,7 @@ export class ResourcesGrid implements OnInit {
     console.log('action ' + action, data);
     if (action === 'deploy') {
       this.notebookName = data.name;
-      this.computationalResourceModal.open({ isFooter: false },  data.name);
+      this.computationalResourceModal.open({ isFooter: false },  data);
     } else if (action === 'run') {
       this.userResourceService
         .runExploratoryEnvironment({notebook_instance_name: data.name})
