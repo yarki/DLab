@@ -181,9 +181,23 @@ def run():
                 "ToPort": 22, "IpProtocol": "tcp", "UserIdGroupPairs": []
             }
         ]
-        params = "--name %s --vpc_id %s --security_group_rules '%s' --infra_tag_name %s --infra_tag_value %s" % \
+        sg_rules_template_egress = [
+            {
+                "PrefixListIds": [],
+                "FromPort": 80,
+                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                "ToPort": 22, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
+                "FromPort": 443,
+                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                "ToPort": 22, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            }
+        ]
+        params = "--name %s --vpc_id %s --security_group_rules '%s' --infra_tag_name %s --infra_tag_value %s --egress %s" % \
                  (edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),
-                  edge_conf['service_base_name'], edge_conf['instance_name'])
+                  edge_conf['service_base_name'], edge_conf['instance_name'], json.dumps(sg_rules_template_egress))
         if not run_routine('create_security_group', params):
             logging.info('Failed creating security group for edge node')
             with open("/root/result.json", 'w') as result:
@@ -210,7 +224,8 @@ def run():
             rules_list.append({"GroupId": i})
         ingress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
-            {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": rules_list, "PrefixListIds": []}
+            {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": rules_list, "PrefixListIds": []},
+            {"IpProtocol": "-1", "IpRanges": [{"CidrIp": get_instance_ip_address(edge_conf['instance_name']).get('Private')}], "UserIdGroupPairs": [], "PrefixListIds": []}
         ]
         egress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}
