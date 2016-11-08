@@ -14,6 +14,7 @@ import { Component, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 import { ResourcesGridRowModel } from './resources-grid.model';
 import { CreateEmrModel } from "./createEmrModel";
+import { ComputationalResourceImage } from "../../models/computationalResourceImage.model";
 import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dialog-type.enum";
 
 @Component({
@@ -31,12 +32,11 @@ export class ResourcesGrid implements OnInit {
   namePattern: string = "\\w+.*\\w+";
   model = new CreateEmrModel('', '');
 
-  @ViewChild('createEmrModal') createEmrModal;
+  @ViewChild('computationalResourceModal') computationalResourceModal;
   @ViewChild('confirmationDialog') confirmationDialog;
   @ViewChild('detailDialog') detailDialog;
 
-  @Input() emrTempls;
-  @Input() shapes;
+  computationalResourcesImages: Array<ComputationalResourceImage> = [];
 
   constructor(
     private userResourceService: UserResourceService
@@ -56,7 +56,6 @@ export class ResourcesGrid implements OnInit {
   }
 
   containsNotebook(notebook_name: string) : boolean {
-
     if(notebook_name)
       for (var index = 0; index < this.environments.length; index++)
         if(notebook_name.toLowerCase() ==  this.environments[index].name.toString().toLowerCase())
@@ -86,8 +85,8 @@ export class ResourcesGrid implements OnInit {
   exploratoryAction(data, action:string) {
     console.log('action ' + action, data);
     if (action === 'deploy') {
-      this.notebookName = data.name
-      this.createEmrModal.open({ isFooter: false });
+      this.notebookName = data.name;
+      this.computationalResourceModal.open({ isFooter: false },  data.name);
     } else if (action === 'run') {
       this.userResourceService
         .runExploratoryEnvironment({notebook_instance_name: data.name})
@@ -101,26 +100,4 @@ export class ResourcesGrid implements OnInit {
       this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.TerminateExploratory);
     }
   }
-
-  createEmr(name, count, shape_master, shape_slave, tmplIndex) {
-
-    this.userResourceService
-      .createComputationalResource({
-        name: name,
-        emr_instance_count: count,
-        emr_master_instance_type: shape_master,
-        emr_slave_instance_type: shape_slave,
-        emr_version: this.emrTempls[tmplIndex].version,
-        notebook_name: this.notebookName
-      })
-      .subscribe((result) => {
-        console.log('result: ', result);
-
-        if (this.createEmrModal.isOpened) {
-         this.createEmrModal.close();
-       }
-       this.buildGrid();
-      });
-      return false;
-  };
 }

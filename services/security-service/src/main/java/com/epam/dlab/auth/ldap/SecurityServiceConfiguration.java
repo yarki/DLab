@@ -34,12 +34,15 @@ public class SecurityServiceConfiguration extends Configuration {
 	private static final String MONGO = "mongo";
 
 	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
-	
+
 	public SecurityServiceConfiguration() {
 		super();
 	}
 	
 	private boolean userInfoPersistenceEnabled = false;
+
+	@JsonProperty
+	private boolean awsUserIdentificationEnabled = false;
 	
 	@JsonProperty
 	private long inactiveUserTimeoutMillSec;
@@ -89,8 +92,11 @@ public class SecurityServiceConfiguration extends Configuration {
   @NotNull
   @JsonProperty(MONGO)
   private MongoServiceFactory mongoFactory = new MongoServiceFactory();
-
-    public MongoServiceFactory getMongoFactory() {
+	public MongoServiceFactory getMongoFactory() {
         return mongoFactory;
     }
+
+	public boolean isAwsUserIdentificationEnabled() {
+		return awsUserIdentificationEnabled;
+	}
 }

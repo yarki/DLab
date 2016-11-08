@@ -22,6 +22,7 @@ import { UserResourceService } from "./../../services/userResource.service";
 
 export class ComputationalResourcesList {
   @ViewChild('terminateConfirmateResource') terminateConfirmateResource;
+  @ViewChild('detailComputationalResource') detailComputationalResource;
   @Input() resources: any[];
   @Input() environment: any[];
 
@@ -41,5 +42,9 @@ export class ComputationalResourcesList {
 
   terminateComputationalResources(notebook, resource){
     this.terminateConfirmateResource.open({ isFooter: false }, notebook, resource);
+  };
+
+  detailComputationalResources(environment, resource){
+    this.detailComputationalResource.open({ isFooter: false }, environment, resource);
   };
 }
