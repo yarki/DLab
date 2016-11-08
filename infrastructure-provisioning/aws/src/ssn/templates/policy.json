@@ -5,12 +5,14 @@
             "Action": [
                 "iam:CreateRole",
                 "iam:CreateInstanceProfile",
+                "iam:CreateSubnet",
                 "iam:AttachRolePolicy",
                 "iam:AddRoleToInstanceProfile",
                 "iam:DetachRolePolicy",
                 "iam:DeleteInstanceProfile",
                 "iam:DeleteRolePolicy",
                 "iam:DeleteRole",
+                "iam:DeleteSubnet"
                 "iam:RemoveRoleFromInstanceProfile",
                 "iam:GetRole",
                 "iam:GetRolePolicy",
