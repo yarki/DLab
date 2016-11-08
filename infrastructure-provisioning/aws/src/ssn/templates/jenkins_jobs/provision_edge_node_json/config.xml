@@ -17,6 +17,11 @@
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
+          <name>IAM_user</name>
+          <description>Name of IAM user</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
           <description>name of the uploaded ssh key file (without ".pem")</description>
           <defaultValue></defaultValue>
@@ -83,7 +88,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>rand=`openssl rand -hex 10`;
-sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/provision_edge_node_json/template.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/UN/&apos;${Username}&apos;/g&apos; | sed &apos;s/SGI/&apos;${SSN_SG_ids}&apos;/g&apos; | sed &apos;s/KN/&apos;${SSH_Key_Name}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sed &apos;s/EVI/&apos;${vpc_id}&apos;/g&apos; | sed &apos;s/CSI/&apos;${subnet_id}&apos;/g&apos; | sed &apos;s/EAI/&apos;${ami_id}&apos;/g&apos; | sed &apos;s/EIS/&apos;${instance_shape}&apos;/g&apos; | sudo docker run -i -v /home/ubuntu/keys:/root/keys -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response docker.epmc-bdcc.projects.epam.com/dlab-aws-edge --action $Action ;</command>
+sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/provision_edge_node_json/template.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/UN/&apos;${Username}&apos;/g&apos; | sed &apos;s/CIU/&apos;${IAM_user}&apos;/g&apos; | sed &apos;s/SGI/&apos;${SSN_SG_ids}&apos;/g&apos; | sed &apos;s/KN/&apos;${SSH_Key_Name}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sed &apos;s/EVI/&apos;${vpc_id}&apos;/g&apos; | sed &apos;s/CSI/&apos;${subnet_id}&apos;/g&apos; | sed &apos;s/EAI/&apos;${ami_id}&apos;/g&apos; | sed &apos;s/EIS/&apos;${instance_shape}&apos;/g&apos; | sudo docker run -i -v /home/ubuntu/keys:/root/keys -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response docker.epmc-bdcc.projects.epam.com/dlab-aws-edge --action $Action ;</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

@@ -9,5 +9,5 @@
     "edge_vpc_id":"EVI",
     "edge_ami_id":"EAI",
     "edge_instance_size":"EIS",
-    "creds_iam_user":"UN@epam.com"
+    "creds_iam_user":"CIU"
 }
