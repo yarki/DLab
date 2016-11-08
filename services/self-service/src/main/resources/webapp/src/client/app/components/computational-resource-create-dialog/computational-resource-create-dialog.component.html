@@ -3,7 +3,7 @@
     <h4 class="modal-title">Create computational resource</h4>
   </modal-header>
   <modal-content>
-    <form novalidate>
+    <form (submit)="createComputationalResource_btnClick($event, name.value, count.value, shape_master.value, shape_slave.value)">
       <div class="form-group row">
         <div  class="col-xs-4">
           <label class="control-label">Select template</label>
@@ -12,7 +12,7 @@
           </div>
         </div>
         <div class="col-xs-8">
-          <select class="form-control" (change)="templateSelectionChange($event.target.value)" #tmplIndex>
+          <select class="form-control" (change)="templateSelectionChange($event.target.value)" required #tmplIndex>
             <option *ngFor="let template of model.computationalResourceApplicationTemplates; let i = index" value="{{i}}">
               {{template.version}}
             </option>
@@ -41,7 +41,7 @@
           <label class="control-label">Master Instance shape</label>
         </div>
         <div class="col-xs-8">
-          <select class="form-control" #shape_master>
+          <select class="form-control" required #shape_master>
             <option *ngFor="let shape of model.selectedItem.shapes">{{shape.type}}</option>
           </select>
         </div>
@@ -51,14 +51,14 @@
           <label class="control-label">Slave Instance shape</label>
         </div>
         <div class="col-xs-8">
-          <select class="form-control" #shape_slave>
+          <select class="form-control" required #shape_slave>
             <option *ngFor="let shape of model.selectedItem.shapes">{{shape.type}}</option>
           </select>
         </div>
       </div>
       <div class="text-right">
         <button type="button" (click)="bindDialog.close()" class="btn btn-default">Cancel</button>
-        <button type="submit" (click)="createComputationalResource_btnClick($event, name.value, count.value, shape_master.value, shape_slave.value)" class="btn btn-success">Create</button>
+        <button type="submit" class="btn btn-success">Create</button>
       </div>
     </form>
   </modal-content>
