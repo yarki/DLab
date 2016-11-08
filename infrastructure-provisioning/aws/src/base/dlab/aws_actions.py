@@ -256,17 +256,17 @@ def remove_s3(bucket_type, scientist=''):
     print "The S3 bucket " + bucket.name + " has been deleted successfully"
 
 
-def remove_subnets(subnet_id):
+def remove_subnets(tag_value):
     print "[Removing subnets]"
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
-    #tag_name = os.environ['conf_service_base_name'] + '-tag'
-    #subnets = ec2.subnets.filter(
-    #    Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
-    #for subnet in subnets:
-    #    print subnet.id
-    client.delete_subnet(SubnetId=subnet_id)
-    #    print "The subnet " + subnet.id + " has been deleted successfully"
+    tag_name = os.environ['conf_service_base_name'] + '-tag'
+    subnets = ec2.subnets.filter(
+        Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': [tag_value]}])
+    for subnet in subnets:
+        print subnet.id
+        client.delete_subnet(SubnetId=subnet.id)
+        print "The subnet " + subnet.id + " has been deleted successfully"
 
 
 def remove_sgroups(tag_value):
@@ -290,6 +290,7 @@ def deregister_image(scientist):
     images_list = response.get('Images')
     for i in images_list:
         client.deregister_image(ImageId=i.get('ImageId'))
+        print "Notebook AMI " + i + " has been deregistered successfully"
 
 
 def terminate_emr(id):
