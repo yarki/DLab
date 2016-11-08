@@ -33,9 +33,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <td>
       <div class="dropdown">
         <span data-toggle="dropdown"
-              class="glyphicon glyphicon-cog"
+              class="actions"
               (click)="dropdownPosition($event)"
               [ngClass]="{'disabled': env.status.toLowerCase() == 'creating' ||
+                                      env.status.toLowerCase() == 'failed' ||
                                       env.status.toLowerCase() == 'terminating' ||
                                       env.status.toLowerCase() == 'terminated'}">
         </span>
