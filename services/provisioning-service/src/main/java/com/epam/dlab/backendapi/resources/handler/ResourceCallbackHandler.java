@@ -126,4 +126,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     protected String getUptime(UserInstanceStatus status) {
         return UserInstanceStatus.RUNNING == status ? Instant.now().toString() : null;
     }
+
+    protected String getTextValue(JsonNode jsonNode) {
+        return jsonNode != null ? jsonNode.textValue() : null;
+    }
 }

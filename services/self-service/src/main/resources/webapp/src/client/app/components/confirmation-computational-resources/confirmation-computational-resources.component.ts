@@ -23,25 +23,26 @@ import { ComputationalResourcesModel } from "./confirmation-computational-resour
 
  export class ConfirmationComputationalResources {
    model : ComputationalResourcesModel;
-
    @ViewChild('bindDialog') bindDialog;
    constructor(
      private userResourceService: UserResourceService
     ) { }
 
    open(option, notebook, resource) {
-     this.model = new ComputationalResourcesModel(notebook, resource, (response: Response) => {
-       console.log(response);
+     this.model = new ComputationalResourcesModel(notebook, resource,
+       (response: Response) => {
+         this.close();
      },
      (response : Response) => console.error(response.status),
      this.userResourceService);
      if(!this.bindDialog.isOpened){
-       this.bindDialog.open(option);  
+       this.bindDialog.open(option);
      }
    }
 
    close() {
-     this.bindDialog.close();
+     if(this.bindDialog.isOpened)
+      this.bindDialog.close();
    }
-   
+
  }

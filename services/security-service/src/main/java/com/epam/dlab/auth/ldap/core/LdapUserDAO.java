@@ -64,7 +64,7 @@ public class LdapUserDAO {
             LOG.debug("User '{}' identified.", username);
             return new UserInfo(username, "******");
         } catch(Exception e){
-            LOG.error("LDAP authentication error for '"+username+"'",e);
+            LOG.error("LDAP getUserInfo authentication error for username '{}': {}",username ,e.getMessage());
             throw e;
         }
     }
@@ -108,7 +108,7 @@ public class LdapUserDAO {
                 }
             }
         } catch (Exception e) {
-            LOG.error("LDAP authentication error for '"+username+"'",e);
+            LOG.error("LDAP enrichUserInfo authentication error for username '{}': {}",username ,e.getMessage());
             throw e;
         }
         return ui;

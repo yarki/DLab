@@ -23,7 +23,7 @@
  	notebook: any;
  	upTime: any;
 
- 	
+
  	@ViewChild('bindDialog') bindDialog;
 
  	open(param, notebook) {
@@ -42,4 +42,3 @@
         return days;
     }
  }
-
