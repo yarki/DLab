@@ -21,9 +21,12 @@ import com.epam.dlab.dto.UserCredentialDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -47,7 +50,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
 
     @POST
     @Path("/login")
-    public Response login(UserCredentialDTO credential) {
+    public Response login(@NotNull UserCredentialDTO credential) {
         LOGGER.debug("Try login user = {}", credential.getUsername());
         dao.writeLoginAttempt(credential);
         return securityService.post(LOGIN, credential, Response.class);
@@ -62,7 +65,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
 
     @POST
     @Path("/authorize")
-    public Response authorize(@Auth UserInfo userInfo, String username) {
+    public Response authorize(@Auth UserInfo userInfo, @Valid @NotBlank String username) {
         LOGGER.debug("Try authorize accessToken {}", userInfo.getAccessToken());
         return Response
                 .status(userInfo.getName().toLowerCase().equals(username.toLowerCase()) ?

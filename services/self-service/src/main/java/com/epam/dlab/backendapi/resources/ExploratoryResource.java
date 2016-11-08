@@ -31,9 +31,13 @@ import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.executable.ValidateOnExecution;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -56,7 +60,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     private RESTService provisioningService;
 
     @PUT
-    public Response create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) {
+    public Response create(@Auth UserInfo userInfo, @Valid @NotNull ExploratoryCreateFormDTO formDTO) {
         LOGGER.debug("creating exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
@@ -84,7 +88,7 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(ExploratoryStatusDTO dto) {
+    public Response status(@Valid @NotNull ExploratoryStatusDTO dto) {
         String currentStatus = infrastructureProvisionDAO.fetchExploratoryStatus(dto.getUser(), dto.getExploratoryName());
         LOGGER.debug("updating status for exploratory environment {} for user {}: was {}, now {}", dto.getExploratoryName(), dto.getUser(), currentStatus, dto.getStatus());
         infrastructureProvisionDAO.updateExploratoryFields(dto);
@@ -102,7 +106,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     }
 
     @POST
-    public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
+    public String start(@Auth UserInfo userInfo, @Valid @NotNull ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
         return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, STARTING);
     }
@@ -110,6 +114,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @DELETE
     @Path("/{name}/stop")
     public String stop(@Auth UserInfo userInfo, @PathParam("name") String name) {
+        System.out.println("stopping " + name);
         LOGGER.debug("stopping exploratory environment {} for user {}", name, userInfo.getName());
         updateComputationalStatuses(createStatusDTO(userInfo.getName(), name, UserInstanceStatus.STOPPING));
         String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);

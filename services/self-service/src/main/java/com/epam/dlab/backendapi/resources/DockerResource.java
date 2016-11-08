@@ -20,6 +20,7 @@ import com.epam.dlab.client.restclient.RESTService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,7 @@ public class DockerResource implements MongoCollections, DockerAPI {
 
     @POST
     @Path("/run")
-    public String run(@Auth UserInfo userInfo, String image) {
+    public String run(@Auth UserInfo userInfo, @NotBlank String image) {
         LOGGER.debug("run docker image {} for user {}", image, userInfo.getName());
         dao.writeDockerAttempt(userInfo.getName(), DockerDAO.RUN);
         return provisioningService.post(DOCKER_RUN, image, String.class);

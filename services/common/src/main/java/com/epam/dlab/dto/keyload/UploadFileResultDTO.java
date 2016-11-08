@@ -13,12 +13,22 @@
 package com.epam.dlab.dto.keyload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 public class UploadFileResultDTO {
+    @NotBlank
     @JsonProperty
     private String user;
+
+    @NotBlank
     @JsonProperty
     private boolean success;
+
+    @Valid
+    @NotNull
     @JsonProperty
     private UserAWSCredentialDTO credential;
 

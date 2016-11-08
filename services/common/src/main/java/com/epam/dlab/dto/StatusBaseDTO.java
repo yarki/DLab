@@ -14,16 +14,26 @@
 package com.epam.dlab.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
+import javax.annotation.Nullable;
 import java.util.Date;
 
 public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
+
+    @NotBlank
     @JsonProperty
     private String user;
+
+    @NotBlank
     @JsonProperty("exploratory_name")
     private String exploratoryName;
+
+    @NotBlank
     @JsonProperty
     private String status;
+
+    @Nullable
     @JsonProperty("up_time")
     private String uptime;
 

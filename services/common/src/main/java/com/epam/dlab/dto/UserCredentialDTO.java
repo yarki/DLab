@@ -13,14 +13,19 @@
 package com.epam.dlab.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
 public class UserCredentialDTO {
+    @NotBlank
     @JsonProperty
     private String username;
+
+    @NotBlank
     @JsonProperty
     private String password;
-    @JsonProperty("access_token")
 
+    @NotBlank
+    @JsonProperty("access_token")
     private String accessToken;
 
     public String getUsername() {
