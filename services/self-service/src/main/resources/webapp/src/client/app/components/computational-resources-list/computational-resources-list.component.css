@@ -18,14 +18,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   color: #333;
   cursor: pointer;
   text-decoration: none;
-  width: 60%;
+  width: auto;
   display: inline-block;
   white-space: nowrap;
   overflow: hidden;
   vertical-align: middle;
   text-overflow: ellipsis;
 }
-
+.glyphicon-remove {
+  vertical-align: middle;
+}
 .source {
   line-height: 30px;
   position: relative;
