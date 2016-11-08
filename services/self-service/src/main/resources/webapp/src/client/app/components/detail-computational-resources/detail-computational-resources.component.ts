@@ -10,8 +10,9 @@
 
  *****************************************************************************************************/
 
- import { Component, OnInit, ViewChild, Input } from '@angular/core';
- import { Modal } from './../modal/modal.component';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Modal } from './../modal/modal.component';
+import {DateUtils} from './../../util/dateUtils'
 
  @Component({
    moduleId: module.id,
@@ -20,14 +21,20 @@
  })
 
  export class DetailComputationalResources {
- 	resource: any;
- 	environment: any;
- 	
- 	@ViewChild('bindDialog') bindDialog;
+   resource: any;
+   environment: any;
+   @ViewChild('bindDialog') bindDialog;
 
- 	open(param, environment, resource) {
+   upTimeInHours: number ;
+   upTimeSince: string = "";
+
+   open(param, environment, resource) {
      this.resource = resource;
      this.environment = environment;
+     if(this.resource.up_time){
+      this.upTimeInHours = DateUtils.diffBetweenDatesInHours(this.resource.up_time);
+      this.upTimeSince = new Date(this.resource.up_time).toString();
+     }
      this.bindDialog.open(param);
    }
  }
