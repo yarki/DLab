@@ -235,3 +235,6 @@ modal-content {
 .modal-content .danger_field {
   border-color: #d9534f;
 }
+.progress-dialog .modal-body {
+  padding: 30px 30px 45px 30px;
+}
