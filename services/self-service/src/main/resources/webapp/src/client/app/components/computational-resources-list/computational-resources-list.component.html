@@ -21,7 +21,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <span *ngIf="resources[0].nodes_number">{{resources[0].nodes_number}} nodes</span>
     </a>
     <span *ngIf="resources.length > 1" class="glyphicon arrow_icon" [ngClass]="{'glyphicon-triangle-bottom': !collapse, 'glyphicon-triangle-top': collapse}" (click)="toggleResourceList()"></span>
-    <span ngClass="{{resources[0].status.toLowerCase() || ''}}" class="status">{{resources[0].status}}</span>
+    <span ngClass="{{resources[0].status.toLowerCase() || ''}}" class="emt_status">{{resources[0].status}}</span>
   </div>
 </div>
 
@@ -32,7 +32,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       {{resource.computational_name}}
       <span *ngIf="resource.nodes_number">{{resource.nodes_number}} nodes</span>
     </a>
-    <span ngClass="{{resource.status.toLowerCase() || ''}}" class="status">{{resource.status}}</span>
+    <span ngClass="{{resource.status.toLowerCase() || ''}}" class="emt_status">{{resource.status}}</span>
   </div>
 </div>
 
