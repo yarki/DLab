@@ -12,10 +12,12 @@
 
 package com.epam.dlab.backendapi.core.response.warmup;
 
+
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageType;
 
 import java.util.Set;
 
 public interface MetadataHolder {
-    Set<ImageMetadataDTO> getMetadatas();
+    Set<ImageMetadataDTO> getMetadatas(ImageType metadataType);
 }

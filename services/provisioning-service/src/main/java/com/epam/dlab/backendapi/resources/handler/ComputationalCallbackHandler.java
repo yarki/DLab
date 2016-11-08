@@ -36,13 +36,13 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
 
     @Override
     protected String getCallbackURI() {
-        return COMPUTATIONAL+STATUS_URI;
+        return COMPUTATIONAL + STATUS_URI;
     }
 
     @Override
     protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO baseStatus) {
-        String computationalId = resultNode.get(COMPUTATIONAL_ID_FIELD).textValue();
-        return baseStatus.withComputationalId(computationalId);
+        return baseStatus
+                .withComputationalId(getTextValue(resultNode.get(COMPUTATIONAL_ID_FIELD)));
     }
 
     @Override

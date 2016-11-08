@@ -32,10 +32,10 @@ public class UserInstanceDTO {
     private String status;
     @JsonProperty
     private String shape;
-    @JsonProperty
+    @JsonProperty("exploratory_url")
     private String url;
-    @JsonProperty("up_time_since")
-    private String upTimeSince;
+    @JsonProperty("up_time")
+    private String uptime;
     @JsonProperty("computational_resources")
     private List<UserComputationalResourceDTO> resources = new ArrayList<>();
 
@@ -121,16 +121,16 @@ public class UserInstanceDTO {
         return this;
     }
 
-    public String getUpTimeSince() {
-        return upTimeSince;
+    public String getUptime() {
+        return uptime;
     }
 
-    public void setUpTimeSince(String upTimeSince) {
-        this.upTimeSince = upTimeSince;
+    public void setUptime(String uptime) {
+        this.uptime = uptime;
     }
 
-    public UserInstanceDTO withUpTimeSince(String upTimeSince) {
-        setUpTimeSince(upTimeSince);
+    public UserInstanceDTO withUptime(String uptime) {
+        setUptime(uptime);
         return this;
     }
 

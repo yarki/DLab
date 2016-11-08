@@ -15,6 +15,8 @@ package com.epam.dlab.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
+
 public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @JsonProperty
     private String user;
@@ -22,6 +24,8 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     private String exploratoryName;
     @JsonProperty
     private String status;
+    @JsonProperty("up_time")
+    private String uptime;
 
     public String getUser() {
         return user;
@@ -63,6 +67,20 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @SuppressWarnings("unchecked")
     public T withStatus(String status) {
         setStatus(status);
+        return (T) this;
+    }
+
+    public String getUptime() {
+        return uptime;
+    }
+
+    public void setUptime(String uptime) {
+        this.uptime = uptime;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withUptime(String uptime) {
+        setUptime(uptime);
         return (T) this;
     }
 }

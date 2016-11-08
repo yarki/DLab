@@ -18,7 +18,11 @@ import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
+import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.dropwizard.lifecycle.Managed;
@@ -26,8 +30,10 @@ import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Singleton
 public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
@@ -40,7 +46,8 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     @Inject
     private CommandExecutor commandExecutor;
     private Map<String, String> uuids = new ConcurrentHashMap<>();
-    private Set<ImageMetadataDTO> metadatas = new ConcurrentHashSet<>();
+    private Set<ImageMetadataDTO> metadataDTOs = new ConcurrentHashSet<>();
+
 
     @Override
     public void start() throws Exception {
@@ -75,9 +82,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
                 String uuid = DockerCommands.extractUUID(fileName);
                 if (uuids.containsKey(uuid)) {
                     LOGGER.debug("handle file {}", fileName);
-                    ImageMetadataDTO metadata = MAPPER.readValue(content, ImageMetadataDTO.class);
-                    metadata.setImage(uuids.get(uuid));
-                    metadatas.add(metadata);
+                    addMetadata(content, uuid);
                     return true;
                 }
                 return false;
@@ -90,6 +95,21 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
         };
     }
 
+    private void addMetadata(byte[] content, String uuid) throws IOException {
+        final JsonNode jsonNode = MAPPER.readTree(content);
+        ImageMetadataDTO metadata;
+        if (jsonNode.has("exploratory_environment_shapes")) {
+            metadata = MAPPER.readValue(content, ExploratoryMetadataDTO.class);
+            metadata.setImageType(ImageType.EXPLORATORY);
+        } else {
+            metadata = MAPPER
+                    .readValue(content, ComputationalMetadataDTO.class);
+            metadata.setImageType(ImageType.COMPUTATIONAL);
+        }
+        metadata.setImage(uuids.get(uuid));
+        metadataDTOs.add(metadata);
+    }
+
     @Override
     public void stop() throws Exception {
     }
@@ -98,7 +118,8 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
         return Collections.unmodifiableMap(uuids);
     }
 
-    public Set<ImageMetadataDTO> getMetadatas() {
-        return Collections.unmodifiableSet(metadatas);
+    public Set<ImageMetadataDTO> getMetadatas(ImageType type) {
+        return metadataDTOs.stream().filter(m -> m.getImageType().equals(type))
+                .collect(Collectors.toSet());
     }
 }

@@ -24,9 +24,10 @@ import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.client.mongo.MongoService;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.imagemetadata.ApplicationDto;
+import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ComputationalResourceShapeDto;
 import com.epam.dlab.dto.imagemetadata.ExploratoryEnvironmentVersion;
-import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageType;
 import com.epam.dlab.dto.imagemetadata.TemplateDTO;
 import com.google.inject.name.Names;
@@ -67,16 +68,17 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         RESTService result = mock(RESTService.class);
         when(result.post(eq(KEY_LOADER), any(), eq(Response.class)))
                 .then(invocationOnMock -> Response.accepted().build());
-        when(result.get(eq(DOCKER), any()))
-                .thenReturn(new ImageMetadataDTO[]{
-                        prepareEmrImage(),
+        when(result.get(eq(DOCKER_EXPLORATORY), any()))
+                .thenReturn(new ExploratoryMetadataDTO[]{
                         prepareJupiterImage()
                 });
+        when(result.get(eq(DOCKER_COMPUTATIONAL), any()))
+                .thenReturn(new ComputationalMetadataDTO[]{prepareEmrImage()});
         when(result.post(eq(EXPLORATORY_CREATE), any(), eq(String.class))).thenReturn(UUID.randomUUID().toString());
         return result;
     }
 
-    private ImageMetadataDTO prepareEmrImage() {
+    private ComputationalMetadataDTO prepareEmrImage() {
         TemplateDTO templateDTO = new TemplateDTO("emr-6.3.0");
         ArrayList<ApplicationDto> applicationDtos = new ArrayList<>();
         applicationDtos.add(new ApplicationDto("2.7.1", "Hadoop"));
@@ -90,20 +92,27 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         applicationDtos.add(new ApplicationDto("2.1.0", "Hive"));
         templateDTO1.setApplications(applicationDtos);
 
-        ImageMetadataDTO imageMetadataDTO = new ImageMetadataDTO("test computational image", "template", "description",
-                                                                 "request_id", ImageType.COMPUTATIONAL.getType(),
-                                                                 Arrays.asList(templateDTO,
-                                                                               templateDTO1));
+        ComputationalMetadataDTO imageMetadataDTO = new ComputationalMetadataDTO(
+                "test computational image", "template", "description",
+                "request_id", ImageType.COMPUTATIONAL.getType(),
+                Arrays.asList(templateDTO, templateDTO1));
+
+        List<ComputationalResourceShapeDto> crsList = new ArrayList<>();
+        crsList.add(new ComputationalResourceShapeDto(
+                "cg1.4xlarge", "22.5 GB", 16));
+        crsList.add(new ComputationalResourceShapeDto(
+                "t2.medium", "4.0 GB", 2));
+        crsList.add(new ComputationalResourceShapeDto(
+                "t2.large", "8.0 GB", 2));
+        crsList.add(new ComputationalResourceShapeDto(
+                "t2.large", "8.0 GB", 2));
+
+        imageMetadataDTO.setComputationResourceShapes(crsList);
         return imageMetadataDTO;
     }
 
-    private ImageMetadataDTO prepareJupiterImage() {
-        ImageMetadataDTO imageMetadataDTO = new ImageMetadataDTO();
-
-//        new ImageMetadataDTO("test exploratory image", "template", "decription", "request_id",
-//                             ImageType.EXPLORATORY.getType(),
-//                             Arrays.asList(new TemplateDTO("jupyter-2"), new TemplateDTO("jupyter-3")
-
+    private ExploratoryMetadataDTO prepareJupiterImage() {
+        ExploratoryMetadataDTO imageMetadataDTO = new ExploratoryMetadataDTO();
         List<ComputationalResourceShapeDto> crsList = new ArrayList<>();
         crsList.add(new ComputationalResourceShapeDto(
                 "cg1.4xlarge", "22.5 GB", 16));
@@ -117,10 +126,8 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         List<ExploratoryEnvironmentVersion> eevList = new ArrayList<>();
         eevList.add(new ExploratoryEnvironmentVersion("Jupyter 1.5", "Base image with jupyter node creation routines",
                                                       "type", "jupyter-1.6", "AWS"));
-        imageMetadataDTO.setType(ImageType.EXPLORATORY.getType());
         imageMetadataDTO.setExploratoryEnvironmentShapes(crsList);
         imageMetadataDTO.setExploratoryEnvironmentVersions(eevList);
-
 
         return imageMetadataDTO;
     }

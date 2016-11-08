@@ -21,12 +21,25 @@
 
  export class DetailDialog {
  	notebook: any;
+ 	upTime: any;
+
  	
  	@ViewChild('bindDialog') bindDialog;
 
  	open(param, notebook) {
      this.bindDialog.open(param);
+     this.upTime = this.diffBetweenDates(notebook.time);
      this.notebook = notebook;
    }
+
+   diffBetweenDates(date){
+        let dateArr = date.split(" ")[0].split('/');
+        let timeArr = date.split(" ")[1].split(':');
+        let createdDate = new Date(20 + dateArr[2], dateArr[1] - 1, dateArr[0], timeArr[0], timeArr[1]);
+        let endTime = new Date();
+        let difference = endTime.getTime() - createdDate.getTime();
+        let days = Math.round(difference / (60000*60));
+        return days;
+    }
  }
 

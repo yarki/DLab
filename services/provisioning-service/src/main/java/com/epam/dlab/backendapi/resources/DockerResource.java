@@ -19,6 +19,7 @@ import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageType;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +46,12 @@ public class DockerResource implements DockerCommands {
     private CommandBuilder commandBuilder;
 
     @GET
-    public Set<ImageMetadataDTO> getDockerImages() throws IOException, InterruptedException {
+    @Path("{type}")
+    public Set<ImageMetadataDTO> getDockerImages(@PathParam("type") String type) throws
+            IOException, InterruptedException {
         LOGGER.debug("docker statuses asked");
-        return metadataHolder.getMetadatas();
+        return metadataHolder
+                .getMetadatas(ImageType.valueOf(type.toUpperCase()));
     }
 
     @Path("/run")
