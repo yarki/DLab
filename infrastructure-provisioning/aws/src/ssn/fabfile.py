@@ -50,11 +50,12 @@ def run():
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn'
         region = os.environ['creds_region']
+        policy_path = '/root/templates/policy.json'
 
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
-        params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
-                 (role_name, role_profile_name, policy_name, os.environ['conf_policy_arn'])
+        params = "--role_name %s --role_profile_name %s --policy_name %s --policy_file_name %s" % \
+                 (role_name, role_profile_name, policy_name, policy_path)
 
         if not run_routine('create_role_policy', params):
             logging.info('Unable to create roles')
