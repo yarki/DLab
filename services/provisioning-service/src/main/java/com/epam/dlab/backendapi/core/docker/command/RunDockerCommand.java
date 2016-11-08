@@ -134,6 +134,11 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withEmrTimeout(String emrTimeout) {
+        options.add(String.format("-e \"emr_timeout=%s\"", emrTimeout));
+        return this;
+    }
+
     public RunDockerCommand withEc2Role(String ec2Role) {
         options.add(String.format("-e \"ec2_role=%s\"", ec2Role));
         return this;

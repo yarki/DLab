@@ -19,6 +19,8 @@ public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDT
     private String notebookInstanceType;
     @JsonProperty("creds_security_groups_ids")
     private String securityGroupIds;
+    @JsonProperty("notebook_ami_id")
+    private String exploratoryAmiId;
 
     public String getNotebookInstanceType() {
         return notebookInstanceType;
@@ -43,6 +45,19 @@ public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDT
 
     public ExploratoryCreateDTO withSecurityGroupIds(String securityGroupIds) {
         setSecurityGroupIds(securityGroupIds);
+        return this;
+    }
+
+    public String getExploratoryAmiId() {
+        return exploratoryAmiId;
+    }
+
+    public void setExploratoryAmiId(String exploratoryAmiId) {
+        this.exploratoryAmiId = exploratoryAmiId;
+    }
+
+    public ExploratoryCreateDTO withExploratoryAmiId(String exploratoryAmiId) {
+        setExploratoryAmiId(exploratoryAmiId);
         return this;
     }
 }

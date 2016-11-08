@@ -10,37 +10,26 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.dto.edge;
 
-import com.epam.dlab.backendapi.core.docker.command.ImagesDockerCommand;
-import com.epam.dlab.backendapi.core.docker.command.UnixCommand;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.epam.dlab.dto.ResourceBaseDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.UUID;
+public class EdgeBaseDTO<T extends EdgeBaseDTO<?>> extends ResourceBaseDTO<T> {
+    @JsonProperty("edge_user_name")
+    private String edgeUserName;
 
-import static com.epam.dlab.backendapi.core.Constants.JSON_EXTENSION;
-
-public interface DockerCommands {
-    String GET_IMAGES = new ImagesDockerCommand()
-            .pipe(UnixCommand.awk("{print $1\":\"$2}"))
-            .pipe(UnixCommand.sort())
-            .pipe(UnixCommand.uniq())
-            .pipe(UnixCommand.grep("dlab"))
-            .pipe(UnixCommand.grep("none", "-v"))
-            .pipe(UnixCommand.grep("base", "-v"))
-            .pipe(UnixCommand.grep("ssn", "-v"))
-            .pipe(UnixCommand.grep("edge", "-v"))
-            .toCMD();
-
-    ObjectMapper MAPPER = new ObjectMapper()
-            .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
-
-    static String generateUUID() {
-        return UUID.randomUUID().toString();
+    public String getEdgeUserName() {
+        return edgeUserName;
     }
 
-    static String extractUUID(String fileName) {
-        return fileName.replace(JSON_EXTENSION, "");
+    public void setEdgeUserName(String edgeUserName) {
+        this.edgeUserName = edgeUserName;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withEdgeUserName(String edgeUserName) {
+        setEdgeUserName(edgeUserName);
+        return (T) this;
     }
 }
