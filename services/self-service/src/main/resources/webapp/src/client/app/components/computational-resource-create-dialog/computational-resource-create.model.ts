@@ -42,13 +42,14 @@ export class ComputationalResourceCreateModel {
     computational_resource_count: number,
     computational_resource_master_shape: string,
     computational_resource_slave_shape: string,
-
+    notebook_name : string,
     fnProcessResults: any,
     fnProcessErrors: any,
     selectedItemChanged: Function,
     continueWith: Function,
     userResourceService: UserResourceService
   ) {
+    this.notebook_name = notebook_name;
     this.userResourceService = userResourceService;
     this.selectedItemChanged = selectedItemChanged;
     this.continueWith = continueWith;
@@ -57,7 +58,7 @@ export class ComputationalResourceCreateModel {
   }
 
   static getDefault(userResourceService): ComputationalResourceCreateModel {
-    return new ComputationalResourceCreateModel('', 0, '', '', () => { }, () => { }, null, null, userResourceService);
+    return new ComputationalResourceCreateModel('', 0, '', '', '', () => { }, () => { }, null, null, userResourceService);
   }
 
   public setSelectedItem(item: ComputationalResourceApplicationTemplate) {
