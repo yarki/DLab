@@ -12,11 +12,13 @@
 
 package com.epam.dlab.backendapi.core;
 
-import java.util.UUID;
 import com.epam.dlab.backendapi.core.docker.command.ImagesDockerCommand;
 import com.epam.dlab.backendapi.core.docker.command.UnixCommand;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.UUID;
+
 import static com.epam.dlab.backendapi.core.Constants.JSON_EXTENSION;
 
 public interface DockerCommands {

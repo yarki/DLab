@@ -25,7 +25,7 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @JsonProperty
     private String status;
     @JsonProperty("up_time")
-    private Date uptime;
+    private String uptime;
 
     public String getUser() {
         return user;
@@ -70,16 +70,16 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
         return (T) this;
     }
 
-    public Date getUptime() {
+    public String getUptime() {
         return uptime;
     }
 
-    public void setUptime(Date uptime) {
+    public void setUptime(String uptime) {
         this.uptime = uptime;
     }
 
     @SuppressWarnings("unchecked")
-    public T withUptime(Date uptime) {
+    public T withUptime(String uptime) {
         setUptime(uptime);
         return (T) this;
     }

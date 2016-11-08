@@ -18,7 +18,6 @@ import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.SecurityDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.UserCredentialDTO;
-import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
