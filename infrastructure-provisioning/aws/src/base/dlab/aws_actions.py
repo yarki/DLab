@@ -260,7 +260,7 @@ def remove_subnets(tag_value):
     print "[Removing subnets]"
     ec2 = boto3.resource('ec2')
     client = boto3.client('ec2')
-    tag_name = os.environ['conf_service_base_name'] + '-tag'
+    tag_name = os.environ['conf_service_base_name'] + '-Tag'
     subnets = ec2.subnets.filter(
         Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': [tag_value]}])
     for subnet in subnets:
