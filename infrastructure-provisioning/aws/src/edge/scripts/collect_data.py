@@ -66,7 +66,8 @@ if __name__ == "__main__":
     edge['Notebooks'] = notebooks
     data.append(edge)
 
-    filename = '{}.json'.format(args.request_id)
+    # filename = '{}.json'.format(args.request_id)
+    filename = 'result.json'
     with open('/root/' + filename, 'w') as outfile:
         json.dump(data, outfile)
 
