@@ -22,15 +22,19 @@ import {DateUtils} from './../../util/dateUtils'
  })
 
  export class DetailDialog {
- 	notebook: any;
- 	upTimeInHours: number;
-
- 	@ViewChild('bindDialog') bindDialog;
+   notebook: any;
+   upTimeInHours: number;
+   upTimeSince: string = "";
+   @ViewChild('bindDialog') bindDialog;
 
  	open(param, notebook) {
- 	  if(notebook.time)
-      this.upTimeInHours = DateUtils.diffBetweenDatesInHours(notebook.time);
     this.notebook = notebook;
+
+    if(notebook.time) {
+      this.upTimeInHours = DateUtils.diffBetweenDatesInHours(this.notebook.time);
+      this.upTimeSince = new Date(this.notebook.time).toString();
+    }
+
     this.bindDialog.open(param);
    }
  }
