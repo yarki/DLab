@@ -52,7 +52,7 @@ export class ExploratoryEnvironmentCreateModel {
     return new ExploratoryEnvironmentCreateModel('', '', '', () => { }, () => { }, null, null, userResourceService);
   }
 
-  public setSelectedItem(item: ExploratoryEnvironmentVersionModel) {
+  public setSelectedItem(item: ExploratoryEnvironmentVersionModel) : void {
     this.selectedItem = item;
   }
 
@@ -66,19 +66,28 @@ export class ExploratoryEnvironmentCreateModel {
 
   private prepareModel(environment_name: string, environment_version: string, environment_shape: string, fnProcessResults: any, fnProcessErrors: any): void {
 
-    this.setCreatingParams(environment_version, environment_name, environment_shape)
+    this.setCreatingParams(environment_version, environment_name, environment_shape);
     this.confirmAction = () => this.createExploratoryEnvironment()
       .subscribe(
       (response: Response) => fnProcessResults(response));
   }
 
-  setCreatingParams(version, name, shape) {
+  public setSelectedTemplate(index) : void {
+    if(this.exploratoryEnvironmentTemplates && this.exploratoryEnvironmentTemplates[index])
+    {
+      this.selectedItem = this.exploratoryEnvironmentTemplates[index];
+      if(this.selectedItemChanged)
+        this.selectedItemChanged();
+    }
+  }
+
+  public setCreatingParams(version, name, shape) : void {
     this.environment_version = version;
     this.environment_name = name;
     this.environment_shape = shape;
   }
 
-  loadTemplates() {
+  public loadTemplates() : void {
     if(this.exploratoryEnvironmentTemplates.length == 0)
       this.userResourceService.getExploratoryEnvironmentTemplates()
         .subscribe(
@@ -103,9 +112,7 @@ export class ExploratoryEnvironmentCreateModel {
         });
   }
 
-  setSelectedTemplate(value) {
-    this.selectedItem = this.exploratoryEnvironmentTemplates[value];
-    if(this.selectedItemChanged)
-      this.selectedItemChanged();
+  public resetModel() : void {
+    this.setSelectedTemplate(0);
   }
 }

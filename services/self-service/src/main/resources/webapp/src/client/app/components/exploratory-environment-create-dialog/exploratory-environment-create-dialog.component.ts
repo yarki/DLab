@@ -44,6 +44,10 @@ export class ExploratoryEnvironmentCreateDialog {
     this.model = ExploratoryEnvironmentCreateModel.getDefault(userResourceService);
   }
 
+  ngOnInit(){
+    this.bindDialog.onClosing =  () => this.resetDialog();
+  }
+
   createExploratoryEnvironment_btnClick($event, index, name, shape) {
     this.notebookExist = false;
 
@@ -83,10 +87,12 @@ export class ExploratoryEnvironmentCreateDialog {
   }
 
   close() {
-    if (this.bindDialog.isOpened) {
-      this.environment_name.nativeElement.value = "";
+    if (this.bindDialog.isOpened)
       this.bindDialog.close();
-    }
+  }
 
+  private resetDialog() : void{
+    this.environment_name.nativeElement.value = "";
+    this.model.resetModel();
   }
 }

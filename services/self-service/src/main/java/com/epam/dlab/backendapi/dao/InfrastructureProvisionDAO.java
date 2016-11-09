@@ -19,17 +19,11 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
-import com.mongodb.client.FindIterable;
 import org.bson.Document;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.elemMatch;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
