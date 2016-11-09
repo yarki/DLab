@@ -18,47 +18,26 @@ import org.hibernate.validator.constraints.NotBlank;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserAWSCredentialDTO {
-    @NotBlank
     @JsonProperty
     private String hostname;
-
-    @NotBlank
     @JsonProperty("public_ip")
     private String publicIp;
-
-    @NotBlank
     @JsonProperty
     private String ip;
-
-    @NotBlank
     @JsonProperty("key_name")
     private String keyName;
-
-    @NotBlank
     @JsonProperty("user_own_bicket_name")
     private String userOwnBicketName;
-
-    @NotBlank
     @JsonProperty("tunnel_port")
     private String tunnelPort;
-
-    @NotBlank
     @JsonProperty("socks_port")
     private String socksPort;
-
-    @NotBlank
     @JsonProperty("notebook_sg")
     private String notebookSg;
-
-    @NotBlank
     @JsonProperty("notebook_profile")
     private String notebookProfile;
-
-    @NotBlank
     @JsonProperty("notebook_subnet")
     private String notebookSubnet;
-
-    @NotBlank
     @JsonProperty("edge_sg")
     private String edgeSG;
 

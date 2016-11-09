@@ -24,7 +24,6 @@ public class UserCredentialDTO {
     @JsonProperty
     private String password;
 
-    @NotBlank
     @JsonProperty("access_token")
     private String accessToken;
 
