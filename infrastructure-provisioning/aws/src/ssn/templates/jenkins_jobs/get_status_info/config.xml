@@ -13,7 +13,7 @@
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.StringParameterDefinition>
                     <name>Username</name>
-                    <description>Name of the scientist</description>
+                    <description>Username of the scientist</description>
                     <defaultValue></defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.StringParameterDefinition>
