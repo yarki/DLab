@@ -13,24 +13,30 @@
 package com.epam.dlab.constants;
 
 public enum UserInstanceStatus {
-    CREATING("creating"),
-    CREATED("created"),
-    STARTING("starting"),
-    RUNNING("running"),
-    STOPPING("stopping"),
-    STOPPED("stopped"),
-    TERMINATING("terminating"),
-    TERMINATED("terminated"),
-    FAILED("failed");
+    CREATING,
+    CREATED,
+    STARTING,
+    RUNNING,
+    STOPPING,
+    STOPPED,
+    TERMINATING,
+    TERMINATED,
+    FAILED;
 
-    private String status;
-
-    UserInstanceStatus(String status) {
-        this.status = status;
+    @Override
+    public String toString() {
+        return super.toString().toLowerCase();
     }
 
-    public String getStatus() {
-        return status;
+    public static UserInstanceStatus of(String status) {
+        if (status != null) {
+            for (UserInstanceStatus uis : UserInstanceStatus.values()) {
+                if (status.equalsIgnoreCase(uis.toString())) {
+                    return uis;
+                }
+            }
+        }
+        return null;
     }
 
 }
