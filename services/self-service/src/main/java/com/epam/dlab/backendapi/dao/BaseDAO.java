@@ -30,7 +30,8 @@ import java.util.function.Supplier;
 class BaseDAO implements MongoCollections {
     protected static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true)
-            .registerModule(new JodaModule());
+            .registerModule(new JodaModule())
+            .configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS , false);
     public static final String FIELD_DELIMETER = ".";
     public static final String FIELD_SET_DELIMETER = ".$.";
     public static final String ID = "_id";
