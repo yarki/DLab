@@ -32,7 +32,7 @@ args = parser.parse_args()
 if __name__ == "__main__":
     print 'Terminating EMR cluster'
     try:
-        clusters_list = get_emr_list(args.tag_value, 'Value')
+        clusters_list = get_emr_list(args.tag_name)
         if clusters_list:
             for cluster_id in clusters_list:
                 client = boto3.client('emr')
@@ -79,6 +79,6 @@ if __name__ == "__main__":
 
     print "Removing private subnet"
     try:
-        remove_sgroups(args.tag_value)
+        remove_subnets(args.tag_value)
     except:
         sys.exit(1)

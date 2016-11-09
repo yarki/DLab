@@ -129,7 +129,7 @@ def remove_ec2(tag_name, tag_value):
             client.terminate_instances(InstanceIds=[instance.id])
             waiter = client.get_waiter('instance_terminated')
             waiter.wait(InstanceIds=[instance.id])
-            print "The instance " + tag_value + " has been terminated successfully"
+            print "The instance " + instance.id + " has been terminated successfully"
     else:
         print "There are no instances with " + tag_value + " name to terminate"
 
