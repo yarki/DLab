@@ -10,8 +10,10 @@
 
  *****************************************************************************************************/
 
- import { Component, OnInit, ViewChild, Input } from '@angular/core';
- import { Modal } from './../modal/modal.component';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Modal } from './../modal/modal.component';
+import {DateUtils} from './../../util/dateUtils'
+
 
  @Component({
    moduleId: module.id,
@@ -20,26 +22,19 @@
  })
 
  export class DetailDialog {
- 	notebook: any;
- 	upTime: any;
-
- 	
- 	@ViewChild('bindDialog') bindDialog;
+   notebook: any;
+   upTimeInHours: number;
+   upTimeSince: string = "";
+   @ViewChild('bindDialog') bindDialog;
 
  	open(param, notebook) {
-     this.bindDialog.open(param);
-     this.upTime = this.diffBetweenDates(notebook.time);
-     this.notebook = notebook;
-   }
+    this.notebook = notebook;
 
-   diffBetweenDates(date){
-        let dateArr = date.split(" ")[0].split('/');
-        let timeArr = date.split(" ")[1].split(':');
-        let createdDate = new Date(20 + dateArr[2], dateArr[1] - 1, dateArr[0], timeArr[0], timeArr[1]);
-        let endTime = new Date();
-        let difference = endTime.getTime() - createdDate.getTime();
-        let days = Math.round(difference / (60000*60));
-        return days;
+    if(notebook.time) {
+      this.upTimeInHours = DateUtils.diffBetweenDatesInHours(this.notebook.time);
+      this.upTimeSince = new Date(this.notebook.time).toString();
     }
- }
 
+    this.bindDialog.open(param);
+   }
+ }
