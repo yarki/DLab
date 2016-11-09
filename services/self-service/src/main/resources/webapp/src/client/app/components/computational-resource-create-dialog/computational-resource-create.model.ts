@@ -84,14 +84,14 @@ export class ComputationalResourceCreateModel {
     );
   }
 
-  setCreatingParams(name: string, count: number, shape_master: string, shape_slave: string) {
+  public setCreatingParams(name: string, count: number, shape_master: string, shape_slave: string) : void {
     this.computational_resource_alias = name;
     this.computational_resource_count = count;
     this.computational_resource_master_shape = shape_master;
     this.computational_resource_slave_shape = shape_slave;
   }
 
-  loadTemplates() {
+  public loadTemplates() : void {
     if (this.computationalResourceImages.length == 0)
       this.userResourceService.getComputationalResourcesTemplates()
         .subscribe(
@@ -111,10 +111,15 @@ export class ComputationalResourceCreateModel {
         });
   }
 
-  setSelectedTemplate(index: number) {
-    this.selectedItem = this.computationalResourceApplicationTemplates[index];
+  public setSelectedTemplate(index: number): void {
+    if(this.computationalResourceApplicationTemplates && this.computationalResourceApplicationTemplates[index]) {
+      this.selectedItem = this.computationalResourceApplicationTemplates[index];
+      if (this.selectedItemChanged)
+        this.selectedItemChanged();
+    }
+  }
 
-    if (this.selectedItemChanged)
-      this.selectedItemChanged();
+  public resetModel(){
+    this.setSelectedTemplate(0);
   }
 }
