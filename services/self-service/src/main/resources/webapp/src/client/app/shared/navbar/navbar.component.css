@@ -45,7 +45,9 @@ sd-navbar {
   display: block;
   float: none;
   display: inline-block;
+  cursor: default;
 }
+
 .dropdown-menu {
   margin-left: 15px;
 }
