@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     # Get Notebook List
     notebooks = []
-    nbs_list = get_ec2_list('{}-Tag'.format(args.service_base_name))
+    nbs_list = get_ec2_list('{}-Tag'.format(args.service_base_name), '{}-{}-nb'.format(args.service_base_name, args.user_name))
     for i in nbs_list:
         notebook = {}
         notebook['Id'] = i.id
@@ -66,7 +66,8 @@ if __name__ == "__main__":
     edge['Notebooks'] = notebooks
     data.append(edge)
 
-    filename = '{}.json'.format(args.request_id)
+    # filename = '{}.json'.format(args.request_id)
+    filename = 'result.json'
     with open('/root/' + filename, 'w') as outfile:
         json.dump(data, outfile)
 
