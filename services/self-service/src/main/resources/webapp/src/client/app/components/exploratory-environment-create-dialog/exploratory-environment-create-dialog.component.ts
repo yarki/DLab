@@ -12,11 +12,11 @@
 
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Response } from "@angular/http";
-import { ExploratoryEnvironmentCreateModel } from './exploratory-environment-create.model';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserResourceService } from "../../services/userResource.service";
-
-import { ResourceShapeModel } from '../../models/resourceShape.model';
+import { ExploratoryEnvironmentCreateModel } from './exploratory-environment-create.model';
 import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
+import { ResourceShapeModel } from '../../models/resourceShape.model';
 
 import HTTP_STATUS_CODES from 'http-status-enum';
 
@@ -29,9 +29,12 @@ import HTTP_STATUS_CODES from 'http-status-enum';
 export class ExploratoryEnvironmentCreateDialog {
   model: ExploratoryEnvironmentCreateModel;
   notebookExist: boolean = false;
+  checkValidity: boolean = false;
   templateDescription: string;
   namePattern = "\\w+.*\\w+";
   resourceGrid: any;
+
+  public createExploratoryEnvironmentForm: FormGroup;
 
   @ViewChild('bindDialog') bindDialog;
   @ViewChild('environment_name') environment_name;
@@ -40,24 +43,36 @@ export class ExploratoryEnvironmentCreateDialog {
 
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
-  constructor(private userResourceService: UserResourceService) {
+  constructor(
+    private userResourceService: UserResourceService,
+    private _fb: FormBuilder
+  ) {
     this.model = ExploratoryEnvironmentCreateModel.getDefault(userResourceService);
   }
 
   ngOnInit(){
+    this.initFormModel();
     this.bindDialog.onClosing =  () => this.resetDialog();
   }
 
-  createExploratoryEnvironment_btnClick($event, index, name, shape) {
-    this.notebookExist = false;
+  initFormModel(): void {
+    this.createExploratoryEnvironmentForm = this._fb.group({
+      environment_name: ['', [Validators.required, Validators.pattern(this.namePattern)]]
+    });
+  }
 
-    if (this.resourceGrid.containsNotebook(name)) {
+  createExploratoryEnvironment_btnClick($event, data, valid, index, shape) {
+    this.notebookExist = false;
+    this.checkValidity = true;
+
+    if (this.resourceGrid.containsNotebook(data.environment_name)) {
       this.notebookExist = true;
       return false;
     }
 
-    this.model.setCreatingParams(this.model.exploratoryEnvironmentTemplates[index].version, name, shape);
+    this.model.setCreatingParams(this.model.exploratoryEnvironmentTemplates[index].version, data.environment_name, shape);
     this.model.confirmAction();
+    this.checkValidity = false;
     $event.preventDefault();
     return false;
   }
@@ -82,7 +97,6 @@ export class ExploratoryEnvironmentCreateDialog {
           this.bindDialog.open(params);
         },
         this.userResourceService);
-
     }
   }
 
@@ -92,7 +106,7 @@ export class ExploratoryEnvironmentCreateDialog {
   }
 
   private resetDialog() : void{
-    this.environment_name.nativeElement.value = "";
+    this.initFormModel();
     this.model.resetModel();
   }
 }
