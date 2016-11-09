@@ -25,6 +25,9 @@ import HTTP_STATUS_CODES from 'http-status-enum';
 export class ComputationalResourceCreateDialog {
 
   model: ComputationalResourceCreateModel;
+  notebook_instance: any;
+  computationalResourceExist: boolean = false;
+  clusterNamePattern: string = "\\w+.*\\w+";
 
   @ViewChild('bindDialog') bindDialog;
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
@@ -34,6 +37,13 @@ export class ComputationalResourceCreateDialog {
   }
 
   createComputationalResource_btnClick($event, name: string, count: number, shape_master: string, shape_slave: string) {
+    this.computationalResourceExist = false;
+
+    if (this.containsComputationalResource(name)) {
+      this.computationalResourceExist = true;
+      return false;
+    }
+
     this.model.setCreatingParams(name, count, shape_master, shape_slave);
     this.model.confirmAction();
     $event.preventDefault();
@@ -41,13 +51,25 @@ export class ComputationalResourceCreateDialog {
   }
 
   templateSelectionChange(value) {
-      this.model.setSelectedTemplate(value);
+    this.model.setSelectedTemplate(value);
   }
 
-  open(params, notebook_instance_name) {
+  containsComputationalResource(conputational_resource_name: string): boolean {
+    if(conputational_resource_name)
+      for (var index = 0; index < this.notebook_instance.resources.length; index++)
+        if (conputational_resource_name.toLowerCase() == this.notebook_instance.resources[index].computational_name.toString().toLowerCase())
+            return true;
+
+      return false;
+  }
+
+  open(params, notebook_instance) {
     if (!this.bindDialog.isOpened) {
-      this.model = new ComputationalResourceCreateModel('', 0, '', '', notebook_instance_name, (response: Response) => {
+      this.notebook_instance = notebook_instance;
+
+      this.model = new ComputationalResourceCreateModel('', 0, '', '', notebook_instance.name, (response: Response) => {
         if (response.status === HTTP_STATUS_CODES.OK) {
+          this.computationalResourceExist = false;
           this.close();
           this.buildGrid.emit();
         }

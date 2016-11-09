@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
+import java.util.Date;
 
 abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implements FileHandlerCallback {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
@@ -123,7 +124,11 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         return UserInstanceStatus.FAILED;
     }
 
-    protected String getUptime(UserInstanceStatus status) {
-        return UserInstanceStatus.RUNNING == status ? Instant.now().toString() : null;
+    protected Date getUptime(UserInstanceStatus status) {
+        return UserInstanceStatus.RUNNING == status ? Date.from(Instant.now()) : null;
+    }
+
+    protected String getTextValue(JsonNode jsonNode) {
+        return jsonNode != null ? jsonNode.textValue() : null;
     }
 }
