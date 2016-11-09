@@ -22,7 +22,6 @@
                 "iam:ListUsers",
                 "iam:PassRole",
                 "iam:ListUserPolicies",
-                "iam:UpdateUser",
                 "iam:DetachUserPolicy",
                 "iam:DeleteUserPolicy",
                 "iam:ListAttachedGroupPolicies",
@@ -44,6 +43,9 @@
                 "ec2:CreateVpcEndpoint",
                 "ec2:CreateSubnet",
                 "ec2:CreateTags",
+                "ec2:CreateImage",
+                "ec2:DeregisterImage",
+                "ec2:DescribeImages",
                 "ec2:CreateRouteTable",
                 "ec2:CreateSecurityGroup",
                 "ec2:AuthorizeSecurityGroupEgress",
@@ -62,7 +64,8 @@
                 "ec2:DescribeSubnets",
                 "ec2:DescribeVpcs",
                 "ec2:DescribeSecurityGroups",
-                "ec2:DescribeInstances"
+                "ec2:DescribeInstances",
+                "ec2:ModifyInstanceAttribute"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -89,7 +92,8 @@
             "Action": [
                 "elasticmapreduce:AddTags",
                 "elasticmapreduce:DescribeCluster",
-                "elasticmapreduce:ListClusters"
+                "elasticmapreduce:ListClusters",
+                "elasticmapreduce:RunJobFlow"
             ],
             "Effect": "Allow",
             "Resource": "*"
