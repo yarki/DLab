@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     # Get Notebook List
     notebooks = []
-    nbs_list = get_ec2_list('{}-Tag'.format(args.service_base_name), '{}-{}-nb'.forum(args.service_base_name, args.user_name))
+    nbs_list = get_ec2_list('{}-Tag'.format(args.service_base_name), '{}-{}-nb'.format(args.service_base_name, args.user_name))
     for i in nbs_list:
         notebook = {}
         notebook['Id'] = i.id
