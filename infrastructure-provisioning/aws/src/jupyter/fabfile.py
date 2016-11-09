@@ -39,6 +39,7 @@ def create_image_from_instance(instance_name='', image_name=''):
 
 # Main function for provisioning notebook server
 def run():
+    instance_class = 'notebook'
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
@@ -81,11 +82,11 @@ def run():
         logging.info('[CREATE JUPYTER NOTEBOOK INSTANCE]')
         print '[CREATE JUPYTER NOTEBOOK INSTANCE]'
         params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
-                 "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s" % \
+                 "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s --instance_class %s" % \
                  (notebook_config['instance_name'], notebook_config['ami_id'], notebook_config['instance_type'],
                   notebook_config['key_name'], get_security_group_by_name(notebook_config['security_group_name']),
                   get_subnet_by_cidr(notebook_config['subnet_cidr']), notebook_config['role_profile_name'],
-                  notebook_config['tag_name'], notebook_config['instance_name'])
+                  notebook_config['tag_name'], notebook_config['instance_name'], instance_class)
         if not run_routine('create_instance', params):
             logging.info('Failed to create instance')
             with open("/root/result.json", 'w') as result:
