@@ -30,13 +30,20 @@ export class ComputationalResourceCreateDialog {
   clusterNamePattern: string = "\\w+.*\\w+";
 
   @ViewChild('bindDialog') bindDialog;
+  @ViewChild('name') name;
+  @ViewChild('count') count;
+
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
   constructor(private userResourceService: UserResourceService) {
     this.model = ComputationalResourceCreateModel.getDefault(userResourceService);
   }
 
-  createComputationalResource_btnClick($event, name: string, count: number, shape_master: string, shape_slave: string) {
+  ngOnInit(){
+    this.bindDialog.onClosing =  () => this.resetDialog();
+  }
+
+  public createComputationalResource_btnClick($event, name: string, count: number, shape_master: string, shape_slave: string) {
     this.computationalResourceExist = false;
 
     if (this.containsComputationalResource(name)) {
@@ -50,11 +57,11 @@ export class ComputationalResourceCreateDialog {
     return false;
   }
 
-  templateSelectionChange(value) {
+  public templateSelectionChange(value) {
     this.model.setSelectedTemplate(value);
   }
 
-  containsComputationalResource(conputational_resource_name: string): boolean {
+  public containsComputationalResource(conputational_resource_name: string): boolean {
     if(conputational_resource_name)
       for (var index = 0; index < this.notebook_instance.resources.length; index++)
         if (conputational_resource_name.toLowerCase() == this.notebook_instance.resources[index].computational_name.toString().toLowerCase())
@@ -63,7 +70,7 @@ export class ComputationalResourceCreateDialog {
       return false;
   }
 
-  open(params, notebook_instance) {
+  public open(params, notebook_instance) {
     if (!this.bindDialog.isOpened) {
       this.notebook_instance = notebook_instance;
 
@@ -89,5 +96,11 @@ export class ComputationalResourceCreateDialog {
   close() {
     if (this.bindDialog.isOpened)
       this.bindDialog.close();
+  }
+
+  private resetDialog() : void {
+    this.model.resetModel();
+    this.name.nativeElement.value = "";
+    this.count.nativeElement.value = "";
   }
 }
