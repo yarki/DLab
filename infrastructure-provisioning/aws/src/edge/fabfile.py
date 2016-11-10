@@ -250,7 +250,8 @@ def run():
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
             # {"IpProtocol": "-1", "IpRanges": [{"CidrIp": get_instance_ip_address(edge_conf['instance_name']).get('Private')}], "UserIdGroupPairs": rules_list, "PrefixListIds": []},
             {"IpProtocol": "-1", "IpRanges": [{"CidrIp": get_instance_ip_address(edge_conf['instance_name']).get('Private')}], "UserIdGroupPairs": [], "PrefixListIds": []},
-            {"IpProtocol": "-1", "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}], "UserIdGroupPairs": [], "PrefixListIds": []}
+            {"IpProtocol": "-1", "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}], "UserIdGroupPairs": [], "PrefixListIds": []},
+            {"IpProtocol": "tcp", "IpRanges": [{"CidrIp": get_instance_ip_address('{}-ssn'.format(edge_conf['service_base_name'])).get('Private')}], "UserIdGroupPairs": [], "PrefixListIds": []}
         ]
         egress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []}
