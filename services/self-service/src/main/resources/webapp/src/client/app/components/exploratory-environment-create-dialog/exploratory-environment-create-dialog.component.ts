@@ -18,6 +18,7 @@ import { ExploratoryEnvironmentCreateModel } from './exploratory-environment-cre
 import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
 import { ResourceShapeModel } from '../../models/resourceShape.model';
 
+import { ErrorMapUtils } from './../../util/errorMapUtils'
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
@@ -33,6 +34,9 @@ export class ExploratoryEnvironmentCreateDialog {
   templateDescription: string;
   namePattern = "\\w+.*\\w+";
   resourceGrid: any;
+
+  processError: boolean = false;
+  errorMessage: string = '';
 
   public createExploratoryEnvironmentForm: FormGroup;
 
@@ -50,9 +54,9 @@ export class ExploratoryEnvironmentCreateDialog {
     this.model = ExploratoryEnvironmentCreateModel.getDefault(userResourceService);
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.initFormModel();
-    this.bindDialog.onClosing =  () => this.resetDialog();
+    this.bindDialog.onClosing = () => this.resetDialog();
   }
 
   initFormModel(): void {
@@ -77,7 +81,7 @@ export class ExploratoryEnvironmentCreateDialog {
   }
 
   templateSelectionChanged(value) {
-      this.model.setSelectedTemplate(value);
+    this.model.setSelectedTemplate(value);
   }
 
   open(params) {
@@ -88,7 +92,10 @@ export class ExploratoryEnvironmentCreateDialog {
           this.buildGrid.emit();
         }
       },
-        (response: Response) => console.error(response.status),
+        (response: Response) => {
+          this.processError = true;
+          this.errorMessage = ErrorMapUtils.setErrorMessage(response);
+        },
         () => {
           this.templateDescription = this.model.selectedItem.description;
         },
@@ -104,9 +111,11 @@ export class ExploratoryEnvironmentCreateDialog {
       this.bindDialog.close();
   }
 
-  private resetDialog() : void {
+  private resetDialog(): void {
     this.notebookExist = false;
     this.checkValidity = false;
+    this.processError = false;
+    this.errorMessage = '';
 
     this.initFormModel();
     this.model.resetModel();
