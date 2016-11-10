@@ -26,7 +26,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class IsoDateDeSerializer extends JsonDeserializer {
+public class IsoDateDeSerializer extends JsonDeserializer<Date> {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsoDateDeSerializer.class);
 
     @Override
