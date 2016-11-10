@@ -12,10 +12,12 @@
 
 package com.epam.dlab.backendapi.dao;
 
+import com.epam.dlab.backendapi.dao.databind.IsoDateModule;
 import com.epam.dlab.client.mongo.MongoService;
 import com.epam.dlab.exceptions.DlabException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -27,7 +29,9 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 class BaseDAO implements MongoCollections {
-    protected static final ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+    protected static final ObjectMapper MAPPER = new ObjectMapper()
+            .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true)
+            .registerModule(new IsoDateModule());
     public static final String FIELD_DELIMETER = ".";
     public static final String FIELD_SET_DELIMETER = ".$.";
     public static final String ID = "_id";
