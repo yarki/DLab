@@ -70,7 +70,6 @@ export class ComputationalResourceCreateDialog {
 
     this.model.setCreatingParams(data.cluster_alias_name, data.instance_number, shape_master, shape_slave);
     this.model.confirmAction();
-    this.checkValidity = false;
     $event.preventDefault();
     return false;
   }
@@ -117,6 +116,9 @@ export class ComputationalResourceCreateDialog {
   }
 
   private resetDialog() : void {
+    this.computationalResourceExist = false;
+    this.checkValidity = false;
+
     this.initFormModel();
     this.model.resetModel();
   }

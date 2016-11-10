@@ -72,7 +72,6 @@ export class ExploratoryEnvironmentCreateDialog {
 
     this.model.setCreatingParams(this.model.exploratoryEnvironmentTemplates[index].version, data.environment_name, shape);
     this.model.confirmAction();
-    this.checkValidity = false;
     $event.preventDefault();
     return false;
   }
@@ -105,7 +104,10 @@ export class ExploratoryEnvironmentCreateDialog {
       this.bindDialog.close();
   }
 
-  private resetDialog() : void{
+  private resetDialog() : void {
+    this.notebookExist = false;
+    this.checkValidity = false;
+
     this.initFormModel();
     this.model.resetModel();
   }
