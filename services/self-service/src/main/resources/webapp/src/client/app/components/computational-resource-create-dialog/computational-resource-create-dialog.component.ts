@@ -15,6 +15,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Response } from "@angular/http";
 import { UserResourceService } from "../../services/userResource.service";
 import { ComputationalResourceCreateModel } from "./computational-resource-create.model";
+
+import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
@@ -31,6 +33,9 @@ export class ComputationalResourceCreateDialog {
   checkValidity: boolean = false;
   clusterNamePattern: string = "\\w+.*\\w+";
   nodeCountPattern: string = "^[1-9]\\d*$";
+
+  processError: boolean = false;
+  errorMessage: string = '';
 
   public createComputationalResourceForm: FormGroup;
 
@@ -98,7 +103,10 @@ export class ComputationalResourceCreateDialog {
           this.buildGrid.emit();
         }
       },
-        (response: Response) => console.error(response.status),
+        (response: Response) => {
+          this.processError = true;
+          this.errorMessage = ErrorMapUtils.setErrorMessage(response);
+        },
         () => {
           // this.templateDescription = this.model.selectedItem.description;
         },
@@ -118,6 +126,8 @@ export class ComputationalResourceCreateDialog {
   private resetDialog() : void {
     this.computationalResourceExist = false;
     this.checkValidity = false;
+    this.processError = false;
+    this.errorMessage = '';
 
     this.initFormModel();
     this.model.resetModel();

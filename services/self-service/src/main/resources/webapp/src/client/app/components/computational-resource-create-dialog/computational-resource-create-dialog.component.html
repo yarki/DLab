@@ -58,6 +58,9 @@
           </select>
         </div>
       </div>
+      <div class="text-right" *ngIf="processError">
+        <small class="danger_color">{{errorMessage}}</small>
+      </div>
       <div class="text-right">
         <button type="button" (click)="bindDialog.close()" class="btn btn-default">Cancel</button>
         <button type="submit" [disabled]="!createComputationalResourceForm.valid" class="btn btn-success">Create</button>

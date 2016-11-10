@@ -15,6 +15,8 @@ import { Response } from "@angular/http";
 
 import { KeyUploadDialogModel } from './key-upload.model';
 import {UserAccessKeyService} from "../../services/userAccessKey.service";
+
+import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
@@ -25,12 +27,19 @@ import HTTP_STATUS_CODES from 'http-status-enum';
 
 export class UploadKeyDialog {
   model: KeyUploadDialogModel;
+  processError: boolean = false;
+  errorMessage: string = '';
 
   @ViewChild('bindDialog') bindDialog;
   @ViewChild('userAccessKeyUploadControl') userAccessKeyUploadControl;
   @Output() checkInfrastructureCreationProgress: EventEmitter<{}> = new EventEmitter();
+
   constructor(private userAccessKeyService : UserAccessKeyService) {
     this.model = KeyUploadDialogModel.getDefault();
+  }
+
+  ngOnInit(){
+    this.bindDialog.onClosing = () => this.resetDialog();
   }
 
   uploadUserAccessKey_onChange($event) {
@@ -54,7 +63,10 @@ export class UploadKeyDialog {
             this.checkInfrastructureCreationProgress.emit();
           }
         },
-        (response: Response) => console.error(response.status),
+        (response: Response) => {
+          this.processError = true;
+          this.errorMessage = ErrorMapUtils.setErrorMessage(response);
+        },
         this.userAccessKeyService);
 
       this.bindDialog.open(params);
@@ -62,8 +74,14 @@ export class UploadKeyDialog {
   }
 
   close() {
-    this.userAccessKeyUploadControl.nativeElement.value = "";
     if(this.bindDialog.isOpened)
       this.bindDialog.close();
+  }
+
+  private resetDialog() : void {
+    this.userAccessKeyUploadControl.nativeElement.value = "";
+
+    this.processError = false;
+    this.errorMessage = '';
   }
 }

@@ -15,39 +15,55 @@ import { UserResourceService } from "./../../services/userResource.service";
 import {ConfirmationDialogModel} from "./confirmation-dialog.model";
 import {ConfirmationDialogType} from "./confirmation-dialog-type.enum";
 import {Response} from "@angular/http";
+
+import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
- @Component({
-   moduleId: module.id,
-   selector: 'confirmation-dialog',
-   templateUrl: 'confirmation-dialog.component.html'
- })
+@Component({
+  moduleId: module.id,
+  selector: 'confirmation-dialog',
+  templateUrl: 'confirmation-dialog.component.html'
+})
 
- export class confirmationDialog {
-   model : ConfirmationDialogModel;
+export class confirmationDialog {
+  model: ConfirmationDialogModel;
 
-   @ViewChild('bindDialog') bindDialog;
-   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
-   constructor(
-    private userResourceService: UserResourceService
-    ) {
-     this.model = ConfirmationDialogModel.getDefault();
-   }
+  processError: boolean = false;
+  errorMessage: string = '';
 
-   open(param, notebook: any, type : ConfirmationDialogType) {
-     this.model = new ConfirmationDialogModel(type, notebook, (response: Response) => {
-       if(response.status === HTTP_STATUS_CODES.OK)
-       {
-         this.close();
-         this.buildGrid.emit();
-       }
-     },
-       (response : Response) => console.error(response.status),
-       this.userResourceService);
+  @ViewChild('bindDialog') bindDialog;
+  @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
-     this.bindDialog.open(param);
-   }
-   close() {
-     this.bindDialog.close();
-   }
- }
+  constructor(private userResourceService: UserResourceService) {
+    this.model = ConfirmationDialogModel.getDefault();
+  }
+
+  ngOnInit() {
+    this.bindDialog.onClosing = () => this.resetDialog();
+  }
+
+  public open(param, notebook: any, type: ConfirmationDialogType) {
+    this.model = new ConfirmationDialogModel(type, notebook, (response: Response) => {
+      if (response.status === HTTP_STATUS_CODES.OK) {
+        this.close();
+        this.buildGrid.emit();
+      }
+    },
+      (response: Response) => {
+        this.processError = true;
+        this.errorMessage = ErrorMapUtils.setErrorMessage(response);
+      },
+      this.userResourceService);
+
+    this.bindDialog.open(param);
+  }
+
+  public close() {
+    this.bindDialog.close();
+  }
+
+  private resetDialog(): void {
+    this.processError = false;
+    this.errorMessage = '';
+  }
+}

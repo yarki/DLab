@@ -15,6 +15,8 @@ import { Response } from "@angular/http";
 import { UserResourceService } from "../../services/userResource.service";
 import { ComputationalResourcesModel } from "./confirmation-computational-resources.model";
 
+import { ErrorMapUtils } from './../../util/errorMapUtils';
+
  @Component({
    moduleId: module.id,
    selector: 'confirmation-computational-resources',
@@ -23,18 +25,30 @@ import { ComputationalResourcesModel } from "./confirmation-computational-resour
 
  export class ConfirmationComputationalResources {
    model : ComputationalResourcesModel;
+   processError: boolean = false;
+   errorMessage: string = '';
+
    @ViewChild('bindDialog') bindDialog;
+
    constructor(
      private userResourceService: UserResourceService
     ) { }
+
+    ngOnInit() {
+      this.bindDialog.onClosing = () => this.resetDialog();
+    }
 
    open(option, notebook, resource) {
      this.model = new ComputationalResourcesModel(notebook, resource,
        (response: Response) => {
          this.close();
      },
-     (response : Response) => console.error(response.status),
+     (response : Response) => {
+       this.processError = true;
+       this.errorMessage = ErrorMapUtils.setErrorMessage(response);
+     },
      this.userResourceService);
+
      if(!this.bindDialog.isOpened){
        this.bindDialog.open(option);
      }
@@ -45,4 +59,8 @@ import { ComputationalResourcesModel } from "./confirmation-computational-resour
       this.bindDialog.close();
    }
 
+   private resetDialog() : void {
+     this.processError = false;
+     this.errorMessage = '';
+   }
  }

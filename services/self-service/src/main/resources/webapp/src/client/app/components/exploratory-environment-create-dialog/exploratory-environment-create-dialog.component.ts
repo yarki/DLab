@@ -18,7 +18,7 @@ import { ExploratoryEnvironmentCreateModel } from './exploratory-environment-cre
 import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
 import { ResourceShapeModel } from '../../models/resourceShape.model';
 
-import { ErrorMapUtils } from './../../util/errorMapUtils'
+import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
