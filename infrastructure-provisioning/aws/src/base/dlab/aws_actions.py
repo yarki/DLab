@@ -125,7 +125,7 @@ def create_instance(definitions, instance_tag):
                                                      "DeviceName": "/dev/sda1",
                                                      "Ebs":
                                                          {
-                                                             "VolumeSize": definitions.instance_disk_size
+                                                             "VolumeSize": int(definitions.instance_disk_size)
                                                          }
                                                  }],
                                              KeyName=definitions.key_name,
