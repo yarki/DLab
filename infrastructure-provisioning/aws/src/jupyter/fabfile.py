@@ -99,7 +99,7 @@ def run():
 
     # generating variables regarding EDGE proxy on Notebook instance
     instance_hostname = get_instance_hostname(notebook_config['instance_name'])
-    edge_instance_name = os.environ['conf_service_base_name'] + "-" + os.environ['notebook_user_name'] + '-edge'
+    edge_instance_name = os.environ['conf_service_base_name'] + "-" + os.environ['creds_region'] + '-edge'
     edge_instance_hostname = get_instance_hostname(edge_instance_name)
     keyfile_name = "/root/keys/%s.pem" % os.environ['creds_key_name']
 
