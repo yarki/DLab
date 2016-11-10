@@ -22,6 +22,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--user_name', type=str)
 parser.add_argument('--tag_name', type=str)
 parser.add_argument('--tag_value', type=str)
+parser.add_argument('--nb_sg', type=str)
+parser.add_argument('--edge_sg', type=str)
 args = parser.parse_args()
 
 
@@ -73,7 +75,8 @@ if __name__ == "__main__":
 
     print "Removing security groups"
     try:
-        remove_sgroups(args.tag_value)
+        remove_sgroups(args.nb_sg)
+        remove_sgroups(args.edge_sg)
     except:
         sys.exit(1)
 

@@ -442,15 +442,16 @@ def terminate():
     edge_conf = dict()
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['user_name'] = os.environ['edge_user_name']
-    edge_conf['edge_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
     edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
     edge_conf['tag_value'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '*'
+    edge_conf['edge_sg'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
+    edge_conf['nb_sg'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb'
 
     try:
         logging.info('[TERMINATE EDGE]')
         print '[TERMINATE EDGE]'
-        params = "--user_name %s --tag_name %s --tag_value %s" % \
-                 (edge_conf['user_name'], edge_conf['tag_name'], edge_conf['tag_value'])
+        params = "--user_name %s --tag_name %s --tag_value %s --edge_sg %s --nb_sg %s" % \
+                 (edge_conf['user_name'], edge_conf['tag_name'], edge_conf['tag_value'], edge_conf['edge_sg'], edge_conf['nb_sg'])
         if not run_routine('terminate_edge', params):
             logging.info('Failed to terminate edge')
             with open("/root/result.json", 'w') as result:
@@ -463,8 +464,7 @@ def terminate():
 
     try:
         with open("/root/result.json", 'w') as result:
-            res = {"edge_name": edge_conf['edge_name'],
-                   "service_base_name": edge_conf['service_base_name'],
+            res = {"service_base_name": edge_conf['service_base_name'],
                    "user_name": edge_conf['user_name'],
                    "Action": "Terminate edge node"}
             print json.dumps(res)
