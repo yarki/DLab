@@ -10,31 +10,17 @@
 
  *****************************************************************************************************/
 
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { Modal } from './../modal/modal.component';
-import {DateUtils} from './../../util/dateUtils'
+package com.epam.dlab.backendapi.dao.databind;
 
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
- @Component({
-   moduleId: module.id,
-   selector: 'detail-dialog',
-   templateUrl: 'detail-dialog.component.html'
- })
+import java.util.Date;
 
- export class DetailDialog {
-   notebook: any;
-   upTimeInHours: number;
-   upTimeSince: string = "";
-   @ViewChild('bindDialog') bindDialog;
+public class IsoDateModule extends SimpleModule {
 
- 	open(param, notebook) {
-    this.notebook = notebook;
-
-    if(notebook.time) {
-      this.upTimeInHours = DateUtils.diffBetweenDatesInHours(this.notebook.time);
-      this.upTimeSince = new Date(this.notebook.time).toString();
+    public IsoDateModule() {
+        super();
+        addDeserializer(Date.class, new IsoDateDeSerializer());
     }
 
-    this.bindDialog.open(param);
-   }
- }
+}

@@ -190,7 +190,7 @@ def get_ec2_list(tag_name, value=''):
     if value:
         notebook_instances = ec2.instances.filter(
             Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
-                     {'Name': 'tag:{}'.format(tag_name), 'Values': [value]}])
+                     {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}*'.format(value)]}])
     else:
         notebook_instances = ec2.instances.filter(
             Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped']},
@@ -198,10 +198,13 @@ def get_ec2_list(tag_name, value=''):
     return notebook_instances
 
 
-def provide_index(resource_type, tag_name):
+def provide_index(resource_type, tag_name, tag_value=''):
     ids = []
     if resource_type == 'EMR':
-        list = get_emr_list(tag_name, 'Key', True)
+        if tag_value:
+            list = get_emr_list(tag_value, 'Value', True)
+        else:
+            list = get_emr_list(tag_name, 'Key', True)
         emr = boto3.client('emr')
         for i in list:
             response = emr.describe_cluster(ClusterId=i)
@@ -209,7 +212,10 @@ def provide_index(resource_type, tag_name):
             if number not in ids:
                 ids.append(int(number))
     elif resource_type == 'EC2':
-        list = get_ec2_list(tag_name)
+        if tag_value:
+            list = get_ec2_list(tag_name, tag_value)
+        else:
+            list = get_ec2_list(tag_name)
         for i in list:
             for tag in i.tags:
                 if tag['Key'] == 'Name':
