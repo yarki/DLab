@@ -31,6 +31,7 @@ parser.add_argument('--infra_tag_name', type=str, default='BDCC-DSA-test-infra')
 parser.add_argument('--infra_tag_value', type=str, default='tmp')
 parser.add_argument('--user_data_file', type=str, default='')
 parser.add_argument('--instance_class', type=str, default='')
+parser.add_argument('--instance_disk_size', type=str, default='')
 args = parser.parse_args()
 
 
