@@ -145,7 +145,7 @@ def run():
                              "backend_hostname": get_instance_hostname(notebook_config['instance_name']),
                              "backend_port": "8888",
                              "nginx_template_dir": "/root/templates/"}
-        params = "--hostname %s --instance_name %s --keyfile %s --region % --additional_config '%s'" % \
+        params = "--hostname %s --instance_name %s --keyfile %s --region %s --additional_config '%s'" % \
                  (instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['notebook_user_name'], json.dumps(additional_config))
         if not run_routine('configure_jupyter_node', params):
             logging.info('Failed to configure jupiter')
