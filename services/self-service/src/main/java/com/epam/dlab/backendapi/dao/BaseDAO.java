@@ -12,6 +12,7 @@
 
 package com.epam.dlab.backendapi.dao;
 
+import com.epam.dlab.backendapi.dao.databind.IsoDateModule;
 import com.epam.dlab.client.mongo.MongoService;
 import com.epam.dlab.exceptions.DlabException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -30,8 +31,7 @@ import java.util.function.Supplier;
 class BaseDAO implements MongoCollections {
     protected static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true)
-            .registerModule(new JodaModule())
-            .configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS , false);
+            .registerModule(new IsoDateModule());
     public static final String FIELD_DELIMETER = ".";
     public static final String FIELD_SET_DELIMETER = ".$.";
     public static final String ID = "_id";

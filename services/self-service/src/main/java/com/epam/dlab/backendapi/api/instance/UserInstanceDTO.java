@@ -14,7 +14,6 @@ package com.epam.dlab.backendapi.api.instance;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,7 +36,7 @@ public class UserInstanceDTO {
     @JsonProperty("exploratory_url")
     private String url;
     @JsonProperty("up_time")
-    private DateTime uptime;
+    private Date uptime;
     @JsonProperty("computational_resources")
     private List<UserComputationalResourceDTO> resources = new ArrayList<>();
 
@@ -123,15 +122,15 @@ public class UserInstanceDTO {
         return this;
     }
 
-    public DateTime getUptime() {
+    public Date getUptime() {
         return uptime;
     }
 
-    public void setUptime(DateTime uptime) {
+    public void setUptime(Date uptime) {
         this.uptime = uptime;
     }
 
-    public UserInstanceDTO withUptime(DateTime uptime) {
+    public UserInstanceDTO withUptime(Date uptime) {
         setUptime(uptime);
         return this;
     }
