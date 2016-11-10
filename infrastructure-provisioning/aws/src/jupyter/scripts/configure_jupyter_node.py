@@ -37,6 +37,16 @@ s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 
 
+def prepare_disk():
+    try:
+        sudo('''bash -c 'echo -e "o\nn\np\n1\n\n\nw" | fdisk /dev/xvdb' ''')
+        sudo('mkfs.ext4 /dev/xvdb1')
+        sudo('mount /dev/xvdb1 /opt/')
+        sudo(''' bash -c "echo '/dev/xvdb1 /opt/ ext4 errors=remount-ro 0 1' >> /etc/fstab" ''')
+    except:
+        sys.exit(1)
+
+
 def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
@@ -149,4 +159,5 @@ if __name__ == "__main__":
             sudo('mkdir /home/ubuntu/.ensure_dir')
     except:
         sys.exit(1)
+    prepare_disk()
     configure_notebook_server("_".join(args.instance_name.split()))
