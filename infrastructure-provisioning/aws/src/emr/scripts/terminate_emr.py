@@ -35,7 +35,7 @@ args = parser.parse_args()
 if __name__ == "__main__":
     print 'Terminating EMR cluster and cleaning EMR config from S3 bucket'
     try:
-        clusters_list = get_emr_list(args.nb_tag_value, 'Value')
+        clusters_list = get_emr_list(args.emr_name, 'Value')
         if clusters_list:
             for cluster_id in clusters_list:
                 client = boto3.client('emr')

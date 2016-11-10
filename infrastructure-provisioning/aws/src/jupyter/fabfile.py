@@ -82,11 +82,11 @@ def run():
         logging.info('[CREATE JUPYTER NOTEBOOK INSTANCE]')
         print '[CREATE JUPYTER NOTEBOOK INSTANCE]'
         params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
-                 "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s --instance_class %s" % \
+                 "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s --instance_class %s --instance_disk_size %s" % \
                  (notebook_config['instance_name'], notebook_config['ami_id'], notebook_config['instance_type'],
                   notebook_config['key_name'], get_security_group_by_name(notebook_config['security_group_name']),
                   get_subnet_by_cidr(notebook_config['subnet_cidr']), notebook_config['role_profile_name'],
-                  notebook_config['tag_name'], notebook_config['instance_name'], instance_class)
+                  notebook_config['tag_name'], notebook_config['instance_name'], instance_class, os.environ['notebook_disk_size'])
         if not run_routine('create_instance', params):
             logging.info('Failed to create instance')
             with open("/root/result.json", 'w') as result:
@@ -145,8 +145,8 @@ def run():
                              "backend_hostname": get_instance_hostname(notebook_config['instance_name']),
                              "backend_port": "8888",
                              "nginx_template_dir": "/root/templates/"}
-        params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" % \
-                 (instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
+        params = "--hostname %s --instance_name %s --keyfile %s --region %s --additional_config '%s'" % \
+                 (instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['creds_region'], json.dumps(additional_config))
         if not run_routine('configure_jupyter_node', params):
             logging.info('Failed to configure jupiter')
             with open("/root/result.json", 'w') as result:
