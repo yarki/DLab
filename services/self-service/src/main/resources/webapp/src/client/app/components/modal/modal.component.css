@@ -179,6 +179,7 @@ modal-content {
 }
 .detail-header {
   width: 100%;
+  table-layout: fixed;
 }
 .detail-header td {
   border: 1px solid #edf1f5;
@@ -190,6 +191,8 @@ modal-content {
   font-size: 16px;
   font-weight: 600;
   color: #455c74;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .tunnel_instruction:before {
   content: "?";
@@ -208,12 +211,13 @@ modal-content {
 .detail-info span {
   font-size: 14px;
   color: #9cadbe;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 .detail-info p {
   font-weight: 600;
-}
-.detail-info p:last-child {
-  margin-bottom: 0;
+  margin-bottom: 10px;
 }
 .detail-info p small {
   font-size: 12px;

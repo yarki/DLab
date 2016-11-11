@@ -18,12 +18,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   color: #333;
   cursor: pointer;
   text-decoration: none;
-  width: auto;
-  display: inline-block;
+  display: block;
   white-space: nowrap;
   overflow: hidden;
   vertical-align: middle;
   text-overflow: ellipsis;
+  margin-left: 20px;
+}
+.resource_wrap {
+  display: block;
+  float: none;
+  margin-right: 170px;
 }
 .source {
   line-height: 30px;
@@ -36,6 +41,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   vertical-align: middle;
   cursor: pointer;
   text-decoration: none;
+  float: left;
 }
 .source .remove_butt.disabled {
   color: #f5d3d3;
@@ -49,8 +55,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   cursor: pointer;
 }
 .emt_status {
-  float: right;
   margin-right: 30px;
   width: 100px;
   text-transform: capitalize;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
+
