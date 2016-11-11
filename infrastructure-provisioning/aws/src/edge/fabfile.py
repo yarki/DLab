@@ -67,7 +67,7 @@ def run():
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['key_name'] = os.environ['creds_key_name']
     edge_conf['user_keyname'] = os.environ['edge_user_name']
-    edge_conf['policy_arn'] = os.environ['conf_policy_arn']
+    edge_conf['policy_arn'] = os.environ['edge_notebook_policy_arn']
     edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
     # edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
     edge_conf['vpc_id'] = os.environ['edge_vpc_id']
@@ -94,7 +94,6 @@ def run():
     edge_conf['notebook_role_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Role'
     edge_conf['notebook_policy_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Policy'
     edge_conf['notebook_role_profile_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Profile'
-    edge_conf['notebook_policy_arn'] = os.environ['edge_notebook_policy_arn']
     edge_conf['notebook_security_group_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-SG'
     edge_conf['notebook_security_group_rules'] = [{"IpProtocol": "-1",
                                                    "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
@@ -151,7 +150,7 @@ def run():
         print '[CREATE BACKEND (NOTEBOOK) ROLES]'
         params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
                  (edge_conf['notebook_role_name'], edge_conf['notebook_role_profile_name'],
-                  edge_conf['notebook_policy_name'], edge_conf['notebook_policy_arn'])
+                  edge_conf['notebook_policy_name'], edge_conf['policy_arn'])
         if not run_routine('create_role_policy', params):
             logging.info('Failed creating roles')
             with open("/root/result.json", 'w') as result:
