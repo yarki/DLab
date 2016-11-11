@@ -101,13 +101,11 @@ def run():
                                                    "UserIdGroupPairs": [],
                                                    "PrefixListIds": []}]
 
-
     # FUSE in case of absence of user's key
     fname = "/root/keys/{}.pub".format(edge_conf['user_keyname'])
     if not os.path.isfile(fname):
         print "USERs PUBLIC KEY DOES NOT EXIST in {}".format(fname)
         sys.exit(1)
-
 
     print "Will create exploratory environment with edge node as access point as following: " + \
           json.dumps(edge_conf, sort_keys=True, indent=4, separators=(',', ': '))
@@ -257,10 +255,10 @@ def run():
         sys.exit(1)
 
     try:
-        logging.info('[CREATING BUCKET POLICY FOR CURRENT USER]')
-        print('[CREATING BUCKET POLICY FOR CURRENT USER]')
-        params = '--bucket_name {} --iam_user "{}" --service_base_name {}'.format(
-            edge_conf['bucket_name'], os.environ['creds_iam_user'], edge_conf['service_base_name'])
+        logging.info('[CREATING BUCKET POLICY FOR USER INSTANCES]')
+        print('[CREATING BUCKET POLICY FOR USER INSTANCES]')
+        params = '--bucket_name {} --username {} --edge_role_name {} --notebook_role_name {} --service_base_name {}'.format(
+            edge_conf['bucket_name'], os.environ['edge_user_name'], edge_conf['role_name'], edge_conf['notebook_role_name'],  edge_conf['service_base_name'])
         if not run_routine('create_policy', params):
             logging.info('Failed creating bucket policy')
             with open("/root/result.json", 'w') as result:
