@@ -36,14 +36,6 @@ public class LoginConveyor extends KBalancedParallelConveyor<String,LoginStep,Us
         this.setScrapConsumer(bin->{
             LOG.error("UserInfo Build Failed: {}",bin);
         });
-        this.setBalancingCartAlgorithm(cart->{
-            int index = Math.abs(cart.getKey().hashCode() % pf);
-            return this.conveyors.subList(index, index+1);
-        });
-        this.setBalancingCommandAlgorithm(command->{
-            int index = Math.abs(command.getKey().hashCode() % pf);
-            return this.conveyors.subList(index, index+1);
-        });
     }
 
     public void setUserInfoDao(UserInfoDAO userInfoDao) {

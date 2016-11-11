@@ -77,7 +77,7 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
         b.readinessStatus |= ROLE_SET;
     }
 
-    public static void mergeUserInfo(UserInfoBuilder b, UserInfo ui) {
+    public static void ldapUserInfo(UserInfoBuilder b, UserInfo ui) {
         LOG.debug("merge user info{}",ui);
         UserInfoBuilder.firstName(b,ui.getFirstName());
         UserInfoBuilder.lastName(b,ui.getLastName());
