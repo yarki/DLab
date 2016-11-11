@@ -10,41 +10,17 @@
 
  *****************************************************************************************************/
 
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { Response } from "@angular/http";
-import { UserResourceService } from "../../services/userResource.service";
-import { ComputationalResourcesModel } from "./confirmation-computational-resources.model";
+package com.epam.dlab.backendapi.dao.databind;
 
- @Component({
-   moduleId: module.id,
-   selector: 'confirmation-computational-resources',
-   templateUrl: 'confirmation-computational-resources.component.html'
- })
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
- export class ConfirmationComputationalResources {
-   model : ComputationalResourcesModel;
+import java.util.Date;
 
-   @ViewChild('bindDialog') bindDialog;
-   @Output() rebuildGrid: EventEmitter<{}> = new EventEmitter();
+public class IsoDateModule extends SimpleModule {
 
-   constructor(private userResourceService: UserResourceService) { }
+    public IsoDateModule() {
+        super();
+        addDeserializer(Date.class, new IsoDateDeSerializer());
+    }
 
-   public open(option, notebook, resource) {
-     this.model = new ComputationalResourcesModel(notebook, resource,
-       (response: Response) => {
-         this.close();
-         this.rebuildGrid.emit();
-     },
-     (response : Response) => console.error(response.status),
-     this.userResourceService);
-     
-     if(!this.bindDialog.isOpened) {
-       this.bindDialog.open(option);
-     }
-   }
-
-   public close() {
-     if(this.bindDialog.isOpened)
-      this.bindDialog.close();
-   }
- }
+}

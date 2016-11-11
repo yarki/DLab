@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,7 +36,7 @@ public class UserInstanceDTO {
     @JsonProperty("exploratory_url")
     private String url;
     @JsonProperty("up_time")
-    private String uptime;
+    private Date uptime;
     @JsonProperty("computational_resources")
     private List<UserComputationalResourceDTO> resources = new ArrayList<>();
 
@@ -121,15 +122,15 @@ public class UserInstanceDTO {
         return this;
     }
 
-    public String getUptime() {
+    public Date getUptime() {
         return uptime;
     }
 
-    public void setUptime(String uptime) {
+    public void setUptime(Date uptime) {
         this.uptime = uptime;
     }
 
-    public UserInstanceDTO withUptime(String uptime) {
+    public UserInstanceDTO withUptime(Date uptime) {
         setUptime(uptime);
         return this;
     }

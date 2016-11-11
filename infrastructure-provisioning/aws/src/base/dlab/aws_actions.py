@@ -120,13 +120,30 @@ def create_instance(definitions, instance_tag):
                 f.close()
             except:
                 print("Error reading user-data file")
-        instances = ec2.create_instances(ImageId=definitions.ami_id, MinCount=1, MaxCount=1,
-                                         KeyName=definitions.key_name,
-                                         SecurityGroupIds=security_groups_ids,
-                                         InstanceType=definitions.instance_type,
-                                         SubnetId=definitions.subnet_id,
-                                         IamInstanceProfile={'Name': definitions.iam_profile},
-                                         UserData=user_data)
+        if definitions.instance_class == 'notebook':
+            instances = ec2.create_instances(ImageId=definitions.ami_id, MinCount=1, MaxCount=1,
+                                             BlockDeviceMappings=[
+                                                 {
+                                                     "DeviceName": "/dev/sdb",
+                                                     "Ebs":
+                                                         {
+                                                             "VolumeSize": int(definitions.instance_disk_size)
+                                                         }
+                                                 }],
+                                             KeyName=definitions.key_name,
+                                             SecurityGroupIds=security_groups_ids,
+                                             InstanceType=definitions.instance_type,
+                                             SubnetId=definitions.subnet_id,
+                                             IamInstanceProfile={'Name': definitions.iam_profile},
+                                             UserData=user_data)
+        else:
+            instances = ec2.create_instances(ImageId=definitions.ami_id, MinCount=1, MaxCount=1,
+                                             KeyName=definitions.key_name,
+                                             SecurityGroupIds=security_groups_ids,
+                                             InstanceType=definitions.instance_type,
+                                             SubnetId=definitions.subnet_id,
+                                             IamInstanceProfile={'Name': definitions.iam_profile},
+                                             UserData=user_data)
         for instance in instances:
             print "Waiting for instance " + instance.id + " become running."
             instance.wait_until_running()
