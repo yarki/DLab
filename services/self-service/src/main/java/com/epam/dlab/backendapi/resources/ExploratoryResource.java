@@ -26,6 +26,7 @@ import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStopDTO;
+import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.registry.ApiCallbacks;
 import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
@@ -61,21 +62,26 @@ public class ExploratoryResource implements ExploratoryAPI {
         boolean isAdded = infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
                 .withExploratoryName(formDTO.getName())
-                .withStatus(CREATING.getStatus())
+                .withStatus(CREATING.toString())
                 .withShape(formDTO.getShape()));
         if (isAdded) {
-            ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
-                    .withServiceBaseName(settingsDAO.getServiceBaseName())
-                    .withExploratoryName(formDTO.getName())
-                    .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                    .withIamUserName(userInfo.getName())
-                    .withNotebookInstanceType(formDTO.getShape())
-                    .withRegion(settingsDAO.getAwsRegion())
-                    .withSecurityGroupIds(settingsDAO.getSecurityGroups());
-            LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
-            return Response
-                    .ok(provisioningService.post(EXPLORATORY_CREATE, dto, String.class))
-                    .build();
+            try {
+                ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
+                        .withServiceBaseName(settingsDAO.getServiceBaseName())
+                        .withExploratoryName(formDTO.getName())
+                        .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                        .withIamUserName(userInfo.getName())
+                        .withNotebookInstanceType(formDTO.getShape())
+                        .withRegion(settingsDAO.getAwsRegion())
+                        .withSecurityGroupIds(settingsDAO.getSecurityGroups());
+                LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
+                return Response
+                        .ok(provisioningService.post(EXPLORATORY_CREATE, dto, String.class))
+                        .build();
+            } catch (Throwable t) {
+                infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo.getName(), formDTO.getName(), FAILED));
+                throw new DlabException("Could not create exploratory environment " + formDTO.getName(), t);
+            }
         } else {
             LOGGER.debug("used existing exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
             return Response.status(Response.Status.FOUND).build();
@@ -85,20 +91,15 @@ public class ExploratoryResource implements ExploratoryAPI {
     @POST
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(ExploratoryStatusDTO dto) {
-        String currentStatus = infrastructureProvisionDAO.fetchExploratoryStatus(dto.getUser(), dto.getExploratoryName());
+        UserInstanceStatus currentStatus = infrastructureProvisionDAO.fetchExploratoryStatus(dto.getUser(), dto.getExploratoryName());
         LOGGER.debug("updating status for exploratory environment {} for user {}: was {}, now {}", dto.getExploratoryName(), dto.getUser(), currentStatus, dto.getStatus());
         infrastructureProvisionDAO.updateExploratoryFields(dto);
-        if (TERMINATING.getStatus().equals(currentStatus)) {
-            updateComputationalStatuses(dto);
-        } else if (STOPPING.getStatus().equals(currentStatus)) {
-            updateComputationalStatuses(createStatusDTO(dto.getUser(), dto.getExploratoryName(), TERMINATED));
+        if (currentStatus == TERMINATING) {
+            updateComputationalStatuses(dto.getUser(), dto.getExploratoryName(), UserInstanceStatus.of(dto.getStatus()));
+        } else if (currentStatus == STOPPING) {
+            updateComputationalStatuses(dto.getUser(), dto.getExploratoryName(), TERMINATED);
         }
         return Response.ok().build();
-    }
-
-    private void updateComputationalStatuses(StatusBaseDTO status) {
-        LOGGER.debug("updating status for all computational resources of {} for user {}: {}", status.getExploratoryName(), status.getUser(), status.getStatus());
-        infrastructureProvisionDAO.updateComputationalStatusesForExploratory(status);
     }
 
     @POST
@@ -112,19 +113,24 @@ public class ExploratoryResource implements ExploratoryAPI {
     public String stop(@Auth UserInfo userInfo, @PathParam("name") String name) {
         LOGGER.debug("stopping exploratory environment {} for user {}", name, userInfo.getName());
         UserInstanceStatus status = STOPPING;
-        infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo.getName(), name, status));
-        updateComputationalStatuses(createStatusDTO(userInfo.getName(), name, status));
-        String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
-        ExploratoryStopDTO dto = new ExploratoryStopDTO()
-                .withServiceBaseName(settingsDAO.getServiceBaseName())
-                .withExploratoryName(name)
-                .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                .withIamUserName(userInfo.getName())
-                .withNotebookInstanceName(exploratoryId)
-                .withKeyDir(settingsDAO.getCredsKeyDir())
-                .withSshUser(settingsDAO.getExploratorySshUser())
-                .withRegion(settingsDAO.getAwsRegion());
-        return provisioningService.post(EXPLORATORY_STOP, dto, String.class);
+        updateExploratoryStatus(userInfo.getName(), name, status);
+        updateComputationalStatuses(userInfo.getName(), name, status);
+        try {
+            String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
+            ExploratoryStopDTO dto = new ExploratoryStopDTO()
+                    .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withExploratoryName(name)
+                    .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                    .withIamUserName(userInfo.getName())
+                    .withNotebookInstanceName(exploratoryId)
+                    .withKeyDir(settingsDAO.getCredsKeyDir())
+                    .withSshUser(settingsDAO.getExploratorySshUser())
+                    .withRegion(settingsDAO.getAwsRegion());
+            return provisioningService.post(EXPLORATORY_STOP, dto, String.class);
+        } catch (Throwable t) {
+            updateExploratoryStatus(userInfo.getName(), name, FAILED);
+            throw new DlabException("Could not stop exploratory environment " + name, t);
+        }
     }
 
     @DELETE
@@ -132,28 +138,44 @@ public class ExploratoryResource implements ExploratoryAPI {
     public String terminate(@Auth UserInfo userInfo, @PathParam("name") String name) {
         LOGGER.debug("terminating exploratory environment {} for user {}", name, userInfo.getName());
         UserInstanceStatus status = TERMINATING;
-        updateComputationalStatuses(createStatusDTO(userInfo.getName(), name, status));
+        updateExploratoryStatus(userInfo.getName(), name, status);
         return action(userInfo, name, EXPLORATORY_TERMINATE, status);
     }
 
     private String action(UserInfo userInfo, String name, String action, UserInstanceStatus status) {
-        infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo.getName(), name, status));
-        String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
-        ExploratoryActionDTO dto = new ExploratoryActionDTO<>()
-                .withServiceBaseName(settingsDAO.getServiceBaseName())
-                .withExploratoryName(name)
-                .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                .withIamUserName(userInfo.getName())
-                .withNotebookInstanceName(exploratoryId)
-                .withRegion(settingsDAO.getAwsRegion());
-        return provisioningService.post(action, dto, String.class);
+        updateExploratoryStatus(userInfo.getName(), name, status);
+        try {
+            String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
+            ExploratoryActionDTO dto = new ExploratoryActionDTO<>()
+                    .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withExploratoryName(name)
+                    .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                    .withIamUserName(userInfo.getName())
+                    .withNotebookInstanceName(exploratoryId)
+                    .withRegion(settingsDAO.getAwsRegion());
+            return provisioningService.post(action, dto, String.class);
+        } catch (Throwable t) {
+            updateExploratoryStatus(userInfo.getName(), name, FAILED);
+            throw new DlabException("Could not " + action + " exploratory environment " + name, t);
+        }
     }
 
     private StatusBaseDTO createStatusDTO(String user, String name, UserInstanceStatus status) {
         return new ExploratoryStatusDTO()
                 .withUser(user)
                 .withExploratoryName(name)
-                .withStatus(status.getStatus());
+                .withStatus(status);
+    }
+
+    private void updateComputationalStatuses(String user, String exploratoryName, UserInstanceStatus status) {
+        LOGGER.debug("updating status for all computational resources of {} for user {}: {}", exploratoryName, user, status);
+        StatusBaseDTO exploratoryStatus = createStatusDTO(user, exploratoryName, status);
+        infrastructureProvisionDAO.updateComputationalStatusesForExploratory(exploratoryStatus);
+    }
+
+    private void updateExploratoryStatus(String user, String exploratoryName, UserInstanceStatus status) {
+        StatusBaseDTO exploratoryStatus = createStatusDTO(user, exploratoryName, status);
+        infrastructureProvisionDAO.updateExploratoryStatus(exploratoryStatus);
     }
 
 }

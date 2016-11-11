@@ -25,23 +25,24 @@ import { ErrorMapUtils } from './../../util/errorMapUtils';
 
  export class ConfirmationComputationalResources {
    model : ComputationalResourcesModel;
+
    processError: boolean = false;
    errorMessage: string = '';
 
    @ViewChild('bindDialog') bindDialog;
+   @Output() rebuildGrid: EventEmitter<{}> = new EventEmitter();
 
-   constructor(
-     private userResourceService: UserResourceService
-    ) { }
+   constructor(private userResourceService: UserResourceService) { }
 
-    ngOnInit() {
-      this.bindDialog.onClosing = () => this.resetDialog();
-    }
-
-   open(option, notebook, resource) {
+   ngOnInit() {
+     this.bindDialog.onClosing = () => this.resetDialog();
+   }
+   
+   public open(option, notebook, resource) {
      this.model = new ComputationalResourcesModel(notebook, resource,
        (response: Response) => {
          this.close();
+         this.rebuildGrid.emit();
      },
      (response : Response) => {
        this.processError = true;
@@ -49,12 +50,12 @@ import { ErrorMapUtils } from './../../util/errorMapUtils';
      },
      this.userResourceService);
 
-     if(!this.bindDialog.isOpened){
+     if(!this.bindDialog.isOpened) {
        this.bindDialog.open(option);
      }
    }
 
-   close() {
+   public close() {
      if(this.bindDialog.isOpened)
       this.bindDialog.close();
    }

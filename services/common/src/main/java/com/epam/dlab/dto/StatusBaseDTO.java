@@ -13,6 +13,7 @@
 
 package com.epam.dlab.dto;
 
+import com.epam.dlab.constants.UserInstanceStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
@@ -68,6 +69,10 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     public T withStatus(String status) {
         setStatus(status);
         return (T) this;
+    }
+
+    public T withStatus(UserInstanceStatus status) {
+        return withStatus(status.toString());
     }
 
     public Date getUptime() {
