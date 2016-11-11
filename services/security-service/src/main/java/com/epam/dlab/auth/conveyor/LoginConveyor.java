@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
  * Created by Mikhail_Teplitskiy on 11/10/2016.
@@ -46,15 +45,7 @@ public class LoginConveyor extends KBalancedParallelConveyor<String,LoginStep,Us
             return this.conveyors.subList(index, index+1);
         });
     }
-/*		this.balancingCart = cart -> {
-			int index = cart.getKey().hashCode() % pf;
-			return this.conveyors.subList(index, index+1);
-		};
 
-		this.balancingCommand = command -> {
-			int index = command.getKey().hashCode() % pf;
-			return this.conveyors.subList(index, index+1);
-		};*/
     public void setUserInfoDao(UserInfoDAO userInfoDao) {
         this.userInfoDao = userInfoDao;
     }

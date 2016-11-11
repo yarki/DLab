@@ -27,7 +27,6 @@ import com.epam.dlab.auth.ldap.core.filter.AwsUserDAO;
 import com.epam.dlab.auth.rest.AbstractAuthenticationService;
 import com.epam.dlab.auth.rest.AuthorizedUsers;
 import com.epam.dlab.dto.UserCredentialDTO;
-import com.epam.dlab.exceptions.DlabException;
 import io.dropwizard.setup.Environment;
 
 import javax.servlet.http.HttpServletRequest;
@@ -97,25 +96,26 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		} else {
 			CompletableFuture<UserInfo> uiFuture = loginConveyor.startUserInfoBuild(token,username);
 			loginConveyor.add(token,remoteIp, LoginStep.REMOTE_IP);
+
+			//Try to login
 			threadpool.submit(()->{
 				try {
-					UserInfo firstLastNames = ldapUserDAO.getUserInfo(username,password);
-					log.debug("First and last names: {}",firstLastNames);
-					loginConveyor.add(token,firstLastNames,LoginStep.MERGE_USER_INFO);
+					ldapUserDAO.getUserInfo(username,password);
+					log.debug("User Authenticated: {}",username);
 				} catch (Exception e) {
 					loginConveyor.cancel(token);
 				}
 			});
-
+			//Extract User Info from LDAP
 			threadpool.submit(()->{
 				try {
 					UserInfo rolesUserInfo = ldapUserDAO.enrichUserInfo(new UserInfo(username, token));
-					loginConveyor.add(token,rolesUserInfo,LoginStep.MERGE_GROUP_INFO);
+					loginConveyor.add(token,rolesUserInfo,LoginStep.LDAP_USER_INFO);
 				} catch (Exception e) {
 					loginConveyor.cancel(token);
 				}
 			});
-
+			//Check AWS account
 			threadpool.submit(()->{
 				if(config.isAwsUserIdentificationEnabled()) {
 					try {
@@ -133,37 +133,6 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 					loginConveyor.add(token,false,LoginStep.AWS_USER);
 				}
 			});
-			threadpool.submit(()->{
-
-			});
-/*			try {
-				ui = ldapUserDAO.getUserInfo(username,password);
-				//loginConveyor.add(token,ui.getFirstName(),LoginStep.FIRST_NAME);
-				//loginConveyor.add(token,ui.getLastName(),LoginStep.LAST_NAME);
-				log.debug("user '{}' identified. fetching data...", username);
-				ui = ldapUserDAO.enrichUserInfo(ui);
-				//loginConveyor.add(token,ui.getRoles(),LoginStep.ROLES);
-				if(config.isAwsUserIdentificationEnabled()) {
-					User awsUser = awsUserDAO.getAwsUser(username);
-					if(awsUser != null) {
-						ui.setAwsUser(true);
-						//loginConveyor.add(token,true,LoginStep.AWS_USER);
-					} else {
-						ui.setAwsUser(false);
-						//loginConveyor.add(token,false,LoginStep.AWS_USER);
-						log.warn("AWS User '{}' was not found. ",username);
-					}
-				}
-			} catch (Exception e) {
-				log.error("LDAP error {}", e.getMessage());
-				loginConveyor.cancel(token);
-				return Response.status(Response.Status.UNAUTHORIZED).build();
-			}
-			ui.setRemoteIp(remoteIp);
-			UserInfo finalUserInfo = rememberUserInfo(token, ui);
-			rememberUserInfo(token, ui);
-			userInfoDao.saveUserInfo(finalUserInfo);*/
-//			log.debug("user info collected '{}' ", finalUserInfo);
 
 			try {
 				UserInfo userInfo = uiFuture.get(10,TimeUnit.SECONDS);
@@ -172,7 +141,6 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				log.error("Conveyor error {}", e.getMessage());
 				return Response.status(Response.Status.UNAUTHORIZED).build();
 			}
-
 			return Response.ok(token).build();
 		}
 	}

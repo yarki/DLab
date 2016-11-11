@@ -81,10 +81,6 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
         LOG.debug("merge user info{}",ui);
         UserInfoBuilder.firstName(b,ui.getFirstName());
         UserInfoBuilder.lastName(b,ui.getLastName());
-    }
-
-    public static void mergeGroupInfo(UserInfoBuilder b, UserInfo ui) {
-        LOG.debug("merge group info{}",ui);
         UserInfoBuilder.roles(b,ui.getRoles());
     }
 

@@ -5,12 +5,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by Mikhail_Teplitskiy on 11/10/2016.
@@ -41,8 +37,7 @@ public class LoginConveyorTest {
         uiSource.addRole("admin");
 
         lc.add("1","127.0.0.1",LoginStep.REMOTE_IP);
-        lc.add("1",uiSource,LoginStep.MERGE_USER_INFO);
-        lc.add("1",uiSource,LoginStep.MERGE_GROUP_INFO);
+        lc.add("1",uiSource,LoginStep.LDAP_USER_INFO);
         lc.add("1",true,LoginStep.AWS_USER);
 
         UserInfo ui = uf.get(5, TimeUnit.SECONDS);
