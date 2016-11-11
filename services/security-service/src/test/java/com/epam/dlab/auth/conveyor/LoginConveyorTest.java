@@ -35,18 +35,15 @@ public class LoginConveyorTest {
     @Test
     public void startUserInfoBuild() throws Exception {
         CompletableFuture<UserInfo> uf = lc.startUserInfoBuild("1","test");
+        UserInfo uiSource = new UserInfo("a","b");
+        uiSource.setFirstName("test");
+        uiSource.setLastName("user");
+        uiSource.addRole("admin");
 
-        lc.addClosure("1",b -> {
-            UserInfoBuilder.firstName(b,"user");
-            UserInfoBuilder.lastName(b,"test");
-        },LoginStep.USER_INFO);
-        lc.addClosure("1",b -> {
-            UserInfoBuilder.roles(b,new HashSet<String>(){{add("admin");}});
-        },LoginStep.GROUP_INFO);
-        lc.addClosure("1",b -> {
-            UserInfoBuilder.awsUser(b,true);
-        },LoginStep.AWS_INFO);
         lc.add("1","127.0.0.1",LoginStep.REMOTE_IP);
+        lc.add("1",uiSource,LoginStep.MERGE_USER_INFO);
+        lc.add("1",uiSource,LoginStep.MERGE_GROUP_INFO);
+        lc.add("1",true,LoginStep.AWS_USER);
 
         UserInfo ui = uf.get(5, TimeUnit.SECONDS);
         System.out.println("Future now: "+ui);

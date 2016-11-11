@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 /**
  * Created by Mikhail_Teplitskiy on 11/10/2016.
  */
-public class UserInfoBuilder implements Supplier<UserInfo> {
+public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
 
     private final static Logger LOG = LoggerFactory.getLogger(UserInfoBuilder.class);
 
@@ -77,12 +77,6 @@ public class UserInfoBuilder implements Supplier<UserInfo> {
         b.readinessStatus |= ROLE_SET;
     }
 
-    public static void mergeAwsUser(UserInfoBuilder b, UserInfo ui) {
-        LOG.debug("merge aws user {}",ui);
-        UserInfoBuilder.awsUser(b,ui.isAwsUser());
-    }
-
-
     public static void mergeUserInfo(UserInfoBuilder b, UserInfo ui) {
         LOG.debug("merge user info{}",ui);
         UserInfoBuilder.firstName(b,ui.getFirstName());
@@ -113,16 +107,8 @@ public class UserInfoBuilder implements Supplier<UserInfo> {
                 '}';
     }
 
-    public static void userInfo(UserInfoBuilder b, Consumer<UserInfoBuilder> consumer) {
-        consumer.accept(b);
+    @Override
+    public boolean test() {
+        return UserInfoBuilder.testMask(this,UserInfoBuilder.READYNESS_MASK);
     }
-
-    public static void groupInfo(UserInfoBuilder b, Consumer<UserInfoBuilder> consumer) {
-        consumer.accept(b);
-    }
-
-    public static void awsInfo(UserInfoBuilder b, Consumer<UserInfoBuilder> consumer) {
-        consumer.accept(b);
-    }
-
 }

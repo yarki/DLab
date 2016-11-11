@@ -9,14 +9,9 @@ import java.util.function.BiConsumer;
  */
 public enum LoginStep implements SmartLabel<UserInfoBuilder> {
 
-    USER_INFO(UserInfoBuilder::userInfo),
-    GROUP_INFO(UserInfoBuilder::groupInfo),
-    AWS_INFO(UserInfoBuilder::awsInfo),
-
     MERGE_USER_INFO(UserInfoBuilder::mergeUserInfo),
     MERGE_GROUP_INFO(UserInfoBuilder::mergeGroupInfo),
-    MERGE_AWS_INFO(UserInfoBuilder::mergeAwsUser),
-
+    AWS_USER(UserInfoBuilder::awsUser),
     REMOTE_IP(UserInfoBuilder::remoteIp),
     ;
 

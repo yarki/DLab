@@ -48,7 +48,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	private final LdapUserDAO ldapUserDAO;
 	private final AwsUserDAO awsUserDAO;
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-	private final ExecutorService threadpool = Executors.newCachedThreadPool();
+	private final ExecutorService threadpool = Executors.newFixedThreadPool(32);
 	private UserInfoDAO userInfoDao;
 
 	private final LoginConveyor loginConveyor = new LoginConveyor();
@@ -97,7 +97,46 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		} else {
 			CompletableFuture<UserInfo> uiFuture = loginConveyor.startUserInfoBuild(token,username);
 			loginConveyor.add(token,remoteIp, LoginStep.REMOTE_IP);
-			try {
+			threadpool.submit(()->{
+				try {
+					UserInfo firstLastNames = ldapUserDAO.getUserInfo(username,password);
+					log.debug("First and last names: {}",firstLastNames);
+					loginConveyor.add(token,firstLastNames,LoginStep.MERGE_USER_INFO);
+				} catch (Exception e) {
+					loginConveyor.cancel(token);
+				}
+			});
+
+			threadpool.submit(()->{
+				try {
+					UserInfo rolesUserInfo = ldapUserDAO.enrichUserInfo(new UserInfo(username, token));
+					loginConveyor.add(token,rolesUserInfo,LoginStep.MERGE_GROUP_INFO);
+				} catch (Exception e) {
+					loginConveyor.cancel(token);
+				}
+			});
+
+			threadpool.submit(()->{
+				if(config.isAwsUserIdentificationEnabled()) {
+					try {
+						User awsUser = awsUserDAO.getAwsUser(username);
+						if (awsUser != null) {
+							loginConveyor.add(token, true, LoginStep.AWS_USER);
+						} else {
+							loginConveyor.add(token, false, LoginStep.AWS_USER);
+							log.warn("AWS User '{}' was not found. ", username);
+						}
+					} catch (Exception e) {
+						loginConveyor.cancel(token);
+					}
+				} else {
+					loginConveyor.add(token,false,LoginStep.AWS_USER);
+				}
+			});
+			threadpool.submit(()->{
+
+			});
+/*			try {
 				ui = ldapUserDAO.getUserInfo(username,password);
 				//loginConveyor.add(token,ui.getFirstName(),LoginStep.FIRST_NAME);
 				//loginConveyor.add(token,ui.getLastName(),LoginStep.LAST_NAME);
@@ -123,11 +162,11 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			ui.setRemoteIp(remoteIp);
 			UserInfo finalUserInfo = rememberUserInfo(token, ui);
 			rememberUserInfo(token, ui);
-			userInfoDao.saveUserInfo(finalUserInfo);
-			log.debug("user info collected '{}' ", finalUserInfo);
+			userInfoDao.saveUserInfo(finalUserInfo);*/
+//			log.debug("user info collected '{}' ", finalUserInfo);
 
 			try {
-				UserInfo userInfo = uiFuture.get(5,TimeUnit.SECONDS);
+				UserInfo userInfo = uiFuture.get(10,TimeUnit.SECONDS);
 				log.debug("user info collected by conveyor '{}' ", userInfo);
 			} catch (Exception e) {
 				log.error("Conveyor error {}", e.getMessage());
