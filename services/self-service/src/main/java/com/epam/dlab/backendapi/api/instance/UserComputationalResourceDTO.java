@@ -14,6 +14,8 @@ package com.epam.dlab.backendapi.api.instance;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
+
 public class UserComputationalResourceDTO {
     @JsonProperty("computational_name")
     private String computationalName;
@@ -21,8 +23,8 @@ public class UserComputationalResourceDTO {
     private String computationalId;
     @JsonProperty
     private String status;
-    @JsonProperty("up_time_since")
-    private String upTimeSince;
+    @JsonProperty("up_time")
+    private Date uptime;
     @JsonProperty("master_node_shape")
     private String masterShape;
     @JsonProperty("slave_node_shape")
@@ -69,16 +71,16 @@ public class UserComputationalResourceDTO {
         return this;
     }
 
-    public String getUpTimeSince() {
-        return upTimeSince;
+    public Date getUptime() {
+        return uptime;
     }
 
-    public void setUpTimeSince(String upTimeSince) {
-        this.upTimeSince = upTimeSince;
+    public void setUptime(Date uptime) {
+        this.uptime = uptime;
     }
 
-    public UserComputationalResourceDTO withUpTimeSince(String upTimeSince) {
-        setUpTimeSince(upTimeSince);
+    public UserComputationalResourceDTO withUptime(Date uptime) {
+        setUptime(uptime);
         return this;
     }
 

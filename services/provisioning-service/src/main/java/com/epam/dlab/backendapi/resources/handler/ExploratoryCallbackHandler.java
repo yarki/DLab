@@ -23,6 +23,7 @@ import static com.epam.dlab.registry.ApiCallbacks.STATUS_URI;
 
 public class ExploratoryCallbackHandler extends ResourceCallbackHandler<ExploratoryStatusDTO> {
     private static final String EXPLORATORY_ID_FIELD = "notebook_name";
+    private static final String EXPLORATORY_URL_FIELD = "exploratory_url";
 
     private String exploratoryName;
 
@@ -33,16 +34,16 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     }
 
     protected String getCallbackURI() {
-        return EXPLORATORY+STATUS_URI;
+        return EXPLORATORY + STATUS_URI;
     }
 
     protected ExploratoryStatusDTO parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO baseStatus) {
-        String exploratoryId = resultNode.get(EXPLORATORY_ID_FIELD).textValue();
-        return baseStatus.withExploratoryId(exploratoryId);
+        return baseStatus
+                .withExploratoryId(getTextValue(resultNode.get(EXPLORATORY_ID_FIELD)))
+                .withExploratoryUrl(getTextValue(resultNode.get(EXPLORATORY_URL_FIELD)));
     }
 
     protected ExploratoryStatusDTO getBaseStatusDTO(UserInstanceStatus status) {
         return super.getBaseStatusDTO(status).withExploratoryName(exploratoryName);
     }
-
 }

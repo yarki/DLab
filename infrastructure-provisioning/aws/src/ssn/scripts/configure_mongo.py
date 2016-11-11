@@ -91,7 +91,8 @@ if __name__ == "__main__":
         client.dlabdb.settings.insert_one({"_id": "service_base_name", "value": args.base_name})
         client.dlabdb.settings.insert_one({"_id": "security_groups_ids", "value": args.sg})
         client.dlabdb.settings.insert_one({"_id": "notebook_ssh_user", "value": "ubuntu"})
-        client.dlabdb.settings.insert_one({"_id": "creds_key_dir", "value": "/home/ubuntu/keys"})
+        client.dlabdb.settings.insert_one({"_id": "creds_key_dir", "value": "/root/keys"})
+        client.dlabdb.security.insert({ "expireAt": "1" }, { "expireAfterSeconds": "3600" })
         client.dlabdb.shapes.insert(shapes)
         if add_2_yml_config(path,'security','authorization','enabled'):
             command = ['service', 'mongod', 'restart']

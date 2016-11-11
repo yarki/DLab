@@ -13,7 +13,10 @@
 
 package com.epam.dlab.dto;
 
+import com.epam.dlab.constants.UserInstanceStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Date;
 
 public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @JsonProperty
@@ -22,6 +25,8 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     private String exploratoryName;
     @JsonProperty
     private String status;
+    @JsonProperty("up_time")
+    private Date uptime;
 
     public String getUser() {
         return user;
@@ -63,6 +68,24 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @SuppressWarnings("unchecked")
     public T withStatus(String status) {
         setStatus(status);
+        return (T) this;
+    }
+
+    public T withStatus(UserInstanceStatus status) {
+        return withStatus(status.toString());
+    }
+
+    public Date getUptime() {
+        return uptime;
+    }
+
+    public void setUptime(Date uptime) {
+        this.uptime = uptime;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withUptime(Date uptime) {
+        setUptime(uptime);
         return (T) this;
     }
 }

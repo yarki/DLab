@@ -10,8 +10,10 @@
 
  *****************************************************************************************************/
 
- import { Component, OnInit, ViewChild, Input } from '@angular/core';
- import { Modal } from './../modal/modal.component';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Modal } from './../modal/modal.component';
+import {DateUtils} from './../../util/dateUtils'
+
 
  @Component({
    moduleId: module.id,
@@ -20,13 +22,19 @@
  })
 
  export class DetailDialog {
- 	notebook: any;
- 	
- 	@ViewChild('bindDialog') bindDialog;
+   notebook: any;
+   upTimeInHours: number;
+   upTimeSince: string = "";
+   @ViewChild('bindDialog') bindDialog;
 
  	open(param, notebook) {
-     this.bindDialog.open(param);
-     this.notebook = notebook;
+    this.notebook = notebook;
+
+    if(notebook.time) {
+      this.upTimeInHours = DateUtils.diffBetweenDatesInHours(this.notebook.time);
+      this.upTimeSince = new Date(this.notebook.time).toString();
+    }
+
+    this.bindDialog.open(param);
    }
  }
-

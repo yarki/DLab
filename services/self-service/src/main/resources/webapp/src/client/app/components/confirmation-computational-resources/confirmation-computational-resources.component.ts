@@ -25,23 +25,26 @@ import { ComputationalResourcesModel } from "./confirmation-computational-resour
    model : ComputationalResourcesModel;
 
    @ViewChild('bindDialog') bindDialog;
-   constructor(
-     private userResourceService: UserResourceService
-    ) { }
+   @Output() rebuildGrid: EventEmitter<{}> = new EventEmitter();
 
-   open(option, notebook, resource) {
-     this.model = new ComputationalResourcesModel(notebook, resource, (response: Response) => {
-       console.log(response);
+   constructor(private userResourceService: UserResourceService) { }
+
+   public open(option, notebook, resource) {
+     this.model = new ComputationalResourcesModel(notebook, resource,
+       (response: Response) => {
+         this.close();
+         this.rebuildGrid.emit();
      },
      (response : Response) => console.error(response.status),
      this.userResourceService);
-     if(!this.bindDialog.isOpened){
-       this.bindDialog.open(option);  
+     
+     if(!this.bindDialog.isOpened) {
+       this.bindDialog.open(option);
      }
    }
 
-   close() {
-     this.bindDialog.close();
+   public close() {
+     if(this.bindDialog.isOpened)
+      this.bindDialog.close();
    }
-   
  }

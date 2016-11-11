@@ -10,7 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 *****************************************************************************************************/
 
-import {Component, Input, Output, ViewChild} from "@angular/core";
+import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 
 @Component({
@@ -22,24 +22,29 @@ import { UserResourceService } from "./../../services/userResource.service";
 
 export class ComputationalResourcesList {
   @ViewChild('terminateConfirmateResource') terminateConfirmateResource;
+  @ViewChild('detailComputationalResource') detailComputationalResource;
   @Input() resources: any[];
   @Input() environment: any[];
 
+  @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
+
   collapse: boolean = false;
 
-  constructor(
-    private userResourceService: UserResourceService
-    ) { }
+  constructor(private userResourceService: UserResourceService) { }
 
   toggleResourceList() {
     this.collapse = !this.collapse;
   }
 
-  printDetailResourceModal(data) {
-    console.log(data);
+  rebuildGrid(): void {
+    this.buildGrid.emit();
   }
 
-  terminateComputationalResources(notebook, resource){
+  terminateComputationalResources(notebook, resource): void {
     this.terminateConfirmateResource.open({ isFooter: false }, notebook, resource);
+  };
+
+  detailComputationalResources(environment, resource): void {
+    this.detailComputationalResource.open({ isFooter: false }, environment, resource);
   };
 }

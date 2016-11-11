@@ -15,26 +15,27 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <span *ngIf="!resources.length" class="no_details">no details</span>
   </div>
   <div *ngIf="resources.length">
-    <span class="glyphicon glyphicon-remove" (click)="terminateComputationalResources(environment, resources[0])"></span>
-    <a class="detailed-link" (click)="printDetailResourceModal(resources[0])">
+    <a class="remove_butt" [ngClass]="{'disabled' : resources[0].status == 'terminating' || resources[0].status == 'terminated'}" (click)="terminateComputationalResources(environment, resources[0])">&times;</a>
+    <a class="detailed-link" (click)="detailComputationalResources(environment, resources[0])">
       {{resources[0].computational_name}}
       <span *ngIf="resources[0].nodes_number">{{resources[0].nodes_number}} nodes</span>
     </a>
     <span *ngIf="resources.length > 1" class="glyphicon arrow_icon" [ngClass]="{'glyphicon-triangle-bottom': !collapse, 'glyphicon-triangle-top': collapse}" (click)="toggleResourceList()"></span>
-    <span class="emt_status">{{resources[0].status}}</span>
+    <span ngClass="{{resources[0].status.toLowerCase() || ''}}" class="emt_status">{{resources[0].status}}</span>
   </div>
 </div>
 
 <div *ngIf="collapse" class="source">
   <div *ngFor="let resource of resources | slice:1">
-    <span class="glyphicon glyphicon-remove" (click)="terminateComputationalResources(environment, resource)"></span>
-    <a class="detailed-link" (click)="printDetailResourceModal(resource)">
+    <a class="remove_butt" [ngClass]="{'disabled' : resource.status == 'terminating' || resource.status == 'terminated'}" (click)="terminateComputationalResources(environment, resource)">&times;</a>
+    <a class="detailed-link" (click)="detailComputationalResources(environment, resource)">
       {{resource.computational_name}}
       <span *ngIf="resource.nodes_number">{{resource.nodes_number}} nodes</span>
     </a>
-    <span class="emt_status">{{resource.status}}</span>
+    <span ngClass="{{resource.status.toLowerCase() || ''}}" class="emt_status">{{resource.status}}</span>
   </div>
 </div>
 
 
-<confirmation-computational-resources #terminateConfirmateResource></confirmation-computational-resources>
+<confirmation-computational-resources #terminateConfirmateResource (rebuildGrid)="rebuildGrid($event)"></confirmation-computational-resources>
+<detail-computational-resources #detailComputationalResource></detail-computational-resources>

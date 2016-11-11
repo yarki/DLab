@@ -24,6 +24,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   font-size: 16px;
   margin-top: 20px;
 }
+.transparent-header .modal-header {
+  background: transparent;
+  border-bottom: 0;
+  height: 30px;
+}
 
 .modal-header {
   padding: 13px 22px;
@@ -31,7 +36,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   border-bottom: 1px solid #edf1f5;
 }
 .modal-body {
-  padding: 25px 50px;
+  padding: 30px 50px 45px 50px;
 }
 .modal-header .modal-title {
   font-weight: 600;
@@ -48,6 +53,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 }
 .modal .form-control {
   font-size: 16px;
+  height: 38px;
   color: #455c74;
 }
 .modal .form-group small {
@@ -199,12 +205,22 @@ modal-content {
   line-height: 16px;
   padding-left: 1px;
 }
+.detail-info span {
+  font-size: 14px;
+  color: #9cadbe;
+}
 .detail-info p {
   font-weight: 600;
+}
+.detail-info p:last-child {
+  margin-bottom: 0;
 }
 .detail-info p small {
   font-size: 12px;
   font-weight: 400;
+}
+.detail-info .time_info {
+  margin-top: 15px;
 }
 .modal a {
   color: #35afd5;
@@ -218,4 +234,7 @@ modal-content {
 }
 .modal-content .danger_field {
   border-color: #d9534f;
+}
+.progress-dialog .modal-body {
+  padding: 30px 30px 45px 30px;
 }

@@ -113,7 +113,7 @@ public class ComputationalResource implements DockerCommands {
     }
 
     private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO dto) {
-        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getEdgeUserName(), dto.getExploratoryName(), dto.getComputationalName());
+        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName(), dto.getComputationalName());
     }
 
 }

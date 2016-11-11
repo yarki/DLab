@@ -197,6 +197,13 @@ def spark_defaults(args):
     with open(spark_def_path, 'w') as f:
         f.write(text)
 
+
+def configuring_hadoop(args):
+    endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
+    hadoop_core_path = '/srv/hadoopconf/config/' + args.cluster_name + '/core-site.xml'
+    local("""sudo bash -c 'sed -i "s|</configuration>||" """ + hadoop_core_path + """ ; printf "  <property> \n    <name>fs.s3a.endpoint</name>\n    <value>""" + endpoint_url + """</value>\n  </property>\n</configuration>" >> """ + hadoop_core_path + """'""")
+
+
 if __name__ == "__main__":
     if args.dry_run == 'true':
         parser.print_help()
@@ -209,3 +216,4 @@ if __name__ == "__main__":
         pyspark_kernel(args)
         toree_kernel(args)
         spark_defaults(args)
+        configuring_hadoop(args)

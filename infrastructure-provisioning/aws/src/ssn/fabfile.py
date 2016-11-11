@@ -247,7 +247,6 @@ def run():
         print "SSN AMI ID: " + os.environ['ssn_ami_id']
         print "SSN bucket name: " + user_bucket_name
         print "Region: " + region
-
         jenkins_url = "http://%s/jenkins" % get_instance_hostname(instance_name)
         print "Jenkins URL: " + jenkins_url
         try:

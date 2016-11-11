@@ -75,9 +75,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   box-shadow: 0 0 20px 0 rgba(0,0,0,.175);
   border: none;
 }
+.dashboard_table .dropdown-outscreen .dropdown-menu {
+  top: -110px;
+  right: 55px;
+}
 .dropdown .disabled {
-  color: #d2d2d2;
+  opacity: .4;
   cursor: not-allowed;
+}
+.dropdown .actions {
+  background-image: url(./../../assets/svg/settings_icon.svg);
+  width: 16px;
+  height: 16px;
+  margin-top: 5px;
+  display: inline-block;
+  text-align: center;
+  zoom: 1.2;
 }
 .dashboard_table .dropdown-menu li {
   font-size: 14px;

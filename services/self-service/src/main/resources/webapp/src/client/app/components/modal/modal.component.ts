@@ -65,7 +65,7 @@ export class Modal {
     // -------------------------------------------------------------------------
 
     isOpened = false;
-
+    onClosing: Function;
     isHeader = true;
     isFooter = true;
 
@@ -122,6 +122,8 @@ export class Modal {
             return;
 
         this.isOpened = false;
+        if(this.onClosing)
+          this.onClosing();
         this.onClose.emit(args);
         document.body.removeChild(this.backdropElement);
         document.body.className = document.body.className.replace(/modal-open\b/, "");
