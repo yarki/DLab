@@ -31,7 +31,7 @@ export class ComputationalResourceCreateDialog {
   notebook_instance: any;
   computationalResourceExist: boolean = false;
   checkValidity: boolean = false;
-  clusterNamePattern: string = "\\w+.*\\w+";
+  clusterNamePattern: string = "[-_ a-zA-Z0-9]+";
   nodeCountPattern: string = "^[1-9]\\d*$";
 
   processError: boolean = false;

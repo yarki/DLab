@@ -32,7 +32,7 @@ export class ExploratoryEnvironmentCreateDialog {
   notebookExist: boolean = false;
   checkValidity: boolean = false;
   templateDescription: string;
-  namePattern = "\\w+.*\\w+";
+  namePattern = "[-_ a-zA-Z0-9]+";
   resourceGrid: any;
 
   processError: boolean = false;
