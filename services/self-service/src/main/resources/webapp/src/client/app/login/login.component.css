@@ -29,6 +29,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   width: 100%;
   height: 100%;
   text-align: center;
+  display: table;
 }
 
 .login_page .content {
