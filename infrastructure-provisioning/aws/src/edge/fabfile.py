@@ -225,7 +225,7 @@ def run():
                 "ToPort": 443, "IpProtocol": "tcp", "UserIdGroupPairs": []
             }
         ]
-        params = "--name %s --vpc_id %s --security_group_rules '%s' --infra_tag_name %s --infra_tag_value %s --egress %s" % \
+        params = "--name %s --vpc_id %s --security_group_rules '%s' --infra_tag_name %s --infra_tag_value %s --egress '%s'" % \
                  (edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),
                   edge_conf['service_base_name'], edge_conf['instance_name'], json.dumps(sg_rules_template_egress))
         if not run_routine('create_security_group', params):
