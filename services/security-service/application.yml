@@ -103,10 +103,11 @@ mongo:
   database: dlabdb
 
 logging:
-  level: INFO
+  level: DEBUG
   loggers:
     io.dropwizard: INFO
     com.epam: DEBUG
+    com.aegisql: DEBUG
   appenders:
     - type: console
     - type: file

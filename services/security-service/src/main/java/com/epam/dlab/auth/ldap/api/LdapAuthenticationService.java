@@ -16,6 +16,8 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.identitymanagement.model.User;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.UserInfoDAO;
+import com.epam.dlab.auth.conveyor.LoginConveyor;
+import com.epam.dlab.auth.conveyor.LoginStep;
 import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
 import com.epam.dlab.auth.ldap.core.AwsUserDAOImpl;
 import com.epam.dlab.auth.ldap.core.LdapUserDAO;
@@ -36,10 +38,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -49,8 +48,11 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	private final LdapUserDAO ldapUserDAO;
 	private final AwsUserDAO awsUserDAO;
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+	private final ExecutorService threadpool = Executors.newCachedThreadPool();
 	private UserInfoDAO userInfoDao;
-	
+
+	private final LoginConveyor loginConveyor = new LoginConveyor();
+
 	public LdapAuthenticationService(SecurityServiceConfiguration config, Environment env) {
 		super(config);
 		AuthorizedUsers.setInactiveTimeout(config.getInactiveUserTimeoutMillSec());
@@ -59,6 +61,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		} else {
 			this.userInfoDao = new UserInfoDAODumbImpl();
 		}
+		loginConveyor.setUserInfoDao(userInfoDao);
 		if(config.isAwsUserIdentificationEnabled()) {
 			DefaultAWSCredentialsProviderChain providerChain = DefaultAWSCredentialsProviderChain.getInstance();
 			awsUserDAO = new AwsUserDAOImpl(providerChain.getCredentials());
@@ -85,28 +88,36 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		String password    = credential.getPassword();
 		String accessToken = credential.getAccessToken();
 		String remoteIp    = request.getRemoteAddr();
+
 		log.debug("validating username:{} password:****** token:{} ip:{}", username, accessToken,remoteIp);
 		String token = getRandomToken();
 		UserInfo ui;
 		if (this.isAccessTokenAvailable(accessToken)) {
 			return Response.ok(accessToken).build();
 		} else {
-			final SynchronousQueue<Boolean> sQueue = new SynchronousQueue<>();
+			CompletableFuture<UserInfo> uiFuture = loginConveyor.startUserInfoBuild(token,username);
+			loginConveyor.add(token,remoteIp, LoginStep.REMOTE_IP);
 			try {
 				ui = ldapUserDAO.getUserInfo(username,password);
+				//loginConveyor.add(token,ui.getFirstName(),LoginStep.FIRST_NAME);
+				//loginConveyor.add(token,ui.getLastName(),LoginStep.LAST_NAME);
 				log.debug("user '{}' identified. fetching data...", username);
 				ui = ldapUserDAO.enrichUserInfo(ui);
+				//loginConveyor.add(token,ui.getRoles(),LoginStep.ROLES);
 				if(config.isAwsUserIdentificationEnabled()) {
 					User awsUser = awsUserDAO.getAwsUser(username);
 					if(awsUser != null) {
 						ui.setAwsUser(true);
+						//loginConveyor.add(token,true,LoginStep.AWS_USER);
 					} else {
 						ui.setAwsUser(false);
+						//loginConveyor.add(token,false,LoginStep.AWS_USER);
 						log.warn("AWS User '{}' was not found. ",username);
 					}
 				}
 			} catch (Exception e) {
 				log.error("LDAP error {}", e.getMessage());
+				loginConveyor.cancel(token);
 				return Response.status(Response.Status.UNAUTHORIZED).build();
 			}
 			ui.setRemoteIp(remoteIp);
@@ -114,6 +125,15 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			rememberUserInfo(token, ui);
 			userInfoDao.saveUserInfo(finalUserInfo);
 			log.debug("user info collected '{}' ", finalUserInfo);
+
+			try {
+				UserInfo userInfo = uiFuture.get(5,TimeUnit.SECONDS);
+				log.debug("user info collected by conveyor '{}' ", userInfo);
+			} catch (Exception e) {
+				log.error("Conveyor error {}", e.getMessage());
+				return Response.status(Response.Status.UNAUTHORIZED).build();
+			}
+
 			return Response.ok(token).build();
 		}
 	}
