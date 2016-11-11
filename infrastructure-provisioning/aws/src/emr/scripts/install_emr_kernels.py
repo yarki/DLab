@@ -24,6 +24,7 @@ parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--dry_run', type=str, default='false')
 parser.add_argument('--emr_version', type=str, default='emr-4.8.0')
 parser.add_argument('--keyfile', type=str, default='')
+parser.add_argument('--region', type=str, default='')
 parser.add_argument('--notebook_ip', type=str, default='')
 args = parser.parse_args()
 
@@ -79,4 +80,4 @@ if __name__ == "__main__":
     configure_notebook()
     spark_version = get_spark_version()
     hadoop_version = get_hadoop_version()
-    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version + ' --hadoop_version ' + hadoop_version)
+    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version + ' --hadoop_version ' + hadoop_version + ' --region ' + args.region)

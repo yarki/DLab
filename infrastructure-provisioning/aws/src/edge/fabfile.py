@@ -217,6 +217,12 @@ def run():
                 "FromPort": 80,
                 "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
                 "ToPort": 80, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
+                "FromPort": 443,
+                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                "ToPort": 443, "IpProtocol": "tcp", "UserIdGroupPairs": []
             }
         ]
         params = "--name %s --vpc_id %s --security_group_rules '%s' --infra_tag_name %s --infra_tag_value %s --egress %s" % \
