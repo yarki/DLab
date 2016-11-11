@@ -12,12 +12,13 @@
 
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Response } from "@angular/http";
-import { ExploratoryEnvironmentCreateModel } from './exploratory-environment-create.model';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserResourceService } from "../../services/userResource.service";
-
-import { ResourceShapeModel } from '../../models/resourceShape.model';
+import { ExploratoryEnvironmentCreateModel } from './exploratory-environment-create.model';
 import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
+import { ResourceShapeModel } from '../../models/resourceShape.model';
 
+import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
@@ -29,9 +30,15 @@ import HTTP_STATUS_CODES from 'http-status-enum';
 export class ExploratoryEnvironmentCreateDialog {
   model: ExploratoryEnvironmentCreateModel;
   notebookExist: boolean = false;
+  checkValidity: boolean = false;
   templateDescription: string;
-  namePattern = "\\w+.*\\w+";
+  namePattern = "[-_ a-zA-Z0-9]+";
   resourceGrid: any;
+
+  processError: boolean = false;
+  errorMessage: string = '';
+
+  public createExploratoryEnvironmentForm: FormGroup;
 
   @ViewChild('bindDialog') bindDialog;
   @ViewChild('environment_name') environment_name;
@@ -40,30 +47,41 @@ export class ExploratoryEnvironmentCreateDialog {
 
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
-  constructor(private userResourceService: UserResourceService) {
+  constructor(
+    private userResourceService: UserResourceService,
+    private _fb: FormBuilder
+  ) {
     this.model = ExploratoryEnvironmentCreateModel.getDefault(userResourceService);
   }
 
-  ngOnInit(){
-    this.bindDialog.onClosing =  () => this.resetDialog();
+  ngOnInit() {
+    this.initFormModel();
+    this.bindDialog.onClosing = () => this.resetDialog();
   }
 
-  createExploratoryEnvironment_btnClick($event, index, name, shape) {
-    this.notebookExist = false;
+  initFormModel(): void {
+    this.createExploratoryEnvironmentForm = this._fb.group({
+      environment_name: ['', [Validators.required, Validators.pattern(this.namePattern)]]
+    });
+  }
 
-    if (this.resourceGrid.containsNotebook(name)) {
+  createExploratoryEnvironment_btnClick($event, data, valid, index, shape) {
+    this.notebookExist = false;
+    this.checkValidity = true;
+
+    if (this.resourceGrid.containsNotebook(data.environment_name)) {
       this.notebookExist = true;
       return false;
     }
 
-    this.model.setCreatingParams(this.model.exploratoryEnvironmentTemplates[index].version, name, shape);
+    this.model.setCreatingParams(this.model.exploratoryEnvironmentTemplates[index].version, data.environment_name, shape);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
   }
 
   templateSelectionChanged(value) {
-      this.model.setSelectedTemplate(value);
+    this.model.setSelectedTemplate(value);
   }
 
   open(params) {
@@ -74,7 +92,10 @@ export class ExploratoryEnvironmentCreateDialog {
           this.buildGrid.emit();
         }
       },
-        (response: Response) => console.error(response.status),
+        (response: Response) => {
+          this.processError = true;
+          this.errorMessage = ErrorMapUtils.setErrorMessage(response);
+        },
         () => {
           this.templateDescription = this.model.selectedItem.description;
         },
@@ -82,7 +103,6 @@ export class ExploratoryEnvironmentCreateDialog {
           this.bindDialog.open(params);
         },
         this.userResourceService);
-
     }
   }
 
@@ -91,8 +111,13 @@ export class ExploratoryEnvironmentCreateDialog {
       this.bindDialog.close();
   }
 
-  private resetDialog() : void{
-    this.environment_name.nativeElement.value = "";
+  private resetDialog(): void {
+    this.notebookExist = false;
+    this.checkValidity = false;
+    this.processError = false;
+    this.errorMessage = '';
+
+    this.initFormModel();
     this.model.resetModel();
   }
 }

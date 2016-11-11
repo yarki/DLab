@@ -22,6 +22,7 @@ import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.utils.UsernameUtils;
+import com.epam.dlab.exceptions.DlabException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -91,10 +92,8 @@ public class KeyUploaderResource implements KeyLoaderAPI {
                 keyDAO.deleteKey(userInfo.getName());
             }
         } catch (Exception e) {
-            LOGGER.debug("uploading file exception", e);
             keyDAO.deleteKey(userInfo.getName());
-
-            return Response.serverError().build();
+            throw new DlabException("Could not upload the key", e);
         }
 
         return Response.ok().build();

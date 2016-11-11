@@ -25,6 +25,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .dashboard_table .th_actions {
   width: 8%;
 }
+.dashboard_table tr {
+  vertical-align: top;
+}
 .dashboard_table tr td {
   font-size: 14px;
   padding: 26px 14px;

@@ -14,6 +14,7 @@ package com.epam.dlab.backendapi.dao;
 
 import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
+import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
@@ -55,11 +56,12 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 .getOrDefault(EXPLORATORY_ID, EMPTY).toString();
     }
 
-    public String fetchExploratoryStatus(String user, String exploratoryName) {
-        return Optional.ofNullable(mongoService.getCollection(USER_INSTANCES)
-                .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first())
-                .orElse(new Document())
-                .getOrDefault(STATUS, EMPTY).toString();
+    public UserInstanceStatus fetchExploratoryStatus(String user, String exploratoryName) {
+        return UserInstanceStatus.of(
+                Optional.ofNullable(mongoService.getCollection(USER_INSTANCES)
+                        .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first())
+                        .orElse(new Document())
+                        .getOrDefault(STATUS, EMPTY).toString());
     }
 
     public boolean insertExploratory(UserInstanceDTO dto) {
