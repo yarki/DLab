@@ -26,26 +26,24 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class IsoDateDeSerializer extends JsonDeserializer<Date> {
+class IsoDateDeSerializer extends JsonDeserializer<Date> {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsoDateDeSerializer.class);
+    private static final String DATE_NODE = "$date";
+    private static final String ISO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     @Override
     public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         ObjectCodec oc = jsonParser.getCodec();
         JsonNode node = oc.readTree(jsonParser);
-        String dateValue = node.get("$date").asText();
+        String dateValue = node.get(DATE_NODE).asText();
 
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        DateFormat df = new SimpleDateFormat(ISO_DATE_FORMAT);
         Date date;
         try {
             date = df.parse(dateValue);
-            LOGGER.debug("parsed out date from string : {}", date);
         } catch (ParseException e) {
-            e.printStackTrace();
             date = new Date(Long.valueOf(dateValue));
-            LOGGER.debug("parsed out date from long : {}", date);
         }
-
         return date;
     }
 

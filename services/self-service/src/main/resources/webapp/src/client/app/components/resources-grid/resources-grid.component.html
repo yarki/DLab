@@ -28,7 +28,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <td class="status" ngClass="{{env.status.toLowerCase() || ''}}">{{env.status}}</td>
     <td>{{env.shape}}</td>
     <td>
-      <computational-resources-list [resources]="env.resources" [environment]="env"></computational-resources-list>
+      <computational-resources-list [resources]="env.resources" [environment]="env" (buildGrid)="buildGrid($event)"></computational-resources-list>
     </td>
     <td>
       <div class="dropdown">
@@ -47,7 +47,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                                                          env.status != 'stopping'">Stop</li>
             <li (click)="exploratoryAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped' ||
                                                         env.status == 'stopping'">Run</li>
-            <li (click)="exploratoryAction(env, 'terminate')">Terminate</li>
+            <li (click)="exploratoryAction(env, 'terminate')" *ngIf="env.status.toLowerCase() == 'running' || env.status.toLowerCase() == 'stopped'">Terminate</li>
             <li (click)="exploratoryAction(env, 'deploy')" *ngIf="env.status != 'stopping' && env.status != 'stopped'">Deploy EMR</li>
           </ul>
         </div>

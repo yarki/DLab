@@ -68,8 +68,7 @@ export class ExploratoryEnvironmentCreateModel {
 
     this.setCreatingParams(environment_version, environment_name, environment_shape);
     this.confirmAction = () => this.createExploratoryEnvironment()
-      .subscribe(
-      (response: Response) => fnProcessResults(response));
+      .subscribe((response: Response) => fnProcessResults(response), (response: Response) => fnProcessErrors(response));
   }
 
   public setSelectedTemplate(index) : void {

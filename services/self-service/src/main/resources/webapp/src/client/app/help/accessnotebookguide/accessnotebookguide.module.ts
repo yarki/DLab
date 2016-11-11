@@ -10,30 +10,15 @@
 
  *****************************************************************************************************/
 
-import { Routes, RouterModule, CanActivate } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-import { LoginComponent } from './login/login.component';
-import { AccessNotebookGuide } from './help/accessnotebookguide/accessnotebookguide.component';
-import { AuthorizationGuard } from './security/authorization.guard';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AccessNotebookGuide } from './accessnotebookguide.component';
+import { NavbarModule } from './../../shared/navbar/index';
 
-export const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full'
+@NgModule({
+  imports: [CommonModule, NavbarModule],
+  declarations: [AccessNotebookGuide],
+  exports: [AccessNotebookGuide]
+})
 
-  },
-  {
-    path: 'dashboard',
-    component: HomeComponent,
-    canActivate: [AuthorizationGuard]
-  },
-  {
-    path: 'login',
-    component: LoginComponent
-  },
-  {
-    path: 'help/accessnotebookguide',
-    component: AccessNotebookGuide
-  }
-];
+export class AccessNotebookGuideModule { }

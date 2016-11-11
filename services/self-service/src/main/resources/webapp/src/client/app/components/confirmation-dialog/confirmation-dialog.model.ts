@@ -41,14 +41,16 @@ export class ConfirmationDialogModel {
         this.title = "Exploratory Environment will be stopped and all connected computational resources will be terminated.";
         this.notebook = notebook;
         this.confirmAction = () => this.stopExploratory()
-          .subscribe((response : Response) => fnProcessResults(response));
+          .subscribe((response : Response) => fnProcessResults(response),
+            (response: Response) => fnProcessErrors(response));
       }
       break;
       case ConfirmationDialogType.TerminateExploratory: {
         this.title = "Exploratory Environment and all connected computational resources will be terminated.";
         this.notebook = notebook;
         this.confirmAction = () => this.terminateExploratory()
-          .subscribe((response : Response) => fnProcessResults(response));
+          .subscribe((response : Response) => fnProcessResults(response),
+            (response: Response) => fnProcessErrors(response));
       }
       break;
       default: {

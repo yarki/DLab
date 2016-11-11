@@ -17,7 +17,6 @@ import com.epam.dlab.client.mongo.MongoService;
 import com.epam.dlab.exceptions.DlabException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;

@@ -25,6 +25,7 @@ import {
 import { AuthorizationGuard } from './security/authorization.guard';
 import { LoginModule } from './login/login.module';
 import { HomeModule } from './home/home.module';
+import { AccessNotebookGuideModule } from './help/accessnotebookguide/accessnotebookguide.module';
 import {FormsModule} from "@angular/forms";
 import {UserAccessKeyService} from "./services/userAccessKey.service";
 import {AppRoutingService} from "./routing/appRouting.service";
@@ -34,7 +35,7 @@ import {ApplicationServiceFacade} from "./services/applicationServiceFacade.serv
 import {ApplicationSecurityService} from "./services/applicationSecurity.service";
 
 @NgModule({
-  imports: [BrowserModule, HttpModule, RouterModule.forRoot(routes, { useHash: true }), LoginModule, HomeModule, FormsModule],
+  imports: [BrowserModule, HttpModule, RouterModule.forRoot(routes, { useHash: true }), LoginModule, HomeModule, FormsModule, AccessNotebookGuideModule],
   declarations: [AppComponent],
   providers: [{
     provide: LocationStrategy,

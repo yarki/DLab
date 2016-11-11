@@ -11,9 +11,12 @@
  *****************************************************************************************************/
 
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { UserResourceService } from "../../services/userResource.service";
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Response } from "@angular/http";
+import { UserResourceService } from "../../services/userResource.service";
 import { ComputationalResourceCreateModel } from "./computational-resource-create.model";
+
+import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
@@ -27,7 +30,14 @@ export class ComputationalResourceCreateDialog {
   model: ComputationalResourceCreateModel;
   notebook_instance: any;
   computationalResourceExist: boolean = false;
-  clusterNamePattern: string = "\\w+.*\\w+";
+  checkValidity: boolean = false;
+  clusterNamePattern: string = "[-_ a-zA-Z0-9]+";
+  nodeCountPattern: string = "^[1-9]\\d*$";
+
+  processError: boolean = false;
+  errorMessage: string = '';
+
+  public createComputationalResourceForm: FormGroup;
 
   @ViewChild('bindDialog') bindDialog;
   @ViewChild('name') name;
@@ -35,23 +45,35 @@ export class ComputationalResourceCreateDialog {
 
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
-  constructor(private userResourceService: UserResourceService) {
+  constructor(
+    private userResourceService: UserResourceService,
+    private _fb: FormBuilder
+  ) {
     this.model = ComputationalResourceCreateModel.getDefault(userResourceService);
   }
 
   ngOnInit(){
+    this.initFormModel();
     this.bindDialog.onClosing =  () => this.resetDialog();
   }
 
-  public createComputationalResource_btnClick($event, name: string, count: number, shape_master: string, shape_slave: string) {
-    this.computationalResourceExist = false;
+  private initFormModel(): void {
+    this.createComputationalResourceForm = this._fb.group({
+      cluster_alias_name: ['', [Validators.required, Validators.pattern(this.clusterNamePattern)]],
+      instance_number: ['1', [Validators.required, Validators.pattern(this.nodeCountPattern)]]
+    });
+  }
 
-    if (this.containsComputationalResource(name)) {
+  public createComputationalResource($event, data, shape_master: string, shape_slave: string) {
+    this.computationalResourceExist = false;
+    this.checkValidity = true;
+
+    if (this.containsComputationalResource(data.cluster_alias_name)) {
       this.computationalResourceExist = true;
       return false;
     }
 
-    this.model.setCreatingParams(name, count, shape_master, shape_slave);
+    this.model.setCreatingParams(data.cluster_alias_name, data.instance_number, shape_master, shape_slave);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
@@ -81,7 +103,10 @@ export class ComputationalResourceCreateDialog {
           this.buildGrid.emit();
         }
       },
-        (response: Response) => console.error(response.status),
+        (response: Response) => {
+          this.processError = true;
+          this.errorMessage = ErrorMapUtils.setErrorMessage(response);
+        },
         () => {
           // this.templateDescription = this.model.selectedItem.description;
         },
@@ -99,8 +124,12 @@ export class ComputationalResourceCreateDialog {
   }
 
   private resetDialog() : void {
+    this.computationalResourceExist = false;
+    this.checkValidity = false;
+    this.processError = false;
+    this.errorMessage = '';
+
+    this.initFormModel();
     this.model.resetModel();
-    this.name.nativeElement.value = "";
-    this.count.nativeElement.value = "";
   }
 }
