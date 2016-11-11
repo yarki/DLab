@@ -40,7 +40,7 @@ public class AwsUserDAOImpl implements AwsUserDAO {
             });
 
         } catch(Exception e) {
-            LOG.error("Failed AWS user initialization. Will keep trying ... ",e);
+            LOG.error("Failed AWS user initialization. Will keep trying. Error: {}",e.getMessage());
         }
     }
 

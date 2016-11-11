@@ -18,6 +18,7 @@ import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.SecurityDAO;
 import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.UserCredentialDTO;
+import com.epam.dlab.exceptions.DlabException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -49,15 +50,23 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
     @Path("/login")
     public Response login(UserCredentialDTO credential) {
         LOGGER.debug("Try login user = {}", credential.getUsername());
-        dao.writeLoginAttempt(credential);
-        return securityService.post(LOGIN, credential, Response.class);
+        try {
+            dao.writeLoginAttempt(credential);
+            return securityService.post(LOGIN, credential, Response.class);
+        } catch (Throwable t) {
+            throw new DlabException("Could not login user", t);
+        }
     }
 
     @POST
     @Path("/logout")
     public Response logout(@Auth UserInfo userInfo) {
         LOGGER.debug("Try logout accessToken {}", userInfo.getAccessToken());
-        return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
+        try {
+            return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
+        } catch(Throwable t) {
+            throw new DlabException("Could not logout user", t);
+        }
     }
 
     @POST

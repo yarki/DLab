@@ -19,9 +19,30 @@ import org.slf4j.LoggerFactory;
 public class SecurityAuthorizer implements Authorizer<UserInfo> {
     private final static Logger LOGGER = LoggerFactory.getLogger(SecurityRestAuthenticator.class);
 
+    /*
+    Add annotations to the service resource class:
+@PermitAll. All authenticated users will have access to the method.
+@RolesAllowed("awsUser"). Access will be granted to the users with the specified roles.
+@DenyAll. No access will be granted to anyone.
+    */
+
     @Override
     public boolean authorize(UserInfo userInfo, String role) {
         LOGGER.debug("authorize user = {} with role = {}", userInfo.getName(), role);
-        return true;
+        if(role == null) {
+            return true;
+        }
+
+        boolean authorized = false;
+
+        switch(role.toUpperCase()) {
+            case "AWSUSER":
+                authorized = userInfo.isAwsUser();
+                break;
+            default:
+                authorized = true;
+        }
+
+        return authorized;
     }
 }
