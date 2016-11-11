@@ -13,12 +13,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import { NgModule, Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ModalModule } from './../modal/index';
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ExploratoryEnvironmentCreateDialog } from "./exploratory-environment-create-dialog.component";
 
 export * from "./exploratory-environment-create-dialog.component";
 
 @NgModule({
-  imports: [CommonModule, ModalModule],
+  imports: [CommonModule, ModalModule, FormsModule, ReactiveFormsModule],
   declarations: [ExploratoryEnvironmentCreateDialog],
   exports: [ExploratoryEnvironmentCreateDialog]
 })

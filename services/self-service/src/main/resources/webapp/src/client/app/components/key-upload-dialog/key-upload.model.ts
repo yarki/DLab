@@ -47,8 +47,7 @@ export class KeyUploadDialogModel {
   private prepareModel(newAccessKeyForUpload: any, fnProcessResults: any, fnProcessErrors: any): void {
     this.setUserAccessKey(newAccessKeyForUpload);
     this.confirmAction = () => this.uploadUserAccessKey()
-      .subscribe(
-      (response: Response) => fnProcessResults(response));
+      .subscribe((response: Response) => fnProcessResults(response),  (response: Response) => fnProcessErrors(response));
   }
 
   private getLabel(file : File): string {
