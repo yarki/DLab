@@ -42,7 +42,7 @@ if __name__ == "__main__":
             if args.policy_file_name != '':
                 create_attach_policy(args.policy_name, args.role_name, args.policy_file_name)
             else:
-                if args.policy_file_name == '':
+                if args.policy_arn == '':
                     print "POLICY ARN is empty, there is nothing to attach."
                     success = True
                 else:
