@@ -60,11 +60,12 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			this.userInfoDao = new UserInfoDAODumbImpl();
 		}
 		if(config.isAwsUserIdentificationEnabled()) {
-			DefaultAWSCredentialsProviderChain providerChain = DefaultAWSCredentialsProviderChain.getInstance();
+			DefaultAWSCredentialsProviderChain providerChain = new DefaultAWSCredentialsProviderChain();
 			awsUserDAO = new AwsUserDAOImpl(providerChain.getCredentials());
 			scheduler.scheduleAtFixedRate(()->{
 				try {
 					providerChain.refresh();
+					awsUserDAO.updateCredentials(providerChain.getCredentials());
 					log.debug("provider credentials refreshed");
 				} catch (Exception e) {
 					log.error("AWS provider error",e);
