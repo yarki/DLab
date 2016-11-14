@@ -41,11 +41,8 @@ class IsoDateDeSerializer extends JsonDeserializer<Date> {
         Date date;
         try {
             date = df.parse(dateValue);
-            LOGGER.debug("parsed out date {} as string : {}", dateValue, date);
         } catch (ParseException e) {
-            LOGGER.warn("could not parse date {} as string", dateValue, e);
             date = new Date(Long.valueOf(dateValue));
-            LOGGER.debug("parsed out date {} as long : {}", dateValue, date);
         }
         return date;
     }
