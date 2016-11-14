@@ -42,9 +42,13 @@ if __name__ == "__main__":
             if args.policy_file_name != '':
                 create_attach_policy(args.policy_name, args.role_name, args.policy_file_name)
             else:
-                policy_arn_bits = eval(args.policy_arn)
-                for bit in policy_arn_bits:
-                    attach_policy(bit, args.role_name)
+                if args.policy_file_name == '':
+                    print "POLICY ARN is empty, there is nothing to attach."
+                    success = True
+                else:
+                    policy_arn_bits = eval(args.policy_arn)
+                    for bit in policy_arn_bits:
+                        attach_policy(bit, args.role_name)
             print "POLICY %s created " % args.policy_name
             success = True
         except:
