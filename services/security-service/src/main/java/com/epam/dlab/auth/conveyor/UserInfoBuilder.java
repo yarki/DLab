@@ -17,9 +17,9 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
 
     private final static Logger LOG = LoggerFactory.getLogger(UserInfoBuilder.class);
 
-    private final String token;
-    private final String username;
-    private final UserInfo userInfo;
+    private String token;
+    private String username;
+    private UserInfo userInfo;
 
     private int readinessStatus = 0b00000000;
 
@@ -90,6 +90,10 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
         this.userInfo = new UserInfo(username,token);
     }
 
+    public UserInfoBuilder() {
+
+    }
+
     @Override
     public UserInfo get() {
         return userInfo;
@@ -106,5 +110,11 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
     @Override
     public boolean test() {
         return UserInfoBuilder.testMask(this,UserInfoBuilder.READYNESS_MASK);
+    }
+
+    public static void cloneUserInfo(UserInfoBuilder b, UserInfo ui) {
+        b.userInfo = ui.withToken(ui.getAccessToken());
+        b.username = ui.getName();
+        b.token    = ui.getAccessToken();
     }
 }
