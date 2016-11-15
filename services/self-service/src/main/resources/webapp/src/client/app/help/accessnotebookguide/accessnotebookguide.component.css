@@ -1,0 +1,51 @@
+.guide-wrapper {
+  font-family: Trebuchet MS, sans-serif;
+  width: 60%;
+  margin: 0 auto;
+}
+.guide-wrapper p {
+  margin-bottom: 30px;
+}
+.guide-wrapper h3 {
+  margin-top: 30px;
+  margin-bottom: 25px;
+}
+.guide-wrapper ul {
+  list-style: none;
+}
+.guide-wrapper ul li {
+  position: relative;
+  line-height: 30px;
+}
+.guide-wrapper ul li:before {
+  position: absolute;
+  margin-left: -25px;
+  padding-right: 12px;
+  content: '';
+  height: 12px;
+  display: block;
+  top: 10px;
+  background: #31708f;
+  border-radius: 30%;
+}
+.guide-wrapper img {
+  display: block;
+    margin: 50px auto;
+}
+.code-block {
+  line-height: 30px;
+  background: #333;
+  color: #fff;
+  padding: 10px;
+  border: 2px solid #ccc;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.txt-color-green {
+  color: #589d59;
+}
+.txt-color-yellow {
+  color: #e1e155;
+  font-style: italic;
+}
