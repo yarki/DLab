@@ -254,13 +254,13 @@ def run():
             rules_list.append({"GroupId": i})
         ingress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
-            {"IpProtocol": "-1", "IpRanges": [{"CidrIp": get_instance_ip_address(edge_conf['instance_name']).get('Private') + "/32"}], "UserIdGroupPairs": [], "PrefixListIds": []},
+            #{"IpProtocol": "-1", "IpRanges": [{"CidrIp": get_instance_ip_address(edge_conf['instance_name']).get('Private') + "/32"}], "UserIdGroupPairs": [], "PrefixListIds": []},
             {"IpProtocol": "-1", "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}], "UserIdGroupPairs": [], "PrefixListIds": []},
             {"IpProtocol": "-1", "IpRanges": [{"CidrIp": get_instance_ip_address('{}-ssn'.format(edge_conf['service_base_name'])).get('Private') + "/32"}], "UserIdGroupPairs": [], "PrefixListIds": []}
         ]
         egress_sg_rules_template = [
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
-            {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [], "PrefixListIds": []}
+            {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "PrefixListIds": []}
         ]
         params = "--name %s --vpc_id %s --security_group_rules '%s' --egress '%s' --infra_tag_name %s --infra_tag_value %s" % \
                  (edge_conf['notebook_security_group_name'], edge_conf['vpc_id'],
