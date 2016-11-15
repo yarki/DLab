@@ -18,6 +18,7 @@ export class ComputationalResourcesModel {
   private resource: any;
   private confirmAction : Function;
   private userResourceService : UserResourceService;
+  public computationalName : string;
   constructor(notebook: any,
    			      resource: any,
               fnProcessResults: any,
@@ -28,11 +29,21 @@ export class ComputationalResourcesModel {
   	this.terminateComputationalResource(notebook, resource, fnProcessResults, fnProcessErrors);
   }
 
+
   terminateComputationalResource(notebook: any, resource: any,  fnProcessResults : any, fnProcessErrors: any){
     this.notebook = notebook;
     this.resource = resource;
+
+    if(this.resource)
+      this.computationalName = this.resource.computational_name
+
     this.confirmAction = () => this.userResourceService
       .suspendComputationalResource(notebook.name, resource.computational_name)
       .subscribe((response : Response) => fnProcessResults(response), (response: Response) => fnProcessErrors(response));
     };
+
+   static getDefault (userResourceService : UserResourceService) : ComputationalResourcesModel {
+     return new
+       ComputationalResourcesModel({}, {}, () => {}, () => {}, userResourceService);
+   }
 }
