@@ -16,6 +16,7 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.identitymanagement.model.User;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.UserInfoDAO;
+import com.epam.dlab.auth.conveyor.LoginCache;
 import com.epam.dlab.auth.conveyor.LoginConveyor;
 import com.epam.dlab.auth.conveyor.LoginStep;
 import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
@@ -92,7 +93,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		log.debug("validating username:{} password:****** token:{} ip:{}", username, accessToken,remoteIp);
 		String token = getRandomToken();
 		UserInfo ui;
-		if (this.isAccessTokenAvailable(accessToken)) {
+		if (LoginCache.getInstance().getUserInfo(accessToken) != null) {
 			return Response.ok(accessToken).build();
 		} else {
 			CompletableFuture<UserInfo> uiFuture = loginConveyor.startUserInfoBuild(token,username);
@@ -155,7 +156,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		if(ui == null) {
 			ui = userInfoDao.getUserInfoByAccessToken(access_token);
 			if( ui != null ) {
-				ui = rememberUserInfo(access_token, ui);
+				ui = ui.withToken(access_token);
+				LoginCache.getInstance().save(ui);
 				userInfoDao.updateUserInfoTTL(access_token, ui);
 				log.debug("restored UserInfo from DB {}",ui);
 			}
@@ -171,9 +173,9 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	@POST
 	@Path("/logout")
 	public Response logout(String access_token) {
-		UserInfo ui = this.forgetAccessToken(access_token);
+		LoginCache.getInstance().removeUserInfo(access_token);
 		userInfoDao.deleteUserInfo(access_token);
-		log.debug("Logged out {} {}", access_token, ui);
+		log.debug("Logged out {}", access_token);
 		return Response.ok().build();
 	}
 }
