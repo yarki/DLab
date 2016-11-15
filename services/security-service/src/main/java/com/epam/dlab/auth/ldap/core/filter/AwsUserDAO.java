@@ -11,10 +11,12 @@
  *****************************************************************************************************/
 package com.epam.dlab.auth.ldap.core.filter;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.identitymanagement.model.User;
 
 public interface AwsUserDAO {
 
     public User getAwsUser(String username);
+    public void updateCredentials(AWSCredentials credentials);
 
 }

@@ -10,35 +10,15 @@
 
  *****************************************************************************************************/
 
-package com.epam.dlab.backendapi.health;
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AccessNotebookGuide } from './accessnotebookguide.component';
+import { NavbarModule } from './../../shared/navbar/index';
 
-import com.epam.dlab.client.restclient.RESTService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+@NgModule({
+  imports: [CommonModule, NavbarModule],
+  declarations: [AccessNotebookGuide],
+  exports: [AccessNotebookGuide]
+})
 
-import javax.ws.rs.core.Response;
-
-public class ProvisioningHealthChecker implements HealthChecker {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningHealthChecker.class);
-
-    private RESTService provisioningService;
-
-    public ProvisioningHealthChecker(RESTService provisioningService) {
-        this.provisioningService = provisioningService;
-    }
-
-    @Override
-    public boolean isAlive() {
-        try {
-            Response response = provisioningService.get("infrastructure/status", Response.class);
-            boolean alive = response.getStatusInfo().getStatusCode() == Response.Status.OK.getStatusCode();
-            if (!alive) {
-                LOGGER.error("Provisioning service is not available");
-            }
-            return alive;
-        } catch (Throwable t) {
-            LOGGER.error("Provisioning service is not available", t);
-            return false;
-        }
-    }
-}
+export class AccessNotebookGuideModule { }

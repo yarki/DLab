@@ -20,7 +20,9 @@ import boto3, botocore
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket_name', type=str, default='')
 parser.add_argument('--service_base_name', type=str, default='')
-parser.add_argument('--iam_user', type=str, default='')
+parser.add_argument('--username', type=str, default='')
+parser.add_argument('--edge_role_name', type=str, default='')
+parser.add_argument('--notebook_role_name', type=str, default='')
 args = parser.parse_args()
 
 
@@ -38,18 +40,20 @@ if __name__ == "__main__":
         try:
             iam = boto3.client('iam')
             try:
-                response = iam.create_policy(PolicyName='{}-{}-strict_to_S3-Policy'.format(args.service_base_name, args.iam_user), PolicyDocument=policy)
+                response = iam.create_policy(PolicyName='{}-{}-strict_to_S3-Policy'.format(args.service_base_name, args.username), PolicyDocument=policy)
                 arn = response.get('Policy').get('Arn')
             except botocore.exceptions.ClientError as cle:
                 if cle.response['Error']['Code'] == 'EntityAlreadyExists':
-                    print "Policy {}-{}-strict_to_S3-Policy alredy exists. Reusing it.".format(args.service_base_name, args.iam_user)
+                    print "Policy {}-{}-strict_to_S3-Policy already exists. Reusing it.".format(args.service_base_name, args.username)
                     list = iam.list_policies().get('Policies')
                     for i in list:
-                        if args.iam_user in i.get('Arn'):
+                        if args.username in i.get('Arn'):
                             arn = i.get('Arn')
             try:
-                iam.attach_user_policy(UserName=args.iam_user, PolicyArn=arn)
-                print 'POLICY_NAME "{0}-{1}-strict_to_S3-Policy" has been attached to user "{1}"'.format(args.service_base_name, args.iam_user)
+                iam.attach_role_policy(RoleName=args.edge_role_name, PolicyArn=arn)
+                print 'POLICY_NAME "{0}-{1}-strict_to_S3-Policy" has been attached to role "{2}"'.format(args.service_base_name, args.username, args.edge_role_name)
+                iam.attach_role_policy(RoleName=args.notebook_role_name, PolicyArn=arn)
+                print 'POLICY_NAME "{0}-{1}-strict_to_S3-Policy" has been attached to role "{2}"'.format(args.service_base_name, args.username, args.notebook_role_name)
                 success = True
             except botocore.exceptions.ClientError as e:
                 print e.response['Error']['Message']

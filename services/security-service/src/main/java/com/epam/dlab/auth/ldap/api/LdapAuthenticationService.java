@@ -36,7 +36,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
 
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -45,7 +48,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 
 	private final LdapUserDAO ldapUserDAO;
 	private final AwsUserDAO awsUserDAO;
-
+	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	private UserInfoDAO userInfoDao;
 	
 	public LdapAuthenticationService(SecurityServiceConfiguration config, Environment env) {
@@ -57,8 +60,18 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			this.userInfoDao = new UserInfoDAODumbImpl();
 		}
 		if(config.isAwsUserIdentificationEnabled()) {
-			DefaultAWSCredentialsProviderChain providerChain = DefaultAWSCredentialsProviderChain.getInstance();
+			DefaultAWSCredentialsProviderChain providerChain = new DefaultAWSCredentialsProviderChain();
 			awsUserDAO = new AwsUserDAOImpl(providerChain.getCredentials());
+			scheduler.scheduleAtFixedRate(()->{
+				try {
+					providerChain.refresh();
+					awsUserDAO.updateCredentials(providerChain.getCredentials());
+					log.debug("provider credentials refreshed");
+				} catch (Exception e) {
+					log.error("AWS provider error",e);
+					throw e;
+				}
+			},5,5, TimeUnit.MINUTES);
 		} else {
 			awsUserDAO = null;
 		}
@@ -89,7 +102,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 					if(awsUser != null) {
 						ui.setAwsUser(true);
 					} else {
-						throw new DlabException("AWS User "+username+" was not found.");
+						ui.setAwsUser(false);
+						log.warn("AWS User '{}' was not found. ",username);
 					}
 				}
 			} catch (Exception e) {

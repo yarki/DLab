@@ -25,8 +25,8 @@ public class AwsUserDAOImpl implements AwsUserDAO {
     private final static Logger LOG = LoggerFactory.getLogger(AwsUserDAOImpl.class);
 
     private final ExpirableContainer<User> usersCache = new ExpirableContainer<>();
-    private final AWSCredentials credentials;
-    private final AmazonIdentityManagement aim;
+    private volatile AWSCredentials credentials;
+    private volatile AmazonIdentityManagement aim;
 
     public AwsUserDAOImpl(AWSCredentials credentials) {
 
@@ -40,7 +40,7 @@ public class AwsUserDAOImpl implements AwsUserDAO {
             });
 
         } catch(Exception e) {
-            LOG.error("Failed AWS user initialization. Will keep trying ... ",e);
+            LOG.error("Failed AWS user initialization. Will keep trying. Error: {}",e.getMessage());
         }
     }
 
@@ -53,6 +53,12 @@ public class AwsUserDAOImpl implements AwsUserDAO {
             LOG.debug("Fetched AWS user {}",u);
         }
         return u;
+    }
+
+    @Override
+    public void updateCredentials(AWSCredentials credentials) {
+        this.credentials = credentials;
+        this.aim         = new AmazonIdentityManagementClient(credentials);
     }
 
     private User fetchAwsUser(String username) {
