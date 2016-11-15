@@ -67,7 +67,6 @@ def run():
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['key_name'] = os.environ['creds_key_name']
     edge_conf['user_keyname'] = os.environ['edge_user_name']
-    edge_conf['policy_arn'] = os.environ['edge_notebook_policy_arn']
     edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
     # edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
     edge_conf['vpc_id'] = os.environ['edge_vpc_id']
@@ -132,9 +131,9 @@ def run():
     try:
         logging.info('[CREATE EDGE ROLES]')
         print '[CREATE EDGE ROLES]'
-        params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
+        params = "--role_name %s --role_profile_name %s --policy_name %s" % \
                  (edge_conf['role_name'], edge_conf['role_profile_name'],
-                  edge_conf['policy_name'], edge_conf['policy_arn'])
+                  edge_conf['policy_name'])
         if not run_routine('create_role_policy', params):
             logging.info('Failed creating roles')
             with open("/root/result.json", 'w') as result:
@@ -148,9 +147,9 @@ def run():
     try:
         logging.info('[CREATE BACKEND (NOTEBOOK) ROLES]')
         print '[CREATE BACKEND (NOTEBOOK) ROLES]'
-        params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
+        params = "--role_name %s --role_profile_name %s --policy_name %s" % \
                  (edge_conf['notebook_role_name'], edge_conf['notebook_role_profile_name'],
-                  edge_conf['notebook_policy_name'], edge_conf['policy_arn'])
+                  edge_conf['notebook_policy_name'])
         if not run_routine('create_role_policy', params):
             logging.info('Failed creating roles')
             with open("/root/result.json", 'w') as result:
