@@ -109,7 +109,7 @@ def emr_sg(id):
     return master, slave
 
 
-def wait_emr(bucket, cluster_name, timeout, delay=20):
+def wait_emr(bucket, cluster_name, timeout, delay=30):
     deadline = time.time() + timeout
     prefix = "config/" + cluster_name + "/"
     global cluster_id

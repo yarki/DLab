@@ -31,7 +31,7 @@ public class ProvisioningHealthChecker implements HealthChecker {
     public boolean isAlive() {
         try {
             Response response = provisioningService.get("infrastructure/status", Response.class);
-            boolean alive = response.getStatusInfo() == Response.Status.OK;
+            boolean alive = response.getStatusInfo().getStatusCode() == Response.Status.OK.getStatusCode();
             if (!alive) {
                 LOGGER.error("Provisioning service is not available");
             }

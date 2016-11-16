@@ -32,12 +32,14 @@ import { ErrorMapUtils } from './../../util/errorMapUtils';
    @ViewChild('bindDialog') bindDialog;
    @Output() rebuildGrid: EventEmitter<{}> = new EventEmitter();
 
-   constructor(private userResourceService: UserResourceService) { }
+   constructor(private userResourceService: UserResourceService) {
+     this.model = ComputationalResourcesModel.getDefault(userResourceService);
+   }
 
    ngOnInit() {
      this.bindDialog.onClosing = () => this.resetDialog();
    }
-   
+
    public open(option, notebook, resource) {
      this.model = new ComputationalResourcesModel(notebook, resource,
        (response: Response) => {
