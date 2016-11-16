@@ -205,7 +205,7 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withUserKeyName(String userKeyName) {
-        options.add(String.format("-e \"user_keyname=%s\"", userKeyName));
+        options.add(String.format("-e \"edge_user_name=%s\"", userKeyName));
         return this;
     }
 
