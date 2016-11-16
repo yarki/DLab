@@ -26,6 +26,7 @@ import boto3, botocore
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket_name', type=str, default='')
+parser.add_argument('--ssn_bucket_name', type=str, default='')
 parser.add_argument('--service_base_name', type=str, default='')
 parser.add_argument('--username', type=str, default='')
 parser.add_argument('--edge_role_name', type=str, default='')
@@ -40,6 +41,7 @@ if __name__ == "__main__":
             handler = open('/root/templates/s3_policy.json', 'r')
             policy = handler.read()
             policy = policy.replace('BUCKET_NAME', args.bucket_name)
+            policy = policy.replace('SSN_BUCK', args.ssn_bucket_name)
         except OSError:
             print "Failed to open policy template"
             success = False
@@ -48,6 +50,7 @@ if __name__ == "__main__":
             iam = boto3.client('iam')
             try:
                 response = iam.create_policy(PolicyName='{}-{}-strict_to_S3-Policy'.format(args.service_base_name, args.username), PolicyDocument=policy)
+                time.sleep(10)
                 arn = response.get('Policy').get('Arn')
             except botocore.exceptions.ClientError as cle:
                 if cle.response['Error']['Code'] == 'EntityAlreadyExists':
@@ -59,8 +62,10 @@ if __name__ == "__main__":
             try:
                 iam.attach_role_policy(RoleName=args.edge_role_name, PolicyArn=arn)
                 print 'POLICY_NAME "{0}-{1}-strict_to_S3-Policy" has been attached to role "{2}"'.format(args.service_base_name, args.username, args.edge_role_name)
+                time.sleep(5)
                 iam.attach_role_policy(RoleName=args.notebook_role_name, PolicyArn=arn)
                 print 'POLICY_NAME "{0}-{1}-strict_to_S3-Policy" has been attached to role "{2}"'.format(args.service_base_name, args.username, args.notebook_role_name)
+                time.sleep(5)
                 success = True
             except botocore.exceptions.ClientError as e:
                 print e.response['Error']['Message']
