@@ -50,6 +50,7 @@ if __name__ == "__main__":
             iam = boto3.client('iam')
             try:
                 response = iam.create_policy(PolicyName='{}-{}-strict_to_S3-Policy'.format(args.service_base_name, args.username), PolicyDocument=policy)
+                time.sleep(10)
                 arn = response.get('Policy').get('Arn')
             except botocore.exceptions.ClientError as cle:
                 if cle.response['Error']['Code'] == 'EntityAlreadyExists':
