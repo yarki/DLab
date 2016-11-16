@@ -12,6 +12,12 @@
 
 package com.epam.dlab.backendapi.core.response.keyloader;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.SelfAPI;
 import com.epam.dlab.backendapi.core.CommandBuilder;
@@ -25,17 +31,9 @@ import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
-import com.epam.dlab.utils.UsernameUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Singleton
 public class KeyLoader implements DockerCommands, SelfAPI {
@@ -69,7 +67,8 @@ public class KeyLoader implements DockerCommands, SelfAPI {
                                 .withVolumeForResponse(configuration.getKeyLoaderDirectory())
                                 .withRequestId(uuid)
                                 .withCredsKeyName(configuration.getAdminKey())
-                                .withActionCreate(configuration.getEdgeImage()),
+                                .withActionCreate(configuration.getEdgeImage()).
+                                withUserKeyName(dto.getEdge().getEdgeUserName()),
                         dto.getEdge()
                 )
         );
