@@ -81,8 +81,7 @@ def get_instance_ip_address(instance_name):
 def get_ami_id_by_name(ami_name):
     ec2 = boto3.resource('ec2')
     try:
-        for image in ec2.images.filter(Filters=[{'Name': 'name', 'Values': [ami_name]},
-                                                {'Name': 'state', 'Values': 'available'}]):
+        for image in ec2.images.filter(Filters=[{'Name': 'name', 'Values': [ami_name]}, {'Name': 'state', 'Values': ['available']}]):
             return image.id
     except:
         return ''
