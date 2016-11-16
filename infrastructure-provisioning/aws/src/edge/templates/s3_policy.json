@@ -16,7 +16,7 @@
         "s3:HeadObject",
         "s3:ListObjects"
       ],
-      "Resource": "arn:aws:s3:::SSN_BUCK",
+      "Resource": "arn:aws:s3:::SSN_BUCK/*",
       "Condition": {}
     },
     {
