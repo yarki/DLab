@@ -26,6 +26,7 @@ import boto3, botocore
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket_name', type=str, default='')
+parser.add_argument('--ssn_bucket_name', type=str, default='')
 parser.add_argument('--service_base_name', type=str, default='')
 parser.add_argument('--username', type=str, default='')
 parser.add_argument('--edge_role_name', type=str, default='')
@@ -40,6 +41,7 @@ if __name__ == "__main__":
             handler = open('/root/templates/s3_policy.json', 'r')
             policy = handler.read()
             policy = policy.replace('BUCKET_NAME', args.bucket_name)
+            policy = policy.replace('SSN_BUCK', args.ssn_bucket_name)
         except OSError:
             print "Failed to open policy template"
             success = False
