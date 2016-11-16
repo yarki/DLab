@@ -30,9 +30,6 @@ import java.nio.file.Paths;
 
 import static com.epam.dlab.backendapi.core.DockerCommands.MAPPER;
 
-/**
- * @author Viktor Chukhra <Viktor_Chukhra@epam.com>
- */
 public class ReadMetadataTest {
     private static final String EMR_METADATA_DESCRIPTION_JSON = "/metadata/description.json";
     private static final String JUPITER_METADATA_DESCRIPTION_JSON = "/metadata/description_1.json";
