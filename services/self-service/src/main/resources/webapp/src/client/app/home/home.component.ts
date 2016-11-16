@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Copyright © 2016, EPAM SYSTEMS INC
+Copyright (c) 2016, EPAM SYSTEMS INC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ export class HomeComponent implements OnInit {
       this.toggleDialogs(false, false, false);
 
   }
-  
+
   setProgressDialogConfiguration() {
     return {
       message: 'Initial infrastructure is being created, <br/>please, wait...',

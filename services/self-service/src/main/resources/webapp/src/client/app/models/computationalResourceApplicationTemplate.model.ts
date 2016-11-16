@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Copyright © 2016, EPAM SYSTEMS INC
+Copyright (c) 2016, EPAM SYSTEMS INC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ export class ComputationalResourceApplicationTemplate {
   version: string;
   applications: Array<ComputationalResourceApplication>
   shapes: Array<ResourceShapeModel>;
-  
+
   constructor(jsonModel:any, shapes: Array<ResourceShapeModel>) {
     this.version = jsonModel.version;
     this.applications = [];
