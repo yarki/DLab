@@ -181,6 +181,7 @@ def attach_policy(policy_arn, role_name):
     try:
         conn = boto.connect_iam()
         conn.attach_role_policy(policy_arn, role_name)
+        time.sleep(10)
     except Exception as err:
         logging.info("Unable to attach Policy: " + str(err))
         with open("/root/result.json", 'w') as result:
