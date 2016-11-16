@@ -62,8 +62,10 @@ if __name__ == "__main__":
             try:
                 iam.attach_role_policy(RoleName=args.edge_role_name, PolicyArn=arn)
                 print 'POLICY_NAME "{0}-{1}-strict_to_S3-Policy" has been attached to role "{2}"'.format(args.service_base_name, args.username, args.edge_role_name)
+                time.sleep(5)
                 iam.attach_role_policy(RoleName=args.notebook_role_name, PolicyArn=arn)
                 print 'POLICY_NAME "{0}-{1}-strict_to_S3-Policy" has been attached to role "{2}"'.format(args.service_base_name, args.username, args.notebook_role_name)
+                time.sleep(5)
                 success = True
             except botocore.exceptions.ClientError as e:
                 print e.response['Error']['Message']
