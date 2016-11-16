@@ -62,6 +62,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			this.userInfoDao = new UserInfoDAODumbImpl();
 		}
 		loginConveyor.setUserInfoDao(userInfoDao);
+		LoginCache.getInstance().setDefaultBuilderTimeout(config.getInactiveUserTimeoutMillSec(),TimeUnit.MILLISECONDS);
+		LoginCache.getInstance().setExpirationPostponeTime(config.getInactiveUserTimeoutMillSec(),TimeUnit.MILLISECONDS);
 		if(config.isAwsUserIdentificationEnabled()) {
 			DefaultAWSCredentialsProviderChain providerChain = new DefaultAWSCredentialsProviderChain();
 			awsUserDAO = new AwsUserDAOImpl(providerChain.getCredentials());
@@ -92,7 +94,6 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 
 		log.debug("validating username:{} password:****** token:{} ip:{}", username, accessToken,remoteIp);
 		String token = getRandomToken();
-		UserInfo ui;
 		if (LoginCache.getInstance().getUserInfo(accessToken) != null) {
 			return Response.ok(accessToken).build();
 		} else {
@@ -152,7 +153,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	@Path("/getuserinfo")
 	public UserInfo getUserInfo(String access_token, @Context HttpServletRequest request) {
 		String remoteIp = request.getRemoteAddr();
-		UserInfo ui     = AuthorizedUsers.getInstance().getUserInfo(access_token);
+		UserInfo ui     = LoginCache.getInstance().getUserInfo(access_token);
+				//AuthorizedUsers.getInstance().getUserInfo(access_token);
 		if(ui == null) {
 			ui = userInfoDao.getUserInfoByAccessToken(access_token);
 			if( ui != null ) {
