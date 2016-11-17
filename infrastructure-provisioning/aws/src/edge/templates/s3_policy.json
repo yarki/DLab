@@ -11,6 +11,24 @@
     },
     {
       "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:HeadObject",
+        "s3:ListObjects"
+      ],
+      "Resource": "arn:aws:s3:::SSN_BUCK/*",
+      "Condition": {}
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": "arn:aws:s3:::SSN_BUCK",
+      "Condition": {}
+    },
+    {
+      "Effect": "Allow",
       "Action": "s3:ListAllMyBuckets",
       "Resource": "*",
       "Condition": {}
