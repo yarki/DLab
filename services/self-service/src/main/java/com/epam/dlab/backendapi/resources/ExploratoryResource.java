@@ -75,6 +75,8 @@ public class ExploratoryResource implements ExploratoryAPI {
                 ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withExploratoryName(formDTO.getName())
+                        // TODO hardcoded, should be taken from response.json and stored in mongo, then fetched here...
+                        .withAmiId("ami-746aba14")
                         .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
                         .withNotebookInstanceType(formDTO.getShape())
