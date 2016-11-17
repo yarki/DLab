@@ -191,6 +191,20 @@ def get_emr_list(tag_name, type='Key', emr_count=False):
     return clusters_list
 
 
+def get_emr_id_by_name(name):
+    cluster_id = ''
+    emr = boto3.client('emr')
+    clusters = emr.list_clusters(
+        ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING']
+    )
+    clusters = clusters.get('Clusters')
+    for i in clusters:
+        response = emr.describe_cluster(ClusterId=i.get('Id'))
+        if response.get('Cluster').get('Name') == name:
+            cluster_id = i.get('Id')
+    return cluster_id
+
+
 def get_ec2_list(tag_name, value=''):
     ec2 = boto3.resource('ec2')
     if value:

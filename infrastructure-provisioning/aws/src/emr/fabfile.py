@@ -21,6 +21,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
+from dlab.aws_actions import *
 import sys
 
 
@@ -166,6 +167,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        emr_id = get_emr_id_by_name(emr_conf['cluster_name'])
+        terminate_emr(emr_id)
         sys.exit(1)
 
     try:
