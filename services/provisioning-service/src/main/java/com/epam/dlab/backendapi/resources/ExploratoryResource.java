@@ -18,6 +18,15 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
+import java.io.IOException;
+import java.util.Properties;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
@@ -33,21 +42,15 @@ import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStopDTO;
 import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 
 @Path("/exploratory")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
+    private static final String AMI_ID = "AMI_ID";
+    private static final String SSH_USER = "SSH_USER";
+
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
@@ -64,7 +67,9 @@ public class ExploratoryResource implements DockerCommands {
     @Path("/create")
     @POST
     public String create(ExploratoryCreateDTO dto) throws IOException, InterruptedException {
-        return action(dto, DockerAction.CREATE);
+        Properties properties = new Properties();
+        properties.put(AMI_ID, dto.getExploratoryAmiId());
+        return action(dto, DockerAction.CREATE, properties);
     }
 
     @Path("/start")
@@ -82,28 +87,44 @@ public class ExploratoryResource implements DockerCommands {
     @Path("/stop")
     @POST
     public String stop(ExploratoryStopDTO dto) throws IOException, InterruptedException {
-        return action(dto, DockerAction.STOP);
+        Properties properties = new Properties();
+        properties.put(AMI_ID, dto.getSshUser());
+        return action(dto, DockerAction.STOP, properties);
     }
 
-    private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException, InterruptedException {
+    private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException,   InterruptedException {
+        return action(dto, action, new Properties());
+    }
+
+
+    private String action(ExploratoryBaseDTO dto, DockerAction action, Properties properties) throws IOException,
+            InterruptedException {
         LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(action, uuid, dto));
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withInteractive()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withImage(configuration.getNotebookImage())
-                                .withAction(action),
-                        dto
-                )
-        );
+
+
+        RunDockerCommand runDockerCommand = new RunDockerCommand().withInteractive().withVolumeForRootKeys(
+                configuration.getKeyDirectory()).withVolumeForResponse(configuration.getImagesDirectory())
+                                                                  .withRequestId(uuid)
+                                                                  .withCredsKeyName(configuration.getAdminKey())
+                                                                  .withCredsKeyDir(configuration.getKeyDirectory())
+                                                                  .withImage(configuration.getNotebookImage())
+                                                                  .withConfServiceBaseName(dto.getServiceBaseName())
+                                                                  .withNotebookUserName(dto.getNotebookUserName())
+                                                                  .withCredsRegion(dto.getRegion())
+                                                                  .withAction(action);
+
+        if (properties.getProperty(AMI_ID) != null) {
+            runDockerCommand = runDockerCommand.withNotebookAmiId(properties.getProperty(AMI_ID));
+        }
+        if (properties.getProperty(SSH_USER) != null) {
+            runDockerCommand = runDockerCommand.withNotebookSshUser(properties.getProperty(SSH_USER));
+
+        }
+        commandExecuter.executeAsync(commandBuilder.buildCommand(runDockerCommand, dto));
         return uuid;
     }
 

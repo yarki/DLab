@@ -120,6 +120,21 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withCredsKeyDir(String credsKeyDir) {
+        options.add(String.format("-e \"creds_key_dir=%s\"", credsKeyDir));
+        return this;
+    }
+
+    public RunDockerCommand withNotebookAmiId(String amiId) {
+        options.add(String.format("-e \"notebook_ami_id=%s\"", amiId));
+        return this;
+    }
+
+    public RunDockerCommand withNotebookSshUser(String sshUser) {
+        options.add(String.format("-e \"notebook_ssh_user=%s\"", sshUser));
+        return this;
+    }
+
     public RunDockerCommand withConfServiceBaseName(String confServiceBaseName) {
         options.add(String.format("-e \"conf_service_base_name=%s\"", confServiceBaseName));
         return this;
@@ -135,10 +150,11 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withAmiId(String amiId) {
+    public RunDockerCommand withEdgeAmiId(String amiId) {
         options.add(String.format("-e \"edge_ami_id=%s\"", amiId));
         return this;
     }
+    
     public RunDockerCommand withVpcId(String vpcId) {
         options.add(String.format("-e \"edge_vpc_id=%s\"", vpcId));
         return this;
@@ -256,7 +272,6 @@ public class RunDockerCommand implements DockerCommand {
     public String toString() {
         return toCMD();
     }
-
 
 
 }
