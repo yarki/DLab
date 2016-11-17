@@ -18,6 +18,12 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.response.keyloader;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.SelfAPI;
 import com.epam.dlab.backendapi.core.CommandBuilder;
@@ -27,21 +33,14 @@ import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
-import com.epam.dlab.utils.UsernameUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Singleton
 public class KeyLoader implements DockerCommands, SelfAPI {
@@ -65,9 +64,10 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     public String uploadKey(UploadFileDTO dto) throws IOException, InterruptedException {
         saveKeyToFile(dto);
         String uuid = DockerCommands.generateUUID();
+        EdgeCreateDTO edgeDto = dto.getEdge();
         folderListenerExecutor.start(configuration.getKeyLoaderDirectory(),
-                configuration.getKeyLoaderPollTimeout(),
-                getFileHandlerCallback(dto.getEdge().getIamUser(), uuid));
+                                     configuration.getKeyLoaderPollTimeout(),
+                                     getFileHandlerCallback(edgeDto.getIamUser(), uuid));
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
@@ -75,8 +75,15 @@ public class KeyLoader implements DockerCommands, SelfAPI {
                                 .withVolumeForResponse(configuration.getKeyLoaderDirectory())
                                 .withRequestId(uuid)
                                 .withCredsKeyName(configuration.getAdminKey())
-                                .withActionCreate(configuration.getEdgeImage()),
-                        dto.getEdge()
+                                .withActionCreate(configuration.getEdgeImage())
+                                .withAmiId(edgeDto.getAmiId())
+                                .withConfServiceBaseName(edgeDto.getServiceBaseName())
+                                .withEmrInstanceSize(edgeDto.getInstanceSize())
+                                .withCredsRegion(edgeDto.getRegion())
+                                .withCredsSecurityGroupsIds(edgeDto.getSecurityGroupIds())
+                                .withVpcId(edgeDto.getVpcId())
+                                .withEdgeSubnetId(edgeDto.getSubnetId())
+                                .withUserKeyName(edgeDto.getEdgeUserName()), edgeDto
                 )
         );
 

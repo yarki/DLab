@@ -130,6 +130,26 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withEmrInstanceSize(String instanceSize) {
+        options.add(String.format("-e \"edge_instance_size=%s\"", instanceSize));
+        return this;
+    }
+
+    public RunDockerCommand withAmiId(String amiId) {
+        options.add(String.format("-e \"edge_ami_id=%s\"", amiId));
+        return this;
+    }
+    public RunDockerCommand withVpcId(String vpcId) {
+        options.add(String.format("-e \"edge_vpc_id=%s\"", vpcId));
+        return this;
+    }
+
+    public RunDockerCommand withEdgeSubnetId(String subnetId) {
+        options.add(String.format("-e \"creds_subnet_id=%s\"", subnetId));
+        return this;
+    }
+
+
     public RunDockerCommand withEmrInstanceType(String emrInstanceType) {
         options.add(String.format("-e \"emr_instance_type=%s\"", emrInstanceType));
         return this;
@@ -211,7 +231,7 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withUserKeyName(String userKeyName) {
-        options.add(String.format("-e \"user_keyname=%s\"", userKeyName));
+        options.add(String.format("-e \"edge_user_name=%s\"", userKeyName));
         return this;
     }
 
@@ -236,6 +256,7 @@ public class RunDockerCommand implements DockerCommand {
     public String toString() {
         return toCMD();
     }
+
 
 
 }
