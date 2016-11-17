@@ -178,7 +178,7 @@ def run():
         additional_config = [{"name": "base", "tag": "latest"},
                              {"name": "jupyter", "tag": "latest"},
                              {"name": "edge", "tag": "latest"},
-                             {"name": "emr", "tag": "latest"},]
+                             {"name": "emr", "tag": "latest"}, ]
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
 
@@ -259,7 +259,22 @@ def run():
             print "Jenkins is either configured already or have issues in configuration routine."
 
         with open("/root/result.json", 'w') as f:
-            res = {"hostname": get_instance_hostname(instance_name), "master_keyname": os.environ['creds_key_name']}
+            res = {"service_base_name": service_base_name,
+                   "instance_name": instance_name,
+                   "instance_hostname": get_instance_hostname(instance_name),
+                   "role_name": role_name,
+                   "role_profile_name": role_profile_name,
+                   "policy_name": policy_name,
+                   "master_keyname": os.environ['creds_key_name'],
+                   "policies": os.environ['conf_policy_arn'],
+                   "vpc_id": os.environ['creds_vpc_id'],
+                   "subnet_id": os.environ['creds_subnet_id'],
+                   "security_id": os.environ['creds_security_groups_ids'],
+                   "instance_shape": os.environ['ssn_instance_size'],
+                   "ami_id": os.environ['ssn_ami_id'],
+                   "bucket_name": user_bucket_name,
+                   "region": region,
+                   "action": "Create SSN instance"}
             f.write(json.dumps(res))
 
         logging.info('[FINALIZE]')

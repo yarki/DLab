@@ -21,7 +21,8 @@
 import os
 import json
 import sys
-from fabric.api import local
+from fabric.api import *
+from dlab.aws_meta import *
 
 
 if __name__ == "__main__":
@@ -50,6 +51,17 @@ if __name__ == "__main__":
 
     with open("/response/%s.json" % os.environ['request_id'], 'w') as response_file:
         response_file.write(json.dumps(reply))
+
+    print 'Upload response file'
+    instance_name = os.environ['conf_service_base_name'] + '-ssn'
+    env['connection_attempts'] = 100
+    env.key_filename = os.environ['creds_key_name']
+    env.host_string = 'ubuntu@' + get_instance_hostname(instance_name)
+    try:
+        put('/response/%s.json' % os.environ['request_id'], '/home/ubuntu/')
+    except:
+        print 'Failed to upload response file'
+        sys.exit(1)
 
     if not success:
         sys.exit(1)
