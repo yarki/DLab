@@ -4,31 +4,36 @@
     {
       "Effect": "Allow",
       "Action": "s3:ListAllMyBuckets",
-      "Resource": "*"
+      "Resource": "arn:aws:s3:::*"
     },
     {
       "Effect": "Allow",
       "Action": [
-        "s3:GetObject",
-        "s3:HeadObject",
-        "s3:ListObjects",
         "s3:ListBucket",
         "s3:GetBucketLocation"
       ],
       "Resource": [
         "arn:aws:s3:::SSN_BUCK",
-        "arn:aws:s3:::SSN_BUCK/*"
+        "arn:aws:s3:::BUCKET_NAME"
 	  ]
     },
     {
       "Effect": "Allow",
       "Action": [
-        "s3:*"
+        "s3:GetObject",
+        "s3:HeadObject"
       ],
-      "Resource": [
-        "arn:aws:s3:::BUCKET_NAME",
-        "arn:aws:s3:::BUCKET_NAME/*"
-      ]
+      "Resource": "arn:aws:s3:::SSN_BUCK/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:HeadObject",
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::BUCKET_NAME/*"
     }
   ]
 }
