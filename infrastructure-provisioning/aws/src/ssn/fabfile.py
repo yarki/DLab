@@ -56,6 +56,7 @@ def run():
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn'
         region = os.environ['creds_region']
+        ssn_ami_id = get_ami_id()
 
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
@@ -114,7 +115,7 @@ def run():
         print('[CREATE SSN INSTANCE]')
         params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
                  "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s" % \
-                 (instance_name, os.environ['ssn_ami_id'], os.environ['ssn_instance_size'],
+                 (instance_name, ssn_ami_id, os.environ['ssn_instance_size'],
                   os.environ['creds_key_name'], os.environ['creds_security_groups_ids'],
                   os.environ['creds_subnet_id'], role_profile_name, tag_name, instance_name)
 

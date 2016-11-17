@@ -257,3 +257,34 @@ def get_route_table_by_tag(tag_name, tag_value):
         Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
     rt_id = route_tables.get('RouteTables')[0].get('RouteTableId')
     return rt_id
+
+
+def get_ami_id():
+    client = boto3.client('ec2')
+    image_id = ''
+    response = client.describe_images(
+        Filters=[
+            {
+                'Name': 'name',
+                'Values': ['ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20160907.1']
+            },
+            {
+                'Name': 'virtualization-type', 'Values': ['hvm']
+            },
+            {
+                'Name': 'state', 'Values': ['available']
+            },
+            {
+                'Name': 'root-device-name', 'Values': ['/dev/sda1']
+            },
+            {
+                'Name': 'root-device-type', 'Values': ['ebs']
+            },
+            {
+                'Name': 'architecture', 'Values': ['x86_64']
+            }
+        ])
+    response = response.get('Images')
+    for i in response:
+        image_id = i.get('ImageId')
+    return image_id
