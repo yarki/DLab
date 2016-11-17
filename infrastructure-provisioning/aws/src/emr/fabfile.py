@@ -211,7 +211,7 @@ def terminate():
     emr_conf['notebook_name'] = os.environ['notebook_instance_name']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     emr_conf['ssh_user'] = os.environ['notebook_ssh_user']
-    emr_conf['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
+    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
 
     try:

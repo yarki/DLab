@@ -299,7 +299,7 @@ def stop():
     notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
     notebook_config['ssh_user'] = os.environ['notebook_ssh_user']
-    notebook_config['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
+    notebook_config['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
 
     try:
         logging.info('[STOP NOTEBOOK]')
