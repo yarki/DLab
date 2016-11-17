@@ -9,26 +9,26 @@
     {
       "Effect": "Allow",
       "Action": [
+        "s3:GetObject",
+        "s3:HeadObject",
+        "s3:ListObjects",
         "s3:ListBucket",
         "s3:GetBucketLocation"
       ],
-      "Resource": "arn:aws:s3:::SSN_BUCK"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:HeadObject",
-        "s3:ListObjects"
-      ],
-      "Resource": "arn:aws:s3:::SSN_BUCK/*"
+      "Resource": [
+        "arn:aws:s3:::SSN_BUCK",
+        "arn:aws:s3:::SSN_BUCK/*"
+	  ]
     },
     {
       "Effect": "Allow",
       "Action": [
         "s3:*"
       ],
-      "Resource": "arn:aws:s3:::BUCKET_NAME/*"
+      "Resource": [
+        "arn:aws:s3:::BUCKET_NAME",
+        "arn:aws:s3:::BUCKET_NAME/*"
+      ]
     }
   ]
 }
