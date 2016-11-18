@@ -56,7 +56,7 @@ def run():
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn'
         region = os.environ['creds_region']
-        ssn_ami_id = get_ami_id()
+        ssn_ami_id = get_ami_id(os.environ['ssn_ami_name'])
 
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
