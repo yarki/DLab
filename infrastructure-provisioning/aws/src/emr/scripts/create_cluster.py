@@ -70,7 +70,7 @@ cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{
     args.s3_bucket, args.name, args.nbs_user, args.region, os.environ['edge_user_name'])
 
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/jars_parser.sh /tmp/jars_parser.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
-          "Name=CUSTOM_JAR, Args=cat /tmp/{4}.pub >> /home/hadoop/.ssh/authorized_keys, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+          "Name=CUSTOM_JAR, Args=sudo cat /tmp/{4}.pub >> /home/hadoop/.ssh/authorized_keys, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
           "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, os.environ['edge_user_name'])
 
 logfile = '{}_creation.log'.format(args.name)
@@ -102,6 +102,11 @@ def upload_jars_parser(args):
 def upload_user_key(args):
     s3 = boto3.resource('s3')
     s3.meta.client.upload_file(os.environ['creds_key_dir'] + '/' + os.environ['edge_user_name'] + '.pub', args.s3_bucket, os.environ['edge_user_name'] + '.pub')
+
+
+def remove_user_key(args):
+    client = boto3.client('s3')
+    client.delete_object(Bucket=args.s3_bucket, Key=os.environ['edge_user_name'] + '.pub')
 
 
 def get_instance_by_ip(ip):
@@ -257,6 +262,7 @@ if __name__ == "__main__":
         upload_jars_parser(args)
         upload_user_key(args)
         build_emr_cluster(args)
+        remove_user_key(args)
     else:
         upload_jars_parser(args)
         upload_user_key(args)
@@ -285,4 +291,5 @@ if __name__ == "__main__":
                 terminate_emr(cluster_id)
             s3_cleanup(args.s3_bucket, args.name)
             sys.exit(1)
+        remove_user_key(args)
     sys.exit(0)
