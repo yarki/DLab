@@ -194,12 +194,20 @@ def spark_defaults(args):
     local('cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR1|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" > /tmp/spark-defaults-temporary.conf')
     local('printf "\\n"')
     local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> /tmp/spark-defaults-temporary.conf')
+    local('cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.historyServer.address >> /tmp/spark-defaults-temporary.conf')
+    local('cat  /tmp/spark-defaults-emr.conf | grep spark.history.ui.port >> /tmp/spark-defaults-temporary.conf')
+    local('cat  /tmp/spark-defaults-emr.conf | grep spark.shuffle.service.enabled >> /tmp/spark-defaults-temporary.conf')
+    local('cat  /tmp/spark-defaults-emr.conf | grep spark.dynamicAllocation.enabled >> /tmp/spark-defaults-temporary.conf')
+    local('cat  /tmp/spark-defaults-emr.conf | grep spark.executor.memory >> /tmp/spark-defaults-temporary.conf')
+    local('cat  /tmp/spark-defaults-emr.conf | grep spark.executor.cores >> /tmp/spark-defaults-temporary.conf')
+    local("""cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.dist.files | sed 's|/etc/spark/conf/|/srv/hadoopconf/config/CLUSTER/|g' >> /tmp/spark-defaults-temporary.conf""")
     template_file = "/tmp/spark-defaults-temporary.conf"
     with open(template_file, 'r') as f:
         text = f.read()
     text = text.replace('EMRVERSION', args.emr_version)
     text = text.replace('MISSEDJAR1', missed_jar_path1)
     text = text.replace('MISSEDJAR2', missed_jar_path2)
+    text = text.replace('CLUSTER', args.cluster_name)
     with open(spark_def_path, 'w') as f:
         f.write(text)
     endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'

@@ -191,6 +191,20 @@ def get_emr_list(tag_name, type='Key', emr_count=False):
     return clusters_list
 
 
+def get_emr_id_by_name(name):
+    cluster_id = ''
+    emr = boto3.client('emr')
+    clusters = emr.list_clusters(
+        ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING']
+    )
+    clusters = clusters.get('Clusters')
+    for i in clusters:
+        response = emr.describe_cluster(ClusterId=i.get('Id'))
+        if response.get('Cluster').get('Name') == name:
+            cluster_id = i.get('Id')
+    return cluster_id
+
+
 def get_ec2_list(tag_name, value=''):
     ec2 = boto3.resource('ec2')
     if value:
@@ -243,3 +257,34 @@ def get_route_table_by_tag(tag_name, tag_value):
         Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
     rt_id = route_tables.get('RouteTables')[0].get('RouteTableId')
     return rt_id
+
+
+def get_ami_id(ami_name):
+    client = boto3.client('ec2')
+    image_id = ''
+    response = client.describe_images(
+        Filters=[
+            {
+                'Name': 'name',
+                'Values': [ami_name]
+            },
+            {
+                'Name': 'virtualization-type', 'Values': ['hvm']
+            },
+            {
+                'Name': 'state', 'Values': ['available']
+            },
+            {
+                'Name': 'root-device-name', 'Values': ['/dev/sda1']
+            },
+            {
+                'Name': 'root-device-type', 'Values': ['ebs']
+            },
+            {
+                'Name': 'architecture', 'Values': ['x86_64']
+            }
+        ])
+    response = response.get('Images')
+    for i in response:
+        image_id = i.get('ImageId')
+    return image_id
