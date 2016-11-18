@@ -119,7 +119,6 @@ public class RunDockerCommand implements DockerCommand {
         options.add(String.format("-e \"creds_key_name=%s\"", keyName));
         return this;
     }
-
     public RunDockerCommand withConfServiceBaseName(String confServiceBaseName) {
         options.add(String.format("-e \"conf_service_base_name=%s\"", confServiceBaseName));
         return this;
@@ -135,10 +134,11 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withAmiId(String amiId) {
+    public RunDockerCommand withEdgeAmiId(String amiId) {
         options.add(String.format("-e \"edge_ami_id=%s\"", amiId));
         return this;
     }
+
     public RunDockerCommand withVpcId(String vpcId) {
         options.add(String.format("-e \"edge_vpc_id=%s\"", vpcId));
         return this;
@@ -256,7 +256,6 @@ public class RunDockerCommand implements DockerCommand {
     public String toString() {
         return toCMD();
     }
-
 
 
 }
