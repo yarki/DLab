@@ -72,7 +72,7 @@ def run():
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
     print 'Searching preconfigured images'
-    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
+    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'], 'available')
     if ami_id != '':
         print 'Preconfigured image found. Using: ' + ami_id
         notebook_config['ami_id'] = ami_id
