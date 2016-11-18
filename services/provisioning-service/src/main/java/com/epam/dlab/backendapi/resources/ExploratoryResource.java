@@ -48,9 +48,6 @@ import com.google.inject.Inject;
 @Produces(MediaType.APPLICATION_JSON)
 public class ExploratoryResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryResource.class);
-    private static final String AMI_ID = "AMI_ID";
-    private static final String SSH_USER = "SSH_USER";
-
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
@@ -67,9 +64,7 @@ public class ExploratoryResource implements DockerCommands {
     @Path("/create")
     @POST
     public String create(ExploratoryCreateDTO dto) throws IOException, InterruptedException {
-        Properties properties = new Properties();
-        properties.put(AMI_ID, dto.getExploratoryAmiId());
-        return action(dto, DockerAction.CREATE, properties);
+        return action(dto, DockerAction.CREATE);
     }
 
     @Path("/start")
@@ -87,9 +82,7 @@ public class ExploratoryResource implements DockerCommands {
     @Path("/stop")
     @POST
     public String stop(ExploratoryStopDTO dto) throws IOException, InterruptedException {
-        Properties properties = new Properties();
-        properties.put(AMI_ID, dto.getSshUser());
-        return action(dto, DockerAction.STOP, properties);
+        return action(dto, DockerAction.STOP);
     }
 
     private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException,   InterruptedException {
@@ -110,20 +103,9 @@ public class ExploratoryResource implements DockerCommands {
                 configuration.getKeyDirectory()).withVolumeForResponse(configuration.getImagesDirectory())
                                                                   .withRequestId(uuid)
                                                                   .withCredsKeyName(configuration.getAdminKey())
-                                                                  .withCredsKeyDir(configuration.getKeyDirectory())
                                                                   .withImage(configuration.getNotebookImage())
-                                                                  .withConfServiceBaseName(dto.getServiceBaseName())
-                                                                  .withNotebookUserName(dto.getNotebookUserName())
-                                                                  .withCredsRegion(dto.getRegion())
                                                                   .withAction(action);
 
-        if (properties.getProperty(AMI_ID) != null) {
-            runDockerCommand = runDockerCommand.withNotebookAmiId(properties.getProperty(AMI_ID));
-        }
-        if (properties.getProperty(SSH_USER) != null) {
-            runDockerCommand = runDockerCommand.withNotebookSshUser(properties.getProperty(SSH_USER));
-
-        }
         commandExecuter.executeAsync(commandBuilder.buildCommand(runDockerCommand, dto));
         return uuid;
     }
