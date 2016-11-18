@@ -168,7 +168,7 @@ def create_iam_role(role_name, role_profile):
         conn.create_role(role_name)
         conn.create_instance_profile(role_profile)
         conn.add_role_to_instance_profile(role_profile, role_name)
-        time.sleep(10)
+        time.sleep(30)
     except Exception as err:
         logging.info("Unable to create IAM role: " + str(err))
         with open("/root/result.json", 'w') as result:
@@ -181,6 +181,7 @@ def attach_policy(policy_arn, role_name):
     try:
         conn = boto.connect_iam()
         conn.attach_role_policy(policy_arn, role_name)
+        time.sleep(30)
     except Exception as err:
         logging.info("Unable to attach Policy: " + str(err))
         with open("/root/result.json", 'w') as result:

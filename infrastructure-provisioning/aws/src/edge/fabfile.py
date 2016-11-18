@@ -78,7 +78,7 @@ def run():
     # edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
     edge_conf['vpc_id'] = os.environ['edge_vpc_id']
     edge_conf['region'] = os.environ['edge_region']
-    edge_conf['ami_id'] = os.environ['edge_ami_id']
+    edge_conf['ami_id'] = get_ami_id(os.environ['edge_ami_name'])
     edge_conf['instance_size'] = os.environ['edge_instance_size']
     edge_conf['sg_ids'] = os.environ['creds_security_groups_ids']
 
@@ -86,6 +86,7 @@ def run():
     edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
     edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
     edge_conf['bucket_name'] = (edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-bucket').lower().replace('_', '-')
+    edge_conf['ssn_bucket_name'] = (edge_conf['service_base_name'] + "-ssn-bucket").lower().replace('_', '-')
     edge_conf['role_name'] = edge_conf['instance_name'] + '-Role'
     edge_conf['role_profile_name'] = edge_conf['instance_name'] + '-Profile'
     edge_conf['policy_name'] = edge_conf['instance_name'] + '-Policy'
@@ -262,8 +263,8 @@ def run():
     try:
         logging.info('[CREATING BUCKET POLICY FOR USER INSTANCES]')
         print('[CREATING BUCKET POLICY FOR USER INSTANCES]')
-        params = '--bucket_name {} --username {} --edge_role_name {} --notebook_role_name {} --service_base_name {}'.format(
-            edge_conf['bucket_name'], os.environ['edge_user_name'], edge_conf['role_name'], edge_conf['notebook_role_name'],  edge_conf['service_base_name'])
+        params = '--bucket_name {} --ssn_bucket_name {} --username {} --edge_role_name {} --notebook_role_name {} --service_base_name {}'.format(
+            edge_conf['bucket_name'], edge_conf['ssn_bucket_name'], os.environ['edge_user_name'], edge_conf['role_name'], edge_conf['notebook_role_name'],  edge_conf['service_base_name'])
         if not run_routine('create_policy', params):
             logging.info('Failed creating bucket policy')
             with open("/root/result.json", 'w') as result:
