@@ -255,9 +255,11 @@ if __name__ == "__main__":
     elif args.dry_run:
         # get_emr_state(args.id)
         upload_jars_parser(args)
+        upload_user_key(args)
         build_emr_cluster(args)
     else:
         upload_jars_parser(args)
+        upload_user_key(args)
         out = open(logpath, 'a')
         nbs_id = get_instance_by_ip(args.nbs_ip)
         out.write('Notebook server "{}" IP is "{}"\n'.format(nbs_id, args.nbs_ip))
