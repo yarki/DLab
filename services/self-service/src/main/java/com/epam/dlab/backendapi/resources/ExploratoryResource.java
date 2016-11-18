@@ -85,7 +85,6 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withIamUserName(userInfo.getName())
                         .withNotebookInstanceType(formDTO.getShape())
                         .withRegion(settingsDAO.getAwsRegion())
-                        //hardcoded value. should be taken from settings dao in future.
                         .withSecurityGroupIds(settingsDAO.getSecurityGroups());
                 LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
