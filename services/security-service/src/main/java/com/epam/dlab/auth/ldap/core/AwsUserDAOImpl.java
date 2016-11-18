@@ -27,6 +27,8 @@ import com.epam.dlab.auth.rest.ExpirableContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class AwsUserDAOImpl implements AwsUserDAO {
 
     private final static Logger LOG = LoggerFactory.getLogger(AwsUserDAOImpl.class);
@@ -66,6 +68,19 @@ public class AwsUserDAOImpl implements AwsUserDAO {
     public void updateCredentials(AWSCredentials credentials) {
         this.credentials = credentials;
         this.aim         = new AmazonIdentityManagementClient(credentials);
+    }
+
+    @Override
+    public List<AccessKeyMetadata> getAwsAccessKeys(String username) {
+        List<AccessKeyMetadata> data = null;
+        try {
+            ListAccessKeysRequest request = new ListAccessKeysRequest().withUserName(username);
+            ListAccessKeysResult result   = aim.listAccessKeys(request);
+            data = result.getAccessKeyMetadata();
+        } catch (Exception e) {
+            LOG.error("AccessKeyMetadata for {} request failed: {}",username,e.getMessage());
+        }
+        return data;
     }
 
     private User fetchAwsUser(String username) {

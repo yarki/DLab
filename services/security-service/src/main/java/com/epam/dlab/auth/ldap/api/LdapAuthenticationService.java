@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.auth.ldap.api;
 
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.services.identitymanagement.model.AccessKeyMetadata;
 import com.amazonaws.services.identitymanagement.model.User;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.UserInfoDAO;
@@ -44,6 +45,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 @Path("/")
@@ -140,6 +143,25 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 					}
 				} else {
 					loginConveyor.add(token,false,LoginStep.AWS_USER);
+				}
+			});
+
+			//Check AWS keys
+			threadpool.submit(()->{
+				if(config.isAwsUserIdentificationEnabled()) {
+					try {
+						List<AccessKeyMetadata> keys = awsUserDAO.getAwsAccessKeys(username);
+						if (keys != null) {
+							loginConveyor.add(token, keys, LoginStep.AWS_KEYS);
+						} else {
+							loginConveyor.add(token, new ArrayList<AccessKeyMetadata>(), LoginStep.AWS_KEYS);
+							log.warn("AWS Keys for '{}' were not found. ", username);
+						}
+					} catch (Exception e) {
+						loginConveyor.cancel(token);
+					}
+				} else {
+					loginConveyor.add(token,new ArrayList<AccessKeyMetadata>(),LoginStep.AWS_KEYS);
 				}
 			});
 

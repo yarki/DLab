@@ -2,11 +2,13 @@ package com.epam.dlab.auth.conveyor;
 
 import com.aegisql.conveyor.BuilderSupplier;
 import com.aegisql.conveyor.Testing;
+import com.amazonaws.services.identitymanagement.model.AccessKeyMetadata;
 import com.epam.dlab.auth.UserInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -23,14 +25,14 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
 
     private int readinessStatus = 0b00000000;
 
-    public final static int FIRST_NAME      = 0b00001;
-    public final static int LAST_NAME       = 0b00010;
-    public final static int AWS_USER_SET    = 0b00100;
-    public final static int ROLE_SET        = 0b01000;
-    public final static int REMOTE_IP       = 0b10000;
+    public final static int FIRST_NAME      = 0b000001;
+    public final static int LAST_NAME       = 0b000010;
+    public final static int AWS_USER_SET    = 0b000100;
+    public final static int ROLE_SET        = 0b001000;
+    public final static int REMOTE_IP       = 0b010000;
+    public final static int AWS_KEYS        = 0b100000;
 
-    public final static int FIRST_LAST_SET = 0b00011;
-    public final static int READYNESS_MASK  = 0b11111;
+    public final static int READYNESS_MASK  = 0b111111;
 
     public static boolean testMask(Supplier<? extends UserInfo> supplier, int mask) {
         UserInfoBuilder builder = (UserInfoBuilder) supplier;
@@ -116,5 +118,11 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
         b.userInfo = ui.withToken(ui.getAccessToken());
         b.username = ui.getName();
         b.token    = ui.getAccessToken();
+    }
+
+    public static void awsKeys(UserInfoBuilder userInfoBuilder, List<AccessKeyMetadata> keyMetadata) {
+        LOG.debug("AWS Keys {}",keyMetadata);
+        keyMetadata.forEach(k-> userInfoBuilder.userInfo.addKey(k.getAccessKeyId(),k.getStatus()));
+        userInfoBuilder.readinessStatus |= AWS_KEYS;
     }
 }
