@@ -28,6 +28,7 @@ from fabric.api import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import json
+import os
 
 parser = argparse.ArgumentParser()
 # parser.add_argument('--id', type=str, default='')
@@ -64,11 +65,13 @@ args = parser.parse_args()
 cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/config/{1}/hive-site.xml --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/config/{1} --recursive --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/{4}.pub /tmp/{4}.pub --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
-    args.s3_bucket, args.name, args.nbs_user, args.region)
+    args.s3_bucket, args.name, args.nbs_user, args.region, os.environ['notebook_user_name'])
 
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/jars_parser.sh /tmp/jars_parser.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
-          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label)
+          "Name=CUSTOM_JAR, Args=cat /tmp/{4}.pub >> /home/hadoop/.ssh/authorized_keys, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, os.environ['notebook_user_name'])
 
 logfile = '{}_creation.log'.format(args.name)
 logpath = '/response/' + logfile
@@ -94,6 +97,11 @@ def get_object_count(bucket, prefix):
 def upload_jars_parser(args):
     s3 = boto3.resource('s3')
     s3.meta.client.upload_file('/root/scripts/jars_parser.sh', args.s3_bucket, 'jars_parser.sh')
+
+
+def upload_user_key(args):
+    s3 = boto3.resource('s3')
+    s3.meta.client.upload_file(os.environ['creds_key_dir'] + '/' + os.environ['notebook_user_name'] + '.pub', args.s3_bucket, os.environ['notebook_user_name'] + '.pub')
 
 
 def get_instance_by_ip(ip):
