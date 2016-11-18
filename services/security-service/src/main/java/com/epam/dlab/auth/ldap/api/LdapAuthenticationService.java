@@ -182,7 +182,6 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 	public UserInfo getUserInfo(String access_token, @Context HttpServletRequest request) {
 		String remoteIp = request.getRemoteAddr();
 		UserInfo ui     = LoginCache.getInstance().getUserInfo(access_token);
-				//AuthorizedUsers.getInstance().getUserInfo(access_token);
 		if(ui == null) {
 			ui = userInfoDao.getUserInfoByAccessToken(access_token);
 			if( ui != null ) {

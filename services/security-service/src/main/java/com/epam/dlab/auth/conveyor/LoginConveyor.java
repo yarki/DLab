@@ -39,7 +39,6 @@ public class LoginConveyor extends KBalancedParallelConveyor<String,LoginStep,Us
         this.setResultConsumer(res->{
             LOG.debug("UserInfo Build Success: {}",res);
             LoginCache.getInstance().save(res.product);
-//            AuthorizedUsers.getInstance().addUserInfo(res.key, res.product);
             if(userInfoDao != null) {
                 userInfoDao.saveUserInfo(res.product);
             } else {
