@@ -77,8 +77,8 @@ def run():
         print 'Preconfigured image found. Using: ' + ami_id
         notebook_config['ami_id'] = ami_id
     else:
-        print 'No preconfigured image found. Using default one: ' + get_ami_id(os.environ['ssn_ami_name'])
-        notebook_config['ami_id'] = get_ami_id(os.environ['ssn_ami_name'])
+        print 'No preconfigured image found. Using default one: ' + get_ami_id(os.environ['notebook_ami_name'])
+        notebook_config['ami_id'] = get_ami_id(os.environ['notebook_ami_name'])
 
     tag = {"Key": notebook_config['tag_name'], "Value": "{}-{}-subnet".format(notebook_config['service_base_name'], os.environ['notebook_user_name'])}
     notebook_config['subnet_cidr'] = get_subnet_by_tag(tag)
