@@ -57,6 +57,7 @@ if __name__ == "__main__":
     env['connection_attempts'] = 100
     env.key_filename = os.environ['creds_key_name']
     env.host_string = 'ubuntu@' + get_instance_hostname(instance_name)
+    print env.key_filename + env.host_string
     try:
         put('/response/%s.json' % os.environ['request_id'], '/home/ubuntu/')
     except:
