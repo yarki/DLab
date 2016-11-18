@@ -55,7 +55,7 @@ if __name__ == "__main__":
     print 'Upload response file'
     instance_name = os.environ['conf_service_base_name'] + '-ssn'
     env['connection_attempts'] = 100
-    env.key_filename = os.environ['creds_key_name']
+    env.key_filename = "/root/keys/%s.pem" % os.environ['creds_key_name']
     env.host_string = 'ubuntu@' + get_instance_hostname(instance_name)
     print env.key_filename + env.host_string
     try:
