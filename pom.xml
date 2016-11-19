@@ -62,6 +62,33 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <version>0.7</version>
+                <configuration>
+                    <excludes>
+                        <exclude>.git/**</exclude>
+                        <exclude>.idea/**</exclude>
+                        <exclude>**/.gitignore</exclude>
+                        <exclude>**/*.ini</exclude>
+                        <exclude>**/*.json</exclude>
+                        <exclude>**/__init__.py</exclude>
+                        <exclude>**/*.conf</exclude>
+                        <exclude>**/.gitkeep</exclude>
+                        <exclude>**/*.lst</exclude>
+                        <exclude>**/*template</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
