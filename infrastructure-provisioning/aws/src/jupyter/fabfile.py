@@ -58,7 +58,6 @@ def run():
     notebook_config = dict()
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
     notebook_config['instance_type'] = os.environ['notebook_instance_type']
-    #notebook_config['subnet_cidr'] = os.environ['notebook_subnet_cidr']
     notebook_config['key_name'] = os.environ['creds_key_name']
     notebook_config['user_keyname'] = os.environ['notebook_user_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[

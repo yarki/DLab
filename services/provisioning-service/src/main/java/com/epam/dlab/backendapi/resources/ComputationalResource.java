@@ -69,6 +69,7 @@ public class ComputationalResource implements DockerCommands {
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(DockerAction.CREATE, uuid, dto));
         try {
+            long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
             commandExecuter.executeAsync(
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
@@ -77,9 +78,9 @@ public class ComputationalResource implements DockerCommands {
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withRequestId(uuid)
                                     .withEc2Role(configuration.getEmrEC2RoleDefault())
+                                    .withEmrTimeout(Long.toString(timeout))
                                     .withServiceRole(configuration.getEmrServiceRoleDefault())
                                     .withCredsKeyName(configuration.getAdminKey())
-                                    .withCredsSecurityGroupsIds(dto.getSecurityGroupIds())
                                     .withActionCreate(configuration.getEmrImage()),
                             dto
                     )
@@ -106,7 +107,6 @@ public class ComputationalResource implements DockerCommands {
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withRequestId(uuid)
-                                    .withEmrClusterName(dto.getClusterName())
                                     .withCredsKeyName(configuration.getAdminKey())
                                     .withActionTerminate(configuration.getEmrImage()),
                             dto

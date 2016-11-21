@@ -86,8 +86,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withVersion(formDTO.getVersion())
                         .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
-                        .withRegion(settingsDAO.getAwsRegion())
-                        .withSecurityGroupIds(settingsDAO.getSecurityGroups());
+                        .withRegion(settingsDAO.getAwsRegion());
                 ;
                 LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
@@ -125,6 +124,8 @@ public class ComputationalResource implements ComputationalAPI {
                     .withComputationalName(computationalName)
                     .withNotebookInstanceName(exploratoryId)
                     .withClusterName(computationalId)
+                    .withKeyDir(settingsDAO.getCredsKeyDir())
+                    .withSshUser(settingsDAO.getExploratorySshUser())
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withRegion(settingsDAO.getAwsRegion());

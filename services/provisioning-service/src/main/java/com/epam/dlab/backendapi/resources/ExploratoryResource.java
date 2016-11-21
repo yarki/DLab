@@ -18,6 +18,15 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
+import java.io.IOException;
+import java.util.Properties;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
@@ -33,15 +42,6 @@ import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStopDTO;
 import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 
 @Path("/exploratory")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -85,25 +85,28 @@ public class ExploratoryResource implements DockerCommands {
         return action(dto, DockerAction.STOP);
     }
 
-    private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException, InterruptedException {
+    private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException,   InterruptedException {
+        return action(dto, action, new Properties());
+    }
+
+
+    private String action(ExploratoryBaseDTO dto, DockerAction action, Properties properties) throws IOException,
+            InterruptedException {
         LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(action, uuid, dto));
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withInteractive()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withImage(configuration.getNotebookImage())
-                                .withAction(action),
-                        dto
-                )
-        );
+
+
+        RunDockerCommand runDockerCommand = new RunDockerCommand().withInteractive().withVolumeForRootKeys(
+                configuration.getKeyDirectory()).withVolumeForResponse(configuration.getImagesDirectory())
+                                                                  .withRequestId(uuid)
+                                                                  .withCredsKeyName(configuration.getAdminKey())
+                                                                  .withImage(configuration.getNotebookImage())
+                                                                  .withAction(action);
+
+        commandExecuter.executeAsync(commandBuilder.buildCommand(runDockerCommand, dto));
         return uuid;
     }
 
