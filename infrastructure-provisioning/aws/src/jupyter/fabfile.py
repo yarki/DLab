@@ -1,16 +1,22 @@
 #!/usr/bin/python
 
-# ******************************************************************************************************
+# *****************************************************************************
 #
-# Copyright (c) 2016 EPAM Systems Inc.
+# Copyright (c) 2016, EPAM SYSTEMS INC
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#    http://www.apache.org/licenses/LICENSE-2.0
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# ****************************************************************************************************/
+# ******************************************************************************
 
 import json
 import sys
@@ -66,13 +72,13 @@ def run():
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
     print 'Searching preconfigured images'
-    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
+    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'], 'available')
     if ami_id != '':
         print 'Preconfigured image found. Using: ' + ami_id
         notebook_config['ami_id'] = ami_id
     else:
-        print 'No preconfigured image found. Using default one: ' + os.environ['notebook_ami_id']
-        notebook_config['ami_id'] = os.environ['notebook_ami_id']
+        print 'No preconfigured image found. Using default one: ' + get_ami_id(os.environ['notebook_ami_name'])
+        notebook_config['ami_id'] = get_ami_id(os.environ['notebook_ami_name'])
 
     tag = {"Key": notebook_config['tag_name'], "Value": "{}-{}-subnet".format(notebook_config['service_base_name'], os.environ['notebook_user_name'])}
     notebook_config['subnet_cidr'] = get_subnet_by_tag(tag)
@@ -192,6 +198,7 @@ def run():
         sys.exit(1)
 
     # checking the need for image creation
+    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
     if ami_id == '':
         print "Looks like it's first time we configure notebook server. Creating image."
         image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
@@ -293,7 +300,7 @@ def stop():
     notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
     notebook_config['ssh_user'] = os.environ['notebook_ssh_user']
-    notebook_config['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
+    notebook_config['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
 
     try:
         logging.info('[STOP NOTEBOOK]')
