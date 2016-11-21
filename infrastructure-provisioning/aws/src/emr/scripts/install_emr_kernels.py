@@ -32,7 +32,6 @@ parser.add_argument('--emr_version', type=str, default='emr-4.8.0')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--notebook_ip', type=str, default='')
-parser.add_argument('--region', type=str, default='')
 args = parser.parse_args()
 
 
