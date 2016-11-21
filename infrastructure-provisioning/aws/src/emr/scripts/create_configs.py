@@ -191,16 +191,16 @@ def spark_defaults(args):
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
     local('touch /tmp/spark-defaults-temporary.conf')
-    local('cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR1|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" > /tmp/spark-defaults-temporary.conf')
+    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR1|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" > /tmp/spark-defaults-temporary.conf' ''')
     local('printf "\\n"')
-    local('cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> /tmp/spark-defaults-temporary.conf')
-    local('cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.historyServer.address >> /tmp/spark-defaults-temporary.conf')
-    local('cat  /tmp/spark-defaults-emr.conf | grep spark.history.ui.port >> /tmp/spark-defaults-temporary.conf')
-    local('cat  /tmp/spark-defaults-emr.conf | grep spark.shuffle.service.enabled >> /tmp/spark-defaults-temporary.conf')
-    local('cat  /tmp/spark-defaults-emr.conf | grep spark.dynamicAllocation.enabled >> /tmp/spark-defaults-temporary.conf')
-    local('cat  /tmp/spark-defaults-emr.conf | grep spark.executor.memory >> /tmp/spark-defaults-temporary.conf')
-    local('cat  /tmp/spark-defaults-emr.conf | grep spark.executor.cores >> /tmp/spark-defaults-temporary.conf')
-    local("""cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.dist.files | sed 's|/etc/spark/conf/|/srv/hadoopconf/config/CLUSTER/|g' >> /tmp/spark-defaults-temporary.conf""")
+    local(''' sudo bash -c 'cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> /tmp/spark-defaults-temporary.conf' ''')
+    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.historyServer.address >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.history.ui.port >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.shuffle.service.enabled >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.dynamicAllocation.enabled >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.executor.memory >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.executor.cores >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    local(""" sudo bash -c "cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.dist.files | sed 's|/etc/spark/conf/|/srv/hadoopconf/config/CLUSTER/|g' >> /tmp/spark-defaults-temporary.conf | true;" """)
     template_file = "/tmp/spark-defaults-temporary.conf"
     with open(template_file, 'r') as f:
         text = f.read()
@@ -212,6 +212,12 @@ def spark_defaults(args):
         f.write(text)
     endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
     local("""bash -c 'echo "spark.hadoop.fs.s3a.endpoint    """ + endpoint_url + """" >> """ + spark_def_path + """'""")
+    local('sudo rm -f ' + template_file)
+
+
+def configuring_notebook(args):
+    jars_path = '/opt/' + args.emr_version + '/jars/'
+    local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
 
 
 if __name__ == "__main__":
@@ -226,3 +232,4 @@ if __name__ == "__main__":
         pyspark_kernel(args)
         toree_kernel(args)
         spark_defaults(args)
+        configuring_notebook(args)
