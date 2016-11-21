@@ -58,13 +58,14 @@ if __name__ == "__main__":
         for j in emr_list:
             emr = {}
             emr['id'] = j
-            emr['status'] =  get_emr_info(j, 'Status')['State']
+            emr['name'] = get_emr_info(j, 'name')
+            emr['status'] = get_emr_info(j, 'Status')['State']
             counter = 0
             for instance in get_ec2_list('Notebook', notebook['Name']):
                 counter +=1
                 emr['shape'] = instance.instance_type
             emr['nodes_count'] = counter
-            emr['type'] =  get_emr_info(j, 'ReleaseLabel')
+            emr['type'] = get_emr_info(j, 'ReleaseLabel')
             resources.append(emr)
         notebook['computeresources'] = resources
         notebooks.append(notebook)
