@@ -52,18 +52,5 @@ if __name__ == "__main__":
     with open("/response/%s.json" % os.environ['request_id'], 'w') as response_file:
         response_file.write(json.dumps(reply))
 
-    print 'Upload response file'
-    instance_name = os.environ['conf_service_base_name'] + '-ssn'
-    instance_hostname = get_instance_hostname(instance_name)
-    print 'Connect to SSN instance with hostname: ' + instance_hostname + 'and name' + instance_name
-    env['connection_attempts'] = 100
-    env.key_filename = "/root/keys/%s.pem" % os.environ['creds_key_name']
-    env.host_string = 'ubuntu@' + instance_hostname
-    try:
-        put('/response/%s.json' % os.environ['request_id'], '/home/ubuntu/')
-    except:
-        print 'Failed to upload response file'
-        sys.exit(1)
-
     if not success:
         sys.exit(1)
