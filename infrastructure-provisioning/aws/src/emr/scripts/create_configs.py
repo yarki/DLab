@@ -200,7 +200,7 @@ def spark_defaults(args):
     local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.dynamicAllocation.enabled >> /tmp/spark-defaults-temporary.conf | true;' ''')
     local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.executor.memory >> /tmp/spark-defaults-temporary.conf | true;' ''')
     local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.executor.cores >> /tmp/spark-defaults-temporary.conf | true;' ''')
-    local("""bash -c "cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.dist.files | sed 's|/etc/spark/conf/|/srv/hadoopconf/config/CLUSTER/|g' >> /tmp/spark-defaults-temporary.conf | true;" """)
+    local(""" sudo bash -c "cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.dist.files | sed 's|/etc/spark/conf/|/srv/hadoopconf/config/CLUSTER/|g' >> /tmp/spark-defaults-temporary.conf | true;" """)
     template_file = "/tmp/spark-defaults-temporary.conf"
     with open(template_file, 'r') as f:
         text = f.read()
