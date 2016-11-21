@@ -27,9 +27,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--bucket', type=str, default='')
 parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--dry_run', type=str, default='false')
-parser.add_argument('--emr_version', type=str, default='emr-4.8.0')
-parser.add_argument('--spark_version', type=str, default='1.6.0')
-parser.add_argument('--hadoop_version', type=str, default='2.6')
+parser.add_argument('--emr_version', type=str, default='')
+parser.add_argument('--spark_version', type=str, default='')
+parser.add_argument('--hadoop_version', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 args = parser.parse_args()
 
@@ -47,6 +47,7 @@ def install_emr_spark(args):
     local('wget ' + spark_link + ' -O /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
     local('mkdir -p /opt/' + args.emr_version)
     local('tar -zxvf /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/' + args.emr_version + '/')
+
 
 def prepare():
     local('mkdir -p ' + yarn_dir)
@@ -168,7 +169,6 @@ def toree_kernel(args):
         text = text.replace('CLUSTER', args.cluster_name)
         with open(run_sh_path, 'w') as f:
             f.write(text)
-
 
 
 def get_files(s3client, s3resource, dist, bucket, local):

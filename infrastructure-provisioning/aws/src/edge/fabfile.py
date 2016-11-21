@@ -75,9 +75,8 @@ def run():
     edge_conf['key_name'] = os.environ['creds_key_name']
     edge_conf['user_keyname'] = os.environ['edge_user_name']
     edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
-    # edge_conf['private_subnet_cidr'] = os.environ['edge_subnet_cidr']
     edge_conf['vpc_id'] = os.environ['edge_vpc_id']
-    edge_conf['region'] = os.environ['edge_region']
+    edge_conf['region'] = os.environ['creds_region']
     edge_conf['ami_id'] = get_ami_id(os.environ['edge_ami_name'])
     edge_conf['instance_size'] = os.environ['edge_instance_size']
     edge_conf['sg_ids'] = os.environ['creds_security_groups_ids']
