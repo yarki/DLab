@@ -26,7 +26,7 @@ import sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--config_dir', type=str, default='/root/conf/')
+parser.add_argument('--config_dir', type=str, default='')
 args = parser.parse_args()
 
 

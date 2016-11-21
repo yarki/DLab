@@ -25,26 +25,27 @@
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>Service_base_name</name>
-          <description>Base name of your services</description>
+          <description>unique infrastructure value that previously was used when ssn being provisioned</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>Notebook_Name</name>
-          <description>name of the notebook to stop</description>
+          <description>name of the notebook to start</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
-          <description>AWS admin key name</description>
-          <defaultValue>BDCC-DSS-POC</defaultValue>
+          <description>name of the uploaded ssh key file (without ".pem")</description>
+          <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>Region</name>
-          <description></description>
+          <description>aws region where infrastructure was deployed</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
               <string>us-west-2</string>
               <string>us-west-1</string>
+              <string>eu-west-1</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>

@@ -18,29 +18,29 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.response.keyloader;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.SelfAPI;
+import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
-import com.epam.dlab.utils.UsernameUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Singleton
 public class KeyLoader implements DockerCommands, SelfAPI {
@@ -57,33 +57,40 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     @Inject
     private CommandExecutor commandExecuter;
     @Inject
+    private CommandBuilder commandBuilder;
+    @Inject
     private RESTService selfService;
 
     public String uploadKey(UploadFileDTO dto) throws IOException, InterruptedException {
         saveKeyToFile(dto);
         String uuid = DockerCommands.generateUUID();
+        EdgeCreateDTO edgeDto = dto.getEdge();
         folderListenerExecutor.start(configuration.getKeyLoaderDirectory(),
-                configuration.getKeyLoaderPollTimeout(),
-                getFileHandlerCallback(dto.getUser(), uuid));
+                                     configuration.getKeyLoaderPollTimeout(),
+                                     getFileHandlerCallback(edgeDto.getIamUser(), uuid));
         commandExecuter.executeAsync(
-                new RunDockerCommand()
-                        .withVolumeForRootKeys(configuration.getKeyDirectory())
-                        .withVolumeForResponse(configuration.getKeyLoaderDirectory())
-                        .withRequestId(uuid)
-                        .withConfServiceBaseName(dto.getServiceBaseName())
-                        .withCredsKeyName(configuration.getAdminKey())
-                        .withCredsSecurityGroupsIds(dto.getSecurityGroup())
-                        .withEdgeUserName(UsernameUtils.removeDomain(dto.getUser()))
-                        .withIamUserName(dto.getUser())
-                        .withActionCreate(configuration.getEdgeImage())
-                        .toCMD()
+                commandBuilder.buildCommand(
+                        new RunDockerCommand()
+                                .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                .withVolumeForResponse(configuration.getKeyLoaderDirectory())
+                                .withRequestId(uuid)
+                                .withCredsKeyName(configuration.getAdminKey())
+                                .withActionCreate(configuration.getEdgeImage())
+                                .withConfServiceBaseName(edgeDto.getServiceBaseName())
+                                .withEmrInstanceSize(edgeDto.getInstanceSize())
+                                .withCredsRegion(edgeDto.getRegion())
+                                .withCredsSecurityGroupsIds(edgeDto.getSecurityGroupIds())
+                                .withVpcId(edgeDto.getVpcId())
+                                .withEdgeSubnetId(edgeDto.getSubnetId())
+                                .withUserKeyName(edgeDto.getEdgeUserName()), edgeDto
+                )
         );
 
         return uuid;
     }
 
     private void saveKeyToFile(UploadFileDTO dto) throws IOException {
-        Path keyFilePath = Paths.get(configuration.getKeyDirectory(), UsernameUtils.removeDomain(dto.getUser()) + KEY_EXTENTION);
+        Path keyFilePath = Paths.get(configuration.getKeyDirectory(), dto.getEdge().getEdgeUserName() + KEY_EXTENTION);
         LOGGER.debug("saving key to {}", keyFilePath.toString());
         Files.write(keyFilePath, dto.getContent().getBytes());
     }

@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--bucket', type=str, default='')
 parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--dry_run', type=str, default='false')
-parser.add_argument('--emr_version', type=str, default='emr-4.8.0')
+parser.add_argument('--emr_version', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--notebook_ip', type=str, default='')
@@ -62,6 +62,7 @@ def get_spark_version():
                 if j.get("Name") == 'Spark':
                     spark_version = j.get("Version")
     return spark_version
+
 
 def get_hadoop_version():
     hadoop_version = ''
