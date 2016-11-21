@@ -134,11 +134,6 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withEdgeAmiId(String amiId) {
-        options.add(String.format("-e \"edge_ami_id=%s\"", amiId));
-        return this;
-    }
-
     public RunDockerCommand withVpcId(String vpcId) {
         options.add(String.format("-e \"edge_vpc_id=%s\"", vpcId));
         return this;

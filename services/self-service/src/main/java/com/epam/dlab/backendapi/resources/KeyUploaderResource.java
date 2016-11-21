@@ -87,7 +87,6 @@ public class KeyUploaderResource implements KeyLoaderAPI {
                     .withRegion(settingsDAO.getAwsRegion())
                     // TODO hardcoded, should be taken from response.json and stored in mongo, then fetched here...
                     .withVpcId("vpc-588a2c3d")
-                    .withAmiId("ami-746aba14")
                     .withSubnetId("subnet-1e6c9347")
                     .withInstanceSize("t2.medium");
             UploadFileDTO dto = new UploadFileDTO()
