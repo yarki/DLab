@@ -119,7 +119,6 @@ public class RunDockerCommand implements DockerCommand {
         options.add(String.format("-e \"creds_key_name=%s\"", keyName));
         return this;
     }
-
     public RunDockerCommand withConfServiceBaseName(String confServiceBaseName) {
         options.add(String.format("-e \"conf_service_base_name=%s\"", confServiceBaseName));
         return this;
@@ -130,6 +129,22 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withEmrInstanceSize(String instanceSize) {
+        options.add(String.format("-e \"edge_instance_size=%s\"", instanceSize));
+        return this;
+    }
+
+    public RunDockerCommand withVpcId(String vpcId) {
+        options.add(String.format("-e \"edge_vpc_id=%s\"", vpcId));
+        return this;
+    }
+
+    public RunDockerCommand withEdgeSubnetId(String subnetId) {
+        options.add(String.format("-e \"creds_subnet_id=%s\"", subnetId));
+        return this;
+    }
+
+
     public RunDockerCommand withEmrInstanceType(String emrInstanceType) {
         options.add(String.format("-e \"emr_instance_type=%s\"", emrInstanceType));
         return this;
@@ -137,6 +152,11 @@ public class RunDockerCommand implements DockerCommand {
 
     public RunDockerCommand withEmrVersion(String emrVersion) {
         options.add(String.format("-e \"emr_version=%s\"", emrVersion));
+        return this;
+    }
+
+    public RunDockerCommand withEmrTimeout(String emrTimeout) {
+        options.add(String.format("-e \"emr_timeout=%s\"", emrTimeout));
         return this;
     }
 
@@ -206,7 +226,7 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withUserKeyName(String userKeyName) {
-        options.add(String.format("-e \"user_keyname=%s\"", userKeyName));
+        options.add(String.format("-e \"edge_user_name=%s\"", userKeyName));
         return this;
     }
 

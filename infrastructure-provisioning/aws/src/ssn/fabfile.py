@@ -23,6 +23,7 @@ from dlab.fab import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import sys, os
+from fabric.api import *
 
 
 def run():
@@ -156,10 +157,7 @@ def run():
     try:
         logging.info('[CONFIGURE SSN INSTANCE]')
         print('[CONFIGURE SSN INSTANCE]')
-        additional_config = {"nginx_template_dir": "/root/templates/",
-                             "squid_template_file": "/root/templates/squid.conf",
-                             "proxy_port": os.environ["ssn_proxy_port"],
-                             "proxy_subnet": os.environ["ssn_proxy_subnet"]}
+        additional_config = {"nginx_template_dir": "/root/templates/"}
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
 
@@ -182,7 +180,7 @@ def run():
         additional_config = [{"name": "base", "tag": "latest"},
                              {"name": "jupyter", "tag": "latest"},
                              {"name": "edge", "tag": "latest"},
-                             {"name": "emr", "tag": "latest"},]
+                             {"name": "emr", "tag": "latest"}, ]
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
 
@@ -263,8 +261,34 @@ def run():
             print "Jenkins is either configured already or have issues in configuration routine."
 
         with open("/root/result.json", 'w') as f:
-            res = {"hostname": get_instance_hostname(instance_name), "master_keyname": os.environ['creds_key_name']}
+            res = {"service_base_name": service_base_name,
+                   "instance_name": instance_name,
+                   "instance_hostname": get_instance_hostname(instance_name),
+                   "role_name": role_name,
+                   "role_profile_name": role_profile_name,
+                   "policy_name": policy_name,
+                   "master_keyname": os.environ['creds_key_name'],
+                   "policies": os.environ['conf_policy_arn'],
+                   "vpc_id": os.environ['creds_vpc_id'],
+                   "subnet_id": os.environ['creds_subnet_id'],
+                   "security_id": os.environ['creds_security_groups_ids'],
+                   "instance_shape": os.environ['ssn_instance_size'],
+                   "bucket_name": user_bucket_name,
+                   "region": region,
+                   "action": "Create SSN instance"}
             f.write(json.dumps(res))
+
+        print 'Upload response file'
+        instance_hostname = get_instance_hostname(instance_name)
+        print 'Connect to SSN instance with hostname: ' + instance_hostname + 'and name: ' + instance_name
+        env['connection_attempts'] = 100
+        env.key_filename = "/root/keys/%s.pem" % os.environ['creds_key_name']
+        env.host_string = 'ubuntu@' + instance_hostname
+        try:
+            put('/root/result.json', '/home/ubuntu/%s.json' % os.environ['request_id'])
+        except:
+            print 'Failed to upload response file'
+            sys.exit(1)
 
         logging.info('[FINALIZE]')
         print('[FINALIZE]')
@@ -277,3 +301,4 @@ def run():
         remove_role(instance)
         remove_s3(instance)
         sys.exit(1)
+

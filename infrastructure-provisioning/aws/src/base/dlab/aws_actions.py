@@ -16,7 +16,9 @@
 #
 # ******************************************************************************
 
-import boto3, boto, botocore
+import boto3
+import boto
+import botocore
 import time
 import sys
 import os
@@ -416,6 +418,8 @@ def terminate_emr(id):
         emr.terminate_job_flows(
             JobFlowIds=[id]
         )
+        waiter = emr.get_waiter('cluster_terminated')
+        waiter.wait(ClusterId=id)
     except Exception as err:
         logging.info("Unable to remove EMR: " + str(err))
         with open("/root/result.json", 'w') as result:
