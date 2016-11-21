@@ -7,7 +7,6 @@
     "creds_region":"CREG",
     "creds_subnet_id":"CSI",
     "edge_vpc_id":"EVI",
-    "edge_ami_id":"EAI",
     "edge_instance_size":"EIS",
     "creds_iam_user":"CIU"
 }
