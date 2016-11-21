@@ -56,6 +56,7 @@ def run():
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn'
         region = os.environ['creds_region']
+        ssn_ami_id = get_ami_id(os.environ['ssn_ami_name'])
 
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
@@ -114,7 +115,7 @@ def run():
         print('[CREATE SSN INSTANCE]')
         params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
                  "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s" % \
-                 (instance_name, os.environ['ssn_ami_id'], os.environ['ssn_instance_size'],
+                 (instance_name, ssn_ami_id, os.environ['ssn_instance_size'],
                   os.environ['creds_key_name'], os.environ['creds_security_groups_ids'],
                   os.environ['creds_subnet_id'], role_profile_name, tag_name, instance_name)
 
@@ -247,7 +248,7 @@ def run():
         print "Subnet ID: " + os.environ['creds_subnet_id']
         print "Security IDs: " + os.environ['creds_security_groups_ids']
         print "SSN instance shape: " + os.environ['ssn_instance_size']
-        print "SSN AMI ID: " + os.environ['ssn_ami_id']
+        print "SSN AMI name: " + os.environ['ssn_ami_name']
         print "SSN bucket name: " + user_bucket_name
         print "Region: " + region
         jenkins_url = "http://%s/jenkins" % get_instance_hostname(instance_name)

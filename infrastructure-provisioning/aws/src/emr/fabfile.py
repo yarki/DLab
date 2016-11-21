@@ -21,6 +21,7 @@
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
+from dlab.aws_actions import *
 import sys
 
 
@@ -37,6 +38,7 @@ def run():
     emr_conf = dict()
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
     emr_conf['service_base_name'] = os.environ['conf_service_base_name']
+    emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
     emr_conf['key_name'] = os.environ['creds_key_name']
     emr_conf['region'] = os.environ['creds_region']
     emr_conf['release_label'] = os.environ['emr_version']
@@ -55,6 +57,7 @@ def run():
 
     tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
     emr_conf['subnet_cidr'] = get_subnet_by_tag(tag)
+    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
 
     try:
         emr_conf['emr_timeout'] = os.environ['emr_timeout']
@@ -107,6 +110,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        emr_id = get_emr_id_by_name(emr_conf['cluster_name'])
+        terminate_emr(emr_id)
+        remove_kernels(emr_conf['cluster_name'],emr_conf['tag_name'],os.environ['notebook_name'],'ubuntu',emr_conf['key_path'])
         sys.exit(1)
 
     try:
@@ -152,7 +158,7 @@ def terminate():
     emr_conf['notebook_name'] = os.environ['notebook_instance_name']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     emr_conf['ssh_user'] = os.environ['notebook_ssh_user']
-    emr_conf['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
+    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
 
     try:

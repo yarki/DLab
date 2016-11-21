@@ -71,13 +71,13 @@ def run():
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
     print 'Searching preconfigured images'
-    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
+    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'], 'available')
     if ami_id != '':
         print 'Preconfigured image found. Using: ' + ami_id
         notebook_config['ami_id'] = ami_id
     else:
-        print 'No preconfigured image found. Using default one: ' + os.environ['notebook_ami_id']
-        notebook_config['ami_id'] = os.environ['notebook_ami_id']
+        print 'No preconfigured image found. Using default one: ' + get_ami_id(os.environ['notebook_ami_name'])
+        notebook_config['ami_id'] = get_ami_id(os.environ['notebook_ami_name'])
 
     tag = {"Key": notebook_config['tag_name'], "Value": "{}-{}-subnet".format(notebook_config['service_base_name'], os.environ['notebook_user_name'])}
     notebook_config['subnet_cidr'] = get_subnet_by_tag(tag)
@@ -197,6 +197,7 @@ def run():
         sys.exit(1)
 
     # checking the need for image creation
+    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
     if ami_id == '':
         print "Looks like it's first time we configure notebook server. Creating image."
         image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
@@ -298,7 +299,7 @@ def stop():
     notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
     notebook_config['ssh_user'] = os.environ['notebook_ssh_user']
-    notebook_config['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
+    notebook_config['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
 
     try:
         logging.info('[STOP NOTEBOOK]')

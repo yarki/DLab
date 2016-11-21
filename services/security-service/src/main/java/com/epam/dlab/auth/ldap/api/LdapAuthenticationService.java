@@ -18,6 +18,18 @@ limitations under the License.
 
 package com.epam.dlab.auth.ldap.api;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.identitymanagement.model.User;
 import com.epam.dlab.auth.UserInfo;
@@ -31,21 +43,7 @@ import com.epam.dlab.auth.ldap.core.filter.AwsUserDAO;
 import com.epam.dlab.auth.rest.AbstractAuthenticationService;
 import com.epam.dlab.auth.rest.AuthorizedUsers;
 import com.epam.dlab.dto.UserCredentialDTO;
-import com.epam.dlab.exceptions.DlabException;
 import io.dropwizard.setup.Environment;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.TimeUnit;
 
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -110,6 +108,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 					} else {
 						ui.setAwsUser(false);
 						log.warn("AWS User '{}' was not found. ",username);
+						//EPMCBDCCSS-880  if there is no user on AWS we don't allow user to login
+						return Response.status(Response.Status.UNAUTHORIZED).build();
 					}
 				}
 			} catch (Exception e) {
