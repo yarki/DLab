@@ -1,17 +1,32 @@
-/******************************************************************************************************
+/***************************************************************************
 
- Copyright (c) 2016 EPAM Systems Inc.
+Copyright (c) 2016, EPAM SYSTEMS INC
 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+    http://www.apache.org/licenses/LICENSE-2.0
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
- *****************************************************************************************************/
+****************************************************************************/
 
 package com.epam.dlab.backendapi.resources;
 
+import java.io.IOException;
+import java.util.Properties;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandBuilder;
 import com.epam.dlab.backendapi.core.CommandExecutor;
@@ -27,15 +42,6 @@ import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStopDTO;
 import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 
 @Path("/exploratory")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -79,25 +85,28 @@ public class ExploratoryResource implements DockerCommands {
         return action(dto, DockerAction.STOP);
     }
 
-    private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException, InterruptedException {
+    private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException,   InterruptedException {
+        return action(dto, action, new Properties());
+    }
+
+
+    private String action(ExploratoryBaseDTO dto, DockerAction action, Properties properties) throws IOException,
+            InterruptedException {
         LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(action, uuid, dto));
-        commandExecuter.executeAsync(
-                commandBuilder.buildCommand(
-                        new RunDockerCommand()
-                                .withInteractive()
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getImagesDirectory())
-                                .withRequestId(uuid)
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withImage(configuration.getNotebookImage())
-                                .withAction(action),
-                        dto
-                )
-        );
+
+
+        RunDockerCommand runDockerCommand = new RunDockerCommand().withInteractive().withVolumeForRootKeys(
+                configuration.getKeyDirectory()).withVolumeForResponse(configuration.getImagesDirectory())
+                                                                  .withRequestId(uuid)
+                                                                  .withCredsKeyName(configuration.getAdminKey())
+                                                                  .withImage(configuration.getNotebookImage())
+                                                                  .withAction(action);
+
+        commandExecuter.executeAsync(commandBuilder.buildCommand(runDockerCommand, dto));
         return uuid;
     }
 
