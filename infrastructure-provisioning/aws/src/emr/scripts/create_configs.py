@@ -214,6 +214,11 @@ def spark_defaults(args):
     local("""bash -c 'echo "spark.hadoop.fs.s3a.endpoint    """ + endpoint_url + """" >> """ + spark_def_path + """'""")
 
 
+def configuring_notebook(args):
+    jars_path = '/opt/' + args.emr_version + '/jars/'
+    local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
+
+
 if __name__ == "__main__":
     if args.dry_run == 'true':
         parser.print_help()
@@ -226,3 +231,4 @@ if __name__ == "__main__":
         pyspark_kernel(args)
         toree_kernel(args)
         spark_defaults(args)
+        configuring_notebook(args)
