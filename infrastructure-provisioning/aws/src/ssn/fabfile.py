@@ -23,6 +23,7 @@ from dlab.fab import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import sys, os
+from fabric.api import *
 
 
 def run():
@@ -278,18 +279,6 @@ def run():
                    "action": "Create SSN instance"}
             f.write(json.dumps(res))
 
-        print 'Upload response file'
-        instance_hostname = get_instance_hostname(instance_name)
-        print 'Connect to SSN instance with hostname: ' + instance_hostname + 'and name: ' + instance_name
-        env['connection_attempts'] = 100
-        env.key_filename = "/root/keys/%s.pem" % os.environ['creds_key_name']
-        env.host_string = 'ubuntu@' + instance_hostname
-        try:
-            put('/root/result.json', '/home/ubuntu/%s.json' % os.environ['request_id'])
-        except:
-            print 'Failed to upload response file'
-            sys.exit(1)
-
         logging.info('[FINALIZE]')
         print('[FINALIZE]')
         params = ""
@@ -300,4 +289,16 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_role(instance)
         remove_s3(instance)
+        sys.exit(1)
+
+    print 'Upload response file'
+    instance_hostname = get_instance_hostname(instance_name)
+    print 'Connect to SSN instance with hostname: ' + instance_hostname + 'and name: ' + instance_name
+    env['connection_attempts'] = 100
+    env.key_filename = "/root/keys/%s.pem" % os.environ['creds_key_name']
+    env.host_string = 'ubuntu@' + instance_hostname
+    try:
+        put('/root/result.json', '/home/ubuntu/%s.json' % os.environ['request_id'])
+    except:
+        print 'Failed to upload response file'
         sys.exit(1)
