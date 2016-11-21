@@ -40,6 +40,9 @@ limitations under the License.
   line-height: 30px;
   position: relative;
 }
+.source > div{
+  position: relative;
+}
 .source .remove_butt {
   color: #EF5C4B;
   font-size: 21px;
@@ -68,4 +71,3 @@ limitations under the License.
   right: 0;
   top: 0;
 }
-
