@@ -33,28 +33,28 @@ export class HttpInterceptor extends Http {
   }
 
   get(url: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.intercept(super.get(url,options));
+    return this.intercept(super.get(this.addNoCacheToUrl(url),options));
   }
 
   post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.intercept(super.post(url, body, this.getRequestOptionArgs(options)));
+    return this.intercept(super.post(this.addNoCacheToUrl(url), body, this.getRequestOptionArgs(options)));
   }
 
   put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.intercept(super.put(url, body, this.getRequestOptionArgs(options)));
+    return this.intercept(super.put(this.addNoCacheToUrl(url), body, this.getRequestOptionArgs(options)));
   }
 
   delete(url: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.intercept(super.delete(url, options));
+    return this.intercept(super.delete(this.addNoCacheToUrl(url), options));
   }
 
   getRequestOptionArgs(options?: RequestOptionsArgs) : RequestOptionsArgs {
-    if (options == null) {
+    if (options == null)
       options = new RequestOptions();
-    }
-    if (options.headers == null) {
+
+    if (options.headers == null)
       options.headers = new Headers();
-    }
+
     return options;
   }
 
@@ -70,5 +70,12 @@ export class HttpInterceptor extends Http {
         return Observable.throw(err);
       }
     });
+  }
+  
+  private addNoCacheToUrl(url : string) {
+	let separator = url.indexOf('?') === -1 ? '?' : '&';
+	let returnUrl = url+separator+'noCache=' + new Date().getTime();
+	
+	return returnUrl;
   }
 }
