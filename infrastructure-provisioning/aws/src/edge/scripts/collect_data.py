@@ -58,7 +58,7 @@ if __name__ == "__main__":
         for j in emr_list:
             emr = {}
             emr['id'] = j
-            emr['name'] = get_emr_info(j, 'name')
+            emr['name'] = get_emr_info(j, 'Name')
             emr['status'] = get_emr_info(j, 'Status')['State']
             counter = 0
             for instance in get_ec2_list('Notebook', notebook['Name']):
