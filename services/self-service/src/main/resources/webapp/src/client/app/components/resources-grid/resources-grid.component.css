@@ -18,6 +18,7 @@ limitations under the License.
 
 .dashboard_table {
   width: 100%;
+  table-layout: fixed;
 }
 .dashboard_table .th_status {
   width: 16%;
