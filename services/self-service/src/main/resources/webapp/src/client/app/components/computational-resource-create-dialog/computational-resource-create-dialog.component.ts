@@ -1,19 +1,28 @@
-/******************************************************************************************************
+/***************************************************************************
 
- Copyright (c) 2016 EPAM Systems Inc.
+Copyright (c) 2016, EPAM SYSTEMS INC
 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+    http://www.apache.org/licenses/LICENSE-2.0
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
- *****************************************************************************************************/
+****************************************************************************/
 
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { UserResourceService } from "../../services/userResource.service";
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Response } from "@angular/http";
+import { UserResourceService } from "../../services/userResource.service";
 import { ComputationalResourceCreateModel } from "./computational-resource-create.model";
+
+import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
@@ -27,7 +36,14 @@ export class ComputationalResourceCreateDialog {
   model: ComputationalResourceCreateModel;
   notebook_instance: any;
   computationalResourceExist: boolean = false;
-  clusterNamePattern: string = "\\w+.*\\w+";
+  checkValidity: boolean = false;
+  clusterNamePattern: string = "[-_ a-zA-Z0-9]+";
+  nodeCountPattern: string = "^[1-9]\\d*$";
+
+  processError: boolean = false;
+  errorMessage: string = '';
+
+  public createComputationalResourceForm: FormGroup;
 
   @ViewChild('bindDialog') bindDialog;
   @ViewChild('name') name;
@@ -35,23 +51,35 @@ export class ComputationalResourceCreateDialog {
 
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
-  constructor(private userResourceService: UserResourceService) {
+  constructor(
+    private userResourceService: UserResourceService,
+    private _fb: FormBuilder
+  ) {
     this.model = ComputationalResourceCreateModel.getDefault(userResourceService);
   }
 
   ngOnInit(){
+    this.initFormModel();
     this.bindDialog.onClosing =  () => this.resetDialog();
   }
 
-  public createComputationalResource_btnClick($event, name: string, count: number, shape_master: string, shape_slave: string) {
-    this.computationalResourceExist = false;
+  private initFormModel(): void {
+    this.createComputationalResourceForm = this._fb.group({
+      cluster_alias_name: ['', [Validators.required, Validators.pattern(this.clusterNamePattern)]],
+      instance_number: ['1', [Validators.required, Validators.pattern(this.nodeCountPattern)]]
+    });
+  }
 
-    if (this.containsComputationalResource(name)) {
+  public createComputationalResource($event, data, shape_master: string, shape_slave: string) {
+    this.computationalResourceExist = false;
+    this.checkValidity = true;
+
+    if (this.containsComputationalResource(data.cluster_alias_name)) {
       this.computationalResourceExist = true;
       return false;
     }
 
-    this.model.setCreatingParams(name, count, shape_master, shape_slave);
+    this.model.setCreatingParams(data.cluster_alias_name, data.instance_number, shape_master, shape_slave);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
@@ -81,7 +109,10 @@ export class ComputationalResourceCreateDialog {
           this.buildGrid.emit();
         }
       },
-        (response: Response) => console.error(response.status),
+        (response: Response) => {
+          this.processError = true;
+          this.errorMessage = ErrorMapUtils.setErrorMessage(response);
+        },
         () => {
           // this.templateDescription = this.model.selectedItem.description;
         },
@@ -99,8 +130,12 @@ export class ComputationalResourceCreateDialog {
   }
 
   private resetDialog() : void {
+    this.computationalResourceExist = false;
+    this.checkValidity = false;
+    this.processError = false;
+    this.errorMessage = '';
+
+    this.initFormModel();
     this.model.resetModel();
-    this.name.nativeElement.value = "";
-    this.count.nativeElement.value = "";
   }
 }
