@@ -1,20 +1,27 @@
 #!/usr/bin/python
 
-# ******************************************************************************************************
+# *****************************************************************************
 #
-# Copyright (c) 2016 EPAM Systems Inc.
+# Copyright (c) 2016, EPAM SYSTEMS INC
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#    http://www.apache.org/licenses/LICENSE-2.0
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# ****************************************************************************************************/
+# ******************************************************************************
 
 import json
 from dlab.fab import *
 from dlab.aws_meta import *
+from dlab.aws_actions import *
 import sys
 
 
@@ -31,6 +38,7 @@ def run():
     emr_conf = dict()
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
     emr_conf['service_base_name'] = os.environ['conf_service_base_name']
+    emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
     emr_conf['key_name'] = os.environ['creds_key_name']
     #emr_conf['subnet_cidr'] = os.environ['edge_subnet_cidr']
     emr_conf['region'] = os.environ['creds_region']
@@ -51,6 +59,7 @@ def run():
 
     tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
     emr_conf['subnet_cidr'] = get_subnet_by_tag(tag)
+    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
 
     try:
         emr_conf['emr_timeout'] = os.environ['emr_timeout']
@@ -151,7 +160,7 @@ def run():
     try:
         logging.info('[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]')
         print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
-        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {}".format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'], keyfile_name, emr_conf['notebook_ip'])
+        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {} --region {}".format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'], keyfile_name, emr_conf['notebook_ip'], emr_conf['region'])
         if not run_routine('install_emr_kernels', params):
             logging.info('Failed installing EMR kernels')
             with open("/root/result.json", 'w') as result:
@@ -160,6 +169,9 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        emr_id = get_emr_id_by_name(emr_conf['cluster_name'])
+        terminate_emr(emr_id)
+        remove_kernels(emr_conf['cluster_name'],emr_conf['tag_name'],os.environ['notebook_name'],'ubuntu',emr_conf['key_path'])
         sys.exit(1)
 
     try:
@@ -205,7 +217,7 @@ def terminate():
     emr_conf['notebook_name'] = os.environ['notebook_instance_name']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     emr_conf['ssh_user'] = os.environ['notebook_ssh_user']
-    emr_conf['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
+    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
 
     try:

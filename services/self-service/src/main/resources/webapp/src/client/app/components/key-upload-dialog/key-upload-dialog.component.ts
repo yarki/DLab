@@ -1,20 +1,28 @@
-/******************************************************************************************************
+/***************************************************************************
 
- Copyright (c) 2016 EPAM Systems Inc.
+Copyright (c) 2016, EPAM SYSTEMS INC
 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+    http://www.apache.org/licenses/LICENSE-2.0
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
- *****************************************************************************************************/
+****************************************************************************/
 
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Response } from "@angular/http";
 
 import { KeyUploadDialogModel } from './key-upload.model';
 import {UserAccessKeyService} from "../../services/userAccessKey.service";
+
+import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Component({
@@ -25,12 +33,19 @@ import HTTP_STATUS_CODES from 'http-status-enum';
 
 export class UploadKeyDialog {
   model: KeyUploadDialogModel;
+  processError: boolean = false;
+  errorMessage: string = '';
 
   @ViewChild('bindDialog') bindDialog;
   @ViewChild('userAccessKeyUploadControl') userAccessKeyUploadControl;
   @Output() checkInfrastructureCreationProgress: EventEmitter<{}> = new EventEmitter();
+
   constructor(private userAccessKeyService : UserAccessKeyService) {
     this.model = KeyUploadDialogModel.getDefault();
+  }
+
+  ngOnInit(){
+    this.bindDialog.onClosing = () => this.resetDialog();
   }
 
   uploadUserAccessKey_onChange($event) {
@@ -54,7 +69,10 @@ export class UploadKeyDialog {
             this.checkInfrastructureCreationProgress.emit();
           }
         },
-        (response: Response) => console.error(response.status),
+        (response: Response) => {
+          this.processError = true;
+          this.errorMessage = ErrorMapUtils.setErrorMessage(response);
+        },
         this.userAccessKeyService);
 
       this.bindDialog.open(params);
@@ -62,8 +80,14 @@ export class UploadKeyDialog {
   }
 
   close() {
-    this.userAccessKeyUploadControl.nativeElement.value = "";
     if(this.bindDialog.isOpened)
       this.bindDialog.close();
+  }
+
+  private resetDialog() : void {
+    this.userAccessKeyUploadControl.nativeElement.value = "";
+
+    this.processError = false;
+    this.errorMessage = '';
   }
 }
