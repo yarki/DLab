@@ -8,7 +8,7 @@
             <parameterDefinitions>
                 <hudson.model.StringParameterDefinition>
                     <name>Service_base_name</name>
-                    <description></description>
+                    <description>unique infrastructure value that previously was used when ssn being provisioned</description>
                     <defaultValue></defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.StringParameterDefinition>
