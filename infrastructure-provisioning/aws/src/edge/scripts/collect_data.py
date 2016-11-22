@@ -70,7 +70,8 @@ if __name__ == "__main__":
                 emr['shape'] = instance.instance_type
             emr['nodes_count'] = counter
             emr['type'] = get_emr_info(j, 'ReleaseLabel')
-            # emr['uptime'] = ''
+            emr_start_time = get_emr_info(j, 'Status')['Timeline']['CreationDateTime'].replace(tzinfo=None)
+            emr['uptime'] = str(datetime.datetime.now() - emr_start_time)
             resources.append(emr)
         notebook['computeresources'] = resources
         notebooks.append(notebook)
