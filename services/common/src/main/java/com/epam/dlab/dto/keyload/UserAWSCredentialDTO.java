@@ -20,6 +20,7 @@ package com.epam.dlab.dto.keyload;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserAWSCredentialDTO {

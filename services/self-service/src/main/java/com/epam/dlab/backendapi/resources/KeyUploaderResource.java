@@ -37,6 +37,8 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -106,7 +108,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
 
     @POST
     @Path("/callback")
-    public Response loadKeyResponse(UploadFileResultDTO result) {
+    public Response loadKeyResponse(@Valid @NotNull UploadFileResultDTO result) {
         LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
         keyDAO.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
         if (result.isSuccess()) {
