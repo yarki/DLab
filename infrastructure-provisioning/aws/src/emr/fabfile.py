@@ -33,7 +33,7 @@ def run():
                         filename=local_log_filepath)
 
     create_aws_config_files()
-    index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag')
+    index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag', '{}-{}-emr'.format(os.environ['conf_service_base_name'], os.environ['edge_user_name']))
     print 'Generating infrastructure names and tags'
     emr_conf = dict()
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
