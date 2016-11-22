@@ -33,7 +33,7 @@ import HTTP_STATUS_CODES from 'http-status-enum';
 
 export class confirmationDialog {
   model: ConfirmationDialogModel;
-
+  isAliveResources: boolean;
   processError: boolean = false;
   errorMessage: string = '';
 
@@ -62,6 +62,7 @@ export class confirmationDialog {
       this.userResourceService);
 
     this.bindDialog.open(param);
+    this.isAliveResources = this.model.isAliveResources(notebook.resources);
   }
 
   public close() {
