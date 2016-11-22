@@ -87,4 +87,4 @@ if __name__ == "__main__":
     configure_notebook()
     spark_version = get_spark_version()
     hadoop_version = get_hadoop_version()
-    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version + ' --hadoop_version ' + hadoop_version + ' --region ' + args.region + ' --excluded_lines "' + os.environ['emr_excluded_spark_properties'] + '"')
+    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version + ' --hadoop_version ' + hadoop_version + ' --region ' + args.region + ' --excluded_lines ' + os.environ['emr_excluded_spark_properties'])

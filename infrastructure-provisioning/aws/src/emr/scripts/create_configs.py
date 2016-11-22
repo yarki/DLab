@@ -37,24 +37,22 @@ args = parser.parse_args()
 emr_dir = '/opt/' + args.emr_version + '/jars/'
 kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
 yarn_dir = '/srv/hadoopconf/'
-if args.emr_version == 'emr-4.3.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-4.8.0':
-    hadoop_version = '2.6'
-else:
-    hadoop_version = args.hadoop_version
-spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
+# if args.emr_version == 'emr-4.3.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-4.8.0':
+#     hadoop_version = '2.6'
+# else:1
+#     hadoop_version = args.hadoop_version
+# spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 
 
 def install_emr_spark(args):
     # local('wget ' + spark_link + ' -O /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
     # local('mkdir -p /opt/' + args.emr_version)
     # local('tar -zxvf /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/' + args.emr_version + '/')
-    spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
+    spark_def_path = '/opt/' + args.emr_version + '/spark/conf/spark-defaults.conf'
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'spark.tar.gz', '/tmp/spark.tar.gz')
-    local('sudo rm -rf /opt/' + args.emr_version + '/spark*')
     local('sudo tar -zhxvf /tmp/spark.tar.gz -C /opt/' + args.emr_version + '/')
-    local('sudo mv /opt/' + args.emr_version + '/spark/ /opt/' + args.emr_version + '/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
-    for i in args.excluded_lines:
+    for i in eval(args.excluded_lines):
         local('sudo cp ' + spark_def_path + ' /tmp/spark-temp.conf')
         local('''sudo bash -c 'cat /tmp/spark-temp.conf | grep -v "^''' + i + '''" | grep -v "^spark.driver.extraLibraryPath" | grep -v "^spark.driver.extraClassPath" | grep -v "^#" | sed '/^\s*$/d' > ''' + spark_def_path + '''' ''')
 
@@ -62,7 +60,7 @@ def install_emr_spark(args):
 def prepare():
     local('mkdir -p ' + yarn_dir)
     local('mkdir -p ' + emr_dir)
-    result = os.path.exists(emr_dir + args.emr_version + "/")
+    result = os.path.exists(emr_dir + args.emr_version + "/jars/")
     return result
 
 
@@ -89,13 +87,13 @@ def pyspark_kernel(args):
     text = text.replace('CLUSTER', args.cluster_name)
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
     text = text.replace('SPARK_PATH',
-                        '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+                        '/opt/' + args.emr_version + '/spark/')
     text = text.replace('PY_VER', '2.7')
     with open(kernel_path, 'w') as f:
         f.write(text)
     local('touch /tmp/kernel_var.json')
     local(
-        "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+        "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|${PYJ}'|g' > /tmp/kernel_var.json")
     local('sudo mv /tmp/kernel_var.json ' + kernel_path)
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'python_version', '/tmp/python_version')
@@ -111,13 +109,13 @@ def pyspark_kernel(args):
         text = text.replace('CLUSTER', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH',
-                            '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+                            '/opt/' + args.emr_version + '/spark/')
         text = text.replace('PY_VER', '3.4')
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
         local(
-            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|${PYJ}|g' > /tmp/kernel_var.json")
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
     elif python_version == '3.5':
         local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
@@ -128,13 +126,13 @@ def pyspark_kernel(args):
         text = text.replace('CLUSTER', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH',
-                            '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+                            '/opt/' + args.emr_version + '/spark/')
         text = text.replace('PY_VER', '3.5')
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
         local(
-            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|${PYJ}|g' > /tmp/kernel_var.json")
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
 
 
@@ -148,12 +146,12 @@ def toree_kernel(args):
         text = text.replace('CLUSTER', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH',
-                            '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+                            '/opt/' + args.emr_version + '/spark/')
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
         local(
-            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|${PYJ}'|g' > /tmp/kernel_var.json")
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
     else:
         local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
@@ -165,12 +163,12 @@ def toree_kernel(args):
         text = text.replace('CLUSTER', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH',
-                            '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+                            '/opt/' + args.emr_version + '/spark/')
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
         local(
-            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'${PYJ}'|g' > /tmp/kernel_var.json")
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
         run_sh_path = kernels_dir + "toree_" + args.cluster_name + "/bin/run.sh"
         template_sh_file = '/tmp/run_template.sh'
@@ -197,7 +195,7 @@ def get_files(s3client, s3resource, dist, bucket, local):
 def spark_defaults(args):
     # missed_jar_path1 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/client/*'
     missed_jar_path2 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/*'
-    spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
+    spark_def_path = '/opt/' + args.emr_version + '/spark/conf/spark-defaults.conf'
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
     local('touch /tmp/spark-defaults-temporary.conf')
