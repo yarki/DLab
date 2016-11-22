@@ -60,7 +60,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
             dao.writeLoginAttempt(credential);
             return securityService.post(LOGIN, credential, Response.class);
         } catch (Throwable t) {
-            throw new DlabException("Could not login user", t);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(t.getMessage()).build();
         }
     }
 
@@ -71,7 +71,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
         try {
             return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
         } catch(Throwable t) {
-            throw new DlabException("Could not logout user", t);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(t.getMessage()).build();
         }
     }
 

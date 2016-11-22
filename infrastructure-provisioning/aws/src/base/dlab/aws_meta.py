@@ -186,7 +186,7 @@ def get_emr_list(tag_name, type='Key', emr_count=False):
         response = emr.describe_cluster(ClusterId=i.get('Id'))
         tag = response.get('Cluster').get('Tags')
         for j in tag:
-            if j.get(type) == tag_name:
+            if tag_name in j.get(type):
                 clusters_list.append(i.get('Id'))
     return clusters_list
 
