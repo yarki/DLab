@@ -31,6 +31,7 @@ parser.add_argument('--emr_version', type=str, default='')
 parser.add_argument('--spark_version', type=str, default='')
 parser.add_argument('--hadoop_version', type=str, default='')
 parser.add_argument('--region', type=str, default='')
+parser.add_argument('--excluded_lines', type=str, default='')
 args = parser.parse_args()
 
 emr_dir = '/opt/' + args.emr_version + '/jars/'
@@ -50,10 +51,10 @@ def install_emr_spark(args):
     spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'spark.tar.gz', '/tmp/spark.tar.gz')
+    local('sudo rm -rf /opt/' + args.emr_version + '/spark*')
     local('sudo tar -zhxvf /tmp/spark.tar.gz -C /opt/' + args.emr_version + '/')
     local('sudo mv /opt/' + args.emr_version + '/spark/ /opt/' + args.emr_version + '/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
-    excluded_spark_lines = os.environ['emr_excluded_spark_properties']
-    for i in excluded_spark_lines:
+    for i in args.excluded_lines:
         local('sudo cp ' + spark_def_path + ' /tmp/spark-temp.conf')
         local('''sudo bash -c 'cat /tmp/spark-temp.conf | grep -v "^''' + i + '''" | grep -v "^spark.driver.extraLibraryPath" | grep -v "^spark.driver.extraClassPath" | grep -v "^#" | sed '/^\s*$/d' > ''' + spark_def_path + '''' ''')
 
@@ -61,7 +62,7 @@ def install_emr_spark(args):
 def prepare():
     local('mkdir -p ' + yarn_dir)
     local('mkdir -p ' + emr_dir)
-    result = os.path.exists(emr_dir + args.emr_version + "/aws")
+    result = os.path.exists(emr_dir + args.emr_version + "/")
     return result
 
 
