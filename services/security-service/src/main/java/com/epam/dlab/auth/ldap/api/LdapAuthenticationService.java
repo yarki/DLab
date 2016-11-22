@@ -109,12 +109,13 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 						ui.setAwsUser(false);
 						log.warn("AWS User '{}' was not found. ",username);
 						//EPMCBDCCSS-880  if there is no user on AWS we don't allow user to login
-						return Response.status(Response.Status.UNAUTHORIZED).build();
+						return Response.status(Response.Status.UNAUTHORIZED)
+								.entity("Please contact AWS administrator to create corresponding IAM User and Access Key").build();
 					}
 				}
 			} catch (Exception e) {
 				log.error("LDAP error {}", e.getMessage());
-				return Response.status(Response.Status.UNAUTHORIZED).build();
+				return Response.status(Response.Status.UNAUTHORIZED).entity("Username or password are not valid").build();
 			}
 			ui.setRemoteIp(remoteIp);
 			UserInfo finalUserInfo = rememberUserInfo(token, ui);
