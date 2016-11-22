@@ -19,8 +19,10 @@ limitations under the License.
 package com.epam.dlab.backendapi.api.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
 public class ExploratoryActionFormDTO {
+    @NotBlank
     @JsonProperty("notebook_instance_name")
     private String notebookInstanceName;
 
