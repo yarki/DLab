@@ -49,14 +49,14 @@ if __name__ == "__main__":
     for i in nbs_list:
         notebook = {}
         notebook['Id'] = i.id
-        notebook['Fqdn'] = i.private_dns_name
+        notebook['Exploratory_fqdn'] = i.private_dns_name
         for tag in i.tags:
             if tag['Key'] == 'Name':
                 notebook['Name'] = tag['Value']
         notebook['Shape'] = i.instance_type
         notebook['Status'] = i.state['Name']
         nbs_start_time = i.launch_time.replace(tzinfo=None)
-        notebook['Uptime'] = str(datetime.datetime.now() - nbs_start_time)
+        notebook['Exploratory_uptime'] = str(datetime.datetime.now() - nbs_start_time)
         emr_list = get_emr_list(notebook['Name'], 'Value')
         resources = []
         for j in emr_list:
@@ -71,7 +71,7 @@ if __name__ == "__main__":
             emr['nodes_count'] = counter
             emr['type'] = get_emr_info(j, 'ReleaseLabel')
             emr_start_time = get_emr_info(j, 'Status')['Timeline']['CreationDateTime'].replace(tzinfo=None)
-            emr['uptime'] = str(datetime.datetime.now() - emr_start_time)
+            emr['computational_uptime'] = str(datetime.datetime.now() - emr_start_time)
             resources.append(emr)
         notebook['computeresources'] = resources
         notebooks.append(notebook)
