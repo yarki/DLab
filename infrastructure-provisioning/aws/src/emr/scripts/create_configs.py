@@ -44,9 +44,18 @@ spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version 
 
 
 def install_emr_spark(args):
-    local('wget ' + spark_link + ' -O /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
-    local('mkdir -p /opt/' + args.emr_version)
-    local('tar -zxvf /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/' + args.emr_version + '/')
+    # local('wget ' + spark_link + ' -O /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
+    # local('mkdir -p /opt/' + args.emr_version)
+    # local('tar -zxvf /tmp/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/' + args.emr_version + '/')
+    spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
+    s3_client = boto3.client('s3')
+    s3_client.download_file(args.bucket, 'spark.tar.gz', '/tmp/spark.tar.gz')
+    local('sudo tar -zhxvf /tmp/spark.tar.gz -C /opt/' + args.emr_version + '/')
+    local('sudo mv /opt/' + args.emr_version + '/spark/ /opt/' + args.emr_version + '/spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/')
+    excluded_spark_lines = os.environ['emr_excluded_spark_properties']
+    for i in excluded_spark_lines:
+        local('sudo cp ' + spark_def_path + ' /tmp/spark-temp.conf')
+        local('''sudo bash -c 'cat /tmp/spark-temp.conf | grep -v "^''' + i + '''" | grep -v "^spark.driver.extraLibraryPath" | grep -v "^spark.driver.extraClassPath" | grep -v "^#" | sed '/^\s*$/d' > ''' + spark_def_path + '''' ''')
 
 
 def prepare():
@@ -185,34 +194,35 @@ def get_files(s3client, s3resource, dist, bucket, local):
 
 
 def spark_defaults(args):
-    missed_jar_path1 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/client/*'
+    # missed_jar_path1 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/client/*'
     missed_jar_path2 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/*'
     spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
     local('touch /tmp/spark-defaults-temporary.conf')
-    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR1|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" > /tmp/spark-defaults-temporary.conf' ''')
+    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" >> ''' + spark_def_path + '''' ''')
     local('printf "\\n"')
-    local(''' sudo bash -c 'cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> /tmp/spark-defaults-temporary.conf' ''')
-    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.historyServer.address >> /tmp/spark-defaults-temporary.conf | true;' ''')
-    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.history.ui.port >> /tmp/spark-defaults-temporary.conf | true;' ''')
-    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.shuffle.service.enabled >> /tmp/spark-defaults-temporary.conf | true;' ''')
-    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.dynamicAllocation.enabled >> /tmp/spark-defaults-temporary.conf | true;' ''')
-    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.executor.memory >> /tmp/spark-defaults-temporary.conf | true;' ''')
-    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.executor.cores >> /tmp/spark-defaults-temporary.conf | true;' ''')
-    local(""" sudo bash -c "cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.dist.files | sed 's|/etc/spark/conf/|/srv/hadoopconf/config/CLUSTER/|g' >> /tmp/spark-defaults-temporary.conf | true;" """)
-    template_file = "/tmp/spark-defaults-temporary.conf"
+    local(''' sudo bash -c 'cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> ''' + spark_def_path + '''' ''')
+    # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.historyServer.address >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.history.ui.port >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.shuffle.service.enabled >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.dynamicAllocation.enabled >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.executor.memory >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.executor.cores >> /tmp/spark-defaults-temporary.conf | true;' ''')
+    # local(""" sudo bash -c "cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.dist.files | sed 's|/etc/spark/conf/|/srv/hadoopconf/config/CLUSTER/|g' >> /tmp/spark-defaults-temporary.conf | true;" """)
+    # template_file = "/tmp/spark-defaults-temporary.conf"
+    template_file = spark_def_path
     with open(template_file, 'r') as f:
         text = f.read()
     text = text.replace('EMRVERSION', args.emr_version)
-    text = text.replace('MISSEDJAR1', missed_jar_path1)
+    # text = text.replace('MISSEDJAR1', missed_jar_path1)
     text = text.replace('MISSEDJAR2', missed_jar_path2)
     text = text.replace('CLUSTER', args.cluster_name)
     with open(spark_def_path, 'w') as f:
         f.write(text)
     endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
     local("""bash -c 'echo "spark.hadoop.fs.s3a.endpoint    """ + endpoint_url + """" >> """ + spark_def_path + """'""")
-    local('sudo rm -f ' + template_file)
+    # local('sudo rm -f ' + template_file)
 
 
 def configuring_notebook(args):
