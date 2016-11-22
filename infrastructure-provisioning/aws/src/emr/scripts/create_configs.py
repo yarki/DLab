@@ -93,7 +93,7 @@ def pyspark_kernel(args):
         f.write(text)
     local('touch /tmp/kernel_var.json')
     local(
-        "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|${PYJ}'|g' > /tmp/kernel_var.json")
+        "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
     local('sudo mv /tmp/kernel_var.json ' + kernel_path)
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, 'python_version', '/tmp/python_version')
@@ -115,7 +115,7 @@ def pyspark_kernel(args):
             f.write(text)
         local('touch /tmp/kernel_var.json')
         local(
-            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|${PYJ}|g' > /tmp/kernel_var.json")
+            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
     elif python_version == '3.5':
         local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
@@ -132,7 +132,7 @@ def pyspark_kernel(args):
             f.write(text)
         local('touch /tmp/kernel_var.json')
         local(
-            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|${PYJ}|g' > /tmp/kernel_var.json")
+            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
 
 
@@ -151,7 +151,7 @@ def toree_kernel(args):
             f.write(text)
         local('touch /tmp/kernel_var.json')
         local(
-            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|${PYJ}'|g' > /tmp/kernel_var.json")
+            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
     else:
         local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
@@ -168,7 +168,7 @@ def toree_kernel(args):
             f.write(text)
         local('touch /tmp/kernel_var.json')
         local(
-            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip'`; cat " + kernel_path + " | sed 's|PY4J|'${PYJ}'|g' > /tmp/kernel_var.json")
+            "PYJ=`find /opt/" + args.emr_version + "/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
         run_sh_path = kernels_dir + "toree_" + args.cluster_name + "/bin/run.sh"
         template_sh_file = '/tmp/run_template.sh'
@@ -202,6 +202,7 @@ def spark_defaults(args):
     local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" >> ''' + spark_def_path + '''' ''')
     local('printf "\\n"')
     local(''' sudo bash -c 'cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> ''' + spark_def_path + '''' ''')
+
     # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.historyServer.address >> /tmp/spark-defaults-temporary.conf | true;' ''')
     # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.history.ui.port >> /tmp/spark-defaults-temporary.conf | true;' ''')
     # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.shuffle.service.enabled >> /tmp/spark-defaults-temporary.conf | true;' ''')
