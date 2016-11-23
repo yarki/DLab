@@ -18,28 +18,28 @@ limitations under the License.
 
 <table class="dashboard_table">
   <tr>
-    <th class="th_name">Environment name</th>
-    <th class="th_status">Status</th>
-    <th class="th_shape">Shape</th>
-    <th class="th_resources">Computational resources</th>
-    <th class="th_actions">Actions</th>
+    <th *ngFor="let column of filteringColumns"
+         ngClass="{{column.className || ''}}">
+         {{column.title}}
+
+         <i *ngIf="column.filtering" class="glyphicon glyphicon-knight pull-right" (click)="toggleFilterRow()"></i>
+       </th>
   </tr>
 
-  <tr *ngIf="(!environments) || (environments.length == 0)" class="message_block">
+  <tr *ngIf="(!filteredEnvironments) || (filteredEnvironments.length == 0)" class="message_block">
     <td colspan="5">To start working, please, create new environment</td>
   </tr>
 
-  <tr class="filter-row">
-    <td></td>
-    <td>
-      <input class="form-control" type="text" placeholder="Filter by status" (input)="onChangeFilter($event)">
+  <tr *ngIf="filteredEnvironments && collapseFilterRow" class="filter-row">
+    <td *ngFor="let column of filteringColumns">
+      <input *ngIf="column.filtering"
+              placeholder="{{column.filtering.placeholder}}"
+              class="form-control"
+              (input)="onChangeFilter($event, column.name)"/>
     </td>
-    <td></td>
-    <td></td>
-    <td></td>
   </tr>
 
-  <tr *ngFor="let env of environments;" [ngClass]="{'dropdown-outscreen': isOutscreenDropdown}">
+  <tr *ngFor="let env of filteredEnvironments;" [ngClass]="{'dropdown-outscreen': isOutscreenDropdown}">
     <td (click)="(env.status != 'starting' && env.status != 'creating' && printDetailEnvironmentModal(env))" [ngClass]="{'not-allowed' : env.status == 'starting' || env.status == 'creating'}">{{env.name}}</td>
     <td class="status" ngClass="{{env.status.toLowerCase() || ''}}">{{env.status}}</td>
     <td>{{env.shape}}</td>

@@ -34,9 +34,11 @@ export class ResourcesGrid implements OnInit {
 
   isFilled: boolean = false;
   environments: Array<ResourcesGridRowModel>;
+  filteredEnvironments: Array<ResourcesGridRowModel>;
   notebookName: string;
   model = new CreateEmrModel('', '');
   isOutscreenDropdown: boolean;
+  collapseFilterRow: boolean = false;
 
   @ViewChild('computationalResourceModal') computationalResourceModal;
   @ViewChild('confirmationDialog') confirmationDialog;
@@ -48,19 +50,31 @@ export class ResourcesGrid implements OnInit {
     private userResourceService: UserResourceService
   ) { }
 
+  public filteringColumns:Array<any> = [
+    {title: 'Environment name', name: 'name', className: 'th_name', filtering: {placeholder: 'Filter by environment name'}},
+    {title: 'Status', name: 'status', className: 'th_status', filtering: {placeholder: 'Filter by status'}},
+    {title: 'Shape', name: 'shape', className: 'th_shape'},
+    {title: 'Computational resources', name: 'resources', className: 'th_resources'},
+    {title: 'Actions', className: 'th_actions'}
+  ];
+
   ngOnInit() : void {
     this.buildGrid();
   }
 
-  onChangeFilter($event) {
+  onChangeFilter($event, column) {
     let filteredData:Array<any> = this.environments;
 
     if($event.target.value)
       filteredData = filteredData.filter((item:any) => {
-        return item.status.match($event.target.value);
+        return item[column].toLowerCase().match($event.target.value.toLowerCase());
       });
 
     console.log('filteredData => ', filteredData);
+    this.filteredEnvironments = filteredData;
+  }
+  toggleFilterRow() {
+    this.collapseFilterRow = !this.collapseFilterRow;
   }
 
   buildGrid() : void {
@@ -68,6 +82,7 @@ export class ResourcesGrid implements OnInit {
       .subscribe((result) => {
         this.environments = this.loadEnvironments(result);
 
+        this.filteredEnvironments = this.environments;
         console.log('models ', this.environments);
       });
   }
