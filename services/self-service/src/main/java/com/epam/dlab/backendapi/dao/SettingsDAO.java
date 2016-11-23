@@ -53,10 +53,6 @@ public class SettingsDAO extends BaseDAO {
         return getSetting(CREDS_SUBNET_ID);
     }
 
-    public String getEdgeInstanceSize() {
-        return getSetting(EDGE_INSTANCE_SIZE);
-    }
-
     private String getSetting(MongoSetting setting) {
         return mongoService.getCollection(SETTINGS).find(eq(ID, setting.getId())).first().getOrDefault(VALUE, EMPTY).toString();
     }
