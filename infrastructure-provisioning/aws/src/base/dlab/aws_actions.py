@@ -219,7 +219,7 @@ def remove_ec2(tag_name, tag_value):
                 client.terminate_instances(InstanceIds=[instance.id])
                 waiter = client.get_waiter('instance_terminated')
                 waiter.wait(InstanceIds=[instance.id])
-                print "The instance " + tag_value + " has been terminated successfully"
+                print "The instance " + instance.id + " has been terminated successfully"
         else:
             print "There are no instances with " + tag_value + " name to terminate"
     except Exception as err:
@@ -355,24 +355,25 @@ def remove_s3(bucket_type, scientist=''):
             result.write(json.dumps(res))
 
 
-def remove_subnets(subnet_id):
+def remove_subnets(tag_value):
     try:
         print "[Removing subnets]"
         ec2 = boto3.resource('ec2')
         client = boto3.client('ec2')
-        #tag_name = os.environ['conf_service_base_name'] + '-tag'
-        #subnets = ec2.subnets.filter(
-        #    Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
-        #for subnet in subnets:
-        #    print subnet.id
-        client.delete_subnet(SubnetId=subnet_id)
-        #    print "The subnet " + subnet.id + " has been deleted successfully"
+        tag_name = os.environ['conf_service_base_name'] + '-Tag'
+        subnets = ec2.subnets.filter(
+            Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': [tag_value]}])
+        for subnet in subnets:
+            print subnet.id
+            client.delete_subnet(SubnetId=subnet.id)
+            print "The subnet " + subnet.id + " has been deleted successfully"
     except Exception as err:
         logging.info("Unable to remove subnet: " + str(err))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to remove subnet", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
+
 
 
 def remove_sgroups(tag_value):
@@ -404,6 +405,7 @@ def deregister_image(scientist):
         images_list = response.get('Images')
         for i in images_list:
             client.deregister_image(ImageId=i.get('ImageId'))
+            print "Notebook AMI " + i + " has been deregistered successfully"
     except Exception as err:
         logging.info("Unable to de-register image: " + str(err))
         with open("/root/result.json", 'w') as result:

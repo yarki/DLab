@@ -61,7 +61,7 @@ def configure_mongo():
             sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
         local('scp -i {} /root/templates/instance_shapes.lst {}:/tmp/instance_shapes.lst'.format(args.keyfile, env.host_string))
         local('scp -i {} /root/scripts/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
-        sudo('python /tmp/configure_mongo.py --region {} --base_name {} --sg "{}"'.format(os.environ['creds_region'], os.environ['conf_service_base_name'], os.environ['creds_security_groups_ids'].replace(" ", "")))
+        sudo('python /tmp/configure_mongo.py --region {} --base_name {} --sg "{}" --vpc {} --subnet {}'.format(os.environ['creds_region'], os.environ['conf_service_base_name'], os.environ['creds_security_groups_ids'].replace(" ", ""), os.environ['creds_vpc_id'], os.environ['creds_subnet_id']))
         return True
     except:
         return False

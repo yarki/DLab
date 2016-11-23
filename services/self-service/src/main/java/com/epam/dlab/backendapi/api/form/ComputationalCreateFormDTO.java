@@ -19,18 +19,30 @@ limitations under the License.
 package com.epam.dlab.backendapi.api.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
 public class ComputationalCreateFormDTO {
+    @NotBlank
     @JsonProperty
     private String name;
+
+    @NotBlank
     @JsonProperty("emr_instance_count")
     private String instanceCount;
+
+    @NotBlank
     @JsonProperty("emr_master_instance_type")
     private String masterInstanceType;
+
+    @NotBlank
     @JsonProperty("emr_slave_instance_type")
     private String slaveInstanceType;
+
+    @NotBlank
     @JsonProperty("emr_version")
     private String version;
+
+    @NotBlank
     @JsonProperty("notebook_name")
     private String notebookName;
 

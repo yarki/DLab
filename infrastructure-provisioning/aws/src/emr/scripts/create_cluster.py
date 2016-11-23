@@ -264,7 +264,6 @@ if __name__ == "__main__":
         upload_jars_parser(args)
         upload_user_key(args)
         build_emr_cluster(args)
-        remove_user_key(args)
     else:
         upload_jars_parser(args)
         upload_user_key(args)
@@ -293,5 +292,4 @@ if __name__ == "__main__":
                 terminate_emr(cluster_id)
             s3_cleanup(args.s3_bucket, args.name)
             sys.exit(1)
-        remove_user_key(args)
     sys.exit(0)

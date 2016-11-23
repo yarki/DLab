@@ -66,15 +66,15 @@ def prepare():
 
 def jars(args):
     print "Downloading jars..."
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
     s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
     local('tar -zhxvf /tmp/jars.tar.gz -C ' + emr_dir)
 
 
 def yarn(args):
     print "Downloading yarn configuration..."
-    s3client = boto3.client('s3')
-    s3resource = boto3.resource('s3')
+    s3client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
+    s3resource = boto3.resource('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
     get_files(s3client, s3resource, 'config/{}/'.format(args.cluster_name), args.bucket, yarn_dir)
     local('sudo mv ' + yarn_dir + args.cluster_name + '/* ' + yarn_dir)
     local('sudo rm -rf ' + yarn_dir + args.cluster_name + '/')
@@ -97,7 +97,7 @@ def pyspark_kernel(args):
     local(
         "PYJ=`find /opt/" + args.emr_version + "/" + args.cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
     local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
     s3_client.download_file(args.bucket, 'python_version', '/tmp/python_version')
     with file('/tmp/python_version') as f:
         python_version = f.read()
@@ -194,8 +194,8 @@ def get_files(s3client, s3resource, dist, bucket, local):
 def spark_defaults(args):
     # missed_jar_path1 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/client/*'
     missed_jar_path2 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/*'
-    spark_def_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/conf/spark-defaults.conf'
-    s3_client = boto3.client('s3')
+    spark_def_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version + '/conf/spark-defaults.conf'
+    s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
     s3_client.download_file(args.bucket, 'spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
     local('touch /tmp/spark-defaults-temporary.conf')
     local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" >> ''' + spark_def_path + '''' ''')

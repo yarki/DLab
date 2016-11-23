@@ -1,21 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--
-  ~         Licensed to the Apache Software Foundation (ASF) under one or more
-  ~         contributor license agreements. See the NOTICE file distributed with
-  ~         this work for additional information regarding copyright ownership.
-  ~         The ASF licenses this file to You under the Apache License, Version 2.0
-  ~         (the "License"); you may not use this file except in compliance with
-  ~         the License. You may obtain a copy of the License at
-  ~
-  ~         http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~         Unless required by applicable law or agreed to in writing, software
-  ~         distributed under the License is distributed on an "AS IS" BASIS,
-  ~         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~         See the License for the specific language governing permissions and
-  ~         limitations under the License.
-  -->
-
 <project>
     <actions/>
     <description>Create new EMR Cluster</description>
@@ -25,7 +8,7 @@
             <parameterDefinitions>
                 <hudson.model.StringParameterDefinition>
                     <name>Service_base_name</name>
-                    <description></description>
+                    <description>unique infrastructure value that previously was used when ssn being provisioned</description>
                     <defaultValue></defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.StringParameterDefinition>
@@ -202,7 +185,7 @@
     <builders>
         <hudson.tasks.Shell>
             <command>rand=`openssl rand -hex 10`;
-                sudo docker run -i -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e "request_id=$rand" -e &quot;edge_user_name=$User_name&quot; -e &quot;emr_service_role=$Service_role&quot; -e &quot;emr_ec2_role=$EMR_EC2_role&quot; -e &quot;emr_version=$Release_label&quot; -e &quot;emr_master_instance_type=$Master_node_size&quot; -e &quot;emr_slave_instance_type=$Slave_node_size&quot;  -e &quot;emr_instance_count=$Nodes_Count&quot; -e &quot;emr_timeout=$Timeout&quot; -e &quot;creds_region=$Region&quot; -e &quot;conf_service_base_name=$Service_base_name&quot; -e &quot;notebook_name=$Notebook_name&quot; -e &quot;creds_key_name=$SSH_Key_Name&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-emr --action create</command>
+sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/launch_EMR_cluster_json/template.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/EUN/&apos;${User_name}&apos;/g&apos; | sed &apos;s/ESR/&apos;${Service_role}&apos;/g&apos; | sed &apos;s/EE2R/&apos;${EMR_EC2_role}&apos;/g&apos; | sed &apos;s/EVER/&apos;${Release_label}&apos;/g&apos; | sed &apos;s/EMIT/&apos;${Master_node_size}&apos;/g&apos; | sed &apos;s/ESMT/&apos;${Slave_node_size}&apos;/g&apos; | sed &apos;s/EIC/&apos;${Nodes_Count}&apos;/g&apos; | sed &apos;s/ETIM/&apos;${Timeout}&apos;/g&apos; | sed &apos;s/KN/&apos;${SSH_Key_Name}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sed &apos;s/NNM/&apos;${Notebook_name}&apos;/g&apos; | sudo docker run -i -v /home/ubuntu/keys:/root/keys -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response  docker.epmc-bdcc.projects.epam.com/dlab-aws-emr --action create</command>
         </hudson.tasks.Shell>
     </builders>
     <publishers/>

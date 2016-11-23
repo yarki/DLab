@@ -30,8 +30,8 @@ parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--dry_run', type=str, default='false')
 parser.add_argument('--emr_version', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
-parser.add_argument('--notebook_ip', type=str, default='')
 parser.add_argument('--region', type=str, default='')
+parser.add_argument('--notebook_ip', type=str, default='')
 args = parser.parse_args()
 
 

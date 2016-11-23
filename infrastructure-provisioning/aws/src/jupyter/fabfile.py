@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 # ******************************************************************************
-
+import logging
 import json
 import sys
 from dlab.fab import *
@@ -45,6 +45,10 @@ def create_image_from_instance(instance_name='', image_name=''):
 
 # Main function for provisioning notebook server
 def run():
+    # enable debug level for boto3
+    logging.getLogger('botocore').setLevel(logging.DEBUG)
+    logging.getLogger('boto3').setLevel(logging.DEBUG)
+
     instance_class = 'notebook'
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename

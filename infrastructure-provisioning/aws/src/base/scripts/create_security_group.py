@@ -40,6 +40,10 @@ def create_security_group(security_group_name, vpc_id, security_group_rules, egr
     group = ec2.create_security_group(GroupName=security_group_name, Description='security_group_name', VpcId=vpc_id)
     time.sleep(10)
     group.create_tags(Tags=[tag])
+    try:
+        group.revoke_egress(IpPermissions=[{"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}])
+    except:
+        print "Mentioned rule does not exist"
     for rule in security_group_rules:
         group.authorize_ingress(IpPermissions=[rule])
     for rule in egress:

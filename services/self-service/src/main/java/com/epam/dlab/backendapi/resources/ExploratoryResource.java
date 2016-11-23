@@ -18,17 +18,6 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.api.form.ExploratoryActionFormDTO;
 import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
@@ -48,9 +37,18 @@ import com.epam.dlab.registry.ApiCallbacks;
 import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import io.dropwizard.auth.Auth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.constants.UserInstanceStatus.*;
-import io.dropwizard.auth.Auth;
 
 @Path("/infrastructure_provision/exploratory_environment")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -67,7 +65,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     private RESTService provisioningService;
 
     @PUT
-    public Response create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) {
+    public Response create(@Auth UserInfo userInfo, @Valid @NotNull ExploratoryCreateFormDTO formDTO) {
         LOGGER.debug("creating exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
@@ -82,7 +80,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
                         .withNotebookInstanceType(formDTO.getShape())
-                        .withRegion(settingsDAO.getAwsRegion())
+                        .withRegion(settingsDAO.getCredsRegion())
                         .withSecurityGroupIds(settingsDAO.getSecurityGroups());
                 LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
@@ -100,7 +98,7 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(ExploratoryStatusDTO dto) {
+    public Response status(@Valid @NotNull ExploratoryStatusDTO dto) {
         UserInstanceStatus currentStatus = infrastructureProvisionDAO.fetchExploratoryStatus(dto.getUser(), dto.getExploratoryName());
         LOGGER.debug("updating status for exploratory environment {} for user {}: was {}, now {}", dto.getExploratoryName(), dto.getUser(), currentStatus, dto.getStatus());
         infrastructureProvisionDAO.updateExploratoryFields(dto);
@@ -113,7 +111,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     }
 
     @POST
-    public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
+    public String start(@Auth UserInfo userInfo, @Valid @NotNull ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
         return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, STARTING);
     }
@@ -121,6 +119,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @DELETE
     @Path("/{name}/stop")
     public String stop(@Auth UserInfo userInfo, @PathParam("name") String name) {
+        System.out.println("stopping " + name);
         LOGGER.debug("stopping exploratory environment {} for user {}", name, userInfo.getName());
         UserInstanceStatus status = STOPPING;
         updateExploratoryStatus(userInfo.getName(), name, status);
@@ -135,7 +134,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookInstanceName(exploratoryId)
                     .withKeyDir(settingsDAO.getCredsKeyDir())
                     .withSshUser(settingsDAO.getExploratorySshUser())
-                    .withRegion(settingsDAO.getAwsRegion());
+                    .withRegion(settingsDAO.getCredsRegion());
             return provisioningService.post(EXPLORATORY_STOP, dto, String.class);
         } catch (Throwable t) {
             updateExploratoryStatus(userInfo.getName(), name, FAILED);
@@ -162,7 +161,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(exploratoryId)
-                    .withRegion(settingsDAO.getAwsRegion());
+                    .withRegion(settingsDAO.getCredsRegion());
             return provisioningService.post(action, dto, String.class);
         } catch (Throwable t) {
             updateExploratoryStatus(userInfo.getName(), name, FAILED);

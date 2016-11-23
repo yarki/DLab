@@ -35,9 +35,12 @@ import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -60,7 +63,7 @@ public class ComputationalResource implements ComputationalAPI {
     private RESTService provisioningService;
 
     @PUT
-    public Response create(@Auth UserInfo userInfo, ComputationalCreateFormDTO formDTO) {
+    public Response create(@Auth UserInfo userInfo, @Valid @NotNull ComputationalCreateFormDTO formDTO) {
         LOGGER.debug("creating computational resource {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
@@ -83,7 +86,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withVersion(formDTO.getVersion())
                         .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
-                        .withRegion(settingsDAO.getAwsRegion());
+                        .withRegion(settingsDAO.getCredsRegion());
                 ;
                 LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
@@ -101,7 +104,7 @@ public class ComputationalResource implements ComputationalAPI {
 
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(ComputationalStatusDTO dto) {
+    public Response status(@Valid @NotNull ComputationalStatusDTO dto) {
         LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateComputationalFields(dto);
         return Response.ok().build();
@@ -125,7 +128,7 @@ public class ComputationalResource implements ComputationalAPI {
                     .withSshUser(settingsDAO.getExploratorySshUser())
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
-                    .withRegion(settingsDAO.getAwsRegion());
+                    .withRegion(settingsDAO.getCredsRegion());
             return provisioningService.post(EMR_TERMINATE, dto, String.class);
         } catch (Throwable t) {
             updateComputationalStatus(userInfo.getName(), exploratoryName, computationalName, FAILED);

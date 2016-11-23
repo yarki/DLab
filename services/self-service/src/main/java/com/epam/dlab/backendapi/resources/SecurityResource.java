@@ -28,9 +28,12 @@ import com.epam.dlab.exceptions.DlabException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -54,13 +57,13 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
 
     @POST
     @Path("/login")
-    public Response login(UserCredentialDTO credential) {
+    public Response login(@NotNull UserCredentialDTO credential) {
         LOGGER.debug("Try login user = {}", credential.getUsername());
         try {
             dao.writeLoginAttempt(credential);
             return securityService.post(LOGIN, credential, Response.class);
         } catch (Throwable t) {
-            throw new DlabException("Could not login user", t);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(t.getMessage()).build();
         }
     }
 
@@ -71,13 +74,13 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
         try {
             return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
         } catch(Throwable t) {
-            throw new DlabException("Could not logout user", t);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(t.getMessage()).build();
         }
     }
 
     @POST
     @Path("/authorize")
-    public Response authorize(@Auth UserInfo userInfo, String username) {
+    public Response authorize(@Auth UserInfo userInfo, @Valid @NotBlank String username) {
         LOGGER.debug("Try authorize accessToken {}", userInfo.getAccessToken());
         return Response
                 .status(userInfo.getName().toLowerCase().equals(username.toLowerCase()) ?
