@@ -1,24 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--
-  ~         Licensed to the Apache Software Foundation (ASF) under one or more
-  ~         contributor license agreements. See the NOTICE file distributed with
-  ~         this work for additional information regarding copyright ownership.
-  ~         The ASF licenses this file to You under the Apache License, Version 2.0
-  ~         (the "License"); you may not use this file except in compliance with
-  ~         the License. You may obtain a copy of the License at
-  ~
-  ~         http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~         Unless required by applicable law or agreed to in writing, software
-  ~         distributed under the License is distributed on an "AS IS" BASIS,
-  ~         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~         See the License for the specific language governing permissions and
-  ~         limitations under the License.
-  -->
-
 <project>
   <actions/>
-  <description>Create Notebook Server</description>
+  <description>Create EDGE node</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -34,6 +17,11 @@
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
+          <name>IAM_user</name>
+          <description>Name of user in IAM</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
           <description>name of the uploaded ssh key file (without ".pem")</description>
           <defaultValue></defaultValue>
@@ -41,6 +29,16 @@
         <hudson.model.StringParameterDefinition>
           <name>SSN_SG_ids</name>
           <description>The ID of the SSN Security Group to be accessible</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>vpc_id</name>
+          <description>id of VPC where infrastructure is being deployed </description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>subnet_id</name>
+          <description>id of the public subnet where EDGE will be deployed</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
@@ -85,7 +83,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>rand=`openssl rand -hex 10`;
-                sudo docker run -i -v /home/ubuntu/keys:/root/keys -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e &quot;request_id=${rand}&quot; -e &quot;conf_service_base_name=${Service_base_name}&quot; -e &quot;creds_region=${Region}&quot; -e &quot;creds_key_name=${SSH_Key_Name}&quot; -e &quot;notebook_instance_type=${instance_shape}&quot; -e &quot;notebook_user_name=${Username}&quot; -e &quot;creds_security_groups_ids=${SSN_SG_ids}&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter --action $Action</command>
+sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/provision_edge_node_json/template.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/UN/&apos;${Username}&apos;/g&apos; | sed &apos;s/CIU/&apos;${IAM_user}&apos;/g&apos; | sed &apos;s/SGI/&apos;${SSN_SG_ids}&apos;/g&apos; | sed &apos;s/KN/&apos;${SSH_Key_Name}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sed &apos;s/EVI/&apos;${vpc_id}&apos;/g&apos; | sed &apos;s/CSI/&apos;${subnet_id}&apos;/g&apos; | sed &apos;s/EIS/&apos;${instance_shape}&apos;/g&apos; | sudo docker run -i -v /home/ubuntu/keys:/root/keys -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response docker.epmc-bdcc.projects.epam.com/dlab-aws-edge --action $Action ;</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

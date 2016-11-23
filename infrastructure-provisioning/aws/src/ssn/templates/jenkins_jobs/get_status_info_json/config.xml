@@ -1,24 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--
-  ~         Licensed to the Apache Software Foundation (ASF) under one or more
-  ~         contributor license agreements. See the NOTICE file distributed with
-  ~         this work for additional information regarding copyright ownership.
-  ~         The ASF licenses this file to You under the Apache License, Version 2.0
-  ~         (the "License"); you may not use this file except in compliance with
-  ~         the License. You may obtain a copy of the License at
-  ~
-  ~         http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~         Unless required by applicable law or agreed to in writing, software
-  ~         distributed under the License is distributed on an "AS IS" BASIS,
-  ~         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~         See the License for the specific language governing permissions and
-  ~         limitations under the License.
-  -->
-
 <project>
   <actions/>
-  <description>This job starts notebook server.</description>
+  <description>Status of exploratory environment</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -29,8 +12,8 @@
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>Notebook_Name</name>
-          <description>name of the notebook to start</description>
+          <name>Username</name>
+          <description>Username of the scientist</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -39,22 +22,20 @@
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
+          <name>Action</name>
+          <description></description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>status</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
           <name>Region</name>
           <description>aws region where infrastructure was deployed</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
               <string>us-west-2</string>
-              <string>us-west-1</string>
-              <string>eu-west-1</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>Action</name>
-          <description></description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>start</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
@@ -71,7 +52,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>rand=`openssl rand -hex 10`;
-                sudo docker run -i -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e &quot;request_id=$rand&quot; -e &quot;conf_service_base_name=${Service_base_name}&quot; -e &quot;creds_region=$Region&quot; -e &quot;notebook_instance_name=$Notebook_Name&quot; -e &quot;creds_key_name=$SSH_Key_Name&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter --action $Action</command>
+sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/get_status_info_json/template.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sed &apos;s/EUN/&apos;${Username}&apos;/g&apos; | sed &apos;s/KN/&apos;${SSH_Key_Name}&apos;/g&apos; | sudo docker run -i -v /home/ubuntu/keys:/root/keys -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response docker.epmc-bdcc.projects.epam.com/dlab-aws-edge --action $Action </command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
