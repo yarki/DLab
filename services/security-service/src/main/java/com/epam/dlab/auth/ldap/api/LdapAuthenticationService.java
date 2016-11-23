@@ -109,61 +109,10 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			CompletableFuture<UserInfo> uiFuture = loginConveyor.startUserInfoBuild(token,username);
 			loginConveyor.add(token,remoteIp, LoginStep.REMOTE_IP);
 
-			//Try to login
-			threadpool.submit(()->{
-				try {
-					ldapUserDAO.getUserInfo(username,password);
-					log.debug("User Authenticated: {}",username);
-				} catch (Exception e) {
-					loginConveyor.cancel(token);
-				}
-			});
-			//Extract User Info from LDAP
-			threadpool.submit(()->{
-				try {
-					UserInfo rolesUserInfo = ldapUserDAO.enrichUserInfo(new UserInfo(username, token));
-					loginConveyor.add(token,rolesUserInfo,LoginStep.LDAP_USER_INFO);
-				} catch (Exception e) {
-					loginConveyor.cancel(token);
-				}
-			});
-			//Check AWS account
-			threadpool.submit(()->{
-				if(config.isAwsUserIdentificationEnabled()) {
-					try {
-						User awsUser = awsUserDAO.getAwsUser(username);
-						if (awsUser != null) {
-							loginConveyor.add(token, true, LoginStep.AWS_USER);
-						} else {
-							loginConveyor.add(token, false, LoginStep.AWS_USER);
-							log.warn("AWS User '{}' was not found. ", username);
-						}
-					} catch (Exception e) {
-						loginConveyor.cancel(token);
-					}
-				} else {
-					loginConveyor.add(token,false,LoginStep.AWS_USER);
-				}
-			});
-
-			//Check AWS keys
-			threadpool.submit(()->{
-				if(config.isAwsUserIdentificationEnabled()) {
-					try {
-						List<AccessKeyMetadata> keys = awsUserDAO.getAwsAccessKeys(username);
-						if (keys != null) {
-							loginConveyor.add(token, keys, LoginStep.AWS_KEYS);
-						} else {
-							loginConveyor.add(token, new ArrayList<AccessKeyMetadata>(), LoginStep.AWS_KEYS);
-							log.warn("AWS Keys for '{}' were not found. ", username);
-						}
-					} catch (Exception e) {
-						loginConveyor.cancel(token);
-					}
-				} else {
-					loginConveyor.add(token,new ArrayList<AccessKeyMetadata>(),LoginStep.AWS_KEYS);
-				}
-			});
+			submitLdapLogin(username,password,token);
+			submitLdapInfo(username,token);
+			submitAwsCheck(username,token);
+			submitAwsKeys(username,token);
 
 			try {
 				UserInfo userInfo = uiFuture.get(10,TimeUnit.SECONDS);
@@ -174,6 +123,74 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			}
 			return Response.ok(token).build();
 		}
+	}
+
+	private void submitLdapLogin(String username, String password, String token) {
+		//Try to login
+		threadpool.submit(()->{
+			try {
+				ldapUserDAO.getUserInfo(username,password);
+				log.debug("User Authenticated: {}",username);
+			} catch (Exception e) {
+				loginConveyor.cancel(token);
+			}
+		});
+	}
+
+	private void submitLdapInfo(String username, String token) {
+		//Extract User Info from LDAP
+		threadpool.submit(()->{
+			try {
+				UserInfo rolesUserInfo = ldapUserDAO.enrichUserInfo(new UserInfo(username, token));
+				loginConveyor.add(token,rolesUserInfo,LoginStep.LDAP_USER_INFO);
+			} catch (Exception e) {
+				loginConveyor.cancel(token);
+			}
+		});
+	}
+
+	private void submitAwsCheck(String username, String token) {
+		//Check AWS account
+		threadpool.submit(()->{
+			if(config.isAwsUserIdentificationEnabled()) {
+				try {
+					User awsUser = awsUserDAO.getAwsUser(username);
+					if (awsUser != null) {
+						loginConveyor.add(token, true, LoginStep.AWS_USER);
+					} else {
+						loginConveyor.add(token, false, LoginStep.AWS_USER);
+						log.warn("AWS User '{}' was not found. ", username);
+					}
+				} catch (Exception e) {
+					loginConveyor.cancel(token);
+				}
+			} else {
+				loginConveyor.add(token,false,LoginStep.AWS_USER);
+			}
+		});
+
+	}
+
+	private void submitAwsKeys(String username, String token) {
+		//Check AWS keys
+		threadpool.submit(()->{
+			if(config.isAwsUserIdentificationEnabled()) {
+				try {
+					List<AccessKeyMetadata> keys = awsUserDAO.getAwsAccessKeys(username);
+					if (keys != null) {
+						loginConveyor.add(token, keys, LoginStep.AWS_KEYS);
+					} else {
+						loginConveyor.add(token, new ArrayList<AccessKeyMetadata>(), LoginStep.AWS_KEYS);
+						log.warn("AWS Keys for '{}' were not found. ", username);
+					}
+				} catch (Exception e) {
+					loginConveyor.cancel(token);
+				}
+			} else {
+				loginConveyor.add(token,new ArrayList<AccessKeyMetadata>(),LoginStep.AWS_KEYS);
+			}
+		});
+
 	}
 
 	@Override
