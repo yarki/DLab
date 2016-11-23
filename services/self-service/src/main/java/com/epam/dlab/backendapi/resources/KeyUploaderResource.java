@@ -88,8 +88,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
                     .withSecurityGroupIds(settingsDAO.getSecurityGroups())
                     .withRegion(settingsDAO.getCredsRegion())
                     .withVpcId(settingsDAO.getCredsVpcId())
-                    .withSubnetId(settingsDAO.getCredsSubnetId())
-                    .withInstanceSize(settingsDAO.getEdgeInstanceSize());
+                    .withSubnetId(settingsDAO.getCredsSubnetId());
             UploadFileDTO dto = new UploadFileDTO()
                     .withEdge(edge)
                     .withContent(content);

@@ -17,8 +17,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class EdgeCreateDTO extends EdgeBaseDTO<EdgeCreateDTO> {
     @JsonProperty("edge_vpc_id")
     private String vpcId;
-    @JsonProperty("edge_instance_size")
-    private String instanceSize;
     @JsonProperty("creds_subnet_id")
     private String subnetId;
     @JsonProperty("creds_iam_user")
@@ -39,20 +37,7 @@ public class EdgeCreateDTO extends EdgeBaseDTO<EdgeCreateDTO> {
         return this;
     }
 
-    public String getInstanceSize() {
-        return instanceSize;
-    }
-
-    public void setInstanceSize(String instanceSize) {
-        this.instanceSize = instanceSize;
-    }
-
-    public EdgeCreateDTO withInstanceSize(String instanceSize) {
-        setInstanceSize(instanceSize);
-        return this;
-    }
-
-    public String getSubnetId() {
+     public String getSubnetId() {
         return subnetId;
     }
 

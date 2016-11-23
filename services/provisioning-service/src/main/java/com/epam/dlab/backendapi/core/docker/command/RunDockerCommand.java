@@ -129,11 +129,6 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withEmrInstanceSize(String instanceSize) {
-        options.add(String.format("-e \"edge_instance_size=%s\"", instanceSize));
-        return this;
-    }
-
     public RunDockerCommand withVpcId(String vpcId) {
         options.add(String.format("-e \"edge_vpc_id=%s\"", vpcId));
         return this;
@@ -143,7 +138,6 @@ public class RunDockerCommand implements DockerCommand {
         options.add(String.format("-e \"creds_subnet_id=%s\"", subnetId));
         return this;
     }
-
 
     public RunDockerCommand withEmrInstanceType(String emrInstanceType) {
         options.add(String.format("-e \"emr_instance_type=%s\"", emrInstanceType));
