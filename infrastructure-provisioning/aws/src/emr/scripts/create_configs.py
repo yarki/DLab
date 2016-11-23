@@ -77,8 +77,8 @@ def yarn(args):
     s3client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
     s3resource = boto3.resource('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
     get_files(s3client, s3resource, args.user_name + '/' + args.cluster_name + '/config/', args.bucket, yarn_dir)
-    local('sudo mv ' + yarn_dir + args.cluster_name + '/* ' + yarn_dir)
-    local('sudo rm -rf ' + yarn_dir + args.cluster_name + '/')
+    local('sudo mv ' + yarn_dir + args.user_name + '/' + args.cluster_name + '/config/* ' + yarn_dir)
+    local('sudo rm -rf ' + yarn_dir + args.user_name + '/')
 
 
 def pyspark_kernel(args):
@@ -92,6 +92,7 @@ def pyspark_kernel(args):
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
     text = text.replace('SPARK_PATH', spark_path)
     text = text.replace('PY_VER', '2.7')
+    text = text.replace('EMR', args.emr_version)
     with open(kernel_path, 'w') as f:
         f.write(text)
     local('touch /tmp/kernel_var.json')
@@ -113,6 +114,7 @@ def pyspark_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
         text = text.replace('PY_VER', '3.4')
+        text = text.replace('EMR', args.emr_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
@@ -129,6 +131,7 @@ def pyspark_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
         text = text.replace('PY_VER', '3.5')
+        text = text.replace('EMR', args.emr_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
@@ -148,6 +151,7 @@ def toree_kernel(args):
         text = text.replace('CLUSTER', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
+        text = text.replace('EMR', args.emr_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
@@ -164,6 +168,7 @@ def toree_kernel(args):
         text = text.replace('CLUSTER', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
+        text = text.replace('EMR', args.emr_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
