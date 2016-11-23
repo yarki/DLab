@@ -83,7 +83,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withVersion(formDTO.getVersion())
                         .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
-                        .withRegion(settingsDAO.getAwsRegion());
+                        .withRegion(settingsDAO.getCredsRegion());
                 ;
                 LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
@@ -125,7 +125,7 @@ public class ComputationalResource implements ComputationalAPI {
                     .withSshUser(settingsDAO.getExploratorySshUser())
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
-                    .withRegion(settingsDAO.getAwsRegion());
+                    .withRegion(settingsDAO.getCredsRegion());
             return provisioningService.post(EMR_TERMINATE, dto, String.class);
         } catch (Throwable t) {
             updateComputationalStatus(userInfo.getName(), exploratoryName, computationalName, FAILED);
