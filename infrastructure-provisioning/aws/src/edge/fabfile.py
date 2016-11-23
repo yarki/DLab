@@ -491,3 +491,49 @@ def run():
         sys.exit(0)
 
     sys.exit(0)
+
+
+# Main function for terminating EDGE node and exploratory environment if exists
+def terminate():
+    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filepath = "/response/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG,
+                        filename=local_log_filepath)
+
+    # generating variables dictionary
+    create_aws_config_files()
+    print 'Generating infrastructure names and tags'
+    edge_conf = dict()
+    edge_conf['service_base_name'] = os.environ['conf_service_base_name']
+    edge_conf['user_name'] = os.environ['edge_user_name']
+    edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
+    edge_conf['tag_value'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '*'
+    edge_conf['edge_sg'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
+    edge_conf['nb_sg'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb'
+
+    try:
+        logging.info('[TERMINATE EDGE]')
+        print '[TERMINATE EDGE]'
+        params = "--user_name %s --tag_name %s --tag_value %s --edge_sg %s --nb_sg %s" % \
+                 (edge_conf['user_name'], edge_conf['tag_name'], edge_conf['tag_value'], edge_conf['edge_sg'], edge_conf['nb_sg'])
+        if not run_routine('terminate_edge', params):
+            logging.info('Failed to terminate edge')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to terminate edge", "conf": edge_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        sys.exit(1)
+
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"service_base_name": edge_conf['service_base_name'],
+                   "user_name": edge_conf['user_name'],
+                   "Action": "Terminate edge node"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)
