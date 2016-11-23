@@ -82,7 +82,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
                         .withNotebookInstanceType(formDTO.getShape())
-                        .withRegion(settingsDAO.getAwsRegion())
+                        .withRegion(settingsDAO.getCredsRegion())
                         .withSecurityGroupIds(settingsDAO.getSecurityGroups());
                 LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
@@ -135,7 +135,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookInstanceName(exploratoryId)
                     .withKeyDir(settingsDAO.getCredsKeyDir())
                     .withSshUser(settingsDAO.getExploratorySshUser())
-                    .withRegion(settingsDAO.getAwsRegion());
+                    .withRegion(settingsDAO.getCredsRegion());
             return provisioningService.post(EXPLORATORY_STOP, dto, String.class);
         } catch (Throwable t) {
             updateExploratoryStatus(userInfo.getName(), name, FAILED);
@@ -162,7 +162,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(exploratoryId)
-                    .withRegion(settingsDAO.getAwsRegion());
+                    .withRegion(settingsDAO.getCredsRegion());
             return provisioningService.post(action, dto, String.class);
         } catch (Throwable t) {
             updateExploratoryStatus(userInfo.getName(), name, FAILED);
