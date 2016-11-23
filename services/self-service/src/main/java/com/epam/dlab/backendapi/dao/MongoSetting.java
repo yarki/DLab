@@ -25,8 +25,7 @@ public enum MongoSetting {
     EXPLORATORY_SSH_USER("notebook_ssh_user"),
     CREDS_KEY_DIRECTORY("creds_key_dir"),
     CREDS_VPC_ID("creds_vpc_id"),
-    CREDS_SUBNET_ID("creds_subnet_id"),
-    EDGE_INSTANCE_SIZE("edge_instance_size");
+    CREDS_SUBNET_ID("creds_subnet_id");
 
     private String id;
 
