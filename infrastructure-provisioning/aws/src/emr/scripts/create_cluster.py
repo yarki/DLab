@@ -72,7 +72,7 @@ cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/jars_parser.sh /tmp/jars_parser.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
           "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/key_importer.sh /tmp/key_importer.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
           "Name=CUSTOM_JAR, Args=sh /tmp/key_importer.sh {4}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, os.environ['edge_user_name'])
+          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2} {4} {5}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, os.environ['edge_user_name'], args.name)
 
 logfile = '{}_creation.log'.format(args.name)
 logpath = '/response/' + logfile
