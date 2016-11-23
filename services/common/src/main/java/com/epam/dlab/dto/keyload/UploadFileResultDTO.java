@@ -29,7 +29,6 @@ public class UploadFileResultDTO {
     @JsonProperty
     private String user;
 
-    @NotBlank
     @JsonProperty
     private boolean success;
 

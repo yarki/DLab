@@ -86,11 +86,10 @@ public class KeyUploaderResource implements KeyLoaderAPI {
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withSecurityGroupIds(settingsDAO.getSecurityGroups())
-                    .withRegion(settingsDAO.getAwsRegion())
-                    // TODO hardcoded, should be taken from response.json and stored in mongo, then fetched here...
-                    .withVpcId("vpc-588a2c3d")
-                    .withSubnetId("subnet-1e6c9347")
-                    .withInstanceSize("t2.medium");
+                    .withRegion(settingsDAO.getCredsRegion())
+                    .withVpcId(settingsDAO.getCredsVpcId())
+                    .withSubnetId(settingsDAO.getCredsSubnetId())
+                    .withInstanceSize(settingsDAO.getEdgeInstanceSize());
             UploadFileDTO dto = new UploadFileDTO()
                     .withEdge(edge)
                     .withContent(content);
