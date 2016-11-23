@@ -36,8 +36,7 @@ export class ConfirmationDialogModel {
     this.setup(confirmationType, notebook, fnProcessResults, fnProcessErrors);
   }
 
-  static getDefault () : ConfirmationDialogModel
-  {
+  static getDefault () : ConfirmationDialogModel {
     return new
       ConfirmationDialogModel(
         ConfirmationDialogType.StopExploratory, {name: "", resources: []}, () => {},  () => {}, null);
@@ -51,12 +50,17 @@ export class ConfirmationDialogModel {
     return this.userResourceService.suspendExploratoryEnvironment(this.notebook, "terminate")
   }
 
-  private setup(confirmationType : ConfirmationDialogType, notebook : any, fnProcessResults : any, fnProcessErrors: any) : void
-  {
-    switch (confirmationType)
-    {
+  private setup(confirmationType : ConfirmationDialogType, notebook : any, fnProcessResults : any, fnProcessErrors: any) : void {
+
+    let containRunningResourcesStopMessage = 'Exploratory Environment will be stopped and all connected computational resources will be terminated.';
+    let defaultStopMessage = 'Exploratory Environment will be stopped';
+
+    let containRunningResourcesTerminateMessage = "Exploratory Environment and all connected computational resources will be terminated.";
+    let defaultTerminateMessage = "Exploratory Environment will be terminated.";
+
+    switch (confirmationType) {
       case ConfirmationDialogType.StopExploratory: {
-        this.title = "Exploratory Environment will be stopped and all connected computational resources will be terminated.";
+        this.title = this.isAliveResources(notebook.resources) ? containRunningResourcesStopMessage : defaultStopMessage;
         this.notebook = notebook;
         this.confirmAction = () => this.stopExploratory()
           .subscribe((response : Response) => fnProcessResults(response),
@@ -64,7 +68,7 @@ export class ConfirmationDialogModel {
       }
       break;
       case ConfirmationDialogType.TerminateExploratory: {
-        this.title = "Exploratory Environment and all connected computational resources will be terminated.";
+        this.title = this.isAliveResources(notebook.resources) ? containRunningResourcesTerminateMessage : defaultTerminateMessage;
         this.notebook = notebook;
         this.confirmAction = () => this.terminateExploratory()
           .subscribe((response : Response) => fnProcessResults(response),
@@ -72,7 +76,7 @@ export class ConfirmationDialogModel {
       }
       break;
       default: {
-        this.title = "Exploratory Environment and all connected computational resources will be terminated.";
+        this.title = this.isAliveResources(notebook.resources) ? containRunningResourcesTerminateMessage : defaultTerminateMessage;
         this.notebook = notebook;
         this.confirmAction = () => this.stopExploratory()
           .subscribe((response : Response) => fnProcessResults(response),
@@ -80,5 +84,13 @@ export class ConfirmationDialogModel {
       }
       break;
     }
+  }
+
+  public isAliveResources(resources): boolean {
+    for (var i = 0, len = resources.length; i < len; i++)
+      if (resources[i].status.toLowerCase() == 'running')
+        return true;
+
+    return false;
   }
 }
