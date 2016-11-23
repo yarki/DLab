@@ -29,6 +29,16 @@ limitations under the License.
     <td colspan="5">To start working, please, create new environment</td>
   </tr>
 
+  <tr class="filter-row">
+    <td></td>
+    <td>
+      <input class="form-control" type="text" placeholder="Filter by status" (input)="onChangeFilter($event)">
+    </td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+
   <tr *ngFor="let env of environments;" [ngClass]="{'dropdown-outscreen': isOutscreenDropdown}">
     <td (click)="(env.status != 'starting' && env.status != 'creating' && printDetailEnvironmentModal(env))" [ngClass]="{'not-allowed' : env.status == 'starting' || env.status == 'creating'}">{{env.name}}</td>
     <td class="status" ngClass="{{env.status.toLowerCase() || ''}}">{{env.status}}</td>

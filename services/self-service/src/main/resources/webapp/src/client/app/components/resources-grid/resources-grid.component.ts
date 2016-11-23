@@ -52,6 +52,17 @@ export class ResourcesGrid implements OnInit {
     this.buildGrid();
   }
 
+  onChangeFilter($event) {
+    let filteredData:Array<any> = this.environments;
+
+    if($event.target.value)
+      filteredData = filteredData.filter((item:any) => {
+        return item.status.match($event.target.value);
+      });
+
+    console.log('filteredData => ', filteredData);
+  }
+
   buildGrid() : void {
     this.userResourceService.getUserProvisionedResources()
       .subscribe((result) => {
