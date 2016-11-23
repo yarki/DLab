@@ -62,12 +62,12 @@ parser.add_argument('--configurations', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 args = parser.parse_args()
 
-cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/config/{1}/hive-site.xml --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/config/{1} --recursive --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
+cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/{4}/{5}/config/hive-site.xml --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/{4}/{5}/config/ --recursive --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/{4}.pub /tmp/{4}.pub --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/{4}/{4}.pub /tmp/{4}.pub --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
-    args.s3_bucket, args.name, args.nbs_user, args.region, os.environ['edge_user_name'])
+    args.s3_bucket, args.name, args.nbs_user, args.region, os.environ['edge_user_name'], args.name)
 
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/jars_parser.sh /tmp/jars_parser.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
           "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/key_importer.sh /tmp/key_importer.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
@@ -102,7 +102,7 @@ def upload_jars_parser(args):
 
 def upload_user_key(args):
     s3 = boto3.resource('s3')
-    s3.meta.client.upload_file(os.environ['creds_key_dir'] + '/' + os.environ['edge_user_name'] + '.pub', args.s3_bucket, os.environ['edge_user_name'] + '.pub')
+    s3.meta.client.upload_file(os.environ['creds_key_dir'] + '/' + os.environ['edge_user_name'] + '.pub', args.s3_bucket, os.environ['edge_user_name'] + '/' + os.environ['edge_user_name'] + '.pub')
     s3.meta.client.upload_file('/root/scripts/key_importer.sh', args.s3_bucket, 'key_importer.sh')
 
 
@@ -132,7 +132,7 @@ def emr_sg(id):
 
 def wait_emr(bucket, cluster_name, timeout, delay=30):
     deadline = time.time() + timeout
-    prefix = "config/" + cluster_name + "/"
+    prefix = os.environ['edge_user_name'] + '/' + cluster_name + "/config/"
     global cluster_id
     while time.time() < deadline:
         state = action_validate(cluster_id)
