@@ -45,7 +45,7 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withName(String name) {
-        options.add(String.format("-name %s", name));
+        options.add(String.format("--name %s", name));
         return this;
     }
 
