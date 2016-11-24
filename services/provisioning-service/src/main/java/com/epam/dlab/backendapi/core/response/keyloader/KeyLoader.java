@@ -71,13 +71,13 @@ public class KeyLoader implements DockerCommands, SelfAPI {
         commandExecuter.executeAsync(
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
+                                .withName(nameContainer(edgeDto.getEdgeUserName(), "create", "edge"))
                                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                                 .withVolumeForResponse(configuration.getKeyLoaderDirectory())
                                 .withRequestId(uuid)
                                 .withCredsKeyName(configuration.getAdminKey())
                                 .withActionCreate(configuration.getEdgeImage())
                                 .withConfServiceBaseName(edgeDto.getServiceBaseName())
-                                .withEmrInstanceSize(edgeDto.getInstanceSize())
                                 .withCredsRegion(edgeDto.getRegion())
                                 .withCredsSecurityGroupsIds(edgeDto.getSecurityGroupIds())
                                 .withVpcId(edgeDto.getVpcId())
