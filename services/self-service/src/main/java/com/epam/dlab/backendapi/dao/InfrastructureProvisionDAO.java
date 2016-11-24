@@ -148,7 +148,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
             }
             update(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)
                     , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName),
-                    not(eq(getComputationalSetPrefix() + STATUS, TERMINATED))),
+                    not(eq(getComputationalSetPrefix() + STATUS, TERMINATED.name()))),
                     new Document(SET, values));
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);
