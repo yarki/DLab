@@ -20,7 +20,6 @@ import { Component, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 import { ResourcesGridRowModel } from './resources-grid.model';
 import { CreateEmrModel } from "./createEmrModel";
-import { ComputationalResourceImage } from "../../models/computationalResourceImage.model";
 import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dialog-type.enum";
 
 @Component({
@@ -32,19 +31,18 @@ import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dial
 
 export class ResourcesGrid implements OnInit {
 
-  isFilled: boolean = false;
   environments: Array<ResourcesGridRowModel>;
   filteredEnvironments: Array<ResourcesGridRowModel>;
-  notebookName: string;
   model = new CreateEmrModel('', '');
+  notebookName: string;
   isOutscreenDropdown: boolean;
   collapseFilterRow: boolean = false;
+  filtering: boolean = false;
 
   @ViewChild('computationalResourceModal') computationalResourceModal;
   @ViewChild('confirmationDialog') confirmationDialog;
   @ViewChild('detailDialog') detailDialog;
-
-  computationalResourcesImages: Array<ComputationalResourceImage> = [];
+  @ViewChild('filterRow') filterRow;
 
   constructor(
     private userResourceService: UserResourceService
@@ -64,17 +62,26 @@ export class ResourcesGrid implements OnInit {
 
   onChangeFilter($event, column) {
     let filteredData:Array<any> = this.environments;
-
     if($event.target.value)
+      this.filtering = true;
       filteredData = filteredData.filter((item:any) => {
         return item[column].toLowerCase().match($event.target.value.toLowerCase());
       });
-
-    console.log('filteredData => ', filteredData);
     this.filteredEnvironments = filteredData;
   }
-  toggleFilterRow() {
+
+  toggleFilterRow() : void {
     this.collapseFilterRow = !this.collapseFilterRow;
+  }
+
+  clearFilters() : void {
+    if(this.filterRow) {
+      let el: HTMLElement = this.filterRow.nativeElement;
+      let filterFields: NodeListOf<Element> = el.getElementsByClassName('filter-field');
+
+      for (let i = 0; i < filterFields.length; i++)
+        filterFields[i]['value'] = '';
+    }
   }
 
   buildGrid() : void {
@@ -83,6 +90,7 @@ export class ResourcesGrid implements OnInit {
         this.environments = this.loadEnvironments(result);
 
         this.filteredEnvironments = this.environments;
+        this.clearFilters();
         console.log('models ', this.environments);
       });
   }
@@ -132,7 +140,8 @@ export class ResourcesGrid implements OnInit {
       this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.TerminateExploratory);
     }
   }
-  dropdownPosition(event) {
+
+  dropdownPosition(event) : void{
     let contentHeight = document.body.offsetHeight > window.outerHeight ? document.body.offsetHeight : window.outerHeight;
     this.isOutscreenDropdown = event.pageY + 215 > contentHeight ? true : false;
   }
