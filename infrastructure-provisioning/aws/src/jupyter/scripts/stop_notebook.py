@@ -49,7 +49,7 @@ if __name__ == "__main__":
                 cluster = cluster.get("Cluster")
                 emr_name = cluster.get('Name')
                 emr_version = cluster.get('ReleaseLabel')
-                s3_cleanup(args.bucket_name, emr_name, os.environ['edge_user_name'])
+                s3_cleanup(args.bucket_name, emr_name, os.environ['notebook_user_name'])
                 print "The bucket " + args.bucket_name + " has been cleaned successfully"
                 terminate_emr(cluster_id)
                 print "The EMR cluster " + emr_name + " has been terminated successfully"
