@@ -45,7 +45,7 @@ def ensure_pip(requisites):
             sudo('echo PATH=$PATH:/usr/local/bin/:/opt/spark/bin/ >> /etc/profile')
             sudo('echo export PATH >> /etc/profile')
             sudo('touch /tmp/pip_path_added')
-        sudo('pip install -U ' + requisites)
+        sudo('pip install -U ' + requisites + ' --no-cache-dir')
         return True
     except:
         return False
