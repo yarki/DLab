@@ -290,6 +290,6 @@ if __name__ == "__main__":
             out.close()
             if action_validate(cluster_id)[0] == "True":
                 terminate_emr(cluster_id)
-            s3_cleanup(args.s3_bucket, args.name)
+            s3_cleanup(args.s3_bucket, args.name, os.environ['edge_user_name'])
             sys.exit(1)
     sys.exit(0)

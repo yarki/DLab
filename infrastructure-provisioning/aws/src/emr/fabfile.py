@@ -112,7 +112,7 @@ def run():
     except:
         emr_id = get_emr_id_by_name(emr_conf['cluster_name'])
         terminate_emr(emr_id)
-        remove_kernels(emr_conf['cluster_name'],emr_conf['tag_name'],os.environ['notebook_name'],'ubuntu',emr_conf['key_path'])
+        remove_kernels(emr_conf['cluster_name'],emr_conf['tag_name'],os.environ['notebook_name'],'ubuntu',emr_conf['key_path'], emr_conf['release_label'])
         sys.exit(1)
 
     try:
