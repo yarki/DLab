@@ -69,14 +69,8 @@ export class LoginComponent {
 
         return false;
       }, (err) => {
-          if(err.status == HTTP_STATUS_CODES.UNAUTHORIZED){
-            this.error = 'Username or password is incorrect.';
-            this.loading = false;
-          }
-          else {
-            this.error = 'System failure. Please contact administrator.';
-            this.loading = false;
-          }
+          this.error = err.text();
+          this.loading = false;
         });
 
     return false;
