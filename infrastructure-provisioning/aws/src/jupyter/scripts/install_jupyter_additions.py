@@ -35,9 +35,9 @@ def ensure_matplot():
     if not exists('/home/ubuntu/.ensure_dir/matplot_ensured'):
         try:
             sudo('apt-get build-dep -y python-matplotlib')
-            sudo('pip install matplotlib')
-            sudo('pip3 install matplotlib')
-            sudo('python3.4 -m pip install matplotlib  --upgrade')
+            sudo('pip install matplotlib --no-cache-dir')
+            sudo('pip3 install matplotlib --no-cache-dir')
+            sudo('python3.4 -m pip install matplotlib  --upgrade --no-cache-dir')
             sudo('touch /home/ubuntu/.ensure_dir/matplot_ensured')
         except:
             sys.exit(1)
@@ -61,8 +61,8 @@ def ensure_libraries_py2():
         try:
             sudo('export LC_ALL=C')
             sudo('apt-get install -y libjpeg8-dev zlib1g-dev')
-            sudo('pip2 install boto boto3')
-            sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
+            sudo('pip2 install boto boto3 --no-cache-dir')
+            sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
             sudo('touch /home/ubuntu/.ensure_dir/ensure_libraries_py2_installed')
         except:
             sys.exit(1)
@@ -71,10 +71,10 @@ def ensure_libraries_py2():
 def ensure_libraries_py3():
     if not exists('/home/ubuntu/.ensure_dir/ensure_libraries_py3_installed'):
         try:
-            sudo('pip3 install boto boto3')
-            sudo('python3.4 -m pip install boto boto3 --upgrade')
-            sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn')
-            sudo('python3.4 -m pip install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --upgrade')
+            sudo('pip3 install boto boto3 --no-cache-dir')
+            sudo('python3.4 -m pip install boto boto3 --upgrade --no-cache-dir')
+            sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
+            sudo('python3.4 -m pip install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --upgrade --no-cache-dir')
             sudo('touch /home/ubuntu/.ensure_dir/ensure_libraries_py3_installed')
         except:
             sys.exit(1)
