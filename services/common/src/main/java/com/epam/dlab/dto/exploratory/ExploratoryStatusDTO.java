@@ -20,16 +20,11 @@ package com.epam.dlab.dto.exploratory;
 
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.NotBlank;
-
-import javax.annotation.Nullable;
 
 public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
-    @NotBlank
     @JsonProperty("exploratory_id")
     private String exploratoryId;
 
-    @Nullable
     @JsonProperty("exploratory_url")
     private String exploratoryUrl;
 

@@ -20,16 +20,11 @@ package com.epam.dlab.dto.computational;
 
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.NotBlank;
-
-import javax.annotation.Nullable;
 
 public class ComputationalStatusDTO extends StatusBaseDTO<ComputationalStatusDTO> {
-    @Nullable
     @JsonProperty("computational_id")
     private String computationalId;
 
-    @NotBlank
     @JsonProperty("computational_name")
     private String computationalName;
 
