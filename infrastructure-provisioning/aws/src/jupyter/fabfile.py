@@ -159,7 +159,7 @@ def run():
         if not run_routine('configure_jupyter_node', params):
             logging.info('Failed to configure jupiter')
             with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to configure jupiter", "conf": notebook_config}
+                res = {"error": "Failed to configure jupyter", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
@@ -175,7 +175,7 @@ def run():
         if not run_routine('install_jupyter_additions', params):
             logging.info('Failed to install python libs')
             with open("/root/result.json", 'w') as result:
-                res = {"error": "ailed to install python libs", "conf": notebook_config}
+                res = {"error": "Failed to install python libs", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
