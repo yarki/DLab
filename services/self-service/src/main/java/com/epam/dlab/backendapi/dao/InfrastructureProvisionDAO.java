@@ -30,8 +30,10 @@ import org.bson.Document;
 
 import java.util.Optional;
 
+import static com.epam.dlab.constants.UserInstanceStatus.TERMINATED;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.not;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -145,7 +147,8 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 values.append(getComputationalSetPrefix() + UPTIME, null);
             }
             update(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)
-                    , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)),
+                    , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName),
+                    not(eq(getComputationalSetPrefix() + STATUS, TERMINATED))),
                     new Document(SET, values));
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);
