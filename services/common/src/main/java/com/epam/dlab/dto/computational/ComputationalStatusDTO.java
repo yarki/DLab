@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ComputationalStatusDTO extends StatusBaseDTO<ComputationalStatusDTO> {
     @JsonProperty("computational_id")
     private String computationalId;
-
     @JsonProperty("computational_name")
     private String computationalName;
 

@@ -23,10 +23,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UploadFileResultDTO {
     @JsonProperty
     private String user;
-
     @JsonProperty
     private boolean success;
-
     @JsonProperty
     private UserAWSCredentialDTO credential;
 

@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
     @JsonProperty("exploratory_id")
     private String exploratoryId;
-
     @JsonProperty("exploratory_url")
     private String exploratoryUrl;
 

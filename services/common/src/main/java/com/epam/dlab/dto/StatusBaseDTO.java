@@ -25,16 +25,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
 
 public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
-
     @JsonProperty
     private String user;
-
     @JsonProperty("exploratory_name")
     private String exploratoryName;
-
     @JsonProperty
     private String status;
-
     @JsonProperty("up_time")
     private Date uptime;
 
