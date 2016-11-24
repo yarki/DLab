@@ -43,6 +43,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
+import static com.epam.dlab.backendapi.core.docker.command.DockerAction.CREATE;
+import static com.epam.dlab.backendapi.core.docker.command.DockerAction.TERMINATE;
+
 @Path("/computational")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -67,13 +70,14 @@ public class ComputationalResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(DockerAction.CREATE, uuid, dto));
+                getFileHandlerCallback(CREATE, uuid, dto));
         try {
             long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
             commandExecuter.executeAsync(
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
                                     .withInteractive()
+                                    .withName(nameContainer(dto.getEdgeUserName(), CREATE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withRequestId(uuid)
@@ -98,12 +102,13 @@ public class ComputationalResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(DockerAction.TERMINATE, uuid, dto));
+                getFileHandlerCallback(TERMINATE, uuid, dto));
         try {
             commandExecuter.executeAsync(
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
                                     .withInteractive()
+                                    .withName(nameContainer(dto.getEdgeUserName(), TERMINATE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withRequestId(uuid)
@@ -120,6 +125,10 @@ public class ComputationalResource implements DockerCommands {
 
     private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO dto) {
         return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName(), dto.getComputationalName());
+    }
+
+    private String nameContainer(String user, DockerAction action, String name) {
+        return nameContainer(user, action.toString(), "computational", name);
     }
 
 }
