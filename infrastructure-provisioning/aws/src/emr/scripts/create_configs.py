@@ -53,15 +53,15 @@ def install_emr_spark(args):
     s3_client = boto3.client('s3')
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/spark.tar.gz', '/tmp/spark.tar.gz')
     local('sudo tar -zhxvf /tmp/spark.tar.gz -C /opt/' + args.emr_version + '/' + args.cluster_name + '/')
-    for i in eval(args.excluded_lines):
-        local('sudo cp ' + spark_def_path + ' /tmp/spark-temp.conf')
-        local('''sudo bash -c 'cat /tmp/spark-temp.conf | grep -v "^''' + i + '''" | grep -v "^spark.driver.extraLibraryPath" | grep -v "^spark.driver.extraClassPath" | grep -v "^#" | sed '/^\s*$/d' > ''' + spark_def_path + '''' ''')
+    #for i in eval(args.excluded_lines):
+    #    local('sudo cp ' + spark_def_path + ' /tmp/spark-temp.conf')
+    #    local('''sudo bash -c 'cat /tmp/spark-temp.conf | grep -v "^''' + i + '''" | grep -v "^spark.driver.extraLibraryPath" | grep -v "^spark.driver.extraClassPath" | grep -v "^#" | sed '/^\s*$/d' > ''' + spark_def_path + '''' ''')
 
 
 def prepare():
     local('mkdir -p ' + emr_dir)
     local('mkdir -p ' + yarn_dir)
-    result = os.path.exists(emr_dir)
+    result = os.path.exists(emr_dir + 'usr/')
     return result
 
 
@@ -199,14 +199,20 @@ def get_files(s3client, s3resource, dist, bucket, local):
 
 def spark_defaults(args):
     # missed_jar_path1 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/client/*'
-    missed_jar_path2 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/*'
+    #missed_jar_path2 = '/opt/' + args.emr_version + '/jars/usr/lib/hadoop/*'
     spark_def_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/conf/spark-defaults.conf'
-    s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
-    s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
-    local('touch /tmp/spark-defaults-temporary.conf')
-    local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" >> ''' + spark_def_path + '''' ''')
-    local('printf "\\n"')
-    local(''' sudo bash -c 'cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> ''' + spark_def_path + '''' ''')
+    for i in eval(args.excluded_lines):
+        local(""" sudo bash -c " sed -i '/""" + i + """/d' """ + spark_def_path + """ " """)
+    local(""" sudo bash -c " sed -i '/#/d' """ + spark_def_path + """ " """)
+    local(""" sudo bash -c " sed -i '/^\s*$/d' """ + spark_def_path + """ " """)
+    local(""" sudo bash -c "sed -i '/spark.driver.extraClassPath/,/spark.driver.extraLibraryPath/s|/usr|/opt/EMRVERSION/jars/usr|g' """ + spark_def_path + """ " """)
+    local(""" sudo bash -c "sed -i '/spark.yarn.dist.files/s/\/etc\/spark\/conf/\/opt\/EMRVERSION\/CLUSTER\/conf/g' """ + spark_def_path + """ " """)
+    #s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
+    #s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/spark-defaults.conf', '/tmp/spark-defaults-emr.conf')
+    #local('touch /tmp/spark-defaults-temporary.conf')
+    #local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.driver.extraClassPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|$|:MISSEDJAR2|" | sed "s|\(.*\)\ |\\1|" >> ''' + spark_def_path + '''' ''')
+    #local('printf "\\n"')
+    #local(''' sudo bash -c 'cat /tmp/spark-defaults-emr.conf | grep spark.driver.extraLibraryPath |  tr "[ :]" "\\n" | sed "/^$/d" | sed "s|^|/opt/EMRVERSION/jars|g" | tr "\\n" ":" | sed "s|/opt/EMRVERSION/jars||1" | sed "s/\(.*\)\:/\\1 /" | sed "s|:|    |1" | sed "r|$|" | sed "s|\(.*\)\ |\\1|" >> ''' + spark_def_path + '''' ''')
 
     # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.yarn.historyServer.address >> /tmp/spark-defaults-temporary.conf | true;' ''')
     # local(''' sudo bash -c 'cat  /tmp/spark-defaults-emr.conf | grep spark.history.ui.port >> /tmp/spark-defaults-temporary.conf | true;' ''')
@@ -221,7 +227,7 @@ def spark_defaults(args):
         text = f.read()
     text = text.replace('EMRVERSION', args.emr_version)
     # text = text.replace('MISSEDJAR1', missed_jar_path1)
-    text = text.replace('MISSEDJAR2', missed_jar_path2)
+    # text = text.replace('MISSEDJAR2', missed_jar_path2)
     text = text.replace('CLUSTER', args.cluster_name)
     with open(spark_def_path, 'w') as f:
         f.write(text)
