@@ -310,7 +310,7 @@ def remove_role(instance_type, scientist=''):
             result.write(json.dumps(res))
 
 
-def s3_cleanup(bucket, cluster_name, user_name=''):
+def s3_cleanup(bucket, cluster_name, user_name):
     try:
         s3_res = boto3.resource('s3')
         resource = s3_res.Bucket(bucket)
@@ -430,7 +430,7 @@ def terminate_emr(id):
             result.write(json.dumps(res))
 
 
-def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version=''):
+def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version):
     try:
         ec2 = boto3.resource('ec2')
         inst = ec2.instances.filter(
