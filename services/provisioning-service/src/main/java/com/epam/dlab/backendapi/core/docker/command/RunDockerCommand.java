@@ -44,6 +44,11 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withName(String name) {
+        options.add(String.format("--name %s", name));
+        return this;
+    }
+
     public RunDockerCommand withRequestId(String requestId) {
         options.add(String.format("-e \"request_id=%s\"", requestId));
         return this;

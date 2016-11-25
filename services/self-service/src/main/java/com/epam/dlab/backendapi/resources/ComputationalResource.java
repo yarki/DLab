@@ -35,7 +35,6 @@ import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
-import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +103,7 @@ public class ComputationalResource implements ComputationalAPI {
 
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(@Valid @NotNull ComputationalStatusDTO dto) {
+    public Response status(ComputationalStatusDTO dto) {
         LOGGER.debug("updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateComputationalFields(dto);
         return Response.ok().build();
