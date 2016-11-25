@@ -52,20 +52,39 @@ public class FolderListener implements Runnable {
 
     private void pollFile() {
         Path directoryPath = Paths.get(directory);
+        boolean responsed = false;
         try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
             directoryPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
-            WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
-            if (watchKey != null) {
-                List<WatchEvent<?>> events = watchKey.pollEvents();
-                for (WatchEvent event : events) {
-                    String fileName = event.context().toString();
-                    if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
-                        handleFileAsync(fileName);
+            LOGGER.debug("Registered a new watcher for directory {}", directoryPath.toAbsolutePath().toString());
+            while (true) {
+                final WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
+                if (watchKey != null) {
+                    for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
+                        final WatchEvent.Kind<?> kind = watchEvent.kind();
+                        if (kind == StandardWatchEventKinds.OVERFLOW) {
+                            continue;
+                        }
+
+                        if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                            String fileName = watchEvent.context().toString();
+                            boolean victim = fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName));
+                            LOGGER.debug("Caught {} response file creation, skipping: {}", fileName, !victim);
+                            if (victim) {
+                                handleFileAsync(fileName);
+                                responsed = true;
+                                break;
+                            }
+                        }
                     }
-                    pollFile();
+                    boolean valid = watchKey.reset();
+                    if (!valid || responsed) {
+                        break;
+                    }
+                } else if (!success) {
+                    LOGGER.debug("Either could not receive a response, or there was an error during response processing");
+                    fileHandlerCallback.handleError();
+                    break;
                 }
-            } else if (!success) {
-                fileHandlerCallback.handleError();
             }
         } catch (Exception e) {
             throw new DlabException("FolderListenerExecutor exception", e);

@@ -60,7 +60,7 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
             }
             return true;
         } catch (Exception e) {
-            LOGGER.debug("handle file async", e);
+            LOGGER.debug("Could not handle file async", e);
         }
         return false;
     }
@@ -71,15 +71,15 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
 
     private byte[] readBytes(Path path) throws IOException, InterruptedException {
         File file = path.toFile();
-        waitFileCompliteWrited(file, file.length());
+        waitFileCompletelyWritten(file, file.length());
         return Files.readAllBytes(path);
     }
 
-    private void waitFileCompliteWrited(File file, long before) throws InterruptedException {
+    private void waitFileCompletelyWritten(File file, long before) throws InterruptedException {
         Thread.sleep(fileLengthCheckDelay.toMilliseconds());
         long after = file.length();
         if (before != after) {
-            waitFileCompliteWrited(file, after);
+            waitFileCompletelyWritten(file, after);
         }
     }
 }
