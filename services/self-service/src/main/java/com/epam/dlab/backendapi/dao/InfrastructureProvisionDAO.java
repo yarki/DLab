@@ -26,14 +26,14 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import org.bson.Document;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static com.epam.dlab.constants.UserInstanceStatus.TERMINATED;
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.not;
+import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -146,10 +146,11 @@ public class InfrastructureProvisionDAO extends BaseDAO {
             if (clearUptime) {
                 values.append(getComputationalSetPrefix() + UPTIME, null);
             }
-            update(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)
-                    , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName),
-                    not(eq(getComputationalSetPrefix() + STATUS, TERMINATED.name()))),
-                    new Document(SET, values));
+            if (isNotTerminated(user, exploratoryName, computationalName)) {
+                update(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)
+                        , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)),
+                        new Document(SET, values));
+            }
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);
         }
@@ -172,5 +173,19 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     private String getComputationalSetPrefix() {
         return COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER;
+    }
+
+    private boolean isNotTerminated(String user, String exploratoryName, String computationalName) {
+        boolean result = true;
+        FindIterable<Document> doc = find(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)
+                , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)));
+        ArrayList<Document> values = doc.first().get(COMPUTATIONAL_RESOURCES, ArrayList.class);
+        for (Document d : values){
+            if(d.get(COMPUTATIONAL_NAME).equals(computationalName) && d.get(STATUS).equals(TERMINATED.toString())){
+                result = false;
+                break;
+            }
+        }
+        return result;
     }
 }
