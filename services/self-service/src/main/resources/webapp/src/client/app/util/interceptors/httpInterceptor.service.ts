@@ -60,9 +60,15 @@ export class HttpInterceptor extends Http {
 
   intercept(observable: Observable<Response>): Observable<Response> {
     return observable.catch((err, source) => {
+      let url = err.url;
+
+      if (url.indexOf("?") > -1) {
+        url = url.substr(0, url.indexOf("?"));
+      }
+
       if ((err.status  === HTTP_STATUS_CODES.FORBIDDEN
         || err.status === HTTP_STATUS_CODES.UNAUTHORIZED)
-        && !err.url.toString().endsWith("login")) {
+        && !url.endsWith("login")) {
         localStorage.removeItem('access_token');
         this.router.navigate(['/login']);
         return Observable.of(err);
@@ -71,11 +77,11 @@ export class HttpInterceptor extends Http {
       }
     });
   }
-  
+
   private addNoCacheToUrl(url : string) {
 	let separator = url.indexOf('?') === -1 ? '?' : '&';
 	let returnUrl = url+separator+'noCache=' + new Date().getTime();
-	
+
 	return returnUrl;
   }
 }

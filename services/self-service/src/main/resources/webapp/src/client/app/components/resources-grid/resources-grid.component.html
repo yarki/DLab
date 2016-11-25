@@ -37,7 +37,9 @@ limitations under the License.
   </tr>
 
   <tr *ngFor="let env of filteredEnvironments;" [ngClass]="{'dropdown-outscreen': isOutscreenDropdown}">
-    <td (click)="(env.status != 'starting' && env.status != 'creating' && printDetailEnvironmentModal(env))" [ngClass]="{'not-allowed' : env.status == 'starting' || env.status == 'creating'}">{{env.name}}</td>
+    <!-- Need to be restored after debugging -->
+    <!-- (click)="(env.status != 'starting' && env.status != 'creating' && printDetailEnvironmentModal(env))" [ngClass]="{'not-allowed' : env.status == 'starting' || env.status == 'creating'}" -->
+    <td (click)="printDetailEnvironmentModal(env)">{{env.name}}</td>
     <td class="status" ngClass="{{env.status.toLowerCase() || ''}}">{{env.status}}</td>
     <td>{{env.shape}}</td>
     <td>

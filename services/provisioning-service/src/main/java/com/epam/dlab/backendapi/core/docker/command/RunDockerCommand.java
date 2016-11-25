@@ -44,6 +44,11 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withName(String name) {
+        options.add(String.format("--name %s", name));
+        return this;
+    }
+
     public RunDockerCommand withRequestId(String requestId) {
         options.add(String.format("-e \"request_id=%s\"", requestId));
         return this;
@@ -129,11 +134,6 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withEmrInstanceSize(String instanceSize) {
-        options.add(String.format("-e \"edge_instance_size=%s\"", instanceSize));
-        return this;
-    }
-
     public RunDockerCommand withVpcId(String vpcId) {
         options.add(String.format("-e \"edge_vpc_id=%s\"", vpcId));
         return this;
@@ -143,7 +143,6 @@ public class RunDockerCommand implements DockerCommand {
         options.add(String.format("-e \"creds_subnet_id=%s\"", subnetId));
         return this;
     }
-
 
     public RunDockerCommand withEmrInstanceType(String emrInstanceType) {
         options.add(String.format("-e \"emr_instance_type=%s\"", emrInstanceType));
@@ -190,11 +189,6 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withIamUserName(String edgeUserName) {
-        options.add(String.format("-e \"creds_iam_user=%s\"", edgeUserName));
-        return this;
-    }
-
     public RunDockerCommand withEmrClusterName(String emrClusterName) {
         options.add(String.format("-e \"emr_cluster_name=%s\"", emrClusterName));
         return this;
@@ -202,11 +196,6 @@ public class RunDockerCommand implements DockerCommand {
 
     public RunDockerCommand withNotebookUserName(String notebookUserName) {
         options.add(String.format("-e \"notebook_user_name=%s\"", notebookUserName));
-        return this;
-    }
-
-    public RunDockerCommand withNotebookInstanceType(String notebookInstanceType) {
-        options.add(String.format("-e \"notebook_instance_type=%s\"", notebookInstanceType));
         return this;
     }
 

@@ -37,8 +37,6 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -88,8 +86,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
                     .withSecurityGroupIds(settingsDAO.getSecurityGroups())
                     .withRegion(settingsDAO.getCredsRegion())
                     .withVpcId(settingsDAO.getCredsVpcId())
-                    .withSubnetId(settingsDAO.getCredsSubnetId())
-                    .withInstanceSize(settingsDAO.getEdgeInstanceSize());
+                    .withSubnetId(settingsDAO.getCredsSubnetId());
             UploadFileDTO dto = new UploadFileDTO()
                     .withEdge(edge)
                     .withContent(content);
@@ -107,7 +104,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
 
     @POST
     @Path("/callback")
-    public Response loadKeyResponse(@Valid @NotNull UploadFileResultDTO result) {
+    public Response loadKeyResponse(UploadFileResultDTO result) {
         LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
         keyDAO.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
         if (result.isSuccess()) {

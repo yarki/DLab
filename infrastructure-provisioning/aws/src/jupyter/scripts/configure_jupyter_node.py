@@ -78,7 +78,7 @@ def ensure_spark_scala():
             put(templates_dir + 'py3spark_local_template.json', '/tmp/py3spark_local_template.json')
             sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
             sudo('\cp /tmp/py3spark_local_template.json ' + py3spark_local_path_dir + 'kernel.json')
-            sudo('pip install --pre toree')
+            sudo('pip install --pre toree --no-cache-dir')
             sudo('ln -s /opt/spark/ /usr/local/spark')
             sudo('jupyter toree install')
             sudo('touch /home/ubuntu/.ensure_dir/spark_scala_ensured')
@@ -91,12 +91,12 @@ def ensure_python3_kernel():
         try:
             sudo('apt-get install python3-setuptools')
             sudo('apt install -y python3-pip')
-            sudo('pip3 install ipython ipykernel')
+            sudo('pip3 install ipython ipykernel --no-cache-dir')
             sudo('python3 -m ipykernel install')
             sudo('add-apt-repository -y ppa:fkrull/deadsnakes')
             sudo('apt update')
             sudo('apt install -y python3.4 python3.4-dev')
-            sudo('python3.4 -m pip install ipython ipykernel  --upgrade')
+            sudo('python3.4 -m pip install ipython ipykernel  --upgrade --no-cache-dir')
             sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
         except:
             sys.exit(1)
@@ -118,7 +118,7 @@ def ensure_s3_kernel():
 
 def configure_notebook_server(notebook_name):
     try:
-        sudo('pip install jupyter')
+        sudo('pip install jupyter --no-cache-dir')
         sudo('rm -rf /root/.jupyter/jupyter_notebook_config.py')
         sudo("for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
         sudo('jupyter notebook --generate-config --config /root/.jupyter/jupyter_notebook_config.py')
