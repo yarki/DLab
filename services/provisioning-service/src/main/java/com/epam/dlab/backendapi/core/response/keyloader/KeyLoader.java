@@ -104,7 +104,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
 
             @Override
             public boolean handle(String fileName, byte[] content) throws Exception {
-                LOGGER.debug("Expected {}; processing response {} with content: {}", originalUuid, fileName, content);
+                LOGGER.debug("Expected {}; processing response {} with content: {}", originalUuid, fileName, new String(content));
                 JsonNode document = MAPPER.readTree(content);
                 UploadFileResultDTO result = new UploadFileResultDTO(user);
                 if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
