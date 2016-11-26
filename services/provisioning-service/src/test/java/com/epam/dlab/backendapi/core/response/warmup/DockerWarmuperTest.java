@@ -68,9 +68,9 @@ public class DockerWarmuperTest {
                 .handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
         warmuper.getFileHandlerCallback()
                 .handle(getFileName(), COMPUTATIONAL_TEST_JSON.getBytes());
-        assertEquals(exploratoryMetadata, warmuper.getMetadatas(ImageType.EXPLORATORY)
+        assertEquals(exploratoryMetadata, warmuper.getMetadata(ImageType.EXPLORATORY)
                 .toArray(new ImageMetadataDTO[1])[0]);
-        assertEquals(computationalMetadata, warmuper.getMetadatas(ImageType.COMPUTATIONAL)
+        assertEquals(computationalMetadata, warmuper.getMetadata(ImageType.COMPUTATIONAL)
                 .toArray(new ImageMetadataDTO[1])[0]);
     }
 

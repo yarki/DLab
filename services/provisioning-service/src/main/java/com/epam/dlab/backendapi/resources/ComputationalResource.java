@@ -41,6 +41,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.io.File;
 import java.io.IOException;
 
 import static com.epam.dlab.backendapi.core.docker.command.DockerAction.CREATE;
@@ -68,7 +69,8 @@ public class ComputationalResource implements DockerCommands {
     public String create(ComputationalCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create computational resources cluster");
         String uuid = DockerCommands.generateUUID();
-        folderListenerExecutor.start(configuration.getImagesDirectory(),
+        String responseDir = configuration.getImagesDirectory() + File.separator + uuid;
+        folderListenerExecutor.start(responseDir,
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(CREATE, uuid, dto));
         try {
@@ -79,7 +81,7 @@ public class ComputationalResource implements DockerCommands {
                                     .withInteractive()
                                     .withName(nameContainer(dto.getEdgeUserName(), CREATE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                    .withVolumeForResponse(configuration.getImagesDirectory())
+                                    .withVolumeForResponse(responseDir)
                                     .withRequestId(uuid)
                                     .withEc2Role(configuration.getEmrEC2RoleDefault())
                                     .withEmrTimeout(Long.toString(timeout))
@@ -100,7 +102,8 @@ public class ComputationalResource implements DockerCommands {
     public String terminate(ComputationalTerminateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("terminate computational resources cluster");
         String uuid = DockerCommands.generateUUID();
-        folderListenerExecutor.start(configuration.getImagesDirectory(),
+        String responseDir = configuration.getImagesDirectory() + File.separator + uuid;
+        folderListenerExecutor.start(responseDir,
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(TERMINATE, uuid, dto));
         try {
@@ -110,7 +113,7 @@ public class ComputationalResource implements DockerCommands {
                                     .withInteractive()
                                     .withName(nameContainer(dto.getEdgeUserName(), TERMINATE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                    .withVolumeForResponse(configuration.getImagesDirectory())
+                                    .withVolumeForResponse(responseDir)
                                     .withRequestId(uuid)
                                     .withCredsKeyName(configuration.getAdminKey())
                                     .withActionTerminate(configuration.getEmrImage()),

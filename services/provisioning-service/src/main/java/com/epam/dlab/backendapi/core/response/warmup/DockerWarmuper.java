@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
+    public static final String EXPLORATORY_RESPONSE_MARKER = "exploratory_environment_shapes";
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
@@ -57,14 +58,14 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
 
     @Override
     public void start() throws Exception {
-        LOGGER.debug("docker warm up start");
+        LOGGER.debug("warming up docker");
         folderListenerExecutor.start(configuration.getWarmupDirectory(),
                 configuration.getWarmupPollTimeout(),
                 getFileHandlerCallback());
         List<String> images = commandExecutor.executeSync(GET_IMAGES);
         for (String image : images) {
-            LOGGER.debug("image: {}", image);
             String uuid = UUID.randomUUID().toString();
+            LOGGER.debug("warming up image: {} with uid {}", image, uuid);
             uuids.put(uuid, image);
             String command = new RunDockerCommand()
                     .withVolumeForRootKeys(configuration.getKeyDirectory())
@@ -87,7 +88,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
             public boolean handle(String fileName, byte[] content) throws Exception {
                 String uuid = DockerCommands.extractUUID(fileName);
                 if (uuids.containsKey(uuid)) {
-                    LOGGER.debug("handle file {}", fileName);
+                    LOGGER.debug("processing response file {} with content {}", fileName, new String(content));
                     addMetadata(content, uuid);
                     return true;
                 }
@@ -96,7 +97,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
 
             @Override
             public void handleError() {
-                LOGGER.warn("docker warmuper returned no result");
+                LOGGER.warn("docker warmupper returned no result");
             }
         };
     }
@@ -104,15 +105,16 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     private void addMetadata(byte[] content, String uuid) throws IOException {
         final JsonNode jsonNode = MAPPER.readTree(content);
         ImageMetadataDTO metadata;
-        if (jsonNode.has("exploratory_environment_shapes")) {
+        if (jsonNode.has(EXPLORATORY_RESPONSE_MARKER)) {
             metadata = MAPPER.readValue(content, ExploratoryMetadataDTO.class);
             metadata.setImageType(ImageType.EXPLORATORY);
         } else {
-            metadata = MAPPER
-                    .readValue(content, ComputationalMetadataDTO.class);
+            metadata = MAPPER.readValue(content, ComputationalMetadataDTO.class);
             metadata.setImageType(ImageType.COMPUTATIONAL);
         }
-        metadata.setImage(uuids.get(uuid));
+        String image = uuids.get(uuid);
+        metadata.setImage(image);
+        LOGGER.debug("caching metadata for image {}: {}", image, metadata);
         metadataDTOs.add(metadata);
     }
 
@@ -124,7 +126,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
         return Collections.unmodifiableMap(uuids);
     }
 
-    public Set<ImageMetadataDTO> getMetadatas(ImageType type) {
+    public Set<ImageMetadataDTO> getMetadata(ImageType type) {
         return metadataDTOs.stream().filter(m -> m.getImageType().equals(type))
                 .collect(Collectors.toSet());
     }

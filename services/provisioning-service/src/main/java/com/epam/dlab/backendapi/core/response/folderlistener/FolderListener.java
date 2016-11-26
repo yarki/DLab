@@ -52,7 +52,6 @@ public class FolderListener implements Runnable {
 
     private void pollFile() {
         Path directoryPath = Paths.get(directory);
-        boolean responsed = false;
         try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
             directoryPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
             LOGGER.debug("Registered a new watcher for directory {}", directoryPath.toAbsolutePath().toString());
@@ -71,13 +70,12 @@ public class FolderListener implements Runnable {
                             LOGGER.debug("Caught {} response file creation, skipping: {}", fileName, !victim);
                             if (victim) {
                                 handleFileAsync(fileName);
-                                responsed = true;
                                 break;
                             }
                         }
                     }
                     boolean valid = watchKey.reset();
-                    if (!valid || responsed) {
+                    if (!valid) {
                         break;
                     }
                 } else if (!success) {
@@ -86,6 +84,7 @@ public class FolderListener implements Runnable {
                     break;
                 }
             }
+            LOGGER.debug("Closing a watcher for directory {}", directoryPath.toAbsolutePath().toString());
         } catch (Exception e) {
             throw new DlabException("FolderListenerExecutor exception", e);
         }

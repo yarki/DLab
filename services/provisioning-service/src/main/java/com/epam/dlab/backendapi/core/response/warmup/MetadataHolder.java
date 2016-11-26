@@ -25,5 +25,5 @@ import com.epam.dlab.dto.imagemetadata.ImageType;
 import java.util.Set;
 
 public interface MetadataHolder {
-    Set<ImageMetadataDTO> getMetadatas(ImageType metadataType);
+    Set<ImageMetadataDTO> getMetadata(ImageType metadataType);
 }

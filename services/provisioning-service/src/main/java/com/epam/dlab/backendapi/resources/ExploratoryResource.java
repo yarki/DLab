@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 import javax.ws.rs.Consumes;
@@ -88,7 +89,8 @@ public class ExploratoryResource implements DockerCommands {
     private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException, InterruptedException {
         LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
-        folderListenerExecutor.start(configuration.getImagesDirectory(),
+        String responseDir = configuration.getImagesDirectory() + File.separator + uuid;
+        folderListenerExecutor.start(responseDir,
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(action, uuid, dto));
 
@@ -96,7 +98,7 @@ public class ExploratoryResource implements DockerCommands {
                 .withInteractive()
                 .withName(nameContainer(dto.getNotebookUserName(), action, dto.getExploratoryName()))
                 .withVolumeForRootKeys(configuration.getKeyDirectory())
-                .withVolumeForResponse(configuration.getImagesDirectory())
+                .withVolumeForResponse(responseDir)
                 .withRequestId(uuid)
                 .withCredsKeyName(configuration.getAdminKey())
                 .withImage(configuration.getNotebookImage())
