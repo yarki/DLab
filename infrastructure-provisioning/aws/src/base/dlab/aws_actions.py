@@ -310,11 +310,11 @@ def remove_role(instance_type, scientist=''):
             result.write(json.dumps(res))
 
 
-def s3_cleanup(bucket, cluster_name):
+def s3_cleanup(bucket, cluster_name, user_name):
     try:
         s3_res = boto3.resource('s3')
         resource = s3_res.Bucket(bucket)
-        prefix = "config/" + cluster_name + "/"
+        prefix = user_name + '/' + cluster_name + "/"
         for i in resource.objects.filter(Prefix=prefix):
             s3_res.Object(resource.name, i.key).delete()
     except Exception as err:
@@ -430,7 +430,7 @@ def terminate_emr(id):
             result.write(json.dumps(res))
 
 
-def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
+def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version):
     try:
         ec2 = boto3.resource('ec2')
         inst = ec2.instances.filter(
@@ -444,7 +444,7 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
                 env.user = "{}".format(ssh_user)
                 env.key_filename = "{}".format(key_path)
                 env.host_string = env.user + "@" + env.hosts
-                sudo('rm -rf /srv/hadoopconf/config/{}'.format(emr_name))
+                sudo('rm -rf  /opt/' + emr_version + '/' + emr_name + '/')
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
                 print "Notebook's " + env.hosts + " kernels were removed"
         else:
