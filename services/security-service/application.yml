@@ -14,10 +14,10 @@
 #
 inactiveUserTimeoutMillSec: 300000
 ldapConnectionConfig:
-  ldapHost: localhost
-#  ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
-  ldapPort: 3890
-#  ldapPort: 389
+#  ldapHost: localhost
+  ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
+#  ldapPort: 3890
+  ldapPort: 389
   name: cn=admin,dc=example,dc=com
   credentials: ldap
 ldapBindTemplate: uid=%s,ou=People,dc=example,dc=com
@@ -43,7 +43,7 @@ ldapSearch:
           if not key in userInfo:
             raise Exception('Python LDAP UserInfo not found for '+key)
           uid= userInfo[key]
-          cn = context['userInfo']['uid='+name+',ou=People,dc=example,dc=com']['cn'].split(' ')
+          cn = context['userInfo'][key]['cn'].split(' ')
           ui.setFirstName(cn[0])
           ui.setLastName(cn[1])
           return ui
