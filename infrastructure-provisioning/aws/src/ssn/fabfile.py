@@ -179,6 +179,7 @@ def run():
         print('[CONFIGURING DOCKER AT SSN INSTANCE]')
         additional_config = [{"name": "base", "tag": "latest"},
                              {"name": "jupyter", "tag": "latest"},
+                             {"name": "rstudio", "tag": "latest"},
                              {"name": "edge", "tag": "latest"},
                              {"name": "emr", "tag": "latest"}, ]
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
