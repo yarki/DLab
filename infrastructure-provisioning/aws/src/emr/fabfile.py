@@ -76,11 +76,11 @@ def run():
     logging.info(json.dumps(emr_conf))
 
     with hide('stderr', 'running', 'warnings'):
-        local("echo Waitning for changes to propagate; sleep 10")
+        local("echo Waiting for changes to propagate; sleep 10")
 
     try:
-        logging.info('[CREATE EMR CLUSTER]')
-        print '[CREATE EMR CLUSTER]'
+        logging.info('[Creating EMR Cluster]')
+        print '[Creating EMR Cluster]'
         params = "--name {} --applications '{}' --master_instance_type {} --slave_instance_type {} --instance_count {} --ssh_key {} --release_label {} --emr_timeout {} " \
                  "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --region {} --tags '{}'".format(
             emr_conf['cluster_name'], emr_conf['apps'], emr_conf['master_instance_type'], emr_conf['slave_instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'], emr_conf['emr_timeout'],
