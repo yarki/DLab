@@ -34,45 +34,45 @@ parser = argparse.ArgumentParser()
 # parser.add_argument('--id', type=str, default='')
 parser.add_argument('--dry_run', action='store_true', help='Print all variables')
 parser.add_argument('--name', type=str, default='', help='Name to be applied to Cluster ( MANDATORY !!! )')
-parser.add_argument('--applications', type=str, default='Hadoop Hive Hue Spark',
+parser.add_argument('--applications', type=str, default='',
                     help='Set of applications to be installed on EMR (Default are: "Hadoop Hive Hue Spark")')
-parser.add_argument('--master_instance_type', type=str, default='m3.xlarge', help='EC2 instance size for Master-Node (Default: m3.xlarge)')
-parser.add_argument('--slave_instance_type', type=str, default='m3.xlarge', help='EC2 instance size for Worker-Nodes (Default: m3.xlarge)')
-parser.add_argument('--instance_count', type=int, default='3',
+parser.add_argument('--master_instance_type', type=str, default='', help='EC2 instance size for Master-Node (Default: m3.xlarge)')
+parser.add_argument('--slave_instance_type', type=str, default='', help='EC2 instance size for Worker-Nodes (Default: m3.xlarge)')
+parser.add_argument('--instance_count', type=int, default='',
                     help='Number of nodes the cluster will consist of (Default: 3)')
-parser.add_argument('--release_label', type=str, default='emr-4.8.0', help='EMR release version (Default: "emr-4.8.0")')
+parser.add_argument('--release_label', type=str, default='', help='EMR release version (Default: "emr-4.8.0")')
 parser.add_argument('--steps', type=str, default='')
-parser.add_argument('--tags', type=str, default='Name=DSA, Project=DSA')
+parser.add_argument('--tags', type=str, default='')
 parser.add_argument('--auto_terminate', action='store_true')
-parser.add_argument('--service_role', type=str, default='EMR_DefaultRole',
+parser.add_argument('--service_role', type=str, default='',
                     help='Role name EMR cluster (Default: "EMR_DefaultRole")')
-parser.add_argument('--ec2_role', type=str, default='EMR_EC2_DefaultRole',
+parser.add_argument('--ec2_role', type=str, default='',
                     help='Role name for EC2 instances in cluster (Default: "EMR_EC2_DefaultRole")')
-parser.add_argument('--ssh_key', type=str, default='BDCC-DSA-POC')
-parser.add_argument('--availability_zone', type=str, default='eu-west-1a')
+parser.add_argument('--ssh_key', type=str, default='')
+parser.add_argument('--availability_zone', type=str, default='')
 parser.add_argument('--subnet', type=str, default='', help='Subnet CIDR')
 parser.add_argument('--cp_jars_2_s3', action='store_true',
                     help='Copy executable JARS to S3 (Need only once per EMR release version)')
 parser.add_argument('--nbs_ip', type=str, default='', help='Notebook server IP cluster should be attached to')
-parser.add_argument('--nbs_user', type=str, default='ubuntu',
+parser.add_argument('--nbs_user', type=str, default='',
                     help='Username to be used for connection to Notebook server')
-parser.add_argument('--s3_bucket', type=str, default='dsa-poc-test-bucket', help='S3 bucket name to work with')
-parser.add_argument('--emr_timeout', type=int, default=1200)
+parser.add_argument('--s3_bucket', type=str, default='', help='S3 bucket name to work with')
+parser.add_argument('--emr_timeout', type=int)
 parser.add_argument('--configurations', type=str, default='')
-parser.add_argument('--region', type=str, default='us-west-2')
+parser.add_argument('--region', type=str, default='')
 args = parser.parse_args()
 
-cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/config/{1}/hive-site.xml --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/config/{1} --recursive --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
+cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/{4}/{5}/config/hive-site.xml --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/{4}/{5}/config/ --recursive --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/{4}.pub /tmp/{4}.pub --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/{4}/{4}.pub /tmp/{4}.pub --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
-    args.s3_bucket, args.name, args.nbs_user, args.region, os.environ['edge_user_name'])
+    args.s3_bucket, args.name, args.nbs_user, args.region, os.environ['edge_user_name'], args.name)
 
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/jars_parser.sh /tmp/jars_parser.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
           "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/key_importer.sh /tmp/key_importer.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
           "Name=CUSTOM_JAR, Args=sh /tmp/key_importer.sh {4}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, os.environ['edge_user_name'])
+          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2} {4} {5}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, os.environ['edge_user_name'], args.name)
 
 logfile = '{}_creation.log'.format(args.name)
 logpath = '/response/' + logfile
@@ -102,7 +102,7 @@ def upload_jars_parser(args):
 
 def upload_user_key(args):
     s3 = boto3.resource('s3')
-    s3.meta.client.upload_file(os.environ['creds_key_dir'] + '/' + os.environ['edge_user_name'] + '.pub', args.s3_bucket, os.environ['edge_user_name'] + '.pub')
+    s3.meta.client.upload_file(os.environ['creds_key_dir'] + '/' + os.environ['edge_user_name'] + '.pub', args.s3_bucket, os.environ['edge_user_name'] + '/' + os.environ['edge_user_name'] + '.pub')
     s3.meta.client.upload_file('/root/scripts/key_importer.sh', args.s3_bucket, 'key_importer.sh')
 
 
@@ -132,7 +132,7 @@ def emr_sg(id):
 
 def wait_emr(bucket, cluster_name, timeout, delay=30):
     deadline = time.time() + timeout
-    prefix = "config/" + cluster_name + "/"
+    prefix = os.environ['edge_user_name'] + '/' + cluster_name + "/config/"
     global cluster_id
     while time.time() < deadline:
         state = action_validate(cluster_id)
@@ -264,7 +264,6 @@ if __name__ == "__main__":
         upload_jars_parser(args)
         upload_user_key(args)
         build_emr_cluster(args)
-        remove_user_key(args)
     else:
         upload_jars_parser(args)
         upload_user_key(args)
@@ -291,7 +290,6 @@ if __name__ == "__main__":
             out.close()
             if action_validate(cluster_id)[0] == "True":
                 terminate_emr(cluster_id)
-            s3_cleanup(args.s3_bucket, args.name)
+            s3_cleanup(args.s3_bucket, args.name, os.environ['edge_user_name'])
             sys.exit(1)
-        remove_user_key(args)
     sys.exit(0)

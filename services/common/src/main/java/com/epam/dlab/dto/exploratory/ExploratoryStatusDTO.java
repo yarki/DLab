@@ -21,8 +21,6 @@ package com.epam.dlab.dto.exploratory;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Date;
-
 public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
     @JsonProperty("exploratory_id")
     private String exploratoryId;

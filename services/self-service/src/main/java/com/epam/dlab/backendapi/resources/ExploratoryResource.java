@@ -41,6 +41,8 @@ import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -63,7 +65,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     private RESTService provisioningService;
 
     @PUT
-    public Response create(@Auth UserInfo userInfo, ExploratoryCreateFormDTO formDTO) {
+    public Response create(@Auth UserInfo userInfo, @Valid @NotNull ExploratoryCreateFormDTO formDTO) {
         LOGGER.debug("creating exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
@@ -78,7 +80,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
                         .withNotebookInstanceType(formDTO.getShape())
-                        .withRegion(settingsDAO.getAwsRegion())
+                        .withRegion(settingsDAO.getCredsRegion())
                         .withSecurityGroupIds(settingsDAO.getSecurityGroups());
                 LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
@@ -109,7 +111,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     }
 
     @POST
-    public String start(@Auth UserInfo userInfo, ExploratoryActionFormDTO formDTO) {
+    public String start(@Auth UserInfo userInfo, @Valid @NotNull ExploratoryActionFormDTO formDTO) {
         LOGGER.debug("starting exploratory environment {} for user {}", formDTO.getNotebookInstanceName(), userInfo.getName());
         return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, STARTING);
     }
@@ -117,6 +119,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @DELETE
     @Path("/{name}/stop")
     public String stop(@Auth UserInfo userInfo, @PathParam("name") String name) {
+        System.out.println("stopping " + name);
         LOGGER.debug("stopping exploratory environment {} for user {}", name, userInfo.getName());
         UserInstanceStatus status = STOPPING;
         updateExploratoryStatus(userInfo.getName(), name, status);
@@ -131,7 +134,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookInstanceName(exploratoryId)
                     .withKeyDir(settingsDAO.getCredsKeyDir())
                     .withSshUser(settingsDAO.getExploratorySshUser())
-                    .withRegion(settingsDAO.getAwsRegion());
+                    .withRegion(settingsDAO.getCredsRegion());
             return provisioningService.post(EXPLORATORY_STOP, dto, String.class);
         } catch (Throwable t) {
             updateExploratoryStatus(userInfo.getName(), name, FAILED);
@@ -158,7 +161,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(exploratoryId)
-                    .withRegion(settingsDAO.getAwsRegion());
+                    .withRegion(settingsDAO.getCredsRegion());
             return provisioningService.post(action, dto, String.class);
         } catch (Throwable t) {
             updateExploratoryStatus(userInfo.getName(), name, FAILED);

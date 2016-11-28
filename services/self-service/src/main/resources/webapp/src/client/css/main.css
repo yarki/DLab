@@ -18,6 +18,8 @@ limitations under the License.
 
 @import 'https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800';
 
+[hidden] { display: none !important;}
+
 button {
   font-family: 'Open Sans', sans-serif;
 }

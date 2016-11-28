@@ -16,7 +16,8 @@
 #
 # ******************************************************************************
 
-import boto3, boto, botocore
+import boto3
+import botocore
 import time
 import sys
 import os
@@ -163,39 +164,50 @@ def create_instance(definitions, instance_tag):
 
 
 def create_iam_role(role_name, role_profile):
+    conn = boto3.client('iam')
     try:
-        conn = boto.connect_iam()
-        conn.create_role(role_name)
-        conn.create_instance_profile(role_profile)
-        conn.add_role_to_instance_profile(role_profile, role_name)
+        conn.create_role(RoleName=role_name, AssumeRolePolicyDocument='{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":["ec2.amazonaws.com"]},"Action":["sts:AssumeRole"]}]}')
+        conn.create_instance_profile(InstanceProfileName=role_profile)
+    except botocore.exceptions.ClientError as e_role:
+        if e_role.response['Error']['Code'] == 'EntityAlreadyExists':
+            print "Instance profile already exists. Reusing..."
+        else:
+            logging.info("Unable to create Instance Profile: " + str(e_role.response['Error']['Message']))
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to create Instance Profile", "error_message": str(e_role.response['Error']['Message'])}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            return
+    try:
+        conn.add_role_to_instance_profile(InstanceProfileName=role_profile, RoleName=role_name)
         time.sleep(30)
-    except Exception as err:
-        logging.info("Unable to create IAM role: " + str(err))
+    except botocore.exceptions.ClientError as err:
+        logging.info("Unable to create IAM role: " + str(err.response['Error']['Message']))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create IAM role", "error_message": str(err)}
+            res = {"error": "Unable to create IAM role", "error_message": str(err.response['Error']['Message'])}
             print json.dumps(res)
             result.write(json.dumps(res))
 
 
 def attach_policy(policy_arn, role_name):
     try:
-        conn = boto.connect_iam()
-        conn.attach_role_policy(policy_arn, role_name)
+        conn = boto3.client('iam')
+        conn.attach_role_policy(PolicyArn=policy_arn, RoleName=role_name)
         time.sleep(30)
-    except Exception as err:
-        logging.info("Unable to attach Policy: " + str(err))
+    except botocore.exceptions.ClientError as err:
+        logging.info("Unable to attach Policy: " + str(err.response['Error']['Message']))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to attach Policy", "error_message": str(err)}
+            res = {"error": "Unable to attach Policy", "error_message": str(err.response['Error']['Message'])}
             print json.dumps(res)
             result.write(json.dumps(res))
 
 
 def create_attach_policy(policy_name, role_name, file_path):
     try:
-        conn = boto.connect_iam()
+        conn = boto3.connect_iam()
         with open(file_path, 'r') as myfile:
             json_file = myfile.read()
-        conn.put_role_policy(role_name, policy_name, json_file)
+        conn.put_role_policy(RoleName=role_name, PolicyName=policy_name, PolicyDocument=json_file)
     except Exception as err:
         logging.info("Unable to attach Policy: " + str(err))
         with open("/root/result.json", 'w') as result:
@@ -217,7 +229,7 @@ def remove_ec2(tag_name, tag_value):
                 client.terminate_instances(InstanceIds=[instance.id])
                 waiter = client.get_waiter('instance_terminated')
                 waiter.wait(InstanceIds=[instance.id])
-                print "The instance " + tag_value + " has been terminated successfully"
+                print "The instance " + instance.id + " has been terminated successfully"
         else:
             print "There are no instances with " + tag_value + " name to terminate"
     except Exception as err:
@@ -308,11 +320,11 @@ def remove_role(instance_type, scientist=''):
             result.write(json.dumps(res))
 
 
-def s3_cleanup(bucket, cluster_name):
+def s3_cleanup(bucket, cluster_name, user_name):
     try:
         s3_res = boto3.resource('s3')
         resource = s3_res.Bucket(bucket)
-        prefix = "config/" + cluster_name + "/"
+        prefix = user_name + '/' + cluster_name + "/"
         for i in resource.objects.filter(Prefix=prefix):
             s3_res.Object(resource.name, i.key).delete()
     except Exception as err:
@@ -353,24 +365,25 @@ def remove_s3(bucket_type, scientist=''):
             result.write(json.dumps(res))
 
 
-def remove_subnets(subnet_id):
+def remove_subnets(tag_value):
     try:
         print "[Removing subnets]"
         ec2 = boto3.resource('ec2')
         client = boto3.client('ec2')
-        #tag_name = os.environ['conf_service_base_name'] + '-tag'
-        #subnets = ec2.subnets.filter(
-        #    Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': ['*']}])
-        #for subnet in subnets:
-        #    print subnet.id
-        client.delete_subnet(SubnetId=subnet_id)
-        #    print "The subnet " + subnet.id + " has been deleted successfully"
+        tag_name = os.environ['conf_service_base_name'] + '-Tag'
+        subnets = ec2.subnets.filter(
+            Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': [tag_value]}])
+        for subnet in subnets:
+            print subnet.id
+            client.delete_subnet(SubnetId=subnet.id)
+            print "The subnet " + subnet.id + " has been deleted successfully"
     except Exception as err:
         logging.info("Unable to remove subnet: " + str(err))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to remove subnet", "error_message": str(err)}
             print json.dumps(res)
             result.write(json.dumps(res))
+
 
 
 def remove_sgroups(tag_value):
@@ -402,6 +415,7 @@ def deregister_image(scientist):
         images_list = response.get('Images')
         for i in images_list:
             client.deregister_image(ImageId=i.get('ImageId'))
+            print "Notebook AMI " + i + " has been deregistered successfully"
     except Exception as err:
         logging.info("Unable to de-register image: " + str(err))
         with open("/root/result.json", 'w') as result:
@@ -416,6 +430,8 @@ def terminate_emr(id):
         emr.terminate_job_flows(
             JobFlowIds=[id]
         )
+        waiter = emr.get_waiter('cluster_terminated')
+        waiter.wait(ClusterId=id)
     except Exception as err:
         logging.info("Unable to remove EMR: " + str(err))
         with open("/root/result.json", 'w') as result:
@@ -424,7 +440,7 @@ def terminate_emr(id):
             result.write(json.dumps(res))
 
 
-def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
+def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version):
     try:
         ec2 = boto3.resource('ec2')
         inst = ec2.instances.filter(
@@ -438,7 +454,7 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
                 env.user = "{}".format(ssh_user)
                 env.key_filename = "{}".format(key_path)
                 env.host_string = env.user + "@" + env.hosts
-                sudo('rm -rf /srv/hadoopconf/config/{}'.format(emr_name))
+                sudo('rm -rf  /opt/' + emr_version + '/' + emr_name + '/')
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
                 print "Notebook's " + env.hosts + " kernels were removed"
         else:

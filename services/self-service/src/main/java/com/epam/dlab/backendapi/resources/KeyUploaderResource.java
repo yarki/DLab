@@ -23,9 +23,11 @@ import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
+import com.epam.dlab.utils.UsernameUtils;
 import com.epam.dlab.exceptions.DlabException;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -77,11 +79,17 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         }
         keyDAO.uploadKey(userInfo.getName(), content);
         try {
-            UploadFileDTO dto = new UploadFileDTO()
-                    .withUser(userInfo.getName())
-                    .withContent(content)
+            EdgeCreateDTO edge = new EdgeCreateDTO()
+                    .withIamUser(userInfo.getName())
+                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
-                    .withSecurityGroup(settingsDAO.getSecurityGroups());
+                    .withSecurityGroupIds(settingsDAO.getSecurityGroups())
+                    .withRegion(settingsDAO.getCredsRegion())
+                    .withVpcId(settingsDAO.getCredsVpcId())
+                    .withSubnetId(settingsDAO.getCredsSubnetId());
+            UploadFileDTO dto = new UploadFileDTO()
+                    .withEdge(edge)
+                    .withContent(content);
             Response response = provisioningService.post(KEY_LOADER, dto, Response.class);
             if (Response.Status.ACCEPTED.getStatusCode() != response.getStatus()) {
                 keyDAO.deleteKey(userInfo.getName());

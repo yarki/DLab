@@ -1,38 +1,48 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>This job terminates notebook server and all EMRs which are linked to it</description>
+  <description>Create Notebook Server</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>Service_base_name</name>
-          <description>Base name of your services</description>
-          <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>Notebook_Name</name>
-          <description>name of the notebook, EMR is linked to.</description>
+          <description>unique infrastructure value that previously was used when ssn being provisioned</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>Username</name>
-          <description>name of the data scientist user</description>
+          <description>name of the scientist</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
-          <description>Key name at AWS to be used for accessing Jupyter</description>
-          <defaultValue>BDCC-DSS-POC</defaultValue>
+          <description>name of the uploaded ssh key file (without &quot;.pem&quot;)</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>SSN_SG_ids</name>
+          <description>The ID of the SSN Security Group to be accessible</description>
+          <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
+          <name>instance_shape</name>
+          <description>value of the EDGE EC2 instance shape</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>t2.medium</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
           <name>Region</name>
-          <description></description>
+          <description>aws region where infrastructure was deployed</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
               <string>us-west-2</string>
               <string>us-west-1</string>
+              <string>eu-west-1</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
@@ -41,7 +51,7 @@
           <description></description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
-              <string>terminate</string>
+              <string>create</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
@@ -58,7 +68,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>rand=`openssl rand -hex 10`;
-                sudo docker run -i -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response -e &quot;request_id=$rand&quot; -e &quot;conf_service_base_name=${Service_base_name}&quot; -e &quot;notebook_user_name=$Username&quot; -e &quot;creds_region=$Region&quot; -e &quot;notebook_instance_name=$Notebook_Name&quot; -e &quot;creds_key_name=$SSH_Key_Name&quot; docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter --action $Action</command>
+sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/provision_notebook_server_json/template.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sed &apos;s/CKN/&apos;${SSH_Key_Name}&apos;/g&apos; | sed &apos;s/NIT/&apos;${instance_shape}&apos;/g&apos; | sed &apos;s/NUN/&apos;${Username}&apos;/g&apos; | sed &apos;s/SGI/&apos;${SSN_SG_ids}&apos;/g&apos; | sudo docker run -i -v /home/ubuntu/keys:/root/keys -v /project_images/${SSH_Key_Name}.pem:/root/keys/${SSH_Key_Name}.pem -v /home/ubuntu:/response  docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter --action $Action</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

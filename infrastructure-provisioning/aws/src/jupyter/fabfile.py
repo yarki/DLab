@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 # ******************************************************************************
-
+import logging
 import json
 import sys
 from dlab.fab import *
@@ -45,6 +45,10 @@ def create_image_from_instance(instance_name='', image_name=''):
 
 # Main function for provisioning notebook server
 def run():
+    # enable debug level for boto3
+    logging.getLogger('botocore').setLevel(logging.DEBUG)
+    logging.getLogger('boto3').setLevel(logging.DEBUG)
+
     instance_class = 'notebook'
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename
@@ -58,7 +62,6 @@ def run():
     notebook_config = dict()
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
     notebook_config['instance_type'] = os.environ['notebook_instance_type']
-    #notebook_config['subnet_cidr'] = os.environ['notebook_subnet_cidr']
     notebook_config['key_name'] = os.environ['creds_key_name']
     notebook_config['user_keyname'] = os.environ['notebook_user_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
@@ -156,7 +159,7 @@ def run():
         if not run_routine('configure_jupyter_node', params):
             logging.info('Failed to configure jupiter')
             with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to configure jupiter", "conf": notebook_config}
+                res = {"error": "Failed to configure jupyter", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
@@ -172,7 +175,7 @@ def run():
         if not run_routine('install_jupyter_additions', params):
             logging.info('Failed to install python libs')
             with open("/root/result.json", 'w') as result:
-                res = {"error": "ailed to install python libs", "conf": notebook_config}
+                res = {"error": "Failed to install python libs", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
@@ -198,13 +201,13 @@ def run():
         sys.exit(1)
 
     # checking the need for image creation
-    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
-    if ami_id == '':
-        print "Looks like it's first time we configure notebook server. Creating image."
-        image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
-                                              image_name=notebook_config['expected_ami_name'])
-        if image_id != '':
-            print "Image was successfully created. It's ID is " + image_id
+    #ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
+    #if ami_id == '':
+    #    print "Looks like it's first time we configure notebook server. Creating image."
+    #    image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
+    #                                          image_name=notebook_config['expected_ami_name'])
+    #    if image_id != '':
+    #        print "Image was successfully created. It's ID is " + image_id
 
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')
