@@ -125,4 +125,9 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
         keyMetadata.forEach(k-> userInfoBuilder.userInfo.addKey(k.getAccessKeyId(),k.getStatus()));
         userInfoBuilder.readinessStatus |= AWS_KEYS;
     }
+
+    public static void failed(UserInfoBuilder userInfoBuilder, RuntimeException error) {
+        LOG.error("UserInfo error {}", error.getMessage());
+        throw error;
+    }
 }

@@ -119,7 +119,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				log.debug("user info collected by conveyor '{}' ", userInfo);
 			} catch (Exception e) {
 				log.error("Conveyor error {}", e.getMessage());
-				return Response.status(Response.Status.UNAUTHORIZED).build();
+				return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
 			}
 			return Response.ok(token).build();
 		}
@@ -132,7 +132,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				ldapUserDAO.getUserInfo(username,password);
 				log.debug("User Authenticated: {}",username);
 			} catch (Exception e) {
-				loginConveyor.cancel(token);
+				loginConveyor.cancel(token,"LDAP login failed for user '"+username+"': "+e.getMessage());
 			}
 		});
 	}
@@ -144,7 +144,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				UserInfo rolesUserInfo = ldapUserDAO.enrichUserInfo(new UserInfo(username, token));
 				loginConveyor.add(token,rolesUserInfo,LoginStep.LDAP_USER_INFO);
 			} catch (Exception e) {
-				loginConveyor.cancel(token);
+				loginConveyor.cancel(token,"LDAP Info failed for user "+username+"': "+e.getMessage());
 			}
 		});
 	}
@@ -158,11 +158,10 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 					if (awsUser != null) {
 						loginConveyor.add(token, true, LoginStep.AWS_USER);
 					} else {
-						loginConveyor.add(token, false, LoginStep.AWS_USER);
-						log.warn("AWS User '{}' was not found. ", username);
+						loginConveyor.cancel(token,"AWS account not found for user '"+username+"'. Please contact AWS administrator to create corresponding IAM User and Access Key");
 					}
 				} catch (Exception e) {
-					loginConveyor.cancel(token);
+					loginConveyor.cancel(token,"AWS account check failed for user '"+username+"': "+e.getMessage());
 				}
 			} else {
 				loginConveyor.add(token,false,LoginStep.AWS_USER);
@@ -184,7 +183,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 						log.warn("AWS Keys for '{}' were not found. ", username);
 					}
 				} catch (Exception e) {
-					loginConveyor.cancel(token);
+					loginConveyor.cancel(token,"AWS Key failed for user '"+username+"': "+e.getMessage());
 				}
 			} else {
 				loginConveyor.add(token,new ArrayList<AccessKeyMetadata>(),LoginStep.AWS_KEYS);

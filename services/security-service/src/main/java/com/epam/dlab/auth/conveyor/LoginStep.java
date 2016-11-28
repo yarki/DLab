@@ -12,6 +12,7 @@ public enum LoginStep implements SmartLabel<UserInfoBuilder> {
     AWS_KEYS(UserInfoBuilder::awsKeys),
     REMOTE_IP(UserInfoBuilder::remoteIp),
     USER_INFO(UserInfoBuilder::cloneUserInfo),
+    ERROR(UserInfoBuilder::failed)
     ;
     BiConsumer<UserInfoBuilder, Object> setter;
     <T> LoginStep (BiConsumer<UserInfoBuilder,T> setter) {

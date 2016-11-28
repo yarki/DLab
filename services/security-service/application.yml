@@ -38,8 +38,11 @@ ldapSearch:
       code: |
         def enrichUserInfo(ui,context):
           name = ui.getName()
+          key = 'uid='+name+',ou=People,dc=example,dc=com'
           userInfo=context['userInfo']
-          uid= userInfo['uid='+name+',ou=People,dc=example,dc=com']
+          if not key in userInfo:
+            raise Exception('Python LDAP UserInfo not found for '+key)
+          uid= userInfo[key]
           cn = context['userInfo']['uid='+name+',ou=People,dc=example,dc=com']['cn'].split(' ')
           ui.setFirstName(cn[0])
           ui.setLastName(cn[1])
@@ -60,8 +63,12 @@ ldapSearch:
       code: |
         var enrichUserInfo = function(ui,context) {
           name = ui.getName();
+          key = 'uid='+name+',ou=People,dc=example,dc=com';
           userInfo=context['userInfo'];
-          uid= userInfo['uid='+name+',ou=People,dc=example,dc=com'];
+          if( userInfo[key] == undefined ) {
+            throw 'JavaScript LDAP UserInfo not found for '+key;
+          }
+          uid= userInfo[key];
           userGid = uid['gidnumber'];
           groupInfo=context['groupInfo'];
           for( dn in groupInfo ) {
