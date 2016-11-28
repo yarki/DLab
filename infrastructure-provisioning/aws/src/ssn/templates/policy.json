@@ -97,7 +97,8 @@
                 "elasticmapreduce:AddTags",
                 "elasticmapreduce:DescribeCluster",
                 "elasticmapreduce:ListClusters",
-                "elasticmapreduce:RunJobFlow"
+                "elasticmapreduce:RunJobFlow",
+                "elasticmapreduce:TerminateJobFlows"
             ],
             "Effect": "Allow",
             "Resource": "*"
