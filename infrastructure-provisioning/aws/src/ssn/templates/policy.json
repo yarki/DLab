@@ -65,7 +65,11 @@
                 "ec2:DescribeVpcs",
                 "ec2:DescribeSecurityGroups",
                 "ec2:DescribeInstances",
-                "ec2:ModifyInstanceAttribute"
+                "ec2:ModifyInstanceAttribute",
+                "ec2:RevokeSecurityGroupEgress",
+                "ec2:RevokeSecurityGroupIngress",
+                "ec2:AuthorizeSecurityGroupEgress",
+                "ec2:AuthorizeSecurityGroupIngress"
             ],
             "Effect": "Allow",
             "Resource": "*"
