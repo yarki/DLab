@@ -1,14 +1,20 @@
-/******************************************************************************************************
+/***************************************************************************
 
- Copyright (c) 2016 EPAM Systems Inc.
+Copyright (c) 2016, EPAM SYSTEMS INC
 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+    http://www.apache.org/licenses/LICENSE-2.0
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
- *****************************************************************************************************/
+****************************************************************************/
 
 package com.epam.dlab.backendapi.resources.handler;
 
@@ -25,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
+import java.time.Instant;
 import java.util.Date;
 
 abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implements FileHandlerCallback {
@@ -51,7 +58,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         this.user = user;
         this.originalUuid = originalUuid;
         this.action = action;
-        this.resultType = (Class<T>)((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        this.resultType = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
     @Override
@@ -89,16 +96,19 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     }
 
     abstract protected String getCallbackURI();
+
     abstract protected T parseOutResponse(JsonNode document, T baseStatus);
 
     @SuppressWarnings("unchecked")
     protected T getBaseStatusDTO(UserInstanceStatus status) {
         try {
-            return (T) resultType.newInstance().withUser(user).withStatus(status.getStatus()).withUptime(getUptime(status));
+            return (T) resultType.newInstance().withUser(user).withStatus(status).withUptime(getUptime(status));
         } catch (Throwable t) {
             throw new DlabException("Something went wrong", t);
         }
-    };
+    }
+
+    ;
 
     private boolean isSuccess(JsonNode document) {
         return OK_STATUS.equals(document.get(STATUS_FIELD).textValue());
@@ -107,16 +117,24 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     private UserInstanceStatus calcStatus(DockerAction action, boolean success) {
         if (success) {
             switch (action) {
-                case CREATE: return UserInstanceStatus.RUNNING;
-                case START: return UserInstanceStatus.RUNNING;
-                case STOP: return UserInstanceStatus.STOPPED;
-                case TERMINATE: return UserInstanceStatus.TERMINATED;
+                case CREATE:
+                    return UserInstanceStatus.RUNNING;
+                case START:
+                    return UserInstanceStatus.RUNNING;
+                case STOP:
+                    return UserInstanceStatus.STOPPED;
+                case TERMINATE:
+                    return UserInstanceStatus.TERMINATED;
             }
         }
         return UserInstanceStatus.FAILED;
     }
 
     protected Date getUptime(UserInstanceStatus status) {
-        return UserInstanceStatus.RUNNING == status ? new Date() : null;
+        return UserInstanceStatus.RUNNING == status ? Date.from(Instant.now()) : null;
+    }
+
+    protected String getTextValue(JsonNode jsonNode) {
+        return jsonNode != null ? jsonNode.textValue() : null;
     }
 }

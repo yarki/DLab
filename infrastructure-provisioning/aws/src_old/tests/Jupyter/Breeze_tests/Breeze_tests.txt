@@ -1,6 +1,0 @@
-<<<<<<< HEAD
-import breeze.linalg._
-import breeze.numerics._
-
-val v = DenseVector(1.0,2.0,3.0)
-exp(v) 

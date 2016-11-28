@@ -1,33 +1,36 @@
-/******************************************************************************************************
+/***************************************************************************
 
- Copyright (c) 2016 EPAM Systems Inc.
+Copyright (c) 2016, EPAM SYSTEMS INC
 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+    http://www.apache.org/licenses/LICENSE-2.0
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
- *****************************************************************************************************/
+****************************************************************************/
 
 package com.epam.dlab.backendapi.dao;
 
 import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
+import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
-import com.mongodb.client.FindIterable;
 import org.bson.Document;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.elemMatch;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
@@ -59,11 +62,12 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 .getOrDefault(EXPLORATORY_ID, EMPTY).toString();
     }
 
-    public String fetchExploratoryStatus(String user, String exploratoryName) {
-        return Optional.ofNullable(mongoService.getCollection(USER_INSTANCES)
-                .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first())
-                .orElse(new Document())
-                .getOrDefault(STATUS, EMPTY).toString();
+    public UserInstanceStatus fetchExploratoryStatus(String user, String exploratoryName) {
+        return UserInstanceStatus.of(
+                Optional.ofNullable(mongoService.getCollection(USER_INSTANCES)
+                        .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first())
+                        .orElse(new Document())
+                        .getOrDefault(STATUS, EMPTY).toString());
     }
 
     public boolean insertExploratory(UserInstanceDTO dto) {
@@ -117,29 +121,32 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     @SuppressWarnings("unchecked")
     public String fetchComputationalId(String user, String exploratoryName, String computationalName) {
-        Map<String, Object> resources = (Map)Optional.ofNullable(
-                mongoService.getCollection(USER_INSTANCES)
-                        .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName),
-                                eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)))
-                        .projection(elemMatch(COMPUTATIONAL_RESOURCES, eq(COMPUTATIONAL_NAME, computationalName))).first())
-                .orElse(new Document())
-                .getOrDefault(COMPUTATIONAL_RESOURCES, Collections.emptyMap());
-        return resources.getOrDefault(COMPUTATIONAL_ID, EMPTY).toString();
+        return find(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)), UserInstanceDTO.class)
+                .flatMap(exploratory -> exploratory.getResources()
+                        .stream()
+                        .filter(computational -> computationalName.equals(computational.getComputationalName()))
+                        .findFirst())
+                .flatMap(computational -> Optional.ofNullable(computational.getComputationalId()))
+                .orElse(EMPTY);
     }
 
     public void updateComputationalStatus(ComputationalStatusDTO dto) {
-        updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), dto.getComputationalName(), dto.getStatus());
+        updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), dto.getComputationalName(), dto.getStatus(), false);
     }
 
     private void updateComputationalStatus(StatusBaseDTO dto, String computationalName) {
-        updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), computationalName, dto.getStatus());
+        updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), computationalName, dto.getStatus(), true);
     }
 
-    private void updateComputationalStatus(String user, String exploratoryName, String computationalName, String status) {
+    private void updateComputationalStatus(String user, String exploratoryName, String computationalName, String status, boolean clearUptime) {
         try {
+            Document values = new Document(getComputationalSetPrefix() + STATUS, status);
+            if (clearUptime) {
+                values.append(getComputationalSetPrefix() + UPTIME, null);
+            }
             update(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)
                     , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)),
-                    set(COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS, status));
+                    new Document(SET, values));
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);
         }

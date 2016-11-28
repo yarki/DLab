@@ -1,14 +1,20 @@
-/******************************************************************************************************
+/***************************************************************************
 
- Copyright (c) 2016 EPAM Systems Inc.
+Copyright (c) 2016, EPAM SYSTEMS INC
 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+    http://www.apache.org/licenses/LICENSE-2.0
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
- *****************************************************************************************************/
+****************************************************************************/
 
 package com.epam.dlab.backendapi.core.docker.command;
 
@@ -35,6 +41,11 @@ public class RunDockerCommand implements DockerCommand {
 
     public RunDockerCommand withVolume(String hostSrcPath, String bindPath) {
         options.add(String.format("-v %s:%s", hostSrcPath, bindPath));
+        return this;
+    }
+
+    public RunDockerCommand withName(String name) {
+        options.add(String.format("--name %s", name));
         return this;
     }
 
@@ -113,7 +124,6 @@ public class RunDockerCommand implements DockerCommand {
         options.add(String.format("-e \"creds_key_name=%s\"", keyName));
         return this;
     }
-
     public RunDockerCommand withConfServiceBaseName(String confServiceBaseName) {
         options.add(String.format("-e \"conf_service_base_name=%s\"", confServiceBaseName));
         return this;
@@ -124,6 +134,16 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withVpcId(String vpcId) {
+        options.add(String.format("-e \"edge_vpc_id=%s\"", vpcId));
+        return this;
+    }
+
+    public RunDockerCommand withEdgeSubnetId(String subnetId) {
+        options.add(String.format("-e \"creds_subnet_id=%s\"", subnetId));
+        return this;
+    }
+
     public RunDockerCommand withEmrInstanceType(String emrInstanceType) {
         options.add(String.format("-e \"emr_instance_type=%s\"", emrInstanceType));
         return this;
@@ -131,6 +151,11 @@ public class RunDockerCommand implements DockerCommand {
 
     public RunDockerCommand withEmrVersion(String emrVersion) {
         options.add(String.format("-e \"emr_version=%s\"", emrVersion));
+        return this;
+    }
+
+    public RunDockerCommand withEmrTimeout(String emrTimeout) {
+        options.add(String.format("-e \"emr_timeout=%s\"", emrTimeout));
         return this;
     }
 
@@ -164,11 +189,6 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withIamUserName(String edgeUserName) {
-        options.add(String.format("-e \"creds_iam_user=%s\"", edgeUserName));
-        return this;
-    }
-
     public RunDockerCommand withEmrClusterName(String emrClusterName) {
         options.add(String.format("-e \"emr_cluster_name=%s\"", emrClusterName));
         return this;
@@ -176,11 +196,6 @@ public class RunDockerCommand implements DockerCommand {
 
     public RunDockerCommand withNotebookUserName(String notebookUserName) {
         options.add(String.format("-e \"notebook_user_name=%s\"", notebookUserName));
-        return this;
-    }
-
-    public RunDockerCommand withNotebookInstanceType(String notebookInstanceType) {
-        options.add(String.format("-e \"notebook_instance_type=%s\"", notebookInstanceType));
         return this;
     }
 
@@ -200,7 +215,7 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withUserKeyName(String userKeyName) {
-        options.add(String.format("-e \"user_keyname=%s\"", userKeyName));
+        options.add(String.format("-e \"edge_user_name=%s\"", userKeyName));
         return this;
     }
 

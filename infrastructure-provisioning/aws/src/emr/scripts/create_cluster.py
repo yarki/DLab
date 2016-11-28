@@ -1,16 +1,22 @@
 #!/usr/bin/python
 
-# ******************************************************************************************************
+# *****************************************************************************
 #
-# Copyright (c) 2016 EPAM Systems Inc.
+# Copyright (c) 2016, EPAM SYSTEMS INC
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#    http://www.apache.org/licenses/LICENSE-2.0
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# ****************************************************************************************************/
+# ******************************************************************************
 
 # v1.3 from 05/10/2016
 import boto3
@@ -22,47 +28,51 @@ from fabric.api import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import json
+import os
 
 parser = argparse.ArgumentParser()
 # parser.add_argument('--id', type=str, default='')
 parser.add_argument('--dry_run', action='store_true', help='Print all variables')
 parser.add_argument('--name', type=str, default='', help='Name to be applied to Cluster ( MANDATORY !!! )')
-parser.add_argument('--applications', type=str, default='Hadoop Hive Hue Spark',
+parser.add_argument('--applications', type=str, default='',
                     help='Set of applications to be installed on EMR (Default are: "Hadoop Hive Hue Spark")')
-parser.add_argument('--master_instance_type', type=str, default='m3.xlarge', help='EC2 instance size for Master-Node (Default: m3.xlarge)')
-parser.add_argument('--slave_instance_type', type=str, default='m3.xlarge', help='EC2 instance size for Worker-Nodes (Default: m3.xlarge)')
-parser.add_argument('--instance_count', type=int, default='3',
+parser.add_argument('--master_instance_type', type=str, default='', help='EC2 instance size for Master-Node (Default: m3.xlarge)')
+parser.add_argument('--slave_instance_type', type=str, default='', help='EC2 instance size for Worker-Nodes (Default: m3.xlarge)')
+parser.add_argument('--instance_count', type=int, default='',
                     help='Number of nodes the cluster will consist of (Default: 3)')
-parser.add_argument('--release_label', type=str, default='emr-4.8.0', help='EMR release version (Default: "emr-4.8.0")')
+parser.add_argument('--release_label', type=str, default='', help='EMR release version (Default: "emr-4.8.0")')
 parser.add_argument('--steps', type=str, default='')
-parser.add_argument('--tags', type=str, default='Name=DSA, Project=DSA')
+parser.add_argument('--tags', type=str, default='')
 parser.add_argument('--auto_terminate', action='store_true')
-parser.add_argument('--service_role', type=str, default='EMR_DefaultRole',
+parser.add_argument('--service_role', type=str, default='',
                     help='Role name EMR cluster (Default: "EMR_DefaultRole")')
-parser.add_argument('--ec2_role', type=str, default='EMR_EC2_DefaultRole',
+parser.add_argument('--ec2_role', type=str, default='',
                     help='Role name for EC2 instances in cluster (Default: "EMR_EC2_DefaultRole")')
-parser.add_argument('--ssh_key', type=str, default='BDCC-DSA-POC')
-parser.add_argument('--availability_zone', type=str, default='eu-west-1a')
+parser.add_argument('--ssh_key', type=str, default='')
+parser.add_argument('--availability_zone', type=str, default='')
 parser.add_argument('--subnet', type=str, default='', help='Subnet CIDR')
 parser.add_argument('--cp_jars_2_s3', action='store_true',
                     help='Copy executable JARS to S3 (Need only once per EMR release version)')
 parser.add_argument('--nbs_ip', type=str, default='', help='Notebook server IP cluster should be attached to')
-parser.add_argument('--nbs_user', type=str, default='ubuntu',
+parser.add_argument('--nbs_user', type=str, default='',
                     help='Username to be used for connection to Notebook server')
-parser.add_argument('--s3_bucket', type=str, default='dsa-poc-test-bucket', help='S3 bucket name to work with')
-parser.add_argument('--emr_timeout', type=int, default=1200)
+parser.add_argument('--s3_bucket', type=str, default='', help='S3 bucket name to work with')
+parser.add_argument('--emr_timeout', type=int)
 parser.add_argument('--configurations', type=str, default='')
-parser.add_argument('--region', type=str, default='us-west-2')
+parser.add_argument('--region', type=str, default='')
 args = parser.parse_args()
 
 cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/config/{1}/hive-site.xml --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/config/{1} --recursive --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/{4}.pub /tmp/{4}.pub --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
             "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
-    args.s3_bucket, args.name, args.nbs_user, args.region)
+    args.s3_bucket, args.name, args.nbs_user, args.region, os.environ['edge_user_name'])
 
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/jars_parser.sh /tmp/jars_parser.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
-          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label)
+          "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/key_importer.sh /tmp/key_importer.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
+          "Name=CUSTOM_JAR, Args=sh /tmp/key_importer.sh {4}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, os.environ['edge_user_name'])
 
 logfile = '{}_creation.log'.format(args.name)
 logpath = '/response/' + logfile
@@ -90,6 +100,17 @@ def upload_jars_parser(args):
     s3.meta.client.upload_file('/root/scripts/jars_parser.sh', args.s3_bucket, 'jars_parser.sh')
 
 
+def upload_user_key(args):
+    s3 = boto3.resource('s3')
+    s3.meta.client.upload_file(os.environ['creds_key_dir'] + '/' + os.environ['edge_user_name'] + '.pub', args.s3_bucket, os.environ['edge_user_name'] + '.pub')
+    s3.meta.client.upload_file('/root/scripts/key_importer.sh', args.s3_bucket, 'key_importer.sh')
+
+
+def remove_user_key(args):
+    client = boto3.client('s3')
+    client.delete_object(Bucket=args.s3_bucket, Key=os.environ['edge_user_name'] + '.pub')
+
+
 def get_instance_by_ip(ip):
     ec2 = boto3.resource('ec2')
     check = bool(re.match(r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$", ip))
@@ -109,7 +130,7 @@ def emr_sg(id):
     return master, slave
 
 
-def wait_emr(bucket, cluster_name, timeout, delay=20):
+def wait_emr(bucket, cluster_name, timeout, delay=30):
     deadline = time.time() + timeout
     prefix = "config/" + cluster_name + "/"
     global cluster_id
@@ -241,9 +262,11 @@ if __name__ == "__main__":
     elif args.dry_run:
         # get_emr_state(args.id)
         upload_jars_parser(args)
+        upload_user_key(args)
         build_emr_cluster(args)
     else:
         upload_jars_parser(args)
+        upload_user_key(args)
         out = open(logpath, 'a')
         nbs_id = get_instance_by_ip(args.nbs_ip)
         out.write('Notebook server "{}" IP is "{}"\n'.format(nbs_id, args.nbs_ip))

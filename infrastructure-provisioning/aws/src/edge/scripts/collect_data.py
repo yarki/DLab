@@ -1,19 +1,26 @@
 #!/usr/bin/python
 
-# ******************************************************************************************************
+# *****************************************************************************
 #
-# Copyright (c) 2016 EPAM Systems Inc.
+# Copyright (c) 2016, EPAM SYSTEMS INC
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including # without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject # to the following conditions:
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#    http://www.apache.org/licenses/LICENSE-2.0
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH # # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# ****************************************************************************************************/
+# ******************************************************************************
 
 import argparse
 import json
+import datetime
 from fabric.api import *
 from dlab.aws_actions import *
 from dlab.aws_meta import *
@@ -38,27 +45,33 @@ if __name__ == "__main__":
 
     # Get Notebook List
     notebooks = []
-    nbs_list = get_ec2_list('{}-Tag'.format(args.service_base_name))
+    nbs_list = get_ec2_list('{}-Tag'.format(args.service_base_name), '{}-{}-nb'.format(args.service_base_name, args.user_name))
     for i in nbs_list:
         notebook = {}
         notebook['Id'] = i.id
+        notebook['Exploratory_fqdn'] = i.private_dns_name
         for tag in i.tags:
             if tag['Key'] == 'Name':
                 notebook['Name'] = tag['Value']
         notebook['Shape'] = i.instance_type
         notebook['Status'] = i.state['Name']
+        nbs_start_time = i.launch_time.replace(tzinfo=None)
+        notebook['Exploratory_uptime'] = str(datetime.datetime.now() - nbs_start_time)
         emr_list = get_emr_list(notebook['Name'], 'Value')
         resources = []
         for j in emr_list:
             emr = {}
             emr['id'] = j
-            emr['status'] =  get_emr_info(j, 'Status')['State']
+            emr['name'] = get_emr_info(j, 'Name')
+            emr['status'] = get_emr_info(j, 'Status')['State']
             counter = 0
             for instance in get_ec2_list('Notebook', notebook['Name']):
                 counter +=1
                 emr['shape'] = instance.instance_type
             emr['nodes_count'] = counter
-            emr['type'] =  get_emr_info(j, 'ReleaseLabel')
+            emr['type'] = get_emr_info(j, 'ReleaseLabel')
+            emr_start_time = get_emr_info(j, 'Status')['Timeline']['CreationDateTime'].replace(tzinfo=None)
+            emr['computational_uptime'] = str(datetime.datetime.now() - emr_start_time)
             resources.append(emr)
         notebook['computeresources'] = resources
         notebooks.append(notebook)
@@ -66,7 +79,8 @@ if __name__ == "__main__":
     edge['Notebooks'] = notebooks
     data.append(edge)
 
-    filename = '{}.json'.format(args.request_id)
+    # filename = '{}.json'.format(args.request_id)
+    filename = 'result.json'
     with open('/root/' + filename, 'w') as outfile:
         json.dump(data, outfile)
 
