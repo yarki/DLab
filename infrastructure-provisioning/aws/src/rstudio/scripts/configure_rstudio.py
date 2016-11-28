@@ -61,7 +61,6 @@ if __name__ == "__main__":
     env['connection_attempts'] = 100
     env.key_filename = [args.keyfile]
     env.host_string = 'ubuntu@' + args.hostname
-    deeper_config = json.loads(args.additional_config)
 
     print "Configuring notebook server."
     try:

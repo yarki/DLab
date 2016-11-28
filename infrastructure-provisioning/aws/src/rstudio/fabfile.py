@@ -88,8 +88,8 @@ def run():
 
     # launching instance for notebook server
     try:
-        logging.info('[CREATE JUPYTER NOTEBOOK INSTANCE]')
-        print '[CREATE JUPYTER NOTEBOOK INSTANCE]'
+        logging.info('[CREATE R_STUDIO NOTEBOOK INSTANCE]')
+        print '[CREATE R_STUDIO NOTEBOOK INSTANCE]'
         params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
                  "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s --instance_class %s --instance_disk_size %s" % \
                  (notebook_config['instance_name'], notebook_config['ami_id'], notebook_config['instance_type'],
@@ -114,8 +114,8 @@ def run():
 
     # configuring proxy on Notebook instance
     try:
-        logging.info('[CONFIGURE PROXY ON JUPYTER INSTANCE]')
-        print '[CONFIGURE PROXY ON JUPYTER INSTANCE]'
+        logging.info('[CONFIGURE PROXY ON R_STUDIO INSTANCE]')
+        print '[CONFIGURE PROXY ON R_STUDIO INSTANCE]'
         additional_config = {"proxy_host": edge_instance_hostname, "proxy_port": "3128"}
         params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
@@ -132,8 +132,8 @@ def run():
 
     # updating repositories & installing python packages
     try:
-        logging.info('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
-        print('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
+        logging.info('[INSTALLING PREREQUISITES TO R_STUDIO NOTEBOOK INSTANCE]')
+        print('[INSTALLING PREREQUISITES TO R_STUDIO NOTEBOOK INSTANCE]')
         params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
         if not run_routine('install_prerequisites', params):
             logging.info('Failed installing apps: apt & pip')
@@ -146,7 +146,7 @@ def run():
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
-    # installing and configuring jupiter and all dependencies
+    # installing and configuring R_STUDIO and all dependencies
     try:
         logging.info('[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]')
         print '[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]'
