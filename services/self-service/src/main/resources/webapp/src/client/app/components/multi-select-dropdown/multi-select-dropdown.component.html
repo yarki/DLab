@@ -1,0 +1,27 @@
+<div #wrapper class="dropdown-multiselect btn-group">
+
+  <button data-toggle="dropdown" type="button" class="dropdown-toggle btn">
+    <span *ngIf="model.length == 0">!Selected</span>
+    <span *ngIf="model.length != 0">Selected {{model.length}} items</span>
+    <!-- {{ getButtonText() }}&nbsp;-->
+    <span class="caret-btn" (click)="toggleDropdown()">&#9663;</span>
+  </button>
+
+  <ul class="dropdown-menu" [style.display]="isOpen ? 'block' : 'none'">
+    <li>
+      <a href="#" (click)="deselectAllOptions($event)">
+      <span class="glyphicon glyphicon-remove"></span>&nbsp;
+        Clear All
+    </a>
+    </li>
+      <template let-item ngFor [ngForOf]="items">
+        <li role="presentation">
+          <a href="#" role="menuitem" (click)="toggleSelectedOptions($event, model, item)">
+            <span class="glyphicon" [class.glyphicon-ok]="model.indexOf(item) >= 0"></span>
+            {{item}}
+          </a>
+        </li>
+      </template>
+    <li *ngIf="items.length == 0">No items</li>
+  </ul>
+</div>

@@ -19,6 +19,7 @@ limitations under the License.
 import { Component, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 import { ResourcesGridRowModel } from './resources-grid.model';
+import { FilterConfigurationModel } from './filterConfiguration.model';
 import { CreateEmrModel } from "./createEmrModel";
 import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dialog-type.enum";
 
@@ -32,27 +33,31 @@ import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dial
 export class ResourcesGrid implements OnInit {
 
   environments: Array<ResourcesGridRowModel>;
+
+  filterConfiguration: FilterConfigurationModel;
+  filterForm: FilterConfigurationModel = new FilterConfigurationModel('', [], [], '');
+
   filteredEnvironments: Array<ResourcesGridRowModel>;
   model = new CreateEmrModel('', '');
   notebookName: string;
   isOutscreenDropdown: boolean;
+
   collapseFilterRow: boolean = false;
   filtering: boolean = false;
 
   @ViewChild('computationalResourceModal') computationalResourceModal;
   @ViewChild('confirmationDialog') confirmationDialog;
   @ViewChild('detailDialog') detailDialog;
-  @ViewChild('filterRow') filterRow;
 
   constructor(
     private userResourceService: UserResourceService
   ) { }
 
   public filteringColumns:Array<any> = [
-    {title: 'Environment name', name: 'name', className: 'th_name', filtering: {placeholder: 'Filter by environment name'}},
-    {title: 'Status', name: 'status', className: 'th_status', filtering: {placeholder: 'Filter by status'}},
-    {title: 'Shape', name: 'shape', className: 'th_shape'},
-    {title: 'Computational resources', name: 'resources', className: 'th_resources'},
+    {title: 'Environment name', name: 'name', className: 'th_name', filtering: {}},
+    {title: 'Status', name: 'status', className: 'th_status', filtering: {}},
+    {title: 'Shape', name: 'shape', className: 'th_shape', filtering: {}},
+    {title: 'Computational resources', name: 'resources', className: 'th_resources', filtering: {}},
     {title: 'Actions', className: 'th_actions'}
   ];
 
@@ -60,28 +65,44 @@ export class ResourcesGrid implements OnInit {
     this.buildGrid();
   }
 
-  onChangeFilter($event, column) {
-    let filteredData:Array<any> = this.environments;
-    if($event.target.value)
-      this.filtering = true;
-      filteredData = filteredData.filter((item:any) => {
-        return item[column].toLowerCase().match($event.target.value.toLowerCase());
-      });
-    this.filteredEnvironments = filteredData;
-  }
-
   toggleFilterRow() : void {
     this.collapseFilterRow = !this.collapseFilterRow;
   }
+  getDefaultFilterConfiguration() : void {
+    let data:Array<ResourcesGridRowModel> = this.environments;
+    let shapes = [], statuses = [];
 
-  clearFilters() : void {
-    if(this.filterRow) {
-      let el: HTMLElement = this.filterRow.nativeElement;
-      let filterFields: NodeListOf<Element> = el.getElementsByClassName('filter-field');
+    data.forEach((item:any) => {
+      if(shapes.indexOf(item.shape) == -1)
+      shapes.push(item.shape);
+      if(statuses.indexOf(item.status) == -1)
+      statuses.push(item.status)
+    });
 
-      for (let i = 0; i < filterFields.length; i++)
-        filterFields[i]['value'] = '';
-    }
+    this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, '');
+  }
+  applyFilter_btnClick() {
+    console.log(this.filterForm);
+
+    let filteredData:Array<any> = this.environments;
+    this.filtering = true;
+
+    filteredData = filteredData.filter((item:any) => {
+       console.log(this.filterForm);
+       return item.name.toLowerCase().match(this.filterForm.name.toLowerCase())
+              && (this.filterForm.statuses.indexOf(item.status) != -1)
+              && (this.filterForm.shapes.indexOf(item.shape) != -1);
+
+      // if (item[key].toLowerCase().indexOf(self.filterForm[filterableProps[key]].toLowerCase()) == -1)
+
+    });
+    console.log(filteredData);
+    this.filteredEnvironments = filteredData;
+  }
+
+  resetFilterConfigurations() : void {
+    this.filterForm.resetConfigurations();
+    this.buildGrid();
   }
 
   buildGrid() : void {
@@ -90,7 +111,8 @@ export class ResourcesGrid implements OnInit {
         this.environments = this.loadEnvironments(result);
 
         this.filteredEnvironments = this.environments;
-        this.clearFilters();
+
+        this.getDefaultFilterConfiguration();
         console.log('models ', this.environments);
       });
   }

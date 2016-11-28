@@ -57,8 +57,24 @@ limitations under the License.
 .dashboard_table tr:nth-child(2n+1){
   background: #f9fafb;
 }
-.dashboard_table tr.filter-row td{
+.dashboard_table tr.filter-row {
+  /*position: relative;*/
+}
+.dashboard_table tr.filter-row td {
   padding: 10px;
+}
+.dashboard_table tr.filter-row td:not(:last-child) {
+  /*border-right: none;*/
+  background: #fff;
+}
+.filter-row .actions {
+  position: absolute;
+  right: 10px;
+}
+.filter-row .actions button {
+  background: #fff;
+  border-color: #35afd5;
+  color: #35afd5;
 }
 .dashboard_table tr:nth-child(2n+1) td:first-child {
   background: #edf6f9;

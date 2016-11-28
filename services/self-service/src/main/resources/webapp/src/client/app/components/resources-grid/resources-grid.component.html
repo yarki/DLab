@@ -19,20 +19,49 @@ limitations under the License.
 <table class="dashboard_table">
   <tr>
     <th *ngFor="let column of filteringColumns" ngClass="{{column.className || ''}}">{{column.title}}
-       <i *ngIf="column.filtering" class="glyphicon glyphicon-knight pull-right" (click)="toggleFilterRow()"></i>
-     </th>
+      <i *ngIf="column.filtering" class="glyphicon glyphicon-option-vertical pull-right" (click)="toggleFilterRow()"></i>
+    </th>
   </tr>
 
   <tr *ngIf="(!filteredEnvironments) && !filtering || (filteredEnvironments.length == 0) && !filtering" class="message_block">
     <td colspan="5">To start working, please, create new environment</td>
   </tr>
 
-  <tr #filterRow *ngIf="filteredEnvironments && collapseFilterRow" class="filter-row">
-    <td *ngFor="let column of filteringColumns">
+  <tr *ngIf="filteredEnvironments && collapseFilterRow" class="filter-row">
+    <!-- <td *ngFor="let column of filteringColumns">
       <input *ngIf="column.filtering"
               placeholder="{{column.filtering.placeholder}}"
               class="form-control filter-field"
               (input)="onChangeFilter($event, column.name)"/>
+    </td> -->
+
+
+    <td class="name-filter">
+      <input placeholder="Filter by environment name" class="form-control filter-field" [value]="filterForm.name" (input)="filterForm.name = $event.target.value" />
+    </td>
+
+    <td>
+      <multi-select-dropdown [items]="filterConfiguration.statuses" [model]="filterForm.statuses"></multi-select-dropdown>
+    </td>
+
+    <td>
+      <multi-select-dropdown [items]="filterConfiguration.shapes" [model]="filterForm.shapes"></multi-select-dropdown>
+    </td>
+
+    <td>
+      <!-- <input placeholder="Magic filter by everything" class="form-control filter-field" [value]="filterForm.resource" (input)="filterForm.resource = $event.target.value" /> -->
+    </td>
+
+    <td>
+      <div class="actions">
+        <button class="btn" (click)="resetFilterConfigurations()">
+              <span class="glyphicon glyphicon-remove-circle"></span>
+            </button>
+
+        <button class="btn" (click)="applyFilter_btnClick()">
+              <span class="glyphicon glyphicon-ok-circle"></span>
+            </button>
+      </div>
     </td>
   </tr>
 
@@ -47,10 +76,7 @@ limitations under the License.
     </td>
     <td>
       <div class="dropdown">
-        <span data-toggle="dropdown"
-              class="actions"
-              (click)="dropdownPosition($event)"
-              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating' ||
+        <span data-toggle="dropdown" class="actions" (click)="dropdownPosition($event)" [ngClass]="{'disabled': env.status.toLowerCase() == 'creating' ||
                                       env.status.toLowerCase() == 'failed' ||
                                       env.status.toLowerCase() == 'terminating' ||
                                       env.status.toLowerCase() == 'terminated'}">
