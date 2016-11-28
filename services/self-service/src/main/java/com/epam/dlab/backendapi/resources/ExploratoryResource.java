@@ -149,6 +149,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         LOGGER.debug("terminating exploratory environment {} for user {}", name, userInfo.getName());
         UserInstanceStatus status = TERMINATING;
         updateExploratoryStatus(userInfo.getName(), name, status);
+        updateComputationalStatuses(userInfo.getName(), name, status);
         return action(userInfo, name, EXPLORATORY_TERMINATE, status);
     }
 
