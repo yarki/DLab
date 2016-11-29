@@ -27,45 +27,32 @@ import { Input, Output, Component, EventEmitter, ViewChild, HostListener, Elemen
 })
 
 export class MultiSelectDropdown {
-
+  isOpen: boolean = false;
 
   @Input() items: Array<any>;
   @Input() model: Array<any>;
   @Output() selectionChange: EventEmitter<{}> = new EventEmitter();
 
 
-  @ViewChild('wrapper') wrapper: ElementRef;
-  @HostListener('window:click', ['$event'])
-    clickHandler(event) {
-
-      var parent = event.target;
-      while(parent != this.wrapper.nativeElement && parent != document) {
-        parent = parent.parentNode;
-      }
-      if(parent == document) {
-        this.toggleDropdown();
-      }
-    }
-
-  isOpen: boolean = false;
-
   toggleDropdown() : void {
     this.isOpen = !this.isOpen;
+  }
+
+  onClickOutside($event:Object) {
+    if($event && $event['value'] === true) {
+      this.isOpen = false;
+    }
   }
 
   toggleSelectedOptions($event, model, value) {
     let index = model.indexOf(value);
     (index >= 0) ? model.splice(index, 1) : model.push(value);
-
-    console.log(this.model);
     this.onUpdate();
     $event.preventDefault();
   }
 
   deselectAllOptions($event) {
     this.model = [];
-
-    console.log(this.model);
     $event.preventDefault();
   }
 
