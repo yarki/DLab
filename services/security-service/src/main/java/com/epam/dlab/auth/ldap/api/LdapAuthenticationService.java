@@ -33,7 +33,6 @@ import com.epam.dlab.auth.ldap.core.UserInfoDAODumbImpl;
 import com.epam.dlab.auth.ldap.core.UserInfoDAOMongoImpl;
 import com.epam.dlab.auth.ldap.core.filter.AwsUserDAO;
 import com.epam.dlab.auth.rest.AbstractAuthenticationService;
-import com.epam.dlab.auth.rest.AuthorizedUsers;
 import com.epam.dlab.dto.UserCredentialDTO;
 import io.dropwizard.setup.Environment;
 
@@ -64,7 +63,6 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 
 	public LdapAuthenticationService(SecurityServiceConfiguration config, Environment env) {
 		super(config);
-		AuthorizedUsers.setInactiveTimeout(config.getInactiveUserTimeoutMillSec());
 		if(config.isUserInfoPersistenceEnabled()) {
 			this.userInfoDao = new UserInfoDAOMongoImpl(config.getMongoFactory().build(env),config.getInactiveUserTimeoutMillSec());
 		} else {
