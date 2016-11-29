@@ -31,6 +31,7 @@ export class MultiSelectDropdown {
 
   @Input() items: Array<any>;
   @Input() model: Array<any>;
+  @Input() type: string;
   @Output() selectionChange: EventEmitter<{}> = new EventEmitter();
 
 
@@ -47,16 +48,27 @@ export class MultiSelectDropdown {
   toggleSelectedOptions($event, model, value) {
     let index = model.indexOf(value);
     (index >= 0) ? model.splice(index, 1) : model.push(value);
+
+    this.onUpdate();
+    $event.preventDefault();
+  }
+
+  selectAllOptions($event) {
+    this.model = [];
+    this.items.forEach((item) => {this.model.push(item)});
+
     this.onUpdate();
     $event.preventDefault();
   }
 
   deselectAllOptions($event) {
     this.model = [];
+    this.onUpdate();
     $event.preventDefault();
   }
 
   onUpdate() : void {
-    this.selectionChange.emit(this.model);
+    this.selectionChange.emit({model : this.model, type: this.type});
+
   }
 }

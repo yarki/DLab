@@ -88,16 +88,22 @@ export class ResourcesGrid implements OnInit {
     this.filtering = true;
 
     filteredData = filteredData.filter((item:any) => {
-       console.log(this.filterForm);
-       return item.name.toLowerCase().match(this.filterForm.name.toLowerCase())
-              && (this.filterForm.statuses.indexOf(item.status) != -1)
-              && (this.filterForm.shapes.indexOf(item.shape) != -1);
 
-      // if (item[key].toLowerCase().indexOf(self.filterForm[filterableProps[key]].toLowerCase()) == -1)
+      //  return item.name.toLowerCase().match(this.filterForm.name.toLowerCase())
+      //         && this.filterForm.statuses.length > 0 ? (this.filterForm.statuses.indexOf(item.status) != -1) : true
 
+      //         && this.filterForm.shapes.length > 0 ? (this.filterForm.shapes.indexOf(item.shape) != -1) : true;
+      let name = item.name.toLowerCase().indexOf(this.filterForm.name.toLowerCase()) != -1;
+      let status = this.filterForm.statuses.length > 0 ? (this.filterForm.statuses.indexOf(item.status) != -1) : true;
+      let shape = this.filterForm.shapes.length > 0 ? (this.filterForm.shapes.indexOf(item.shape) != -1) : true;
+
+      return name && status && shape;
     });
     console.log(filteredData);
     this.filteredEnvironments = filteredData;
+  }
+  onUpdate($event) {
+    this.filterForm[$event.type] = $event.model;
   }
 
   resetFilterConfigurations() : void {

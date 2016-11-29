@@ -41,11 +41,11 @@ limitations under the License.
     </td>
 
     <td>
-      <multi-select-dropdown [items]="filterConfiguration.statuses" [model]="filterForm.statuses"></multi-select-dropdown>
+      <multi-select-dropdown (selectionChange)="onUpdate($event)" [type]="'statuses'" [items]="filterConfiguration.statuses" [model]="filterForm.statuses"></multi-select-dropdown>
     </td>
 
     <td>
-      <multi-select-dropdown [items]="filterConfiguration.shapes" [model]="filterForm.shapes"></multi-select-dropdown>
+      <multi-select-dropdown (selectionChange)="onUpdate($event)" [type]="'shapes'" [items]="filterConfiguration.shapes" [model]="filterForm.shapes"></multi-select-dropdown>
     </td>
 
     <td>

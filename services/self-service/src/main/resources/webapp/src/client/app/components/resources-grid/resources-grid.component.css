@@ -64,7 +64,7 @@ limitations under the License.
   padding: 10px;
 }
 .dashboard_table tr.filter-row td:not(:last-child) {
-  /*border-right: none;*/
+  border-right: none;
   background: #fff;
 }
 .filter-row .actions {

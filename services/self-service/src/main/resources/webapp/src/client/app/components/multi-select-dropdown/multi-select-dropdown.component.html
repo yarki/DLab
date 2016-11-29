@@ -8,11 +8,17 @@
   </button>
 
   <ul class="dropdown-menu" [style.display]="isOpen ? 'block' : 'none'">
-    <li>
-      <a href="#" (click)="deselectAllOptions($event)">
-      <span class="glyphicon glyphicon-remove"></span>&nbsp;
-        Clear All
-    </a>
+    <li class="filter-actions">
+      <a (click)="selectAllOptions($event)">
+        <i class="glyphicon glyphicon-ok"></i>&nbsp;
+          All
+      </a>
+    </li>
+    <li class="filter-actions">
+      <a (click)="deselectAllOptions($event)">
+        <i class="glyphicon glyphicon-remove"></i>&nbsp;
+        None
+      </a>
     </li>
       <template let-item ngFor [ngForOf]="items">
         <li role="presentation">

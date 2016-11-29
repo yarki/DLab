@@ -7,6 +7,7 @@
   text-align: left;
   background: #fff;
   border: 1px solid #cad2da;
+  font-size: 14px;
 }
 .dropdown-multiselect .caret-btn {
   position: absolute;
@@ -43,6 +44,17 @@
   padding: 10px;
   padding-left: 35px;
   position: relative;
+  font-weight: 300;
+}
+.dropdown-multiselect .dropdown-menu .filter-actions {
+  border-bottom: 1px solid #ececec;
+  width: 50%;
+  float: left;
+  cursor: pointer;
+}
+.dropdown-multiselect .dropdown-menu .filter-actions a {
+  padding-left: 14px;
+  color: #35afd5;
 }
 
 .dropdown-multiselect .dropdown-menu a span {
