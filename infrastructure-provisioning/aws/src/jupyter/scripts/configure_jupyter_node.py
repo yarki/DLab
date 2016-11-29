@@ -116,6 +116,34 @@ def ensure_s3_kernel():
             sys.exit(1)
 
 
+def ensure_r_kernel():
+    if not exists('/home/ubuntu/.ensure_dir/r_kernel_ensured'):
+        try:
+            sudo('apt-get install -y r-base r-base-dev r-cran-rcurl')
+            sudo('apt-get install -y libcurl4-openssl-dev libssl-dev libreadline-dev')
+            sudo('apt-get install -y cmake')
+            sudo('git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
+            sudo('R -e "install.packages(\'R6\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'pbdZMQ\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'RCurl\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'devtools\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'reshape2\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'caTools\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "library(\'devtools\');chooseCRANmirror(graphics=FALSE, ind=21);install.packages(c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
+            sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
+            sudo('R -e "install.packages(\'RJDBC\',dep=TRUE)"')
+            sudo('R CMD javareconf')
+            sudo('R -e "IRkernel::installspec()"')
+            # sudo('export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin; R -e \'IRkernel::installspec(user = FALSE)\'')
+            # Spark Install
+            sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
+            sudo('export SPARK_HOME=/usr/local/spark/; cd $SPARK_HOME/R/lib/; sudo R --no-site-file --no-environ --no-save --no-restore CMD INSTALL "SparkR"')
+            sudo('touch /home/ubuntu/.ensure_dir/r_kernel_ensured')
+        except:
+            sys.exit(1)
+
+
 def configure_notebook_server(notebook_name):
     try:
         sudo('pip install jupyter --no-cache-dir')
