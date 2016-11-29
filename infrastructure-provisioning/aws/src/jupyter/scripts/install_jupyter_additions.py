@@ -62,7 +62,7 @@ def ensure_libraries_py2():
             sudo('export LC_ALL=C')
             sudo('apt-get install -y libjpeg8-dev zlib1g-dev')
             sudo('pip2 install -U pip --no-cache-dir')
-            sudo('pip2 install boto boto3 --no-cache-dir')
+            sudo('pip2 install boto3 --no-cache-dir')
             sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
             sudo('touch /home/ubuntu/.ensure_dir/ensure_libraries_py2_installed')
         except:
@@ -74,8 +74,8 @@ def ensure_libraries_py3():
         try:
             sudo('pip3 install -U pip --no-cache-dir')
             sudo('python3.4 -m pip install --upgrade pip')
-            sudo('pip3 install boto boto3 --no-cache-dir')
-            sudo('python3.4 -m pip install boto boto3 --upgrade --no-cache-dir')
+            sudo('pip3 install boto3 --no-cache-dir')
+            sudo('python3.4 -m pip install boto3 --upgrade --no-cache-dir')
             sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
             sudo('python3.4 -m pip install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --upgrade --no-cache-dir')
             sudo('touch /home/ubuntu/.ensure_dir/ensure_libraries_py3_installed')
