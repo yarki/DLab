@@ -118,8 +118,12 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				UserInfo userInfo = uiFuture.get(10,TimeUnit.SECONDS);
 				log.debug("user info collected by conveyor '{}' ", userInfo);
 			} catch (Exception e) {
-				log.error("Conveyor error {}", e.getMessage());
-				return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+				Throwable cause = e.getCause();
+				if(cause == null) {
+					cause = e;
+				}
+				log.error("Conveyor error {}", cause.getMessage());
+				return Response.status(Response.Status.UNAUTHORIZED).entity(cause.getMessage()).build();
 			}
 			return Response.ok(token).build();
 		}
@@ -132,7 +136,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				ldapUserDAO.getUserInfo(username,password);
 				log.debug("User Authenticated: {}",username);
 			} catch (Exception e) {
-				loginConveyor.cancel(token,"LDAP login failed for user '"+username+"': "+e.getMessage());
+				loginConveyor.cancel(token,"Username or password are not valid");
 			}
 		});
 	}
@@ -144,7 +148,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				UserInfo rolesUserInfo = ldapUserDAO.enrichUserInfo(new UserInfo(username, token));
 				loginConveyor.add(token,rolesUserInfo,LoginStep.LDAP_USER_INFO);
 			} catch (Exception e) {
-				loginConveyor.cancel(token,"LDAP Info failed for user "+username+"': "+e.getMessage());
+				loginConveyor.cancel(token,"User not authorized. Please access DLAB administrator.");
 			}
 		});
 	}
@@ -158,10 +162,10 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 					if (awsUser != null) {
 						loginConveyor.add(token, true, LoginStep.AWS_USER);
 					} else {
-						loginConveyor.cancel(token,"AWS account not found for user '"+username+"'. Please contact AWS administrator to create corresponding IAM User and Access Key");
+						loginConveyor.cancel(token,"Please contact AWS administrator to create corresponding IAM User");
 					}
 				} catch (Exception e) {
-					loginConveyor.cancel(token,"AWS account check failed for user '"+username+"': "+e.getMessage());
+					loginConveyor.cancel(token,"Please contact AWS administrator to create corresponding IAM User");
 				}
 			} else {
 				loginConveyor.add(token,false,LoginStep.AWS_USER);
@@ -176,14 +180,9 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			if(config.isAwsUserIdentificationEnabled()) {
 				try {
 					List<AccessKeyMetadata> keys = awsUserDAO.getAwsAccessKeys(username);
-					if (keys != null) {
-						loginConveyor.add(token, keys, LoginStep.AWS_KEYS);
-					} else {
-						loginConveyor.add(token, new ArrayList<AccessKeyMetadata>(), LoginStep.AWS_KEYS);
-						log.warn("AWS Keys for '{}' were not found. ", username);
-					}
+					loginConveyor.add(token, keys, LoginStep.AWS_KEYS);
 				} catch (Exception e) {
-					loginConveyor.cancel(token,"AWS Key failed for user '"+username+"': "+e.getMessage());
+					loginConveyor.cancel(token,"Please contact AWS administrator to activate your Access Key");
 				}
 			} else {
 				loginConveyor.add(token,new ArrayList<AccessKeyMetadata>(),LoginStep.AWS_KEYS);

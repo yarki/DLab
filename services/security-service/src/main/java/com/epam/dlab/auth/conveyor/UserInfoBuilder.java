@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -122,7 +123,20 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
 
     public static void awsKeys(UserInfoBuilder userInfoBuilder, List<AccessKeyMetadata> keyMetadata) {
         LOG.debug("AWS Keys {}",keyMetadata);
-        keyMetadata.forEach(k-> userInfoBuilder.userInfo.addKey(k.getAccessKeyId(),k.getStatus()));
+        LongAdder counter = new LongAdder();
+        if(keyMetadata != null) {
+            keyMetadata.forEach(k -> {
+                String key = k.getAccessKeyId();
+                String status = k.getStatus();
+                if ("Active".equalsIgnoreCase(status)) {
+                    counter.increment();
+                }
+                userInfoBuilder.userInfo.addKey(key, status);
+            });
+        }
+        if( counter.intValue() == 0 ) {
+            throw new RuntimeException("Please contact AWS administrator to activate your Access Key");
+        }
         userInfoBuilder.readinessStatus |= AWS_KEYS;
     }
 
