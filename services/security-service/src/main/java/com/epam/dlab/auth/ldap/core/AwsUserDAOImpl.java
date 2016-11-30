@@ -22,8 +22,8 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient;
 import com.amazonaws.services.identitymanagement.model.*;
+import com.epam.dlab.auth.conveyor.AwsUserCache;
 import com.epam.dlab.auth.ldap.core.filter.AwsUserDAO;
-import com.epam.dlab.auth.rest.ExpirableContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,6 @@ public class AwsUserDAOImpl implements AwsUserDAO {
 
     private final static Logger LOG = LoggerFactory.getLogger(AwsUserDAOImpl.class);
 
-    private final ExpirableContainer<User> usersCache = new ExpirableContainer<>();
     private volatile AWSCredentials credentials;
     private volatile AmazonIdentityManagement aim;
 
@@ -44,7 +43,7 @@ public class AwsUserDAOImpl implements AwsUserDAO {
         try {
             ListUsersResult lur = aim.listUsers();
             lur.getUsers().forEach(u -> {
-                usersCache.put(u.getUserName(), u, 3600000);
+                AwsUserCache.getInstance().save(u);
                 LOG.debug("Initialized AWS user {}",u);
             });
 
@@ -55,11 +54,11 @@ public class AwsUserDAOImpl implements AwsUserDAO {
 
     @Override
     public User getAwsUser(String username) {
-        User u = usersCache.get(username);
+        User u = AwsUserCache.getInstance().getAwsUserInfo(username);
         if(u == null) {
             u = fetchAwsUser(username);
-            usersCache.put(username,u,600000);
             LOG.debug("Fetched AWS user {}",u);
+            AwsUserCache.getInstance().save(u);
         }
         return u;
     }

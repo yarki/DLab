@@ -3,11 +3,13 @@ package com.epam.dlab.auth.conveyor;
 import com.aegisql.conveyor.cart.command.CancelCommand;
 import com.aegisql.conveyor.utils.caching.CachingConveyor;
 import com.aegisql.conveyor.utils.caching.ImmutableReference;
-import com.epam.dlab.auth.UserInfo;
+import com.amazonaws.services.identitymanagement.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -26,34 +28,31 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-public class LoginCache extends CachingConveyor<String,String,UserInfo> {
+public class LdapFilterCache extends CachingConveyor<String,String,Map<String,Object>> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(LoginCache.class);
+    private final static Logger LOG = LoggerFactory.getLogger(LdapFilterCache.class);
 
-    private final static LoginCache INSTANCE = new LoginCache();
+    private final static LdapFilterCache INSTANCE = new LdapFilterCache();
 
-    public static LoginCache getInstance() {
+    public static LdapFilterCache getInstance() {
         return INSTANCE;
     }
 
-    private LoginCache() {
+    private LdapFilterCache() {
         super();
-        this.setName("UserInfoCache");
+        this.setName("LdapFilterCache");
         this.setIdleHeartBeat(1, TimeUnit.SECONDS);
-        this.setDefaultBuilderTimeout(60, TimeUnit.MINUTES);
-        this.enablePostponeExpiration(true);
-        this.setExpirationPostponeTime(60,TimeUnit.MINUTES);
         this.setDefaultCartConsumer((b,l,s)->{
-            LOG.debug("UserInfoCache consume {} {}",l,s.get());
+            LOG.debug("LdapFilterCache consume {} {}",l,s.get());
         });
     }
 
-    public void removeUserInfo(String token) {
+    public void removeLdapFilterInfo(String token) {
         this.addCommand(new CancelCommand<String>(token));
     }
 
-    public UserInfo getUserInfo(String token) {
-        Supplier<? extends UserInfo> s = this.getProductSupplier(token);
+    public Map<String,Object> getLdapFilterInfo(String token) {
+        Supplier<? extends Map<String,Object>> s = this.getProductSupplier(token);
         if( s == null ) {
             return null;
         } else {
@@ -61,14 +60,14 @@ public class LoginCache extends CachingConveyor<String,String,UserInfo> {
         }
     }
 
-    public void save(UserInfo userInfo) {
-        CompletableFuture<Boolean> cacheFuture = LoginCache.getInstance().createBuild(userInfo.getAccessToken(),new ImmutableReference<UserInfo>(userInfo));
+    public void save(String token, Map<String,Object> ldapInfo,long expTimeMsec) {
+        CompletableFuture<Boolean> cacheFuture = LdapFilterCache.getInstance().createBuild(token, new ImmutableReference<Map<String,Object>>(ldapInfo),expTimeMsec,TimeUnit.MILLISECONDS);
         try {
             if(! cacheFuture.get() ) {
-                throw new Exception("Offer future returned 'false' for "+userInfo);
+                throw new Exception("Cache offer future returned 'false' for "+ldapInfo);
             }
         } catch (Exception e) {
-            throw new RuntimeException("User Info cache offer failure for "+userInfo,e);
+            throw new RuntimeException("Cache offer failed for "+ldapInfo,e);
         }
     }
 

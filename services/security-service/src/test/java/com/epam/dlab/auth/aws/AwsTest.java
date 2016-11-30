@@ -21,13 +21,17 @@ package com.epam.dlab.auth.aws;
 import com.amazonaws.services.identitymanagement.model.User;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.conveyor.AwsUserCache;
+import com.epam.dlab.auth.conveyor.LdapFilterCache;
 import com.epam.dlab.auth.conveyor.LoginCache;
 import org.junit.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class AwsTest {
     @BeforeClass
@@ -70,5 +74,21 @@ public class AwsTest {
         assertNotNull(u);
         System.out.println(u);
     }
+
+    @Test
+    public void testLdapCache() throws InterruptedException {
+        LdapFilterCache c = LdapFilterCache.getInstance();
+        c.setIdleHeartBeat(100,TimeUnit.MILLISECONDS);
+        Map<String,Object> m = new HashMap<>();
+        m.put("name","a");
+        c.save("a",m,100);
+        Map<String,Object> m2 = c.getLdapFilterInfo("a");
+        assertNotNull(m2);
+        assertTrue(m==m2);
+        m2.put("test","me");
+        System.out.println(m);
+        Thread.sleep(1000);
+    }
+
 
 }

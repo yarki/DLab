@@ -23,8 +23,8 @@ ldapConnectionConfig:
 ldapBindTemplate: uid=%s,ou=People,dc=example,dc=com
 ldapSearch: 
   - name: userInfo
-    cache: false
-#    expirationTimeMsec: 600000
+    cache: true
+    expirationTimeMsec: 600000
     scope: SUBTREE
     attributes: 
       - cn
