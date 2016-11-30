@@ -2,6 +2,7 @@ package com.epam.dlab.auth.conveyor;
 
 import com.aegisql.conveyor.cart.command.CancelCommand;
 import com.aegisql.conveyor.utils.caching.CachingConveyor;
+import com.aegisql.conveyor.utils.caching.ImmutableReference;
 import com.epam.dlab.auth.UserInfo;
 
 import java.util.concurrent.CompletableFuture;
@@ -11,7 +12,7 @@ import java.util.function.Supplier;
 /**
  * Created by Mikhail_Teplitskiy on 11/15/2016.
  */
-public class LoginCache extends CachingConveyor<String,LoginStep,UserInfo> {
+public class LoginCache extends CachingConveyor<String,String,UserInfo> {
 
     private final static LoginCache INSTANCE = new LoginCache();
 
@@ -26,8 +27,6 @@ public class LoginCache extends CachingConveyor<String,LoginStep,UserInfo> {
         this.setDefaultBuilderTimeout(60, TimeUnit.MINUTES);
         this.enablePostponeExpiration(true);
         this.setExpirationPostponeTime(60,TimeUnit.MINUTES);
-        this.setBuilderSupplier(UserInfoBuilder::new);
-        this.acceptLabels(LoginStep.USER_INFO);
     }
 
     public void removeUserInfo(String token) {
@@ -44,7 +43,7 @@ public class LoginCache extends CachingConveyor<String,LoginStep,UserInfo> {
     }
 
     public void save(UserInfo userInfo) {
-        CompletableFuture<Boolean> cacheFuture = LoginCache.getInstance().offer(userInfo.getAccessToken(),userInfo,LoginStep.USER_INFO);
+        CompletableFuture<Boolean> cacheFuture = LoginCache.getInstance().createBuild(userInfo.getAccessToken(),new ImmutableReference<UserInfo>(userInfo));
         try {
             if(! cacheFuture.get() ) {
                 throw new Exception("Offer future returned 'false' for "+userInfo);

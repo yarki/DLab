@@ -80,10 +80,10 @@ public class ExpirableContainer<M> {
 			return (X) dataHolder.get();
 		}
 	}
-	
+
 	public void touchKeys() {
 		ArrayList<String> allKeys = new ArrayList<>( map.keySet() );
 		allKeys.forEach(key->get(key));
 	}
-	
+
 }

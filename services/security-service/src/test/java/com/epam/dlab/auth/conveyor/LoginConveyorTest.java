@@ -1,5 +1,6 @@
 package com.epam.dlab.auth.conveyor;
 
+import com.aegisql.conveyor.utils.caching.ImmutableReference;
 import com.amazonaws.services.identitymanagement.model.AccessKeyMetadata;
 import com.epam.dlab.auth.UserInfo;
 import org.junit.After;
@@ -41,7 +42,7 @@ public class LoginConveyorTest {
         lc.add("1","127.0.0.1",LoginStep.REMOTE_IP);
         lc.add("1",uiSource,LoginStep.LDAP_USER_INFO);
         lc.add("1",true,LoginStep.AWS_USER);
-        lc.add("1",new ArrayList<AccessKeyMetadata>() ,LoginStep.AWS_KEYS);
+        lc.add("1",new ArrayList<AccessKeyMetadata>(){{add(new AccessKeyMetadata().withAccessKeyId("a").withStatus("Active"));}} ,LoginStep.AWS_KEYS);
 
         UserInfo ui = uf.get(5, TimeUnit.SECONDS);
         System.out.println("Future now: "+ui);
@@ -62,7 +63,7 @@ System.out.println("---cacheTest");
         userInfo.setAwsUser(true);
         userInfo.addKey("a","Active");
 
-        CompletableFuture<Boolean> f = cache.add("2",userInfo,LoginStep.USER_INFO);
+        CompletableFuture<Boolean> f = cache.createBuild("2",new ImmutableReference<UserInfo>(userInfo));
         CompletableFuture<UserInfo> uif = cache.getFuture("2");
         f.get();
         //this will take at least 2 seconds
