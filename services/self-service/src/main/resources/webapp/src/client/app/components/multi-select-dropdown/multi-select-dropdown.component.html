@@ -1,10 +1,9 @@
 <div class="dropdown-multiselect btn-group" click-outside (clickOutside)="onClickOutside($event)">
 
-  <button data-toggle="dropdown" type="button" class="dropdown-toggle btn">
-    <span *ngIf="model.length == 0">!Selected</span>
+  <button data-toggle="dropdown" type="button" class="dropdown-toggle btn" (click)="toggleDropdown()">
+    <span *ngIf="model.length == 0">Select {{type}}</span>
     <span *ngIf="model.length != 0">Selected {{model.length}} items</span>
-    <!-- {{ getButtonText() }}&nbsp;-->
-    <span class="caret-btn" (click)="toggleDropdown()">&#9663;</span>
+    <span class="caret-btn">&#9663;</span>
   </button>
 
   <ul class="dropdown-menu" [style.display]="isOpen ? 'block' : 'none'">
