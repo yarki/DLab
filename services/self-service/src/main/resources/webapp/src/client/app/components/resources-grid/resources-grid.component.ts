@@ -87,20 +87,21 @@ export class ResourcesGrid implements OnInit {
     this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, resources);
   }
   applyFilter_btnClick() {
-    console.log(this.filterForm);
-
-    let filteredData:Array<any> = this.environments;
     this.filtering = true;
 
-    filteredData = filteredData.filter((item:any) => {
+    let filteredData: Array<any> = this.environments;
+    let containsStatus = (list, selectedItems) => {
+      if (list) return list.filter((item: any) => { return (selectedItems.indexOf(item.status) != -1) }).length > 0;
+    }
 
+    filteredData = filteredData.filter((item:any) => {
       let name = item.name.toLowerCase().indexOf(this.filterForm.name.toLowerCase()) != -1;
       let status = this.filterForm.statuses.length > 0 ? (this.filterForm.statuses.indexOf(item.status) != -1) : true;
       let shape = this.filterForm.shapes.length > 0 ? (this.filterForm.shapes.indexOf(item.shape) != -1) : true;
+      let resources = this.filterForm.resources.length > 0 ? containsStatus(item.resources, this.filterForm.resources) : true;
 
-      return name && status && shape;
+      return name && status && shape && resources;
     });
-    console.log(filteredData);
     this.filteredEnvironments = filteredData;
   }
   onUpdate($event) {
