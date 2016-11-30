@@ -33,19 +33,18 @@ import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dial
 export class ResourcesGrid implements OnInit {
 
   environments: Array<ResourcesGridRowModel>;
-
+  filteredEnvironments: Array<ResourcesGridRowModel>;
   filterConfiguration: FilterConfigurationModel;
   filterForm: FilterConfigurationModel = new FilterConfigurationModel('', [], [], []);
-
-  filteredEnvironments: Array<ResourcesGridRowModel>;
   model = new CreateEmrModel('', '');
   notebookName: string;
   isOutscreenDropdown: boolean;
-
   collapseFilterRow: boolean = false;
   filtering: boolean = false;
 
   @ViewChild('computationalResourceModal') computationalResourceModal;
+  @ViewChild('computationalResourcesList') computationalResources;
+
   @ViewChild('confirmationDialog') confirmationDialog;
   @ViewChild('detailDialog') detailDialog;
 
@@ -100,8 +99,10 @@ export class ResourcesGrid implements OnInit {
       let shape = this.filterForm.shapes.length > 0 ? (this.filterForm.shapes.indexOf(item.shape) != -1) : true;
       let resources = this.filterForm.resources.length > 0 ? containsStatus(item.resources, this.filterForm.resources) : true;
 
+
       return name && status && shape && resources;
     });
+    this.computationalResources.checkFilteringParams(this.filterForm.resources);
     this.filteredEnvironments = filteredData;
   }
   onUpdate($event) {
