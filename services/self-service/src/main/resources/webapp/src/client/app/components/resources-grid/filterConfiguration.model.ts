@@ -21,13 +21,13 @@ export class FilterConfigurationModel {
     public name: string,
     public statuses: Array<any>,
     public shapes: Array<any>,
-    public resource: string
+    public resources: Array<any>
   ) { }
 
   resetConfigurations() : void {
     this.name = '';
     this.statuses = [];
     this.shapes = [];
-    this.resource = '';
+    this.resources = [];
   }
 }

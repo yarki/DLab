@@ -35,7 +35,7 @@ export class ResourcesGrid implements OnInit {
   environments: Array<ResourcesGridRowModel>;
 
   filterConfiguration: FilterConfigurationModel;
-  filterForm: FilterConfigurationModel = new FilterConfigurationModel('', [], [], '');
+  filterForm: FilterConfigurationModel = new FilterConfigurationModel('', [], [], []);
 
   filteredEnvironments: Array<ResourcesGridRowModel>;
   model = new CreateEmrModel('', '');
@@ -70,16 +70,21 @@ export class ResourcesGrid implements OnInit {
   }
   getDefaultFilterConfiguration() : void {
     let data:Array<ResourcesGridRowModel> = this.environments;
-    let shapes = [], statuses = [];
+    let shapes = [], statuses = [], resources = [];
 
     data.forEach((item:any) => {
       if(shapes.indexOf(item.shape) == -1)
-      shapes.push(item.shape);
+        shapes.push(item.shape);
       if(statuses.indexOf(item.status) == -1)
-      statuses.push(item.status)
+        statuses.push(item.status);
+
+        item.resources.forEach((resource:any) => {
+          if(resources.indexOf(resource.status) == -1)
+            resources.push(resource.status);
+        });
     });
 
-    this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, '');
+    this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, resources);
   }
   applyFilter_btnClick() {
     console.log(this.filterForm);
@@ -89,10 +94,6 @@ export class ResourcesGrid implements OnInit {
 
     filteredData = filteredData.filter((item:any) => {
 
-      //  return item.name.toLowerCase().match(this.filterForm.name.toLowerCase())
-      //         && this.filterForm.statuses.length > 0 ? (this.filterForm.statuses.indexOf(item.status) != -1) : true
-
-      //         && this.filterForm.shapes.length > 0 ? (this.filterForm.shapes.indexOf(item.shape) != -1) : true;
       let name = item.name.toLowerCase().indexOf(this.filterForm.name.toLowerCase()) != -1;
       let status = this.filterForm.statuses.length > 0 ? (this.filterForm.statuses.indexOf(item.status) != -1) : true;
       let shape = this.filterForm.shapes.length > 0 ? (this.filterForm.shapes.indexOf(item.shape) != -1) : true;
@@ -103,6 +104,8 @@ export class ResourcesGrid implements OnInit {
     this.filteredEnvironments = filteredData;
   }
   onUpdate($event) {
+
+    console.log($event);
     this.filterForm[$event.type] = $event.model;
   }
 
