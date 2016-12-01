@@ -35,19 +35,10 @@ export class ComputationalResourcesList {
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
   collapse: boolean = true;
-
-  filtering: boolean = false;
-  filteredResources: Array<string>;
-
   constructor(private userResourceService: UserResourceService) { }
 
   toggleResourceList() {
     this.collapse = !this.collapse;
-  }
-
-  checkFilteringParams(param) : void {
-    this.filtering = true;
-    this.filteredResources = param;
   }
 
   rebuildGrid(): void {

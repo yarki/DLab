@@ -43,8 +43,6 @@ export class ResourcesGrid implements OnInit {
   filtering: boolean = false;
 
   @ViewChild('computationalResourceModal') computationalResourceModal;
-  @ViewChild('computationalResourcesList') computationalResources;
-
   @ViewChild('confirmationDialog') confirmationDialog;
   @ViewChild('detailDialog') detailDialog;
 
@@ -85,29 +83,37 @@ export class ResourcesGrid implements OnInit {
 
     this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, resources);
   }
+
   applyFilter_btnClick() {
     this.filtering = true;
 
-    let filteredData: Array<any> = this.environments;
+    // let filteredData: Array<ResourcesGridRowModel> = this.environments.map(env => (<any>Object).assign({}, env));
+    let filteredData: Array<ResourcesGridRowModel> = this.environments.map(env => (<any>Object).create(env));
     let containsStatus = (list, selectedItems) => {
-      if (list) return list.filter((item: any) => { return (selectedItems.indexOf(item.status) != -1) }).length > 0;
+      return list.filter((item: any) => {
+        if(selectedItems.indexOf(item.status) !== -1) return item;
+      });
     }
 
     filteredData = filteredData.filter((item:any) => {
-      let name = item.name.toLowerCase().indexOf(this.filterForm.name.toLowerCase()) != -1;
-      let status = this.filterForm.statuses.length > 0 ? (this.filterForm.statuses.indexOf(item.status) != -1) : true;
-      let shape = this.filterForm.shapes.length > 0 ? (this.filterForm.shapes.indexOf(item.shape) != -1) : true;
-      let resources = this.filterForm.resources.length > 0 ? containsStatus(item.resources, this.filterForm.resources) : true;
+      let isName = item.name.toLowerCase().indexOf(this.filterForm.name.toLowerCase()) != -1;
+      let isStatus = this.filterForm.statuses.length > 0 ? (this.filterForm.statuses.indexOf(item.status) != -1) : true;
+      let isShape = this.filterForm.shapes.length > 0 ? (this.filterForm.shapes.indexOf(item.shape) != -1) : true;
 
+      let modifiedResources = containsStatus(item.resources, this.filterForm.resources);
+      let isResources = this.filterForm.resources.length > 0 ? modifiedResources.length : true;
 
-      return name && status && shape && resources;
+      if(this.filterForm.resources.length > 0 && modifiedResources.length) {
+        item.resources = modifiedResources;
+      }
+
+      return isName && isStatus && isShape && isResources;
     });
-    this.computationalResources.checkFilteringParams(this.filterForm.resources);
     this.filteredEnvironments = filteredData;
   }
-  onUpdate($event) {
 
-    console.log($event);
+
+  onUpdate($event) {
     this.filterForm[$event.type] = $event.model;
   }
 
@@ -120,10 +126,9 @@ export class ResourcesGrid implements OnInit {
     this.userResourceService.getUserProvisionedResources()
       .subscribe((result) => {
         this.environments = this.loadEnvironments(result);
-
         this.filteredEnvironments = this.environments;
-
         this.getDefaultFilterConfiguration();
+
         console.log('models ', this.environments);
       });
   }

@@ -35,7 +35,6 @@ limitations under the License.
               (input)="onChangeFilter($event, column.name)"/>
     </td> -->
 
-
     <td class="name-filter">
       <input placeholder="Filter by environment name" class="form-control filter-field" [value]="filterForm.name" (input)="filterForm.name = $event.target.value" />
     </td>
@@ -49,7 +48,6 @@ limitations under the License.
     </td>
 
     <td>
-      <!-- <input placeholder="Magic filter by everything" class="form-control filter-field" [value]="filterForm.resource" (input)="filterForm.resource = $event.target.value" /> -->
       <multi-select-dropdown (selectionChange)="onUpdate($event)" [type]="'resources'" [items]="filterConfiguration.resources" [model]="filterForm.resources"></multi-select-dropdown>
     </td>
 
@@ -73,7 +71,7 @@ limitations under the License.
     <td class="status" ngClass="{{env.status.toLowerCase() || ''}}">{{env.status}}</td>
     <td>{{env.shape}}</td>
     <td>
-      <computational-resources-list #computationalResourcesList [resources]="env.resources" [environment]="env" (buildGrid)="buildGrid($event)"></computational-resources-list>
+      <computational-resources-list [resources]="env.resources" [environment]="env" (buildGrid)="buildGrid($event)"></computational-resources-list>
     </td>
     <td>
       <div class="dropdown">
