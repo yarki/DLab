@@ -17,6 +17,7 @@
                 "iam:GetRolePolicy",
                 "iam:GetInstanceProfile",
                 "iam:GetPolicy",
+                "iam:GetUser",
                 "iam:ListUsers",
                 "iam:PassRole",
                 "iam:ListUserPolicies",
