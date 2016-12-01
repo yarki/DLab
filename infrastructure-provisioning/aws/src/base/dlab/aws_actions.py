@@ -204,7 +204,7 @@ def attach_policy(policy_arn, role_name):
 
 def create_attach_policy(policy_name, role_name, file_path):
     try:
-        conn = boto3.connect_iam()
+        conn = boto3.client('iam')
         with open(file_path, 'r') as myfile:
             json_file = myfile.read()
         conn.put_role_policy(RoleName=role_name, PolicyName=policy_name, PolicyDocument=json_file)

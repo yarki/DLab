@@ -121,9 +121,10 @@ public class ExploratoryResource implements ExploratoryAPI {
     public String stop(@Auth UserInfo userInfo, @PathParam("name") String name) {
         System.out.println("stopping " + name);
         LOGGER.debug("stopping exploratory environment {} for user {}", name, userInfo.getName());
-        UserInstanceStatus status = STOPPING;
-        updateExploratoryStatus(userInfo.getName(), name, status);
-        updateComputationalStatuses(userInfo.getName(), name, status);
+        UserInstanceStatus exploratoryStatus = STOPPING;
+        UserInstanceStatus computationalStatus = TERMINATING;
+        updateExploratoryStatus(userInfo.getName(), name, exploratoryStatus);
+        updateComputationalStatuses(userInfo.getName(), name, computationalStatus);
         try {
             String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
             ExploratoryStopDTO dto = new ExploratoryStopDTO()
@@ -148,6 +149,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         LOGGER.debug("terminating exploratory environment {} for user {}", name, userInfo.getName());
         UserInstanceStatus status = TERMINATING;
         updateExploratoryStatus(userInfo.getName(), name, status);
+        updateComputationalStatuses(userInfo.getName(), name, status);
         return action(userInfo, name, EXPLORATORY_TERMINATE, status);
     }
 
