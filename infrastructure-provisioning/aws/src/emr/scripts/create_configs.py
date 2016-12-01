@@ -74,6 +74,23 @@ def yarn(args):
     local('sudo rm -rf ' + yarn_dir + args.user_name + '/')
 
 
+def r_kernel(args):
+    spark_path = '/opt/{}/{}/spark/'.format(args.emr_version, args.cluster_name)
+    local('mkdir -p {}/r_{}/'.format(kernels_dir, args.cluster_name))
+    kernel_path = "{}/r_{}/kernel.json".format(kernels_dir, args.cluster_name)
+    template_file = "/tmp/r_emr_template.json"
+    r_version = local("R --version | awk '/version / {print $3}'", capture = True)
+
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('CLUSTERNAME', args.cluster_name)
+    text = text.replace('SPARK_PATH', spark_path)
+    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
+    text = text.replace('R_VER', 'v{}'.format(str(r_version)))
+    text = text.replace('EMR', args.emr_version)
+    with open(kernel_path, 'w') as f:
+        f.write(text)
+
 def pyspark_kernel(args):
     spark_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
     local('mkdir -p ' + kernels_dir + 'pyspark_' + args.cluster_name + '/')
@@ -226,4 +243,5 @@ if __name__ == "__main__":
         pyspark_kernel(args)
         toree_kernel(args)
         spark_defaults(args)
+        r_kernel(args)
         configuring_notebook(args)
