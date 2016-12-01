@@ -33,7 +33,7 @@ import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dial
 export class ResourcesGrid implements OnInit {
 
   environments: Array<ResourcesGridRowModel>;
-  filteredEnvironments: Array<ResourcesGridRowModel>;
+  filteredEnvironments: Array<ResourcesGridRowModel> = [];
   filterConfiguration: FilterConfigurationModel;
   filterForm: FilterConfigurationModel = new FilterConfigurationModel('', [], [], []);
   model = new CreateEmrModel('', '');
