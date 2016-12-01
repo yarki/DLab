@@ -58,11 +58,12 @@ def run():
         instance_name = service_base_name + '-ssn'
         region = os.environ['creds_region']
         ssn_ami_id = get_ami_id(os.environ['ssn_ami_name'])
+        policy_path = '/root/templates/policy.json'
 
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
-        params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
-                 (role_name, role_profile_name, policy_name, os.environ['conf_policy_arn'])
+        params = "--role_name %s --role_profile_name %s --policy_name %s --policy_file_name %s" % \
+                 (role_name, role_profile_name, policy_name, policy_path)
 
         if not run_routine('create_role_policy', params):
             logging.info('Unable to create roles')
@@ -138,7 +139,7 @@ def run():
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         params = "--hostname %s --keyfile %s " \
-                 "--pip_packages 'boto3 boto argparse fabric jupyter awscli'" % \
+                 "--pip_packages 'boto3 argparse fabric jupyter awscli'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
         if not run_routine('install_prerequisites', params):

@@ -12,7 +12,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-inactiveUserTimeoutMillSec: 3600000
+inactiveUserTimeoutMillSec: 300000
 ldapConnectionConfig:
 #  ldapHost: localhost
   ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
@@ -23,8 +23,8 @@ ldapConnectionConfig:
 ldapBindTemplate: uid=%s,ou=People,dc=example,dc=com
 ldapSearch: 
   - name: userInfo
-    cache: false
-#    expirationTimeMsec: 600000
+    cache: true
+    expirationTimeMsec: 600000
     scope: SUBTREE
     attributes: 
       - cn
@@ -38,9 +38,12 @@ ldapSearch:
       code: |
         def enrichUserInfo(ui,context):
           name = ui.getName()
+          key = 'uid='+name+',ou=People,dc=example,dc=com'
           userInfo=context['userInfo']
-          uid= userInfo['uid='+name+',ou=People,dc=example,dc=com']
-          cn = context['userInfo']['uid='+name+',ou=People,dc=example,dc=com']['cn'].split(' ')
+          if not key in userInfo:
+            raise Exception('Python LDAP UserInfo not found for '+key)
+          uid= userInfo[key]
+          cn = context['userInfo'][key]['cn'].split(' ')
           ui.setFirstName(cn[0])
           ui.setLastName(cn[1])
           return ui
@@ -60,8 +63,12 @@ ldapSearch:
       code: |
         var enrichUserInfo = function(ui,context) {
           name = ui.getName();
+          key = 'uid='+name+',ou=People,dc=example,dc=com';
           userInfo=context['userInfo'];
-          uid= userInfo['uid='+name+',ou=People,dc=example,dc=com'];
+          if( userInfo[key] == undefined ) {
+            throw 'JavaScript LDAP UserInfo not found for '+key;
+          }
+          uid= userInfo[key];
           userGid = uid['gidnumber'];
           groupInfo=context['groupInfo'];
           for( dn in groupInfo ) {
@@ -107,6 +114,7 @@ logging:
   loggers:
     io.dropwizard: INFO
     com.epam: DEBUG
+    com.aegisql: DEBUG
   appenders:
     - type: console
     - type: file
