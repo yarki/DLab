@@ -220,6 +220,17 @@ def configuring_notebook(args):
     local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
 
 
+def configure_rstudio(args):
+    spark_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version
+    emr_path = yarn_dir + 'config/' + args.cluster_name + '/'
+    sudo("""echo "export R_LIBS_USER='""" + spark_path + """/R/lib'" >> /home/ubuntu/.bashrc""")
+    sudo('touch /home/ubuntu/.Renviron')
+    sudo('chown ubuntu:ubuntu /home/ubuntu/.Renviron')
+    sudo('''echo 'SPARK_HOME="''' + spark_path + '''"' >> /home/ubuntu/.Renviron''')
+    sudo('''echo 'YARN_CONF_DIR="''' + emr_path + '''"' >> /home/ubuntu/.Renviron''')
+    sudo('''echo 'HADOOP_CONF_DIR="''' + emr_path + '''"' >> /home/ubuntu/.Renviron''')
+
+
 if __name__ == "__main__":
     if args.dry_run == 'true':
         parser.print_help()
@@ -233,3 +244,5 @@ if __name__ == "__main__":
         toree_kernel(args)
         spark_defaults(args)
         configuring_notebook(args)
+        if os.path.exists('/home/ubuntu/.ensure_dir/rstudio_ensured'):
+            configure_rstudio(args)

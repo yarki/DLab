@@ -45,10 +45,13 @@ def prepare_disk():
 def install_rstudio():
     if not exists('/home/ubuntu/.ensure_dir/rstudio_ensured'):
         try:
+            sudo('apt-get install -y default-jre')
+            sudo('apt-get install -y default-jdk')
             sudo('apt-get install -y r-base')
             sudo('apt-get install -y gdebi-core')
             sudo('wget https://download2.rstudio.org/rstudio-server-1.0.44-amd64.deb')
             sudo('gdebi -n rstudio-server-1.0.44-amd64.deb')
+            sudo('rstudio-server start')
         except:
             sys.exit(1)
 
