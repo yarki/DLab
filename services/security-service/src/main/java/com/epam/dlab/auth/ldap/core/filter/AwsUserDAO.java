@@ -19,11 +19,14 @@ limitations under the License.
 package com.epam.dlab.auth.ldap.core.filter;
 
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.identitymanagement.model.AccessKeyMetadata;
 import com.amazonaws.services.identitymanagement.model.User;
+
+import java.util.List;
 
 public interface AwsUserDAO {
 
     public User getAwsUser(String username);
     public void updateCredentials(AWSCredentials credentials);
-
+    public List<AccessKeyMetadata> getAwsAccessKeys(String username);
 }
