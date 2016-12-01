@@ -27,13 +27,13 @@ SPARK_DEF_PATH="/usr/lib/spark/conf/spark-defaults.conf"
 SPARK_DEF_PATH_LINE1=`cat $SPARK_DEF_PATH | grep spark.driver.extraClassPath | awk '{print $2}' | sed 's/^:// ; s~jar:~jar ~g; s~/\*:~/\* ~g; s~:~/\* ~g'`
 SPARK_DEF_PATH_LINE2=`cat $SPARK_DEF_PATH | grep spark.driver.extraLibraryPath | awk '{print $2}' | sed 's/^:// ; s~jar:~jar ~g; s~/\*:~/\* ~g; s~:\|$~/\* ~g'`
 touch /tmp/python_version
-PYTHON_VER=`which python3.5 | sed 's/\/usr\/bin\/python//'`
+PYTHON_VER=`python3.5 -V 2>/dev/null | awk '{print $2}'`
 if [ -n "$PYTHON_VER" ]
 then
- echo $PYTHON_VER > /tmp/python_version
+ echo $PYTHON_VER
 else
- PYTHON_VER=`which python3.4 | sed 's/\/usr\/bin\/python//'`
- echo $PYTHON_VER > /tmp/python_version
+ PYTHON_VER=`python3.4 -V 2>/dev/null | awk '{print $2}'`
+ echo $PYTHON_VER
 fi
 /bin/tar -zhcvf /tmp/jars.tar.gz --no-recursion --absolute-names --ignore-failed-read /usr/lib/hadoop/* $SPARK_DEF_PATH_LINE1 $SPARK_DEF_PATH_LINE2 /usr/lib/hadoop/client/*
 /bin/tar -zhcvf /tmp/spark.tar.gz -C /usr/lib/ spark
