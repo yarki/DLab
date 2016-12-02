@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.auth.ldap;
 
+import de.thomaskrille.dropwizard_template_config.TemplateConfigBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,7 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 
 	@Override
 	public void initialize(Bootstrap<SecurityServiceConfiguration> bootstrap) {
+		bootstrap.addBundle(new TemplateConfigBundle());
 	}
 
 	@Override
