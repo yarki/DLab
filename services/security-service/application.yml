@@ -95,19 +95,19 @@ server:
     trustStorePassword: ${TRUST_STORE_PASSWORD}
     keyStorePath: ${KEY_STORE_PATH!'./'}
     keyStorePassword: ${KEY_STORE_PASSWORD}
-    certAlias: ${CERT_ALIAS}
+    certAlias: ${CERT_ALIAS!'dlabcert'}
 </#if>
   adminConnectors:
   - type: ${CONNECTOR_TYPE}
     port: ${ADMIN_CONNECTOR_PORT!8091}
 <#if CONNECTOR_TYPE == 'https'>
   - type: ${CONNECTOR_TYPE}
-    port: ${CONNECTOR_PORT!8090}
+    port: ${ADMIN_CONNECTOR_PORT!8090}
     trustStorePath: ${TRUST_STORE_PATH!'./'}
     trustStorePassword: ${TRUST_STORE_PASSWORD}
     keyStorePath: ${KEY_STORE_PATH!'./'}
     keyStorePassword: ${KEY_STORE_PASSWORD}
-    certAlias: ${CERT_ALIAS}
+    certAlias: ${CERT_ALIAS!'dlabcert'}
 </#if>
 
 userInfoPersistenceEnabled: ${SESSION_PERSISTENCE_ENABLED!'true'}
@@ -117,7 +117,7 @@ mongo:
   host: ${MONGO_HOST}
   port: ${MONGO_PORT!27017}
   username: ${MONGO_USERNAME!'admin'}
-  password: ${MOMGO_PASSWORD!'XS3ms9R3tP'}
+  password: ${MONGO_PASSWORD!'XS3ms9R3tP'}
   database: ${MONGO_DB!'dlabdb'}
 
 logging:
