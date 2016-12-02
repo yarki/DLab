@@ -219,8 +219,8 @@ def configure_rstudio(args):
     local("""echo "export R_LIBS_USER='""" + spark_path + """/R/lib'" >> /home/ubuntu/.bashrc""")
     local('cat /dev/null > /home/ubuntu/.Renviron')
     local('''echo 'SPARK_HOME="''' + spark_dir + '''"' >> /home/ubuntu/.Renviron''')
-    local('''echo 'YARN_CONF_DIR="''' + emr_dir + '''"' >> /home/ubuntu/.Renviron''')
-    local('''echo 'HADOOP_CONF_DIR="''' + emr_dir + '''"' >> /home/ubuntu/.Renviron''')
+    local('''echo 'YARN_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
+    local('''echo 'HADOOP_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
 
 
 if __name__ == "__main__":
