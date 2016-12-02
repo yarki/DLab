@@ -205,11 +205,12 @@ def installing_python(args):
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
     with file('/tmp/python_version') as f:
         python_version = f.read()
+    python_version = python_version[0:5]
     if not os.path.exists('/opt/python/python' + python_version):
         local('sudo apt-get install -y build-essential checkinstall')
         local('sudo apt-get install -y libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev')
         local('sudo apt-get install -y libssl-dev openssl')
-        local('sudo wget https://www.python.org/ftp/python/' + python_version + '/Python-' + python_version + '.tgz -O /tmp/Python-' + python_version + '.tgz' )
+        local('sudo -i wget https://www.python.org/ftp/python/' + python_version + '/Python-' + python_version + '.tgz -O /tmp/Python-' + python_version + '.tgz' )
         local('sudo tar zxvf Python-' + python_version + '.tgz -C /tmp/')
         local('sudo cd /tmp/Python-' + python_version)
         local('sudo sudo ./configure --prefix=/opt/python/python' + python_version + ' --with-zlib-dir=/usr/local/lib/ --with-ensurepip=install')
