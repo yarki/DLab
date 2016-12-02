@@ -41,9 +41,6 @@ def id_generator(size=10, chars=string.digits + string.ascii_letters):
 def cp_key():
     try:
         key_name=args.keyfile.split("/")
-        sudo('mkdir -p /project_images/user_keys; chown -R ubuntu:ubuntu /project_images')
-        local('scp -r -q -i {0} {0} {1}:/project_images/{2}'.format(args.keyfile, env.host_string, key_name[-1]))
-        sudo('chmod 600 /project_images/*.pem')
         sudo('mkdir -p /home/ubuntu/keys')
         sudo('chown -R ubuntu:ubuntu /home/ubuntu/keys')
         local('scp -r -q -i {0} {0} {1}:/home/ubuntu/keys/{2}'.format(args.keyfile, env.host_string, key_name[-1]))
