@@ -37,6 +37,7 @@ args = parser.parse_args()
 
 emr_dir = '/opt/' + args.emr_version + '/jars/'
 kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
+spark_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
 yarn_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/conf/'
 # if args.emr_version == 'emr-4.3.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-4.8.0':
 #     hadoop_version = '2.6'
@@ -215,13 +216,11 @@ def configuring_notebook(args):
 
 
 def configure_rstudio(args):
-    spark_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + args.hadoop_version
-    emr_path = yarn_dir + 'config/' + args.cluster_name + '/'
     local("""echo "export R_LIBS_USER='""" + spark_path + """/R/lib'" >> /home/ubuntu/.bashrc""")
     local('cat /dev/null > /home/ubuntu/.Renviron')
-    local('''echo 'SPARK_HOME="''' + spark_path + '''"' >> /home/ubuntu/.Renviron''')
-    local('''echo 'YARN_CONF_DIR="''' + emr_path + '''"' >> /home/ubuntu/.Renviron''')
-    local('''echo 'HADOOP_CONF_DIR="''' + emr_path + '''"' >> /home/ubuntu/.Renviron''')
+    local('''echo 'SPARK_HOME="''' + spark_dir + '''"' >> /home/ubuntu/.Renviron''')
+    local('''echo 'YARN_CONF_DIR="''' + emr_dir + '''"' >> /home/ubuntu/.Renviron''')
+    local('''echo 'HADOOP_CONF_DIR="''' + emr_dir + '''"' >> /home/ubuntu/.Renviron''')
 
 
 if __name__ == "__main__":
