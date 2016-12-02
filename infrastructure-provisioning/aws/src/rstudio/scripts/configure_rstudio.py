@@ -29,6 +29,12 @@ parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 args = parser.parse_args()
 
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
+spark_version = "1.6.2"
+hadoop_version = "2.6"
+s3_jars_dir = '/opt/jars/'
+templates_dir = '/root/templates/'
+
 
 def prepare_disk():
     if not exists('/home/ubuntu/.ensure_dir/disk_ensured'):
@@ -52,9 +58,35 @@ def install_rstudio():
             sudo('wget https://download2.rstudio.org/rstudio-server-1.0.44-amd64.deb')
             sudo('gdebi -n rstudio-server-1.0.44-amd64.deb')
             sudo('rstudio-server start')
+            sudo('touch /home/ubuntu/.ensure_dir/rstudio_ensured')
         except:
             sys.exit(1)
 
+
+def ensure_local_spark():
+    if not exists('/home/ubuntu/.ensure_dir/local_spark_ensured'):
+        try:
+            sudo('wget ' + spark_link + ' -O /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
+            sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
+            sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
+            sudo('touch /home/ubuntu/.ensure_dir/local_spark_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_s3_kernel():
+    if not exists('/home/ubuntu/.ensure_dir/s3_kernel_ensured'):
+        try:
+            sudo('mkdir -p ' + s3_jars_dir)
+            put(templates_dir + 'jars/local_jars.tar.gz', '/tmp/local_jars.tar.gz')
+            sudo('tar -xzf /tmp/local_jars.tar.gz -C ' + s3_jars_dir)
+            put(templates_dir + 'spark-defaults_local.conf', '/tmp/spark-defaults_local.conf')
+            sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/spark-defaults_local.conf".format(
+                args.region))
+            sudo('\cp /tmp/spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
+            sudo('touch /home/ubuntu/.ensure_dir/s3_kernel_ensured')
+        except:
+            sys.exit(1)
 
 ##############
 # Run script #
@@ -73,3 +105,5 @@ if __name__ == "__main__":
         sys.exit(1)
     prepare_disk()
     install_rstudio()
+    ensure_local_spark()
+    ensure_s3_kernel()
