@@ -59,10 +59,12 @@ def install_rstudio():
             sudo('apt-get install -y gdebi-core')
             sudo('wget https://download2.rstudio.org/rstudio-server-1.0.44-amd64.deb')
             sudo('gdebi -n rstudio-server-1.0.44-amd64.deb')
-            sudo("""echo "export R_LIBS_USER='""" + local_spark_path + """/R/lib'" >> /home/ubuntu/.bashrc""")
             sudo('touch /home/ubuntu/.Renviron')
             sudo('chown ubuntu:ubuntu /home/ubuntu/.Renviron')
             sudo('''echo 'SPARK_HOME="''' + local_spark_path + '''"' >> /home/ubuntu/.Renviron''')
+            sudo('touch /home/ubuntu/.Rprofile')
+            sudo('chown ubuntu:ubuntu /home/ubuntu/.Rprofile')
+            sudo('''echo 'library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))' >> /home/ubuntu/.Rprofile''')
             sudo('rstudio-server start')
             sudo('touch /home/ubuntu/.ensure_dir/rstudio_ensured')
         except:
