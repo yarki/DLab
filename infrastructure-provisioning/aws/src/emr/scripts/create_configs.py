@@ -20,6 +20,7 @@
 
 import boto3
 from fabric.api import *
+from fabric.contrib.files import exists
 import argparse
 import os
 
@@ -99,6 +100,7 @@ def pyspark_kernel(args):
         python_version = f.read()
     # python_version = python_version[0:3]
     if python_version != '\n':
+        installing_python(args)
         local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
         kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
         template_file = "/tmp/pyspark_emr_template.json"
@@ -232,7 +234,6 @@ if __name__ == "__main__":
             jars(args)
         yarn(args)
         install_emr_spark(args)
-        installing_python(args)
         pyspark_kernel(args)
         toree_kernel(args)
         spark_defaults(args)
