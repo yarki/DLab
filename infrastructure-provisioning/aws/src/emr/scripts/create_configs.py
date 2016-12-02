@@ -215,14 +215,14 @@ def configuring_notebook(args):
 
 
 def configure_rstudio(args):
-    spark_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + hadoop_version
+    spark_path = '/opt/' + args.emr_version + '/' + 'spark-' + args.spark_version + '-bin-hadoop' + args.hadoop_version
     emr_path = yarn_dir + 'config/' + args.cluster_name + '/'
     sudo("""echo "export R_LIBS_USER='""" + spark_path + """/R/lib'" >> /home/ubuntu/.bashrc""")
-    sudo('touch /home/ubuntu/.Renviron')
-    sudo('chown ubuntu:ubuntu /home/ubuntu/.Renviron')
+    sudo('cat /dev/null > /home/ubuntu/.Renviron')
     sudo('''echo 'SPARK_HOME="''' + spark_path + '''"' >> /home/ubuntu/.Renviron''')
     sudo('''echo 'YARN_CONF_DIR="''' + emr_path + '''"' >> /home/ubuntu/.Renviron''')
     sudo('''echo 'HADOOP_CONF_DIR="''' + emr_path + '''"' >> /home/ubuntu/.Renviron''')
+    sudo('rstudio-server restart')
 
 
 if __name__ == "__main__":

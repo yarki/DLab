@@ -23,6 +23,7 @@ from fabric.contrib.files import exists
 import argparse
 import json
 import sys
+from dlab.aws_meta import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
@@ -32,6 +33,7 @@ args = parser.parse_args()
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
 spark_version = "1.6.2"
 hadoop_version = "2.6"
+local_spark_path = '/opt/spark/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 
@@ -57,6 +59,10 @@ def install_rstudio():
             sudo('apt-get install -y gdebi-core')
             sudo('wget https://download2.rstudio.org/rstudio-server-1.0.44-amd64.deb')
             sudo('gdebi -n rstudio-server-1.0.44-amd64.deb')
+            sudo("""echo "export R_LIBS_USER='""" + local_spark_path + """/R/lib'" >> /home/ubuntu/.bashrc""")
+            sudo('touch /home/ubuntu/.Renviron')
+            sudo('chown ubuntu:ubuntu /home/ubuntu/.Renviron')
+            sudo('''echo 'SPARK_HOME="''' + local_spark_path + '''"' >> /home/ubuntu/.Renviron''')
             sudo('rstudio-server start')
             sudo('touch /home/ubuntu/.ensure_dir/rstudio_ensured')
         except:
@@ -87,6 +93,7 @@ def ensure_s3_kernel():
             sudo('touch /home/ubuntu/.ensure_dir/s3_kernel_ensured')
         except:
             sys.exit(1)
+
 
 ##############
 # Run script #
