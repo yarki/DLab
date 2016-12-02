@@ -150,7 +150,7 @@ def run():
     try:
         logging.info('[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]')
         print '[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]'
-        params = "--hostname %s  --keyfile %s" % (instance_hostname,  keyfile_name)
+        params = "--hostname %s  --keyfile %s --region %s" % (instance_hostname,  keyfile_name, os.environ['creds_region'])
         if not run_routine('configure_rstudio', params):
             logging.info('Failed to configure rstudio')
             with open("/root/result.json", 'w') as result:

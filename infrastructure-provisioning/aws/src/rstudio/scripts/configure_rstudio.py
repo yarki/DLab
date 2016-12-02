@@ -23,11 +23,11 @@ from fabric.contrib.files import exists
 import argparse
 import json
 import sys
-from dlab.aws_meta import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
+parser.add_argument('--region', type=str, default='')
 args = parser.parse_args()
 
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
