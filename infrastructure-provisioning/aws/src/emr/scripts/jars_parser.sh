@@ -30,10 +30,10 @@ touch /tmp/python_version
 PYTHON_VER=`python3.5 -V 2>/dev/null | awk '{print $2}'`
 if [ -n "$PYTHON_VER" ]
 then
- echo $PYTHON_VER
+ echo $PYTHON_VER > /tmp/python_version
 else
  PYTHON_VER=`python3.4 -V 2>/dev/null | awk '{print $2}'`
- echo $PYTHON_VER
+ echo $PYTHON_VER > /tmp/python_version
 fi
 /bin/tar -zhcvf /tmp/jars.tar.gz --no-recursion --absolute-names --ignore-failed-read /usr/lib/hadoop/* $SPARK_DEF_PATH_LINE1 $SPARK_DEF_PATH_LINE2 /usr/lib/hadoop/client/*
 /bin/tar -zhcvf /tmp/spark.tar.gz -C /usr/lib/ spark
