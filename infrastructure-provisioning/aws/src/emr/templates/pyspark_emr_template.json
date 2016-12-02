@@ -1,13 +1,13 @@
 {
  "argv": [
-  "/usr/bin/pythonPY_VER_FULL",
+  "/usr/bin/pythonPY_FULL",
   "-m",
   "ipykernel",
   "-f",
   "{connection_file}"
  ],
  "language": "python",
- "display_name": "PySpark (Python-PY_VER_FULL / SPARK_VERSION ) [CLUSTER]",
+ "display_name": "PySpark (Python-PY_FULL / SPARK_VERSION ) [CLUSTER]",
  "env": {
   "HADOOP_CONF_DIR" : "/opt/EMR/CLUSTER/conf/",
   "YARN_CONF_DIR": "/opt/EMR/CLUSTER/conf/",

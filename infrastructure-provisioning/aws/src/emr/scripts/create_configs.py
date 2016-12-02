@@ -109,7 +109,7 @@ def pyspark_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
         text = text.replace('PY_VER', python_version[0:3])
-        text = text.replace('PY_VER_FULL', python_version)
+        text = text.replace('PY_FULL', python_version)
         text = text.replace('EMR', args.emr_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
