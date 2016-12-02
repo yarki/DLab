@@ -19,6 +19,7 @@
                 "iam:GetPolicy",
                 "iam:GetUser",
                 "iam:ListUsers",
+                "iam:ListAccessKeys",
                 "iam:PassRole",
                 "iam:ListUserPolicies",
                 "iam:PutRolePolicy",
