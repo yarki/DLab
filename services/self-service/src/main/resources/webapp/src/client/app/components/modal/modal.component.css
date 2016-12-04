@@ -153,6 +153,12 @@ modal-content {
   display: block;
 }
 
+.upload-key {
+  margin-bottom: 20px;
+}
+.upload-key > div > div{
+  margin-top: 5px;
+}
 .confirmation-dialog {
   color: #718ba6;
 }
@@ -201,7 +207,7 @@ modal-content {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.tunnel_instruction:before {
+.helper_instruction:before {
   content: "?";
   display: inline-block;
   position: relative;
