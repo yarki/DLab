@@ -295,6 +295,7 @@ def remove_role(instance_type, scientist=''):
         if instance_type == "ssn":
             role_name = os.environ['conf_service_base_name'] + '-ssn-Role'
             role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
+            policy_name = os.environ['conf_service_base_name'] + '-ssn-Policy'
         if instance_type == "edge":
             role_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Role'
             role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
@@ -302,10 +303,13 @@ def remove_role(instance_type, scientist=''):
             role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Role'
             role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
         role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
-        policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
-        for i in policy_list:
-            policy_arn = i.get('PolicyArn')
-            client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
+        if instance_type == "ssn":
+            client.delete_role_policy(RoleName=role, PolicyName=policy_name)
+        else:
+            policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
+            for i in policy_list:
+                policy_arn = i.get('PolicyArn')
+                client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
         profile = client.get_instance_profile(InstanceProfileName="{}".format(role_profile_name)).get(
             "InstanceProfile").get("InstanceProfileName")
         client.remove_role_from_instance_profile(InstanceProfileName=profile, RoleName=role)
