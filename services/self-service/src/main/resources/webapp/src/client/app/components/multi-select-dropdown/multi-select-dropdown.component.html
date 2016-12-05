@@ -8,12 +8,12 @@
 
   <ul class="dropdown-menu" [style.display]="isOpen ? 'block' : 'none'">
     <li class="filter-actions">
-      <a (click)="selectAllOptions($event)">
+      <a class="select_all" (click)="selectAllOptions($event)">
         <i class="glyphicon glyphicon-ok"></i>&nbsp;All
       </a>
     </li>
     <li class="filter-actions">
-      <a (click)="deselectAllOptions($event)">
+      <a class="deselect_all" (click)="deselectAllOptions($event)">
         <i class="glyphicon glyphicon-remove"></i>&nbsp;None
       </a>
     </li>

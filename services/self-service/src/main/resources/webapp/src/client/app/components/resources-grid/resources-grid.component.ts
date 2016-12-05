@@ -80,6 +80,7 @@ export class ResourcesGrid implements OnInit {
         item.resources.forEach((resource:any) => {
           if(resources.indexOf(resource.status) == -1)
             resources.push(resource.status);
+            resources.sort();
         });
     });
 
@@ -117,15 +118,12 @@ export class ResourcesGrid implements OnInit {
     this.filterForm[$event.type] = $event.model;
   }
 
-  resetFilterConfigurations() : void {
-    this.filterForm.resetConfigurations();
-    this.buildGrid();
-  }
-
   buildGrid() : void {
     this.userResourceService.getUserProvisionedResources()
       .subscribe((result) => {
         this.environments = this.loadEnvironments(result);
+
+        this.filterForm.resetConfigurations();
         this.filteredEnvironments = this.environments;
         this.getDefaultFilterConfiguration();
 
