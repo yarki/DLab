@@ -222,6 +222,7 @@ def configure_rstudio(args):
     local('''echo 'SPARK_HOME="''' + spark_path + '''"' >> /home/ubuntu/.Renviron''')
     local('''echo 'YARN_CONF_DIR="''' + emr_path + '''"' >> /home/ubuntu/.Renviron''')
     local('''echo 'HADOOP_CONF_DIR="''' + emr_path + '''"' >> /home/ubuntu/.Renviron''')
+    local("sudo rstudio-server restart")
 
 
 if __name__ == "__main__":
