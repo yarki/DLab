@@ -163,13 +163,17 @@ def configure_notebook_server(notebook_name):
             sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
             sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() + '"\' >> ' + jupyter_conf_file)
+            sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
         except:
             sys.exit(1)
 
         ensure_spark_scala()
 
         try:
-            put(templates_dir + 'jupyter-notebook.service', '/etc/systemd/system/jupyter-notebook.service')
+            put(templates_dir + 'jupyter-notebook.service', '/tmp/jupyter-notebook.service')
+            sudo("chmod 644 /tmp/jupyter-notebook.service")
+            sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
+            sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable jupyter-notebook")
             sudo("systemctl start jupyter-notebook")
