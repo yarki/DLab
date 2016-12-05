@@ -86,6 +86,7 @@ def pyspark_kernel(args):
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
     text = text.replace('SPARK_PATH', spark_path)
     text = text.replace('PY_VER', '2.7')
+    text = text.replace('PY_FULL', '2.7')
     text = text.replace('EMR', args.emr_version)
     with open(kernel_path, 'w') as f:
         f.write(text)
@@ -109,7 +110,7 @@ def pyspark_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
         text = text.replace('PY_VER', python_version[0:3])
-        text = text.replace('PY_FULL', python_version)
+        text = text.replace('PY_FULL', python_version[0:5])
         text = text.replace('EMR', args.emr_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
@@ -214,6 +215,8 @@ def installing_python(args):
         local('sudo tar zxvf /tmp/Python-' + python_version + '.tgz -C /tmp/')
         local('sudo sudo /tmp/Python-' + python_version + '/configure --prefix=/opt/python/python' + python_version + ' --with-zlib-dir=/usr/local/lib/ --with-ensurepip=install')
         local('sudo make altinstall')
+        local('sudo make distclean')
+        local('sudo find . -type d -empty -delete')
         local('sudo ln -s /opt/python/python' + python_version + '/bin/python' + python_version[0:3] + ' /usr/bin/python' + python_version)
         local('sudo cp /usr/bin/pip /usr/bin/pip' + python_version)
         local('''sudo sed -i 's|python|python''' + python_version + '''|g' /usr/bin/pip''' + python_version)
