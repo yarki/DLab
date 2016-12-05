@@ -19,7 +19,7 @@ limitations under the License.
 <table class="dashboard_table">
   <tr>
     <th *ngFor="let column of filteringColumns" ngClass="{{column.className || ''}}">{{column.title}}
-      <i *ngIf="column.filtering" class="glyphicon glyphicon-option-vertical pull-right" (click)="toggleFilterRow()"></i>
+      <span *ngIf="column.filtering" class="glyphicon glyphicon-option-vertical" (click)="toggleFilterRow()"></span>
     </th>
   </tr>
 
@@ -28,36 +28,25 @@ limitations under the License.
   </tr>
 
   <tr *ngIf="filteredEnvironments && collapseFilterRow" class="filter-row">
-    <!-- <td *ngFor="let column of filteringColumns">
-      <input *ngIf="column.filtering"
-              placeholder="{{column.filtering.placeholder}}"
-              class="form-control filter-field"
-              (input)="onChangeFilter($event, column.name)"/>
-    </td> -->
-
     <td class="name-filter">
       <input placeholder="Filter by environment name" class="form-control filter-field" [value]="filterForm.name" (input)="filterForm.name = $event.target.value" />
     </td>
-
     <td>
       <multi-select-dropdown (selectionChange)="onUpdate($event)" [type]="'statuses'" [items]="filterConfiguration.statuses" [model]="filterForm.statuses"></multi-select-dropdown>
     </td>
-
     <td>
       <multi-select-dropdown (selectionChange)="onUpdate($event)" [type]="'shapes'" [items]="filterConfiguration.shapes" [model]="filterForm.shapes"></multi-select-dropdown>
     </td>
-
     <td>
       <multi-select-dropdown (selectionChange)="onUpdate($event)" [type]="'resources'" [items]="filterConfiguration.resources" [model]="filterForm.resources"></multi-select-dropdown>
     </td>
-
     <td>
       <div class="actions">
         <button class="btn" (click)="resetFilterConfigurations()">
               <span class="glyphicon glyphicon-remove-circle"></span>
             </button>
 
-        <button class="btn" (click)="applyFilter_btnClick()">
+        <button class="btn" (click)="applyFilter_btnClick(filterForm)">
               <span class="glyphicon glyphicon-ok-circle"></span>
             </button>
       </div>

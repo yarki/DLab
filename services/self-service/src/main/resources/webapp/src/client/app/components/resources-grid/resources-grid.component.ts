@@ -84,26 +84,24 @@ export class ResourcesGrid implements OnInit {
     this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, resources);
   }
 
-  applyFilter_btnClick() {
+  applyFilter_btnClick(config:FilterConfigurationModel) {
     this.filtering = true;
 
     // let filteredData: Array<ResourcesGridRowModel> = this.environments.map(env => (<any>Object).assign({}, env));
     let filteredData: Array<ResourcesGridRowModel> = this.environments.map(env => (<any>Object).create(env));
     let containsStatus = (list, selectedItems) => {
-      return list.filter((item: any) => {
-        if(selectedItems.indexOf(item.status) !== -1) return item;
-      });
+      return list.filter((item: any) => { if(selectedItems.indexOf(item.status) !== -1) return item; });
     }
 
     filteredData = filteredData.filter((item:any) => {
-      let isName = item.name.toLowerCase().indexOf(this.filterForm.name.toLowerCase()) != -1;
-      let isStatus = this.filterForm.statuses.length > 0 ? (this.filterForm.statuses.indexOf(item.status) != -1) : true;
-      let isShape = this.filterForm.shapes.length > 0 ? (this.filterForm.shapes.indexOf(item.shape) != -1) : true;
+      let isName = item.name.toLowerCase().indexOf(config.name.toLowerCase()) != -1;
+      let isStatus = config.statuses.length > 0 ? (config.statuses.indexOf(item.status) != -1) : true;
+      let isShape = config.shapes.length > 0 ? (config.shapes.indexOf(item.shape) != -1) : true;
 
-      let modifiedResources = containsStatus(item.resources, this.filterForm.resources);
-      let isResources = this.filterForm.resources.length > 0 ? modifiedResources.length : true;
+      let modifiedResources = containsStatus(item.resources, config.resources);
+      let isResources = config.resources.length > 0 ? modifiedResources.length : true;
 
-      if(this.filterForm.resources.length > 0 && modifiedResources.length) {
+      if(config.resources.length > 0 && modifiedResources.length) {
         item.resources = modifiedResources;
       }
 

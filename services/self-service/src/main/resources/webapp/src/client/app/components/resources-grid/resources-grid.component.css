@@ -18,7 +18,7 @@ limitations under the License.
 
 .dashboard_table {
   width: 100%;
-  table-layout: auto;
+  table-layout: fixed;
 }
 .dashboard_table .th_status {
   width: 16%;
@@ -34,6 +34,18 @@ limitations under the License.
 }
 .dashboard_table tr {
   vertical-align: top;
+}
+.dashboard_table tr th {
+  position: relative;
+}
+.dashboard_table tr th span {
+  width: 50px;
+  text-align: center;
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  line-height: 34px;
 }
 .dashboard_table tr td {
   font-size: 14px;
@@ -63,18 +75,21 @@ limitations under the License.
 .dashboard_table tr.filter-row td {
   padding: 10px;
 }
+.dashboard_table tr.filter-row td:last-child {
+  padding: 10px 0;
+}
 .dashboard_table tr.filter-row td:not(:last-child) {
   border-right: none;
   background: #fff;
 }
 .filter-row .actions {
-  position: absolute;
-  right: 10px;
+  text-align: center;
 }
 .filter-row .actions button {
   background: #fff;
   border-color: #35afd5;
   color: #35afd5;
+  outline: none;
 }
 .dashboard_table tr:nth-child(2n+1) td:first-child {
   background: #edf6f9;
