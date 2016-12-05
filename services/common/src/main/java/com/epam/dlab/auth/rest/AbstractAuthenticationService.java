@@ -57,21 +57,6 @@ public abstract class AbstractAuthenticationService<C extends Configuration> ext
 	public abstract Response login(UserCredentialDTO credential, HttpServletRequest request);
 	public abstract UserInfo getUserInfo(String access_token, HttpServletRequest request);
 	public abstract Response logout(String access_token);
-
-	public UserInfo forgetAccessToken(String token) {
-		return AuthorizedUsers.getInstance().removeUserInfo(token);
-	}
-	
-	public UserInfo rememberUserInfo(String token, UserInfo user) {
-		UserInfo ui = user.withToken(token);
-		AuthorizedUsers.getInstance().addUserInfo(token, ui);
-		return ui;
-	}
-	
-	public boolean isAccessTokenAvailable(String token) {
-		UserInfo ui = AuthorizedUsers.getInstance().getUserInfo(token);
-		return ui != null;
-	}
 	
 	public static String getRandomToken() {
 		UUID uuid = UUID.randomUUID();

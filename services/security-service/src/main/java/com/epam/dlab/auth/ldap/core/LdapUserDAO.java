@@ -19,9 +19,9 @@ limitations under the License.
 package com.epam.dlab.auth.ldap.core;
 
 import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.auth.conveyor.LdapFilterCache;
 import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
 import com.epam.dlab.auth.ldap.core.filter.SearchResultProcessor;
-import com.epam.dlab.auth.rest.ExpirableContainer;
 import com.epam.dlab.auth.script.ScriptHolder;
 import com.epam.dlab.auth.script.SearchResultToDictionaryMapper;
 import org.apache.commons.pool.PoolableObjectFactory;
@@ -47,7 +47,6 @@ public class LdapUserDAO {
     private final String bindTemplate;
     private final LdapConnectionPool usersPool;
     private final LdapConnectionPool searchPool;
-    private final ExpirableContainer<Map<String, Object>> filteredDictionaries = new ExpirableContainer<>();
     private final ScriptHolder script = new ScriptHolder();
     protected final static Logger LOG = LoggerFactory.getLogger(LdapUserDAO.class);
 
@@ -94,7 +93,7 @@ public class LdapUserDAO {
                     }
                 });
                 String filter = sr.getFilter().toString();
-                Map<String, Object> contextMap = filteredDictionaries.get(filter);
+                Map<String, Object> contextMap = LdapFilterCache.getInstance().getLdapFilterInfo(filter);
                 SearchResultToDictionaryMapper mapper = new SearchResultToDictionaryMapper(req.getName(),
                         conextTree);
                 if (contextMap == null) {
@@ -103,7 +102,7 @@ public class LdapUserDAO {
                         contextMap = mapper.transformSearchResult(cursor);
                     }
                     if (req.isCache()) {
-                        filteredDictionaries.put(filter, contextMap, req.getExpirationTimeMsec());
+                        LdapFilterCache.getInstance().save(filter, contextMap, req.getExpirationTimeMsec());
                     }
                 } else {
                     LOG.debug("Restoring old branch {} for {}: {}", req.getName(), filter, contextMap);

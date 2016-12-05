@@ -85,26 +85,22 @@ public class ExploratoryResource implements DockerCommands {
         return action(dto, DockerAction.STOP);
     }
 
-    private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException,   InterruptedException {
-        return action(dto, action, new Properties());
-    }
-
-
-    private String action(ExploratoryBaseDTO dto, DockerAction action, Properties properties) throws IOException,
-            InterruptedException {
+    private String action(ExploratoryBaseDTO dto, DockerAction action) throws IOException, InterruptedException {
         LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(action, uuid, dto));
 
-
-        RunDockerCommand runDockerCommand = new RunDockerCommand().withInteractive().withVolumeForRootKeys(
-                configuration.getKeyDirectory()).withVolumeForResponse(configuration.getImagesDirectory())
-                                                                  .withRequestId(uuid)
-                                                                  .withCredsKeyName(configuration.getAdminKey())
-                                                                  .withImage(configuration.getNotebookImage())
-                                                                  .withAction(action);
+        RunDockerCommand runDockerCommand = new RunDockerCommand()
+                .withInteractive()
+                .withName(nameContainer(dto.getNotebookUserName(), action, dto.getExploratoryName()))
+                .withVolumeForRootKeys(configuration.getKeyDirectory())
+                .withVolumeForResponse(configuration.getImagesDirectory())
+                .withRequestId(uuid)
+                .withCredsKeyName(configuration.getAdminKey())
+                .withImage(configuration.getNotebookImage())
+                .withAction(action);
 
         commandExecuter.executeAsync(commandBuilder.buildCommand(runDockerCommand, dto));
         return uuid;
@@ -112,6 +108,10 @@ public class ExploratoryResource implements DockerCommands {
 
     private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ExploratoryBaseDTO dto) {
         return new ExploratoryCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName());
+    }
+
+    private String nameContainer(String user, DockerAction action, String name) {
+        return nameContainer(user, action.toString(), "exploratory", name);
     }
 
 }

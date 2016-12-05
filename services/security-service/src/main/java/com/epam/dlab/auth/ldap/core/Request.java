@@ -46,8 +46,8 @@ public class Request {
 	private String base;
 	private String filter = "";
 	private SearchResultProcessor searchResultProcessor;
-	private boolean cache;
-	private long expirationTimeMsec;
+	private boolean cache = false;
+	private long expirationTimeMsec = 600000; //10 minutes
 	public String getScope() {
 		return scope;
 	}

@@ -26,12 +26,14 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import org.bson.Document;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
+import static com.epam.dlab.constants.UserInstanceStatus.TERMINATED;
+import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -145,7 +147,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 values.append(getComputationalSetPrefix() + UPTIME, null);
             }
             update(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)
-                    , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, computationalName)),
+                    , elemMatch(COMPUTATIONAL_RESOURCES, and(eq(COMPUTATIONAL_NAME, computationalName), not(eq(STATUS, TERMINATED.toString()))))),
                     new Document(SET, values));
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);

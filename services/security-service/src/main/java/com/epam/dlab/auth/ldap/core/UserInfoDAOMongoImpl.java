@@ -68,8 +68,10 @@ public class UserInfoDAOMongoImpl implements UserInfoDAO {
 		ui.setFirstName(firstName);
 		ui.setLastName(lastName);
 		ui.setRemoteIp(remoteIp);
-		if(awsUser != null) {
-			ui.setAwsUser(awsUser);
+		ui.setAwsUser(awsUser);
+		Object awsKeys = uiDoc.get("awsKeys");
+		if(awsKeys != null) {
+			((BasicDBObject)awsKeys).forEach((key,val)->ui.addKey(key,val.toString()));
 		}
 		roles.forEach(o->ui.addRole(""+o));
 		LOG.debug("Found persistent {}",ui);
@@ -113,6 +115,7 @@ public class UserInfoDAOMongoImpl implements UserInfoDAO {
 			uiDoc.put("remoteIp", ui.getRemoteIp());
 			uiDoc.put("awsUser", ui.isAwsUser());
 			uiDoc.put("expireAt", new Date(System.currentTimeMillis() + inactiveUserTimeoutMsec));
+			uiDoc.put("awsKeys",ui.getKeys());
 			MongoCollection<BasicDBObject> security = ms.getCollection("security", BasicDBObject.class);
 			security.insertOne(uiDoc);
 			LOG.debug("Saved persistent {}", ui);
