@@ -117,40 +117,33 @@ def ensure_s3_kernel():
 
 
 def configure_notebook_server(notebook_name):
-    try:
-        sudo('pip install jupyter --no-cache-dir')
-        sudo('rm -rf /root/.jupyter/jupyter_notebook_config.py')
-        sudo("for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
-        sudo('jupyter notebook --generate-config --config /root/.jupyter/jupyter_notebook_config.py')
-        sudo('echo "c.NotebookApp.ip = \'*\'" >> /root/.jupyter/jupyter_notebook_config.py')
-        sudo('echo c.NotebookApp.open_browser = False >> /root/.jupyter/jupyter_notebook_config.py')
-        sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name +
-             '/\'" >> /root/.jupyter/jupyter_notebook_config.py')
-        sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() +
-             '"\' >> /root/.jupyter/jupyter_notebook_config.py')
-    except:
-        sys.exit(1)
+    if not exists('/home/ubuntu/.ensure_dir/jupyter_ensured'):
+        jupyter_conf_file = '/home/ubuntu/.local/share/jupyter/jupyter_notebook_config.py'
+        try:
+            sudo('pip install jupyter --no-cache-dir')
+            sudo('rm -rf ' + jupyter_conf_file)
+            sudo('jupyter notebook --generate-config --config ' + jupyter_conf_file)
+            sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
+            sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
+            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
+            sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() + '"\' >> ' + jupyter_conf_file)
+        except:
+            sys.exit(1)
 
-    ensure_spark_scala()
+        ensure_spark_scala()
 
-    try:
-        sudo("sleep 5; for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
-        sudo("sleep 5; screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py; "
-             "sleep 5;")
-        # for further start up when system boots
-        sudo("sed -i '/exit 0/d' /etc/rc.local")
-        sudo("sed -i '/screen/d' /etc/rc.local")
-        sudo("chmod 757 /etc/rc.local")
-        sudo("""echo "cd /home/ubuntu; runuser -l ubuntu -c 'sudo screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py'" >> /etc/rc.local""")
-        sudo("chmod 755 /etc/rc.local")
-        sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
+        try:
+            put(templates_dir + 'jupyter-notebook.service', '/etc/systemd/system/jupyter-notebook.service')
+            sudo("ln -s /lib/systemd/system/jupyter-notebook.service /etc/systemd/system")
+            sudo("systemctl daemon-reload")
+            sudo("systemctl start jupyter-notebook")
+            sudo('touch /home/ubuntu/.ensure_dir/jupyter_ensured')
+        except:
+            sys.exit(1)
 
-    except:
-        sys.exit(1)
+        ensure_python3_kernel()
 
-    ensure_python3_kernel()
-
-    ensure_s3_kernel()
+        ensure_s3_kernel()
 
 
 ##############
