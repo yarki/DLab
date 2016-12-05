@@ -1,5 +1,5 @@
 {
-  "argv": ["/usr/lib/R/bin/R", "--slave", "--verbose","-e", "library(SparkR)", "-e", "sc<-sparkR.init()", "-e", "IRkernel::main()", "--args", "{connection_file}"],
+  "argv": ["/usr/lib/R/bin/R", "--slave", "-e", "library(SparkR)", "-e", "sc<-sparkR.init()", "-e", "IRkernel::main()", "--args", "{connection_file}"],
   "display_name": "R R_VER (SPARK_VERSION) on [CLUSTERNAME]",
   "language": "R",
   "env": {

@@ -91,6 +91,10 @@ def r_kernel(args):
     with open(kernel_path, 'w') as f:
         f.write(text)
 
+    local('export HADOOP_CONF_DIR="/opt/{0}/{1}/conf/"; export YARN_CONF_DIR="/opt/{0}/{1}/conf/"; export SPARKR_SUBMIT_ARGS="--master yarn-client sparkr-shell"; export SPARK_HOME="/opt/{0}/{1}/spark/";'.format(args.emr_version, args.cluster_name) + ' export R_LIBS_SITE="${R_LIBS_SITE}:${SPARK_HOME}/R/lib"; R -e "install.packages(\'devtools\',repos=\'http://cran.us.r-project.org\')"; R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
+    #local('R -e "IRkernel::installspec()"')
+
+
 def pyspark_kernel(args):
     spark_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
     local('mkdir -p ' + kernels_dir + 'pyspark_' + args.cluster_name + '/')
