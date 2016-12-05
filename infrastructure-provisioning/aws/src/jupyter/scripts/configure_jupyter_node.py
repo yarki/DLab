@@ -145,7 +145,7 @@ def ensure_r_kernel():
             # sudo('export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin; R -e \'IRkernel::installspec(user = FALSE)\'')
             # Spark Install
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
-            sudo('a=`R --version | awk \'/version / {print $3}\'`; sed -i "/display_name/ s/\"R\"/\"R v$a\"/" /home/ubuntu/.local/share/jupyter/kernels/ir/kernel.json')
+            #sudo('a=`R --version | awk \'/version / {print $3}\'`; sed -i "/display_name/ s/\"R\"/\"R v$a\"/" /home/ubuntu/.local/share/jupyter/kernels/ir/kernel.json')
             #sudo('export SPARK_HOME=/usr/local/spark/; cd $SPARK_HOME/R/lib/; sudo R --no-site-file --no-environ --no-save --no-restore CMD INSTALL "SparkR"')
             sudo('touch /home/ubuntu/.ensure_dir/r_kernel_ensured')
         except:
