@@ -12,14 +12,14 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-inactiveUserTimeoutMillSec: ${INACTIVE_TIMEOUT_MSEC!300000}
+inactiveUserTimeoutMillSec: 300000
 ldapConnectionConfig:
-  ldapHost: ${LDAP_HOST}
-#  ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
-  ldapPort: ${LDAP_PORT!389}
-#  ldapPort: 389
-  name: cn=${LDAP_USERNAME!'admin'},dc=example,dc=com
-  credentials: ${LDAP_PASSWORD!'ldap'}
+#  ldapHost: localhost
+  ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
+#  ldapPort: 3890
+  ldapPort: 389
+  name: cn=admin,dc=example,dc=com
+  credentials: ldap
 ldapBindTemplate: uid=%s,ou=People,dc=example,dc=com
 ldapSearch: 
   - name: userInfo
@@ -86,39 +86,43 @@ ldapSearch:
     #certAlias: dlabcert
 server: 
   applicationConnectors:
-  - type: ${CONNECTOR_TYPE}
-    port: ${CONNECTOR_PORT!8090}
-<#if CONNECTOR_TYPE == 'https'>
-  - type: ${CONNECTOR_TYPE}
-    port: ${CONNECTOR_PORT!8090}
-    trustStorePath: ${TRUST_STORE_PATH!'./'}
-    trustStorePassword: ${TRUST_STORE_PASSWORD}
-    keyStorePath: ${KEY_STORE_PATH!'./'}
-    keyStorePassword: ${KEY_STORE_PASSWORD}
-    certAlias: ${CERT_ALIAS!'dlabcert'}
-</#if>
+  - type: http
+    port: 8090
+<#-- Un-comment to enable HTTPS
+#<if SSL_CONNECTION>  ### put'#' after '<'
+  - type: https
+    port: 8090
+    trustStorePath: \Program Files\Java\jre1.8.0_101\lib\security\cacerts
+    trustStorePassword: changeit
+    keyStorePath: \work\keystore.jks
+    keyStorePassword: changeit
+    certAlias: dlabcert
+#</if>   ### put'#' after '</'
+-->
   adminConnectors:
-  - type: ${CONNECTOR_TYPE}
-    port: ${ADMIN_CONNECTOR_PORT!8091}
-<#if CONNECTOR_TYPE == 'https'>
-  - type: ${CONNECTOR_TYPE}
-    port: ${ADMIN_CONNECTOR_PORT!8090}
-    trustStorePath: ${TRUST_STORE_PATH!'./'}
-    trustStorePassword: ${TRUST_STORE_PASSWORD}
-    keyStorePath: ${KEY_STORE_PATH!'./'}
-    keyStorePassword: ${KEY_STORE_PASSWORD}
-    certAlias: ${CERT_ALIAS!'dlabcert'}
-</#if>
+  - type: http
+    port: 8091
+<#-- Un-comment to enable HTTPS
+#<if SSL_CONNECTION>   ### put'#' after '<'
+  - type: https
+    port: 8091
+    trustStorePath: \Program Files\Java\jre1.8.0_101\lib\security\cacerts
+    trustStorePassword: changeit
+    keyStorePath: \work\keystore.jks
+    keyStorePassword: changeit
+    certAlias: dlabcert
+#</if>   ### put'#' after '</'
+-->
 
-userInfoPersistenceEnabled: ${SESSION_PERSISTENCE_ENABLED!'true'}
+userInfoPersistenceEnabled: true
 awsUserIdentificationEnabled: true
 
 mongo:
-  host: ${MONGO_HOST}
-  port: ${MONGO_PORT!27017}
-  username: ${MONGO_USERNAME!'admin'}
-  password: ${MONGO_PASSWORD!'XS3ms9R3tP'}
-  database: ${MONGO_DB!'dlabdb'}
+  host: localhost
+  port: 27017
+  username: admin
+  password: XS3ms9R3tP
+  database: dlabdb
 
 logging:
   level: INFO
@@ -129,5 +133,5 @@ logging:
   appenders:
     - type: console
     - type: file
-      currentLogFilename: ${LOG_PATH!'/tmp/dlab/log'}/security.log
-      archivedLogFilenamePattern: ${LOG_PATH!'/tmp/dlab/log'}/security-%d.log
+      currentLogFilename: /tmp/dlab/log/security.log
+      archivedLogFilenamePattern: /tmp/dlab/log/security-%d.log
