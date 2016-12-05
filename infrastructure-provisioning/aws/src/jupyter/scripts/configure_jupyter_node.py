@@ -134,8 +134,8 @@ def configure_notebook_server(notebook_name):
 
         try:
             put(templates_dir + 'jupyter-notebook.service', '/etc/systemd/system/jupyter-notebook.service')
-            sudo("ln -s /lib/systemd/system/jupyter-notebook.service /etc/systemd/system")
             sudo("systemctl daemon-reload")
+            sudo("systemctl enable jupyter-notebook")
             sudo("systemctl start jupyter-notebook")
             sudo('touch /home/ubuntu/.ensure_dir/jupyter_ensured')
         except:
