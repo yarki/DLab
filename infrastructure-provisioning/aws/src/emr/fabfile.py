@@ -26,6 +26,15 @@ from dlab.aws_actions import *
 import sys
 
 
+def emr_waiter(tag_name):
+    if len(tag_name, 'Key', False, True) > 0:
+        print "Some EMR cluster is still being created. Waiting.."
+        time.sleep(60)
+        emr_waiter(tag_name)
+    else:
+        return True
+
+
 def run():
     local_log_filename = "%s.log" % os.environ['request_id']
     local_log_filepath = "/response/" + local_log_filename
@@ -79,9 +88,14 @@ def run():
     if index != 1:
         time.sleep(15)
 
-    if len(emr_conf['tag_name'], 'Key', False, True) > 0:
-        print "Some EMR cluster is still being created. Waiting.."
-        time.sleep(60)
+    try:
+        emr_waiter(emr_conf['tag_name'])
+    except:
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "EMR waiter fail", "conf": emr_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
 
     with hide('stderr', 'running', 'warnings'):
         local("echo Waiting for changes to propagate; sleep 10")
