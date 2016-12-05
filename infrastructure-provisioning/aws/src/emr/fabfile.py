@@ -19,6 +19,7 @@
 # ******************************************************************************
 
 import json
+import time
 from dlab.fab import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
@@ -74,6 +75,13 @@ def run():
     print "Will create exploratory environment with edge node as access point as following: " + \
           json.dumps(emr_conf, sort_keys=True, indent=4, separators=(',', ': '))
     logging.info(json.dumps(emr_conf))
+
+    if index != 1:
+        time.sleep(15)
+
+    if len(emr_conf['tag_name'], 'Key', False, True) > 0:
+        print "Some EMR cluster is still being created. Waiting.."
+        time.sleep(60)
 
     with hide('stderr', 'running', 'warnings'):
         local("echo Waiting for changes to propagate; sleep 10")
