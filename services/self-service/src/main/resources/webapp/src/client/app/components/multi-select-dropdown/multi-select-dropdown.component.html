@@ -1,4 +1,4 @@
-<div class="dropdown-multiselect btn-group" click-outside (clickOutside)="onClickOutside($event)">
+<div class="dropdown-multiselect btn-group" ngClass="{{type || ''}}" click-outside (clickOutside)="onClickOutside($event)">
 
   <button data-toggle="dropdown" type="button" class="dropdown-toggle btn" (click)="toggleDropdown()">
     <span *ngIf="model.length == 0">Select {{type}}</span>

@@ -74,6 +74,8 @@ export class ResourcesGrid implements OnInit {
         shapes.push(item.shape);
       if(statuses.indexOf(item.status) == -1)
         statuses.push(item.status);
+        statuses.sort();
+
 
         item.resources.forEach((resource:any) => {
           if(resources.indexOf(resource.status) == -1)
