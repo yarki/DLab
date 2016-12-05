@@ -181,7 +181,7 @@ def configure_notebook_server(notebook_name):
 
         ensure_s3_kernel()
 
-    ensure_r_kernel()
+        ensure_r_kernel()
 
 
 ##############
