@@ -40,6 +40,7 @@ spark_version = "1.6.2"
 hadoop_version = "2.6"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
 py3spark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/py3spark_local/'
+jupyter_conf_file = '/home/ubuntu/.local/share/jupyter/jupyter_notebook_config.py'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 
@@ -154,7 +155,6 @@ def ensure_r_kernel():
 
 def configure_notebook_server(notebook_name):
     if not exists('/home/ubuntu/.ensure_dir/jupyter_ensured'):
-        jupyter_conf_file = '/home/ubuntu/.local/share/jupyter/jupyter_notebook_config.py'
         try:
             sudo('pip install jupyter --no-cache-dir')
             sudo('rm -rf ' + jupyter_conf_file)
@@ -163,7 +163,6 @@ def configure_notebook_server(notebook_name):
             sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
             sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() + '"\' >> ' + jupyter_conf_file)
-            sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
         except:
             sys.exit(1)
 
@@ -174,6 +173,7 @@ def configure_notebook_server(notebook_name):
             sudo("chmod 644 /tmp/jupyter-notebook.service")
             sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
             sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
+            sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable jupyter-notebook")
             sudo("systemctl start jupyter-notebook")
