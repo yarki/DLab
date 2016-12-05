@@ -19,7 +19,7 @@ limitations under the License.
 <table class="dashboard_table">
   <tr>
     <th *ngFor="let column of filteringColumns" ngClass="{{column.className || ''}}">{{column.title}}
-      <span *ngIf="column.filtering" class="glyphicon glyphicon-option-vertical" (click)="toggleFilterRow()"></span>
+      <span *ngIf="column.filtering" class="glyphicon glyphicon-option-vertical pull-right" (click)="toggleFilterRow()"></span>
     </th>
   </tr>
 
