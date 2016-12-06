@@ -27,7 +27,7 @@ import sys
 
 
 def emr_waiter(tag_name):
-    if len(tag_name, 'Key', False, True) > 0:
+    if len(get_emr_list(tag_name, 'Key', False, True)) > 0:
         print "Some EMR cluster is still being created. Waiting.."
         time.sleep(60)
         emr_waiter(tag_name)
