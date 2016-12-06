@@ -22,7 +22,6 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient;
 import com.amazonaws.services.identitymanagement.model.*;
-import com.epam.dlab.auth.conveyor.AwsUserCache;
 import com.epam.dlab.auth.ldap.core.filter.AwsUserDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,39 +32,21 @@ public class AwsUserDAOImpl implements AwsUserDAO {
 
     private final static Logger LOG = LoggerFactory.getLogger(AwsUserDAOImpl.class);
 
-    private volatile AWSCredentials credentials;
     private volatile AmazonIdentityManagement aim;
 
     public AwsUserDAOImpl(AWSCredentials credentials) {
-
-        this.credentials = credentials;
         this.aim = new AmazonIdentityManagementClient(credentials);
-        try {
-            ListUsersResult lur = aim.listUsers();
-            lur.getUsers().forEach(u -> {
-                AwsUserCache.getInstance().save(u);
-                LOG.debug("Initialized AWS user {}",u);
-            });
-
-        } catch(Exception e) {
-            LOG.error("Failed AWS user initialization. Will keep trying. Error: {}",e.getMessage());
-        }
     }
 
     @Override
     public User getAwsUser(String username) {
-        User u = AwsUserCache.getInstance().getAwsUserInfo(username);
-        if(u == null) {
-            u = fetchAwsUser(username);
-            LOG.debug("Fetched AWS user {}",u);
-            AwsUserCache.getInstance().save(u);
-        }
+        User u = fetchAwsUser(username);
+        LOG.debug("Fetched AWS user {}",u);
         return u;
     }
 
     @Override
     public void updateCredentials(AWSCredentials credentials) {
-        this.credentials = credentials;
         this.aim         = new AmazonIdentityManagementClient(credentials);
     }
 

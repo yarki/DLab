@@ -22,6 +22,7 @@ import { ResourcesGridRowModel } from './resources-grid.model';
 import { FilterConfigurationModel } from './filterConfiguration.model';
 import { CreateEmrModel } from "./createEmrModel";
 import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dialog-type.enum";
+import { SortUtil } from './../../util/sortUtil';
 
 @Component({
   moduleId: module.id,
@@ -52,8 +53,8 @@ export class ResourcesGrid implements OnInit {
 
   public filteringColumns:Array<any> = [
     {title: 'Environment name', name: 'name', className: 'th_name', filtering: {}},
-    {title: 'Status', name: 'status', className: 'th_status', filtering: {}},
-    {title: 'Shape', name: 'shape', className: 'th_shape', filtering: {}},
+    {title: 'Status', name: 'statuses', className: 'th_status', filtering: {}},
+    {title: 'Shape', name: 'shapes', className: 'th_shape', filtering: {}},
     {title: 'Computational resources', name: 'resources', className: 'th_resources', filtering: {}},
     {title: 'Actions', className: 'th_actions'}
   ];
@@ -74,10 +75,12 @@ export class ResourcesGrid implements OnInit {
         shapes.push(item.shape);
       if(statuses.indexOf(item.status) == -1)
         statuses.push(item.status);
+        statuses.sort(SortUtil.statusSort);
 
         item.resources.forEach((resource:any) => {
           if(resources.indexOf(resource.status) == -1)
             resources.push(resource.status);
+            resources.sort(SortUtil.statusSort);
         });
     });
 
@@ -124,7 +127,9 @@ export class ResourcesGrid implements OnInit {
     this.userResourceService.getUserProvisionedResources()
       .subscribe((result) => {
         this.environments = this.loadEnvironments(result);
+
         this.filteredEnvironments = this.environments;
+        this.applyFilter_btnClick(this.filterForm);
         this.getDefaultFilterConfiguration();
 
         console.log('models ', this.environments);

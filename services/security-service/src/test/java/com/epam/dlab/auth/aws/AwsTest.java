@@ -20,7 +20,6 @@ package com.epam.dlab.auth.aws;
 
 import com.amazonaws.services.identitymanagement.model.User;
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.auth.conveyor.AwsUserCache;
 import com.epam.dlab.auth.conveyor.LdapFilterCache;
 import com.epam.dlab.auth.conveyor.LoginCache;
 import org.junit.*;
@@ -48,20 +47,6 @@ public class AwsTest {
 
     @After
     public void tearDown() throws Exception {
-    }
-
-    @Test
-    public void testAwsCache() throws InterruptedException {
-        AwsUserCache c = AwsUserCache.getInstance();
-        c.setDefaultBuilderTimeout(1, TimeUnit.SECONDS);
-        c.setIdleHeartBeat(100,TimeUnit.MILLISECONDS);
-        c.save(new User().withUserId("test"));
-        User u = c.getAwsUserInfo("test");
-        assertNotNull(u);
-        System.out.println(u);
-        Thread.sleep(1500);
-        u = c.getAwsUserInfo("test");
-        assertNull(u);
     }
 
     @Test
