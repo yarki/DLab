@@ -53,8 +53,8 @@ export class ResourcesGrid implements OnInit {
 
   public filteringColumns:Array<any> = [
     {title: 'Environment name', name: 'name', className: 'th_name', filtering: {}},
-    {title: 'Status', name: 'status', className: 'th_status', filtering: {}},
-    {title: 'Shape', name: 'shape', className: 'th_shape', filtering: {}},
+    {title: 'Status', name: 'statuses', className: 'th_status', filtering: {}},
+    {title: 'Shape', name: 'shapes', className: 'th_shape', filtering: {}},
     {title: 'Computational resources', name: 'resources', className: 'th_resources', filtering: {}},
     {title: 'Actions', className: 'th_actions'}
   ];
