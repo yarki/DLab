@@ -81,6 +81,17 @@ limitations under the License.
   color: #35afd5;
   outline: none;
 }
+.filter-row .actions .reset:hover {
+  border-color: #f1696e;
+  background: #fbfbf4;
+  color: #f1696e;
+}
+.filter-row .actions .apply:hover {
+  border-color: #49af38;
+  background: #fbfbf4;
+  color: #49af38;
+}
+
 .dashboard_table tr:nth-child(2n+1) td:first-child {
   background: #edf6f9;
 }

@@ -9,6 +9,12 @@
   border: 1px solid #cad2da;
   font-size: 14px;
 }
+.dropdown-multiselect button span {
+  color: #999;
+}
+.dropdown-multiselect button .selected-items {
+  color: #4eaf3e;
+}
 .dropdown-multiselect .caret-btn {
   position: absolute;
   top: 0;
@@ -59,13 +65,13 @@
   padding-left: 14px;
   color: #35afd5;
 }
-.dropdown-multiselect .dropdown-menu .filter-actions a.select_all:hover {
-  background: #49af38;
-  color:#fff;
+.dropdown-multiselect .dropdown-menu .filter-actions .select_all:hover {
+  color: #49af38;
+  background: #fbfbf4;
 }
-.dropdown-multiselect .dropdown-menu .filter-actions a.deselect_all:hover {
-  background: #f1696e;
-  color:#fff;
+.dropdown-multiselect .dropdown-menu .filter-actions .deselect_all:hover {
+  color: #f1696e;
+  background: #fbfbf4;
 }
 
 .dropdown-multiselect .dropdown-menu a span {
