@@ -88,6 +88,12 @@ def r_kernel(args):
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
     text = text.replace('R_VER', 'v{}'.format(str(r_version)))
     text = text.replace('EMR', args.emr_version)
+    if 'emr-4.' in args.emr_version:
+        text = text.replace('YRN_CLI_TYPE', 'yarn-client')
+        text = text.replace('SPRK_ACTION', 'init()')
+    else:
+        text = text.replace('YRN_CLI_TYPE', 'yarn')
+        text = text.replace('SPRK_ACTION', 'session(master = \"yarn\")')
     with open(kernel_path, 'w') as f:
         f.write(text)
 
