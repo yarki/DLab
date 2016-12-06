@@ -40,6 +40,7 @@ spark_version = "1.6.2"
 hadoop_version = "2.6"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
 py3spark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/py3spark_local/'
+jupyter_conf_file = '/home/ubuntu/.local/share/jupyter/jupyter_notebook_config.py'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 
@@ -116,41 +117,75 @@ def ensure_s3_kernel():
             sys.exit(1)
 
 
+def ensure_r_kernel():
+    if not exists('/home/ubuntu/.ensure_dir/r_kernel_ensured'):
+        try:
+            sudo('apt-get install -y r-base r-base-dev r-cran-rcurl')
+            sudo('apt-get install -y libcurl4-openssl-dev libssl-dev libreadline-dev')
+            sudo('apt-get install -y cmake')
+            #sudo('add-apt-repository -y ppa:webupd8team/java')
+            #sudo('apt-get update')
+            #sudo('echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections')
+            #sudo('echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections')
+            #sudo('apt-get -y install oracle-java8-installer')
+            #sudo('update-java-alternatives -s java-8-oracle')
+            #sudo('apt-get install oracle-java8-set-default')
+            sudo('R CMD javareconf')
+            sudo('git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
+            sudo('R -e "install.packages(\'R6\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'pbdZMQ\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'RCurl\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'devtools\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'reshape2\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'caTools\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "library(\'devtools\');install.packages(repos=\'http://cran.us.r-project.org\',c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
+            sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
+            sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
+            sudo('R -e "IRkernel::installspec()"')
+            # sudo('export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin; R -e \'IRkernel::installspec(user = FALSE)\'')
+            # Spark Install
+            sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
+            #sudo('a=`R --version | awk \'/version / {print $3}\'`; sed -i "/display_name/ s/\"R\"/\"R v$a\"/" /home/ubuntu/.local/share/jupyter/kernels/ir/kernel.json')
+            #sudo('export SPARK_HOME=/usr/local/spark/; cd $SPARK_HOME/R/lib/; sudo R --no-site-file --no-environ --no-save --no-restore CMD INSTALL "SparkR"')
+            sudo('touch /home/ubuntu/.ensure_dir/r_kernel_ensured')
+        except:
+            sys.exit(1)
+
+
 def configure_notebook_server(notebook_name):
-    try:
-        sudo('pip install jupyter --no-cache-dir')
-        sudo('rm -rf /root/.jupyter/jupyter_notebook_config.py')
-        sudo("for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
-        sudo('jupyter notebook --generate-config --config /root/.jupyter/jupyter_notebook_config.py')
-        sudo('echo "c.NotebookApp.ip = \'*\'" >> /root/.jupyter/jupyter_notebook_config.py')
-        sudo('echo c.NotebookApp.open_browser = False >> /root/.jupyter/jupyter_notebook_config.py')
-        sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name +
-             '/\'" >> /root/.jupyter/jupyter_notebook_config.py')
-        sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() +
-             '"\' >> /root/.jupyter/jupyter_notebook_config.py')
-    except:
-        sys.exit(1)
+    if not exists('/home/ubuntu/.ensure_dir/jupyter_ensured'):
+        try:
+            sudo('pip install jupyter --no-cache-dir')
+            sudo('rm -rf ' + jupyter_conf_file)
+            sudo('jupyter notebook --generate-config --config ' + jupyter_conf_file)
+            sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
+            sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
+            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
+            sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() + '"\' >> ' + jupyter_conf_file)
+        except:
+            sys.exit(1)
 
-    ensure_spark_scala()
+        ensure_spark_scala()
 
-    try:
-        sudo("sleep 5; for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done")
-        sudo("sleep 5; screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py; "
-             "sleep 5;")
-        # for further start up when system boots
-        sudo("sed -i '/exit 0/d' /etc/rc.local")
-        sudo("sed -i '/screen/d' /etc/rc.local")
-        sudo("chmod 757 /etc/rc.local")
-        sudo("""echo "cd /home/ubuntu; runuser -l ubuntu -c 'sudo screen -d -m jupyter notebook --config /root/.jupyter/jupyter_notebook_config.py'" >> /etc/rc.local""")
-        sudo("chmod 755 /etc/rc.local")
-        sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
+        try:
+            put(templates_dir + 'jupyter-notebook.service', '/tmp/jupyter-notebook.service')
+            sudo("chmod 644 /tmp/jupyter-notebook.service")
+            sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
+            sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
+            sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
+            sudo("systemctl daemon-reload")
+            sudo("systemctl enable jupyter-notebook")
+            sudo("systemctl start jupyter-notebook")
+            sudo('touch /home/ubuntu/.ensure_dir/jupyter_ensured')
+        except:
+            sys.exit(1)
 
-    except:
-        sys.exit(1)
+        ensure_python3_kernel()
 
-    ensure_python3_kernel()
+        ensure_s3_kernel()
 
-    ensure_s3_kernel()
+        ensure_r_kernel()
 
 
 ##############

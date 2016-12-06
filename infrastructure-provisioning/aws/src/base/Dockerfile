@@ -25,6 +25,7 @@ RUN	apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install any python dependencies
+RUN pip install -U pip
 RUN pip install boto3 fabric awscli argparse ujson jupyter
 
 # Configuring ssh for user

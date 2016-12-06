@@ -35,7 +35,6 @@ export class ComputationalResourcesList {
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
   collapse: boolean = true;
-
   constructor(private userResourceService: UserResourceService) { }
 
   toggleResourceList() {
