@@ -19,9 +19,10 @@ limitations under the License.
 import { Component, Input, Output, ViewChild, OnInit } from "@angular/core";
 import { UserResourceService } from "./../../services/userResource.service";
 import { ResourcesGridRowModel } from './resources-grid.model';
+import { FilterConfigurationModel } from './filterConfiguration.model';
 import { CreateEmrModel } from "./createEmrModel";
-import { ComputationalResourceImage } from "../../models/computationalResourceImage.model";
 import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dialog-type.enum";
+import { SortUtil } from './../../util/sortUtil';
 
 @Component({
   moduleId: module.id,
@@ -32,23 +33,93 @@ import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dial
 
 export class ResourcesGrid implements OnInit {
 
-  isFilled: boolean = false;
   environments: Array<ResourcesGridRowModel>;
-  notebookName: string;
+  filteredEnvironments: Array<ResourcesGridRowModel> = [];
+  filterConfiguration: FilterConfigurationModel;
+  filterForm: FilterConfigurationModel = new FilterConfigurationModel('', [], [], []);
   model = new CreateEmrModel('', '');
+  notebookName: string;
   isOutscreenDropdown: boolean;
+  collapseFilterRow: boolean = false;
+  filtering: boolean = false;
 
   @ViewChild('computationalResourceModal') computationalResourceModal;
   @ViewChild('confirmationDialog') confirmationDialog;
   @ViewChild('detailDialog') detailDialog;
 
-  computationalResourcesImages: Array<ComputationalResourceImage> = [];
-
   constructor(
     private userResourceService: UserResourceService
   ) { }
 
+  public filteringColumns:Array<any> = [
+    {title: 'Environment name', name: 'name', className: 'th_name', filtering: {}},
+    {title: 'Status', name: 'statuses', className: 'th_status', filtering: {}},
+    {title: 'Shape', name: 'shapes', className: 'th_shape', filtering: {}},
+    {title: 'Computational resources', name: 'resources', className: 'th_resources', filtering: {}},
+    {title: 'Actions', className: 'th_actions'}
+  ];
+
   ngOnInit() : void {
+    this.buildGrid();
+  }
+
+  toggleFilterRow() : void {
+    this.collapseFilterRow = !this.collapseFilterRow;
+  }
+  getDefaultFilterConfiguration() : void {
+    let data:Array<ResourcesGridRowModel> = this.environments;
+    let shapes = [], statuses = [], resources = [];
+
+    data.forEach((item:any) => {
+      if(shapes.indexOf(item.shape) == -1)
+        shapes.push(item.shape);
+      if(statuses.indexOf(item.status) == -1)
+        statuses.push(item.status);
+        statuses.sort(SortUtil.statusSort);
+
+        item.resources.forEach((resource:any) => {
+          if(resources.indexOf(resource.status) == -1)
+            resources.push(resource.status);
+            resources.sort(SortUtil.statusSort);
+        });
+    });
+
+    this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, resources);
+  }
+
+  applyFilter_btnClick(config:FilterConfigurationModel) {
+    this.filtering = true;
+
+    // let filteredData: Array<ResourcesGridRowModel> = this.environments.map(env => (<any>Object).assign({}, env));
+    let filteredData: Array<ResourcesGridRowModel> = this.environments.map(env => (<any>Object).create(env));
+    let containsStatus = (list, selectedItems) => {
+      return list.filter((item: any) => { if(selectedItems.indexOf(item.status) !== -1) return item; });
+    }
+
+    filteredData = filteredData.filter((item:any) => {
+      let isName = item.name.toLowerCase().indexOf(config.name.toLowerCase()) != -1;
+      let isStatus = config.statuses.length > 0 ? (config.statuses.indexOf(item.status) != -1) : true;
+      let isShape = config.shapes.length > 0 ? (config.shapes.indexOf(item.shape) != -1) : true;
+
+      let modifiedResources = containsStatus(item.resources, config.resources);
+      let isResources = config.resources.length > 0 ? modifiedResources.length : true;
+
+      if(config.resources.length > 0 && modifiedResources.length) {
+        item.resources = modifiedResources;
+      }
+
+      return isName && isStatus && isShape && isResources;
+    });
+    this.filteredEnvironments = filteredData;
+  }
+
+
+  onUpdate($event) {
+    this.filterForm[$event.type] = $event.model;
+  }
+
+  resetFilterConfigurations() : void {
+    this.filterForm.resetConfigurations();
     this.buildGrid();
   }
 
@@ -56,6 +127,10 @@ export class ResourcesGrid implements OnInit {
     this.userResourceService.getUserProvisionedResources()
       .subscribe((result) => {
         this.environments = this.loadEnvironments(result);
+
+        this.filteredEnvironments = this.environments;
+        this.applyFilter_btnClick(this.filterForm);
+        this.getDefaultFilterConfiguration();
 
         console.log('models ', this.environments);
       });
@@ -106,7 +181,8 @@ export class ResourcesGrid implements OnInit {
       this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.TerminateExploratory);
     }
   }
-  dropdownPosition(event) {
+
+  dropdownPosition(event) : void{
     let contentHeight = document.body.offsetHeight > window.outerHeight ? document.body.offsetHeight : window.outerHeight;
     this.isOutscreenDropdown = event.pageY + 215 > contentHeight ? true : false;
   }
