@@ -66,6 +66,7 @@ def install_rstudio():
             sudo('chown ubuntu:ubuntu /home/ubuntu/.Rprofile')
             sudo('''echo 'library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))' >> /home/ubuntu/.Rprofile''')
             sudo('rstudio-server start')
+            sudo('echo "ubuntu:dlab" | chpasswd')
             sudo('touch /home/ubuntu/.ensure_dir/rstudio_ensured')
         except:
             sys.exit(1)
