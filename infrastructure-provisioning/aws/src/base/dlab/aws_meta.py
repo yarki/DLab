@@ -97,7 +97,7 @@ def get_ami_id_by_name(ami_name, state="*"):
 def get_security_group_by_name(security_group_name):
     ec2 = boto3.resource('ec2')
     try:
-        for security_group in ec2.security_groups.filter(GroupNames=[security_group_name]):
+        for security_group in ec2.security_groups.filter(Filters=[{'Name': 'group-name', 'Values': [security_group_name]}]):
             return security_group.id
     except:
         return ''
