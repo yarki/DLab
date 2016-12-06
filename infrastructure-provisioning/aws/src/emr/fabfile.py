@@ -44,6 +44,7 @@ def run():
 
     create_aws_config_files()
     index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag', '{}-{}-emr'.format(os.environ['conf_service_base_name'], os.environ['edge_user_name']))
+    time_stamp = int(time.time())
     print 'Generating infrastructure names and tags'
     emr_conf = dict()
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
@@ -59,10 +60,10 @@ def run():
     emr_conf['role_service_name'] = os.environ['emr_service_role']
     emr_conf['role_ec2_name'] = os.environ['emr_ec2_role']
 
-    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index) + ', ' \
-                       + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index)\
+    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp) + ', ' \
+                       + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)\
                        + ', Notebook=' + os.environ['notebook_name']
-    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index)
+    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
 
     tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
@@ -84,9 +85,6 @@ def run():
     print "Will create exploratory environment with edge node as access point as following: " + \
           json.dumps(emr_conf, sort_keys=True, indent=4, separators=(',', ': '))
     logging.info(json.dumps(emr_conf))
-
-    if index != 1:
-        time.sleep(15)
 
     try:
         emr_waiter(emr_conf['tag_name'])
