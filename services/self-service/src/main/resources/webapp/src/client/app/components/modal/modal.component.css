@@ -153,12 +153,26 @@ modal-content {
   display: block;
 }
 
+.upload-key {
+  margin-bottom: 20px;
+}
+.upload-key > div > div{
+  margin-top: 5px;
+}
 .confirmation-dialog {
   color: #718ba6;
 }
 .confirmation-dialog p {
   font-size: 14px;
   font-weight: 600;
+}
+.confirmation-dialog .truncate-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+  display: inline-block;
+  vertical-align: bottom;
+
 }
 .confirmation-dialog li {
   font-size: 14px;
@@ -201,7 +215,7 @@ modal-content {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.tunnel_instruction:before {
+.helper_instruction:before {
   content: "?";
   display: inline-block;
   position: relative;

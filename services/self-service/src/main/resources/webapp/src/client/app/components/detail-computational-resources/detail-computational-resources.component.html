@@ -36,7 +36,10 @@ limitations under the License.
       <div class="detail-info">
         <div class="row">
          <div class="col-xs-6"><p>Cluster Alias:</p></div>
-         <div class="col-xs-6"><span>{{resource.computational_name}}</span></div>
+         <div class="col-xs-6 tooltip-wrap" (mouseover)="isEllipsisActive($event)">
+           <span>{{resource.computational_name}}</span>
+           <div class="tooltip" [style.visibility]="tooltip ? 'visible': 'hidden'">{{resource.computational_name}}</div>
+         </div>
         </div>
         <div class="row">
           <div class="col-xs-6"><p>Total Instance number:</p></div>
