@@ -20,15 +20,18 @@
 
 import json
 import time
+from fabric.api import *
 from dlab.fab import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import sys
+import os
 
 
 def emr_waiter(tag_name):
-    if len(get_emr_list(tag_name, 'Key', False, True)) > 0:
-        print "Some EMR cluster is still being created. Waiting.."
+    if len(get_emr_list(tag_name, 'Key', False, True)) > 0 or os.path.exists('/response/.emr_creating'):
+        with hide('stderr', 'running', 'warnings'):
+            local("echo 'Some EMR cluster is still being created, waiting..'")
         time.sleep(60)
         emr_waiter(tag_name)
     else:
@@ -42,6 +45,8 @@ def run():
                         level=logging.INFO,
                         filename=local_log_filepath)
 
+    if os.path.exists('/response/.emr_creating'):
+        time.sleep(30)
     create_aws_config_files()
     index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag', '{}-{}-emr'.format(os.environ['conf_service_base_name'], os.environ['edge_user_name']))
     time_stamp = int(time.time())
@@ -88,6 +93,7 @@ def run():
 
     try:
         emr_waiter(emr_conf['tag_name'])
+        local('touch /response/.emr_creating')
     except:
         with open("/root/result.json", 'w') as result:
             res = {"error": "EMR waiter fail", "conf": emr_conf}
@@ -115,7 +121,9 @@ def run():
 
         cluster_name = emr_conf['cluster_name']
         keyfile_name = "/root/keys/%s.pem" % emr_conf['key_name']
+        local('rm /response/.emr_creating')
     except:
+        local('rm /response/.emr_creating')
         sys.exit(1)
 
     try:
