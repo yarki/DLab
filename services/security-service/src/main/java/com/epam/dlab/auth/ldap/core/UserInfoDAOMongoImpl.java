@@ -58,6 +58,12 @@ public class UserInfoDAOMongoImpl implements UserInfoDAO {
 			LOG.warn("UI not found {}",accessToken);
 			return null;
 		}
+		Date expDate = uiDoc.getDate("expireAt");
+		if(expDate.before(new Date())) {
+			LOG.warn("UI for {} expired but were not evicted from DB. Contact MongoDB admin to create expireable index on 'expireAt' key.",accessToken);
+			this.deleteUserInfo(accessToken);
+			return null;
+		}
 		String name = uiDoc.get("name").toString();
 		String firstName = uiDoc.get("firstName").toString();
 		String lastName  = uiDoc.get("lastName").toString();
