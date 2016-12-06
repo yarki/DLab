@@ -118,13 +118,18 @@ export class ResourcesGrid implements OnInit {
     this.filterForm[$event.type] = $event.model;
   }
 
+  resetFilterConfigurations() : void {
+    this.filterForm.resetConfigurations();
+    this.buildGrid();
+  }
+
   buildGrid() : void {
     this.userResourceService.getUserProvisionedResources()
       .subscribe((result) => {
         this.environments = this.loadEnvironments(result);
 
-        this.filterForm.resetConfigurations();
         this.filteredEnvironments = this.environments;
+        this.applyFilter_btnClick(this.filterForm);
         this.getDefaultFilterConfiguration();
 
         console.log('models ', this.environments);
