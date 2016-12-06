@@ -130,7 +130,7 @@ def ensure_r_kernel():
             #sudo('update-java-alternatives -s java-8-oracle')
             #sudo('apt-get install oracle-java8-set-default')
             sudo('R CMD javareconf')
-            sudo('git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
+            sudo('cd /root; git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
             sudo('R -e "install.packages(\'R6\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'pbdZMQ\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'RCurl\',repos=\'http://cran.us.r-project.org\')"')
