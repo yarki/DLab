@@ -190,9 +190,12 @@ body {
 }
 
 /* IE can just show/hide with no transition */
-.lte8 .tooltip-wrap .tooltip {
-  display: none;
-}
-.lte8 .tooltip-wrap:hover .tooltip {
-  display: block;
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+     /* IE10+ */
+      .tooltip-wrap .tooltip {
+       display: none;
+     }
+      .tooltip-wrap:hover .tooltip {
+       display: block;
+     }
 }

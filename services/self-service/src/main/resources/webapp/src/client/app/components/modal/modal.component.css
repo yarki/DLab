@@ -166,6 +166,14 @@ modal-content {
   font-size: 14px;
   font-weight: 600;
 }
+.confirmation-dialog .truncate-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+  display: inline-block;
+  vertical-align: bottom;
+
+}
 .confirmation-dialog li {
   font-size: 14px;
   color: #9cadbe;
