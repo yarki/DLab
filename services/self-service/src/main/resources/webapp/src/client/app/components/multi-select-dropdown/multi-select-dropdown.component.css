@@ -85,17 +85,17 @@
   box-shadow: none;
 }
 
-::-webkit-scrollbar {
+.dropdown-multiselect .dropdown-menu::-webkit-scrollbar {
   width: 8px;
 }
 
-::-webkit-scrollbar-track {
+.dropdown-multiselect .dropdown-menu::-webkit-scrollbar-track {
   -webkit-box-shadow: none;
   border-radius: 5px;
   background-color: #f1ecec;
 }
 
-::-webkit-scrollbar-thumb {
+.dropdown-multiselect .dropdown-menu::-webkit-scrollbar-thumb {
   -webkit-box-shadow: inset 1px 1px 6px #9a9393;
   background-color: #f9fafb;
   border-radius: 5px;
