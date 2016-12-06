@@ -46,7 +46,7 @@
   margin: 0;
 }
 .dropdown-multiselect.statuses .dropdown-menu li a,
-.dropdown-multiselect.resources .dropdown-menu li a{
+.dropdown-multiselect.resources .dropdown-menu li a {
   text-transform: capitalize;
 }
 .dropdown-multiselect .dropdown-menu a {
@@ -67,11 +67,11 @@
 }
 .dropdown-multiselect .dropdown-menu .filter-actions .select_all:hover {
   color: #49af38;
-  background: #fbfbf4;
+  background: #f9fafb;
 }
 .dropdown-multiselect .dropdown-menu .filter-actions .deselect_all:hover {
   color: #f1696e;
-  background: #fbfbf4;
+  background: #f9fafb;
 }
 
 .dropdown-multiselect .dropdown-menu a span {

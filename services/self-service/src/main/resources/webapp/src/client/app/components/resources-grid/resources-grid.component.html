@@ -31,7 +31,7 @@ limitations under the License.
   </tr>
 
   <tr *ngIf="filteredEnvironments && collapseFilterRow" class="filter-row">
-    <td class="name-filter">
+    <td>
       <input placeholder="Filter by environment name" class="form-control filter-field" [value]="filterForm.name" (input)="filterForm.name = $event.target.value" />
     </td>
     <td>

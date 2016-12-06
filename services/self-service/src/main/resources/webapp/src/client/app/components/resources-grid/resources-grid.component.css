@@ -69,6 +69,9 @@ limitations under the License.
 .dashboard_table tr.filter-row td {
   padding: 10px;
 }
+.dashboard_table tr.filter-row td:first-child {
+  font-weight: 400;
+}
 .dashboard_table tr.filter-row td:last-child {
   padding: 10px 0;
 }
@@ -83,12 +86,12 @@ limitations under the License.
 }
 .filter-row .actions .reset:hover {
   border-color: #f1696e;
-  background: #fbfbf4;
+  background: #f9fafb;
   color: #f1696e;
 }
 .filter-row .actions .apply:hover {
   border-color: #49af38;
-  background: #fbfbf4;
+  background: #f9fafb;
   color: #49af38;
 }
 
