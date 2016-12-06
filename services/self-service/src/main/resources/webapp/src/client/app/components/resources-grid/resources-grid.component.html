@@ -19,7 +19,10 @@ limitations under the License.
 <table class="dashboard_table">
   <tr>
     <th *ngFor="let column of filteringColumns" ngClass="{{column.className || ''}}">{{column.title}}
-      <span *ngIf="column.filtering" class="glyphicon glyphicon-option-vertical" (click)="toggleFilterRow()"></span>
+      <span *ngIf="column.filtering"
+            class="glyphicon pull-right"
+            [ngClass]="filtering && filterForm[column.name].length > 0 && !collapseFilterRow ? 'glyphicon-filter': 'glyphicon-option-vertical'"
+            (click)="toggleFilterRow()"></span>
     </th>
   </tr>
 
@@ -28,7 +31,7 @@ limitations under the License.
   </tr>
 
   <tr *ngIf="filteredEnvironments && collapseFilterRow" class="filter-row">
-    <td class="name-filter">
+    <td>
       <input placeholder="Filter by environment name" class="form-control filter-field" [value]="filterForm.name" (input)="filterForm.name = $event.target.value" />
     </td>
     <td>
@@ -42,13 +45,13 @@ limitations under the License.
     </td>
     <td>
       <div class="actions">
-        <button class="btn" (click)="resetFilterConfigurations()">
-              <span class="glyphicon glyphicon-remove-circle"></span>
-            </button>
+        <button class="btn reset" (click)="resetFilterConfigurations()">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
 
-        <button class="btn" (click)="applyFilter_btnClick(filterForm)">
-              <span class="glyphicon glyphicon-ok-circle"></span>
-            </button>
+        <button class="btn apply" (click)="applyFilter_btnClick(filterForm)">
+          <span class="glyphicon glyphicon-ok"></span>
+        </button>
       </div>
     </td>
   </tr>

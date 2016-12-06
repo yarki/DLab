@@ -35,17 +35,11 @@ limitations under the License.
 .dashboard_table tr {
   vertical-align: top;
 }
-.dashboard_table tr th {
-  position: relative;
-}
 .dashboard_table tr th span {
   width: 50px;
   text-align: center;
-  position: absolute;
-  right: 0;
-  top: 0;
   height: 100%;
-  line-height: 34px;
+  line-height: 40px;
 }
 .dashboard_table tr td {
   font-size: 14px;
@@ -75,12 +69,11 @@ limitations under the License.
 .dashboard_table tr.filter-row td {
   padding: 10px;
 }
+.dashboard_table tr.filter-row td:first-child {
+  font-weight: 400;
+}
 .dashboard_table tr.filter-row td:last-child {
   padding: 10px 0;
-}
-.dashboard_table tr.filter-row td:not(:last-child) {
-  border-right: none;
-  background: #fff;
 }
 .filter-row .actions {
   text-align: center;
@@ -91,6 +84,17 @@ limitations under the License.
   color: #35afd5;
   outline: none;
 }
+.filter-row .actions .reset:hover {
+  border-color: #f1696e;
+  background: #f9fafb;
+  color: #f1696e;
+}
+.filter-row .actions .apply:hover {
+  border-color: #49af38;
+  background: #f9fafb;
+  color: #49af38;
+}
+
 .dashboard_table tr:nth-child(2n+1) td:first-child {
   background: #edf6f9;
 }
@@ -98,8 +102,9 @@ limitations under the License.
   background: #a1b7d1;
   color: #fff;
   font-weight: 600;
+  line-height: 40px;
   text-transform: uppercase;
-  padding: 11px 15px;
+  padding-left: 12px;
   font-size: 12px;
 }
 .dashboard_table .status {

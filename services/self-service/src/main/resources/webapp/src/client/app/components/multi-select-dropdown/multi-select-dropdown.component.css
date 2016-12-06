@@ -9,6 +9,12 @@
   border: 1px solid #cad2da;
   font-size: 14px;
 }
+.dropdown-multiselect button span {
+  color: #999;
+}
+.dropdown-multiselect button .selected-items {
+  color: #4eaf3e;
+}
 .dropdown-multiselect .caret-btn {
   position: absolute;
   top: 0;
@@ -39,7 +45,10 @@
   padding: 0;
   margin: 0;
 }
-
+.dropdown-multiselect.statuses .dropdown-menu li a,
+.dropdown-multiselect.resources .dropdown-menu li a {
+  text-transform: capitalize;
+}
 .dropdown-multiselect .dropdown-menu a {
   padding: 10px;
   padding-left: 35px;
@@ -56,6 +65,14 @@
   padding-left: 14px;
   color: #35afd5;
 }
+.dropdown-multiselect .dropdown-menu .filter-actions .select_all:hover {
+  color: #49af38;
+  background: #f9fafb;
+}
+.dropdown-multiselect .dropdown-menu .filter-actions .deselect_all:hover {
+  color: #f1696e;
+  background: #f9fafb;
+}
 
 .dropdown-multiselect .dropdown-menu a span {
   position: absolute;
@@ -68,17 +85,17 @@
   box-shadow: none;
 }
 
-::-webkit-scrollbar {
+.dropdown-multiselect .dropdown-menu::-webkit-scrollbar {
   width: 8px;
 }
 
-::-webkit-scrollbar-track {
+.dropdown-multiselect .dropdown-menu::-webkit-scrollbar-track {
   -webkit-box-shadow: none;
   border-radius: 5px;
   background-color: #f1ecec;
 }
 
-::-webkit-scrollbar-thumb {
+.dropdown-multiselect .dropdown-menu::-webkit-scrollbar-thumb {
   -webkit-box-shadow: inset 1px 1px 6px #9a9393;
   background-color: #f9fafb;
   border-radius: 5px;
