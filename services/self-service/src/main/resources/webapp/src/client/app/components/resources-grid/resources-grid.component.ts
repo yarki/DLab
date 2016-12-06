@@ -22,6 +22,7 @@ import { ResourcesGridRowModel } from './resources-grid.model';
 import { FilterConfigurationModel } from './filterConfiguration.model';
 import { CreateEmrModel } from "./createEmrModel";
 import { ConfirmationDialogType } from "../confirmation-dialog/confirmation-dialog-type.enum";
+import { SortUtil } from './../../util/sortUtil';
 
 @Component({
   moduleId: module.id,
@@ -74,13 +75,12 @@ export class ResourcesGrid implements OnInit {
         shapes.push(item.shape);
       if(statuses.indexOf(item.status) == -1)
         statuses.push(item.status);
-        statuses.sort();
-
+        statuses.sort(SortUtil.statusSort);
 
         item.resources.forEach((resource:any) => {
           if(resources.indexOf(resource.status) == -1)
             resources.push(resource.status);
-            resources.sort();
+            resources.sort(SortUtil.statusSort);
         });
     });
 
