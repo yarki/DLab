@@ -36,5 +36,7 @@ logging:
   appenders:
 #    - type: console
     - type: file
-      currentLogFilename: /tmp/dlab/log/provisioning.log
-      archivedLogFilenamePattern: /tmp/dlab/log/provisioning-%d.log
+      currentLogFilename: /var/opt/dlab/log/ssn/provisioning.log
+      archive: true
+      archivedLogFilenamePattern: /var/opt/dlab/log/ssn/provisioning-%d{yyyy-MM-dd}.log.gz
+      archivedFileCount: 10

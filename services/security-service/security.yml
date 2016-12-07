@@ -133,5 +133,8 @@ logging:
   appenders:
     - type: console
     - type: file
-      currentLogFilename: /tmp/dlab/log/security.log
-      archivedLogFilenamePattern: /tmp/dlab/log/security-%d.log
+      currentLogFilename: /var/opt/dlab/log/ssn/security.log
+      archive: true
+      archivedLogFilenamePattern: /var/opt/dlab/log/ssn/security-%d{yyyy-MM-dd}.log.gz
+      archivedFileCount: 10
+      

@@ -39,5 +39,7 @@ logging:
   appenders:
 #    - type: console
     - type: file
-      currentLogFilename: /tmp/dlab/log/selfservice.log
-      archivedLogFilenamePattern: /tmp/dlab/log/selfservice-%d.log
+      currentLogFilename: /var/opt/dlab/log/ssn/selfservice.log
+      archive: true
+      archivedLogFilenamePattern: /var/opt/dlab/log/ssn/selfservice-%d{yyyy-MM-dd}.log.gz
+      archivedFileCount: 10
