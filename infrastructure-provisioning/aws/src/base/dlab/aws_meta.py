@@ -31,17 +31,29 @@ logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
 
 
 def get_instance_hostname(instance_name):
-    ec2 = boto3.resource('ec2')
-    instances = ec2.instances.filter(
-        Filters=[{'Name': 'tag:Name', 'Values': [instance_name]},
-                 {'Name': 'instance-state-name', 'Values': ['running']}])
-    for instance in instances:
-        public = getattr(instance, 'public_dns_name')
-        private = getattr(instance, 'private_dns_name')
-        if public:
-            return public
-        else:
-            return private
+    try:
+        public = ''
+        private = ''
+        ec2 = boto3.resource('ec2')
+        instances = ec2.instances.filter(
+            Filters=[{'Name': 'tag:Name', 'Values': [instance_name]},
+                     {'Name': 'instance-state-name', 'Values': ['running']}])
+        for instance in instances:
+            public = getattr(instance, 'public_dns_name')
+            private = getattr(instance, 'private_dns_name')
+            if public:
+                return public
+            else:
+                return private
+        if public == '' and private == '':
+            raise Exception("Unable to find instance hostname with instance name: " + instance_name)
+    except Exception as err:
+        logging.error("Unable to find instance hostname with instance name: " + instance_name + " : " + str(err))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to find instance hostname", "error_message": str(err)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def get_vpc_endpoints(vpc_id):
@@ -308,7 +320,7 @@ def get_ami_id(ami_name):
             raise Exception("Unable to find image id with name: " + ami_name)
         return image_id
     except Exception as err:
-        logging.error("Failed to find AMI: " + ami_name + " : " + str(err))
+        logging.error("Failed to find AMI: " + ami_name + " : " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to find AMI", "error_message": str(err)}
             print json.dumps(res)
