@@ -18,6 +18,16 @@
 
 import boto3
 import json
+import logging
+import os
+import sys
+import traceback
+
+local_log_filename = "%s.log" % os.environ['request_id']
+local_log_filepath = "/response/" + local_log_filename
+logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                    level=logging.DEBUG,
+                    filename=local_log_filepath)
 
 
 def get_instance_hostname(instance_name):
@@ -89,7 +99,13 @@ def get_ami_id_by_name(ami_name, state="*"):
     try:
         for image in ec2.images.filter(Filters=[{'Name': 'name', 'Values': [ami_name]}, {'Name': 'state', 'Values': [state]}]):
             return image.id
-    except:
+    except Exception as err:
+        logging.error("Failed to find AMI: " + ami_name + " : " + str(err))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to find AMI", "error_message": str(err)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
         return ''
     return ''
 
