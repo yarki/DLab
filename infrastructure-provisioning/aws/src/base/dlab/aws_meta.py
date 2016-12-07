@@ -320,9 +320,9 @@ def get_ami_id(ami_name):
             raise Exception("Unable to find image id with name: " + ami_name)
         return image_id
     except Exception as err:
-        logging.error("Failed to find AMI: " + ami_name + " : " + str(err) + "\n Traceback: ")
+        logging.error("Failed to find AMI: " + ami_name + " : " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to find AMI", "error_message": str(err)}
+            res = {"error": "Unable to find AMI", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
