@@ -391,7 +391,6 @@ def remove_subnets(tag_value):
             result.write(json.dumps(res))
 
 
-
 def remove_sgroups(tag_value):
     try:
         print "[Removing security groups]"

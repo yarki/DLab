@@ -292,9 +292,9 @@ def get_ami_id(ami_name):
 
 
 def get_iam_profile(profile_name, count=0):
+    client = boto3.client('iam')
     try:
         if count < 20:
-            client = boto3.client('iam')
             response = client.get_instance_profile(InstanceProfileName=profile_name)
             iam_profile = response.get('InstanceProfileName')
             print 'IAM profile checked. Creating instance...'
@@ -306,3 +306,17 @@ def get_iam_profile(profile_name, count=0):
         time.sleep(10)
         get_iam_profile(profile_name, count)
     return iam_profile
+
+
+def check_security_group(security_group_name, count=0):
+    ec2 = boto3.resource('ec2')
+    if count < 20:
+        for security_group in ec2.security_groups.filter(Filters=[{'Name': 'group-name', 'Values': [security_group_name]}]):
+            while security_group.id == '':
+                count = count + 1
+                time.sleep(10)
+                print "Security gruop is not available yet. Waiting..."
+                check_security_group(security_group_name, count)
+            return security_group.id
+
+
