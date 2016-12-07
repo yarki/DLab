@@ -315,7 +315,7 @@ def check_security_group(security_group_name, count=0):
             while security_group.id == '':
                 count = count + 1
                 time.sleep(10)
-                print "Security gruop is not available yet. Waiting..."
+                print "Security group is not available yet. Waiting..."
                 check_security_group(security_group_name, count)
             return security_group.id
 
