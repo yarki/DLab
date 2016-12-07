@@ -24,6 +24,7 @@ import os
 import json
 from fabric.api import *
 import logging
+from dlab.aws_meta import *
 
 local_log_filename = "%s.log" % os.environ['request_id']
 local_log_filepath = "/response/" + local_log_filename
@@ -142,6 +143,7 @@ def create_instance(definitions, instance_tag):
                                              IamInstanceProfile={'Name': definitions.iam_profile},
                                              UserData=user_data)
         else:
+            get_iam_profile(definitions.iam_profile)
             instances = ec2.create_instances(ImageId=definitions.ami_id, MinCount=1, MaxCount=1,
                                              KeyName=definitions.key_name,
                                              SecurityGroupIds=security_groups_ids,

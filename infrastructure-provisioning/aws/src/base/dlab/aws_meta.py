@@ -18,6 +18,7 @@
 
 import boto3
 import json
+import time
 
 
 def get_instance_hostname(instance_name):
@@ -288,3 +289,20 @@ def get_ami_id(ami_name):
     for i in response:
         image_id = i.get('ImageId')
     return image_id
+
+
+def get_iam_profile(profile_name, count=0):
+    try:
+        if count < 20:
+            client = boto3.client('iam')
+            response = client.get_instance_profile(InstanceProfileName=profile_name)
+            iam_profile = response.get('InstanceProfileName')
+            print 'IAM profile checked. Creating instance...'
+        else:
+            return False
+    except:
+        count = count + 1
+        print 'IAM profile is not available yet. Waiting...'
+        time.sleep(10)
+        get_iam_profile(profile_name, count)
+    return iam_profile
