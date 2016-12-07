@@ -304,6 +304,8 @@ def get_ami_id(ami_name):
         response = response.get('Images')
         for i in response:
             image_id = i.get('ImageId')
+        if image_id == None:
+            raise Exception("Unable to find image id with name: " + ami_name)
         return image_id
     except Exception as err:
         logging.error("Failed to find AMI: " + ami_name + " : " + str(err))
