@@ -312,6 +312,7 @@ def remove_role(instance_type, scientist=''):
             for i in policy_list:
                 policy_arn = i.get('PolicyArn')
                 client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
+                client.delete_role_policy(RoleName=role, PolicyName=policy_arn)
         profile = client.get_instance_profile(InstanceProfileName="{}".format(role_profile_name)).get(
             "InstanceProfile").get("InstanceProfileName")
         client.remove_role_from_instance_profile(InstanceProfileName=profile, RoleName=role)
