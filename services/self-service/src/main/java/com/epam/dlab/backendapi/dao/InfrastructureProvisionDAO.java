@@ -50,7 +50,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     private static final String SET = "$set";
 
     public Iterable<Document> find(String user) {
-        return mongoService.getCollection(USER_INSTANCES).find(eq(USER, user));
+        return find(USER_INSTANCES, eq(USER, user));
     }
 
     public Iterable<Document> findShapes() {
