@@ -276,31 +276,39 @@ def get_route_table_by_tag(tag_name, tag_value):
 
 
 def get_ami_id(ami_name):
-    client = boto3.client('ec2')
-    image_id = ''
-    response = client.describe_images(
-        Filters=[
-            {
-                'Name': 'name',
-                'Values': [ami_name]
-            },
-            {
-                'Name': 'virtualization-type', 'Values': ['hvm']
-            },
-            {
-                'Name': 'state', 'Values': ['available']
-            },
-            {
-                'Name': 'root-device-name', 'Values': ['/dev/sda1']
-            },
-            {
-                'Name': 'root-device-type', 'Values': ['ebs']
-            },
-            {
-                'Name': 'architecture', 'Values': ['x86_64']
-            }
-        ])
-    response = response.get('Images')
-    for i in response:
-        image_id = i.get('ImageId')
-    return image_id
+    try:
+        client = boto3.client('ec2')
+        image_id = ''
+        response = client.describe_images(
+            Filters=[
+                {
+                    'Name': 'name',
+                    'Values': [ami_name]
+                },
+                {
+                    'Name': 'virtualization-type', 'Values': ['hvm']
+                },
+                {
+                    'Name': 'state', 'Values': ['available']
+                },
+                {
+                    'Name': 'root-device-name', 'Values': ['/dev/sda1']
+                },
+                {
+                    'Name': 'root-device-type', 'Values': ['ebs']
+                },
+                {
+                    'Name': 'architecture', 'Values': ['x86_64']
+                }
+            ])
+        response = response.get('Images')
+        for i in response:
+            image_id = i.get('ImageId')
+        return image_id
+    except Exception as err:
+        logging.error("Failed to find AMI: " + ami_name + " : " + str(err))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to find AMI", "error_message": str(err)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
