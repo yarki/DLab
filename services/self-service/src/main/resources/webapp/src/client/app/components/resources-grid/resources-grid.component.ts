@@ -127,12 +127,12 @@ export class ResourcesGrid implements OnInit {
     this.userResourceService.getUserProvisionedResources()
       .subscribe((result) => {
         this.environments = this.loadEnvironments(result);
-
         this.filteredEnvironments = this.environments;
-        this.applyFilter_btnClick(this.filterForm);
-        this.getDefaultFilterConfiguration();
 
-        console.log('models ', this.environments);
+        if(this.environments.length)
+          this.applyFilter_btnClick(this.filterForm);
+
+        this.getDefaultFilterConfiguration();
       });
   }
 
