@@ -73,10 +73,6 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        try:
-            remove_role(instance)
-        except:
-            sys.exit(1)
         sys.exit(1)
 
     try:
