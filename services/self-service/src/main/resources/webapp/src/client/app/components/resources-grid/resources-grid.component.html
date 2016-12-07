@@ -26,10 +26,6 @@ limitations under the License.
     </th>
   </tr>
 
-  <tr *ngIf="(!filteredEnvironments) && !filtering || (filteredEnvironments.length == 0) && !filtering" class="message_block">
-    <td colspan="5">To start working, please, create new environment</td>
-  </tr>
-
   <tr *ngIf="filteredEnvironments && collapseFilterRow" class="filter-row">
     <td>
       <input placeholder="Filter by environment name" class="form-control filter-field" [value]="filterForm.name" (input)="filterForm.name = $event.target.value" />
@@ -49,11 +45,15 @@ limitations under the License.
           <span class="glyphicon glyphicon-remove"></span>
         </button>
 
-        <button class="btn apply" (click)="applyFilter_btnClick(filterForm)">
-          <span class="glyphicon glyphicon-ok"></span>
+        <button class="btn apply" (click)="applyFilter_btnClick(filterForm)" [disabled]="filteredEnvironments.length == 0">
+          <span class="glyphicon glyphicon-ok" [ngClass]="{'not-allowed': filteredEnvironments.length == 0}"></span>
         </button>
       </div>
     </td>
+  </tr>
+
+  <tr *ngIf="(!filteredEnvironments) && !filtering || (filteredEnvironments.length == 0) && !filtering" class="message_block">
+    <td colspan="5">To start working, please, create new environment</td>
   </tr>
 
   <tr *ngIf="(filteredEnvironments.length == 0) && filtering" class="message_block">
