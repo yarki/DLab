@@ -36,16 +36,23 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
     private String username;
     private UserInfo userInfo;
 
+    private RuntimeException ldapError      = null;
+    private RuntimeException ldapGroupError = null;
+    private RuntimeException awsUserError   = null;
+    private RuntimeException awsKeyError    = null;
+
+
     private int readinessStatus = 0b00000000;
 
-    public final static int FIRST_NAME      = 0b000001;
-    public final static int LAST_NAME       = 0b000010;
-    public final static int AWS_USER_SET    = 0b000100;
-    public final static int ROLE_SET        = 0b001000;
-    public final static int REMOTE_IP       = 0b010000;
-    public final static int AWS_KEYS        = 0b100000;
+    public final static int FIRST_NAME      = 0b0000001;
+    public final static int LAST_NAME       = 0b0000010;
+    public final static int AWS_USER_SET    = 0b0000100;
+    public final static int ROLE_SET        = 0b0001000;
+    public final static int REMOTE_IP       = 0b0010000;
+    public final static int AWS_KEYS        = 0b0100000;
+    public final static int LOGIN           = 0b1000000;
 
-    public final static int READYNESS_MASK  = 0b111111;
+    public final static int READYNESS_MASK  = 0b1111111;
 
     public static boolean testMask(Supplier<? extends UserInfo> supplier, int mask) {
         UserInfoBuilder builder = (UserInfoBuilder) supplier;
@@ -53,43 +60,51 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
         return (builder.readinessStatus & mask) == mask;
     }
 
+    public void setMask(int mask) {
+        this.readinessStatus |= mask;
+    }
+
     public static BuilderSupplier<UserInfo> supplier(final String token, final String username ) {
         LOG.debug("supplier requested {} {}",token, username);
         return () -> new UserInfoBuilder(token,username);
+    }
+
+    public static void ldapLoginPassed(UserInfoBuilder b, Object t) {
+        b.setMask( LOGIN );
     }
 
     public static void firstName(UserInfoBuilder b, String firstName) {
         LOG.debug("firstName {}",firstName);
 
         b.userInfo.setFirstName(firstName);
-        b.readinessStatus |= FIRST_NAME;
+        b.setMask( FIRST_NAME );
     }
 
     public static void lastName(UserInfoBuilder b, String lastName) {
         LOG.debug("lastName {}",lastName);
 
         b.userInfo.setLastName(lastName);
-        b.readinessStatus |= LAST_NAME;
+        b.setMask( LAST_NAME );
     }
 
     public static void remoteIp(UserInfoBuilder b, String remoteIp) {
         LOG.debug("remoteIp {}",remoteIp);
 
         b.userInfo.setRemoteIp(remoteIp);
-        b.readinessStatus |= REMOTE_IP;
+        b.setMask( REMOTE_IP );
     }
 
     public static void awsUser(UserInfoBuilder b, Boolean awsUser) {
         LOG.debug("awsUser {}",awsUser);
 
         b.userInfo.setAwsUser(awsUser);
-        b.readinessStatus |= AWS_USER_SET;
+        b.setMask( AWS_USER_SET );
     }
 
     public static void roles(UserInfoBuilder b, Collection<String> roles) {
         LOG.debug("roles {}",roles);
         roles.forEach( role -> b.userInfo.addRole(role) );
-        b.readinessStatus |= ROLE_SET;
+        b.setMask( ROLE_SET );
     }
 
     public static void ldapUserInfo(UserInfoBuilder b, UserInfo ui) {
@@ -111,6 +126,10 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
 
     @Override
     public UserInfo get() {
+        if( ldapError != null )      throw ldapError;
+        if( ldapGroupError != null ) throw ldapGroupError;
+        if( awsUserError != null )   throw awsUserError;
+        if( awsKeyError != null )    throw awsKeyError;
         return userInfo;
     }
 
@@ -127,13 +146,7 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
         return UserInfoBuilder.testMask(this,UserInfoBuilder.READYNESS_MASK);
     }
 
-    public static void cloneUserInfo(UserInfoBuilder b, UserInfo ui) {
-        b.userInfo = ui.withToken(ui.getAccessToken());
-        b.username = ui.getName();
-        b.token    = ui.getAccessToken();
-    }
-
-    public static void awsKeys(UserInfoBuilder userInfoBuilder, List<AccessKeyMetadata> keyMetadata) {
+    public static void awsKeys(UserInfoBuilder b, List<AccessKeyMetadata> keyMetadata) {
         LOG.debug("AWS Keys {}",keyMetadata);
         LongAdder counter = new LongAdder();
         if(keyMetadata != null) {
@@ -143,17 +156,42 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
                 if ("Active".equalsIgnoreCase(status)) {
                     counter.increment();
                 }
-                userInfoBuilder.userInfo.addKey(key, status);
+                b.userInfo.addKey(key, status);
             });
         }
         if( counter.intValue() == 0 ) {
-            throw new RuntimeException("Please contact AWS administrator to activate your Access Key");
+            b.awsKeyError = new RuntimeException("Please contact AWS administrator to activate your Access Key");
         }
-        userInfoBuilder.readinessStatus |= AWS_KEYS;
+        b.setMask( AWS_KEYS );
     }
 
     public static void failed(UserInfoBuilder userInfoBuilder, RuntimeException error) {
-        LOG.error("UserInfo error {}", error.getMessage());
+        LOG.error("UserInfo failure {}", error.getMessage());
         throw error;
     }
+
+    public static void ldapUserInfoError(UserInfoBuilder b, RuntimeException t) {
+        LOG.error("ldapUserInfoError {}", t.getMessage());
+        b.ldapError = t;
+        b.setMask( LOGIN );
+    }
+
+    public static void ldapGroupInfoError(UserInfoBuilder b, RuntimeException t) {
+        LOG.error("ldapGroupInfoError {}", t.getMessage());
+        b.ldapGroupError = t;
+        b.setMask( FIRST_NAME | LAST_NAME | ROLE_SET );
+    }
+
+    public static void awsUserError(UserInfoBuilder b, RuntimeException t) {
+        LOG.error("awsUserError {}", t.getMessage());
+        b.awsUserError = t;
+        b.setMask( AWS_USER_SET );
+    }
+
+    public static void awsKeysError(UserInfoBuilder b, RuntimeException t) {
+        LOG.error("awsKeysError {}", t.getMessage());
+        b.awsKeyError = t;
+        b.setMask( AWS_KEYS );
+    }
+
 }
