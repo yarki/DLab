@@ -301,7 +301,6 @@ def remove_role(instance_type, scientist=''):
         if instance_type == "edge":
             role_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Role'
             role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
-            policy_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-strict_to_S3-Policy'
         elif instance_type == "notebook":
             role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Role'
             role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
@@ -313,8 +312,8 @@ def remove_role(instance_type, scientist=''):
             for i in policy_list:
                 policy_arn = i.get('PolicyArn')
                 client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
-                client.delete_role_policy(RoleName=role, PolicyName=policy_name)
-        else:
+                client.delete_policy(PolicyArn=policy_arn)
+        elif instance_type == "notebook":
             policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
             for i in policy_list:
                 policy_arn = i.get('PolicyArn')
