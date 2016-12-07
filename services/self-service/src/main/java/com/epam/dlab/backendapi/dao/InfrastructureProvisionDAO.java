@@ -18,21 +18,19 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.dao;
 
-import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
-import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
-import com.epam.dlab.constants.UserInstanceStatus;
+import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
+import com.epam.dlab.backendapi.core.UserInstanceDTO;
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
-import com.mongodb.client.FindIterable;
 import org.bson.Document;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
-import static com.epam.dlab.constants.UserInstanceStatus.TERMINATED;
+import static com.epam.dlab.UserInstanceStatus.TERMINATED;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
