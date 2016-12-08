@@ -10,6 +10,7 @@
                 "iam:AddRoleToInstanceProfile",
                 "iam:DetachRolePolicy",
                 "iam:DeleteInstanceProfile",
+                "iam:DeletePolicy",
                 "iam:DeleteRolePolicy",
                 "iam:DeleteRole",
                 "iam:RemoveRoleFromInstanceProfile",

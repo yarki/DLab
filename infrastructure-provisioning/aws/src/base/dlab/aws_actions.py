@@ -24,6 +24,7 @@ import os
 import json
 from fabric.api import *
 import logging
+from dlab.aws_meta import *
 import traceback
 
 local_log_filename = "%s.log" % os.environ['request_id']
@@ -148,6 +149,7 @@ def create_instance(definitions, instance_tag):
                                              IamInstanceProfile={'Name': definitions.iam_profile},
                                              UserData=user_data)
         else:
+            get_iam_profile(definitions.iam_profile)
             instances = ec2.create_instances(ImageId=definitions.ami_id, MinCount=1, MaxCount=1,
                                              KeyName=definitions.key_name,
                                              SecurityGroupIds=security_groups_ids,
@@ -319,7 +321,13 @@ def remove_role(instance_type, scientist=''):
         role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
         if instance_type == "ssn":
             client.delete_role_policy(RoleName=role, PolicyName=policy_name)
-        else:
+        if instance_type == "edge":
+            policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
+            for i in policy_list:
+                policy_arn = i.get('PolicyArn')
+                client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
+                client.delete_policy(PolicyArn=policy_arn)
+        elif instance_type == "notebook":
             policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
             for i in policy_list:
                 policy_arn = i.get('PolicyArn')

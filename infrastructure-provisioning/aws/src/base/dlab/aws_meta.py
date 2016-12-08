@@ -18,6 +18,18 @@
 
 import boto3
 import json
+import time
+import logging
+import traceback
+import os
+import sys
+
+
+local_log_filename = "%s.log" % os.environ['request_id']
+local_log_filepath = "/response/" + local_log_filename
+logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                    level=logging.DEBUG,
+                    filename=local_log_filepath)
 import logging
 import os
 import sys
@@ -491,3 +503,45 @@ def get_ami_id(ami_name):
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
+
+
+def get_iam_profile(profile_name, count=0):
+    client = boto3.client('iam')
+    try:
+        if count < 20:
+            response = client.get_instance_profile(InstanceProfileName=profile_name)
+            iam_profile = response.get('InstanceProfileName')
+            print 'IAM profile checked. Creating instance...'
+        else:
+            raise Exception("Unable to find IAM profile by name: " + profile_name)
+    except:
+        count = count + 1
+        print 'IAM profile is not available yet. Waiting...'
+        time.sleep(10)
+        get_iam_profile(profile_name, count)
+    return iam_profile
+
+
+def check_security_group(security_group_name, count=0):
+    try:
+        ec2 = boto3.resource('ec2')
+        if count < 20:
+            for security_group in ec2.security_groups.filter(Filters=[{'Name': 'group-name', 'Values': [security_group_name]}]):
+                while security_group.id == '':
+                    count = count + 1
+                    time.sleep(10)
+                    print "Security group is not available yet. Waiting..."
+                    check_security_group(security_group_name, count)
+                if security_group.id == '':
+                    raise Exception("Unable to check Security group by name: " + security_group_name)
+                return security_group.id
+    except Exception as err:
+        logging.error("Error with checking Security group by name: " + security_group_name + " : " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Error with checking Security group by name", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+
