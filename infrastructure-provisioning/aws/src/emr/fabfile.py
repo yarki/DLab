@@ -26,6 +26,8 @@ from dlab.aws_meta import *
 from dlab.aws_actions import *
 import sys
 import os
+import uuid
+import logging
 
 
 def emr_waiter(tag_name):
@@ -48,10 +50,19 @@ def run():
     if os.path.exists('/response/.emr_creating'):
         time.sleep(30)
     create_aws_config_files()
-    index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag', '{}-{}-emr'.format(os.environ['conf_service_base_name'], os.environ['edge_user_name']))
-    time_stamp = int(time.time())
+    #index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag', '{}-{}-emr'.format(os.environ['conf_service_base_name'], os.environ['edge_user_name']))
+    #time_stamp = int(time.time())
     print 'Generating infrastructure names and tags'
     emr_conf = dict()
+    emr_conf['uuid'] = str(uuid.uuid4())[:5]
+    try:
+        emr_conf['exploratory_name'] = os.environ['exploratory_name']
+    except:
+        emr_conf['exploratory_name'] = ''
+    try:
+        emr_conf['computational_name'] = os.environ['computational_name']
+    except:
+        emr_conf['computational_name'] = ''
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
     emr_conf['service_base_name'] = os.environ['conf_service_base_name']
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
@@ -65,10 +76,14 @@ def run():
     emr_conf['role_service_name'] = os.environ['emr_service_role']
     emr_conf['role_ec2_name'] = os.environ['emr_ec2_role']
 
-    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp) + ', ' \
-                       + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)\
+    #emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp) + ', ' \
+    #                   + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)\
+    #                   + ', Notebook=' + os.environ['notebook_name']
+    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-emr-' + emr_conf['uuid'] + ', ' \
+                       + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-emr-' + emr_conf['uuid']\
                        + ', Notebook=' + os.environ['notebook_name']
-    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)
+    #emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)
+    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-emr-' + emr_conf['uuid']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
 
     tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
