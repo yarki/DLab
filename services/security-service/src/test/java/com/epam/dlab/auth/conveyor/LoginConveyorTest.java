@@ -40,6 +40,7 @@ public class LoginConveyorTest {
         uiSource.addRole("admin");
 
         lc.add("1","127.0.0.1",LoginStep.REMOTE_IP);
+        lc.add("1","OK",LoginStep.LDAP_LOGIN);
         lc.add("1",uiSource,LoginStep.LDAP_USER_INFO);
         lc.add("1",true,LoginStep.AWS_USER);
         lc.add("1",new ArrayList<AccessKeyMetadata>(){{add(new AccessKeyMetadata().withAccessKeyId("a").withStatus("Active"));}} ,LoginStep.AWS_KEYS);
