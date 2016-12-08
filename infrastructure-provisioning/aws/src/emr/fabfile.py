@@ -31,7 +31,7 @@ import logging
 
 
 def emr_waiter(tag_name):
-    if len(get_emr_list(tag_name, 'Key', False, True)) > 0 or os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
+    if len(get_emr_list(tag_name, 'Value', False, True)) > 0 or os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
         with hide('stderr', 'running', 'warnings'):
             local("echo 'Some EMR cluster is still being created, waiting..'")
         time.sleep(60)
@@ -107,7 +107,7 @@ def run():
     logging.info(json.dumps(emr_conf))
 
     try:
-        emr_waiter(emr_conf['tag_name'])
+        emr_waiter(os.environ['notebook_name'])
         local('touch /response/.emr_creating_' + os.environ['exploratory_name'])
     except:
         with open("/root/result.json", 'w') as result:
