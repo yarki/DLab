@@ -364,19 +364,20 @@ def s3_cleanup(bucket, cluster_name, user_name):
         traceback.print_exc(file=sys.stdout)
 
 
-def remove_s3(bucket_type, scientist=''):
+def remove_s3(bucket_type='all', scientist=''):
     try:
         print "[Removing S3 buckets]"
         client = boto3.client('s3')
         bucket_list = []
-        if bucket_type == 'all':
-            for item in client.list_buckets().get('Buckets'):
-                if re.search(os.environ['conf_service_base_name'], item.get('Name')):
-                    bucket_list.append(item.get('Name'))
         if bucket_type == 'ssn':
-            bucket_list.append(os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
+            bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
         elif bucket_type == 'edge':
-            bucket_list.append(os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
+            bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
+        else:
+            bucket_name = (os.environ['conf_service_base_name'])
+        for item in client.list_buckets().get('Buckets'):
+            if re.search(bucket_name, item.get('Name')):
+                bucket_list.append(item.get('Name'))
         for s3bucket in bucket_list:
             list_obj = client.list_objects(Bucket=s3bucket)
             list_obj = list_obj.get('Contents')

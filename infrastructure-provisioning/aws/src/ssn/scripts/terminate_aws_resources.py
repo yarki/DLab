@@ -79,8 +79,7 @@ if __name__ == "__main__":
 
     print "Removing s3 bucket"
     try:
-        remove_s3('edge')
-        remove_s3('ssn')
+        remove_s3()
     except:
         sys.exit(1)
 
