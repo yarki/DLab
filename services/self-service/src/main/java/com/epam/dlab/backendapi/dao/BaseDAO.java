@@ -25,10 +25,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.InsertOneOptions;
+import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -68,12 +71,43 @@ class BaseDAO implements MongoCollections {
                 .append(TIMESTAMP, new Date()));
     }
 
-    protected void update(String collection, Bson condition, Bson value) {
+    protected void updateOne(String collection, Bson condition, Bson value) {
         mongoService.getCollection(collection).updateOne(condition, value);
     }
 
-    protected FindIterable<Document> find(String collection, Bson condition) {
-        return mongoService.getCollection(collection).find(condition);
+    protected FindIterable<Document> find(String collection,
+                                          Bson condition) {
+        return mongoService.getCollection(collection)
+                .find(condition);
+    }
+
+    protected FindIterable<Document> find(String collection,
+                                          Bson condition,
+                                          Bson projection) {
+        return mongoService.getCollection(collection)
+                .find(condition)
+                .projection(projection);
+    }
+
+    private Optional<Document> limitOne(FindIterable<Document> documents) {
+        ArrayList<Document> array = documents.limit(2).into(new ArrayList<>());
+        if(array.size() > 1) {
+            throw new DlabException("too many items found while one is expected");
+        }
+        return array.isEmpty() ? Optional.empty() : Optional.ofNullable(array.get(0));
+    }
+
+    protected Optional<Document> findOne(String collection,
+                               Bson condition) {
+        FindIterable<Document> found = find(collection, condition);
+        return limitOne(found);
+    }
+
+    protected Optional<Document> findOne(String collection,
+                               Bson condition,
+                               Bson projection) {
+        FindIterable<Document> found = find(collection, condition, projection);
+        return limitOne(found);
     }
 
     protected Document convertToBson(Object object) {
@@ -84,9 +118,9 @@ class BaseDAO implements MongoCollections {
         }
     }
 
-    protected <T> Optional<T> find(String collection, Bson eq, Class<T> clazz) {
-        return Optional.ofNullable(mongoService.getCollection(collection).find(eq).first())
-                .flatMap(document -> Optional.of(convertFromDocument(document, clazz)));
+    protected <T> Optional<T> findOne(String collection, Bson eq, Class<T> clazz) {
+        Optional<Document> doc = findOne(collection, eq);
+        return doc.isPresent() ? Optional.ofNullable(convertFromDocument(doc.get(), clazz)) : Optional.empty();
     }
 
     private <T> T convertFromDocument(Document document, Class<T> clazz) {

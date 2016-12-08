@@ -26,14 +26,16 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
-import com.mongodb.client.FindIterable;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static com.epam.dlab.constants.UserInstanceStatus.TERMINATED;
 import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Projections.excludeId;
+import static com.mongodb.client.model.Projections.fields;
+import static com.mongodb.client.model.Projections.include;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -49,6 +51,21 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     private static final String SET = "$set";
 
+    private static Bson exploratoryCondition(String user, String exploratoryName) {
+        return and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName));
+    }
+
+    private static Bson computationalCondition(String user,
+                                               String exploratoryName,
+                                               String computationalName) {
+        return and(exploratoryCondition(user, exploratoryName),
+                elemMatch(COMPUTATIONAL_RESOURCES, and(eq(COMPUTATIONAL_NAME, computationalName))));
+    }
+
+    private static String computationalField(String fieldName) {
+        return COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + fieldName;
+    }
+
     public Iterable<Document> find(String user) {
         return find(USER_INSTANCES, eq(USER, user));
     }
@@ -58,16 +75,18 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     }
 
     public String fetchExploratoryId(String user, String exploratoryName) {
-        return Optional.ofNullable(mongoService.getCollection(USER_INSTANCES)
-                .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first())
+        return findOne(USER_INSTANCES,
+                exploratoryCondition(user, exploratoryName),
+                fields(include(EXPLORATORY_ID), excludeId()))
                 .orElse(new Document())
                 .getOrDefault(EXPLORATORY_ID, EMPTY).toString();
     }
 
     public UserInstanceStatus fetchExploratoryStatus(String user, String exploratoryName) {
         return UserInstanceStatus.of(
-                Optional.ofNullable(mongoService.getCollection(USER_INSTANCES)
-                        .find(and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName))).first())
+                findOne(USER_INSTANCES,
+                        exploratoryCondition(user, exploratoryName),
+                        fields(include(STATUS), excludeId()))
                         .orElse(new Document())
                         .getOrDefault(STATUS, EMPTY).toString());
     }
@@ -82,7 +101,9 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     }
 
     public void updateExploratoryStatus(StatusBaseDTO dto) {
-        update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())), set(STATUS, dto.getStatus()));
+        updateOne(USER_INSTANCES,
+                exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
+                set(STATUS, dto.getStatus()));
     }
 
     public void updateExploratoryFields(ExploratoryStatusDTO dto) {
@@ -93,83 +114,80 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         if (dto.getExploratoryUrl() != null) {
             values.append(EXPLORATORY_URL, dto.getExploratoryUrl());
         }
-        update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())), new Document(SET, values));
+        updateOne(USER_INSTANCES,
+                exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
+                new Document(SET, values));
     }
 
-    public void updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
-        find(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())), UserInstanceDTO.class)
-                .ifPresent(instance -> instance.getResources().forEach(resource -> {
-                    updateComputationalStatus(dto, resource.getComputationalName());
-                }));
-    }
+    public boolean addComputational(String user, String exploratoryName, UserComputationalResourceDTO computationalDTO) {
+        Optional<UserInstanceDTO> optional = findOne(USER_INSTANCES,
+                computationalCondition(user, exploratoryName, computationalDTO.getComputationalName()),
+                UserInstanceDTO.class);
 
-    public boolean addComputational(String user, String name, UserComputationalResourceDTO computationalDTO) {
-        Optional<UserInstanceDTO> optional = find(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, name)), UserInstanceDTO.class);
         if (optional.isPresent()) {
-            UserInstanceDTO dto = optional.get();
-            long count = dto.getResources().stream()
-                    .filter(i -> computationalDTO.getComputationalName().equals(i.getComputationalName()))
-                    .count();
+            long count = optional.get().getResources().size();
             if (count == 0) {
-                update(USER_INSTANCES, eq(ID, dto.getId()), push(COMPUTATIONAL_RESOURCES, convertToBson(computationalDTO)));
+                updateOne(USER_INSTANCES,
+                        eq(ID, optional.get().getId()),
+                        push(COMPUTATIONAL_RESOURCES, convertToBson(computationalDTO)));
                 return true;
             } else {
                 return false;
             }
         } else {
-            throw new DlabException("User '" + user + "' has no records for environment '" + name + "'");
+            throw new DlabException("User '" + user + "' has no records for environment '" + exploratoryName + "'");
         }
     }
 
     @SuppressWarnings("unchecked")
     public String fetchComputationalId(String user, String exploratoryName, String computationalName) {
-        return find(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)), UserInstanceDTO.class)
-                .flatMap(exploratory -> exploratory.getResources()
-                        .stream()
-                        .filter(computational -> computationalName.equals(computational.getComputationalName()))
-                        .findFirst())
-                .flatMap(computational -> Optional.ofNullable(computational.getComputationalId()))
-                .orElse(EMPTY);
+        return findOne(USER_INSTANCES,
+                computationalCondition(user, exploratoryName, computationalName),
+                fields(include(computationalField(COMPUTATIONAL_NAME))))
+                .orElse(new Document())
+                .getOrDefault(computationalField(COMPUTATIONAL_NAME), EMPTY).toString();
     }
 
     public void updateComputationalStatus(ComputationalStatusDTO dto) {
         updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), dto.getComputationalName(), dto.getStatus(), false);
     }
 
-    private void updateComputationalStatus(StatusBaseDTO dto, String computationalName) {
-        updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), computationalName, dto.getStatus(), true);
-    }
-
     private void updateComputationalStatus(String user, String exploratoryName, String computationalName, String status, boolean clearUptime) {
         try {
-            Document values = new Document(getComputationalSetPrefix() + STATUS, status);
+            Document values = new Document(computationalField(STATUS), status);
             if (clearUptime) {
-                values.append(getComputationalSetPrefix() + UPTIME, null);
+                values.append(computationalField(UPTIME), null);
             }
-            update(USER_INSTANCES, and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName)
-                    , elemMatch(COMPUTATIONAL_RESOURCES, and(eq(COMPUTATIONAL_NAME, computationalName), not(eq(STATUS, TERMINATED.toString()))))),
+            updateOne(USER_INSTANCES,
+                    and(exploratoryCondition(user, exploratoryName),
+                            elemMatch(COMPUTATIONAL_RESOURCES, and(eq(COMPUTATIONAL_NAME, computationalName), not(eq(STATUS, TERMINATED.toString()))))),
                     new Document(SET, values));
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);
         }
+    }
+
+    public void updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
+        Document values = new Document(computationalField(STATUS), dto.getStatus());
+        values.append(computationalField(UPTIME), null);
+        updateOne(USER_INSTANCES,
+                and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
+                        elemMatch(COMPUTATIONAL_RESOURCES, not(eq(STATUS, TERMINATED.toString())))),
+                new Document(SET, values));
     }
 
     public void updateComputationalFields(ComputationalStatusDTO dto) {
         try {
-            Document values = new Document(getComputationalSetPrefix() + STATUS, dto.getStatus())
-                    .append(getComputationalSetPrefix() + UPTIME, dto.getUptime());
+            Document values = new Document(computationalField(STATUS), dto.getStatus())
+                    .append(computationalField(UPTIME), dto.getUptime());
             if (dto.getComputationalId() != null) {
-                values.append(getComputationalSetPrefix() + COMPUTATIONAL_ID, dto.getComputationalId());
+                values.append(computationalField(COMPUTATIONAL_ID), dto.getComputationalId());
             }
-            update(USER_INSTANCES, and(eq(USER, dto.getUser()), eq(EXPLORATORY_NAME, dto.getExploratoryName())
-                    , eq(COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + COMPUTATIONAL_NAME, dto.getComputationalName())),
+            updateOne(USER_INSTANCES, and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
+                    elemMatch(COMPUTATIONAL_RESOURCES, and(eq(COMPUTATIONAL_NAME, dto.getComputationalName()), not(eq(STATUS, TERMINATED.toString()))))),
                     new Document(SET, values));
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);
         }
-    }
-
-    private String getComputationalSetPrefix() {
-        return COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER;
     }
 }
