@@ -322,7 +322,7 @@ def terminate():
         print '[TERMINATE SSN]'
         params = "--tag_name %s --edge_sg %s --nb_sg %s" % \
                  (ssn_conf['tag_name'], ssn_conf['edge_sg'], ssn_conf['nb_sg'])
-        if not run_routine('terminate_ssn', params):
+        if not run_routine('terminate_aws_resources', params):
             logging.info('Failed to terminate ssn')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to terminate ssn", "conf": ssn_conf}
