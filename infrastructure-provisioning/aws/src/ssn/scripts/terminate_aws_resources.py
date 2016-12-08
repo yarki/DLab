@@ -97,9 +97,3 @@ if __name__ == "__main__":
         remove_route_tables(args.tag_name)
     except:
         sys.exit(1)
-
-    print "Removing route tables"
-    try:
-        remove_endpoint(args.tag_name)
-    except:
-        sys.exit(1)

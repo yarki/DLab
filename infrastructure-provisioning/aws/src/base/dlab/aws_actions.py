@@ -502,26 +502,17 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
 
 def remove_route_tables(tag_name):
     try:
-        print "Route table was removed"
+        client = boto3.client('ec2')
+        rtables = client.describe_route_tables(Filters=[{'Name': 'tag-key', 'Values': tag_name}])
+        for rtable in rtables:
+            rtable.get('RouteTables').get('RouteTableId')
+            client.delete_route_table(RouteTableId=rtable)
+            print "Route table " + rtable + " was removed"
     except Exception as err:
         logging.info("Unable to remove route table: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to remove route table",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-        traceback.print_exc(file=sys.stdout)
-
-
-def remove_endpoint(tag_name):
-    try:
-        print "Endpoint was removed"
-    except Exception as err:
-        logging.info("Unable to remove endpoint: " + str(err) + "\n Traceback: " + traceback.print_exc(
-            file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove endpoint",
                    "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
