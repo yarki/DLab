@@ -78,9 +78,9 @@ def start_ss():
             sudo('mkdir -p ' + web_path + 'self-service/')
             sudo('chown -R ubuntu:ubuntu ' + web_path)
             try:
-                local('scp -i {} /root/web_app/self-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'self-service/')
-                local('scp -i {} /root/web_app/security-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'security-service/')
-                local('scp -i {} /root/web_app/provisioning-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'provisioning-service/')
+                local('scp -r -i {} /root/web_app/self-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'self-service/')
+                local('scp -r -i {} /root/web_app/security-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'security-service/')
+                local('scp -r -i {} /root/web_app/provisioning-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'provisioning-service/')
             except:
                 with open("/root/result.json", 'w') as result:
                     res = {"error": "Unable to upload webapp jars", "conf": os.environ.__dict__}

@@ -131,7 +131,7 @@ def ensure_r_kernel():
             #sudo('update-java-alternatives -s java-8-oracle')
             #sudo('apt-get install oracle-java8-set-default')
             sudo('R CMD javareconf')
-            sudo('git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
+            sudo('cd /root; git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
             sudo('R -e "install.packages(\'R6\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'pbdZMQ\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'RCurl\',repos=\'http://cran.us.r-project.org\')"')
@@ -146,7 +146,6 @@ def ensure_r_kernel():
             # sudo('export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin; R -e \'IRkernel::installspec(user = FALSE)\'')
             # Spark Install
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
-            #sudo('a=`R --version | awk \'/version / {print $3}\'`; sed -i "/display_name/ s/\"R\"/\"R v$a\"/" /home/ubuntu/.local/share/jupyter/kernels/ir/kernel.json')
             #sudo('export SPARK_HOME=/usr/local/spark/; cd $SPARK_HOME/R/lib/; sudo R --no-site-file --no-environ --no-save --no-restore CMD INSTALL "SparkR"')
             sudo('touch /home/ubuntu/.ensure_dir/r_kernel_ensured')
         except:
