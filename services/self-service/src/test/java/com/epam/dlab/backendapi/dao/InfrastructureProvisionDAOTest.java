@@ -17,17 +17,23 @@
  ****************************************************************************/
 package com.epam.dlab.backendapi.dao;
 
+import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.constants.UserInstanceStatus;
+import com.epam.dlab.dto.StatusBaseDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
+import com.mongodb.client.result.UpdateResult;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 
 import static com.epam.dlab.backendapi.dao.BaseDAO.USER;
 import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.EXPLORATORY_NAME;
+import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.exploratoryCondition;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -60,20 +66,20 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
 
     @Test
     public void fetchExploratoryIdSuccess() {
-        UserInstanceDTO instance1 = new UserInstanceDTO();
-        instance1.setUser("user1");
-        instance1.setExploratoryName("exp_name_1");
-        instance1.setExploratoryId("exp1");
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1");
 
-        UserInstanceDTO instance2 = new UserInstanceDTO();
-        instance2.setUser("user1");
-        instance2.setExploratoryName("exp_name_2");
-        instance2.setExploratoryId("exp2");
+        UserInstanceDTO instance2 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_2")
+                .withExploratoryId("exp2");
 
-        UserInstanceDTO instance3 = new UserInstanceDTO();
-        instance3.setUser("user2");
-        instance3.setExploratoryName("exp_name_1");
-        instance3.setExploratoryId("exp21");
+        UserInstanceDTO instance3 = new UserInstanceDTO()
+                .withUser("user2")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp21");
 
         dao.insertOne(USER_INSTANCES, instance1);
         dao.insertOne(USER_INSTANCES, instance2);
@@ -91,15 +97,15 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
 
     @Test(expected = DlabException.class)
     public void fetchExploratoryIdFailWhenMany() throws DlabException {
-        UserInstanceDTO instance1 = new UserInstanceDTO();
-        instance1.setUser("user1");
-        instance1.setExploratoryName("exp_name_1");
-        instance1.setExploratoryId("exp1");
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1");
 
-        UserInstanceDTO instance2 = new UserInstanceDTO();
-        instance2.setUser("user1");
-        instance2.setExploratoryName("exp_name_1");
-        instance2.setExploratoryId("exp2");
+        UserInstanceDTO instance2 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp2");
 
         dao.insertOne(USER_INSTANCES, instance1);
         dao.insertOne(USER_INSTANCES, instance2);
@@ -109,15 +115,15 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
 
     @Test
     public void fetchExploratoryStatusSuccess() {
-        UserInstanceDTO instance1 = new UserInstanceDTO();
-        instance1.setUser("user1");
-        instance1.setExploratoryName("exp_name_1");
-        instance1.setStatus("created");
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withStatus("created");
 
-        UserInstanceDTO instance2 = new UserInstanceDTO();
-        instance2.setUser("user1");
-        instance2.setExploratoryName("exp_name_2");
-        instance2.setStatus("failed");
+        UserInstanceDTO instance2 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_2")
+                .withStatus("failed");
 
         dao.insertOne(USER_INSTANCES, instance1);
         dao.insertOne(USER_INSTANCES, instance2);
@@ -128,10 +134,10 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
 
     @Test
     public void fetchExploratoryStatusBadValue() {
-        UserInstanceDTO instance1 = new UserInstanceDTO();
-        instance1.setUser("user1");
-        instance1.setExploratoryName("exp_name_1");
-        instance1.setStatus("creat");
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withStatus("creat");
 
         dao.insertOne(USER_INSTANCES, instance1);
         UserInstanceStatus status = dao.fetchExploratoryStatus("user1", "exp_name_1");
@@ -146,15 +152,15 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
 
     @Test(expected = DlabException.class)
     public void fetchExploratoryStatusFailWhenMany() throws DlabException {
-        UserInstanceDTO instance1 = new UserInstanceDTO();
-        instance1.setUser("user1");
-        instance1.setExploratoryName("exp_name_1");
-        instance1.setStatus("created");
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withStatus("created");
 
-        UserInstanceDTO instance2 = new UserInstanceDTO();
-        instance2.setUser("user1");
-        instance2.setExploratoryName("exp_name_1");
-        instance2.setStatus("created");
+        UserInstanceDTO instance2 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withStatus("created");
 
         dao.insertOne(USER_INSTANCES, instance1);
         dao.insertOne(USER_INSTANCES, instance2);
@@ -164,21 +170,130 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
 
     @Test
     public void insertExploratorySuccess() {
-        UserInstanceDTO instance1 = new UserInstanceDTO();
-        instance1.setUser("user1");
-        instance1.setExploratoryName("exp_name_1");
-        instance1.setExploratoryId("exp1");
-        instance1.setStatus("created");
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created");
 
         Boolean isInserted = dao.insertExploratory(instance1);
+        assertTrue(isInserted);
+
+        long insertedCount = mongoService.getCollection(USER_INSTANCES).count();
+        assertEquals(insertedCount, 1L);
 
         Optional<UserInstanceDTO> testInstance = dao.findOne(USER_INSTANCES,
-                and(eq(USER, instance1.getUser()), eq(EXPLORATORY_NAME, instance1.getExploratoryName())),
+                exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
                 UserInstanceDTO.class);
-        assertTrue(isInserted);
         assertTrue(testInstance.isPresent());
         assertEquals(instance1.getExploratoryId(), testInstance.get().getExploratoryId());
     }
 
+    @Test
+    public void updateExploratoryStatusSuccess() {
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created");
 
+        UserInstanceDTO instance2 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_2")
+                .withExploratoryId("exp2")
+                .withStatus("created");
+
+        dao.insertOne(USER_INSTANCES, instance1);
+        dao.insertOne(USER_INSTANCES, instance2);
+
+        StatusBaseDTO newStatus = new StatusBaseDTO();
+        newStatus.setUser("user1");
+        newStatus.setExploratoryName("exp_name_1");
+        newStatus.setStatus("running");
+        UpdateResult result = dao.updateExploratoryStatus(newStatus);
+
+        assertEquals(result.getModifiedCount(), 1);
+
+        Optional<UserInstanceDTO> testInstance = dao.findOne(USER_INSTANCES,
+                exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
+                UserInstanceDTO.class);
+        assertTrue(testInstance.isPresent());
+        assertEquals(UserInstanceStatus.of(testInstance.get().getStatus()), UserInstanceStatus.RUNNING);
+
+        Optional<UserInstanceDTO> testInstance2 = dao.findOne(USER_INSTANCES,
+                exploratoryCondition(instance2.getUser(), instance2.getExploratoryName()),
+                UserInstanceDTO.class);
+        assertTrue(testInstance2.isPresent());
+        assertEquals(UserInstanceStatus.of(testInstance2.get().getStatus()), UserInstanceStatus.CREATED);
+    }
+
+    @Test
+    public void updateExploratoryFieldsSuccess() {
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created");
+
+        UserInstanceDTO instance2 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_2")
+                .withExploratoryId("exp2")
+                .withStatus("created");
+
+        dao.insertOne(USER_INSTANCES, instance1);
+        dao.insertOne(USER_INSTANCES, instance2);
+
+        ExploratoryStatusDTO status = new ExploratoryStatusDTO();
+        status.setUser("user1");
+        status.setExploratoryName("exp_name_1");
+        status.setExploratoryId("exp2");
+        status.setExploratoryUrl("www.exp2.com");
+        status.setStatus("running");
+        status.setUptime(new Date(100));
+
+        UpdateResult result = dao.updateExploratoryFields(status);
+        assertEquals(result.getModifiedCount(), 1);
+
+        Optional<UserInstanceDTO> testInstance1 = dao.findOne(USER_INSTANCES,
+                exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
+                UserInstanceDTO.class);
+        assertTrue(testInstance1.isPresent());
+
+        UserInstanceDTO instance = testInstance1.get();
+        assertEquals(instance.getExploratoryId(), status.getExploratoryId());
+        assertEquals(instance.getUrl(), status.getExploratoryUrl());
+        assertEquals(instance.getStatus(), status.getStatus());
+        assertEquals(instance.getUptime(), status.getUptime());
+    }
+
+    @Test
+    public void addComputationalSuccess() {
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+
+        dao.insertOne(USER_INSTANCES, instance1);
+
+        UserComputationalResourceDTO comp1 = new UserComputationalResourceDTO()
+                .withComputationalName("comp1")
+                .withComputationalId("c1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+        dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp1);
+
+        UserInstanceDTO testInstance = dao.findOne(USER_INSTANCES,
+                exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
+                UserInstanceDTO.class).get();
+        assertTrue(testInstance.getResources() != null && testInstance.getResources().size() == 1);
+
+        UserComputationalResourceDTO testComp = testInstance.getResources().get(0);
+        assertEquals(comp1.getComputationalName(), testComp.getComputationalName());
+        assertEquals(comp1.getComputationalId(), testComp.getComputationalId());
+        assertEquals(comp1.getStatus(), testComp.getStatus());
+        assertEquals(comp1.getUptime(), testComp.getUptime());
+    }
 }

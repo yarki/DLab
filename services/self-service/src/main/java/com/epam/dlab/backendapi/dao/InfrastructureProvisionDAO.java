@@ -26,6 +26,7 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -51,18 +52,18 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     private static final String SET = "$set";
 
-    private static Bson exploratoryCondition(String user, String exploratoryName) {
+    public static Bson exploratoryCondition(String user, String exploratoryName) {
         return and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName));
     }
 
-    private static Bson computationalCondition(String user,
+    public static Bson computationalCondition(String user,
                                                String exploratoryName,
                                                String computationalName) {
         return and(exploratoryCondition(user, exploratoryName),
                 elemMatch(COMPUTATIONAL_RESOURCES, and(eq(COMPUTATIONAL_NAME, computationalName))));
     }
 
-    private static String computationalField(String fieldName) {
+    public static String computationalField(String fieldName) {
         return COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + fieldName;
     }
 
@@ -100,13 +101,13 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
     }
 
-    public void updateExploratoryStatus(StatusBaseDTO dto) {
-        updateOne(USER_INSTANCES,
+    public UpdateResult updateExploratoryStatus(StatusBaseDTO dto) {
+        return updateOne(USER_INSTANCES,
                 exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                 set(STATUS, dto.getStatus()));
     }
 
-    public void updateExploratoryFields(ExploratoryStatusDTO dto) {
+    public UpdateResult updateExploratoryFields(ExploratoryStatusDTO dto) {
         Document values = new Document(STATUS, dto.getStatus()).append(UPTIME, dto.getUptime());
         if (dto.getExploratoryId() != null) {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());
@@ -114,28 +115,22 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         if (dto.getExploratoryUrl() != null) {
             values.append(EXPLORATORY_URL, dto.getExploratoryUrl());
         }
-        updateOne(USER_INSTANCES,
+        return updateOne(USER_INSTANCES,
                 exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                 new Document(SET, values));
     }
 
     public boolean addComputational(String user, String exploratoryName, UserComputationalResourceDTO computationalDTO) {
-        Optional<UserInstanceDTO> optional = findOne(USER_INSTANCES,
-                computationalCondition(user, exploratoryName, computationalDTO.getComputationalName()),
-                UserInstanceDTO.class);
+        Optional<Document> optional = findOne(USER_INSTANCES,
+            computationalCondition(user, exploratoryName, computationalDTO.getComputationalName()));
 
-        if (optional.isPresent()) {
-            long count = optional.get().getResources().size();
-            if (count == 0) {
-                updateOne(USER_INSTANCES,
-                        eq(ID, optional.get().getId()),
-                        push(COMPUTATIONAL_RESOURCES, convertToBson(computationalDTO)));
-                return true;
-            } else {
-                return false;
-            }
+        if (!optional.isPresent()) {
+            updateOne(USER_INSTANCES,
+                exploratoryCondition(user, exploratoryName),
+                push(COMPUTATIONAL_RESOURCES, convertToBson(computationalDTO)));
+            return true;
         } else {
-            throw new DlabException("User '" + user + "' has no records for environment '" + exploratoryName + "'");
+            return false;
         }
     }
 
@@ -148,17 +143,17 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 .getOrDefault(computationalField(COMPUTATIONAL_NAME), EMPTY).toString();
     }
 
-    public void updateComputationalStatus(ComputationalStatusDTO dto) {
-        updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), dto.getComputationalName(), dto.getStatus(), false);
+    public UpdateResult updateComputationalStatus(ComputationalStatusDTO dto) {
+        return updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), dto.getComputationalName(), dto.getStatus(), false);
     }
 
-    private void updateComputationalStatus(String user, String exploratoryName, String computationalName, String status, boolean clearUptime) {
+    private UpdateResult updateComputationalStatus(String user, String exploratoryName, String computationalName, String status, boolean clearUptime) {
         try {
             Document values = new Document(computationalField(STATUS), status);
             if (clearUptime) {
                 values.append(computationalField(UPTIME), null);
             }
-            updateOne(USER_INSTANCES,
+            return updateOne(USER_INSTANCES,
                     and(exploratoryCondition(user, exploratoryName),
                             elemMatch(COMPUTATIONAL_RESOURCES, and(eq(COMPUTATIONAL_NAME, computationalName), not(eq(STATUS, TERMINATED.toString()))))),
                     new Document(SET, values));
@@ -167,23 +162,23 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
     }
 
-    public void updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
+    public UpdateResult updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
         Document values = new Document(computationalField(STATUS), dto.getStatus());
         values.append(computationalField(UPTIME), null);
-        updateOne(USER_INSTANCES,
+        return updateOne(USER_INSTANCES,
                 and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                         elemMatch(COMPUTATIONAL_RESOURCES, not(eq(STATUS, TERMINATED.toString())))),
                 new Document(SET, values));
     }
 
-    public void updateComputationalFields(ComputationalStatusDTO dto) {
+    public UpdateResult updateComputationalFields(ComputationalStatusDTO dto) {
         try {
             Document values = new Document(computationalField(STATUS), dto.getStatus())
                     .append(computationalField(UPTIME), dto.getUptime());
             if (dto.getComputationalId() != null) {
                 values.append(computationalField(COMPUTATIONAL_ID), dto.getComputationalId());
             }
-            updateOne(USER_INSTANCES, and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
+            return updateOne(USER_INSTANCES, and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                     elemMatch(COMPUTATIONAL_RESOURCES, and(eq(COMPUTATIONAL_NAME, dto.getComputationalName()), not(eq(STATUS, TERMINATED.toString()))))),
                     new Document(SET, values));
         } catch (Throwable t) {

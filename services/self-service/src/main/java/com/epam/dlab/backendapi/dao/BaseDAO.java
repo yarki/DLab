@@ -27,6 +27,7 @@ import com.google.inject.Inject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.InsertOneOptions;
 import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -71,8 +72,8 @@ class BaseDAO implements MongoCollections {
                 .append(TIMESTAMP, new Date()));
     }
 
-    protected void updateOne(String collection, Bson condition, Bson value) {
-        mongoService.getCollection(collection).updateOne(condition, value);
+    protected UpdateResult updateOne(String collection, Bson condition, Bson value) {
+        return mongoService.getCollection(collection).updateOne(condition, value);
     }
 
     protected FindIterable<Document> find(String collection,
@@ -125,7 +126,8 @@ class BaseDAO implements MongoCollections {
 
     private <T> T convertFromDocument(Document document, Class<T> clazz) {
         try {
-            return MAPPER.readValue(document.toJson(), clazz);
+            String json = document.toJson();
+            return MAPPER.readValue(json, clazz);
         } catch (IOException e) {
             throw new DlabException("error converting from document with id " + document.get(ID), e);
         }
