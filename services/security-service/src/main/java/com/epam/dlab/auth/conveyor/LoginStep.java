@@ -19,12 +19,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 public enum LoginStep implements SmartLabel<UserInfoBuilder> {
+    LDAP_LOGIN(UserInfoBuilder::ldapLoginPassed),
     LDAP_USER_INFO(UserInfoBuilder::ldapUserInfo),
     AWS_USER(UserInfoBuilder::awsUser),
     AWS_KEYS(UserInfoBuilder::awsKeys),
     REMOTE_IP(UserInfoBuilder::remoteIp),
-    USER_INFO(UserInfoBuilder::cloneUserInfo),
-    ERROR(UserInfoBuilder::failed)
+    LDAP_USER_INFO_ERROR(UserInfoBuilder::ldapUserInfoError),
+    LDAP_GROUP_INFO_ERROR(UserInfoBuilder::ldapGroupInfoError),
+    AWS_USER_ERROR(UserInfoBuilder::awsUserError),
+    AWS_KEYS_ERROR(UserInfoBuilder::awsKeysError),
     ;
     BiConsumer<UserInfoBuilder, Object> setter;
     <T> LoginStep (BiConsumer<UserInfoBuilder,T> setter) {
