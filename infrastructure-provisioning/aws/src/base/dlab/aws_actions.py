@@ -26,6 +26,7 @@ from fabric.api import *
 import logging
 from dlab.aws_meta import *
 import traceback
+import re
 
 local_log_filename = "%s.log" % os.environ['request_id']
 local_log_filepath = "/response/" + local_log_filename
@@ -366,25 +367,29 @@ def s3_cleanup(bucket, cluster_name, user_name):
 def remove_s3(bucket_type, scientist=''):
     try:
         print "[Removing S3 buckets]"
-        s3 = boto3.resource('s3')
         client = boto3.client('s3')
+        bucket_list = []
+        if bucket_type == 'all':
+            for item in client.list_buckets().get('Buckets'):
+                if re.search(os.environ['conf_service_base_name'], item.get('Name')):
+                    bucket_list.append(item.get('Name'))
         if bucket_type == 'ssn':
-            bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
+            bucket_list.append(os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
         elif bucket_type == 'edge':
-            bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
-        bucket = s3.Bucket("{}".format(bucket_name))
-        list_obj = client.list_objects(Bucket=bucket.name)
-        list_obj = list_obj.get('Contents')
-        if list_obj is not None:
-            for o in list_obj:
-                list_obj = o.get('Key')
-                client.delete_objects(
-                    Bucket=bucket_name,
-                    Delete={'Objects': [{'Key': list_obj}]}
-                )
-                print "The S3 bucket " + bucket.name + " has been cleaned"
-        client.delete_bucket(Bucket=bucket.name)
-        print "The S3 bucket " + bucket.name + " has been deleted successfully"
+            bucket_list.append(os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
+        for s3bucket in bucket_list:
+            list_obj = client.list_objects(Bucket=s3bucket)
+            list_obj = list_obj.get('Contents')
+            if list_obj is not None:
+                for o in list_obj:
+                    list_obj = o.get('Key')
+                    client.delete_objects(
+                        Bucket=s3bucket,
+                        Delete={'Objects': [{'Key': list_obj}]}
+                    )
+                    print "The S3 bucket " + s3bucket + " has been cleaned"
+            client.delete_bucket(Bucket=s3bucket)
+            print "The S3 bucket " + s3bucket + " has been deleted successfully"
     except Exception as err:
         logging.info("Unable to remove S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
