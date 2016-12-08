@@ -64,6 +64,19 @@ if __name__ == "__main__":
     except:
         sys.exit(1)
 
+    print "Removing security groups"
+    try:
+        remove_sgroups(args.nb_sg)
+        remove_sgroups(args.edge_sg)
+    except:
+        sys.exit(1)
+
+    print "Removing private subnet"
+    try:
+        remove_subnets('*')
+    except:
+        sys.exit(1)
+
     print "Removing s3 bucket"
     try:
         remove_s3('edge')
@@ -76,19 +89,6 @@ if __name__ == "__main__":
         remove_role('notebook', '*')
         remove_role('edge', '*')
         remove_role('ssn', '*')
-    except:
-        sys.exit(1)
-
-    print "Removing security groups"
-    try:
-        remove_sgroups(args.nb_sg)
-        remove_sgroups(args.edge_sg)
-    except:
-        sys.exit(1)
-
-    print "Removing private subnet"
-    try:
-        remove_subnets('*')
     except:
         sys.exit(1)
 
