@@ -93,7 +93,7 @@ def r_kernel(args):
         text = text.replace('SPRK_ACTION', 'init()')
     else:
         text = text.replace('YRN_CLI_TYPE', 'yarn')
-        text = text.replace('SPRK_ACTION', 'session(master = \"yarn\")')
+        text = text.replace('SPRK_ACTION', 'session(master = \\\"yarn\\\")')
     with open(kernel_path, 'w') as f:
         f.write(text)
 
