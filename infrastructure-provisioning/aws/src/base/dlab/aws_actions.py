@@ -307,7 +307,13 @@ def remove_role(instance_type, scientist=''):
         role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
         if instance_type == "ssn":
             client.delete_role_policy(RoleName=role, PolicyName=policy_name)
-        else:
+        if instance_type == "edge":
+            policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
+            for i in policy_list:
+                policy_arn = i.get('PolicyArn')
+                client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
+                client.delete_policy(PolicyArn=policy_arn)
+        elif instance_type == "notebook":
             policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
             for i in policy_list:
                 policy_arn = i.get('PolicyArn')
