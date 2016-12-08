@@ -28,7 +28,6 @@ public enum LoginStep implements SmartLabel<UserInfoBuilder> {
     LDAP_GROUP_INFO_ERROR(UserInfoBuilder::ldapGroupInfoError),
     AWS_USER_ERROR(UserInfoBuilder::awsUserError),
     AWS_KEYS_ERROR(UserInfoBuilder::awsKeysError),
-    ERROR(UserInfoBuilder::failed)
     ;
     BiConsumer<UserInfoBuilder, Object> setter;
     <T> LoginStep (BiConsumer<UserInfoBuilder,T> setter) {

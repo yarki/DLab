@@ -165,11 +165,6 @@ public class UserInfoBuilder implements Supplier<UserInfo>, Testing {
         b.setMask( AWS_KEYS );
     }
 
-    public static void failed(UserInfoBuilder userInfoBuilder, RuntimeException error) {
-        LOG.error("UserInfo failure {}", error.getMessage());
-        throw error;
-    }
-
     public static void ldapUserInfoError(UserInfoBuilder b, RuntimeException t) {
         LOG.error("ldapUserInfoError {}", t.getMessage());
         b.ldapError = t;
