@@ -133,8 +133,9 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			try {
 				ldapUserDAO.getUserInfo(username,password);
 				log.debug("User Authenticated: {}",username);
+				loginConveyor.add(token,"USER LOGGED IN",LoginStep.LDAP_LOGIN);
 			} catch (Exception e) {
-				loginConveyor.cancel(token,"Username or password are not valid");
+				loginConveyor.cancel(token,LoginStep.LDAP_USER_INFO_ERROR,"Username or password are not valid");
 			}
 		});
 	}
@@ -146,7 +147,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 				UserInfo rolesUserInfo = ldapUserDAO.enrichUserInfo(new UserInfo(username, token));
 				loginConveyor.add(token,rolesUserInfo,LoginStep.LDAP_USER_INFO);
 			} catch (Exception e) {
-				loginConveyor.cancel(token,"User not authorized. Please access DLAB administrator.");
+				loginConveyor.cancel(token,LoginStep.LDAP_GROUP_INFO_ERROR,"User not authorized. Please access DLAB administrator.");
 			}
 		});
 	}
@@ -160,10 +161,10 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 					if (awsUser != null) {
 						loginConveyor.add(token, true, LoginStep.AWS_USER);
 					} else {
-						loginConveyor.cancel(token,"Please contact AWS administrator to create corresponding IAM User");
+						loginConveyor.cancel(token,LoginStep.AWS_USER_ERROR,"Please contact AWS administrator to create corresponding IAM User");
 					}
 				} catch (Exception e) {
-					loginConveyor.cancel(token,"Please contact AWS administrator to create corresponding IAM User");
+					loginConveyor.cancel(token,LoginStep.AWS_USER_ERROR,"Please contact AWS administrator to create corresponding IAM User");
 				}
 			} else {
 				loginConveyor.add(token,false,LoginStep.AWS_USER);
@@ -180,7 +181,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 					List<AccessKeyMetadata> keys = awsUserDAO.getAwsAccessKeys(username);
 					loginConveyor.add(token, keys, LoginStep.AWS_KEYS);
 				} catch (Exception e) {
-					loginConveyor.cancel(token,"Please contact AWS administrator to activate your Access Key");
+					loginConveyor.cancel(token,LoginStep.AWS_KEYS_ERROR,"Please contact AWS administrator to activate your Access Key");
 				}
 			} else {
 				loginConveyor.add(token,new ArrayList<AccessKeyMetadata>(),LoginStep.AWS_KEYS);

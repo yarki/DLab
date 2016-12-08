@@ -57,8 +57,8 @@ public class LoginConveyor extends KBalancedParallelConveyor<String,LoginStep,Us
         return this.createBuildFuture(token,UserInfoBuilder.supplier(token,username));
     }
 
-    public void cancel(String token, String errorMessage) {
+    public void cancel(String token, LoginStep step, String errorMessage) {
         LOG.debug("Canceling {}: {}",token,errorMessage);
-        this.add(token,new RuntimeException(errorMessage),LoginStep.ERROR);
+        this.add(token,new RuntimeException(errorMessage),step);
     }
 }

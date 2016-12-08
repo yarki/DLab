@@ -89,7 +89,7 @@ public class LdapUserDAO {
                 SearchRequest sr = req.buildSearchRequest(new HashMap<String, Object>() {
                     private static final long serialVersionUID = 1L;
                     {
-                        put(Pattern.quote("${username}"), username);
+                        put(Pattern.quote("%username%"), username);
                     }
                 });
                 String filter = sr.getFilter().toString();

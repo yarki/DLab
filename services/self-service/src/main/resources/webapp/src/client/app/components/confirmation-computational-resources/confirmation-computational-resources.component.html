@@ -21,8 +21,9 @@ limitations under the License.
   <modal-header></modal-header>
   <modal-content>
       <div class="row">
-        <div class="col-xs-12">
-          <p>Computational resource <strong>{{model.computationalName}}</strong> will be decommissioned.</p>
+        <div class="col-xs-12 tooltip-wrap" (mouseover)="isEllipsisActive($event)">
+          <p>Computational resource <strong class="truncate-name">{{model.computationalName}}</strong> will be decommissioned.</p>
+          <div class="tooltip" [style.visibility]="tooltip ? 'visible': 'hidden'">{{model.computationalName}}</div>
         </div>
       </div>
       <div class="row">

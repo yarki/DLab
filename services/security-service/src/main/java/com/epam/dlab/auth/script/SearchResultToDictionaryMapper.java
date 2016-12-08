@@ -57,7 +57,7 @@ public class SearchResultToDictionaryMapper implements SearchResultMapper<Map<St
 				Entry resultEntry = ((SearchResultEntry) response).getEntry();
 				String dn = resultEntry.getDn().toString();
 				LOG.debug("\tEntryDN {}",dn);
-				DeepMap dnBranch = reqBranch.getBranch(dn);
+				DeepMap dnBranch = reqBranch.getBranch(dn.toLowerCase());
 				resultEntry.forEach(attr -> {
 					dnBranch.put(attr.getId() + "", attr.get() + "");
 					LOG.debug("\t\tAttr {}",attr);
