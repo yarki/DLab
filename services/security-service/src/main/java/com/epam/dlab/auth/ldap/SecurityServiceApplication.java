@@ -19,10 +19,13 @@ limitations under the License.
 package com.epam.dlab.auth.ldap;
 
 import de.thomaskrille.dropwizard_template_config.TemplateConfigBundle;
+import de.thomaskrille.dropwizard_template_config.TemplateConfigBundleConfiguration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.ldap.api.LdapAuthenticationService;
+import com.epam.dlab.utils.ServiceUtils;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -48,7 +51,10 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 
 	@Override
 	public void initialize(Bootstrap<SecurityServiceConfiguration> bootstrap) {
-		bootstrap.addBundle(new TemplateConfigBundle());
+		//bootstrap.addBundle(new TemplateConfigBundle());
+        bootstrap.addBundle(new TemplateConfigBundle(
+        		new TemplateConfigBundleConfiguration().fileIncludePath(ServiceUtils.getConfPath())
+        ));
 	}
 
 	@Override

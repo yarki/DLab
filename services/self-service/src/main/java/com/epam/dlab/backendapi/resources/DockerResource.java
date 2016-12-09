@@ -23,6 +23,7 @@ import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.backendapi.dao.DockerDAO;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.ServiceConsts;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -36,8 +37,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
-
 @Path("/docker")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -47,7 +46,7 @@ public class DockerResource implements MongoCollections, DockerAPI {
     @Inject
     private DockerDAO dao;
     @Inject
-    @Named(PROVISIONING_SERVICE)
+    @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
 
     @POST

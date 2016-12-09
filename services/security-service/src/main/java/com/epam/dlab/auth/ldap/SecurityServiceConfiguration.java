@@ -22,22 +22,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.epam.dlab.ServiceConfiguration;
 import com.epam.dlab.auth.ldap.core.Request;
-import com.epam.dlab.client.mongo.MongoServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.dropwizard.Configuration;
-
-public class SecurityServiceConfiguration extends Configuration {
-
-	private static final String MONGO = "mongo";
+public class SecurityServiceConfiguration extends ServiceConfiguration {
 
 	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
@@ -94,14 +87,6 @@ public class SecurityServiceConfiguration extends Configuration {
 		return ldapBindTemplate;
 	}
 	
-  @Valid
-  @NotNull
-  @JsonProperty(MONGO)
-  private MongoServiceFactory mongoFactory = new MongoServiceFactory();
-	public MongoServiceFactory getMongoFactory() {
-        return mongoFactory;
-    }
-
 	public boolean isAwsUserIdentificationEnabled() {
 		return awsUserIdentificationEnabled;
 	}

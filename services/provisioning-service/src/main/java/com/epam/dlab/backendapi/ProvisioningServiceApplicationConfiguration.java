@@ -18,18 +18,13 @@ limitations under the License.
 
 package com.epam.dlab.backendapi;
 
+import com.epam.dlab.ServiceConfiguration;
 import com.epam.dlab.backendapi.core.response.Directories;
-import com.epam.dlab.client.restclient.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-public class ProvisioningServiceApplicationConfiguration extends Configuration implements Directories {
-    public static final String SELF_SERVICE = "selfService";
+public class ProvisioningServiceApplicationConfiguration extends ServiceConfiguration implements Directories {
 
     @NotEmpty
     @JsonProperty
@@ -75,11 +70,6 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     @JsonProperty
     private String emrServiceRoleDefault;
 
-    @Valid
-    @NotNull
-    @JsonProperty(SELF_SERVICE)
-    private RESTServiceFactory selfFactory = new RESTServiceFactory();
-
     public String getKeyDirectory() {
         return keyDirectory;
     }
@@ -122,10 +112,6 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
 
     public String getEmrServiceRoleDefault() {
         return emrServiceRoleDefault;
-    }
-
-    public RESTServiceFactory getSelfFactory() {
-        return selfFactory;
     }
 
     public String getWarmupDirectory() {

@@ -25,6 +25,7 @@ import com.epam.dlab.backendapi.client.rest.ComputationalAPI;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
@@ -44,7 +45,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.constants.UserInstanceStatus.*;
 
 @Path("/infrastructure_provision/computational_resources")
@@ -58,7 +58,7 @@ public class ComputationalResource implements ComputationalAPI {
     @Inject
     private InfrastructureProvisionDAO infrastructureProvisionDAO;
     @Inject
-    @Named(PROVISIONING_SERVICE)
+    @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
 
     @PUT

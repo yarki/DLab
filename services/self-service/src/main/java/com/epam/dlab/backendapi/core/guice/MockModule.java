@@ -29,6 +29,7 @@ import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.client.mongo.MongoService;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.imagemetadata.ApplicationDto;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ComputationalResourceShapeDto;
@@ -38,7 +39,6 @@ import com.epam.dlab.dto.imagemetadata.ImageType;
 import com.epam.dlab.dto.imagemetadata.TemplateDTO;
 import com.google.inject.name.Names;
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.backendapi.client.rest.ExploratoryAPI.EXPLORATORY_CREATE;
 import static com.epam.dlab.backendapi.client.rest.KeyLoaderAPI.KEY_LOADER;
 import io.dropwizard.setup.Environment;
@@ -58,7 +58,7 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
         bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
                 .toInstance(createAuthenticationService());
-        bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
+        bind(RESTService.class).annotatedWith(Names.named(ServiceConsts.PROVISIONING_SERVICE_NAME))
                 .toInstance(createProvisioningService());
     }
 

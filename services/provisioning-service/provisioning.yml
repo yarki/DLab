@@ -1,3 +1,5 @@
+<#include "ssn.yml">
+
 keyDirectory: /home/ubuntu/keys
 responseDirectory: /tmp/dlab
 warmupPollTimeout: 10s
@@ -13,14 +15,6 @@ emrImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-emr
 emrEC2RoleDefault: EMR_EC2_DefaultRole
 emrServiceRoleDefault: EMR_DefaultRole
 
-selfService:
-  protocol: http
-  host: localhost
-  port: 8080
-  jerseyClient:
-    timeout: 3s
-    connectionTimeout: 3s
-
 server:
   applicationConnectors:
     - type: http
@@ -34,7 +28,7 @@ logging:
   loggers:
     com.epam: DEBUG
   appenders:
-#    - type: console
+    - type: console
     - type: file
       currentLogFilename: /var/opt/dlab/log/ssn/provisioning.log
       archive: true

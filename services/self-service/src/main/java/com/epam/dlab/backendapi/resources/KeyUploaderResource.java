@@ -23,6 +23,7 @@ import com.epam.dlab.backendapi.client.rest.KeyLoaderAPI;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
@@ -46,8 +47,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
-
 @Path("/user/access_key")
 @Produces(MediaType.APPLICATION_JSON)
 public class KeyUploaderResource implements KeyLoaderAPI {
@@ -58,7 +57,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
-    @Named(PROVISIONING_SERVICE)
+    @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
 
 

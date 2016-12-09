@@ -21,11 +21,11 @@ package com.epam.dlab.backendapi.core.guice;
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.client.mongo.MongoService;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.ServiceConsts;
 import com.google.inject.name.Names;
 import io.dropwizard.setup.Environment;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
 public class ProductionModule extends BaseModule {
     public ProductionModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
@@ -38,7 +38,7 @@ public class ProductionModule extends BaseModule {
         bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
         bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
                 .toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE));
-        bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
-                .toInstance(configuration.getProvisioningFactory().build(environment, PROVISIONING_SERVICE));
+        bind(RESTService.class).annotatedWith(Names.named(ServiceConsts.PROVISIONING_SERVICE_NAME))
+                .toInstance(configuration.getProvisioningFactory().build(environment, ServiceConsts.PROVISIONING_SERVICE_NAME));
     }
 }

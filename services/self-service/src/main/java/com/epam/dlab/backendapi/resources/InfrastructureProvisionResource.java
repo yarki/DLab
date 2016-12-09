@@ -33,28 +33,14 @@ import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
-import io.dropwizard.auth.Auth;
 
 @Path("/infrastructure_provision")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -68,7 +54,7 @@ public class InfrastructureProvisionResource implements DockerAPI {
     @Inject
     private KeyDAO keyDAO;
     @Inject
-    @Named(PROVISIONING_SERVICE)
+    @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
 
     @GET

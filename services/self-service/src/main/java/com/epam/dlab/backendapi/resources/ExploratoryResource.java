@@ -26,6 +26,7 @@ import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
@@ -47,7 +48,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.constants.UserInstanceStatus.*;
 
 @Path("/infrastructure_provision/exploratory_environment")
@@ -61,7 +61,7 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Inject
     private InfrastructureProvisionDAO infrastructureProvisionDAO;
     @Inject
-    @Named(PROVISIONING_SERVICE)
+    @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
 
     @PUT
