@@ -94,6 +94,7 @@ def ensure_python3_kernel():
             sudo('apt install -y python3-pip')
             sudo('pip3 install ipython ipykernel --no-cache-dir')
             sudo('python3 -m ipykernel install')
+            sudo('apt-get install -y libssl-dev python-virtualenv')
             sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
         except:
             sys.exit(1)
