@@ -384,12 +384,13 @@ def remove_s3(bucket_type='all', scientist=''):
             if list_obj is not None:
                 for o in list_obj:
                     list_obj = o.get('Key')
-                    client.delete_objects(
-                        Bucket=s3bucket,
-                        Delete={'Objects': [{'Key': list_obj}]}
-                    )
+                    print list_obj
+                    #client.delete_objects(
+                    #    Bucket=s3bucket,
+                    #    Delete={'Objects': [{'Key': list_obj}]}
+                    #)
                     print "The S3 bucket " + s3bucket + " has been cleaned"
-            client.delete_bucket(Bucket=s3bucket)
+            #client.delete_bucket(Bucket=s3bucket)
             print "The S3 bucket " + s3bucket + " has been deleted successfully"
     except Exception as err:
         logging.info("Unable to remove S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))

@@ -58,7 +58,7 @@ if __name__ == "__main__":
     except:
         sys.exit(1)
 
-    print "Terminating EDGE and notebook instances"
+    print "Terminating EC2 instances"
     try:
         remove_ec2(args.tag_name, '*')
     except:
