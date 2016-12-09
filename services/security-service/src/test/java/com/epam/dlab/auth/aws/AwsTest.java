@@ -18,10 +18,9 @@ limitations under the License.
 
 package com.epam.dlab.auth.aws;
 
-import com.amazonaws.services.identitymanagement.model.User;
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.auth.conveyor.LdapFilterCache;
-import com.epam.dlab.auth.conveyor.LoginCache;
+import com.epam.dlab.auth.core.LdapFilterCache;
+import com.epam.dlab.auth.core.LoginCache;
 import org.junit.*;
 
 import java.util.HashMap;
@@ -29,7 +28,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class AwsTest {
