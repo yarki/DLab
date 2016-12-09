@@ -85,11 +85,13 @@ def start_ss():
             put('/root/templates/supervisor_svc.conf', '/tmp/supervisor_svc.conf')
             sudo('cp /tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
             sudo('cp /tmp/supervisor_svc.conf {}'.format(supervisor_conf))
-            with open(supervisor_conf, 'r') as f:
-                text = f.read()
-            text = text.replace('WEB_APP_DIR', web_path)
-            with open(supervisor_conf, 'w') as f:
-                f.write(text)
+
+            sudo('sed -i \'s=WEB_APP_DIR={}=\' {}'.format(supervisor_conf, web_path))
+            #with open(supervisor_conf, 'r') as f:
+            #    text = f.read()
+            #text = text.replace('WEB_APP_DIR', web_path)
+            #with open(supervisor_conf, 'w') as f:
+            #    f.write(text)
 
             sudo('mkdir -p /var/log/application')
             sudo('mkdir -p ' + web_path)
