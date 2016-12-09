@@ -240,7 +240,7 @@ def installing_python(args):
         local('tar zxvf /tmp/Python-' + python_version + '.tgz -C /tmp/')
         with lcd('/tmp/Python-' + python_version):
             local('./configure --prefix=/opt/python/python' + python_version + ' --with-zlib-dir=/usr/local/lib/ --with-ensurepip=install')
-        local('sudo make altinstall')
+            local('sudo make altinstall')
         with lcd('/tmp/'):
             local('sudo rm -rf Python-' + python_version + '/')
         #local('sudo make distclean')
@@ -250,9 +250,9 @@ def installing_python(args):
         # local('''sudo sed -i 's|python|python''' + python_version + '''|g' /usr/bin/pip''' + python_version)
         local('sudo virtualenv /opt/python/python' + python_version)
         with virtualenv('/opt/python/python' + python_version):
-            local('sudo -i pip' + python_version + ' install -U pip --no-cache-dir')
-            local('sudo -i pip' + python_version + ' install ipython ipykernel --no-cache-dir')
-            local('sudo -i pip' + python_version + ' install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
+            local('sudo -H pip' + python_version + ' install -U pip --no-cache-dir')
+            local('sudo -H pip' + python_version + ' install ipython ipykernel --no-cache-dir')
+            local('sudo -H pip' + python_version + ' install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
 
 
 if __name__ == "__main__":

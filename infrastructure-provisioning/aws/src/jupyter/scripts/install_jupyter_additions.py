@@ -62,7 +62,7 @@ def ensure_libraries_py2():
             sudo('apt-get install -y libjpeg8-dev zlib1g-dev')
             sudo('pip2 install -U pip --no-cache-dir')
             sudo('pip2 install boto3 --no-cache-dir')
-            sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
+            sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn fabvenv fabric-virtualenv --no-cache-dir')
             sudo('touch /home/ubuntu/.ensure_dir/ensure_libraries_py2_installed')
         except:
             sys.exit(1)
@@ -73,7 +73,7 @@ def ensure_libraries_py3():
         try:
             sudo('pip3 install -U pip --no-cache-dir')
             sudo('pip3 install boto3 --no-cache-dir')
-            sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
+            sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn fabvenv fabric-virtualenv --no-cache-dir')
             sudo('touch /home/ubuntu/.ensure_dir/ensure_libraries_py3_installed')
         except:
             sys.exit(1)
