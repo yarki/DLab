@@ -378,7 +378,6 @@ def remove_s3(bucket_type='all', scientist=''):
         for item in client.list_buckets().get('Buckets'):
             if bucket_name in item.get('Name'):
                 bucket_list.append(item.get('Name'))
-        print bucket_list
         for s3bucket in bucket_list:
             list_obj = client.list_objects(Bucket=s3bucket)
             list_obj = list_obj.get('Contents')
@@ -390,8 +389,8 @@ def remove_s3(bucket_type='all', scientist=''):
                         Bucket=s3bucket,
                         Delete={'Objects': [{'Key': list_obj}]}
                     )
-                    print "The S3 bucket " + s3bucket + " has been cleaned"
-            #client.delete_bucket(Bucket=s3bucket)
+                print "The S3 bucket " + s3bucket + " has been cleaned"
+            client.delete_bucket(Bucket=s3bucket)
             print "The S3 bucket " + s3bucket + " has been deleted successfully"
     except Exception as err:
         logging.info("Unable to remove S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
