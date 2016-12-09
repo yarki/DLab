@@ -241,8 +241,10 @@ def installing_python(args):
         with lcd('/tmp/Python-' + python_version):
             local('./configure --prefix=/opt/python/python' + python_version + ' --with-zlib-dir=/usr/local/lib/ --with-ensurepip=install')
         local('sudo make altinstall')
-        local('sudo make distclean')
-        local('sudo find . -type d -empty -delete')
+        with lcd('/tmp/'):
+            local('sudo rm -rf Python-' + python_version + '/')
+        #local('sudo make distclean')
+        #local('sudo find . -type d -empty -delete')
         # local('sudo ln -s /opt/python/python' + python_version + '/bin/python' + python_version[0:3] + ' /usr/bin/python' + python_version)
         # local('sudo cp /usr/bin/pip /usr/bin/pip' + python_version)
         # local('''sudo sed -i 's|python|python''' + python_version + '''|g' /usr/bin/pip''' + python_version)
