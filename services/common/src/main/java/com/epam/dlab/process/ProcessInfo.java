@@ -14,8 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 public class ProcessInfo {
 
+    private final ProcessId id;
     private final String command;
     private final ProcessStatus status;
     private final String stdOut;
@@ -24,8 +29,10 @@ public class ProcessInfo {
     private final long startTimeStamp;
     private final long infoTimeStamp;
 
+    private final Collection<ProcessInfo> rejectedCommands;
 
-    ProcessInfo(ProcessStatus status, String command, String stdOut, String stdErr, int exitCode, long startTimeStamp, long infoTimeStamp) {
+    ProcessInfo(ProcessId id, ProcessStatus status, String command, String stdOut, String stdErr, int exitCode, long startTimeStamp, long infoTimeStamp, Collection<ProcessInfo> rejected) {
+        this.id             = id;
         this.status         = status;
         this.command        = command;
         this.stdOut         = stdOut;
@@ -33,6 +40,19 @@ public class ProcessInfo {
         this.exitCode       = exitCode;
         this.startTimeStamp = startTimeStamp;
         this.infoTimeStamp  = infoTimeStamp;
+
+        if(rejected != null && rejected.size() > 0) {
+            Collection<ProcessInfo> r = new ArrayList<>();
+            for(ProcessInfo info:rejected) {
+                if(info != null) {
+                    r.add(info);
+                }
+            }
+            this.rejectedCommands = Collections.unmodifiableCollection(r);
+        } else {
+            this.rejectedCommands = null;
+        }
+
     }
 
     public String getCommand() {
@@ -66,13 +86,15 @@ public class ProcessInfo {
     @Override
     public String toString() {
         return "ProcessInfo{" +
-                "command='" + command + '\'' +
+                "id='" + id + '\'' +
+                ", command='" + command + '\'' +
                 ", status=" + status +
                 ", stdOut='" + stdOut + '\'' +
                 ", stdErr='" + stdErr + '\'' +
                 ", exitCode=" + exitCode +
                 ", startTimeStamp=" + startTimeStamp +
                 ", infoTimeStamp=" + infoTimeStamp +
+                ", rejectedCommands=" + rejectedCommands +
                 '}';
     }
 }

@@ -14,13 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DlabProcess {
 
     private final static DlabProcess INSTANCE = new DlabProcess();
+
+    private ExecutorService executorService = Executors.newFixedThreadPool(32);
 
     public static DlabProcess getInstance() {
         return INSTANCE;
@@ -30,6 +36,15 @@ public class DlabProcess {
 
     private DlabProcess() {
         this.processConveyor = new ProcessConveyor();
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService.shutdown();
+        this.executorService = executorService;
     }
 
     public CompletableFuture<ProcessInfo> start(ProcessId id, String command){
@@ -56,6 +71,15 @@ public class DlabProcess {
 
     public CompletableFuture<Boolean> toStdErr(ProcessId id, String msg){
         return processConveyor.add(id,msg,ProcessStep.STD_ERR);
+    }
+
+    public CompletableFuture<Boolean> toStdErr(ProcessId id, String msg, Throwable err){
+        StringWriter sw = new StringWriter();
+        sw.append(msg);
+        sw.append("\n");
+        PrintWriter pw = new PrintWriter(sw);
+        err.printStackTrace(pw);
+        return processConveyor.add(id,sw.toString(),ProcessStep.STD_ERR);
     }
 
     public Collection<ProcessId> getActiveProcesses() {

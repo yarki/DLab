@@ -14,12 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-public enum ProcessStatus {
-    CREATED,
-    LAUNCHING,
-    RUNNING,
-    STOPPED,
-    KILLED,
-    FINISHED,
-    REJECTED
+public class DlabProcessException extends RuntimeException {
+    public DlabProcessException() {
+    }
+
+    public DlabProcessException(String message) {
+        super(message);
+    }
+
+    public DlabProcessException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public DlabProcessException(Throwable cause) {
+        super(cause);
+    }
+
+    public DlabProcessException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }
