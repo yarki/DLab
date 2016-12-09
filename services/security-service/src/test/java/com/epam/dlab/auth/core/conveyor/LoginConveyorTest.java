@@ -1,17 +1,15 @@
-package com.epam.dlab.auth.core.conveyor;
+package com.epam.dlab.auth.conveyor;
 
 import com.aegisql.conveyor.utils.caching.ImmutableReference;
 import com.amazonaws.services.identitymanagement.model.AccessKeyMetadata;
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.auth.core.LoginCache;
-import com.epam.dlab.auth.core.LoginConveyor;
-import com.epam.dlab.auth.core.LoginStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 /**
  * Created by Mikhail_Teplitskiy on 11/10/2016.
@@ -41,7 +39,8 @@ public class LoginConveyorTest {
         uiSource.setLastName("user");
         uiSource.addRole("admin");
 
-        lc.add("1","127.0.0.1", LoginStep.REMOTE_IP);
+        lc.add("1","127.0.0.1",LoginStep.REMOTE_IP);
+        lc.add("1","OK",LoginStep.LDAP_LOGIN);
         lc.add("1",uiSource,LoginStep.LDAP_USER_INFO);
         lc.add("1",true,LoginStep.AWS_USER);
         lc.add("1",new ArrayList<AccessKeyMetadata>(){{add(new AccessKeyMetadata().withAccessKeyId("a").withStatus("Active"));}} ,LoginStep.AWS_KEYS);

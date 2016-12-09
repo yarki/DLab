@@ -262,7 +262,7 @@ def run():
     try:
         logging.info('[CREATE SECURITY GROUP FOR PRIVATE SUBNET]')
         print '[CREATE SECURITY GROUP FOR PRIVATE SUBNET]'
-        edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
+        edge_group_id = check_security_group(edge_conf['edge_security_group_name'])
         sg_list = edge_conf['sg_ids'].replace(" ", "").split(',')
         rules_list = []
         for i in sg_list:
@@ -296,6 +296,7 @@ def run():
         remove_role('notebook', os.environ['edge_user_name'])
         remove_role('edge', os.environ['edge_user_name'])
         remove_sgroups(edge_conf['instance_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
         sys.exit(1)
 
     try:

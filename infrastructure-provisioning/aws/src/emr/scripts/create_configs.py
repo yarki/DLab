@@ -89,11 +89,16 @@ def r_kernel(args):
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
     text = text.replace('R_VER', 'v{}'.format(str(r_version)))
     text = text.replace('EMR', args.emr_version)
+    if 'emr-4.' in args.emr_version:
+        text = text.replace('YRN_CLI_TYPE', 'yarn-client')
+        text = text.replace('SPRK_ACTION', 'init()')
+    else:
+        text = text.replace('YRN_CLI_TYPE', 'yarn')
+        text = text.replace('SPRK_ACTION', 'session(master = \\\"yarn\\\")')
     with open(kernel_path, 'w') as f:
         f.write(text)
 
-    local('export HADOOP_CONF_DIR="/opt/{0}/{1}/conf/"; export YARN_CONF_DIR="/opt/{0}/{1}/conf/"; export SPARKR_SUBMIT_ARGS="--master yarn-client sparkr-shell"; export SPARK_HOME="/opt/{0}/{1}/spark/";'.format(args.emr_version, args.cluster_name) + ' export R_LIBS_SITE="${R_LIBS_SITE}:${SPARK_HOME}/R/lib"; R -e "install.packages(\'devtools\',repos=\'http://cran.us.r-project.org\')"; R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"; R CMD javareconf; R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
-    #local('R -e "IRkernel::installspec()"')
+    #local('export HADOOP_CONF_DIR="/opt/{0}/{1}/conf/"; export YARN_CONF_DIR="/opt/{0}/{1}/conf/"; export SPARKR_SUBMIT_ARGS="--master yarn-client sparkr-shell"; export SPARK_HOME="/opt/{0}/{1}/spark/";'.format(args.emr_version, args.cluster_name) + ' export R_LIBS_SITE="${R_LIBS_SITE}:${SPARK_HOME}/R/lib"; R -e "install.packages(\'devtools\',repos=\'http://cran.us.r-project.org\')"; R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"; R CMD javareconf; R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
 
 
 def pyspark_kernel(args):
