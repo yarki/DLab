@@ -375,6 +375,7 @@ def remove_s3(bucket_type='all', scientist=''):
             bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
         else:
             bucket_name = (os.environ['conf_service_base_name'])
+        print "before for " + bucket_name
         for item in client.list_buckets().get('Buckets'):
             if bucket_name in item.get('Name'):
                 print item.get('Name')
