@@ -21,6 +21,7 @@ import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
 import com.epam.dlab.constants.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
+import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.client.result.UpdateResult;
@@ -29,15 +30,15 @@ import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.epam.dlab.backendapi.dao.BaseDAO.USER;
 import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.EXPLORATORY_NAME;
 import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.exploratoryCondition;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static com.mongodb.client.model.Filters.*;
 
@@ -300,7 +301,7 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
     }
 
     @Test
-    public void addComputationalAlreadyExists(){
+    public void addComputationalAlreadyExists() {
         UserInstanceDTO instance1 = new UserInstanceDTO()
                 .withUser("user1")
                 .withExploratoryName("exp_name_1")
@@ -348,5 +349,190 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 .withUptime(new Date(100));
         boolean inserted2 = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp2);
         assertTrue(inserted2);
+
+        String testId = dao.fetchComputationalId(instance1.getUser(),
+                instance1.getExploratoryName(), comp2.getComputationalName());
+        assertEquals(comp2.getComputationalId(), testId);
+    }
+
+    @Test
+    public void updateComputationalStatusSuccess() {
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+
+        dao.insertOne(USER_INSTANCES, instance1);
+
+        UserComputationalResourceDTO comp1 = new UserComputationalResourceDTO()
+                .withComputationalName("comp1")
+                .withComputationalId("c1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+        boolean inserted = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp1);
+        assertTrue(inserted);
+
+        UserComputationalResourceDTO comp2 = new UserComputationalResourceDTO()
+                .withComputationalName("comp2")
+                .withComputationalId("c2")
+                .withStatus("created")
+                .withUptime(new Date(100));
+        boolean inserted2 = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp2);
+        assertTrue(inserted2);
+
+        UpdateResult testResult = dao.updateComputationalStatus(
+                new ComputationalStatusDTO()
+                        .withUser(instance1.getUser())
+                        .withExploratoryName(instance1.getExploratoryName())
+                        .withComputationalName(comp2.getComputationalName())
+                        .withStatus(UserInstanceStatus.RUNNING));
+        assertEquals(testResult.getModifiedCount(), 1);
+
+        Optional<UserInstanceDTO> testInstance = dao.findOne(USER_INSTANCES,
+                exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
+                UserInstanceDTO.class);
+        assertTrue(testInstance.isPresent());
+
+        List<UserComputationalResourceDTO> list = testInstance.get().getResources();
+        UserComputationalResourceDTO testComp1 = list.stream()
+                .filter(r -> r.getComputationalName().equals(comp1.getComputationalName()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(testComp1);
+
+        UserComputationalResourceDTO testComp2 = list.stream()
+                .filter(r -> r.getComputationalName().equals(comp2.getComputationalName()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(testComp2);
+
+        assertEquals(testComp1.getStatus(), comp1.getStatus());
+        assertEquals(UserInstanceStatus.of(testComp2.getStatus()), UserInstanceStatus.RUNNING);
+    }
+
+    @Test
+    public void updateComputationalStatusesForExploratorySuccess() {
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+
+        dao.insertOne(USER_INSTANCES, instance1);
+
+        UserComputationalResourceDTO comp1 = new UserComputationalResourceDTO()
+                .withComputationalName("comp1")
+                .withComputationalId("c1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+        boolean inserted = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp1);
+        assertTrue(inserted);
+
+        UserComputationalResourceDTO comp2 = new UserComputationalResourceDTO()
+                .withComputationalName("comp2")
+                .withComputationalId("c2")
+                .withStatus("created")
+                .withUptime(new Date(100));
+        boolean inserted2 = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp2);
+        assertTrue(inserted2);
+
+        UserComputationalResourceDTO comp3 = new UserComputationalResourceDTO()
+                .withComputationalName("comp3")
+                .withComputationalId("c3")
+                .withStatus("terminated")
+                .withUptime(new Date(100));
+        boolean inserted3 = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp3);
+        assertTrue(inserted3);
+
+        UpdateResult testResult = dao.updateComputationalStatusesForExploratory(new StatusBaseDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withStatus(UserInstanceStatus.STOPPED));
+        assertEquals(1, testResult.getModifiedCount());
+
+        Optional<UserInstanceDTO> testInstance = dao.findOne(USER_INSTANCES,
+                exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
+                UserInstanceDTO.class);
+        assertTrue(testInstance.isPresent());
+
+        List<UserComputationalResourceDTO> list = testInstance.get().getResources();
+        UserComputationalResourceDTO testComp1 = list.stream()
+                .filter(r -> r.getComputationalName().equals(comp1.getComputationalName()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(testComp1);
+
+        UserComputationalResourceDTO testComp2 = list.stream()
+                .filter(r -> r.getComputationalName().equals(comp2.getComputationalName()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(testComp2);
+
+        UserComputationalResourceDTO testComp3 = list.stream()
+                .filter(r -> r.getComputationalName().equals(comp3.getComputationalName()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(testComp3);
+
+        assertEquals(UserInstanceStatus.STOPPED, UserInstanceStatus.of(testComp1.getStatus()));
+        assertEquals(UserInstanceStatus.STOPPED, UserInstanceStatus.of(testComp2.getStatus()));
+        assertEquals(testComp3.getStatus(), comp3.getStatus());
+    }
+
+    @Test
+    public void updateComputationalFieldsSuccess() {
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+
+        dao.insertOne(USER_INSTANCES, instance1);
+
+        UserComputationalResourceDTO comp1 = new UserComputationalResourceDTO()
+                .withComputationalName("comp1")
+                .withComputationalId("c1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+        boolean inserted = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp1);
+        assertTrue(inserted);
+
+        UserComputationalResourceDTO comp2 = new UserComputationalResourceDTO()
+                .withComputationalName("comp2")
+                .withComputationalId("c2")
+                .withStatus("created")
+                .withUptime(new Date(100));
+        boolean inserted2 = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp2);
+        assertTrue(inserted2);
+
+        ComputationalStatusDTO status = new ComputationalStatusDTO()
+                .withUser(instance1.getUser())
+                .withExploratoryName(instance1.getExploratoryName())
+                .withComputationalName(comp2.getComputationalName())
+                .withComputationalId("c3")
+                .withStatus("running")
+                .withUptime(new Date(200));
+        UpdateResult result = dao.updateComputationalFields(status);
+        assertEquals(1, result.getModifiedCount());
+
+        Optional<UserInstanceDTO> testInstance = dao.findOne(USER_INSTANCES,
+                exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
+                UserInstanceDTO.class);
+        assertTrue(testInstance.isPresent());
+
+        List<UserComputationalResourceDTO> list = testInstance.get().getResources();
+        UserComputationalResourceDTO testComp2 = list.stream()
+                .filter(r -> r.getComputationalName().equals(comp2.getComputationalName()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(testComp2);
+
+        assertEquals(status.getComputationalId(), testComp2.getComputationalId());
+        assertEquals(status.getStatus(), testComp2.getStatus());
+        assertEquals(status.getUptime(), testComp2.getUptime());
     }
 }

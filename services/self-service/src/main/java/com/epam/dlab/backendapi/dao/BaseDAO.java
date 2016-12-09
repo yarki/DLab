@@ -24,19 +24,22 @@ import com.epam.dlab.exceptions.DlabException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.InsertOneOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
+
+import static com.mongodb.client.model.Aggregates.unwind;
 
 class BaseDAO implements MongoCollections {
     protected static final ObjectMapper MAPPER = new ObjectMapper()
@@ -44,6 +47,7 @@ class BaseDAO implements MongoCollections {
             .registerModule(new IsoDateModule());
     public static final String FIELD_DELIMETER = ".";
     public static final String FIELD_SET_DELIMETER = ".$.";
+    public static final String FIELD_PROJECTION_DELIMITER = "$";
     public static final String ID = "_id";
     public static final String USER = "user";
     public static final String STATUS = "status";
@@ -76,6 +80,10 @@ class BaseDAO implements MongoCollections {
         return mongoService.getCollection(collection).updateOne(condition, value);
     }
 
+    protected UpdateResult updateMany(String collection, Bson condition, Bson value) {
+        return mongoService.getCollection(collection).updateMany(condition, value);
+    }
+
     protected FindIterable<Document> find(String collection,
                                           Bson condition) {
         return mongoService.getCollection(collection)
@@ -90,12 +98,30 @@ class BaseDAO implements MongoCollections {
                 .projection(projection);
     }
 
-    private Optional<Document> limitOne(FindIterable<Document> documents) {
-        ArrayList<Document> array = documents.limit(2).into(new ArrayList<>());
-        if(array.size() > 1) {
-            throw new DlabException("too many items found while one is expected");
+    AggregateIterable<Document> aggregate(String collection,
+                                          List<? extends Bson> pipeline) {
+        return mongoService.getCollection(collection)
+                .aggregate(pipeline);
+    }
+
+    private Optional<Document> limitOne(MongoIterable<Document> documents) {
+        Document first = documents.first();
+        MongoCursor<Document> iterator = null;
+        try {
+            iterator = documents.iterator();
+            if(iterator.hasNext()) {
+                iterator.next();
+                if(iterator.hasNext()) {
+                    throw new DlabException("too many items found while one is expected");
+                }
+            }
         }
-        return array.isEmpty() ? Optional.empty() : Optional.ofNullable(array.get(0));
+        finally {
+            if(iterator != null) {
+                iterator.close();
+            }
+        }
+        return first == null ? Optional.empty() : Optional.ofNullable(first);
     }
 
     protected Optional<Document> findOne(String collection,
@@ -124,6 +150,12 @@ class BaseDAO implements MongoCollections {
         return doc.isPresent() ? Optional.ofNullable(convertFromDocument(doc.get(), clazz)) : Optional.empty();
     }
 
+    Optional<Document> aggregateOne(String collection,
+                                          List<? extends Bson> pipeline) {
+        MongoIterable<Document> found = aggregate(collection, pipeline);
+        return limitOne(found);
+    }
+
     private <T> T convertFromDocument(Document document, Class<T> clazz) {
         try {
             String json = document.toJson();
@@ -135,5 +167,39 @@ class BaseDAO implements MongoCollections {
 
     private String generateUUID() {
         return UUID.randomUUID().toString();
+    }
+
+    static Bson unwindField(String fieldName) {
+        return unwind(FIELD_PROJECTION_DELIMITER + fieldName);
+    }
+
+    static Object getDotted(Document d, String fieldName) {
+        if(fieldName.isEmpty()) {
+            return null;
+        }
+        final String[] fieldParts = StringUtils.split(fieldName, '.');
+        Object val = d.get(fieldParts[0]);
+        for(int i = 1; i < fieldParts.length; ++i) {
+            if(fieldParts[i].equals("$")
+                    && val instanceof ArrayList) {
+                 ArrayList array = (ArrayList) val;
+                if(array.isEmpty()) {
+                    break;
+                }
+                else{
+                    val = array.get(0);
+                }
+            } else if (val instanceof Document) {
+                val = ((Document)val).get(fieldParts[i]);
+            } else {
+                break;
+            }
+        }
+        return val;
+    }
+
+    static Object getDottedOrDefault(Document d, String fieldName, Object defaultValue) {
+        Object result = getDotted(d, fieldName);
+        return result == null ? defaultValue : result;
     }
 }
