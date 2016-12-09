@@ -40,6 +40,16 @@ logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                     level=logging.INFO,
                     filename=local_log_filepath)
 
+def ensure_supervisor():
+    try:
+        if not exists('/tmp/superv_ensured'):
+            sudo('apt-get -y install supervisor')
+            sudo('sysv-rc-conf supervisor on')
+            sudo('touch /tmp/superv_ensured')
+        return True
+    except:
+        return False
+
 
 def ensure_mongo():
     try:
@@ -70,8 +80,18 @@ def configure_mongo():
 def start_ss():
     try:
         if not exists('/tmp/ss_started'):
+            supervisor_conf = '/etc/supervisor/conf.d/supervisor_svc.conf'
             put('/root/templates/proxy_location_webapp_template.conf', '/tmp/proxy_location_webapp_template.conf')
+            put('/root/templates/supervisor_svc.conf', '/tmp/supervisor_svc.conf')
             sudo('cp /tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
+            sudo('cp /tmp/supervisor_svc.conf', supervisor_conf)
+            with open(supervisor_conf, 'r') as f:
+                text = f.read()
+            text = text.replace('WEB_APP_DIR', web_path)
+            with open(supervisor_conf, 'w') as f:
+                f.write(text)
+
+            sudo('mkdir -p /var/log/application')
             sudo('mkdir -p ' + web_path)
             sudo('mkdir -p ' + web_path + 'provisioning-service/')
             sudo('mkdir -p ' + web_path + 'security-service/')
@@ -87,9 +107,8 @@ def start_ss():
                     print json.dumps(res)
                     result.write(json.dumps(res))
                 sys.exit(1)
-            run('screen -d -m java -Xmx1024M -jar ' + web_path + 'self-service/self-service-1.0.jar server ' + web_path + 'self-service/application.yml; sleep 5')
-            run('screen -d -m java -Xmx1024M -jar ' + web_path + 'security-service/security-service-1.0.jar server ' + web_path + 'security-service/application.yml; sleep 5')
-            run('screen -d -m java -Xmx1024M -jar ' + web_path + 'provisioning-service/provisioning-service-1.0.jar server ' + web_path + 'provisioning-service/application.yml; sleep 5')
+
+            sudo('service supervisor start')
             sudo('service nginx restart')
             sudo('touch /tmp/ss_started')
         return True
@@ -108,6 +127,11 @@ if __name__ == "__main__":
         deeper_config = json.loads(args.additional_config)
     except:
         sys.exit(2)
+
+    print "Installing Supervisor"
+    if not ensure_supervisor():
+        logging.error('Failed to install Supervisor')
+        sys.exit(1)
 
     print "Installing MongoDB"
     if not ensure_mongo():
