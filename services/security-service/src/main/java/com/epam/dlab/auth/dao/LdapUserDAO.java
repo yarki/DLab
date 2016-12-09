@@ -18,9 +18,9 @@ limitations under the License.
 
 package com.epam.dlab.auth.dao;
 
+import com.epam.dlab.auth.SecurityServiceConfiguration;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.core.LdapFilterCache;
-import com.epam.dlab.auth.SecurityServiceConfiguration;
 import com.epam.dlab.auth.dao.filter.SearchResultProcessor;
 import com.epam.dlab.auth.dao.script.ScriptHolder;
 import com.epam.dlab.auth.dao.script.SearchResultToDictionaryMapper;

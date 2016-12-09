@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.concurrent.*;
-import java.util.function.Supplier;
 
 /**
  * Created by Mikhail_Teplitskiy on 11/10/2016.

@@ -18,9 +18,9 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.dao;
 
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
-import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
