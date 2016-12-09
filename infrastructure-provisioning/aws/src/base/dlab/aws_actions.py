@@ -378,8 +378,8 @@ def remove_s3(bucket_type='all', scientist=''):
         print "before for " + bucket_name
         for item in client.list_buckets().get('Buckets'):
             print "Comparing " + bucket_name + " with " + item.get('Name')
-            print "Type of bucket name " + type(bucket_name)
-            print "Typy of item " + type(item.get('Name'))
+            print type(bucket_name)
+            print type(item.get('Name'))
             if bucket_name in item.get('Name'):
                 print item.get('Name')
                 bucket_list.append(item.get('Name'))
