@@ -40,13 +40,11 @@ public class LdapFilterCache extends CachingConveyor<String,String,Map<String,Ob
         super();
         this.setName("LdapFilterCache");
         this.setIdleHeartBeat(1, TimeUnit.SECONDS);
-        this.setDefaultCartConsumer((b,l,s)->{
-            LOG.debug("LdapFilterCache consume {} {}",l,s.get());
-        });
+        this.setDefaultCartConsumer((b,l,s)-> LOG.debug("LdapFilterCache consume {} {}",l,s.get()));
     }
 
     public void removeLdapFilterInfo(String token) {
-        this.addCommand(new CancelCommand<String>(token));
+        this.addCommand(new CancelCommand<>(token));
     }
 
     public Map<String,Object> getLdapFilterInfo(String token) {
@@ -59,7 +57,7 @@ public class LdapFilterCache extends CachingConveyor<String,String,Map<String,Ob
     }
 
     public void save(String token, Map<String,Object> ldapInfo,long expTimeMsec) {
-        CompletableFuture<Boolean> cacheFuture = LdapFilterCache.getInstance().createBuild(token, new ImmutableReference<Map<String,Object>>(ldapInfo),expTimeMsec,TimeUnit.MILLISECONDS);
+        CompletableFuture<Boolean> cacheFuture = LdapFilterCache.getInstance().createBuild(token, new ImmutableReference<>(ldapInfo),expTimeMsec,TimeUnit.MILLISECONDS);
         try {
             if(! cacheFuture.get() ) {
                 throw new Exception("Cache offer future returned 'false' for "+ldapInfo);

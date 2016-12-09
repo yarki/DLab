@@ -16,22 +16,22 @@ limitations under the License.
 
 ****************************************************************************/
 
-package com.epam.dlab.auth.ldap.api;
+package com.epam.dlab.auth.resources;
 
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.identitymanagement.model.AccessKeyMetadata;
 import com.amazonaws.services.identitymanagement.model.User;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.UserInfoDAO;
-import com.epam.dlab.auth.conveyor.LoginCache;
-import com.epam.dlab.auth.conveyor.LoginConveyor;
-import com.epam.dlab.auth.conveyor.LoginStep;
-import com.epam.dlab.auth.ldap.SecurityServiceConfiguration;
-import com.epam.dlab.auth.ldap.core.AwsUserDAOImpl;
-import com.epam.dlab.auth.ldap.core.LdapUserDAO;
-import com.epam.dlab.auth.ldap.core.UserInfoDAODumbImpl;
-import com.epam.dlab.auth.ldap.core.UserInfoDAOMongoImpl;
-import com.epam.dlab.auth.ldap.core.filter.AwsUserDAO;
+import com.epam.dlab.auth.core.LoginCache;
+import com.epam.dlab.auth.core.LoginConveyor;
+import com.epam.dlab.auth.core.LoginStep;
+import com.epam.dlab.auth.SecurityServiceConfiguration;
+import com.epam.dlab.auth.dao.AwsUserDAOImpl;
+import com.epam.dlab.auth.dao.LdapUserDAO;
+import com.epam.dlab.auth.dao.UserInfoDAODumbImpl;
+import com.epam.dlab.auth.dao.UserInfoDAOMongoImpl;
+import com.epam.dlab.auth.dao.filter.AwsUserDAO;
 import com.epam.dlab.auth.rest.AbstractAuthenticationService;
 import com.epam.dlab.dto.UserCredentialDTO;
 import io.dropwizard.setup.Environment;

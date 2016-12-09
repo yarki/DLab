@@ -43,13 +43,11 @@ public class LoginCache extends CachingConveyor<String,String,UserInfo> {
         this.setDefaultBuilderTimeout(60, TimeUnit.MINUTES);
         this.enablePostponeExpiration(true);
         this.setExpirationPostponeTime(60,TimeUnit.MINUTES);
-        this.setDefaultCartConsumer((b,l,s)->{
-            LOG.debug("UserInfoCache consume {} {}",l,s.get());
-        });
+        this.setDefaultCartConsumer((b,l,s)-> LOG.debug("UserInfoCache consume {} {}",l,s.get()));
     }
 
     public void removeUserInfo(String token) {
-        this.addCommand(new CancelCommand<String>(token));
+        this.addCommand(new CancelCommand<>(token));
     }
 
     public UserInfo getUserInfo(String token) {
@@ -62,7 +60,7 @@ public class LoginCache extends CachingConveyor<String,String,UserInfo> {
     }
 
     public void save(UserInfo userInfo) {
-        CompletableFuture<Boolean> cacheFuture = LoginCache.getInstance().createBuild(userInfo.getAccessToken(),new ImmutableReference<UserInfo>(userInfo));
+        CompletableFuture<Boolean> cacheFuture = LoginCache.getInstance().createBuild(userInfo.getAccessToken(), new ImmutableReference<>(userInfo));
         try {
             if(! cacheFuture.get() ) {
                 throw new Exception("Offer future returned 'false' for "+userInfo);

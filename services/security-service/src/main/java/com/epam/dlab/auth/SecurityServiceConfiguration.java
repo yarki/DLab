@@ -70,7 +70,7 @@ public class SecurityServiceConfiguration extends Configuration {
 	private String ldapBindTemplate;
 	
 	@JsonProperty
-	private Map<String,String> ldapConnectionConfig = new HashMap<String, String>();
+	private Map<String,String> ldapConnectionConfig = new HashMap<>();
 	private LdapConnectionConfig _ldapConnectionConfig;
 	
 	public LdapConnectionConfig getLdapConnectionConfig() {
