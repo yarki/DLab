@@ -32,7 +32,7 @@ parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
-
+dlab_conf_dir='/etc/opt/dlab'
 web_path = '/tmp/web_app/'
 local_log_filename = "{}_UI.log".format(os.environ['request_id'])
 local_log_filepath = "/response/" + local_log_filename
@@ -142,6 +142,9 @@ if __name__ == "__main__":
     if not configure_mongo():
         logging.error('MongoDB configuration script has failed.')
         sys.exit(1)
+
+    sudo('echo DLAB_CONF_DIR={} >> /etc/profile'.format(dlab_conf_dir))
+    sudo('echo export DLAB_CONF_DIR >> /etc/profile')
 
     print "Starting Self-Service(UI)"
     if not start_ss():
