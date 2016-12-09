@@ -26,39 +26,24 @@ export * from "./modal.component";
     selector: "modal-header",
     template: `<ng-content></ng-content>`
 })
-export class ModalHeader {
-}
+export class ModalHeader { }
 
 @Component({
     selector: "modal-content",
     template: `<ng-content></ng-content>`
 })
-export class ModalContent {
-}
+export class ModalContent { }
 
 @Component({
     selector: "modal-footer",
     template: `<ng-content></ng-content>`
 })
-export class ModalFooter {
-}
+export class ModalFooter { }
+
 
 @NgModule({
-    imports: [
-        CommonModule
-    ],
-    declarations: [
-        Modal,
-        ModalHeader,
-        ModalContent,
-        ModalFooter,
-    ],
-    exports: [
-        Modal,
-        ModalHeader,
-        ModalContent,
-        ModalFooter,
-    ],
+    imports: [CommonModule],
+    declarations: [Modal, ModalHeader, ModalContent, ModalFooter],
+    exports: [Modal, ModalHeader, ModalContent, ModalFooter]
 })
-export class ModalModule {
-}
+export class ModalModule { }
