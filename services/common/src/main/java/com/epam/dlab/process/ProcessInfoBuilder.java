@@ -86,13 +86,11 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing {
     }
 
     public static void stdOut(ProcessInfoBuilder b, Object msg) {
-        b.stdOut.append(msg);
-        b.finished = true;
+        b.stdOut.append(msg).append("\n");
     }
 
     public static void stdErr(ProcessInfoBuilder b, Object msg) {
-        b.stdErr.append(msg);
-        b.finished = true;
+        b.stdErr.append(msg).append("\n");
     }
 
     private void launch() {

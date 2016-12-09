@@ -14,12 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-public enum ProcessStep {
-    START,
-    STOP,
-    KILL,
-    FINISH,
-    STD_OUT,
-    STD_ERR
+import com.aegisql.conveyor.SmartLabel;
+
+import java.util.function.BiConsumer;
+
+public enum ProcessStep implements SmartLabel<ProcessInfoBuilder> {
+    START(ProcessInfoBuilder::start),
+    STOP(ProcessInfoBuilder::stop),
+    KILL(ProcessInfoBuilder::kill),
+    FINISH(ProcessInfoBuilder::finish),
+    STD_OUT(ProcessInfoBuilder::stdOut),
+    STD_ERR(ProcessInfoBuilder::stdErr)
     ;
+
+    private BiConsumer<ProcessInfoBuilder, Object> consumer;
+
+    <T> ProcessStep(BiConsumer<ProcessInfoBuilder, T> consumer) {
+        this.consumer = (BiConsumer<ProcessInfoBuilder, Object>) consumer;
+    }
+
+    @Override
+    public BiConsumer<ProcessInfoBuilder, Object> get() {
+        return consumer;
+    }
 }

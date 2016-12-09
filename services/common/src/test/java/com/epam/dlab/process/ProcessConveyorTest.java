@@ -1,5 +1,9 @@
 package com.epam.dlab.process;
 
+import org.junit.Test;
+
+import java.util.concurrent.CompletableFuture;
+
 import static org.junit.Assert.*;
 
 /*
@@ -18,5 +22,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 public class ProcessConveyorTest {
+    @Test
+    public void testLs() throws Exception {
+        ProcessId ls = new ProcessId("ls");
+        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(ls,"ls /");
+        ProcessInfo pi = cf.get();
+        System.out.println(pi);
 
+    }
 }

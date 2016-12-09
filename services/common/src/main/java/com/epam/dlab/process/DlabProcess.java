@@ -26,7 +26,7 @@ public class DlabProcess {
 
     private final static DlabProcess INSTANCE = new DlabProcess();
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(32);
+    private ExecutorService executorService = Executors.newFixedThreadPool(3*16);
 
     public static DlabProcess getInstance() {
         return INSTANCE;
@@ -48,8 +48,8 @@ public class DlabProcess {
     }
 
     public CompletableFuture<ProcessInfo> start(ProcessId id, String command){
+        CompletableFuture<ProcessInfo> future = processConveyor.createBuildFuture( id, ()-> new ProcessInfoBuilder(id) );
         processConveyor.add(id,command,ProcessStep.START);
-        CompletableFuture<ProcessInfo> future = processConveyor.getFuture(id);
         return future;
     }
 

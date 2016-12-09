@@ -15,10 +15,40 @@ limitations under the License.
 */
 
 import com.aegisql.conveyor.AssemblingConveyor;
+import com.aegisql.conveyor.BuildingSite;
+import com.aegisql.conveyor.cart.Cart;
+import com.aegisql.conveyor.cart.FutureCart;
+
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class ProcessConveyor extends AssemblingConveyor<ProcessId,ProcessStep,ProcessInfo>{
 
     public ProcessConveyor() {
         super();
+        this.setName("ProcessConveyor");
+        this.setIdleHeartBeat(1, TimeUnit.SECONDS);
+        this.setDefaultBuilderTimeout(1,TimeUnit.HOURS);
+        this.setDefaultCartConsumer((l,v,b)->{
+            LOG.warn("default processor for {} {} {}",l,v,b.get());
+            if(v instanceof FutureCart) {
+                FutureCart fc = (FutureCart)v;
+                fc.get().cancel(true);
+            }
+        });
+        this.setResultConsumer((bin)->{
+            LOG.debug("process finished: {}",bin);
+        });
+
     }
+
+    public Supplier<? extends ProcessInfo> getInfo(ProcessId id) {
+        BuildingSite<ProcessId, ProcessStep, Cart<ProcessId, ?, ProcessStep>, ? extends ProcessInfo> bs = this.collector.get(id);
+        if(bs == null) {
+            return () -> null;
+        } else {
+            return bs.getProductSupplier();
+        }
+    }
+
 }
