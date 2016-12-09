@@ -377,7 +377,10 @@ def remove_s3(bucket_type='all', scientist=''):
             bucket_name = (os.environ['conf_service_base_name'])
         print "before for " + bucket_name
         for item in client.list_buckets().get('Buckets'):
-            if str(bucket_name) in item.get('Name'):
+            print "Comparing " + bucket_name + " with " + item.get('Name')
+            print "Type of bucket name " + type(bucket_name)
+            print "Typy of item " + type(item.get('Name'))
+            if bucket_name in item.get('Name'):
                 print item.get('Name')
                 bucket_list.append(item.get('Name'))
         print bucket_list
