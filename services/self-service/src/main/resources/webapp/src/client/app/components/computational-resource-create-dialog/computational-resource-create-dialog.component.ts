@@ -35,6 +35,7 @@ export class ComputationalResourceCreateDialog {
 
   model: ComputationalResourceCreateModel;
   notebook_instance: any;
+  shapes: any;
   computationalResourceExist: boolean = false;
   checkValidity: boolean = false;
   clusterNamePattern: string = "[-_ a-zA-Z0-9]+";
@@ -48,6 +49,9 @@ export class ComputationalResourceCreateDialog {
   @ViewChild('bindDialog') bindDialog;
   @ViewChild('name') name;
   @ViewChild('count') count;
+  @ViewChild('templatesList') templates_list;
+  @ViewChild('masterShapesList') master_shapes_list;
+  @ViewChild('shapesSlaveList') slave_shapes_list;
 
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
@@ -58,9 +62,9 @@ export class ComputationalResourceCreateDialog {
     this.model = ComputationalResourceCreateModel.getDefault(userResourceService);
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.initFormModel();
-    this.bindDialog.onClosing =  () => this.resetDialog();
+    this.bindDialog.onClosing = () => this.resetDialog();
   }
 
   private initFormModel(): void {
@@ -68,6 +72,22 @@ export class ComputationalResourceCreateDialog {
       cluster_alias_name: ['', [Validators.required, Validators.pattern(this.clusterNamePattern)]],
       instance_number: ['1', [Validators.required, Validators.pattern(this.nodeCountPattern)]]
     });
+  }
+  private setDefaultParams(): void {
+    this.shapes = {
+      master_shape: this.model.selectedItem.shapes[0].type,
+      slave_shape: this.model.selectedItem.shapes[0].type
+    };
+    this.templates_list.setDefaultOptions(this.model.selectedItem.version, 'template', 'version');
+    this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'master_shape', 'type');
+    this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'slave_shape', 'type');
+  }
+
+  public onUpdate($event): void {
+    if($event.model.type === 'template')
+      this.model.setSelectedTemplate($event.model.index);
+    if(this.shapes[$event.model.type])
+      this.shapes[$event.model.type] = $event.model.value.type;
   }
 
   public createComputationalResource($event, data, shape_master: string, shape_slave: string) {
@@ -85,10 +105,6 @@ export class ComputationalResourceCreateDialog {
     return false;
   }
 
-  public templateSelectionChange(value) {
-    this.model.setSelectedTemplate(value);
-  }
-
   public containsComputationalResource(conputational_resource_name: string): boolean {
     if(conputational_resource_name)
       for (var index = 0; index < this.notebook_instance.resources.length; index++)
@@ -98,7 +114,7 @@ export class ComputationalResourceCreateDialog {
       return false;
   }
 
-  public open(params, notebook_instance) {
+  public open(params, notebook_instance): void {
     if (!this.bindDialog.isOpened) {
       this.notebook_instance = notebook_instance;
 
@@ -118,18 +134,19 @@ export class ComputationalResourceCreateDialog {
         },
         () => {
           this.bindDialog.open(params);
+          this.setDefaultParams();
         },
         this.userResourceService);
 
     }
   }
 
-  close() {
+  public close(): void {
     if (this.bindDialog.isOpened)
       this.bindDialog.close();
   }
 
-  private resetDialog() : void {
+  private resetDialog(): void {
     this.computationalResourceExist = false;
     this.checkValidity = false;
     this.processError = false;
