@@ -84,7 +84,7 @@ def start_ss():
             put('/root/templates/proxy_location_webapp_template.conf', '/tmp/proxy_location_webapp_template.conf')
             put('/root/templates/supervisor_svc.conf', '/tmp/supervisor_svc.conf')
             sudo('cp /tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
-            sudo('cp /tmp/supervisor_svc.conf', supervisor_conf)
+            sudo('cp /tmp/supervisor_svc.conf {}'.format(supervisor_conf))
             with open(supervisor_conf, 'r') as f:
                 text = f.read()
             text = text.replace('WEB_APP_DIR', web_path)
