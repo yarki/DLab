@@ -134,11 +134,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public String fetchComputationalId(String user, String exploratoryName, String computationalName) {
         return findOne(USER_INSTANCES,
                 computationalCondition(user, exploratoryName, computationalName),
-                fields(include(computationalField(COMPUTATIONAL_NAME))))
+                fields(include(computationalField(COMPUTATIONAL_NAME)), excludeId()))
                 .orElse(new Document())
                 .getOrDefault(computationalField(COMPUTATIONAL_NAME), EMPTY).toString();
     }

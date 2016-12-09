@@ -36,6 +36,7 @@ import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.EXPLORATOR
 import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.exploratoryCondition;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static com.mongodb.client.model.Filters.*;
@@ -283,7 +284,8 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 .withComputationalId("c1")
                 .withStatus("created")
                 .withUptime(new Date(100));
-        dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp1);
+        boolean inserted = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp1);
+        assertTrue(inserted);
 
         UserInstanceDTO testInstance = dao.findOne(USER_INSTANCES,
                 exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
@@ -295,5 +297,56 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         assertEquals(comp1.getComputationalId(), testComp.getComputationalId());
         assertEquals(comp1.getStatus(), testComp.getStatus());
         assertEquals(comp1.getUptime(), testComp.getUptime());
+    }
+
+    @Test
+    public void addComputationalAlreadyExists(){
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+
+        dao.insertOne(USER_INSTANCES, instance1);
+
+        UserComputationalResourceDTO comp1 = new UserComputationalResourceDTO()
+                .withComputationalName("comp1")
+                .withComputationalId("c1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+        boolean inserted = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp1);
+        assertTrue(inserted);
+
+        boolean insertFail = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp1);
+        assertFalse(insertFail);
+    }
+
+    @Test
+    public void fetchComputationalIdSuccess() {
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+
+        dao.insertOne(USER_INSTANCES, instance1);
+
+        UserComputationalResourceDTO comp1 = new UserComputationalResourceDTO()
+                .withComputationalName("comp1")
+                .withComputationalId("c1")
+                .withStatus("created")
+                .withUptime(new Date(100));
+        boolean inserted = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp1);
+        assertTrue(inserted);
+
+        UserComputationalResourceDTO comp2 = new UserComputationalResourceDTO()
+                .withComputationalName("comp2")
+                .withComputationalId("c2")
+                .withStatus("created")
+                .withUptime(new Date(100));
+        boolean inserted2 = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp2);
+        assertTrue(inserted2);
     }
 }
