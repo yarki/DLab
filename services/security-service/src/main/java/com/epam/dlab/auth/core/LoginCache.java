@@ -60,7 +60,7 @@ public class LoginCache extends CachingConveyor<String,String,UserInfo> {
     }
 
     public void save(UserInfo userInfo) {
-        CompletableFuture<Boolean> cacheFuture = LoginCache.getInstance().createBuild(userInfo.getAccessToken(), new ImmutableReference<>(userInfo));
+        CompletableFuture<Boolean> cacheFuture = LoginCache.getInstance().createBuild(userInfo.getAccessToken(), ImmutableReference.newInstance(userInfo));
         try {
             if(! cacheFuture.get() ) {
                 throw new Exception("Offer future returned 'false' for "+userInfo);

@@ -57,7 +57,7 @@ public class LdapFilterCache extends CachingConveyor<String,String,Map<String,Ob
     }
 
     public void save(String token, Map<String,Object> ldapInfo,long expTimeMsec) {
-        CompletableFuture<Boolean> cacheFuture = LdapFilterCache.getInstance().createBuild(token, new ImmutableReference<>(ldapInfo),expTimeMsec,TimeUnit.MILLISECONDS);
+        CompletableFuture<Boolean> cacheFuture = LdapFilterCache.getInstance().createBuild(token, ImmutableReference.newInstance(ldapInfo),expTimeMsec,TimeUnit.MILLISECONDS);
         try {
             if(! cacheFuture.get() ) {
                 throw new Exception("Cache offer future returned 'false' for "+ldapInfo);
