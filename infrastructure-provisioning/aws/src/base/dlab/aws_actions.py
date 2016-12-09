@@ -378,7 +378,7 @@ def remove_s3(bucket_type='all', scientist=''):
         for item in client.list_buckets().get('Buckets'):
             print item.get('Name')
             print bucket_name
-            if re.search(bucket_name, item.get('Name')):
+            if bucket_name in item.get('Name'):
                 bucket_list.append(item.get('Name'))
         print bucket_list
         for s3bucket in bucket_list:
