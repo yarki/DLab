@@ -30,4 +30,13 @@ public class ProcessConveyorTest {
         System.out.println(pi);
 
     }
+
+    @Test
+    public void testLsErr() throws Exception {
+        ProcessId ls = new ProcessId("ls");
+        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(ls,"l/");
+        ProcessInfo pi = cf.get();
+        System.out.println(pi);
+
+    }
 }
