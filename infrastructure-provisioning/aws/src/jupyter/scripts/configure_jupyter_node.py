@@ -162,7 +162,7 @@ def configure_notebook_server(notebook_name):
             sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
             sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() + '"\' >> ' + jupyter_conf_file)
-            sudo('echo c.NotebookApp.token = u\'\' >> ' + jupyter_conf_file)
+            sudo('''echo "c.NotebookApp.token = u''" >> ''' + jupyter_conf_file)
         except:
             sys.exit(1)
 
