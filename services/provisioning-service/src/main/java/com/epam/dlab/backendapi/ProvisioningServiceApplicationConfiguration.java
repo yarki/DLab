@@ -80,6 +80,10 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     @JsonProperty(SELF_SERVICE)
     private RESTServiceFactory selfFactory = new RESTServiceFactory();
 
+    @Valid
+    @JsonProperty
+    private boolean mocked;
+
     public String getKeyDirectory() {
         return keyDirectory;
     }
@@ -139,4 +143,6 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     public String getKeyLoaderDirectory() {
         return responseDirectory + KEY_LOADER_DIRECTORY;
     }
+
+    public boolean isMocked() { return mocked; }
 }

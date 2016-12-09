@@ -20,8 +20,8 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.CommandBuilder;
-import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.backendapi.core.ICommandExecutor;
 import com.epam.dlab.backendapi.core.docker.command.DockerAction;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
@@ -57,7 +57,7 @@ public class ComputationalResource implements DockerCommands {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecutor commandExecuter;
+    private ICommandExecutor commandExecuter;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject

@@ -22,12 +22,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import com.epam.dlab.backendapi.core.ICommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.client.rest.SelfAPI;
 import com.epam.dlab.backendapi.core.CommandBuilder;
-import com.epam.dlab.backendapi.core.CommandExecutor;
 import com.epam.dlab.backendapi.core.DockerCommands;
 import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
@@ -55,7 +56,7 @@ public class KeyLoader implements DockerCommands, SelfAPI {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecutor commandExecuter;
+    private ICommandExecutor commandExecuter;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject

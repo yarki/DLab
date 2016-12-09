@@ -1,11 +1,11 @@
-mocked: false
+mocked: true
 
 mongo:
   host: localhost
   port: 27017
-  username: admin
-  password: XS3ms9R3tP
-  database: dlabdb
+  username: siteUserAdmin
+  password: password
+  database: admin
 
 securityService:
   protocol: http
@@ -37,7 +37,7 @@ logging:
   loggers:
     com.epam: DEBUG
   appenders:
-#    - type: console
-    - type: file
-      currentLogFilename: /tmp/dlab/log/selfservice.log
-      archivedLogFilenamePattern: /tmp/dlab/log/selfservice-%d.log
+    - type: console
+#    - type: file
+ #     currentLogFilename: /tmp/dlab/log/selfservice.log
+  #    archivedLogFilenamePattern: /tmp/dlab/log/selfservice-%d.log

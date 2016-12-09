@@ -18,6 +18,9 @@ limitations under the License.
 
 package com.epam.dlab.backendapi;
 
+import com.epam.dlab.backendapi.core.CommandExecutor;
+import com.epam.dlab.backendapi.core.CommandExecutorMock;
+import com.epam.dlab.backendapi.core.ICommandExecutor;
 import com.epam.dlab.backendapi.core.response.DirectoriesCreator;
 import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
 import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
@@ -62,6 +65,9 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(configuration);
                 bind(MetadataHolder.class).to(DockerWarmuper.class);
                 bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, SELF_SERVICE));
+                bind(ICommandExecutor.class)
+                        .to(configuration.isMocked() ? CommandExecutorMock.class : CommandExecutor.class)
+                        .asEagerSingleton();
             }
         });
     }

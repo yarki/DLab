@@ -54,9 +54,10 @@ public class KeyDAO extends BaseDAO {
     }
 
     public KeyLoadStatus findKeyStatus(UserInfo userInfo) {
-        return find(USER_KEYS, eq(ID, userInfo.getName()), UserKeyDTO.class)
+        Optional<KeyLoadStatus> status = find(USER_KEYS, eq(ID, userInfo.getName()), UserKeyDTO.class)
                 .map(UserKeyDTO::getStatus)
-                .map(KeyLoadStatus::findByStatus)
-                .orElse(KeyLoadStatus.NONE);
+                .map(KeyLoadStatus::findByStatus);
+
+        return status.orElse(KeyLoadStatus.NONE);
     }
 }
