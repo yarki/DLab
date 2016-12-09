@@ -127,9 +127,9 @@ logging:
     com.epam: DEBUG
     com.aegisql: DEBUG
   appenders:
-    - type: console
+#    - type: console
     - type: file
-      currentLogFilename: /var/opt/dlab/log/ssn/security.log
+      currentLogFilename: ${LOG_ROOT_DIR}/ssn/security.log
       archive: true
-      archivedLogFilenamePattern: /var/opt/dlab/log/ssn/security-%d{yyyy-MM-dd}.log.gz
+      archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/security-%d{yyyy-MM-dd}.log.gz
       archivedFileCount: 10

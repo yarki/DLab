@@ -16,9 +16,9 @@ logging:
   loggers:
     com.epam: DEBUG
   appenders:
-    - type: console
+#    - type: console
     - type: file
-      currentLogFilename: /var/opt/dlab/log/ssn/selfservice.log
+      currentLogFilename: ${LOG_ROOT_DIR}/ssn/selfservice.log
       archive: true
-      archivedLogFilenamePattern: /var/opt/dlab/log/ssn/selfservice-%d{yyyy-MM-dd}.log.gz
+      archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/selfservice-%d{yyyy-MM-dd}.log.gz
       archivedFileCount: 10
