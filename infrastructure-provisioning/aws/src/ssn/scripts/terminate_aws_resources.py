@@ -85,9 +85,7 @@ if __name__ == "__main__":
 
     print "Removing IAM roles and profiles"
     try:
-        remove_role('notebook', '*')
-        remove_role('edge', '*')
-        remove_role('ssn', '*')
+        remove_role()
     except:
         sys.exit(1)
 

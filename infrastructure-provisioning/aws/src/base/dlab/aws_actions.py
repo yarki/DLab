@@ -26,7 +26,6 @@ from fabric.api import *
 import logging
 from dlab.aws_meta import *
 import traceback
-import re
 
 local_log_filename = "%s.log" % os.environ['request_id']
 local_log_filepath = "/response/" + local_log_filename
@@ -305,44 +304,50 @@ def start_ec2(tag_name, tag_value):
         traceback.print_exc(file=sys.stdout)
 
 
-def remove_role(instance_type, scientist=''):
+def remove_role(instance_type='all', scientist=''):
     try:
         print "[Removing roles and instance profiles]"
         client = boto3.client('iam')
+        roles_list = []
         if instance_type == "ssn":
             role_name = os.environ['conf_service_base_name'] + '-ssn-Role'
             role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
             policy_name = os.environ['conf_service_base_name'] + '-ssn-Policy'
-        if instance_type == "edge":
+        elif instance_type == "edge":
             role_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Role'
             role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
         elif instance_type == "notebook":
             role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Role'
             role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
-        role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
-        if instance_type == "ssn":
-            client.delete_role_policy(RoleName=role, PolicyName=policy_name)
-        if instance_type == "edge":
-            policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
-            for i in policy_list:
-                policy_arn = i.get('PolicyArn')
-                client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
-                client.delete_policy(PolicyArn=policy_arn)
-        elif instance_type == "notebook":
-            policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
-            for i in policy_list:
-                policy_arn = i.get('PolicyArn')
-                client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
-        profile = client.get_instance_profile(InstanceProfileName="{}".format(role_profile_name)).get(
-            "InstanceProfile").get("InstanceProfileName")
-        client.remove_role_from_instance_profile(InstanceProfileName=profile, RoleName=role)
-        client.delete_instance_profile(InstanceProfileName=profile)
-        client.delete_role(RoleName=role)
-        print "The IAM role " + role + " has been deleted successfully"
+        else:
+            role_name = os.environ['conf_service_base_name']
+            role_profile_name = os.environ['conf_service_base_name']
+            policy_name = os.environ['conf_service_base_name']
+        for item in client.list_roles().get("Role"):
+            if role_name in item.get("RoleName"):
+                roles_list.append(item.get('Name'))
+        for iam_role in roles_list:
+            if instance_type == "ssn":
+                client.delete_role_policy(RoleName=iam_role, PolicyName=policy_name)
+            if instance_type == "edge":
+                policy_list = client.list_attached_role_policies(RoleName=iam_role).get('AttachedPolicies')
+                for i in policy_list:
+                    policy_arn = i.get('PolicyArn')
+                    client.detach_role_policy(RoleName=iam_role, PolicyArn=policy_arn)
+                    client.delete_policy(PolicyArn=policy_arn)
+            elif instance_type == "notebook":
+                policy_list = client.list_attached_role_policies(RoleName=iam_role).get('AttachedPolicies')
+                for i in policy_list:
+                    policy_arn = i.get('PolicyArn')
+                    client.detach_role_policy(RoleName=iam_role, PolicyArn=policy_arn)
+            client.remove_role_from_instance_profile(InstanceProfileName=role_profile_name, RoleName=iam_role)
+            client.delete_instance_profile(InstanceProfileName=role_profile_name)
+            client.delete_role(RoleName=iam_role)
+            print "The IAM role " + iam_role + " has been deleted successfully"
     except Exception as err:
-        logging.info("Unable to remove role: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        logging.info("Unable to remove IAM role/profile/policy: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove role", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            res = {"error": "Unable to remove IAM role/profile/policy", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
