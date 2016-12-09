@@ -386,10 +386,10 @@ def remove_s3(bucket_type='all', scientist=''):
                 for o in list_obj:
                     list_obj = o.get('Key')
                     print list_obj
-                    #client.delete_objects(
-                    #    Bucket=s3bucket,
-                    #    Delete={'Objects': [{'Key': list_obj}]}
-                    #)
+                    client.delete_objects(
+                        Bucket=s3bucket,
+                        Delete={'Objects': [{'Key': list_obj}]}
+                    )
                     print "The S3 bucket " + s3bucket + " has been cleaned"
             #client.delete_bucket(Bucket=s3bucket)
             print "The S3 bucket " + s3bucket + " has been deleted successfully"
