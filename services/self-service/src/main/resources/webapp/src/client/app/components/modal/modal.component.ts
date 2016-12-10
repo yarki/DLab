@@ -88,6 +88,9 @@ export class Modal {
         this.onClose.emit(args);
         document.body.removeChild(this.backdropElement);
         document.body.className = document.body.className.replace(/modal-open\b/, "");
+
+        if(document.getElementsByClassName('dropdown open').length)
+          document.getElementsByClassName('dropdown open')[0].classList.remove('open');
     }
 
     private createBackDrop() {
