@@ -88,7 +88,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         sys.exit(1)
 
     try:
@@ -105,7 +105,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         sys.exit(1)
 
     try:
@@ -125,7 +125,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -147,7 +147,7 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -167,7 +167,7 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -190,7 +190,7 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -210,7 +210,7 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -227,7 +227,7 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -295,7 +295,7 @@ def run():
             run_routine('finalize', params)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 

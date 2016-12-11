@@ -304,50 +304,80 @@ def start_ec2(tag_name, tag_value):
         traceback.print_exc(file=sys.stdout)
 
 
-def remove_role(instance_type='all', scientist=''):
+def remove_detach_iam_policies(role_name, action=''):
+    client = boto3.client('iam')
     try:
-        print "[Removing roles and instance profiles]"
+        policy_list = client.list_attached_role_policies(RoleName=role_name).get('AttachedPolicies')
+        for i in policy_list:
+            policy_arn = i.get('PolicyArn')
+            client.detach_role_policy(RoleName=role_name, PolicyArn=policy_arn)
+            if action == 'delete':
+                client.delete_policy(PolicyArn=policy_arn)
+    except Exception as err:
+        logging.info("Unable to remove/detach IAM policy: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove/detach IAM policy",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def remove_roles_and_profiles(role_name, role_profile_name):
+    client = boto3.client('iam')
+    try:
+        client.delete_role_policy(RoleName=role_name, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
+        client.remove_role_from_instance_profile(InstanceProfileName=role_profile_name, RoleName=role_name)
+        client.delete_instance_profile(InstanceProfileName=role_profile_name)
+    except Exception as err:
+        logging.info("Unable to remove IAM role/profile: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove IAM role/profile",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def remove_all_iam_resources(instance_type, scientist=''):
+    try:
+        print "[Removing IAM roles, instance profiles and policies]"
         client = boto3.client('iam')
         roles_list = []
-        if instance_type == "ssn":
-            role_name = os.environ['conf_service_base_name'] + '-ssn-Role'
-            role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
-            policy_name = os.environ['conf_service_base_name'] + '-ssn-Policy'
-        elif instance_type == "edge":
-            role_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Role'
-            role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
-        elif instance_type == "notebook":
-            role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Role'
-            role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
-        else:
-            role_name = os.environ['conf_service_base_name']
-            role_profile_name = os.environ['conf_service_base_name']
-            policy_name = os.environ['conf_service_base_name']
         for item in client.list_roles().get("Role"):
-            if role_name in item.get("RoleName"):
+            if os.environ['conf_service_base_name'] in item.get("RoleName"):
                 roles_list.append(item.get('Name'))
-        for iam_role in roles_list:
-            if instance_type == "ssn":
-                client.delete_role_policy(RoleName=iam_role, PolicyName=policy_name)
-            if instance_type == "edge":
-                policy_list = client.list_attached_role_policies(RoleName=iam_role).get('AttachedPolicies')
-                for i in policy_list:
-                    policy_arn = i.get('PolicyArn')
-                    client.detach_role_policy(RoleName=iam_role, PolicyArn=policy_arn)
-                    client.delete_policy(PolicyArn=policy_arn)
-            elif instance_type == "notebook":
-                policy_list = client.list_attached_role_policies(RoleName=iam_role).get('AttachedPolicies')
-                for i in policy_list:
-                    policy_arn = i.get('PolicyArn')
-                    client.detach_role_policy(RoleName=iam_role, PolicyArn=policy_arn)
-            client.remove_role_from_instance_profile(InstanceProfileName=role_profile_name, RoleName=iam_role)
-            client.delete_instance_profile(InstanceProfileName=role_profile_name)
-            client.delete_role(RoleName=iam_role)
-            print "The IAM role " + iam_role + " has been deleted successfully"
+        if roles_list != '':
+            for iam_role in roles_list:
+                if '-ssn-Role' in iam_role:
+                    role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
+                    client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
+                    remove_roles_and_profiles(iam_role, role_profile_name)
+                if '-edge-Role' in iam_role:
+                    if instance_type == 'edge' and scientist in iam_role:
+                        role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
+                        remove_detach_iam_policies(iam_role, 'delete')
+                        remove_roles_and_profiles(iam_role, role_profile_name)
+                    if instance_type == 'all':
+                        role_profile_name = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles').get('InstanceProfileName')
+                        remove_detach_iam_policies(iam_role, 'delete')
+                        remove_roles_and_profiles(iam_role, role_profile_name)
+                if '-nb-Role' in iam_role:
+                    if instance_type == 'notebook' and scientist in iam_role:
+                        role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
+                        remove_detach_iam_policies(iam_role)
+                        remove_roles_and_profiles(iam_role, role_profile_name)
+                    if instance_type == 'all':
+                        role_profile_name = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles').get('InstanceProfileName')
+                        remove_detach_iam_policies(iam_role)
+                        remove_roles_and_profiles(iam_role, role_profile_name)
+            print "The IAM role " + iam_role + " and instance profile " + role_profile_name + " with all policies have been deleted successfully"
+        else:
+            print "There is no IAM role to delete"
     except Exception as err:
-        logging.info("Unable to remove IAM role/profile/policy: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        logging.info("Unable to remove some of the IAM resources: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove IAM role/profile/policy", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            res = {"error": "Unable to remove some of the IAM resources", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)

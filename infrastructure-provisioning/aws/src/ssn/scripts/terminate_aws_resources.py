@@ -83,9 +83,9 @@ if __name__ == "__main__":
     except:
         sys.exit(1)
 
-    print "Removing IAM roles and profiles"
+    print "Removing IAM roles, profiles and policies"
     try:
-        remove_role()
+        remove_all_iam_resources('all')
     except:
         sys.exit(1)
 
