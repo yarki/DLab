@@ -552,7 +552,7 @@ def remove_route_tables(tag_name):
         client = boto3.client('ec2')
         rtables = client.describe_route_tables(Filters=[{'Name': 'tag-key', 'Values': [tag_name]}]).get('RouteTables')
         for rtable in rtables:
-            rtable.get('RouteTableId')
+            rtable = rtable.get('RouteTableId')
             client.delete_route_table(RouteTableId=rtable)
             print "Route table " + rtable + " was removed"
     except Exception as err:
