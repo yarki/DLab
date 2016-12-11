@@ -550,9 +550,9 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
 def remove_route_tables(tag_name):
     try:
         client = boto3.client('ec2')
-        rtables = client.describe_route_tables(Filters=[{'Name': 'tag-key', 'Values': [tag_name]}])
+        rtables = client.describe_route_tables(Filters=[{'Name': 'tag-key', 'Values': [tag_name]}]).get('RouteTables')
         for rtable in rtables:
-            rtable.get('RouteTables').get('RouteTableId')
+            rtable.get('RouteTableId')
             client.delete_route_table(RouteTableId=rtable)
             print "Route table " + rtable + " was removed"
     except Exception as err:
