@@ -346,13 +346,14 @@ def remove_all_iam_resources(instance_type, scientist=''):
         roles_list = []
         for item in client.list_roles().get("Roles"):
             if os.environ['conf_service_base_name'] in item.get("RoleName"):
-                roles_list.append(item.get('Name'))
+                roles_list.append(item.get('RoleName'))
         print roles_list
         print ' ----all'
         if roles_list != '':
             for iam_role in roles_list:
                 if '-ssn-Role' in iam_role:
-                    print roles_list + ' ----ssn'
+                    print roles_list
+                    print ' ----ssn'
                     role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
                     client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
                     remove_roles_and_profiles(iam_role, role_profile_name)
