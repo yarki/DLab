@@ -311,8 +311,10 @@ def remove_detach_iam_policies(role_name, action=''):
         for i in policy_list:
             policy_arn = i.get('PolicyArn')
             client.detach_role_policy(RoleName=role_name, PolicyArn=policy_arn)
+            print "The IAM policy " + policy_arn + " has been detached successfully"
             if action == 'delete':
                 client.delete_policy(PolicyArn=policy_arn)
+                print "The IAM policy " + policy_arn + " has been deleted successfully"
     except Exception as err:
         logging.info("Unable to remove/detach IAM policy: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
@@ -329,6 +331,7 @@ def remove_roles_and_profiles(role_name, role_profile_name):
         client.remove_role_from_instance_profile(InstanceProfileName=role_profile_name, RoleName=role_name)
         client.delete_instance_profile(InstanceProfileName=role_profile_name)
         client.delete_role(RoleName=role_name)
+        print "The IAM role " + role_name + " and instance profile " + role_profile_name + " have been deleted successfully"
     except Exception as err:
         logging.info("Unable to remove IAM role/profile: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
@@ -376,7 +379,6 @@ def remove_all_iam_resources(instance_type, scientist=''):
                         for i in role_profile_name:
                             role_profile_name = i.get('InstanceProfileName')
                             remove_roles_and_profiles(iam_role, role_profile_name)
-                print "The IAM role " + iam_role + " and instance profile " + role_profile_name + " with all policies have been deleted successfully"
         else:
             print "There is no IAM role to delete"
     except Exception as err:
