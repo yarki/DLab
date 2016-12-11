@@ -347,7 +347,8 @@ def remove_all_iam_resources(instance_type, scientist=''):
         for item in client.list_roles().get("Roles"):
             if os.environ['conf_service_base_name'] in item.get("RoleName"):
                 roles_list.append(item.get('Name'))
-        print roles_list + ' ----all'
+        print roles_list
+        print ' ----all'
         if roles_list != '':
             for iam_role in roles_list:
                 if '-ssn-Role' in iam_role:
@@ -361,7 +362,8 @@ def remove_all_iam_resources(instance_type, scientist=''):
                         remove_detach_iam_policies(iam_role, 'delete')
                         remove_roles_and_profiles(iam_role, role_profile_name)
                     if instance_type == 'all':
-                        print roles_list + ' ----edge'
+                        print roles_list
+                        print ' ----edge'
                         role_profile_name = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles').get('InstanceProfileName')
                         remove_detach_iam_policies(iam_role, 'delete')
                         remove_roles_and_profiles(iam_role, role_profile_name)
@@ -371,7 +373,8 @@ def remove_all_iam_resources(instance_type, scientist=''):
                         remove_detach_iam_policies(iam_role)
                         remove_roles_and_profiles(iam_role, role_profile_name)
                     if instance_type == 'all':
-                        print roles_list + ' ----notebook'
+                        print roles_list
+                        print ' ----notebook'
                         role_profile_name = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles').get('InstanceProfileName')
                         remove_detach_iam_policies(iam_role)
                         remove_roles_and_profiles(iam_role, role_profile_name)
