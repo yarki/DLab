@@ -18,7 +18,7 @@
 
 package com.epam.dlab.backendapi.dao;
 
-import com.epam.dlab.client.mongo.MongoService;
+import com.epam.dlab.mongo.MongoService;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;

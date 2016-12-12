@@ -18,9 +18,9 @@
 
 package com.epam.dlab.backendapi.dao;
 
-import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
-import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
-import com.epam.dlab.constants.UserInstanceStatus;
+import com.epam.dlab.UserInstanceStatus;
+import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
+import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
@@ -30,13 +30,9 @@ import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import java.util.Arrays;
 import java.util.Optional;
 
-import static com.epam.dlab.constants.UserInstanceStatus.TERMINATED;
-import static com.mongodb.client.model.Aggregates.match;
-import static com.mongodb.client.model.Aggregates.project;
-import static com.mongodb.client.model.Aggregates.unwind;
+import static com.epam.dlab.UserInstanceStatus.TERMINATED;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;

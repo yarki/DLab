@@ -17,30 +17,25 @@
  ****************************************************************************/
 package com.epam.dlab.backendapi.dao;
 
-import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
-import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
-import com.epam.dlab.constants.UserInstanceStatus;
+import com.epam.dlab.UserInstanceStatus;
+import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
+import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.client.result.UpdateResult;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-import static com.epam.dlab.backendapi.dao.BaseDAO.USER;
-import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.EXPLORATORY_NAME;
 import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.exploratoryCondition;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static junit.framework.TestCase.*;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static com.mongodb.client.model.Filters.*;
 
 public class InfrastructureProvisionDAOTest extends DAOTestBase {
     private InfrastructureProvisionDAO dao;
