@@ -349,7 +349,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
         print "[Removing IAM roles, instance profiles and policies]"
         client = boto3.client('iam')
         roles_list = []
-        for item in client.list_roles(MaxItems=200).get("Roles"):
+        for item in client.list_roles(MaxItems=250).get("Roles"):
             if os.environ['conf_service_base_name'] in item.get("RoleName"):
                 roles_list.append(item.get('RoleName'))
         if roles_list:
