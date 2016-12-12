@@ -2,13 +2,13 @@
 Description=Zeppelin notebook
 
 [Service]
-Type=simple
+Type=simle
 PIDFile=/var/run/zeppelin-notebook.pid
-ExecStart=/bin/bash -c "sudo /usr/local/bin/jupyter notebook --config CONF_PATH"
-ExecStop=/bin/bash -c "for i in $(ps aux | grep jupyter | grep -v grep | awk '{print $2}'); do kill -9 $i; done"
+ExecStart=/bin/bash -c "sudo /opt/zeppelin/bin/zeppelin-daemon.sh start"
+ExecStop=/bin/bash -c "sudo /opt/zeppelin/bin/zeppelin-daemon.sh stop"
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/ubuntu
+WorkingDirectory=/opt/zeppelin
 
 [Install]
 WantedBy=multi-user.target

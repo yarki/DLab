@@ -36,11 +36,14 @@ args = parser.parse_args()
 
 scala_link = "http://www.scala-lang.org/files/archive/scala-2.11.8.deb"
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
+
+zeppelin_link = "http://mirrors.advancedhosters.com/apache/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-all.tgz"
+zeppelin_version = "0.6.2"
 spark_version = "1.6.2"
 hadoop_version = "2.6"
-pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
-py3spark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/py3spark_local/'
-jupyter_conf_file = '/home/ubuntu/.local/share/jupyter/jupyter_notebook_config.py'
+pyspark_local_path_dir = '/home/ubuntu/.local/share/zeppelin/interpreters/pyspark_local/'
+py3spark_local_path_dir = '/home/ubuntu/.local/share/zeppelin/interpreters/py3spark_local/'
+zeppelin_conf_file = '/home/ubuntu/.local/share/zeppelin/zeppelin_notebook_config.py'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 
@@ -153,38 +156,37 @@ def ensure_r_kernel():
 
 
 def configure_notebook_server(notebook_name):
-    if not exists('/home/ubuntu/.ensure_dir/jupyter_ensured'):
+    if not exists('/home/ubuntu/.ensure_dir/zeppelin_ensured'):
         try:
-            sudo('pip install jupyter --no-cache-dir')
-            sudo('rm -rf ' + jupyter_conf_file)
-            sudo('jupyter notebook --generate-config --config ' + jupyter_conf_file)
-            sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
-            sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
-            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
-            sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() + '"\' >> ' + jupyter_conf_file)
+            sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
+            sudo('tar -zxvf /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz -C /opt/')
+            sudo('ln -s /opt/zeppelin-' + zeppelin_version + '-bin-netinst /opt/zeppelin')
+            sudo('mkdir /var/log/zeppelin')
+            sudo('mkdir /var/run/zeppelin')
+            sudo('ln -s /var/log/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/logs')
+            sudo('ln -s /var/run/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/run')
         except:
             sys.exit(1)
 
-        ensure_spark_scala()
+        #ensure_spark_scala()
 
         try:
-            put(templates_dir + 'jupyter-notebook.service', '/tmp/jupyter-notebook.service')
-            sudo("chmod 644 /tmp/jupyter-notebook.service")
-            sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
-            sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
+            put(templates_dir + 'zeppelin-notebook.service', '/tmp/zeppelin-notebook.service')
+            sudo("chmod 644 /tmp/zeppelin-notebook.service")
+            sudo('cp /tmp/zeppelin-notebook.service /etc/systemd/system/zeppelin-notebook.service')
             sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
             sudo("systemctl daemon-reload")
-            sudo("systemctl enable jupyter-notebook")
-            sudo("systemctl start jupyter-notebook")
-            sudo('touch /home/ubuntu/.ensure_dir/jupyter_ensured')
+            sudo("systemctl enable zeppelin-notebook")
+            sudo("systemctl start zeppelin-notebook")
+            sudo('touch /home/ubuntu/.ensure_dir/zeppelin_ensured')
         except:
             sys.exit(1)
 
-        ensure_python3_kernel()
+        #ensure_python3_kernel()
 
-        ensure_s3_kernel()
+        #ensure_s3_kernel()
 
-        ensure_r_kernel()
+        #ensure_r_kernel()
 
 
 ##############

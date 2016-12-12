@@ -97,7 +97,7 @@ def run():
     # launching instance for notebook server
     try:
         logging.info('[CREATE IINSTANCE]')
-        print '[CREATE JUPYTER NOTEBOOK INSTANCE]'
+        print '[CREATE ZEPPELIN NOTEBOOK INSTANCE]'
         params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
                  "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s --instance_class %s --instance_disk_size %s" % \
                  (notebook_config['instance_name'], notebook_config['ami_id'], notebook_config['instance_type'],
@@ -122,8 +122,8 @@ def run():
 
     # configuring proxy on Notebook instance
     try:
-        logging.info('[CONFIGURE PROXY ON JUPYTER INSTANCE]')
-        print '[CONFIGURE PROXY ON JUPYTER INSTANCE]'
+        logging.info('[CONFIGURE PROXY ON ZEPPELIN INSTANCE]')
+        print '[CONFIGURE PROXY ON ZEPPELIN INSTANCE]'
         additional_config = {"proxy_host": edge_instance_hostname, "proxy_port": "3128"}
         params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
@@ -140,8 +140,8 @@ def run():
 
     # updating repositories & installing python packages
     try:
-        logging.info('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
-        print('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
+        logging.info('[INSTALLING PREREQUISITES TO ZEPPELIN NOTEBOOK INSTANCE]')
+        print('[INSTALLING PREREQUISITES TO ZEPPELIN NOTEBOOK INSTANCE]')
         N params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
         if not run_routine('install_prerequisites', params):
             logging.info('Failed installing apps: apt & pip')
@@ -154,20 +154,20 @@ def run():
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
-    # installing and configuring jupiter and all dependencies
+    # installing and configuring zeppelin and all dependencies
     try:
-        logging.info('[CONFIGURE JUPYTER NOTEBOOK INSTANCE]')
-        print '[CONFIGURE JUPYTER NOTEBOOK INSTANCE]'
+        logging.info('[CONFIGURE ZEPPELIN NOTEBOOK INSTANCE]')
+        print '[CONFIGURE ZEPPELIN NOTEBOOK INSTANCE]'
         additional_config = {"frontend_hostname": edge_instance_hostname,
                              "backend_hostname": get_instance_hostname(notebook_config['instance_name']),
                              "backend_port": "8888",
                              "nginx_template_dir": "/root/templates/"}
         params = "--hostname %s --instance_name %s --keyfile %s --region %s --additional_config '%s'" % \
                  (instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['creds_region'], json.dumps(additional_config))
-        if not run_routine('configure_jupyter_node', params):
-            logging.info('Failed to configure jupiter')
+        if not run_routine('configure_zeppelin_node', params):
+            logging.info('Failed to configure zeppelin')
             with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to configure jupyter", "conf": notebook_config}
+                res = {"error": "Failed to configure zeppelin", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
@@ -177,10 +177,10 @@ def run():
 
     # installing python2 and python3 libs
     try:
-        logging.info('[CONFIGURE JUPYTER ADDITIONS]')
-        print '[CONFIGURE JUPYTER ADDITIONS]'
+        logging.info('[CONFIGURE ZEPPELIN ADDITIONS]')
+        print '[CONFIGURE ZEPPELIN ADDITIONS]'
         params = "--hostname %s --keyfile %s" % (instance_hostname, keyfile_name)
-        if not run_routine('install_jupyter_additions', params):
+        if not run_routine('install_zeppelin_additions', params):
             logging.info('Failed to install python libs')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to install python libs", "conf": notebook_config}
@@ -220,8 +220,8 @@ def run():
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')
     dns_name = get_instance_hostname(notebook_config['instance_name'])
-    jupyter_ip_url = "http://" + ip_address + ":8888/" + notebook_config['instance_name'] + "/"
-    jupyter_dns_url = "http://" + dns_name + ":8888/" + notebook_config['instance_name'] + "/"
+    zeppelin_ip_url = "http://" + ip_address + ":8888/" + notebook_config['instance_name'] + "/"
+    zeppelin_dns_url = "http://" + dns_name + ":8888/" + notebook_config['instance_name'] + "/"
     print '[SUMMARY]'
     logging.info('[SUMMARY]')
     print "Instance name: " + notebook_config['instance_name']
@@ -233,8 +233,8 @@ def run():
     print "AMI name: " + notebook_config['expected_ami_name']
     print "Profile name: " + notebook_config['role_profile_name']
     print "SG name: " + notebook_config['security_group_name']
-    print "Jupyter URL: " + jupyter_ip_url
-    print "Jupyter URL: " + jupyter_dns_url
+    print "Zeppelin URL: " + zeppelin_ip_url
+    print "Zeppelin URL: " + zeppelin_dns_url
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
         'key_name'] + '.pem ubuntu@' + ip_address
     print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ubuntu@' + dns_name
@@ -245,7 +245,7 @@ def run():
                "master_keyname": os.environ['creds_key_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",
-               "exploratory_url": jupyter_ip_url}
+               "exploratory_url": zeppelin_ip_url}
         result.write(json.dumps(res))
 
 
