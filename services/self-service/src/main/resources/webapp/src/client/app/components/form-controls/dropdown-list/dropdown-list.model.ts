@@ -16,17 +16,10 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { NgModule, Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { MultiSelectDropdown } from "./multi-select-dropdown.component";
-import { ClickOutside } from './click-outside.directive';
-
-export * from "./multi-select-dropdown.component";
-
-@NgModule({
-  imports: [CommonModule],
-  declarations: [MultiSelectDropdown, ClickOutside],
-  exports: [MultiSelectDropdown]
-})
-
-export class MultiSelectDropdownModule { }
+export class DropdownListModel {
+  constructor(
+    public type: string,
+    public value: string,
+    public index: number
+  ) { }
+}
