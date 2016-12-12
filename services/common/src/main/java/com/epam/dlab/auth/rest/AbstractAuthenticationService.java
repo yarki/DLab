@@ -19,15 +19,13 @@ limitations under the License.
 
 package com.epam.dlab.auth.rest;
 
-import java.util.UUID;
+import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.dto.UserCredentialDTO;
+import io.dropwizard.Configuration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-
-import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.dto.UserCredentialDTO;
-
-import io.dropwizard.Configuration;
+import java.util.UUID;
 
 public abstract class AbstractAuthenticationService<C extends Configuration> extends ConfigurableResource<C> {
 

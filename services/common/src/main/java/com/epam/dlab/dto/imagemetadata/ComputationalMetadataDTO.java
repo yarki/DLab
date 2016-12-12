@@ -18,8 +18,9 @@ limitations under the License.
 
 package com.epam.dlab.dto.imagemetadata;
 
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 public class ComputationalMetadataDTO extends ImageMetadataDTO{
     @JsonProperty(value = "template_name")
