@@ -515,13 +515,14 @@ def get_iam_profile(profile_name, count=0):
         if count < 20:
             response = client.get_instance_profile(InstanceProfileName=profile_name)
             iam_profile = response.get('InstanceProfileName')
+            time.sleep(5)
             print 'IAM profile checked. Creating instance...'
         else:
             raise Exception("Unable to find IAM profile by name: " + profile_name)
     except:
         count = count + 1
         print 'IAM profile is not available yet. Waiting...'
-        time.sleep(10)
+        time.sleep(5)
         get_iam_profile(profile_name, count)
     return iam_profile
 
