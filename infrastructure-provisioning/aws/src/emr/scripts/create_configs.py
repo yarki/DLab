@@ -234,7 +234,10 @@ def configure_rstudio(args):
     local('''echo 'SPARK_HOME="''' + spark_dir + '''"' >> /home/ubuntu/.Renviron''')
     local('''echo 'YARN_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
     local('''echo 'HADOOP_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
-    local("sudo rstudio-server stop")
+    try:
+        local("sudo rstudio-server stop")
+    except:
+        print "Rstudio already stopped"
     local("sudo rstudio-server start")
 
 
