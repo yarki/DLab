@@ -19,16 +19,25 @@ import com.aegisql.conveyor.BuildingSite;
 import com.aegisql.conveyor.cart.Cart;
 import com.aegisql.conveyor.cart.FutureCart;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 public class ProcessConveyor extends AssemblingConveyor<ProcessId,ProcessStep,ProcessInfo>{
+
+    private final ConcurrentHashMap<String,ConcurrentLinkedQueue<String>> users = new ConcurrentHashMap<>();
+
+    private int maxUserCommands = 5;
 
     public ProcessConveyor() {
         super();
         this.setName("ProcessConveyor");
         this.setIdleHeartBeat(1, TimeUnit.SECONDS);
-        this.setDefaultBuilderTimeout(1,TimeUnit.HOURS);
+        this.setDefaultBuilderTimeout(3,TimeUnit.HOURS);
         this.setDefaultCartConsumer((l,v,b)->{
             LOG.warn("default processor for {} {} {}",l,v,b.get());
             if(v instanceof FutureCart) {
@@ -40,15 +49,22 @@ public class ProcessConveyor extends AssemblingConveyor<ProcessId,ProcessStep,Pr
             LOG.debug("process finished: {}",bin);
         });
 
+
+
+        this.enablePostponeExpiration(true);
     }
 
-    public Supplier<? extends ProcessInfo> getInfo(ProcessId id) {
+    public Supplier<? extends ProcessInfo> getInfoSupplier(ProcessId id) {
         BuildingSite<ProcessId, ProcessStep, Cart<ProcessId, ?, ProcessStep>, ? extends ProcessInfo> bs = this.collector.get(id);
         if(bs == null) {
             return () -> null;
         } else {
             return bs.getProductSupplier();
         }
+    }
+
+    public void setMaxUserProcesses(int maxUserCommands) {
+        this.maxUserCommands = maxUserCommands;
     }
 
 }

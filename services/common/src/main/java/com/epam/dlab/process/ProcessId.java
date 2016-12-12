@@ -16,14 +16,20 @@ limitations under the License.
 
 public class ProcessId {
 
+    private final String user;
     private final String command;
 
-    public ProcessId(String command) {
+    public ProcessId(String user, String command) {
+        this.user = user;
         this.command = command;
     }
 
     public String getCommand() {
         return command;
+    }
+
+    public String getUser() {
+        return user;
     }
 
     @Override
@@ -33,18 +39,22 @@ public class ProcessId {
 
         ProcessId processId = (ProcessId) o;
 
+        if (user != null ? !user.equals(processId.user) : processId.user != null) return false;
         return command != null ? command.equals(processId.command) : processId.command == null;
     }
 
     @Override
     public int hashCode() {
-        return command != null ? command.hashCode() : 0;
+        int result = user != null ? user.hashCode() : 0;
+        result = 31 * result + (command != null ? command.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return "ProcessId{" +
-                "command='" + command + '\'' +
+                "user='" + user + '\'' +
+                ", command='" + command + '\'' +
                 '}';
     }
 }

@@ -83,6 +83,14 @@ public class ProcessInfo {
         return infoTimeStamp;
     }
 
+    public ProcessId getId() {
+        return id;
+    }
+
+    public Collection<ProcessInfo> getRejectedCommands() {
+        return Collections.unmodifiableCollection(rejectedCommands);
+    }
+
     @Override
     public String toString() {
         return "ProcessInfo{" +

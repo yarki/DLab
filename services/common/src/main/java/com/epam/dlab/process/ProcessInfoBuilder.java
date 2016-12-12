@@ -15,9 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import com.aegisql.conveyor.Expireable;
 import com.aegisql.conveyor.Testing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.util.resources.cldr.ga.LocaleNames_ga;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,33 +27,46 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing {
+import static com.epam.dlab.process.ProcessStatus.*;
+
+public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expireable {
 
     private final static Logger LOG = LoggerFactory.getLogger(ProcessInfoBuilder.class);
 
     private final ProcessId processId;
     private final long startTimeStamp = System.currentTimeMillis();
-    private ProcessStatus status = ProcessStatus.CREATED;
+    private ProcessStatus status = CREATED;
     private final StringBuilder stdOut = new StringBuilder();
     private final StringBuilder stdErr = new StringBuilder();
     private int exitCode = -1;
     private String command = "N/A";
     private Collection<ProcessInfo> rejected = null;
 
-    private boolean finished = false;
+    private boolean finished     = false;
+    private boolean stdOutClosed = false;
+    private boolean stdErrClosed = false;
+
+    private Process p = null;
+    private long expirationTime = Long.MAX_VALUE;
 
     public ProcessInfoBuilder(ProcessId processId) {
         this.processId = processId;
     }
 
+    public static void schedule(ProcessInfoBuilder b, String command) {
+        b.status = SCHEDULED;
+        b.command = command;
+    }
+
     public static void start(ProcessInfoBuilder b, String command) {
-        if( b.status == ProcessStatus.CREATED ) {
-            b.status = ProcessStatus.LAUNCHING;
+        if( b.status == CREATED ) {
+            b.status = LAUNCHING;
             b.command = command;
             b.launch();
-            b.status = ProcessStatus.RUNNING;
+            b.status = RUNNING;
         } else {
             if(b.rejected == null) {
                 b.rejected = new LinkedList<>();
@@ -59,44 +74,69 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing {
             long timeStamp = System.currentTimeMillis();
             b.rejected.add(new ProcessInfo(
                     b.processId,
-                    ProcessStatus.REJECTED,
+                    REJECTED,
                     command,
                     "",
                     "rejected duplicated command",
-                    ProcessStatus.REJECTED.ordinal(),
+                    REJECTED.ordinal(),
                     timeStamp,
                     timeStamp,null));
         }
     }
 
+    public static void failed(ProcessInfoBuilder b, Object dummy) {
+        b.status       = FAILED;
+        b.setReady();
+    }
+
     public static void stop(ProcessInfoBuilder b, Object dummy) {
-        b.status   = ProcessStatus.STOPPED;
-        b.finished = true;
+        if(b.p != null) {
+            b.p.destroy();
+        }
+        if(b.status != LAUNCHING && b.status != RUNNING) {
+            b.setReady();
+        }
+        b.status = STOPPED;
     }
 
     public static void kill(ProcessInfoBuilder b, Object dummy) {
-        b.status   = ProcessStatus.KILLED;
-        b.finished = true;
+        if(b.p != null) {
+            b.p.destroyForcibly();
+        }
+        if(b.status != LAUNCHING && b.status != RUNNING) {
+            b.setReady();
+        }
+        b.status = KILLED;
     }
 
     public static void finish(ProcessInfoBuilder b, Integer exitCode) {
-        b.status   = ProcessStatus.FINISHED;
+        if(b.status != STOPPED && b.status != KILLED ) {
+            b.status = FINISHED;
+        }
         b.exitCode = exitCode;
         b.finished = true;
     }
 
     public static void stdOut(ProcessInfoBuilder b, Object msg) {
-        b.stdOut.append(msg).append("\n");
+        if (msg == null) {
+            b.stdOutClosed = true;
+        } else {
+            b.stdOut.append(msg).append("\n");
+        }
     }
 
     public static void stdErr(ProcessInfoBuilder b, Object msg) {
-        b.stdErr.append(msg).append("\n");
+        if (msg == null) {
+            b.stdErrClosed = true;
+        } else {
+            b.stdErr.append(msg).append("\n");
+        }
     }
 
     private void launch() {
-        DlabProcess.getInstance().getExecutorService().submit(()->{
+         DlabProcess.getInstance().getExecutorService().execute(()->{
             try {
-                Process p = new ProcessBuilder(command).start();
+                p = new ProcessBuilder(command.split("\\s+")).start();
                 InputStream stdOutStream = p.getInputStream();
                 DlabProcess.getInstance().getExecutorService().submit(()->{
                     BufferedReader reader = new BufferedReader(new InputStreamReader(stdOutStream));
@@ -105,9 +145,10 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing {
                         while ((line = reader.readLine()) != null) {
                             DlabProcess.getInstance().toStdOut(processId,line);
                         }
+                        DlabProcess.getInstance().toStdOut(processId,null);
                     } catch (IOException e) {
                         DlabProcess.getInstance().toStdErr(processId,"Failed process STDOUT reader",e);
-                        DlabProcess.getInstance().stop(processId);
+                        DlabProcess.getInstance().failed(processId);
                     }
                 });
                 InputStream stdErrStream = p.getErrorStream();
@@ -118,19 +159,20 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing {
                         while ((line = reader.readLine()) != null) {
                             DlabProcess.getInstance().toStdErr(processId,line);
                         }
+                        DlabProcess.getInstance().toStdErr(processId,null);
                     } catch (IOException e) {
                         DlabProcess.getInstance().toStdErr(processId,"Failed process STDERR reader",e);
-                        DlabProcess.getInstance().stop(processId);
+                        DlabProcess.getInstance().failed(processId);
                     }
                 });
                 int exit = p.waitFor();
                 DlabProcess.getInstance().finish(processId,exit);
             } catch (IOException e) {
-                DlabProcess.getInstance().toStdErr(processId,"Command launch failed. "+get(),e);
-                DlabProcess.getInstance().stop(processId);
+                DlabProcess.getInstance().toStdErr(processId,"Command launch failed. "+get().getCommand(),e);
+                DlabProcess.getInstance().failed(processId);
             } catch (InterruptedException e) {
-                DlabProcess.getInstance().toStdErr(processId,"Command interrupted. "+get(),e);
-                DlabProcess.getInstance().stop(processId);
+                DlabProcess.getInstance().toStdErr(processId,"Command interrupted. "+get().getCommand(),e);
+                DlabProcess.getInstance().failed(processId);
             }
         });
     }
@@ -149,6 +191,17 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing {
 
     @Override
     public boolean test() {
-        return finished;
+        return finished && stdOutClosed && stdErrClosed;
+    }
+
+    private void setReady() {
+        finished     = true;
+        stdOutClosed = true;
+        stdErrClosed = true;
+    }
+
+    @Override
+    public long getExpirationTime() {
+        return expirationTime;
     }
 }
