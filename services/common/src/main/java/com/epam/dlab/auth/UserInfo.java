@@ -104,7 +104,7 @@ public class UserInfo implements Principal {
 
 	public UserInfo withToken(String token) {
         UserInfo newInfo  = new UserInfo(username, token);
-        roles.forEach(role -> newInfo.addRole(role));
+        roles.forEach(newInfo::addRole);
         newInfo.firstName = this.firstName;
         newInfo.lastName  = this.lastName;
         newInfo.remoteIp  = this.remoteIp;
@@ -131,7 +131,7 @@ public class UserInfo implements Principal {
 
     @JsonSetter("keys")
     public void setKeys(Map<String,String> awsKeys) {
-        awsKeys.forEach((k,v)->keys.put(k,v));
+        awsKeys.forEach(keys::put);
     }
 
     @Override
