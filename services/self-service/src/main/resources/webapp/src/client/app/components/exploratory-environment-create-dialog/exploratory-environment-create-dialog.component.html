@@ -22,13 +22,13 @@ limitations under the License.
     <h4 class="modal-title" id="myModalLabel">Create analytical tool</h4>
   </modal-header>
   <modal-content>
-  <form [formGroup]="createExploratoryEnvironmentForm" novalidate (submit)="createExploratoryEnvironment_btnClick($event, createExploratoryEnvironmentForm.value, createExploratoryEnvironmentForm.valid, envitonment_tmpl.value, environment_shape.value)">
+  <form [formGroup]="createExploratoryEnvironmentForm" novalidate (submit)="createExploratoryEnvironment_btnClick($event, createExploratoryEnvironmentForm.value, createExploratoryEnvironmentForm.valid, environment_shape.value)">
     <div class="form-group row">
       <div  class="col-xs-4">
         <label class="control-label">Select template</label>
       </div>
       <div class="col-xs-8">
-        <select class="form-control" (change)="templateSelectionChanged($event.target.value)" #envitonment_tmpl>
+        <select class="form-control" (change)="templateSelectionChanged($event.target.value)">
           <option *ngFor="let template of model.exploratoryEnvironmentTemplates; let i = index" value="{{i}}" >
             {{template.template_name}}
           </option>

@@ -19,15 +19,13 @@ limitations under the License.
 package com.epam.dlab.backendapi.core;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.commands.CommandExecutor;
 import com.epam.dlab.backendapi.core.commands.DockerCommands;
 import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
-import com.epam.dlab.backendapi.core.DockerCommands;
-import com.epam.dlab.backendapi.core.ICommandExecutor;
-import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
-import com.epam.dlab.dto.imagemetadata.*;
+import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -61,9 +59,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
         folderListenerExecutor.start(configuration.getWarmupDirectory(),
                 configuration.getWarmupPollTimeout(),
                 getFileHandlerCallback());
-        /*List<String> images = new ArrayList<>(); // commandExecutor.executeSync(GET_IMAGES);
-        images.add("docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter");
-        images.add("docker.epmc-bdcc.projects.epam.com/dlab-aws-rstudio");
+        List<String> images = commandExecutor.executeSync(GET_IMAGES);
         for (String image : images) {
             LOGGER.debug("image: {}", image);
             String uuid = UUID.randomUUID().toString();
@@ -75,64 +71,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
                     .withActionDescribe(image)
                     .toCMD();
             commandExecutor.executeAsync(command);
-        }*/
-
-        metadataDTOs.add(prepareJupiterImage());
-        metadataDTOs.add(prepareEmrImage());
-    }
-
-    private ComputationalMetadataDTO prepareEmrImage() {
-        TemplateDTO templateDTO = new TemplateDTO("emr-6.3.0");
-        ArrayList<ApplicationDto> applicationDtos = new ArrayList<>();
-        applicationDtos.add(new ApplicationDto("2.7.1", "Hadoop"));
-        applicationDtos.add(new ApplicationDto("1.6.0", "Spark"));
-        templateDTO.setApplications(applicationDtos);
-
-        TemplateDTO templateDTO1 = new TemplateDTO("emr-5.0.3");
-        applicationDtos = new ArrayList<>();
-        applicationDtos.add(new ApplicationDto("2.7.3", "Hadoop"));
-        applicationDtos.add(new ApplicationDto("2.0.1", "Spark"));
-        applicationDtos.add(new ApplicationDto("2.1.0", "Hive"));
-        templateDTO1.setApplications(applicationDtos);
-
-        ComputationalMetadataDTO imageMetadataDTO = new ComputationalMetadataDTO(
-                "test computational image", "template", "description",
-                "request_id", ImageType.COMPUTATIONAL.getType(),
-                Arrays.asList(templateDTO, templateDTO1));
-
-        List<ComputationalResourceShapeDto> crsList = new ArrayList<>();
-        crsList.add(new ComputationalResourceShapeDto(
-                "cg1.4xlarge", "22.5 GB", 16));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.medium", "4.0 GB", 2));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.large", "8.0 GB", 2));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.large", "8.0 GB", 2));
-
-        imageMetadataDTO.setComputationResourceShapes(crsList);
-        return imageMetadataDTO;
-    }
-
-    private ExploratoryMetadataDTO prepareJupiterImage() {
-        ExploratoryMetadataDTO imageMetadataDTO = new ExploratoryMetadataDTO();
-        List<ComputationalResourceShapeDto> crsList = new ArrayList<>();
-        crsList.add(new ComputationalResourceShapeDto(
-                "cg1.4xlarge", "22.5 GB", 16));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.medium", "4.0 GB", 2));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.large", "8.0 GB", 2));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.large", "8.0 GB", 2));
-
-        List<ExploratoryEnvironmentVersion> eevList = new ArrayList<>();
-        eevList.add(new ExploratoryEnvironmentVersion("Jupyter 1.5", "Base image with jupyter node creation routines",
-                "type", "jupyter-1.6", "AWS"));
-        imageMetadataDTO.setExploratoryEnvironmentShapes(crsList);
-        imageMetadataDTO.setExploratoryEnvironmentVersions(eevList);
-
-        return imageMetadataDTO;
+        }
     }
 
     FileHandlerCallback getFileHandlerCallback() {

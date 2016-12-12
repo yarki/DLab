@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.commands;
 
+import com.epam.dlab.backendapi.core.ICommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

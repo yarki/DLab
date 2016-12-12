@@ -18,9 +18,8 @@ limitations under the License.
 
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.core.DirectoriesCreator;
-import com.epam.dlab.backendapi.core.DockerWarmuper;
-import com.epam.dlab.backendapi.core.MetadataHolder;
+import com.epam.dlab.backendapi.core.*;
+import com.epam.dlab.backendapi.core.commands.CommandExecutor;
 import com.epam.dlab.backendapi.resources.*;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.mappers.JsonProcessingExceptionMapper;

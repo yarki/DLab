@@ -66,7 +66,8 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     @PUT
     public Response create(@Auth UserInfo userInfo, @Valid @NotNull ExploratoryCreateFormDTO formDTO) {
-        LOGGER.debug("creating exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
+        LOGGER.debug("creating exploratory environment {} with name {} for user {}",
+                formDTO.getImage(), formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
                 .withExploratoryName(formDTO.getName())
