@@ -34,10 +34,6 @@ logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                     filename=local_log_filepath)
 
 
-def sort_by_alphabet(inputStr):
-    return inputStr[0]
-
-
 def put_to_bucket(bucket_name, local_file, destination_file):
     try:
         s3 = boto3.client('s3')
@@ -355,7 +351,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
             if os.environ['conf_service_base_name'] in item.get("RoleName"):
                 roles_list.append(item.get('RoleName'))
         if roles_list:
-            roles_list.sort(key=sort_by_alphabet, reverse=True)
+            roles_list.sort(reverse=True)
             print roles_list
             for iam_role in roles_list:
                 if '-ssn-Role' in iam_role:
