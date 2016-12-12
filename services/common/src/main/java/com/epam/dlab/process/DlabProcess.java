@@ -22,10 +22,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.concurrent.*;
 
 public class DlabProcess {
 
@@ -33,7 +31,9 @@ public class DlabProcess {
 
     private final static DlabProcess INSTANCE = new DlabProcess();
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(3*50);
+    private ExecutorService executorService = Executors.newFixedThreadPool(50);
+    private Map<String,ExecutorService> perUserService = new ConcurrentHashMap<>();
+    private int userMaxparallelism = 3*5;
 
     public static DlabProcess getInstance() {
         return INSTANCE;
@@ -51,19 +51,22 @@ public class DlabProcess {
 
     public void setExecutorServiceMaxParallelism(int parallelism) {
         this.executorService.shutdown();
-        this.executorService = Executors.newFixedThreadPool(3*parallelism);
+        this.executorService = Executors.newFixedThreadPool(parallelism);
+    }
+
+    public void setUserParallelism(int parallelism) {
+        this.userMaxparallelism = 3*parallelism;
+    }
+
+    public ExecutorService getUserExecutorService(String user) {
+        perUserService.putIfAbsent(user,Executors.newFixedThreadPool(userMaxparallelism));
+        return perUserService.get(user);
     }
 
     public CompletableFuture<ProcessInfo> start(ProcessId id, String command){
         CompletableFuture<ProcessInfo> future = processConveyor.createBuildFuture( id, ()-> new ProcessInfoBuilder(id) );
-        try {
-            processConveyor.add(id, command, ProcessStep.START);
-        } catch (DlabProcessException e){
-            LOG.debug("Rescheduling {} {} {}",id,command,e.getMessage());
-            RescheduleCommand<ProcessId> reschedule = new RescheduleCommand<>(id, 1, TimeUnit.MINUTES);
-            processConveyor.addCommand(reschedule);
-            processConveyor.add(id, command, ProcessStep.SCHEDULE);
-        }
+        processConveyor.add(id, future, ProcessStep.FUTURE);
+        processConveyor.add(id, command, ProcessStep.START);
         return future;
     }
 

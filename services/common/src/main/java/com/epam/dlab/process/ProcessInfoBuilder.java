@@ -17,6 +17,7 @@ limitations under the License.
 
 import com.aegisql.conveyor.Expireable;
 import com.aegisql.conveyor.Testing;
+import com.aegisql.conveyor.TimeoutAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.util.resources.cldr.ga.LocaleNames_ga;
@@ -27,12 +28,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 import static com.epam.dlab.process.ProcessStatus.*;
 
-public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expireable {
+public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expireable, TimeoutAction {
 
     private final static Logger LOG = LoggerFactory.getLogger(ProcessInfoBuilder.class);
 
@@ -51,6 +53,7 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
 
     private Process p = null;
     private long expirationTime = Long.MAX_VALUE;
+    private CompletableFuture<ProcessInfo> future;
 
     public ProcessInfoBuilder(ProcessId processId) {
         this.processId = processId;
@@ -203,5 +206,14 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
     @Override
     public long getExpirationTime() {
         return expirationTime;
+    }
+
+    public static void future(ProcessInfoBuilder b, CompletableFuture<ProcessInfo> future) {
+        b.future = future;
+    }
+
+    @Override
+    public void onTimeout() {
+        kill(this,"KILL");
     }
 }

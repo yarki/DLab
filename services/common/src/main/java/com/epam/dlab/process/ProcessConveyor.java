@@ -49,9 +49,6 @@ public class ProcessConveyor extends AssemblingConveyor<ProcessId,ProcessStep,Pr
             LOG.debug("process finished: {}",bin);
         });
 
-
-
-        this.enablePostponeExpiration(true);
     }
 
     public Supplier<? extends ProcessInfo> getInfoSupplier(ProcessId id) {
