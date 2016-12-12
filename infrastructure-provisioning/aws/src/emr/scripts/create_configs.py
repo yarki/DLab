@@ -22,6 +22,7 @@ import boto3
 from fabric.api import *
 import argparse
 import os
+import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket', type=str, default='')
@@ -238,6 +239,7 @@ def configure_rstudio(args):
         local("sudo rstudio-server stop")
     except:
         print "Rstudio already stopped"
+    time.sleep(10)
     local("sudo rstudio-server start")
 
 
