@@ -21,11 +21,12 @@ import { CommonModule } from "@angular/common";
 import { ModalModule } from './../modal/index';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ComputationalResourceCreateDialog } from "./computational-resource-create-dialog.component";
+import { DropdownListModule } from './../form-controls/dropdown-list/index';
 
 export * from "./computational-resource-create-dialog.component";
 
 @NgModule({
-  imports: [CommonModule, ModalModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, ModalModule, FormsModule, ReactiveFormsModule, DropdownListModule],
   declarations: [ComputationalResourceCreateDialog],
   exports: [ComputationalResourceCreateDialog]
 })
