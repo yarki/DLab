@@ -22,6 +22,8 @@ import boto3
 from fabric.api import *
 import argparse
 import os
+from fabric.api import lcd
+from fabvenv import virtualenv
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket', type=str, default='')
@@ -234,24 +236,24 @@ def installing_python(args):
         python_version = f.read()
     python_version = python_version[0:5]
     if not os.path.exists('/opt/python/python' + python_version):
-        local('sudo apt-get install -y build-essential checkinstall')
-        local('sudo apt-get install -y libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev')
-        local('sudo apt-get install -y libssl-dev openssl')
-        local('sudo -i wget https://www.python.org/ftp/python/' + python_version + '/Python-' + python_version + '.tgz -O /tmp/Python-' + python_version + '.tgz' )
-        local('sudo tar zxvf /tmp/Python-' + python_version + '.tgz -C /tmp/')
-        local('sudo sudo /tmp/Python-' + python_version + '/configure --prefix=/opt/python/python' + python_version + ' --with-zlib-dir=/usr/local/lib/ --with-ensurepip=install')
-        local('sudo make altinstall')
-        local('sudo make distclean')
-        local('sudo find . -type d -empty -delete')
-        local('sudo ln -s /opt/python/python' + python_version + '/bin/python' + python_version[0:3] + ' /usr/bin/python' + python_version)
-        local('sudo cp /usr/bin/pip /usr/bin/pip' + python_version)
-        local('''sudo sed -i 's|python|python''' + python_version + '''|g' /usr/bin/pip''' + python_version)
-        local('sudo -i pip' + python_version + ' install -U pip --no-cache-dir')
-        local('sudo -i pip' + python_version + ' install ipython ipykernel --no-cache-dir')
-        local('sudo -i python' + python_version + ' -m ipykernel install')
-        local('sudo -i pip' + python_version + ' install matplotlib --no-cache-dir')
-        local('sudo -i pip' + python_version + ' install boto3 --no-cache-dir')
-        local('sudo -i pip' + python_version + ' install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
+        local('wget https://www.python.org/ftp/python/' + python_version + '/Python-' + python_version + '.tgz -O /tmp/Python-' + python_version + '.tgz' )
+        local('tar zxvf /tmp/Python-' + python_version + '.tgz -C /tmp/')
+        with lcd('/tmp/Python-' + python_version):
+            local('./configure --prefix=/opt/python/python' + python_version + ' --with-zlib-dir=/usr/local/lib/ --with-ensurepip=install')
+            local('sudo make altinstall')
+        with lcd('/tmp/'):
+            local('sudo rm -rf Python-' + python_version + '/')
+        #local('sudo make distclean')
+        #local('sudo find . -type d -empty -delete')
+        # local('sudo ln -s /opt/python/python' + python_version + '/bin/python' + python_version[0:3] + ' /usr/bin/python' + python_version)
+        # local('sudo cp /usr/bin/pip /usr/bin/pip' + python_version)
+        # local('''sudo sed -i 's|python|python''' + python_version + '''|g' /usr/bin/pip''' + python_version)
+        local('sudo -i virtualenv /opt/python/python' + python_version)
+        venv_command = '/bin/bash /opt/python/python' + python_version + '/bin/activate'
+        pip_command = '/opt/python/python' + python_version + '/bin/pip'+ python_version[:3]
+        local(venv_command + ' && sudo -i ' + pip_command + ' install -U pip --no-cache-dir')
+        local(venv_command + ' && sudo -i ' + pip_command + ' install ipython ipykernel --no-cache-dir')
+        local(venv_command + ' && sudo -i ' + pip_command + ' install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
 
 
 if __name__ == "__main__":
