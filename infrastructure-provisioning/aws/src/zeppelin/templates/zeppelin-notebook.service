@@ -2,10 +2,10 @@
 Description=Zeppelin notebook
 
 [Service]
-Type=simle
-PIDFile=/var/run/zeppelin-notebook.pid
-ExecStart=/bin/bash -c "sudo /opt/zeppelin/bin/zeppelin-daemon.sh start"
-ExecStop=/bin/bash -c "sudo /opt/zeppelin/bin/zeppelin-daemon.sh stop"
+Type=simple
+PIDFile=/var/run/zeppelin/zeppelin-notebook-%H.pid
+ExecStart=/opt/zeppelin/bin/zeppelin-daemon.sh start
+ExecStop=/opt/zeppelin/bin/zeppelin-daemon.sh stop
 User=ubuntu
 Group=ubuntu
 WorkingDirectory=/opt/zeppelin
