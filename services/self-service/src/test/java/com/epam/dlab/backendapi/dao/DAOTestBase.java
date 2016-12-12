@@ -23,8 +23,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcern;
 
+import java.util.Collections;
 import java.util.List;
 
 abstract class DAOTestBase {
@@ -49,11 +52,15 @@ abstract class DAOTestBase {
         disconnectMongo();
     }
 
+    // TODO: Make Mongo test instance configurable
     private static void connectMongo() {
         if(mongoClient == null) {
-            mongoClient = new MongoClient(new ServerAddress("localhost", 27017));
+            mongoClient = new MongoClient(
+                    new ServerAddress("localhost", 27017),
+                    Collections.singletonList(
+                    MongoCredential.createCredential("admin", "dlabdb", "XS3ms9R3tP".toCharArray())));
         }
-        mongoService = new MongoService(mongoClient, DBNAME);
+        mongoService = new MongoService(mongoClient, DBNAME, WriteConcern.ACKNOWLEDGED);
     }
 
     private static void disconnectMongo() {
