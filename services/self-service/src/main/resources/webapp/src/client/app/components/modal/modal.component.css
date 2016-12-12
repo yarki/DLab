@@ -71,6 +71,7 @@ limitations under the License.
 }
 .modal .btn-success {
   margin-left: 40px;
+  margin-right: 2px;
 }
 .modal-content {
   border-radius: 3px;
