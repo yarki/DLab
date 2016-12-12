@@ -250,7 +250,7 @@ def installing_python(args):
         # local('''sudo sed -i 's|python|python''' + python_version + '''|g' /usr/bin/pip''' + python_version)
         local('sudo -i virtualenv /opt/python/python' + python_version)
         venv_command = '/bin/bash /opt/python/python' + python_version + '/bin/activate'
-        pip_command = '/opt/python/python' + python_version + '/bin/pip'
+        pip_command = '/opt/python/python' + python_version + '/bin/pip'+ python_version[:3]
         local(venv_command + ' && sudo -i ' + pip_command + ' install -U pip --no-cache-dir')
         local(venv_command + ' && sudo -i ' + pip_command + ' install ipython ipykernel --no-cache-dir')
         local(venv_command + ' && sudo -i ' + pip_command + ' install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
