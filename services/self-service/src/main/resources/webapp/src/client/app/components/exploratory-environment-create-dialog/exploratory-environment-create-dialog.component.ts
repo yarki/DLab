@@ -82,10 +82,13 @@ export class ExploratoryEnvironmentCreateDialog {
   }
 
   onUpdate($event): void {
-    if($event.model.type == 'template')
+    if($event.model.type === 'template') {
       this.environment.template = $event.model.value.version;
       this.model.setSelectedTemplate($event.model.index);
-    if($event.model.type == 'shape')
+      this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'shape', 'type');
+    }
+
+    if($event.model.type === 'shape')
       this.environment.shape = $event.model.value.type;
   }
 

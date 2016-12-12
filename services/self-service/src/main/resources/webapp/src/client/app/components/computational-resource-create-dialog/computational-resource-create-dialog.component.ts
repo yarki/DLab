@@ -84,8 +84,12 @@ export class ComputationalResourceCreateDialog {
   }
 
   public onUpdate($event): void {
-    if($event.model.type === 'template')
+    if($event.model.type === 'template') {
       this.model.setSelectedTemplate($event.model.index);
+      this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'master_shape', 'type');
+      this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'slave_shape', 'type');
+    }
+    
     if(this.shapes[$event.model.type])
       this.shapes[$event.model.type] = $event.model.value.type;
   }
