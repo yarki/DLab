@@ -18,13 +18,12 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
-import com.epam.dlab.auth.SecurityAPI;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.SecurityDAO;
-import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.UserCredentialDTO;
-import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.SecurityAPI;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;

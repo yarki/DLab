@@ -323,7 +323,7 @@ def get_emr_info(id, key=''):
         traceback.print_exc(file=sys.stdout)
 
 
-def get_emr_list(tag_name, type='Key', emr_count=False):
+def get_emr_list(tag_name, type='Key', emr_count=False, emr_active=False):
     try:
         emr = boto3.client('emr')
         if emr_count:
@@ -333,6 +333,10 @@ def get_emr_list(tag_name, type='Key', emr_count=False):
         else:
             clusters = emr.list_clusters(
                 ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING']
+            )
+        if emr_active:
+            clusters = emr.list_clusters(
+                ClusterStates=['RUNNING', 'STARTING', 'BOOTSTRAPPING', 'TERMINATING']
             )
         clusters = clusters.get('Clusters')
         clusters_list = []
