@@ -73,6 +73,7 @@ def run():
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + "-nb-SG"
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
+    notebook_config['rstudio_pass'] = id_generator()
 
     print 'Searching preconfigured images'
     ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'], 'available')
@@ -150,7 +151,8 @@ def run():
     try:
         logging.info('[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]')
         print '[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]'
-        params = "--hostname %s  --keyfile %s --region %s" % (instance_hostname,  keyfile_name, os.environ['creds_region'])
+        params = "--hostname %s  --keyfile %s --region %s --rstudio_pass %s" % \
+                 (instance_hostname,  keyfile_name, os.environ['creds_region'], notebook_config['rstudio_pass'])
         if not run_routine('configure_rstudio', params):
             logging.info('Failed to configure rstudio')
             with open("/root/result.json", 'w') as result:
@@ -192,8 +194,8 @@ def run():
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')
     dns_name = get_instance_hostname(notebook_config['instance_name'])
-    rstudio_ip_url = "http://ubuntu:dlab@" + ip_address + ":8787/"
-    rstudio_dns_url = "http://ubuntu:dlab@" + dns_name + ":8787/"
+    rstudio_ip_url = "http://" + ip_address + ":8787/"
+    rstudio_dns_url = "http://" + dns_name + ":8787/"
     print '[SUMMARY]'
     logging.info('[SUMMARY]')
     print "Instance name: " + notebook_config['instance_name']
@@ -207,6 +209,8 @@ def run():
     print "SG name: " + notebook_config['security_group_name']
     print "Rstudio URL: " + rstudio_ip_url
     print "Rstudio URL: " + rstudio_dns_url
+    print "Rstudio user: ubuntu"
+    print "Rstudio pass: " + notebook_config['rstudio_pass']
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
         'key_name'] + '.pem ubuntu@' + ip_address
     print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ubuntu@' + dns_name
@@ -217,7 +221,9 @@ def run():
                "master_keyname": os.environ['creds_key_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",
-               "exploratory_url": rstudio_ip_url}
+               "exploratory_url": rstudio_ip_url,
+               "exploratory_user": "ubuntu",
+               "exploratory_pass": notebook_config['rstudio_pass']}
         result.write(json.dumps(res))
 
 

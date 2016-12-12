@@ -28,6 +28,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--region', type=str, default='')
+parser.add_argument('--rstudio_pass', type=str, default='')
 args = parser.parse_args()
 
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
@@ -66,7 +67,7 @@ def install_rstudio():
             sudo('chown ubuntu:ubuntu /home/ubuntu/.Rprofile')
             sudo('''echo 'library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))' >> /home/ubuntu/.Rprofile''')
             sudo('rstudio-server start')
-            sudo('echo "ubuntu:dlab" | chpasswd')
+            sudo('echo "ubuntu:' + args.rstudio_pass + '" | chpasswd')
             sudo('touch /home/ubuntu/.ensure_dir/rstudio_ensured')
         except:
             sys.exit(1)
