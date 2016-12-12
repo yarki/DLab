@@ -165,7 +165,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role('edge', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
         sys.exit(1)
 
     try:
@@ -261,14 +261,14 @@ def run():
             print 'Waiting for changes to propagate'
             time.sleep(10)
     except:
-        remove_role('notebook', os.environ['edge_user_name'])
-        remove_role('edge', os.environ['edge_user_name'])
+        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
         sys.exit(1)
 
     try:
         logging.info('[CREATE SECURITY GROUP FOR PRIVATE SUBNET]')
         print '[CREATE SECURITY GROUP FOR PRIVATE SUBNET]'
-        edge_group_id = get_security_group_by_name(edge_conf['edge_security_group_name'])
+        edge_group_id = check_security_group(edge_conf['edge_security_group_name'])
         sg_list = edge_conf['sg_ids'].replace(" ", "").split(',')
         rules_list = []
         for i in sg_list:
@@ -299,9 +299,10 @@ def run():
             print 'Waiting for changes to propagate'
             time.sleep(10)
     except:
-        remove_role('notebook', os.environ['edge_user_name'])
-        remove_role('edge', os.environ['edge_user_name'])
+        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_sgroups(edge_conf['instance_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
         sys.exit(1)
 
     try:
@@ -318,8 +319,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role('notebook', os.environ['edge_user_name'])
-        remove_role('edge', os.environ['edge_user_name'])
+        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_sgroups(edge_conf['instance_name'])
         sys.exit(1)
@@ -337,8 +338,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role('notebook', os.environ['edge_user_name'])
-        remove_role('edge', os.environ['edge_user_name'])
+        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_sgroups(edge_conf['instance_name'])
         remove_s3('edge', os.environ['edge_user_name'])
@@ -366,8 +367,8 @@ def run():
         public_ip_address = addresses.get('Public')
         keyfile_name = "/root/keys/%s.pem" % edge_conf['key_name']
     except:
-        remove_role('notebook', os.environ['edge_user_name'])
-        remove_role('edge', os.environ['edge_user_name'])
+        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_sgroups(edge_conf['instance_name'])
         remove_s3('edge', os.environ['edge_user_name'])
@@ -385,8 +386,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role('notebook', os.environ['edge_user_name'])
-        remove_role('edge', os.environ['edge_user_name'])
+        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_sgroups(edge_conf['instance_name'])
@@ -408,8 +409,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role('notebook', os.environ['edge_user_name'])
-        remove_role('edge', os.environ['edge_user_name'])
+        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_sgroups(edge_conf['instance_name'])
@@ -431,8 +432,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role('notebook', os.environ['edge_user_name'])
-        remove_role('edge', os.environ['edge_user_name'])
+        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_sgroups(edge_conf['instance_name'])
@@ -455,8 +456,8 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role('notebook', os.environ['edge_user_name'])
-        remove_role('edge', os.environ['edge_user_name'])
+        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
         remove_sgroups(edge_conf['instance_name'])

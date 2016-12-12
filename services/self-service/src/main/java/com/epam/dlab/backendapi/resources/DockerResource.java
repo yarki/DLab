@@ -19,10 +19,10 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.client.rest.DockerAPI;
 import com.epam.dlab.backendapi.dao.DockerDAO;
 import com.epam.dlab.backendapi.dao.MongoCollections;
-import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.DockerAPI;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;

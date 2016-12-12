@@ -19,11 +19,11 @@ limitations under the License.
 package com.epam.dlab.backendapi;
 
 import com.epam.dlab.auth.SecurityFactory;
-import com.epam.dlab.backendapi.core.guice.ModuleFactory;
 import com.epam.dlab.backendapi.dao.IndexCreator;
+import com.epam.dlab.backendapi.modules.ModuleFactory;
 import com.epam.dlab.backendapi.resources.*;
-import com.epam.dlab.providers.JsonProcessingExceptionMapper;
-import com.epam.dlab.providers.RuntimeExceptionMapper;
+import com.epam.dlab.rest.mappers.JsonProcessingExceptionMapper;
+import com.epam.dlab.rest.mappers.RuntimeExceptionMapper;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;

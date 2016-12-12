@@ -33,6 +33,7 @@ import { ErrorMapUtils } from './../../util/errorMapUtils';
    model : ComputationalResourcesModel;
 
    processError: boolean = false;
+   tooltip: boolean = false;
    errorMessage: string = '';
 
    @ViewChild('bindDialog') bindDialog;
@@ -47,6 +48,7 @@ import { ErrorMapUtils } from './../../util/errorMapUtils';
    }
 
    public open(option, notebook, resource) {
+     this.tooltip = false;
      this.model = new ComputationalResourcesModel(notebook, resource,
        (response: Response) => {
          this.close();
@@ -61,6 +63,11 @@ import { ErrorMapUtils } from './../../util/errorMapUtils';
      if(!this.bindDialog.isOpened) {
        this.bindDialog.open(option);
      }
+   }
+
+   public isEllipsisActive($event) {
+     if ($event.target.offsetWidth < $event.target.scrollWidth)
+       this.tooltip = true;
    }
 
    public close() {
