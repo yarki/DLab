@@ -234,7 +234,8 @@ def configure_rstudio(args):
     local('''echo 'SPARK_HOME="''' + spark_dir + '''"' >> /home/ubuntu/.Renviron''')
     local('''echo 'YARN_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
     local('''echo 'HADOOP_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
-    local("sudo rstudio-server restart")
+    local("sudo rstudio-server stop")
+    local("sudo rstudio-server start")
 
 
 def installing_python(args):

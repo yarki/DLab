@@ -149,7 +149,8 @@ def create_instance(definitions, instance_tag):
                                              IamInstanceProfile={'Name': definitions.iam_profile},
                                              UserData=user_data)
         else:
-            get_iam_profile(definitions.iam_profile)
+            profile = get_iam_profile(definitions.iam_profile)
+            print profile
             instances = ec2.create_instances(ImageId=definitions.ami_id, MinCount=1, MaxCount=1,
                                              KeyName=definitions.key_name,
                                              SecurityGroupIds=security_groups_ids,
