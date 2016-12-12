@@ -18,7 +18,8 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core;
 
-import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
+import com.epam.dlab.backendapi.core.commands.CommandBuilder;
+import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;

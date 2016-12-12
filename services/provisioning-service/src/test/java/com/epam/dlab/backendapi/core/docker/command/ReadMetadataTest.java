@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static com.epam.dlab.backendapi.core.DockerCommands.MAPPER;
+import static com.epam.dlab.backendapi.core.commands.DockerCommands.MAPPER;
 
 public class ReadMetadataTest {
     private static final String EMR_METADATA_DESCRIPTION_JSON = "/metadata/description.json";

@@ -33,8 +33,10 @@ import {DateUtils} from './../../util/dateUtils'
 
    upTimeInHours: number ;
    upTimeSince: string = "";
+   tooltip: boolean = false;
 
    open(param, environment, resource) {
+     this.tooltip = false;
      this.resource = resource;
      this.environment = environment;
      if(this.resource.up_time){
@@ -43,5 +45,9 @@ import {DateUtils} from './../../util/dateUtils'
      }
      this.bindDialog.open(param);
    }
- }
 
+   isEllipsisActive($event) {
+     if ($event.target.offsetWidth < $event.target.scrollWidth)
+       this.tooltip = true;
+   }
+ }

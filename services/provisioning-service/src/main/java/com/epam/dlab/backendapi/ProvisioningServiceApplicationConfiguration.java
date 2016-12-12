@@ -18,8 +18,8 @@ limitations under the License.
 
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.core.response.Directories;
-import com.epam.dlab.client.restclient.RESTServiceFactory;
+import com.epam.dlab.backendapi.core.Directories;
+import com.epam.dlab.rest.client.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;

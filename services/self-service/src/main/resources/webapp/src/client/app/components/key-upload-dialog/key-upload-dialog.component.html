@@ -22,15 +22,14 @@ limitations under the License.
   </modal-header>
   <modal-content>
     <form (submit)="uploadUserAccessKey_btnClick($event)" novalidate>
-      <div class="form-group row">
+      <div class="row upload-key">
         <div  class="col-xs-7">
           <label class="control-label">
             Upload public key to start environment creation
           </label>
           <div>
             <a href="#/help/publickeyguide" target="_blank">
-              <span class="glyphicon glyphicon-question-sign"></span>
-               Where can I get public key?
+               <small class="helper_instruction">Where can I get public key?</small>
             </a>
           </div>
         </div>

@@ -31,6 +31,7 @@ The following components are provided under the Apache 2.0 License. See project 
 
 (Apache 2.0 License) MongoDB Java Driver - org.mongodb:mongo-java-driver (http://mongodb.github.io/mongo-java-driver/3.2/driver)
 (Apache 2.0 License) Dropwizard (https://github.com/dropwizard/dropwizard)
+(Apache 2.0 License) Dropwizard Template Config (https://github.com/tkrille/dropwizard-template-config)
 (Apache 2.0 License) directory server (https://github.com/apache/directory-server)
 (Apache 2.0 License) jackson (https://github.com/FasterXML/jackson)
 (Apache 2.0 License) aws java sdk (https://github.com/aws/aws-sdk-java)

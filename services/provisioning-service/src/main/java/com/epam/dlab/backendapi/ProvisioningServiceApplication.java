@@ -18,16 +18,13 @@ limitations under the License.
 
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.backendapi.core.CommandExecutor;
-import com.epam.dlab.backendapi.core.CommandExecutorMock;
-import com.epam.dlab.backendapi.core.ICommandExecutor;
-import com.epam.dlab.backendapi.core.response.DirectoriesCreator;
-import com.epam.dlab.backendapi.core.response.warmup.DockerWarmuper;
-import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
+import com.epam.dlab.backendapi.core.DirectoriesCreator;
+import com.epam.dlab.backendapi.core.DockerWarmuper;
+import com.epam.dlab.backendapi.core.MetadataHolder;
 import com.epam.dlab.backendapi.resources.*;
-import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.providers.JsonProcessingExceptionMapper;
-import com.epam.dlab.providers.RuntimeExceptionMapper;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.mappers.JsonProcessingExceptionMapper;
+import com.epam.dlab.rest.mappers.RuntimeExceptionMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;

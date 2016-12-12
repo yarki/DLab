@@ -19,9 +19,18 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.domain.KeyUploader;
+import com.epam.dlab.backendapi.dao.KeyDAO;
+import com.epam.dlab.backendapi.dao.SettingsDAO;
+import com.epam.dlab.dto.edge.EdgeCreateDTO;
+import com.epam.dlab.dto.keyload.KeyLoadStatus;
+import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
+import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.KeyLoaderAPI;
+import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
