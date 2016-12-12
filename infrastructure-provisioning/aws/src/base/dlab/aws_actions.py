@@ -177,6 +177,8 @@ def create_iam_role(role_name, role_profile):
     try:
         conn.create_role(RoleName=role_name, AssumeRolePolicyDocument='{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":["ec2.amazonaws.com"]},"Action":["sts:AssumeRole"]}]}')
         conn.create_instance_profile(InstanceProfileName=role_profile)
+        waiter = conn.get_waiter('instance_profile_exists')
+        waiter.wait(InstanceProfileName=role_profile)
     except botocore.exceptions.ClientError as e_role:
         if e_role.response['Error']['Code'] == 'EntityAlreadyExists':
             print "Instance profile already exists. Reusing..."
