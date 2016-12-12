@@ -46,7 +46,9 @@ def run():
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.INFO,
                         filename=local_log_filepath)
-    if not os.environ['exploratory_name']:
+    try:
+        os.environ['exploratory_name']
+    except:
         os.environ['exploratory_name'] = ''
     if os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
         time.sleep(30)
