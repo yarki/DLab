@@ -84,7 +84,7 @@ export class ExploratoryEnvironmentCreateModel {
     environment_shape: string,
     fnProcessResults: any, fnProcessErrors: any): void {
 
-    this.setCreatingParams(environment_image, environment_version, environment_name, environment_shape);
+    this.setCreatingParams(environment_name, environment_shape);
     this.confirmAction = () => this.createExploratoryEnvironment()
       .subscribe((response: Response) => fnProcessResults(response), (response: Response) => fnProcessErrors(response));
   }
