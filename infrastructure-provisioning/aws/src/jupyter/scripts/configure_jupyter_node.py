@@ -185,7 +185,7 @@ def configure_notebook_server(notebook_name):
         ensure_r_kernel()
     else:
         try:
-            sudo("sed -i '/^c.NotebookApp.base_url/d' " + + jupyter_conf_file)
+            sudo("sed -i '/^c.NotebookApp.base_url/d' " + jupyter_conf_file)
             sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
             sudo("systemctl stop jupyter-notebook; sleep 5")
             sudo("systemctl start jupyter-notebook")
