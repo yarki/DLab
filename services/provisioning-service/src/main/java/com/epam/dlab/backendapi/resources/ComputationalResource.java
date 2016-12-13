@@ -19,19 +19,15 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.CommandBuilder;
-import com.epam.dlab.backendapi.core.CommandExecutor;
-import com.epam.dlab.backendapi.core.DockerCommands;
-import com.epam.dlab.backendapi.core.docker.command.DockerAction;
-import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.backendapi.core.response.folderlistener.FileHandlerCallback;
+import com.epam.dlab.backendapi.core.FileHandlerCallback;
+import com.epam.dlab.backendapi.core.commands.*;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
-import com.epam.dlab.backendapi.resources.handler.ComputationalCallbackHandler;
-import com.epam.dlab.client.restclient.RESTService;
+import com.epam.dlab.backendapi.core.response.handlers.ComputationalCallbackHandler;
 import com.epam.dlab.dto.computational.ComputationalBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.rest.client.RESTService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +40,8 @@ import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.IOException;
 
-import static com.epam.dlab.backendapi.core.docker.command.DockerAction.CREATE;
-import static com.epam.dlab.backendapi.core.docker.command.DockerAction.TERMINATE;
+import static com.epam.dlab.backendapi.core.commands.DockerAction.CREATE;
+import static com.epam.dlab.backendapi.core.commands.DockerAction.TERMINATE;
 
 @Path("/computational")
 @Consumes(MediaType.APPLICATION_JSON)

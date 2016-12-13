@@ -19,11 +19,11 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.CommandBuilder;
-import com.epam.dlab.backendapi.core.CommandExecutor;
-import com.epam.dlab.backendapi.core.DockerCommands;
-import com.epam.dlab.backendapi.core.docker.command.RunDockerCommand;
-import com.epam.dlab.backendapi.core.response.warmup.MetadataHolder;
+import com.epam.dlab.backendapi.core.MetadataHolder;
+import com.epam.dlab.backendapi.core.commands.CommandBuilder;
+import com.epam.dlab.backendapi.core.commands.CommandExecutor;
+import com.epam.dlab.backendapi.core.commands.DockerCommands;
+import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageType;
 import com.google.inject.Inject;

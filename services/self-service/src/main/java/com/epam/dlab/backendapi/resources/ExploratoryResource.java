@@ -18,22 +18,22 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.api.form.ExploratoryActionFormDTO;
-import com.epam.dlab.backendapi.api.form.ExploratoryCreateFormDTO;
-import com.epam.dlab.backendapi.api.instance.UserInstanceDTO;
-import com.epam.dlab.backendapi.client.rest.ExploratoryAPI;
+import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
-import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.constants.UserInstanceStatus;
+import com.epam.dlab.backendapi.resources.dto.ExploratoryActionFormDTO;
+import com.epam.dlab.backendapi.resources.dto.ExploratoryCreateFormDTO;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStopDTO;
 import com.epam.dlab.exceptions.DlabException;
-import com.epam.dlab.registry.ApiCallbacks;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.ApiCallbacks;
+import com.epam.dlab.rest.contracts.ExploratoryAPI;
 import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -47,8 +47,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import static com.epam.dlab.UserInstanceStatus.*;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
-import static com.epam.dlab.constants.UserInstanceStatus.*;
 
 @Path("/infrastructure_provision/exploratory_environment")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -121,9 +121,10 @@ public class ExploratoryResource implements ExploratoryAPI {
     public String stop(@Auth UserInfo userInfo, @PathParam("name") String name) {
         System.out.println("stopping " + name);
         LOGGER.debug("stopping exploratory environment {} for user {}", name, userInfo.getName());
-        UserInstanceStatus status = STOPPING;
-        updateExploratoryStatus(userInfo.getName(), name, status);
-        updateComputationalStatuses(userInfo.getName(), name, status);
+        UserInstanceStatus exploratoryStatus = STOPPING;
+        UserInstanceStatus computationalStatus = TERMINATING;
+        updateExploratoryStatus(userInfo.getName(), name, exploratoryStatus);
+        updateComputationalStatuses(userInfo.getName(), name, computationalStatus);
         try {
             String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
             ExploratoryStopDTO dto = new ExploratoryStopDTO()
@@ -148,6 +149,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         LOGGER.debug("terminating exploratory environment {} for user {}", name, userInfo.getName());
         UserInstanceStatus status = TERMINATING;
         updateExploratoryStatus(userInfo.getName(), name, status);
+        updateComputationalStatuses(userInfo.getName(), name, status);
         return action(userInfo, name, EXPLORATORY_TERMINATE, status);
     }
 

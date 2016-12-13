@@ -17,7 +17,6 @@
 # ******************************************************************************
 
 import boto3
-import boto
 import botocore
 import time
 import sys
@@ -25,6 +24,8 @@ import os
 import json
 from fabric.api import *
 import logging
+from dlab.aws_meta import *
+import traceback
 
 local_log_filename = "%s.log" % os.environ['request_id']
 local_log_filepath = "/response/" + local_log_filename
@@ -40,11 +41,12 @@ def put_to_bucket(bucket_name, local_file, destination_file):
             s3.upload_fileobj(data, bucket_name, destination_file)
         return True
     except Exception as err:
-        logging.info("Unable to upload files to S3 bucket: " + str(err))
+        logging.info("Unable to upload files to S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to upload files to S3 bucket", "error_message": str(err)}
+            res = {"error": "Unable to upload files to S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
         return False
 
 
@@ -58,11 +60,12 @@ def create_s3_bucket(bucket_name, tag, region):
         tagging.reload()
         return bucket.name
     except Exception as err:
-        logging.info("Unable to create S3 bucket: " + str(err))
+        logging.info("Unable to create S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create S3 bucket", "error_message": str(err)}
+            res = {"error": "Unable to create S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def create_vpc(vpc_cidr, tag):
@@ -72,11 +75,12 @@ def create_vpc(vpc_cidr, tag):
         vpc.create_tags(Tags=[tag])
         return vpc.id
     except Exception as err:
-        logging.info("Unable to create VPC: " + str(err))
+        logging.info("Unable to create VPC: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create VPC", "error_message": str(err)}
+            res = {"error": "Unable to create VPC", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def create_tag(resource, tag):
@@ -89,11 +93,12 @@ def create_tag(resource, tag):
             ]
         )
     except Exception as err:
-        logging.info("Unable to create Tag: " + str(err))
+        logging.info("Unable to create Tag: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create Tag", "error_message": str(err)}
+            res = {"error": "Unable to create Tag", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def create_subnet(vpc_id, subnet, tag):
@@ -104,11 +109,12 @@ def create_subnet(vpc_id, subnet, tag):
         subnet.reload()
         return subnet.id
     except Exception as err:
-        logging.info("Unable to create Subnet: " + str(err))
+        logging.info("Unable to create Subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create Subnet", "error_message": str(err)}
+            res = {"error": "Unable to create Subnet", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def create_instance(definitions, instance_tag):
@@ -143,6 +149,7 @@ def create_instance(definitions, instance_tag):
                                              IamInstanceProfile={'Name': definitions.iam_profile},
                                              UserData=user_data)
         else:
+            get_iam_profile(definitions.iam_profile)
             instances = ec2.create_instances(ImageId=definitions.ami_id, MinCount=1, MaxCount=1,
                                              KeyName=definitions.key_name,
                                              SecurityGroupIds=security_groups_ids,
@@ -157,53 +164,69 @@ def create_instance(definitions, instance_tag):
             return instance.id
         return ''
     except Exception as err:
-        logging.info("Unable to create EC2: " + str(err))
+        logging.info("Unable to create EC2: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create EC2", "error_message": str(err)}
+            res = {"error": "Unable to create EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def create_iam_role(role_name, role_profile):
+    conn = boto3.client('iam')
     try:
-        conn = boto.connect_iam()
-        conn.create_role(role_name)
-        conn.create_instance_profile(role_profile)
-        conn.add_role_to_instance_profile(role_profile, role_name)
+        conn.create_role(RoleName=role_name, AssumeRolePolicyDocument='{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":["ec2.amazonaws.com"]},"Action":["sts:AssumeRole"]}]}')
+        conn.create_instance_profile(InstanceProfileName=role_profile)
+    except botocore.exceptions.ClientError as e_role:
+        if e_role.response['Error']['Code'] == 'EntityAlreadyExists':
+            print "Instance profile already exists. Reusing..."
+        else:
+            logging.info("Unable to create Instance Profile: " + str(e_role.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Unable to create Instance Profile", "error_message": str(e_role.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            traceback.print_exc(file=sys.stdout)
+            return
+    try:
+        conn.add_role_to_instance_profile(InstanceProfileName=role_profile, RoleName=role_name)
         time.sleep(30)
-    except Exception as err:
-        logging.info("Unable to create IAM role: " + str(err))
+    except botocore.exceptions.ClientError as err:
+        logging.info("Unable to create IAM role: " + str(err.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create IAM role", "error_message": str(err)}
+            res = {"error": "Unable to create IAM role", "error_message": str(err.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def attach_policy(policy_arn, role_name):
     try:
-        conn = boto.connect_iam()
-        conn.attach_role_policy(policy_arn, role_name)
+        conn = boto3.client('iam')
+        conn.attach_role_policy(PolicyArn=policy_arn, RoleName=role_name)
         time.sleep(30)
-    except Exception as err:
-        logging.info("Unable to attach Policy: " + str(err))
+    except botocore.exceptions.ClientError as err:
+        logging.info("Unable to attach Policy: " + str(err.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to attach Policy", "error_message": str(err)}
+            res = {"error": "Unable to attach Policy", "error_message": str(err.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def create_attach_policy(policy_name, role_name, file_path):
     try:
-        conn = boto.connect_iam()
+        conn = boto3.client('iam')
         with open(file_path, 'r') as myfile:
             json_file = myfile.read()
-        conn.put_role_policy(role_name, policy_name, json_file)
+        conn.put_role_policy(RoleName=role_name, PolicyName=policy_name, PolicyDocument=json_file)
     except Exception as err:
-        logging.info("Unable to attach Policy: " + str(err))
+        logging.info("Unable to attach Policy: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to attach Policy", "error_message": str(err)}
+            res = {"error": "Unable to attach Policy", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def remove_ec2(tag_name, tag_value):
@@ -223,11 +246,12 @@ def remove_ec2(tag_name, tag_value):
         else:
             print "There are no instances with " + tag_value + " name to terminate"
     except Exception as err:
-        logging.info("Unable to remove EC2: " + str(err))
+        logging.info("Unable to remove EC2: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to EC2", "error_message": str(err)}
+            res = {"error": "Unable to EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def stop_ec2(tag_name, tag_value):
@@ -247,11 +271,12 @@ def stop_ec2(tag_name, tag_value):
         else:
             print "There are no instances with " + tag_value + " name to stop"
     except Exception as err:
-        logging.info("Unable to stop EC2: " + str(err))
+        logging.info("Unable to stop EC2: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to stop EC2", "error_message": str(err)}
+            res = {"error": "Unable to stop EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def start_ec2(tag_name, tag_value):
@@ -271,88 +296,152 @@ def start_ec2(tag_name, tag_value):
         else:
             print "There are no instances with " + tag_value + " name to start"
     except Exception as err:
-        logging.info("Unable to start EC2: " + str(err))
+        logging.info("Unable to start EC2: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to start EC2", "error_message": str(err)}
+            res = {"error": "Unable to start EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
-def remove_role(instance_type, scientist=''):
+def remove_detach_iam_policies(role_name, action=''):
+    client = boto3.client('iam')
     try:
-        print "[Removing roles and instance profiles]"
-        client = boto3.client('iam')
-        if instance_type == "ssn":
-            role_name = os.environ['conf_service_base_name'] + '-ssn-Role'
-            role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
-        if instance_type == "edge":
-            role_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Role'
-            role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
-        elif instance_type == "notebook":
-            role_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Role'
-            role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
-        role = client.get_role(RoleName="{}".format(role_name)).get("Role").get("RoleName")
-        policy_list = client.list_attached_role_policies(RoleName=role).get('AttachedPolicies')
+        policy_list = client.list_attached_role_policies(RoleName=role_name).get('AttachedPolicies')
         for i in policy_list:
             policy_arn = i.get('PolicyArn')
-            client.detach_role_policy(RoleName=role, PolicyArn=policy_arn)
-        profile = client.get_instance_profile(InstanceProfileName="{}".format(role_profile_name)).get(
-            "InstanceProfile").get("InstanceProfileName")
-        client.remove_role_from_instance_profile(InstanceProfileName=profile, RoleName=role)
-        client.delete_instance_profile(InstanceProfileName=profile)
-        client.delete_role(RoleName=role)
-        print "The IAM role " + role + " has been deleted successfully"
+            client.detach_role_policy(RoleName=role_name, PolicyArn=policy_arn)
+            print "The IAM policy " + policy_arn + " has been detached successfully"
+            if action == 'delete':
+                client.delete_policy(PolicyArn=policy_arn)
+                print "The IAM policy " + policy_arn + " has been deleted successfully"
     except Exception as err:
-        logging.info("Unable to remove role: " + str(err))
+        logging.info("Unable to remove/detach IAM policy: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove role", "error_message": str(err)}
+            res = {"error": "Unable to remove/detach IAM policy",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
-def s3_cleanup(bucket, cluster_name):
+def remove_roles_and_profiles(role_name, role_profile_name):
+    client = boto3.client('iam')
+    try:
+        client.remove_role_from_instance_profile(InstanceProfileName=role_profile_name, RoleName=role_name)
+        client.delete_instance_profile(InstanceProfileName=role_profile_name)
+        client.delete_role(RoleName=role_name)
+        print "The IAM role " + role_name + " and instance profile " + role_profile_name + " have been deleted successfully"
+    except Exception as err:
+        logging.info("Unable to remove IAM role/profile: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove IAM role/profile",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def remove_all_iam_resources(instance_type, scientist=''):
+    try:
+        print "[Removing IAM roles, instance profiles and policies]"
+        client = boto3.client('iam')
+        roles_list = []
+        for item in client.list_roles().get("Roles"):
+            if os.environ['conf_service_base_name'] in item.get("RoleName"):
+                roles_list.append(item.get('RoleName'))
+        if roles_list:
+            for iam_role in roles_list:
+                if '-ssn-Role' in iam_role:
+                    if instance_type == 'ssn' or instance_type == 'all':
+                        role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
+                        client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
+                        remove_roles_and_profiles(iam_role, role_profile_name)
+                if '-edge-Role' in iam_role:
+                    if instance_type == 'edge' and scientist in iam_role:
+                        remove_detach_iam_policies(iam_role, 'delete')
+                        role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
+                        remove_roles_and_profiles(iam_role, role_profile_name)
+                    if instance_type == 'all':
+                        remove_detach_iam_policies(iam_role, 'delete')
+                        role_profile_name = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
+                        for i in role_profile_name:
+                            role_profile_name = i.get('InstanceProfileName')
+                            remove_roles_and_profiles(iam_role, role_profile_name)
+                if '-nb-Role' in iam_role:
+                    if instance_type == 'notebook' and scientist in iam_role:
+                        remove_detach_iam_policies(iam_role)
+                        role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
+                        remove_roles_and_profiles(iam_role, role_profile_name)
+                    if instance_type == 'all':
+                        remove_detach_iam_policies(iam_role)
+                        role_profile_name = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
+                        for i in role_profile_name:
+                            role_profile_name = i.get('InstanceProfileName')
+                            remove_roles_and_profiles(iam_role, role_profile_name)
+        else:
+            print "There is no IAM role to delete"
+    except Exception as err:
+        logging.info("Unable to remove some of the IAM resources: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove some of the IAM resources", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def s3_cleanup(bucket, cluster_name, user_name):
     try:
         s3_res = boto3.resource('s3')
         resource = s3_res.Bucket(bucket)
-        prefix = "config/" + cluster_name + "/"
+        prefix = user_name + '/' + cluster_name + "/"
         for i in resource.objects.filter(Prefix=prefix):
             s3_res.Object(resource.name, i.key).delete()
     except Exception as err:
-        logging.info("Unable to clean S3 bucket: " + str(err))
+        logging.info("Unable to clean S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to clean S3 bucket", "error_message": str(err)}
+            res = {"error": "Unable to clean S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
-def remove_s3(bucket_type, scientist=''):
+def remove_s3(bucket_type='all', scientist=''):
     try:
         print "[Removing S3 buckets]"
-        s3 = boto3.resource('s3')
         client = boto3.client('s3')
+        bucket_list = []
         if bucket_type == 'ssn':
             bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
         elif bucket_type == 'edge':
             bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
-        bucket = s3.Bucket("{}".format(bucket_name))
-        list_obj = client.list_objects(Bucket=bucket.name)
-        list_obj = list_obj.get('Contents')
-        if list_obj is not None:
-            for o in list_obj:
-                list_obj = o.get('Key')
-                client.delete_objects(
-                    Bucket=bucket_name,
-                    Delete={'Objects': [{'Key': list_obj}]}
-                )
-                print "The S3 bucket " + bucket.name + " has been cleaned"
-        client.delete_bucket(Bucket=bucket.name)
-        print "The S3 bucket " + bucket.name + " has been deleted successfully"
+        else:
+            bucket_name = (os.environ['conf_service_base_name']).lower().replace('_', '-')
+        for item in client.list_buckets().get('Buckets'):
+            if bucket_name in item.get('Name'):
+                bucket_list.append(item.get('Name'))
+        for s3bucket in bucket_list:
+            list_obj = client.list_objects(Bucket=s3bucket)
+            list_obj = list_obj.get('Contents')
+            if list_obj is not None:
+                for o in list_obj:
+                    list_obj = o.get('Key')
+                    print list_obj
+                    client.delete_objects(
+                        Bucket=s3bucket,
+                        Delete={'Objects': [{'Key': list_obj}]}
+                    )
+                print "The S3 bucket " + s3bucket + " has been cleaned"
+            client.delete_bucket(Bucket=s3bucket)
+            print "The S3 bucket " + s3bucket + " has been deleted successfully"
+        print "There are no more buckets to delete"
     except Exception as err:
-        logging.info("Unable to remove S3 bucket: " + str(err))
+        logging.info("Unable to remove S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove S3 bucket", "error_message": str(err)}
+            res = {"error": "Unable to remove S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def remove_subnets(tag_value):
@@ -368,12 +457,12 @@ def remove_subnets(tag_value):
             client.delete_subnet(SubnetId=subnet.id)
             print "The subnet " + subnet.id + " has been deleted successfully"
     except Exception as err:
-        logging.info("Unable to remove subnet: " + str(err))
+        logging.info("Unable to remove subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove subnet", "error_message": str(err)}
+            res = {"error": "Unable to remove subnet", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
-
+        traceback.print_exc(file=sys.stdout)
 
 
 def remove_sgroups(tag_value):
@@ -389,11 +478,12 @@ def remove_sgroups(tag_value):
             client.delete_security_group(GroupId=sg.id)
             print "The security group " + sg.id + " has been deleted successfully"
     except Exception as err:
-        logging.info("Unable to remove SG: " + str(err))
+        logging.info("Unable to remove SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove SG", "error_message": str(err)}
+            res = {"error": "Unable to remove SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def deregister_image(scientist):
@@ -407,11 +497,12 @@ def deregister_image(scientist):
             client.deregister_image(ImageId=i.get('ImageId'))
             print "Notebook AMI " + i + " has been deregistered successfully"
     except Exception as err:
-        logging.info("Unable to de-register image: " + str(err))
+        logging.info("Unable to de-register image: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to de-register image", "error_message": str(err)}
+            res = {"error": "Unable to de-register image", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
 def terminate_emr(id):
@@ -423,14 +514,15 @@ def terminate_emr(id):
         waiter = emr.get_waiter('cluster_terminated')
         waiter.wait(ClusterId=id)
     except Exception as err:
-        logging.info("Unable to remove EMR: " + str(err))
+        logging.info("Unable to remove EMR: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove EMR", "error_message": str(err)}
+            res = {"error": "Unable to remove EMR", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
 
 
-def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
+def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version):
     try:
         ec2 = boto3.resource('ec2')
         inst = ec2.instances.filter(
@@ -444,14 +536,37 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path):
                 env.user = "{}".format(ssh_user)
                 env.key_filename = "{}".format(key_path)
                 env.host_string = env.user + "@" + env.hosts
-                sudo('rm -rf /srv/hadoopconf/config/{}'.format(emr_name))
+                sudo('rm -rf  /opt/' + emr_version + '/' + emr_name + '/')
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
                 print "Notebook's " + env.hosts + " kernels were removed"
         else:
             print "There are no notebooks to clean kernels."
     except Exception as err:
-        logging.info("Unable to remove kernels on Notebook: " + str(err))
+        logging.info("Unable to remove kernels on Notebook: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove kernels on Notebook", "error_message": str(err)}
+            res = {"error": "Unable to remove kernels on Notebook", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def remove_route_tables(tag_name):
+    try:
+        client = boto3.client('ec2')
+        rtables = client.describe_route_tables(Filters=[{'Name': 'tag-key', 'Values': [tag_name]}]).get('RouteTables')
+        for rtable in rtables:
+            if rtable:
+                rtable = rtable.get('RouteTableId')
+                client.delete_route_table(RouteTableId=rtable)
+                print "Route table " + rtable + " was removed"
+            else:
+                print "There is no route table to remove"
+    except Exception as err:
+        logging.info("Unable to remove route table: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove route table",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)

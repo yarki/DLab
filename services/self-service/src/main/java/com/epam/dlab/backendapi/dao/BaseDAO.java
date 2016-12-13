@@ -19,11 +19,12 @@ limitations under the License.
 package com.epam.dlab.backendapi.dao;
 
 import com.epam.dlab.backendapi.dao.databind.IsoDateModule;
-import com.epam.dlab.client.mongo.MongoService;
 import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.mongo.MongoService;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import com.mongodb.client.FindIterable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -69,6 +70,10 @@ class BaseDAO implements MongoCollections {
 
     protected void update(String collection, Bson condition, Bson value) {
         mongoService.getCollection(collection).updateOne(condition, value);
+    }
+
+    protected FindIterable<Document> find(String collection, Bson condition) {
+        return mongoService.getCollection(collection).find(condition);
     }
 
     protected Document convertToBson(Object object) {

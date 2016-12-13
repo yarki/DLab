@@ -18,7 +18,8 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
-import com.epam.dlab.backendapi.core.DockerCommands;
+import com.epam.dlab.backendapi.core.FileHandlerCallback;
+import com.epam.dlab.backendapi.core.commands.DockerCommands;
 import com.epam.dlab.exceptions.DlabException;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;

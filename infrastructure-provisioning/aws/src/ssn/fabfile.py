@@ -58,11 +58,12 @@ def run():
         instance_name = service_base_name + '-ssn'
         region = os.environ['creds_region']
         ssn_ami_id = get_ami_id(os.environ['ssn_ami_name'])
+        policy_path = '/root/templates/policy.json'
 
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
-        params = "--role_name %s --role_profile_name %s --policy_name %s --policy_arn %s" % \
-                 (role_name, role_profile_name, policy_name, os.environ['conf_policy_arn'])
+        params = "--role_name %s --role_profile_name %s --policy_name %s --policy_file_name %s" % \
+                 (role_name, role_profile_name, policy_name, policy_path)
 
         if not run_routine('create_role_policy', params):
             logging.info('Unable to create roles')
@@ -72,10 +73,6 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        try:
-            remove_role(instance)
-        except:
-            sys.exit(1)
         sys.exit(1)
 
     try:
@@ -91,7 +88,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         sys.exit(1)
 
     try:
@@ -108,7 +105,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         sys.exit(1)
 
     try:
@@ -128,7 +125,7 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -138,7 +135,7 @@ def run():
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         params = "--hostname %s --keyfile %s " \
-                 "--pip_packages 'boto3 boto argparse fabric jupyter awscli'" % \
+                 "--pip_packages 'boto3 argparse fabric jupyter awscli'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
         if not run_routine('install_prerequisites', params):
@@ -150,7 +147,7 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -170,7 +167,7 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -193,7 +190,7 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -213,7 +210,7 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -230,7 +227,7 @@ def run():
             sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
@@ -298,7 +295,49 @@ def run():
             run_routine('finalize', params)
     except:
         remove_ec2(tag_name, instance_name)
-        remove_role(instance)
+        remove_all_iam_resources(instance)
         remove_s3(instance)
         sys.exit(1)
 
+
+# Main function for terminating all aws resources per service_base_name
+def terminate():
+    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filepath = "/response/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG,
+                        filename=local_log_filepath)
+
+    # generating variables dictionary
+    create_aws_config_files()
+    print 'Generating infrastructure names and tags'
+    ssn_conf = dict()
+    ssn_conf['service_base_name'] = os.environ['conf_service_base_name']
+    ssn_conf['tag_name'] = ssn_conf['service_base_name'] + '-Tag'
+    ssn_conf['edge_sg'] = ssn_conf['service_base_name'] + "*" + '-edge'
+    ssn_conf['nb_sg'] = ssn_conf['service_base_name'] + "*" + '-nb'
+
+    try:
+        logging.info('[TERMINATE SSN]')
+        print '[TERMINATE SSN]'
+        params = "--tag_name %s --edge_sg %s --nb_sg %s" % \
+                 (ssn_conf['tag_name'], ssn_conf['edge_sg'], ssn_conf['nb_sg'])
+        if not run_routine('terminate_aws_resources', params):
+            logging.info('Failed to terminate ssn')
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to terminate ssn", "conf": ssn_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+            sys.exit(1)
+    except:
+        sys.exit(1)
+
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"service_base_name": ssn_conf['service_base_name'],
+                   "Action": "Terminate ssn with all service_base_name environment"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)
