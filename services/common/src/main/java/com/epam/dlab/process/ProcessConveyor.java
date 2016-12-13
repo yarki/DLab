@@ -19,19 +19,14 @@ import com.aegisql.conveyor.BuildingSite;
 import com.aegisql.conveyor.cart.Cart;
 import com.aegisql.conveyor.cart.FutureCart;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 public class ProcessConveyor extends AssemblingConveyor<ProcessId,ProcessStep,ProcessInfo>{
 
     private final ConcurrentHashMap<String,ConcurrentLinkedQueue<String>> users = new ConcurrentHashMap<>();
-
-    private int maxUserCommands = 5;
 
     public ProcessConveyor() {
         super();
@@ -58,10 +53,6 @@ public class ProcessConveyor extends AssemblingConveyor<ProcessId,ProcessStep,Pr
         } else {
             return bs.getProductSupplier();
         }
-    }
-
-    public void setMaxUserProcesses(int maxUserCommands) {
-        this.maxUserCommands = maxUserCommands;
     }
 
 }

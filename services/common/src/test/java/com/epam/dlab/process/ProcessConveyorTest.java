@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
 
@@ -68,8 +69,7 @@ public class ProcessConveyorTest {
 
         ProcessId ping = new ProcessId(user, "ping");
         ArrayList<CompletableFuture<ProcessInfo>> cf = new ArrayList<>();
-        DlabProcess.getInstance().setExecutorServiceMaxParallelism(2);
-        DlabProcess.getInstance().setMaxUserProcesses(3);
+        DlabProcess.getInstance().setMaxProcessesPerBox(2);
         for(int i = 0; i < 5; i++) {
             cf.add(DlabProcess.getInstance().start(new ProcessId(user, "ping "+i), pingCommand));
         }
@@ -83,9 +83,46 @@ public class ProcessConveyorTest {
             assertTrue(pi.getStdOut().length() > 0);
             assertTrue(pi.getStatus().equals(ProcessStatus.FINISHED));
         }
-        DlabProcess.getInstance().setExecutorServiceMaxParallelism(50);
-        DlabProcess.getInstance().setMaxUserProcesses(5);
+        DlabProcess.getInstance().setMaxProcessesPerBox(50);
      }
+
+    @Test
+    public void testPingsWithManyProcesses() throws Exception {
+
+        String pingCommand;
+
+        if(windows) {
+            pingCommand = "ping -n 5 localhost";
+        } else {
+            pingCommand = "ping -c 5 localhost";
+        }
+
+        ProcessId ping = new ProcessId(user, "ping");
+        ArrayList<CompletableFuture<ProcessInfo>> cf = new ArrayList<>();
+        for(int i = 0; i < 10; i++) {
+            for(int ii=0; ii<10; ii++) {
+                ping = new ProcessId(user+i, "ping " + (i*10+ii));
+                cf.add(DlabProcess.getInstance().start(ping, pingCommand));
+            }
+        }
+        Thread.sleep(500);
+        Collection<ProcessId> pIds = DlabProcess.getInstance().getActiveProcesses();
+        assertEquals(100,pIds.size());
+
+        Supplier<? extends ProcessInfo> s = DlabProcess.getInstance().getProcessInfoSupplier(ping);
+        assertNotNull(s);
+        ProcessInfo processInfo = s.get();
+        assertNotNull(processInfo);
+        assertEquals(ProcessStatus.LAUNCHING,processInfo.getStatus());
+        System.out.println(pIds);
+        System.out.println(processInfo);
+        for (CompletableFuture<ProcessInfo> f:cf){
+            ProcessInfo pi = f.get();
+            System.out.println("RES: "+pi.getId()+" "+(pi.getStdOut().length()>0?"true":"false"));
+            assertTrue(pi.getStdOut().length() > 0);
+            assertTrue(pi.getStatus().equals(ProcessStatus.FINISHED));
+        }
+    }
 
 
     @Test

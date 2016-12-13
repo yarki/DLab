@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 public class DlabProcess {
 
@@ -48,16 +49,18 @@ public class DlabProcess {
         return executorService;
     }
 
-    public void setExecutorServiceMaxParallelism(int parallelism) {
+    public void setMaxProcessesPerBox(int parallelism) {
         this.executorService.shutdown();
-        this.executorService = Executors.newFixedThreadPool(parallelism);
+        this.executorService = Executors.newFixedThreadPool(3*parallelism);
     }
 
-    public void setUserParallelism(int parallelism) {
-        this.userMaxparallelism = 3*parallelism;
+    public void setMaxProcessesPerUser(int parallelism) {
+        this.userMaxparallelism = parallelism;
+        this.perUserService.forEach((k,e)->{e.shutdown();});
+        this.perUserService = new ConcurrentHashMap<>();
     }
 
-    public ExecutorService getUserExecutorService(String user) {
+    public ExecutorService getUsersExecutorService(String user) {
         perUserService.putIfAbsent(user,Executors.newFixedThreadPool(userMaxparallelism));
         return perUserService.get(user);
     }
@@ -108,12 +111,12 @@ public class DlabProcess {
         return pList;
     }
 
-    public void setProcessTimeout(long time, TimeUnit unit) {
-        processConveyor.setDefaultBuilderTimeout(time,unit);
+    public Supplier<? extends ProcessInfo> getProcessInfoSupplier(ProcessId id) {
+        return processConveyor.getInfoSupplier(id);
     }
 
-    public void setMaxUserProcesses(int max) {
-        processConveyor.setMaxUserProcesses(max);
+    public void setProcessTimeout(long time, TimeUnit unit) {
+        processConveyor.setDefaultBuilderTimeout(time,unit);
     }
 
 }

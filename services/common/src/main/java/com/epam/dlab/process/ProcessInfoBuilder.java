@@ -20,7 +20,6 @@ import com.aegisql.conveyor.Testing;
 import com.aegisql.conveyor.TimeoutAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.util.resources.cldr.ga.LocaleNames_ga;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,8 +28,6 @@ import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 import static com.epam.dlab.process.ProcessStatus.*;
@@ -137,13 +134,13 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
     }
 
     private void launch() {
-        DlabProcess.getInstance().getUserExecutorService(processId.getUser()).submit(()->{
+        DlabProcess.getInstance().getUsersExecutorService(processId.getUser()).submit(()->{
             status = SCHEDULED;
             DlabProcess.getInstance().getExecutorService().execute(()->{
                 try {
                     p = new ProcessBuilder(command.split("\\s+")).start();
                     InputStream stdOutStream = p.getInputStream();
-                    DlabProcess.getInstance().getExecutorService().submit(()->{
+                    DlabProcess.getInstance().getExecutorService().execute(()->{
                         BufferedReader reader = new BufferedReader(new InputStreamReader(stdOutStream));
                         String line;
                         try {
@@ -157,7 +154,7 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
                         }
                     });
                     InputStream stdErrStream = p.getErrorStream();
-                    DlabProcess.getInstance().getExecutorService().submit(()->{
+                    DlabProcess.getInstance().getExecutorService().execute(()->{
                         BufferedReader reader = new BufferedReader(new InputStreamReader(stdErrStream));
                         String line;
                         try {
