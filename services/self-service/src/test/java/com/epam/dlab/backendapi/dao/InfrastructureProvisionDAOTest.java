@@ -37,6 +37,7 @@ import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static junit.framework.TestCase.*;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+@Ignore
 public class InfrastructureProvisionDAOTest extends DAOTestBase {
     private InfrastructureProvisionDAO dao;
 

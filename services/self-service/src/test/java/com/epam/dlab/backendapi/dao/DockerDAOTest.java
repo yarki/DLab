@@ -18,16 +18,14 @@
 
 package com.epam.dlab.backendapi.dao;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.util.Collections;
 
 import static com.epam.dlab.backendapi.dao.MongoCollections.DOCKER_ATTEMPTS;
 import static junit.framework.TestCase.assertEquals;
 
+@Ignore
 public class DockerDAOTest extends DAOTestBase {
     private DockerDAO dockerDAO;
 
