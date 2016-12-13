@@ -166,12 +166,46 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
     }
 
     @Test
+    public void fetchExploratoryFieldsSuccess() {
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created")
+                .withImageName("jupyter")
+                .withImageVersion("jupyter-2");
+
+        Boolean isInserted = dao.insertExploratory(instance1);
+        assertTrue(isInserted);
+
+        UserInstanceDTO instance2 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_2")
+                .withExploratoryId("exp2")
+                .withStatus("running")
+                .withImageName("rstudio")
+                .withImageVersion("r-3");
+
+        Boolean isInserted2 = dao.insertExploratory(instance2);
+        assertTrue(isInserted2);
+
+        Optional<UserInstanceDTO> testInstance = dao.fetchExploratoryFields("user1", "exp_name_2");
+        assertTrue(testInstance.isPresent());
+        assertEquals(instance2.getExploratoryId(), testInstance.get().getExploratoryId());
+        assertEquals(instance2.getStatus(), testInstance.get().getStatus());
+        assertEquals(instance2.getImageName(), testInstance.get().getImageName());
+        assertEquals(instance2.getImageVersion(), testInstance.get().getImageVersion());
+    }
+
+    @Test
     public void insertExploratorySuccess() {
         UserInstanceDTO instance1 = new UserInstanceDTO()
                 .withUser("user1")
                 .withExploratoryName("exp_name_1")
                 .withExploratoryId("exp1")
-                .withStatus("created");
+                .withStatus("created")
+                .withImageName("jupyter")
+                .withImageVersion("jupyter-2");
 
         Boolean isInserted = dao.insertExploratory(instance1);
         assertTrue(isInserted);
@@ -184,6 +218,9 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 UserInstanceDTO.class);
         assertTrue(testInstance.isPresent());
         assertEquals(instance1.getExploratoryId(), testInstance.get().getExploratoryId());
+        assertEquals(instance1.getStatus(), testInstance.get().getStatus());
+        assertEquals(instance1.getImageName(), testInstance.get().getImageName());
+        assertEquals(instance1.getImageVersion(), testInstance.get().getImageVersion());
     }
 
     @Test
