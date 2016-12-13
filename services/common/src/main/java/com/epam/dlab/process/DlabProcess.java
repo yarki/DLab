@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.aegisql.conveyor.cart.command.RescheduleCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +30,9 @@ public class DlabProcess {
 
     private final static DlabProcess INSTANCE = new DlabProcess();
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(50);
+    private ExecutorService executorService = Executors.newFixedThreadPool(50*3);
     private Map<String,ExecutorService> perUserService = new ConcurrentHashMap<>();
-    private int userMaxparallelism = 3*5;
+    private int userMaxparallelism = 5;
 
     public static DlabProcess getInstance() {
         return INSTANCE;

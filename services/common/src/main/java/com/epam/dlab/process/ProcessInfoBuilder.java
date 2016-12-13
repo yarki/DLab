@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
@@ -69,7 +70,6 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
             b.status = LAUNCHING;
             b.command = command;
             b.launch();
-            b.status = RUNNING;
         } else {
             if(b.rejected == null) {
                 b.rejected = new LinkedList<>();
@@ -137,45 +137,54 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
     }
 
     private void launch() {
-         DlabProcess.getInstance().getExecutorService().execute(()->{
+        DlabProcess.getInstance().getUserExecutorService(processId.getUser()).submit(()->{
+            status = SCHEDULED;
+            DlabProcess.getInstance().getExecutorService().execute(()->{
+                try {
+                    p = new ProcessBuilder(command.split("\\s+")).start();
+                    InputStream stdOutStream = p.getInputStream();
+                    DlabProcess.getInstance().getExecutorService().submit(()->{
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(stdOutStream));
+                        String line;
+                        try {
+                            while ((line = reader.readLine()) != null) {
+                                DlabProcess.getInstance().toStdOut(processId,line);
+                            }
+                            DlabProcess.getInstance().toStdOut(processId,null);
+                        } catch (IOException e) {
+                            DlabProcess.getInstance().toStdErr(processId,"Failed process STDOUT reader",e);
+                            DlabProcess.getInstance().failed(processId);
+                        }
+                    });
+                    InputStream stdErrStream = p.getErrorStream();
+                    DlabProcess.getInstance().getExecutorService().submit(()->{
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(stdErrStream));
+                        String line;
+                        try {
+                            while ((line = reader.readLine()) != null) {
+                                DlabProcess.getInstance().toStdErr(processId,line);
+                            }
+                            DlabProcess.getInstance().toStdErr(processId,null);
+                        } catch (IOException e) {
+                            DlabProcess.getInstance().toStdErr(processId,"Failed process STDERR reader",e);
+                            DlabProcess.getInstance().failed(processId);
+                        }
+                    });
+                    status = RUNNING;
+                    int exit = p.waitFor();
+                    DlabProcess.getInstance().finish(processId,exit);
+                } catch (IOException e) {
+                    DlabProcess.getInstance().toStdErr(processId,"Command launch failed. "+get().getCommand(),e);
+                    DlabProcess.getInstance().failed(processId);
+                } catch (InterruptedException e) {
+                    DlabProcess.getInstance().toStdErr(processId,"Command interrupted. "+get().getCommand(),e);
+                    DlabProcess.getInstance().failed(processId);
+                }
+            });
             try {
-                p = new ProcessBuilder(command.split("\\s+")).start();
-                InputStream stdOutStream = p.getInputStream();
-                DlabProcess.getInstance().getExecutorService().submit(()->{
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(stdOutStream));
-                    String line;
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            DlabProcess.getInstance().toStdOut(processId,line);
-                        }
-                        DlabProcess.getInstance().toStdOut(processId,null);
-                    } catch (IOException e) {
-                        DlabProcess.getInstance().toStdErr(processId,"Failed process STDOUT reader",e);
-                        DlabProcess.getInstance().failed(processId);
-                    }
-                });
-                InputStream stdErrStream = p.getErrorStream();
-                DlabProcess.getInstance().getExecutorService().submit(()->{
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(stdErrStream));
-                    String line;
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            DlabProcess.getInstance().toStdErr(processId,line);
-                        }
-                        DlabProcess.getInstance().toStdErr(processId,null);
-                    } catch (IOException e) {
-                        DlabProcess.getInstance().toStdErr(processId,"Failed process STDERR reader",e);
-                        DlabProcess.getInstance().failed(processId);
-                    }
-                });
-                int exit = p.waitFor();
-                DlabProcess.getInstance().finish(processId,exit);
-            } catch (IOException e) {
-                DlabProcess.getInstance().toStdErr(processId,"Command launch failed. "+get().getCommand(),e);
-                DlabProcess.getInstance().failed(processId);
-            } catch (InterruptedException e) {
-                DlabProcess.getInstance().toStdErr(processId,"Command interrupted. "+get().getCommand(),e);
-                DlabProcess.getInstance().failed(processId);
+                future.get();
+            } catch (Exception e) {
+
             }
         });
     }
