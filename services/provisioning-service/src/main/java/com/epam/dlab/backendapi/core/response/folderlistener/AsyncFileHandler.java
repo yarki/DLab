@@ -19,10 +19,11 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
-import com.epam.dlab.backendapi.core.FileHandlerCallback;
 import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.epam.dlab.backendapi.core.FileHandlerCallback;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +62,7 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
             }
             return true;
         } catch (Exception e) {
-            LOGGER.debug("Could not handle file async", e);
+            LOGGER.debug("Could not handle file {} async", path, e);
         }
         return false;
     }
@@ -77,6 +78,7 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
     }
 
     private void waitFileCompletelyWritten(File file, long before) throws InterruptedException {
+    	// TODO: Remove this method. This issue have fixed in FolderListener class
         Thread.sleep(fileLengthCheckDelay.toMilliseconds());
         long after = file.length();
         if (before != after) {

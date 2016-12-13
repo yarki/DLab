@@ -18,17 +18,27 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
-import com.epam.dlab.backendapi.core.FileHandlerCallback;
-import com.epam.dlab.backendapi.core.commands.DockerCommands;
-import com.epam.dlab.exceptions.DlabException;
-import io.dropwizard.util.Duration;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.*;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import com.epam.dlab.backendapi.core.FileHandlerCallback;
+import com.epam.dlab.backendapi.core.commands.DockerCommands;
+import com.epam.dlab.exceptions.DlabException;
+
+import io.dropwizard.util.Duration;
 
 public class FolderListener implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
@@ -53,41 +63,49 @@ public class FolderListener implements Runnable {
 
     private void pollFile() {
         Path directoryPath = Paths.get(directory);
+        
         try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
-            directoryPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
-            LOGGER.debug("Registered a new watcher for directory {}", directoryPath.toAbsolutePath().toString());
+            directoryPath.register(watcher, ENTRY_CREATE, ENTRY_MODIFY);
+            LOGGER.debug("Registered a new watcher for directory {}", directoryPath.toAbsolutePath());
+
+            Map<String, Integer> fileList = new HashMap<String, Integer>();
             while (true) {
                 final WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
                 if (watchKey != null) {
                     for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
                         final WatchEvent.Kind<?> kind = watchEvent.kind();
-                        if (kind == StandardWatchEventKinds.OVERFLOW) {
-                            continue;
-                        }
-
-                        if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                        if (kind == ENTRY_CREATE || kind == ENTRY_MODIFY) {
                             String fileName = watchEvent.context().toString();
-                            boolean victim = fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName));
-                            LOGGER.debug("Caught {} response file creation, skipping: {}", fileName, !victim);
-                            if (victim) {
-                                handleFileAsync(fileName);
-                                break;
+                            if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
+                            	Integer eventCount = fileList.get(fileName);
+                            	if (eventCount == null) {
+                            		fileList.put(fileName, 0);
+                            		LOGGER.debug("Response file {}/{} created.", directory, fileName);
+                            	} else if (eventCount > 1) {
+                                    LOGGER.debug("Response file {}/{} is processed ...", directory, fileName);
+                                    handleFileAsync(fileName);
+                            	} else {
+                            		fileList.put(fileName, ++eventCount);
+                            		LOGGER.debug("Response file {}/{} writing.", directory, fileName);
+                            	}
+                            } else {
+                            	LOGGER.trace("Response file {}/{} skipped", directory, fileName);
                             }
                         }
                     }
-                    boolean valid = watchKey.reset();
-                    if (!valid) {
+                    if (!watchKey.reset()) {
                         break;
                     }
                 } else if (!success) {
-                    LOGGER.debug("Either could not receive a response, or there was an error during response processing");
+                    LOGGER.warn("Either could not receive a response, or there was an error during response processing");
                     fileHandlerCallback.handleError();
                     break;
                 }
             }
-            LOGGER.debug("Closing a watcher for directory {}", directoryPath.toAbsolutePath().toString());
+            LOGGER.debug("Closing a watcher for directory {}", directoryPath.toAbsolutePath());
         } catch (Exception e) {
-            throw new DlabException("FolderListenerExecutor exception", e);
+        	LOGGER.warn("FolderListenerExecutor exception for folder {}", directoryPath.toAbsolutePath(), e);
+            throw new DlabException("FolderListenerExecutor exception for folder {}" + directoryPath.toAbsolutePath(), e);
         }
     }
 
