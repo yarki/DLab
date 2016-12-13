@@ -38,7 +38,7 @@ export class ComputationalResourceCreateDialog {
   shapes: any;
   computationalResourceExist: boolean = false;
   checkValidity: boolean = false;
-  clusterNamePattern: string = "[-_ a-zA-Z0-9]+";
+  clusterNamePattern: string = "[-_a-zA-Z0-9]+";
   nodeCountPattern: string = "^[1-9]\\d*$";
 
   processError: boolean = false;
@@ -89,7 +89,7 @@ export class ComputationalResourceCreateDialog {
       this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'master_shape', 'type');
       this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'slave_shape', 'type');
     }
-    
+
     if(this.shapes[$event.model.type])
       this.shapes[$event.model.type] = $event.model.value.type;
   }
