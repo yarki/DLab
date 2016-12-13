@@ -209,13 +209,13 @@ def run():
         sys.exit(1)
 
     # checking the need for image creation
-    #ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
-    #if ami_id == '':
-    #    print "Looks like it's first time we configure notebook server. Creating image."
-    #    image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
-    #                                          image_name=notebook_config['expected_ami_name'])
-    #    if image_id != '':
-    #        print "Image was successfully created. It's ID is " + image_id
+    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
+    if ami_id == '':
+        print "Looks like it's first time we configure notebook server. Creating image."
+        image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
+                                              image_name=notebook_config['expected_ami_name'])
+        if image_id != '':
+            print "Image was successfully created. It's ID is " + image_id
 
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')

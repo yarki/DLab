@@ -499,7 +499,7 @@ def deregister_image(scientist):
         images_list = response.get('Images')
         for i in images_list:
             client.deregister_image(ImageId=i.get('ImageId'))
-            print "Notebook AMI " + i + " has been deregistered successfully"
+            print "Notebook AMI has been deregistered successfully"
     except Exception as err:
         logging.info("Unable to de-register image: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
