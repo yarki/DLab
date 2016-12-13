@@ -34,9 +34,11 @@ import java.util.Optional;
 
 import static com.epam.dlab.UserInstanceStatus.TERMINATED;
 import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Projections.excludeId;
+import static com.mongodb.client.model.Projections.elemMatch;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
+import static com.mongodb.client.model.Projections.excludeId;
+import static com.mongodb.client.model.Projections.exclude;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -101,6 +103,13 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                         fields(include(STATUS), excludeId()))
                         .orElse(new Document())
                         .getOrDefault(STATUS, EMPTY).toString());
+    }
+
+    public Optional<UserInstanceDTO> fetchExploratoryFields(String user, String exploratoryName) {
+        return findOne(USER_INSTANCES,
+                exploratoryCondition(user, exploratoryName),
+                fields(exclude(COMPUTATIONAL_RESOURCES)),
+                UserInstanceDTO.class);
     }
 
     public boolean insertExploratory(UserInstanceDTO dto) {

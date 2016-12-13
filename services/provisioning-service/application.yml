@@ -9,8 +9,6 @@ adminKey: BDCC-DSS-POC
 edgeImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-edge
 fileLengthCheckDelay: 500ms
 
-notebookImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter
-
 emrImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-emr
 emrEC2RoleDefault: EMR_EC2_DefaultRole
 emrServiceRoleDefault: EMR_DefaultRole

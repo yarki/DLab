@@ -150,6 +150,11 @@ class BaseDAO implements MongoCollections {
         return doc.isPresent() ? Optional.ofNullable(convertFromDocument(doc.get(), clazz)) : Optional.empty();
     }
 
+    protected <T> Optional<T> findOne(String collection, Bson eq, Bson projection, Class<T> clazz) {
+        Optional<Document> doc = findOne(collection, eq, projection);
+        return doc.isPresent() ? Optional.ofNullable(convertFromDocument(doc.get(), clazz)) : Optional.empty();
+    }
+
     Optional<Document> aggregateOne(String collection,
                                           List<? extends Bson> pipeline) {
         MongoIterable<Document> found = aggregate(collection, pipeline);
