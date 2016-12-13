@@ -1,6 +1,6 @@
 {
  "argv": [
-  "/opt/python/pythonPY_FULL/bin/pythonPY_VER",
+  "PYTHON_PATH",
   "-m",
   "ipykernel",
   "-f",
