@@ -71,7 +71,7 @@ export class ExploratoryEnvironmentCreateDialog {
     });
   }
 
-  createExploratoryEnvironment_btnClick($event, data, valid, index, shape) {
+  createExploratoryEnvironment_btnClick($event, data, valid, shape) {
     this.notebookExist = false;
     this.checkValidity = true;
 
@@ -80,7 +80,7 @@ export class ExploratoryEnvironmentCreateDialog {
       return false;
     }
 
-    this.model.setCreatingParams(this.model.exploratoryEnvironmentTemplates[index].version, data.environment_name, shape);
+    this.model.setCreatingParams(data.environment_name, shape);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
@@ -92,7 +92,7 @@ export class ExploratoryEnvironmentCreateDialog {
 
   open(params) {
     if (!this.bindDialog.isOpened) {
-      this.model = new ExploratoryEnvironmentCreateModel('', '', '', (response: Response) => {
+      this.model = new ExploratoryEnvironmentCreateModel('', '', '', '', (response: Response) => {
         if (response.status === HTTP_STATUS_CODES.OK) {
           this.close();
           this.buildGrid.emit();

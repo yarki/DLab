@@ -28,6 +28,7 @@ export class ExploratoryEnvironmentCreateModel {
   confirmAction: Function;
   selectedItemChanged: Function;
 
+  private environment_image: string;
   private environment_name: string;
   private environment_version: string;
   private environment_shape: string;
@@ -38,6 +39,7 @@ export class ExploratoryEnvironmentCreateModel {
   exploratoryEnvironmentTemplates: Array<ExploratoryEnvironmentVersionModel> = [];
 
   constructor(
+    environment_image: string,
     environment_name: string,
     environment_version: string,
     environment_shape: string,
@@ -50,12 +52,16 @@ export class ExploratoryEnvironmentCreateModel {
     this.userResourceService = userResourceService;
     this.selectedItemChanged = selectedItemChanged;
     this.continueWith = continueWith;
-    this.prepareModel(environment_name, environment_version, environment_shape, fnProcessResults, fnProcessErrors);
+    this.prepareModel(environment_image,
+      environment_name,
+      environment_version,
+      environment_shape,
+      fnProcessResults, fnProcessErrors);
     this.loadTemplates();
   }
 
   static getDefault(userResourceService): ExploratoryEnvironmentCreateModel {
-    return new ExploratoryEnvironmentCreateModel('', '', '', () => { }, () => { }, null, null, userResourceService);
+    return new ExploratoryEnvironmentCreateModel('', '', '', '', () => { }, () => { }, null, null, userResourceService);
   }
 
   public setSelectedItem(item: ExploratoryEnvironmentVersionModel) : void {
@@ -64,15 +70,21 @@ export class ExploratoryEnvironmentCreateModel {
 
   private createExploratoryEnvironment(): Observable<Response> {
     return this.userResourceService.createExploratoryEnvironment({
+      image: this.environment_image,
       name: this.environment_name,
       shape: this.environment_shape,
       version: this.environment_version
     });
   }
 
-  private prepareModel(environment_name: string, environment_version: string, environment_shape: string, fnProcessResults: any, fnProcessErrors: any): void {
+  private prepareModel(
+    environment_image: string,
+    environment_name: string,
+    environment_version: string,
+    environment_shape: string,
+    fnProcessResults: any, fnProcessErrors: any): void {
 
-    this.setCreatingParams(environment_version, environment_name, environment_shape);
+    this.setCreatingParams(environment_name, environment_shape);
     this.confirmAction = () => this.createExploratoryEnvironment()
       .subscribe((response: Response) => fnProcessResults(response), (response: Response) => fnProcessErrors(response));
   }
@@ -86,8 +98,9 @@ export class ExploratoryEnvironmentCreateModel {
     }
   }
 
-  public setCreatingParams(version, name, shape) : void {
-    this.environment_version = version;
+  public setCreatingParams(name, shape) : void {
+    this.environment_image = this.selectedItem.image;
+    this.environment_version = this.selectedItem.version;
     this.environment_name = name;
     this.environment_shape = shape;
   }

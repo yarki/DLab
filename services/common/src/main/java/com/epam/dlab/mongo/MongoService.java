@@ -19,29 +19,40 @@ limitations under the License.
 package com.epam.dlab.mongo;
 
 import com.mongodb.MongoClient;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
 public class MongoService {
     private MongoClient client;
-    private String database;
+    private String databaseName;
+    private MongoDatabase database;
 
     private static final Document PING = new Document("ping", "1");
 
-    public MongoService(MongoClient client, String database) {
+    public MongoService(MongoClient client,
+                        String databaseName,
+                        WriteConcern writeConcern) {
+        this(client, databaseName);
+        database = database.withWriteConcern(writeConcern);
+    }
+
+    public MongoService(MongoClient client, String databaseName) {
         this.client = client;
-        this.database = database;
+        this.databaseName = databaseName;
+        this.database = client.getDatabase(databaseName);
     }
 
     public MongoCollection<Document> getCollection(String name) {
-        return client.getDatabase(database).getCollection(name, Document.class);
+        return database.getCollection(name, Document.class);
     }
 
     public <T> MongoCollection<T> getCollection(String name, Class<T> c) {
-        return client.getDatabase(database).getCollection(name, c);
+        return database.getCollection(name, c);
     }
 
     public Document ping() {
-        return client.getDatabase(database).runCommand(PING);
+        return database.runCommand(PING);
     }
 }

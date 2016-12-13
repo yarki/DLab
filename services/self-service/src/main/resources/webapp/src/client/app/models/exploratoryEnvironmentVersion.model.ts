@@ -20,6 +20,7 @@ import { ImageType } from "./imageType.enum";
 import { ResourceShapeModel } from './resourceShape.model';
 
 export class ExploratoryEnvironmentVersionModel {
+  image: string;
   template_name: string;
   description: string;
   environment_type: ImageType;
@@ -29,6 +30,7 @@ export class ExploratoryEnvironmentVersionModel {
   shapes: Array<ResourceShapeModel>;
 
   constructor(jsonModel:any, shapes: Array<ResourceShapeModel>) {
+    this.image = jsonModel.image;
     this.template_name = jsonModel.template_name;
     this.description = jsonModel.description;
     this.environment_type = ImageType.EXPLORATORY;
