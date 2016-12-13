@@ -38,7 +38,7 @@ export class ComputationalResourceCreateDialog {
   shapes: any;
   computationalResourceExist: boolean = false;
   checkValidity: boolean = false;
-  clusterNamePattern: string = "[-_ a-zA-Z0-9]+";
+  clusterNamePattern: string = "[-_a-zA-Z0-9]+";
   nodeCountPattern: string = "^[1-9]\\d*$";
 
   processError: boolean = false;
@@ -73,6 +73,7 @@ export class ComputationalResourceCreateDialog {
       instance_number: ['1', [Validators.required, Validators.pattern(this.nodeCountPattern)]]
     });
   }
+
   private setDefaultParams(): void {
     this.shapes = {
       master_shape: this.model.selectedItem.shapes[0].type,
@@ -83,13 +84,22 @@ export class ComputationalResourceCreateDialog {
     this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'slave_shape', 'type');
   }
 
+  public isNumberKey($event): boolean {
+    let charCode = ($event.which) ? $event.which : $event.keyCode;
+      if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+        $event.preventDefault();
+        return false;
+      }
+      return true;
+  }
+
   public onUpdate($event): void {
     if($event.model.type === 'template') {
       this.model.setSelectedTemplate($event.model.index);
       this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'master_shape', 'type');
       this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'slave_shape', 'type');
     }
-    
+
     if(this.shapes[$event.model.type])
       this.shapes[$event.model.type] = $event.model.value.type;
   }

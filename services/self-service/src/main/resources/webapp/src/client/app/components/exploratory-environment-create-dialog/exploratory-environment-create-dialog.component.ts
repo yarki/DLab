@@ -38,7 +38,7 @@ export class ExploratoryEnvironmentCreateDialog {
   notebookExist: boolean = false;
   checkValidity: boolean = false;
   templateDescription: string;
-  namePattern = "[-_ a-zA-Z0-9]+";
+  namePattern = "[-_a-zA-Z0-9]+";
   resourceGrid: any;
   environment: any;
 

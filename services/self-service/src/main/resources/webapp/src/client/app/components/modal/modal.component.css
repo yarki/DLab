@@ -216,6 +216,16 @@ limitations under the License.
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.detail-header .tooltip-wrap {
+  background: #f6fafe;
+}
+.detail-header .tooltip-wrap .hint-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #455c74;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .helper_instruction:before {
   content: "?";
   display: inline-block;

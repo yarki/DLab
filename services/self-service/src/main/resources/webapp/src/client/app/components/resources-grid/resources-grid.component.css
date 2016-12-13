@@ -59,6 +59,8 @@ limitations under the License.
   font-weight: 600;
   font-size: 16px;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .dashboard_table tr:nth-child(2n+1){
   background: #f9fafb;
