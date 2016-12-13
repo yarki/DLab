@@ -23,6 +23,7 @@ import sys
 from dlab.fab import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
+import uuid
 
 
 # Function for creating AMI from already provisioned notebook
@@ -60,12 +61,17 @@ def run():
     create_aws_config_files()
     print 'Generating infrastructure names and tags'
     notebook_config = dict()
+    notebook_config['uuid'] = str(uuid.uuid4())[:5]
+    try:
+        notebook_config['exploratory_name'] = os.environ['exploratory_name']
+    except:
+        notebook_config['exploratory_name'] = ''
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
     notebook_config['instance_type'] = os.environ['notebook_instance_type']
     notebook_config['key_name'] = os.environ['creds_key_name']
     notebook_config['user_keyname'] = os.environ['notebook_user_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
-        'notebook_user_name'] + '-nb-' + str(provide_index('EC2', '{}-Tag'.format(os.environ['conf_service_base_name']), '{}-{}-nb'.format(os.environ['conf_service_base_name'], os.environ['notebook_user_name'])))
+        'notebook_user_name'] + "-" + notebook_config['exploratory_name'] + "-nb-" + notebook_config['uuid']
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-rstudio-notebook-image'
     notebook_config['role_profile_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
