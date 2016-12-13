@@ -27,7 +27,7 @@ from dlab.aws_actions import *
 
 
 def status():
-    local_log_filename = "{}.log".format(os.environ['request_id'])
+    local_log_filename = "edge_{0}_{1}.log".format(os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,

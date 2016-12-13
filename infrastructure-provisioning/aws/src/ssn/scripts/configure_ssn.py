@@ -55,11 +55,11 @@ def cp_key():
 
 def ensure_nginx():
     try:
-        if not exists('/tmp/nginx_ensured'):
+        if not exists('/opt/dlab/tmp/nginx_ensured'):
             sudo('apt-get -y install nginx')
             sudo('service nginx restart')
             sudo('sysv-rc-conf nginx on')
-            sudo('touch /tmp/nginx_ensured')
+            sudo('touch /opt/dlab/tmp/nginx_ensured')
         return True
     except:
         return False
@@ -122,12 +122,12 @@ def place_notebook_automation_scripts():
 
 def ensure_jenkins():
     try:
-        if not exists('/tmp/jenkins_ensured'):
+        if not exists('/opt/dlab/tmp/jenkins_ensured'):
             sudo('wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | apt-key add -')
             sudo('echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list')
             sudo('apt-get -y update')
             sudo('apt-get -y install jenkins')
-            sudo('touch /tmp/jenkins_ensured')
+            sudo('touch /opt/dlab/tmp/jenkins_ensured')
         return True
     except:
         return False
@@ -135,7 +135,7 @@ def ensure_jenkins():
 
 def configure_jenkins():
     try:
-        if not exists('/tmp/jenkins_configured'):
+        if not exists('/opt/dlab/tmp/jenkins_configured'):
             sudo('echo \'JENKINS_ARGS="--prefix=/jenkins --httpPort=8070"\' >> /etc/default/jenkins')
             sudo('rm -rf /var/lib/jenkins/*')
             sudo('mkdir -p /var/lib/jenkins/jobs/')
@@ -145,11 +145,32 @@ def configure_jenkins():
             sudo('/etc/init.d/jenkins stop; sleep 5')
             sudo('sysv-rc-conf jenkins on')
             sudo('service jenkins start')
-            sudo('touch /tmp/jenkins_configured')
+            sudo('touch /opt/dlab/tmp/jenkins_configured')
             sudo('echo "jenkins ALL = NOPASSWD:ALL" >> /etc/sudoers')
         return True
     except:
         return False
+
+
+def creating_service_directories():
+    try:
+        if not exists('/opt/dlab/'):
+            sudo('mkdir -p /opt/dlab/')
+            sudo('mkdir -p /opt/dlab/webapp/lib')
+            sudo('mkdir -p /opt/dlab/webapp/static')
+            sudo('mkdir -p /opt/dlab/template')
+            sudo('mkdir -p /opt/dlab/tmp')
+            sudo('mkdir -p /opt/dlab/tmp/result')
+            sudo('mkdir -p /var/opt/dlab/log/ssn')
+            sudo('mkdir -p /var/opt/dlab/log/edge')
+            sudo('mkdir -p /var/opt/dlab/log/notebook')
+            sudo('mkdir -p /var/opt/dlab/log/emr')
+            sudo('ln -s /opt/dlab/conf /etc/opt/dlab')
+            sudo('ln -s /var/opt/dlab/log /var/log/dlab')
+        return True
+    except:
+        return False
+
 
 
 ##############
@@ -164,6 +185,10 @@ if __name__ == "__main__":
         deeper_config = json.loads(args.additional_config)
     except:
         sys.exit(2)
+
+    print "Creating service directories."
+    if not creating_service_directories():
+        sys.exit(1)
 
     print "Installing nginx as frontend."
     if not ensure_nginx():

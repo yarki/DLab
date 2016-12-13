@@ -43,12 +43,12 @@ logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
 
 def ensure_mongo():
     try:
-        if not exists('/tmp/mongo_ensured'):
+        if not exists('/opt/dlab/tmp/mongo_ensured'):
             sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927')
             sudo('ver=`lsb_release -cs`; echo "deb http://repo.mongodb.org/apt/ubuntu $ver/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list; apt-get update')
             sudo('apt-get -y install mongodb-org')
             sudo('sysv-rc-conf mongod on')
-            sudo('touch /tmp/mongo_ensured')
+            sudo('touch /opt/dlab/tmp/mongo_ensured')
         return True
     except:
         return False
@@ -69,7 +69,7 @@ def configure_mongo():
 
 def start_ss():
     try:
-        if not exists('/tmp/ss_started'):
+        if not exists('/opt/dlab/tmp/ss_started'):
             put('/root/templates/proxy_location_webapp_template.conf', '/tmp/proxy_location_webapp_template.conf')
             sudo('cp /tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
             sudo('mkdir -p ' + web_path)
@@ -91,7 +91,7 @@ def start_ss():
             run('screen -d -m java -Xmx1024M -jar ' + web_path + 'security-service/security-service-1.0.jar server ' + web_path + 'security-service/application.yml; sleep 5')
             run('screen -d -m java -Xmx1024M -jar ' + web_path + 'provisioning-service/provisioning-service-1.0.jar server ' + web_path + 'provisioning-service/application.yml; sleep 5')
             sudo('service nginx restart')
-            sudo('touch /tmp/ss_started')
+            sudo('touch /opt/dlab/tmp/ss_started')
         return True
     except:
         return False

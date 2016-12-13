@@ -33,7 +33,7 @@ args = parser.parse_args()
 
 def ensure_docker_daemon():
     try:
-        if not exists('/tmp/docker_daemon_ensured'):
+        if not exists('/opt/dlab/tmp/docker_daemon_ensured'):
             sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D')
             sudo('echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" | sudo tee /etc/apt/sources.list.d/docker.list')
             sudo('apt-get update')
@@ -41,7 +41,7 @@ def ensure_docker_daemon():
             sudo('apt-get install -y docker-engine')
             sudo('usermod -a -G docker ubuntu')
             sudo('sysv-rc-conf docker on')
-            sudo('touch /tmp/docker_daemon_ensured')
+            sudo('touch /opt/dlab/tmp/docker_daemon_ensured')
         return True
     except:
         return False
