@@ -156,6 +156,7 @@ def creating_service_directories():
     try:
         if not exists('/opt/dlab/'):
             sudo('mkdir -p /opt/dlab/')
+            sudo('mkdir -p /opt/dlab/conf')
             sudo('mkdir -p /opt/dlab/webapp/lib')
             sudo('mkdir -p /opt/dlab/webapp/static')
             sudo('mkdir -p /opt/dlab/template')
