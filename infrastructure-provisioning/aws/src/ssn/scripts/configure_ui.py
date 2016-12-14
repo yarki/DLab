@@ -44,7 +44,9 @@ def ensure_supervisor():
     try:
         if not exists('/tmp/superv_ensured'):
             sudo('apt-get -y install supervisor')
-            sudo('sysv-rc-conf supervisor on')
+            #sudo('sysv-rc-conf supervisor on')
+            sudo('update-rc.d supervisor defaults')
+            sudo('update-rc.d supervisor enable')
             sudo('touch /tmp/superv_ensured')
         return True
     except:
