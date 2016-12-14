@@ -23,6 +23,8 @@ import sys
 from dlab.fab import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
+import os
+import uuid
 
 
 # Function for creating AMI from already provisioned notebook
@@ -60,12 +62,18 @@ def run():
     create_aws_config_files()
     print 'Generating infrastructure names and tags'
     notebook_config = dict()
+    notebook_config['uuid'] = str(uuid.uuid4())[:5]
+    try:
+        notebook_config['exploratory_name'] = os.environ['exploratory_name']
+    except:
+        notebook_config['exploratory_name'] = ''
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
     notebook_config['instance_type'] = os.environ['notebook_instance_type']
     notebook_config['key_name'] = os.environ['creds_key_name']
     notebook_config['user_keyname'] = os.environ['notebook_user_name']
-    notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
-        'notebook_user_name'] + '-nb-' + str(provide_index('EC2', '{}-Tag'.format(os.environ['conf_service_base_name']), '{}-{}-nb'.format(os.environ['conf_service_base_name'], os.environ['notebook_user_name'])))
+    # notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
+    #     'notebook_user_name'] + '-nb-' + str(provide_index('EC2', '{}-Tag'.format(os.environ['conf_service_base_name']), '{}-{}-nb'.format(os.environ['conf_service_base_name'], os.environ['notebook_user_name'])))
+    notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ['notebook_user_name'] + "-nb-" + notebook_config['exploratory_name'] + "-" + notebook_config['uuid']
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-notebook-image'
     notebook_config['role_profile_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
@@ -201,13 +209,13 @@ def run():
         sys.exit(1)
 
     # checking the need for image creation
-    #ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
-    #if ami_id == '':
-    #    print "Looks like it's first time we configure notebook server. Creating image."
-    #    image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
-    #                                          image_name=notebook_config['expected_ami_name'])
-    #    if image_id != '':
-    #        print "Image was successfully created. It's ID is " + image_id
+    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
+    if ami_id == '':
+        print "Looks like it's first time we configure notebook server. Creating image."
+        image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
+                                              image_name=notebook_config['expected_ami_name'])
+        if image_id != '':
+            print "Image was successfully created. It's ID is " + image_id
 
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')

@@ -71,10 +71,11 @@ limitations under the License.
 }
 .modal .btn-success {
   margin-left: 40px;
+  margin-right: 2px;
 }
 .modal-content {
   border-radius: 3px;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 .modal-header .close {
   margin-top: 3px;
@@ -149,7 +150,7 @@ limitations under the License.
   margin: 10% auto;
 }
 
-modal-content {
+.modal-content {
   display: block;
 }
 
@@ -209,6 +210,16 @@ modal-content {
 }
 .detail-header .modal-title {
   background: #f6fafe;
+  font-size: 16px;
+  font-weight: 600;
+  color: #455c74;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-header .tooltip-wrap {
+  background: #f6fafe;
+}
+.detail-header .tooltip-wrap .hint-title {
   font-size: 16px;
   font-weight: 600;
   color: #455c74;

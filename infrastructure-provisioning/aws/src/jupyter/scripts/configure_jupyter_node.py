@@ -94,10 +94,7 @@ def ensure_python3_kernel():
             sudo('apt install -y python3-pip')
             sudo('pip3 install ipython ipykernel --no-cache-dir')
             sudo('python3 -m ipykernel install')
-            sudo('add-apt-repository -y ppa:fkrull/deadsnakes')
-            sudo('apt update')
-            sudo('apt install -y python3.4 python3.4-dev')
-            sudo('python3.4 -m pip install ipython ipykernel  --upgrade --no-cache-dir')
+            sudo('apt-get install -y libssl-dev python-virtualenv')
             sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
         except:
             sys.exit(1)
@@ -131,7 +128,7 @@ def ensure_r_kernel():
             #sudo('update-java-alternatives -s java-8-oracle')
             #sudo('apt-get install oracle-java8-set-default')
             sudo('R CMD javareconf')
-            sudo('git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
+            sudo('cd /root; git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
             sudo('R -e "install.packages(\'R6\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'pbdZMQ\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'RCurl\',repos=\'http://cran.us.r-project.org\')"')
@@ -146,7 +143,6 @@ def ensure_r_kernel():
             # sudo('export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin; R -e \'IRkernel::installspec(user = FALSE)\'')
             # Spark Install
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
-            #sudo('a=`R --version | awk \'/version / {print $3}\'`; sed -i "/display_name/ s/\"R\"/\"R v$a\"/" /home/ubuntu/.local/share/jupyter/kernels/ir/kernel.json')
             #sudo('export SPARK_HOME=/usr/local/spark/; cd $SPARK_HOME/R/lib/; sudo R --no-site-file --no-environ --no-save --no-restore CMD INSTALL "SparkR"')
             sudo('touch /home/ubuntu/.ensure_dir/r_kernel_ensured')
         except:
@@ -162,7 +158,8 @@ def configure_notebook_server(notebook_name):
             sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
             sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
-            sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() + '"\' >> ' + jupyter_conf_file)
+            sudo('echo \'c.NotebookApp.cookie_secret = b"' + id_generator() + '"\' >> ' + jupyter_conf_file)
+            sudo('''echo "c.NotebookApp.token = u''" >> ''' + jupyter_conf_file)
         except:
             sys.exit(1)
 
@@ -186,7 +183,14 @@ def configure_notebook_server(notebook_name):
         ensure_s3_kernel()
 
         ensure_r_kernel()
-
+    else:
+        try:
+            sudo("sed -i '/^c.NotebookApp.base_url/d' " + jupyter_conf_file)
+            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
+            sudo("systemctl stop jupyter-notebook; sleep 5")
+            sudo("systemctl start jupyter-notebook")
+        except:
+            sys.exit(1)
 
 ##############
 # Run script #

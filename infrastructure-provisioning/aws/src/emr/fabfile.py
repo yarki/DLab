@@ -19,10 +19,25 @@
 # ******************************************************************************
 
 import json
+import time
+from fabric.api import *
 from dlab.fab import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import sys
+import os
+import uuid
+import logging
+
+
+def emr_waiter(tag_name):
+    if len(get_emr_list(tag_name, 'Value', False, True)) > 0 or os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
+        with hide('stderr', 'running', 'warnings'):
+            local("echo 'Some EMR cluster is still being created, waiting..'")
+        time.sleep(60)
+        emr_waiter(tag_name)
+    else:
+        return True
 
 
 def run():
@@ -31,11 +46,26 @@ def run():
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.INFO,
                         filename=local_log_filepath)
-
+    try:
+        os.environ['exploratory_name']
+    except:
+        os.environ['exploratory_name'] = ''
+    if os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
+        time.sleep(30)
     create_aws_config_files()
-    index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag', '{}-{}-emr'.format(os.environ['conf_service_base_name'], os.environ['edge_user_name']))
+    #index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag', '{}-{}-emr'.format(os.environ['conf_service_base_name'], os.environ['edge_user_name']))
+    #time_stamp = int(time.time())
     print 'Generating infrastructure names and tags'
     emr_conf = dict()
+    emr_conf['uuid'] = str(uuid.uuid4())[:5]
+    try:
+        emr_conf['exploratory_name'] = os.environ['exploratory_name']
+    except:
+        emr_conf['exploratory_name'] = ''
+    try:
+        emr_conf['computational_name'] = os.environ['computational_name']
+    except:
+        emr_conf['computational_name'] = ''
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
     emr_conf['service_base_name'] = os.environ['conf_service_base_name']
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
@@ -49,10 +79,14 @@ def run():
     emr_conf['role_service_name'] = os.environ['emr_service_role']
     emr_conf['role_ec2_name'] = os.environ['emr_ec2_role']
 
-    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index) + ', ' \
-                       + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index)\
+    #emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp) + ', ' \
+    #                   + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)\
+    #                   + ', Notebook=' + os.environ['notebook_name']
+    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid'] + ', ' \
+                       + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']\
                        + ', Notebook=' + os.environ['notebook_name']
-    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index)
+    #emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)
+    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
 
     tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
@@ -75,6 +109,16 @@ def run():
           json.dumps(emr_conf, sort_keys=True, indent=4, separators=(',', ': '))
     logging.info(json.dumps(emr_conf))
 
+    try:
+        emr_waiter(os.environ['notebook_name'])
+        local('touch /response/.emr_creating_' + os.environ['exploratory_name'])
+    except:
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "EMR waiter fail", "conf": emr_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
     with hide('stderr', 'running', 'warnings'):
         local("echo Waiting for changes to propagate; sleep 10")
 
@@ -95,7 +139,9 @@ def run():
 
         cluster_name = emr_conf['cluster_name']
         keyfile_name = "/root/keys/%s.pem" % emr_conf['key_name']
+        local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
     except:
+        local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
         sys.exit(1)
 
     try:

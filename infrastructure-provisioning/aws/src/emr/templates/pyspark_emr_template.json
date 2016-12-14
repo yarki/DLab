@@ -1,6 +1,6 @@
 {
  "argv": [
-  "/usr/bin/pythonPY_FULL",
+  "PYTHON_PATH",
   "-m",
   "ipykernel",
   "-f",

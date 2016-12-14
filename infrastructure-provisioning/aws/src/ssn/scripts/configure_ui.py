@@ -32,13 +32,25 @@ parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
-
+dlab_conf_dir='/etc/opt/dlab'
 web_path = '/tmp/web_app/'
 local_log_filename = "{}_UI.log".format(os.environ['request_id'])
 local_log_filepath = "/response/" + local_log_filename
 logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                     level=logging.INFO,
                     filename=local_log_filepath)
+
+def ensure_supervisor():
+    try:
+        if not exists('/tmp/superv_ensured'):
+            sudo('apt-get -y install supervisor')
+            #sudo('sysv-rc-conf supervisor on')
+            sudo('update-rc.d supervisor defaults')
+            sudo('update-rc.d supervisor enable')
+            sudo('touch /tmp/superv_ensured')
+        return True
+    except:
+        return False
 
 
 def ensure_mongo():
@@ -70,26 +82,32 @@ def configure_mongo():
 def start_ss():
     try:
         if not exists('/opt/dlab/tmp/ss_started'):
+            supervisor_conf = '/etc/supervisor/conf.d/supervisor_svc.conf'
             put('/root/templates/proxy_location_webapp_template.conf', '/tmp/proxy_location_webapp_template.conf')
+            put('/root/templates/supervisor_svc.conf', '/tmp/supervisor_svc.conf')
             sudo('cp /tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
+            sudo('cp /tmp/supervisor_svc.conf {}'.format(supervisor_conf))
+
+            sudo('sed -i \'s=WEB_APP_DIR={}=\' {}'.format(web_path, supervisor_conf))
+
+            sudo('mkdir -p /var/log/application')
             sudo('mkdir -p ' + web_path)
             sudo('mkdir -p ' + web_path + 'provisioning-service/')
             sudo('mkdir -p ' + web_path + 'security-service/')
             sudo('mkdir -p ' + web_path + 'self-service/')
             sudo('chown -R ubuntu:ubuntu ' + web_path)
             try:
-                local('scp -i {} /root/web_app/self-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'self-service/')
-                local('scp -i {} /root/web_app/security-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'security-service/')
-                local('scp -i {} /root/web_app/provisioning-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'provisioning-service/')
+                local('scp -r -i {} /root/web_app/self-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'self-service/')
+                local('scp -r -i {} /root/web_app/security-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'security-service/')
+                local('scp -r -i {} /root/web_app/provisioning-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'provisioning-service/')
             except:
                 with open("/root/result.json", 'w') as result:
                     res = {"error": "Unable to upload webapp jars", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
                 sys.exit(1)
-            run('screen -d -m java -Xmx1024M -jar ' + web_path + 'self-service/self-service-1.0.jar server ' + web_path + 'self-service/application.yml; sleep 5')
-            run('screen -d -m java -Xmx1024M -jar ' + web_path + 'security-service/security-service-1.0.jar server ' + web_path + 'security-service/application.yml; sleep 5')
-            run('screen -d -m java -Xmx1024M -jar ' + web_path + 'provisioning-service/provisioning-service-1.0.jar server ' + web_path + 'provisioning-service/application.yml; sleep 5')
+
+            sudo('service supervisor start')
             sudo('service nginx restart')
             sudo('touch /opt/dlab/tmp/ss_started')
         return True
@@ -109,6 +127,11 @@ if __name__ == "__main__":
     except:
         sys.exit(2)
 
+    print "Installing Supervisor"
+    if not ensure_supervisor():
+        logging.error('Failed to install Supervisor')
+        sys.exit(1)
+
     print "Installing MongoDB"
     if not ensure_mongo():
         logging.error('Failed to install MongoDB')
@@ -118,6 +141,9 @@ if __name__ == "__main__":
     if not configure_mongo():
         logging.error('MongoDB configuration script has failed.')
         sys.exit(1)
+
+    sudo('echo DLAB_CONF_DIR={} >> /etc/profile'.format(dlab_conf_dir))
+    sudo('echo export DLAB_CONF_DIR >> /etc/profile')
 
     print "Starting Self-Service(UI)"
     if not start_ss():
