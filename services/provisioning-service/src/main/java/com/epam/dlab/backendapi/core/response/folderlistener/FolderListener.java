@@ -88,13 +88,13 @@ public class FolderListener implements Runnable {
                     LOGGER.debug("Timeout expired for FolderListener directory {}", directoryName);
                     break;
                 }
-                if (handleCalled) {
+                /*if (handleCalled) {
                 	handleCalled = false;
                 	if (!success) {
                 		LOGGER.warn("Either could not receive a response, or there was an error during response processing");
                 		fileHandlerCallback.handleError();
                 	}
-                }
+                }*/
             }
             LOGGER.debug("Closing a watcher for directory {}", directoryName);
         } catch (Exception e) {
@@ -106,6 +106,6 @@ public class FolderListener implements Runnable {
     private void handleFileAsync(String fileName) {
         CompletableFuture
                 .supplyAsync(new AsyncFileHandler(fileName, directory, fileHandlerCallback, fileLengthCheckDelay))
-                .thenAccept(result -> success = success || result);
+                /*.thenAccept(result -> success = success || result)*/;
     }
 }
