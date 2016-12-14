@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -134,6 +135,9 @@ public class DlabProcess {
 
     public void setProcessTimeout(long time, TimeUnit unit) {
         this.expirationTime = unit.toMillis(time);
+    }
+    public void setProcessTimeout(Duration duration) {
+        this.expirationTime = duration.toMillis();
     }
 
 }

@@ -13,6 +13,10 @@ emrImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-emr
 emrEC2RoleDefault: EMR_EC2_DefaultRole
 emrServiceRoleDefault: EMR_DefaultRole
 
+processMaxThreadsPerJvm: 50
+processMaxThreadsPerUser: 5
+processTimeout: 180m
+
 selfService:
   protocol: http
   host: localhost

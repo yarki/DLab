@@ -80,6 +80,25 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     @JsonProperty(SELF_SERVICE)
     private RESTServiceFactory selfFactory = new RESTServiceFactory();
 
+    @JsonProperty
+    private int processMaxThreadsPerJvm = 50;
+    @JsonProperty
+    private int processMaxThreadsPerUser = 5;
+    @JsonProperty
+    private Duration processTimeout = Duration.hours(3);
+
+    public int getProcessMaxThreadsPerJvm() {
+        return processMaxThreadsPerJvm;
+    }
+
+    public int getProcessMaxThreadsPerUser() {
+        return processMaxThreadsPerUser;
+    }
+
+    public Duration getProcessTimeout() {
+        return processTimeout;
+    }
+
     public String getKeyDirectory() {
         return keyDirectory;
     }
