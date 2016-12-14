@@ -35,7 +35,7 @@ export class ExploratoryEnvironmentCreateModel {
   private userResourceService: UserResourceService;
   private continueWith: Function;
 
-  selectedItem: ExploratoryEnvironmentVersionModel = new ExploratoryEnvironmentVersionModel({}, []);
+  selectedItem: ExploratoryEnvironmentVersionModel = new ExploratoryEnvironmentVersionModel('', {}, []);
   exploratoryEnvironmentTemplates: Array<ExploratoryEnvironmentVersionModel> = [];
 
   constructor(
@@ -120,7 +120,8 @@ export class ExploratoryEnvironmentCreateModel {
               shapeArr.push(new ResourceShapeModel(shapeJson[index]));
 
             for (let index = 0; index < exploratoryJson.length; index++)
-              this.exploratoryEnvironmentTemplates.push(new ExploratoryEnvironmentVersionModel(exploratoryJson[index], shapeArr));
+              this.exploratoryEnvironmentTemplates.push(
+                new ExploratoryEnvironmentVersionModel(data[parentIndex].image, exploratoryJson[index], shapeArr));
           }
           if(this.exploratoryEnvironmentTemplates.length > 0)
             this.setSelectedTemplate(0);
