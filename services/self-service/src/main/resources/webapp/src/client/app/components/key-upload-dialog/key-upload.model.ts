@@ -59,7 +59,7 @@ export class KeyUploadDialogModel {
 
   private getLabel(file : File): string {
     if (file)
-      return !this.accessKeyFormValid ? ".pub file is required." : file.name;
+      return !this.accessKeyFormValid ? "Public key is required." : file.name;
     return '';
   }
 
@@ -71,9 +71,8 @@ export class KeyUploadDialogModel {
 
   setUserAccessKey(accessKey: File) : void {
     if(accessKey && (this.accessKeyFormValid = this.isValidKey(accessKey.name))) {
-
       this.newAccessKeyForUpload = accessKey;
-      this.accessKeyLabel = this.getLabel(this.newAccessKeyForUpload)
     }
+    this.accessKeyLabel = this.getLabel(accessKey);
   }
 }

@@ -16,34 +16,17 @@ limitations under the License.
 
 ****************************************************************************/
 
-import {Modal} from "./modal.component";
-import {CommonModule} from "@angular/common";
-import {NgModule, Component} from "@angular/core";
+import { NgModule, Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { MultiSelectDropdown } from "./multi-select-dropdown.component";
+import { ClickOutsideModule } from '../../../directives/click-outside/index';
 
-export * from "./modal.component";
-
-@Component({
-    selector: "modal-header",
-    template: `<ng-content></ng-content>`
-})
-export class ModalHeader { }
-
-@Component({
-    selector: "modal-content",
-    template: `<ng-content></ng-content>`
-})
-export class ModalContent { }
-
-@Component({
-    selector: "modal-footer",
-    template: `<ng-content></ng-content>`
-})
-export class ModalFooter { }
-
+export * from "./multi-select-dropdown.component";
 
 @NgModule({
-    imports: [CommonModule],
-    declarations: [Modal, ModalHeader, ModalContent, ModalFooter],
-    exports: [Modal, ModalHeader, ModalContent, ModalFooter]
+  imports: [CommonModule, ClickOutsideModule],
+  declarations: [MultiSelectDropdown],
+  exports: [MultiSelectDropdown]
 })
-export class ModalModule { }
+
+export class MultiSelectDropdownModule { }
