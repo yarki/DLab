@@ -25,6 +25,14 @@ selfService:
     timeout: 3s
     connectionTimeout: 3s
 
+securityService:
+  protocol: http
+  host: localhost
+  port: 8090
+  jerseyClient:
+    timeout: 10s
+    connectionTimeout: 10s
+
 server:
   applicationConnectors:
     - type: http

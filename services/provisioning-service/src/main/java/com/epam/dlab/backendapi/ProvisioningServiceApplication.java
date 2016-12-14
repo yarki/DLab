@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi;
 
+import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.core.DirectoriesCreator;
 import com.epam.dlab.backendapi.core.DockerWarmuper;
 import com.epam.dlab.backendapi.core.MetadataHolder;
@@ -48,6 +49,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         DlabProcess.getInstance().setMaxProcessesPerUser(configuration.getProcessMaxThreadsPerUser());
         environment.lifecycle().manage(injector.getInstance(DirectoriesCreator.class));
         environment.lifecycle().manage(injector.getInstance(DockerWarmuper.class));
+        injector.getInstance(SecurityFactory.class).configure(injector, environment);
         JerseyEnvironment jersey = environment.jersey();
         jersey.register(new RuntimeExceptionMapper());
         jersey.register(new JsonProcessingExceptionMapper());
@@ -57,6 +59,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         jersey.register(injector.getInstance(ExploratoryResource.class));
         jersey.register(injector.getInstance(ComputationalResource.class));
         jersey.register(injector.getInstance(InfrastructureResource.class));
+
     }
 
     private Injector createInjector(ProvisioningServiceApplicationConfiguration configuration, Environment environment) {
