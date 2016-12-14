@@ -64,9 +64,10 @@ public class FolderListener implements Runnable {
         String directoryName = directoryPath.toAbsolutePath().toString();
         boolean handleCalled = false;
         int retryCount = 0;
+        int retryContMax = 1200;
         
         LOGGER.debug("Registers a new watcher for directory {} with timeout {} sec", directoryName, timeout.toSeconds());
-        while ( retryCount < 10 ) {
+        while ( retryCount < retryContMax ) {
 	        try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
 	            directoryPath.register(watcher, ENTRY_CREATE);
 	            LOGGER.debug("Registered a new watcher for directory {}", directoryName);
@@ -103,8 +104,8 @@ public class FolderListener implements Runnable {
 	            }
 	            LOGGER.debug("Closing a watcher for directory {}", directoryName);
 	        } catch (NoSuchFileException e) {
-				LOGGER.warn("FolderListenerExecutor exception for folder {}. Waits one second.", directoryName, e);
 		        retryCount++;
+				LOGGER.warn("FolderListenerExecutor exception for folder {}. Waits one second, attempt {}. Error: {}", directoryName, retryContMax, e);
 		        continue;
 			} catch (InterruptedException e) {
 				LOGGER.debug("Closing a watcher for directory {} has been interrupted", directoryName);
