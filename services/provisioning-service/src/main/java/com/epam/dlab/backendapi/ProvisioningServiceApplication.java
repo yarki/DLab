@@ -22,6 +22,7 @@ import com.epam.dlab.backendapi.core.DirectoriesCreator;
 import com.epam.dlab.backendapi.core.DockerWarmuper;
 import com.epam.dlab.backendapi.core.MetadataHolder;
 import com.epam.dlab.backendapi.resources.*;
+import com.epam.dlab.process.DlabProcess;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.mappers.JsonProcessingExceptionMapper;
 import com.epam.dlab.rest.mappers.RuntimeExceptionMapper;
@@ -42,6 +43,9 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
     @Override
     public void run(ProvisioningServiceApplicationConfiguration configuration, Environment environment) throws Exception {
         Injector injector = createInjector(configuration, environment);
+        DlabProcess.getInstance().setProcessTimeout(configuration.getProcessTimeout());
+        DlabProcess.getInstance().setMaxProcessesPerBox(configuration.getProcessMaxThreadsPerJvm());
+        DlabProcess.getInstance().setMaxProcessesPerUser(configuration.getProcessMaxThreadsPerUser());
         environment.lifecycle().manage(injector.getInstance(DirectoriesCreator.class));
         environment.lifecycle().manage(injector.getInstance(DockerWarmuper.class));
         JerseyEnvironment jersey = environment.jersey();

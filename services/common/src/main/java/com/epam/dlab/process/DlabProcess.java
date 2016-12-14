@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import io.dropwizard.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -137,7 +137,7 @@ public class DlabProcess {
         this.expirationTime = unit.toMillis(time);
     }
     public void setProcessTimeout(Duration duration) {
-        this.expirationTime = duration.toMillis();
+        this.expirationTime = duration.toMilliseconds();
     }
 
 }
