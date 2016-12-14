@@ -66,7 +66,7 @@ public class FolderListener implements Runnable {
             directoryPath.register(watcher, ENTRY_CREATE);
             LOGGER.debug("Registered a new watcher for directory {} with timeout {} sec", directoryName, timeout.toSeconds());
 
-            long endTimeout = System.currentTimeMillis() + timeout.toSeconds();
+            long endTimeout = System.currentTimeMillis() + timeout.toMilliseconds();
             while (true) {
                 final WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
                 if (watchKey != null) {
