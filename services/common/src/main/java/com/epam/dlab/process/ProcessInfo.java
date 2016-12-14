@@ -41,7 +41,7 @@ public class ProcessInfo {
         this.exitCode       = exitCode;
         this.startTimeStamp = startTimeStamp;
         this.infoTimeStamp  = infoTimeStamp;
-        this.pid = pid;
+        this.pid            = pid;
 
         if(rejected != null && rejected.size() > 0) {
             Collection<ProcessInfo> r = new ArrayList<>();
@@ -87,6 +87,10 @@ public class ProcessInfo {
 
     public ProcessId getId() {
         return id;
+    }
+
+    public int getPid() {
+        return pid;
     }
 
     public Collection<ProcessInfo> getRejectedCommands() {
