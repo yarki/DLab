@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.MetadataHolder;
 import com.epam.dlab.backendapi.core.commands.CommandBuilder;
@@ -27,6 +28,7 @@ import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageType;
 import com.google.inject.Inject;
+import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,10 +64,11 @@ public class DockerResource implements DockerCommands {
 
     @Path("/run")
     @POST
-    public String run(String image) throws IOException, InterruptedException {
+    public String run(@Auth UserInfo ui,String image) throws IOException, InterruptedException {
         LOGGER.debug("run docker image {}", image);
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(
+                ui.getName(),
                 new RunDockerCommand()
                         .withName(nameContainer("image", "runner"))
                         .withVolumeForRootKeys(configuration.getKeyDirectory())

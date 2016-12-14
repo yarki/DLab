@@ -61,7 +61,7 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
     @Inject
     private RESTService selfService;
 
-    public String uploadKey(UploadFileDTO dto) throws IOException, InterruptedException {
+    public String uploadKey(String username, UploadFileDTO dto) throws IOException, InterruptedException {
         saveKeyToFile(dto);
         String uuid = DockerCommands.generateUUID();
         EdgeCreateDTO edgeDto = dto.getEdge();
@@ -69,6 +69,7 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
                                      configuration.getKeyLoaderPollTimeout(),
                                      getFileHandlerCallback(edgeDto.getIamUser(), uuid));
         commandExecuter.executeAsync(
+                username,
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withName(nameContainer(edgeDto.getEdgeUserName(), "create", "edge"))

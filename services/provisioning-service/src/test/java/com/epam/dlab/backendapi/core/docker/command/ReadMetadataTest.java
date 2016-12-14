@@ -36,7 +36,7 @@ public class ReadMetadataTest {
 
 
     @Test
-    public void readEmrMetadataTest() throws IOException {
+    public void readEmrMetadataTest() throws Exception {
         ImageMetadataDTO imageMetadataDTO = MAPPER.readValue(
                 readTestResource(EMR_METADATA_DESCRIPTION_JSON),
                 ComputationalMetadataDTO.class);
@@ -45,15 +45,22 @@ public class ReadMetadataTest {
     }
 
     @Test
-    public void readJupiterMetadataTest() throws IOException {
+    public void readJupiterMetadataTest() throws Exception {
         ImageMetadataDTO imageMetadataDTO = MAPPER.readValue(
                 readTestResource(JUPITER_METADATA_DESCRIPTION_JSON),
                 ExploratoryMetadataDTO.class);
         Assert.assertNotNull(imageMetadataDTO);
     }
 
-    private String readTestResource(String testResourceName) throws IOException {
-        String file = getClass().getResource(testResourceName).getFile();
-        return new String(Files.readAllBytes(Paths.get(file)));
+    private String readTestResource(String testResourceName) throws Exception {
+        System.out.println(testResourceName);
+        String path = testResourceName;
+        if( System.getProperty( "os.name" ).contains( "indow" )) {
+            path = getClass().getResource(testResourceName).toURI().toString().replace("file:/C:/", "C:/").replaceAll("/","\\\\");
+        } else {
+            path = getClass().getResource(testResourceName).getFile();
+        }
+        System.out.println(path);
+        return new String(Files.readAllBytes(Paths.get(path)));
     }
 }

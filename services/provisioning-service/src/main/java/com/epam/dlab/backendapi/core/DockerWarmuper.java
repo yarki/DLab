@@ -60,7 +60,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
         folderListenerExecutor.start(configuration.getWarmupDirectory(),
                 configuration.getWarmupPollTimeout(),
                 getFileHandlerCallback());
-        List<String> images = commandExecutor.executeSync(GET_IMAGES);
+        List<String> images = commandExecutor.executeSync("warmup",GET_IMAGES);
         for (String image : images) {
             LOGGER.debug("image: {}", image);
             String uuid = UUID.randomUUID().toString();
@@ -71,7 +71,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
                     .withRequestId(uuid)
                     .withActionDescribe(image)
                     .toCMD();
-            commandExecutor.executeAsync(command);
+            commandExecutor.executeAsync("warmup",command);
         }
     }
 

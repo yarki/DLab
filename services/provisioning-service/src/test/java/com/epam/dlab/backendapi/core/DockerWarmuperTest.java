@@ -99,7 +99,7 @@ public class DockerWarmuperTest {
     private CommandExecutor createCommandExecuter() {
         CommandExecutor result = mock(CommandExecutor.class);
         try {
-            when(result.executeSync(anyString())).thenReturn(Collections.singletonList("executeResult"));
+            when(result.executeSync(anyString(),anyString())).thenReturn(Collections.singletonList("executeResult"));
         } catch (Exception e) {
             e.printStackTrace();
         }
