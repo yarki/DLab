@@ -19,15 +19,11 @@ limitations under the License.
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -64,13 +60,11 @@ public class FolderListener implements Runnable {
     private void pollFile() {
         Path directoryPath = Paths.get(directory);
         String directoryName = directoryPath.toAbsolutePath().toString();
-        success = false;
         
         try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
-            directoryPath.register(watcher, ENTRY_CREATE, ENTRY_MODIFY);
+            directoryPath.register(watcher, ENTRY_CREATE);
             LOGGER.debug("Registered a new watcher for directory {} with timeout {} sec", directoryName, timeout.toSeconds());
 
-            Map<String, Integer> fileList = new HashMap<String, Integer>();
             long endTimeout = System.currentTimeMillis() + timeout.toSeconds();
             while (true) {
                 final WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
@@ -81,29 +75,17 @@ public class FolderListener implements Runnable {
                         
                         if (kind == ENTRY_CREATE) {
                             if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
-                           		fileList.put(fileName, 0);
-                           		LOGGER.debug("Response file {}/{} created.", directory, fileName);
-                            } else {
-                            	LOGGER.trace("Response file {}/{} skipped", directory, fileName);
-                            }
-                        } else if (kind == ENTRY_MODIFY) {
-                           	Integer eventCount = fileList.get(fileName);
-                           	if (eventCount != null) {
-                           		LOGGER.debug("Response file {}/{} is processed ...", directory, fileName);
-                            	fileList.remove(fileName);
                                 handleFileAsync(fileName);
+                                if (!success) {
+                                    LOGGER.warn("Either could not receive a response, or there was an error during response processing");
+                                    fileHandlerCallback.handleError();
+                                }
                            	}
                         }
                     }
-                    if (!watchKey.reset()) {
-                        break;
-                    }
-                } else if (!success) {
-                    LOGGER.warn("Either could not receive a response, or there was an error during response processing");
-                    fileHandlerCallback.handleError();
-                    break;
+                    watchKey.reset();
                 }
-                if ( endTimeout > System.currentTimeMillis() ) {
+                if ( endTimeout < System.currentTimeMillis() ) {
                     LOGGER.debug("Timeout expired for FolderListener directory {}", directoryName);
                     break;
                 }
@@ -118,6 +100,6 @@ public class FolderListener implements Runnable {
     private void handleFileAsync(String fileName) {
         CompletableFuture
                 .supplyAsync(new AsyncFileHandler(fileName, directory, fileHandlerCallback, fileLengthCheckDelay))
-                .thenAccept(result -> success = success || result);
+                .thenAccept(result -> success = result);
     }
 }
