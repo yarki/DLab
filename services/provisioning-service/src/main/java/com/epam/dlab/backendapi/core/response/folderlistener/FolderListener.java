@@ -71,6 +71,7 @@ public class FolderListener implements Runnable {
             LOGGER.debug("Registered a new watcher for directory {} with timeout {} sec", directoryName, timeout.toSeconds());
 
             Map<String, Integer> fileList = new HashMap<String, Integer>();
+            long endTimeout = System.currentTimeMillis() + timeout.toSeconds();
             while (true) {
                 final WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
                 if (watchKey != null) {
@@ -102,9 +103,7 @@ public class FolderListener implements Runnable {
                     fileHandlerCallback.handleError();
                     break;
                 }
-                if ( fileList.size() > 0 ) {
-                    LOGGER.debug("Waiting for next events for FolderListener directory {}", directoryName);
-                } else {
+                if ( endTimeout > System.currentTimeMillis() ) {
                     LOGGER.debug("Timeout expired for FolderListener directory {}", directoryName);
                     break;
                 }
