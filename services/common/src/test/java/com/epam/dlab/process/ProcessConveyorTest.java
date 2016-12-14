@@ -4,7 +4,9 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
@@ -87,6 +89,41 @@ public class ProcessConveyorTest {
      }
 
     @Test
+    public void testPingsWithDuplicates() throws Exception {
+
+        String pingCommand;
+
+        if(windows) {
+            pingCommand = "ping -n 5 localhost";
+        } else {
+            pingCommand = "ping -c 5 localhost";
+        }
+
+        ProcessId ping = new ProcessId(user, "ping");
+        ArrayList<CompletableFuture<ProcessInfo>> cf = new ArrayList<>();
+        for(int i = 0; i < 5; i++) {
+            cf.add(DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand));
+        }
+        Thread.sleep(100);
+        Collection<ProcessId> pIds = DlabProcess.getInstance().getActiveProcesses();
+        System.out.println(pIds);
+        Thread.sleep(5000);
+        int errCount = 0;
+        for (CompletableFuture<ProcessInfo> f:cf){
+            try {
+                ProcessInfo pi = f.get();
+                System.out.println("RES: " + pi.getId() + " " + (pi.getStdOut().length() > 0 ? "true" : "false"));
+                assertTrue(pi.getStdOut().length() > 0);
+                assertTrue(pi.getStatus().equals(ProcessStatus.FINISHED));
+            } catch( CancellationException e) {
+                errCount++;
+            }
+        }
+        assertEquals(4,errCount);
+    }
+
+
+    @Test
     public void testPingsWithManyProcesses() throws Exception {
 
         String pingCommand;
@@ -163,5 +200,22 @@ public class ProcessConveyorTest {
         assertTrue(pi.getStatus().equals(ProcessStatus.KILLED));
     }
 
+    @Test
+    public void testTimeoutPing() throws Exception {
+
+        String pingCommand;
+
+        if(windows) {
+            pingCommand = "ping -t localhost";
+        } else {
+            pingCommand = "ping localhost";
+        }
+        ProcessId ping = new ProcessId(user, "ping");
+        DlabProcess.getInstance().setProcessTimeout(5, TimeUnit.SECONDS);
+        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand);
+        ProcessInfo pi = cf.get();
+        System.out.println("TIMEOUT: "+pi);
+        assertEquals(ProcessStatus.TIMEOUT,pi.getStatus());
+    }
 
 }

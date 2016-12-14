@@ -25,14 +25,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
 import static com.epam.dlab.process.ProcessStatus.*;
 
-public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expireable, TimeoutAction {
+public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, TimeoutAction, Expireable {
 
     private final static Logger LOG = LoggerFactory.getLogger(ProcessInfoBuilder.class);
 
@@ -44,17 +47,19 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
     private int exitCode = -1;
     private String command = "N/A";
     private Collection<ProcessInfo> rejected = null;
+    private int pid = -1;
 
     private boolean finished     = false;
     private boolean stdOutClosed = false;
     private boolean stdErrClosed = false;
 
     private Process p = null;
-    private long expirationTime = Long.MAX_VALUE;
     private CompletableFuture<ProcessInfo> future;
+    private long expirationTime;
 
-    public ProcessInfoBuilder(ProcessId processId) {
+    public ProcessInfoBuilder(ProcessId processId, long ttl) {
         this.processId = processId;
+        this.expirationTime = System.currentTimeMillis() + ttl;
     }
 
     public static void schedule(ProcessInfoBuilder b, String command) {
@@ -80,7 +85,7 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
                     "rejected duplicated command",
                     REJECTED.ordinal(),
                     timeStamp,
-                    timeStamp,null));
+                    timeStamp,null, b.pid));
         }
     }
 
@@ -110,7 +115,7 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
     }
 
     public static void finish(ProcessInfoBuilder b, Integer exitCode) {
-        if(b.status != STOPPED && b.status != KILLED ) {
+        if(b.status != STOPPED && b.status != KILLED && b.status != TIMEOUT ) {
             b.status = FINISHED;
         }
         b.exitCode = exitCode;
@@ -139,6 +144,7 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
             DlabProcess.getInstance().getExecutorService().execute(()->{
                 try {
                     p = new ProcessBuilder(command.split("\\s+")).start();
+                    pid = getPid(p);
                     InputStream stdOutStream = p.getInputStream();
                     DlabProcess.getInstance().getExecutorService().execute(()->{
                         BufferedReader reader = new BufferedReader(new InputStreamReader(stdOutStream));
@@ -195,7 +201,7 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
                 stdOut.toString(),
                 stdErr.toString(),
                 exitCode,
-                startTimeStamp, System.currentTimeMillis(),rejected );
+                startTimeStamp, System.currentTimeMillis(),rejected, pid);
     }
 
     @Override
@@ -209,17 +215,60 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Expir
         stdErrClosed = true;
     }
 
+    public static void future(ProcessInfoBuilder b, CompletableFuture<ProcessInfo> future) {
+        if(b.future == null) {
+            b.future = future;
+        } else {
+            future.cancel(true);
+        }
+    }
+
+    @Override
+    public void onTimeout() {
+        if(status != TIMEOUT) {
+            LOG.debug("Stopping on timeout ...");
+            stop(this, "STOP");
+            status = TIMEOUT;
+            expirationTime += 60_000;
+        } else {
+            LOG.debug("Killing on timeout ...");
+            kill(this, "KILL");
+            status = TIMEOUT;
+            setReady();
+        }
+    }
+
     @Override
     public long getExpirationTime() {
         return expirationTime;
     }
 
-    public static void future(ProcessInfoBuilder b, CompletableFuture<ProcessInfo> future) {
-        b.future = future;
+    private static Function<Process,Integer> pidSupplier = null;
+
+    public static int getPid(Process process) {
+        try {
+            if(pidSupplier == null) {
+                Class<?> cProcessImpl = process.getClass();
+                final Field fPid = cProcessImpl.getDeclaredField("pid");
+                LOG.debug("PID field found");
+                if (!fPid.isAccessible()) {
+                    fPid.setAccessible(true);
+                }
+                pidSupplier = (p) -> {
+                    try {
+                        return fPid.getInt(p);
+                    } catch (IllegalAccessException e) {
+                        LOG.error("Unable to access PID. {}",e.getMessage());
+                        return -1;
+                    }
+                };
+            }
+            return pidSupplier.apply(process);
+        } catch (NoSuchFieldException e) {
+            LOG.debug("PID field not found");
+            pidSupplier = (p) -> -1;
+            return -1;
+        }
     }
 
-    @Override
-    public void onTimeout() {
-        kill(this,"KILL");
-    }
 }

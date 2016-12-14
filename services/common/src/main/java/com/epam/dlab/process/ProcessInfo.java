@@ -28,10 +28,11 @@ public class ProcessInfo {
     private final int exitCode;
     private final long startTimeStamp;
     private final long infoTimeStamp;
+    private final int pid;
 
     private final Collection<ProcessInfo> rejectedCommands;
 
-    ProcessInfo(ProcessId id, ProcessStatus status, String command, String stdOut, String stdErr, int exitCode, long startTimeStamp, long infoTimeStamp, Collection<ProcessInfo> rejected) {
+    ProcessInfo(ProcessId id, ProcessStatus status, String command, String stdOut, String stdErr, int exitCode, long startTimeStamp, long infoTimeStamp, Collection<ProcessInfo> rejected, int pid) {
         this.id             = id;
         this.status         = status;
         this.command        = command;
@@ -40,6 +41,7 @@ public class ProcessInfo {
         this.exitCode       = exitCode;
         this.startTimeStamp = startTimeStamp;
         this.infoTimeStamp  = infoTimeStamp;
+        this.pid = pid;
 
         if(rejected != null && rejected.size() > 0) {
             Collection<ProcessInfo> r = new ArrayList<>();
@@ -96,6 +98,7 @@ public class ProcessInfo {
         return "ProcessInfo{" +
                 "id='" + id + '\'' +
                 ", command='" + command + '\'' +
+                ", pid=" + pid +
                 ", status=" + status +
                 ", stdOut='" + stdOut + '\'' +
                 ", stdErr='" + stdErr + '\'' +

@@ -34,6 +34,7 @@ public class DlabProcess {
     private ExecutorService executorService = Executors.newFixedThreadPool(50*3);
     private Map<String,ExecutorService> perUserService = new ConcurrentHashMap<>();
     private int userMaxparallelism = 5;
+    private long expirationTime = TimeUnit.HOURS.toMillis(3);
 
     public static DlabProcess getInstance() {
         return INSTANCE;
@@ -66,7 +67,7 @@ public class DlabProcess {
     }
 
     public CompletableFuture<ProcessInfo> start(ProcessId id, String command){
-        CompletableFuture<ProcessInfo> future = processConveyor.createBuildFuture( id, ()-> new ProcessInfoBuilder(id) );
+        CompletableFuture<ProcessInfo> future = processConveyor.createBuildFuture( id, ()-> new ProcessInfoBuilder(id,expirationTime) );
         processConveyor.add(id, future, ProcessStep.FUTURE);
         processConveyor.add(id, command, ProcessStep.START);
         return future;
@@ -116,7 +117,7 @@ public class DlabProcess {
     }
 
     public void setProcessTimeout(long time, TimeUnit unit) {
-        processConveyor.setDefaultBuilderTimeout(time,unit);
+        this.expirationTime = unit.toMillis(time);
     }
 
 }

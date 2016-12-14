@@ -32,7 +32,7 @@ public class ProcessConveyor extends AssemblingConveyor<ProcessId,ProcessStep,Pr
         super();
         this.setName("ProcessConveyor");
         this.setIdleHeartBeat(1, TimeUnit.SECONDS);
-        this.setDefaultBuilderTimeout(3,TimeUnit.HOURS);
+        this.enablePostponeExpiration(true);
         this.setDefaultCartConsumer((l,v,b)->{
             LOG.warn("default processor for {} {} {}",l,v,b.get());
             if(v instanceof FutureCart) {
@@ -43,7 +43,6 @@ public class ProcessConveyor extends AssemblingConveyor<ProcessId,ProcessStep,Pr
         this.setResultConsumer((bin)->{
             LOG.debug("process finished: {}",bin);
         });
-
     }
 
     public Supplier<? extends ProcessInfo> getInfoSupplier(ProcessId id) {

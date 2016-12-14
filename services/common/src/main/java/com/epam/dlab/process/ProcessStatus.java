@@ -20,6 +20,7 @@ public enum ProcessStatus {
     RUNNING,
     STOPPED,
     KILLED,
+    TIMEOUT,
     FINISHED,
     REJECTED,
     FAILED,
