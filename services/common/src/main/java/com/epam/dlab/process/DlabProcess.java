@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class DlabProcess {
 
@@ -72,14 +73,23 @@ public class DlabProcess {
         processConveyor.add(id, command, ProcessStep.START);
         return future;
     }
+    public CompletableFuture<ProcessInfo> start(String username, String uniqDescriptor, String command){
+        return start(new ProcessId(username,uniqDescriptor),command);
+    }
+    public CompletableFuture<ProcessInfo> start(String username, String command){
+        return start(new ProcessId(username,command),command);
+    }
+
 
     public CompletableFuture<Boolean> stop(ProcessId id){
         return processConveyor.add(id,"STOP",ProcessStep.STOP);
     }
+    public CompletableFuture<Boolean> stop(String username, String command){ return stop(new ProcessId(username,command));}
 
     public CompletableFuture<Boolean> kill(ProcessId id){
         return processConveyor.add(id,"KILL",ProcessStep.KILL);
     }
+    public CompletableFuture<Boolean> kill(String username, String command){ return kill(new ProcessId(username,command));}
 
     public CompletableFuture<Boolean> failed(ProcessId id){
         return processConveyor.add(id,"FAILED",ProcessStep.FAILED);
@@ -111,9 +121,15 @@ public class DlabProcess {
         processConveyor.forEachKeyAndBuilder( (k,b)-> pList.add(k) );
         return pList;
     }
+    public Collection<ProcessId> getActiveProcesses(String username){
+        return getActiveProcesses().stream().filter((id)->id.getUser().equals(username)).collect(Collectors.toList());
+    }
 
     public Supplier<? extends ProcessInfo> getProcessInfoSupplier(ProcessId id) {
         return processConveyor.getInfoSupplier(id);
+    }
+    public Supplier<? extends ProcessInfo> getProcessInfoSupplier(String username, String command){
+        return getProcessInfoSupplier(new ProcessId(username,command));
     }
 
     public void setProcessTimeout(long time, TimeUnit unit) {
