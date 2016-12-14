@@ -123,8 +123,12 @@ export class ExploratoryEnvironmentCreateModel {
               this.exploratoryEnvironmentTemplates.push(
                 new ExploratoryEnvironmentVersionModel(data[parentIndex].image, exploratoryJson[index], shapeArr));
           }
-          if(this.exploratoryEnvironmentTemplates.length > 0)
+          if(this.exploratoryEnvironmentTemplates.length > 0) {
+            this.exploratoryEnvironmentTemplates.sort(function(t1, t2) {
+              return ((t1.template_name < t2.template_name) ? -1 : ((t1.template_name > t2.template_name) ? 1 : 0));
+            });
             this.setSelectedTemplate(0);
+          }
 
           if(this.continueWith)
             this.continueWith();
