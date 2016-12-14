@@ -60,6 +60,7 @@ public class FolderListener implements Runnable {
     private void pollFile() {
         Path directoryPath = Paths.get(directory);
         String directoryName = directoryPath.toAbsolutePath().toString();
+        boolean handleCalled = false;
         
         try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
             directoryPath.register(watcher, ENTRY_CREATE);
@@ -75,11 +76,9 @@ public class FolderListener implements Runnable {
                         
                         if (kind == ENTRY_CREATE) {
                             if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
+                            	LOGGER.debug("Folder listener {} handle file {}", directoryName, fileName);
+                            	handleCalled = true;
                                 handleFileAsync(fileName);
-                                if (!success) {
-                                    LOGGER.warn("Either could not receive a response, or there was an error during response processing");
-                                    fileHandlerCallback.handleError();
-                                }
                            	}
                         }
                     }
@@ -88,6 +87,13 @@ public class FolderListener implements Runnable {
                 if ( endTimeout < System.currentTimeMillis() ) {
                     LOGGER.debug("Timeout expired for FolderListener directory {}", directoryName);
                     break;
+                }
+                if (handleCalled) {
+                	handleCalled = false;
+                	if (!success) {
+                		LOGGER.warn("Either could not receive a response, or there was an error during response processing");
+                		fileHandlerCallback.handleError();
+                	}
                 }
             }
             LOGGER.debug("Closing a watcher for directory {}", directoryName);
@@ -100,6 +106,6 @@ public class FolderListener implements Runnable {
     private void handleFileAsync(String fileName) {
         CompletableFuture
                 .supplyAsync(new AsyncFileHandler(fileName, directory, fileHandlerCallback, fileLengthCheckDelay))
-                .thenAccept(result -> success = result);
+                .thenAccept(result -> success = success || result);
     }
 }
