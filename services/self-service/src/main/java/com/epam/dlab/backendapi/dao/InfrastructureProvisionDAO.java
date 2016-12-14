@@ -47,6 +47,8 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     public static final String EXPLORATORY_NAME = "exploratory_name";
     private static final String EXPLORATORY_ID = "exploratory_id";
     private static final String EXPLORATORY_URL = "exploratory_url";
+    private static final String EXPLORATORY_USER = "exploratory_user";
+    private static final String EXPLORATORY_PASSWORD = "exploratory_pass";
     private static final String UPTIME = "up_time";
     private static final String COMPUTATIONAL_RESOURCES = "computational_resources";
     private static final String COMPUTATIONAL_NAME = "computational_name";
@@ -134,6 +136,12 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
         if (dto.getExploratoryUrl() != null) {
             values.append(EXPLORATORY_URL, dto.getExploratoryUrl());
+        }
+        if (dto.getExploratoryUser() != null) {
+            values.append(EXPLORATORY_USER, dto.getExploratoryUser());
+        }
+        if (dto.getExploratoryPassword() != null) {
+            values.append(EXPLORATORY_PASSWORD, dto.getExploratoryPassword());
         }
         return updateOne(USER_INSTANCES,
                 exploratoryCondition(dto.getUser(), dto.getExploratoryName()),

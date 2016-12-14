@@ -40,7 +40,10 @@ import {DateUtils} from './../../util/dateUtils'
       this.upTimeInHours = DateUtils.diffBetweenDatesInHours(this.notebook.time);
       this.upTimeSince = new Date(this.notebook.time).toString();
     }
-
+    else {
+      this.upTimeInHours = null;
+      this.upTimeSince = null;
+    }
     this.bindDialog.open(param);
    }
  }
