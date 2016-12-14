@@ -64,6 +64,7 @@ public class FolderListener implements Runnable {
     private void pollFile() {
         Path directoryPath = Paths.get(directory);
         String directoryName = directoryPath.toAbsolutePath().toString();
+        success = false;
         
         try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
             directoryPath.register(watcher, ENTRY_CREATE, ENTRY_MODIFY);
@@ -75,34 +76,38 @@ public class FolderListener implements Runnable {
                 if (watchKey != null) {
                     for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
                         final WatchEvent.Kind<?> kind = watchEvent.kind();
-                        if (kind == ENTRY_CREATE || kind == ENTRY_MODIFY) {
-                            String fileName = watchEvent.context().toString();
+                        String fileName = watchEvent.context().toString();
+                        
+                        if (kind == ENTRY_CREATE) {
                             if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
-                            	Integer eventCount = fileList.get(fileName);
-                            	if (eventCount == null) {
-                            		fileList.put(fileName, 0);
-                            		LOGGER.debug("Response file {}/{} created.", directory, fileName);
-                            	} else if (eventCount > 1) {
-                                    LOGGER.debug("Response file {}/{} is processed ...", directory, fileName);
-                                    handleFileAsync(fileName);
-                            	} else {
-                            		fileList.put(fileName, ++eventCount);
-                            		LOGGER.debug("Response file {}/{} writing.", directory, fileName);
-                            	}
+                           		fileList.put(fileName, 0);
+                           		LOGGER.debug("Response file {}/{} created.", directory, fileName);
                             } else {
                             	LOGGER.trace("Response file {}/{} skipped", directory, fileName);
                             }
+                        } else if (kind == ENTRY_MODIFY) {
+                           	Integer eventCount = fileList.get(fileName);
+                           	if (eventCount != null) {
+                           		LOGGER.debug("Response file {}/{} is processed ...", directory, fileName);
+                            	fileList.remove(fileName);
+                                handleFileAsync(fileName);
+                           	}
                         }
                     }
                     if (!watchKey.reset()) {
                         break;
                     }
-                } /*else if (!success) {
+                } else if (!success) {
                     LOGGER.warn("Either could not receive a response, or there was an error during response processing");
                     fileHandlerCallback.handleError();
                     break;
-                }*/
-                LOGGER.debug("Timeout expired for FolderListener directory {}", directoryName);
+                }
+                if ( fileList.size() > 0 ) {
+                    LOGGER.debug("Waiting for next events for FolderListener directory {}", directoryName);
+                } else {
+                    LOGGER.debug("Timeout expired for FolderListener directory {}", directoryName);
+                    break;
+                }
             }
             LOGGER.debug("Closing a watcher for directory {}", directoryName);
         } catch (Exception e) {
