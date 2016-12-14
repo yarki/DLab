@@ -18,8 +18,8 @@ limitations under the License.
 
 package com.epam.dlab;
 
-import com.epam.dlab.client.mongo.MongoServiceFactory;
-import com.epam.dlab.client.restclient.RESTServiceFactory;
+import com.epam.dlab.mongo.MongoServiceFactory;
+import com.epam.dlab.rest.client.RESTServiceFactory;
 import com.epam.dlab.constants.ServiceConsts;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;

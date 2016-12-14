@@ -18,20 +18,20 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.api.form.ComputationalCreateFormDTO;
-import com.epam.dlab.backendapi.api.instance.UserComputationalResourceDTO;
-import com.epam.dlab.backendapi.client.rest.ComputationalAPI;
+import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
-import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.constants.ServiceConsts;
-import com.epam.dlab.constants.UserInstanceStatus;
+import com.epam.dlab.backendapi.resources.dto.ComputationalCreateFormDTO;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.exceptions.DlabException;
-import com.epam.dlab.registry.ApiCallbacks;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.ApiCallbacks;
+import com.epam.dlab.rest.contracts.ComputationalAPI;
 import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -45,7 +45,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static com.epam.dlab.constants.UserInstanceStatus.*;
+import static com.epam.dlab.UserInstanceStatus.*;
 
 @Path("/infrastructure_provision/computational_resources")
 @Consumes(MediaType.APPLICATION_JSON)

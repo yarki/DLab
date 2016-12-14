@@ -18,28 +18,29 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
+import com.epam.dlab.backendapi.dao.KeyDAO;
+import com.epam.dlab.constants.ServiceConsts;
+import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.DockerAPI;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import io.dropwizard.auth.Auth;
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.client.rest.DockerAPI;
-import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
-import com.epam.dlab.backendapi.dao.KeyDAO;
-import com.epam.dlab.client.restclient.RESTService;
-import com.epam.dlab.constants.ServiceConsts;
-import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
-import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import io.dropwizard.auth.Auth;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Path("/infrastructure_provision")

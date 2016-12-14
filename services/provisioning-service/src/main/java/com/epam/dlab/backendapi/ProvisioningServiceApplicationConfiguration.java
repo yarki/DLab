@@ -19,7 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi;
 
 import com.epam.dlab.ServiceConfiguration;
-import com.epam.dlab.backendapi.core.response.Directories;
+import com.epam.dlab.backendapi.core.Directories;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.util.Duration;
 import org.hibernate.validator.constraints.NotEmpty;
