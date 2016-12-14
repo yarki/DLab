@@ -94,10 +94,7 @@ def ensure_python3_kernel():
             sudo('apt install -y python3-pip')
             sudo('pip3 install ipython ipykernel --no-cache-dir')
             sudo('python3 -m ipykernel install')
-            sudo('add-apt-repository -y ppa:fkrull/deadsnakes')
-            sudo('apt update')
-            sudo('apt install -y python3.4 python3.4-dev')
-            sudo('python3.4 -m pip install ipython ipykernel  --upgrade --no-cache-dir')
+            sudo('apt-get install -y libssl-dev python-virtualenv')
             sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
         except:
             sys.exit(1)
@@ -161,7 +158,7 @@ def configure_notebook_server(notebook_name):
             sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
             sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
-            sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() + '"\' >> ' + jupyter_conf_file)
+            sudo('echo \'c.NotebookApp.cookie_secret = b"' + id_generator() + '"\' >> ' + jupyter_conf_file)
             sudo('''echo "c.NotebookApp.token = u''" >> ''' + jupyter_conf_file)
         except:
             sys.exit(1)
@@ -186,7 +183,14 @@ def configure_notebook_server(notebook_name):
         ensure_s3_kernel()
 
         ensure_r_kernel()
-
+    else:
+        try:
+            sudo("sed -i '/^c.NotebookApp.base_url/d' " + jupyter_conf_file)
+            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
+            sudo("systemctl stop jupyter-notebook; sleep 5")
+            sudo("systemctl start jupyter-notebook")
+        except:
+            sys.exit(1)
 
 ##############
 # Run script #

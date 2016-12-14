@@ -32,21 +32,21 @@ import {DateUtils} from './../../util/dateUtils'
    @ViewChild('bindDialog') bindDialog;
 
    upTimeInHours: number ;
-   upTimeSince: string = "";
+   upTimeSince: string = '';
    tooltip: boolean = false;
 
-   open(param, environment, resource) {
-     this.tooltip = false;
-     this.resource = resource;
-     this.environment = environment;
-     if(this.resource.up_time){
-      this.upTimeInHours = DateUtils.diffBetweenDatesInHours(this.resource.up_time);
-      this.upTimeSince = new Date(this.resource.up_time).toString();
-     }
-     this.bindDialog.open(param);
-   }
+   public open(param, environment, resource): void {
+    this.tooltip = false;
+    this.resource = resource;
+    this.environment = environment;
 
-   isEllipsisActive($event) {
+    this.upTimeInHours = (this.resource.up_time) ? DateUtils.diffBetweenDatesInHours(this.resource.up_time) : 0;
+    this.upTimeSince = (this.resource.up_time) ? new Date(this.resource.up_time).toString() : '';
+
+    this.bindDialog.open(param);
+  }
+
+   public isEllipsisActive($event): void {
      if ($event.target.offsetWidth < $event.target.scrollWidth)
        this.tooltip = true;
    }
