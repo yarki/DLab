@@ -25,7 +25,7 @@ import os
 import sys
 
 
-local_log_filename = "%s.log" % os.environ['request_id']
+local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
 local_log_filepath = "/response/" + local_log_filename
 logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                     level=logging.DEBUG,
@@ -35,7 +35,7 @@ import os
 import sys
 import traceback
 
-local_log_filename = "%s.log" % os.environ['request_id']
+local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
 local_log_filepath = "/response/" + local_log_filename
 logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                     level=logging.DEBUG,

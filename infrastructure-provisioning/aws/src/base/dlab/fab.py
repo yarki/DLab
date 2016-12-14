@@ -54,18 +54,11 @@ def ensure_pip(requisites):
 
 def run_routine(routine_name, params, resource='default'):
     success = False
-    if resource == 'edge':
-        local_log_filename = "edge_{0}_{1}.log".format(os.environ['edge_user_name'], os.environ['request_id'])
-        local_log_filepath = "/logs/edge/" + local_log_filename
-        logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                            level=logging.INFO,
-                            filename=local_log_filepath)
-    if resource == 'default':
-        local_log_filename = "%s.log" % os.environ['request_id']
-        local_log_filepath = "/response/" + local_log_filename
-        logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                            level=logging.INFO,
-                            filename=local_log_filepath)
+    local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
+    local_log_filepath = "/response/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.INFO,
+                        filename=local_log_filepath)
     try:
         with settings(abort_exception=RoutineException):
             logging.info("~/scripts/%s.py %s" % (routine_name, params))
