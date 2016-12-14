@@ -63,10 +63,11 @@ public class FolderListener implements Runnable {
 
     private void pollFile() {
         Path directoryPath = Paths.get(directory);
+        String directoryName = directoryPath.toAbsolutePath().toString();
         
         try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
             directoryPath.register(watcher, ENTRY_CREATE, ENTRY_MODIFY);
-            LOGGER.debug("Registered a new watcher for directory {}", directoryPath.toAbsolutePath());
+            LOGGER.debug("Registered a new watcher for directory {} with timeout {} sec", directoryName, timeout.toSeconds());
 
             Map<String, Integer> fileList = new HashMap<String, Integer>();
             while (true) {
@@ -96,16 +97,17 @@ public class FolderListener implements Runnable {
                     if (!watchKey.reset()) {
                         break;
                     }
-                } else if (!success) {
+                } /*else if (!success) {
                     LOGGER.warn("Either could not receive a response, or there was an error during response processing");
                     fileHandlerCallback.handleError();
                     break;
-                }
+                }*/
+                LOGGER.debug("Timeout expired for FolderListener directory {}", directoryName);
             }
-            LOGGER.debug("Closing a watcher for directory {}", directoryPath.toAbsolutePath());
+            LOGGER.debug("Closing a watcher for directory {}", directoryName);
         } catch (Exception e) {
-        	LOGGER.warn("FolderListenerExecutor exception for folder {}", directoryPath.toAbsolutePath(), e);
-            throw new DlabException("FolderListenerExecutor exception for folder {}" + directoryPath.toAbsolutePath(), e);
+        	LOGGER.warn("FolderListenerExecutor exception for folder {}", directoryName, e);
+            throw new DlabException("FolderListenerExecutor exception for folder {}" + directoryName, e);
         }
     }
 
