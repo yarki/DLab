@@ -45,8 +45,8 @@ limitations under the License.
           <span class="glyphicon glyphicon-remove"></span>
         </button>
 
-        <button class="btn apply" (click)="applyFilter_btnClick(filterForm)" [disabled]="filteredEnvironments.length == 0">
-          <span class="glyphicon glyphicon-ok" [ngClass]="{'not-allowed': filteredEnvironments.length == 0}"></span>
+        <button class="btn apply" (click)="applyFilter_btnClick(filterForm)" [disabled]="filteredEnvironments.length == 0 && !filtering">
+          <span class="glyphicon glyphicon-ok" [ngClass]="{'not-allowed': filteredEnvironments.length == 0 && !filtering}"></span>
         </button>
       </div>
     </td>

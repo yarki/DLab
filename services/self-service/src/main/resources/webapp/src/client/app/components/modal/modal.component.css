@@ -71,10 +71,11 @@ limitations under the License.
 }
 .modal .btn-success {
   margin-left: 40px;
+  margin-right: 2px;
 }
 .modal-content {
   border-radius: 3px;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 .modal-header .close {
   margin-top: 3px;
@@ -149,7 +150,7 @@ limitations under the License.
   margin: 10% auto;
 }
 
-modal-content {
+.modal-content {
   display: block;
 }
 

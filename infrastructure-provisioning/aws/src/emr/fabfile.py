@@ -46,7 +46,10 @@ def run():
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.INFO,
                         filename=local_log_filepath)
-
+    try:
+        os.environ['exploratory_name']
+    except:
+        os.environ['exploratory_name'] = ''
     if os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
         time.sleep(30)
     create_aws_config_files()
