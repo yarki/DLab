@@ -71,7 +71,8 @@ def configure_nginx(config):
         if not exists("/etc/nginx/conf.d/nginx_proxy.conf"):
             sudo('rm -f /etc/nginx/conf.d/*')
             put(config['nginx_template_dir'] + 'nginx_proxy.conf', '/tmp/nginx_proxy.conf')
-            sudo('\cp /tmp/nginx_proxy.conf /etc/nginx/conf.d/')
+            sudo('mv /tmp/nginx_proxy.conf /opt/dlab/tmp/')
+            sudo('\cp /opt/dlab/tmp/nginx_proxy.conf /etc/nginx/conf.d/')
             sudo('mkdir -p /etc/nginx/locations')
             sudo('rm -f /etc/nginx/sites-enabled/default')
     except:
@@ -86,7 +87,8 @@ def configure_nginx(config):
                     for line in tpl:
                         out.write(line)
             put("/tmp/%s-tmpproxy_location_jenkins_template.conf" % random_file_part, '/tmp/proxy_location_jenkins.conf')
-            sudo('\cp /tmp/proxy_location_jenkins.conf /etc/nginx/locations/')
+            sudo('mv /tmp/proxy_location_jenkins.conf /opt/dlab/tmp/')
+            sudo('\cp /opt/dlab/tmp/proxy_location_jenkins.conf /etc/nginx/locations/')
             sudo("echo 'engineer:" + crypt.crypt(nginx_password, id_generator()) + "' > /etc/nginx/htpasswd")
             with open('jenkins_crids.txt', 'w+') as f:
                 f.write("Jenkins credentials: engineer  / " + nginx_password)
@@ -166,8 +168,8 @@ def creating_service_directories():
             sudo('mkdir -p /var/opt/dlab/log/edge')
             sudo('mkdir -p /var/opt/dlab/log/notebook')
             sudo('mkdir -p /var/opt/dlab/log/emr')
-            sudo('ln -s /opt/dlab/conf /etc/opt/dlab')
-            sudo('ln -s /var/opt/dlab/log /var/log/dlab')
+            sudo('ln -s /opt/dlab/conf/ /etc/opt/dlab/')
+            sudo('ln -s /var/opt/dlab/log/ /var/log/dlab/')
         return True
     except:
         return False

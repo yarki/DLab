@@ -42,12 +42,12 @@ logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
 
 def ensure_supervisor():
     try:
-        if not exists('/tmp/superv_ensured'):
+        if not exists('/opt/dlab/tmp/superv_ensured'):
             sudo('apt-get -y install supervisor')
             #sudo('sysv-rc-conf supervisor on')
             sudo('update-rc.d supervisor defaults')
             sudo('update-rc.d supervisor enable')
-            sudo('touch /tmp/superv_ensured')
+            sudo('touch /opt/dlab/tmp/superv_ensured')
         return True
     except:
         return False
@@ -72,8 +72,10 @@ def configure_mongo():
             local('scp -i {} /root/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
             sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
         local('scp -i {} /root/templates/instance_shapes.lst {}:/tmp/instance_shapes.lst'.format(args.keyfile, env.host_string))
+        sudo('mv /tmp/instance_shapes.lst /opt/dlab/tmp/')
         local('scp -i {} /root/scripts/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
-        sudo('python /tmp/configure_mongo.py --region {} --base_name {} --sg "{}" --vpc {} --subnet {}'.format(os.environ['creds_region'], os.environ['conf_service_base_name'], os.environ['creds_security_groups_ids'].replace(" ", ""), os.environ['creds_vpc_id'], os.environ['creds_subnet_id']))
+        sudo('mv /tmp/configure_mongo.py /opt/dlab/tmp/')
+        sudo('python /opt/dlab/tmp/configure_mongo.py --region {} --base_name {} --sg "{}" --vpc {} --subnet {}'.format(os.environ['creds_region'], os.environ['conf_service_base_name'], os.environ['creds_security_groups_ids'].replace(" ", ""), os.environ['creds_vpc_id'], os.environ['creds_subnet_id']))
         return True
     except:
         return False
@@ -84,9 +86,11 @@ def start_ss():
         if not exists('/opt/dlab/tmp/ss_started'):
             supervisor_conf = '/etc/supervisor/conf.d/supervisor_svc.conf'
             put('/root/templates/proxy_location_webapp_template.conf', '/tmp/proxy_location_webapp_template.conf')
+            sudo('mv /tmp/proxy_location_webapp_template.conf /opt/dlab/tmp/')
             put('/root/templates/supervisor_svc.conf', '/tmp/supervisor_svc.conf')
-            sudo('cp /tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
-            sudo('cp /tmp/supervisor_svc.conf {}'.format(supervisor_conf))
+            sudo('mv /tmp/supervisor_svc.conf /opt/dlab/tmp/')
+            sudo('cp /opt/dlab/tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
+            sudo('cp /opt/dlab/tmp/supervisor_svc.conf {}'.format(supervisor_conf))
 
             sudo('sed -i \'s=WEB_APP_DIR={}=\' {}'.format(web_path, supervisor_conf))
 
