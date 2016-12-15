@@ -115,6 +115,8 @@ def ensure_s3_kernel():
 
 
 def ensure_r_kernel():
+    templates_dir = '/root/templates/'
+    kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
     if not exists('/home/ubuntu/.ensure_dir/r_kernel_ensured'):
         try:
             sudo('apt-get install -y r-base r-base-dev r-cran-rcurl')
@@ -140,6 +142,8 @@ def ensure_r_kernel():
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
             sudo('R -e "IRkernel::installspec()"')
+            put(templates_dir + 'r_template.json', '/tmp/r_template.json')
+            sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
             # sudo('export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin; R -e \'IRkernel::installspec(user = FALSE)\'')
             # Spark Install
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
