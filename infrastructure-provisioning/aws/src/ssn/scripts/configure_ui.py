@@ -32,7 +32,7 @@ parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
-dlab_conf_dir='/etc/opt/dlab'
+dlab_conf_dir='/opt/dlab/conf/'
 web_path = '/opt/dlab/webapp/lib/'
 local_log_filename = "{}_UI.log".format(os.environ['request_id'])
 local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
@@ -89,6 +89,11 @@ def start_ss():
             sudo('mv /tmp/ssn.yml /opt/dlab/conf/')
             put('/root/templates/proxy_location_webapp_template.conf', '/tmp/proxy_location_webapp_template.conf')
             sudo('mv /tmp/proxy_location_webapp_template.conf /opt/dlab/tmp/')
+            with open('/root/templates/supervisor_svc.conf', 'r') as f:
+                text = f.read()
+            text = text.replace('CONF', dlab_conf_dir)
+            with open('/root/templates/supervisor_svc.conf', 'w') as f:
+                f.write(text)
             put('/root/templates/supervisor_svc.conf', '/tmp/supervisor_svc.conf')
             sudo('mv /tmp/supervisor_svc.conf /opt/dlab/tmp/')
             sudo('cp /opt/dlab/tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
@@ -154,6 +159,7 @@ if __name__ == "__main__":
         logging.error('MongoDB configuration script has failed.')
         sys.exit(1)
 
+    run('export DLAB_CONF_DIR={}'.format(dlab_conf_dir))
     sudo('echo DLAB_CONF_DIR={} >> /etc/profile'.format(dlab_conf_dir))
     sudo('echo export DLAB_CONF_DIR >> /etc/profile')
 
