@@ -40,7 +40,7 @@ export class ExploratoryEnvironmentCreateDialog {
   templateDescription: string;
   namePattern = "[-_a-zA-Z0-9]+";
   resourceGrid: any;
-  environment: any;
+  environment_shape: string;
 
   processError: boolean = false;
   errorMessage: string = '';
@@ -73,26 +73,22 @@ export class ExploratoryEnvironmentCreateDialog {
   }
 
   setDefaultParams(): void {
-    this.environment = {
-      template: this.model.selectedItem.version,
-      shape: this.model.selectedItem.shapes[0].type
-    };
+    this.environment_shape = this.model.selectedItem.shapes[0].type;
     this.templates_list.setDefaultOptions(this.model.selectedItem.template_name, 'template', 'template_name');
     this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'shape', 'type');
   }
 
   onUpdate($event): void {
     if($event.model.type === 'template') {
-      this.environment.template = $event.model.value.version;
       this.model.setSelectedTemplate($event.model.index);
       this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'shape', 'type');
     }
 
     if($event.model.type === 'shape')
-      this.environment.shape = $event.model.value.type;
+      this.environment_shape = $event.model.value.type;
   }
 
-  createExploratoryEnvironment_btnClick($event, data, valid, template, shape) {
+  createExploratoryEnvironment_btnClick($event, data, valid, shape) {
     this.notebookExist = false;
     this.checkValidity = true;
 
@@ -100,7 +96,7 @@ export class ExploratoryEnvironmentCreateDialog {
       this.notebookExist = true;
       return false;
     }
-    this.model.setCreatingParams(template, data.environment_name, shape);
+    this.model.setCreatingParams(data.environment_name, shape);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
