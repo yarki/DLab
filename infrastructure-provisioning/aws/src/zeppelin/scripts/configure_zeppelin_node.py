@@ -37,7 +37,7 @@ args = parser.parse_args()
 scala_link = "http://www.scala-lang.org/files/archive/scala-2.11.8.deb"
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
 
-zeppelin_link = "http://mirrors.advancedhosters.com/apache/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-all.tgz"
+zeppelin_link = "http://mirrors.advancedhosters.com/apache/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-netinst.tgz"
 zeppelin_version = "0.6.2"
 spark_version = "1.6.2"
 hadoop_version = "2.6"
