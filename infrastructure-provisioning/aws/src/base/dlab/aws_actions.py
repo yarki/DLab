@@ -27,12 +27,6 @@ import logging
 from dlab.aws_meta import *
 import traceback
 
-local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
-local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
-logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                    level=logging.DEBUG,
-                    filename=local_log_filepath)
-
 
 def put_to_bucket(bucket_name, local_file, destination_file):
     try:

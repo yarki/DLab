@@ -41,7 +41,7 @@ def emr_waiter(tag_name):
 
 
 def run():
-    local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.INFO,
@@ -189,7 +189,7 @@ def run():
 
 
 def terminate():
-    local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
