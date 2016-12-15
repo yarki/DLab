@@ -20,7 +20,7 @@ package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 
-import java.nio.file.NoSuchFileException;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
@@ -45,7 +45,8 @@ public class FolderListener implements Runnable {
     private final Duration timeout;
     private final FileHandlerCallback fileHandlerCallback;
     private final Duration fileLengthCheckDelay;
-    private volatile boolean success;
+    //private volatile boolean success;
+    private long timeoutExpired;
 
     public FolderListener(String directory, Duration timeout, FileHandlerCallback fileHandlerCallback, Duration fileLengthCheckDelay) {
         this.directory = directory;
@@ -58,63 +59,82 @@ public class FolderListener implements Runnable {
     public void run() {
         pollFile();
     }
+    
+    
+    private boolean waitForDirectory() throws InterruptedException {
+    	File file = new File(directory);
+		if (file.exists()) {
+    		return true;
+    	} else {
+    		LOGGER.debug("FolderListener for directory {} expect to create it", directory);
+    	}
+
+		while (timeoutExpired >= System.currentTimeMillis()) {
+    		Thread.sleep(1000);
+    		if (file.exists()) {
+        		return true;
+        	}
+    	}
+    	return false;
+    }
 
     private void pollFile() {
         Path directoryPath = Paths.get(directory);
         String directoryName = directoryPath.toAbsolutePath().toString();
-        boolean handleCalled = false;
-        int retryCount = 0;
-        int retryContMax = 1200;
-        
+        boolean fileHandled = false;
+    	long timeoutMillis = timeout.toMilliseconds();
+    	timeoutExpired = System.currentTimeMillis() + timeoutMillis;
+    	
+    	try {
+    		if (!waitForDirectory()) {
+    			LOGGER.error("FolderListener error. Timeout expired and directory {} not exists", directoryName);
+    			fileHandlerCallback.handleError();
+    			return;
+    		}
+    	} catch (InterruptedException e) {
+    		LOGGER.debug("FolderListener for directory {} has been interrupted", directoryName);
+    	}
+    	
         LOGGER.debug("Registers a new watcher for directory {} with timeout {} sec", directoryName, timeout.toSeconds());
-        while ( retryCount < retryContMax ) {
-	        try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
-	            directoryPath.register(watcher, ENTRY_CREATE);
-	            LOGGER.debug("Registered a new watcher for directory {}", directoryName);
-	
-	            long endTimeout = System.currentTimeMillis() + timeout.toMilliseconds();
-	            while (true) {
-	                final WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
-	                if (watchKey != null) {
-	                    for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
-	                        final WatchEvent.Kind<?> kind = watchEvent.kind();
-	                        String fileName = watchEvent.context().toString();
-	                        
-	                        if (kind == ENTRY_CREATE) {
-	                            if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
-	                            	LOGGER.debug("Folder listener {} handle file {}", directoryName, fileName);
-	                            	handleCalled = true;
-	                                handleFileAsync(fileName);
-	                           	}
-	                        }
-	                    }
-	                    watchKey.reset();
-	                }
-	                if ( endTimeout < System.currentTimeMillis() ) {
-	                    LOGGER.debug("Timeout expired for FolderListener directory {}", directoryName);
-	                    break;
-	                }
-	                /*if (handleCalled) {
-	                	handleCalled = false;
-	                	if (!success) {
-	                		LOGGER.warn("Either could not receive a response, or there was an error during response processing");
-	                		fileHandlerCallback.handleError();
-	                	}
-	                }*/
-	            }
-	            LOGGER.debug("Closing a watcher for directory {}", directoryName);
-	        } catch (NoSuchFileException e) {
-		        retryCount++;
-				LOGGER.warn("FolderListenerExecutor exception for folder {}. Waits one second, attempt {}. Error: {}", directoryName, retryContMax, e);
-		        continue;
-			} catch (InterruptedException e) {
-				LOGGER.debug("Closing a watcher for directory {} has been interrupted", directoryName);
-			} catch (Exception e) {
-	        	LOGGER.warn("FolderListenerExecutor exception for folder {}", directoryName, e);
-	            throw new DlabException("FolderListenerExecutor exception for folder {}" + directoryName, e);
-	        }
-	        break;
-        }
+		try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
+			directoryPath.register(watcher, ENTRY_CREATE);
+			LOGGER.debug("Registered a new watcher for directory {}", directoryName);
+
+			while (true) {
+				final WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
+				if (watchKey != null) {
+					for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
+						final WatchEvent.Kind<?> kind = watchEvent.kind();
+						String fileName = watchEvent.context().toString();
+
+						if (kind == ENTRY_CREATE) {
+							if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
+								LOGGER.debug("Folder listener {} handle file {}", directoryName, fileName);
+								handleFileAsync(fileName);
+								fileHandled = true;
+							}
+						}
+					}
+					watchKey.reset();
+				}
+				if (timeoutExpired < System.currentTimeMillis()) {
+					if ( fileHandled ) {
+						LOGGER.debug("Timeout expired for FolderListener directory {}", directoryName);
+						break;
+					} else {
+						LOGGER.warn("Timeout expired for FolderListener directory {}", directoryName);
+						fileHandlerCallback.handleError();
+		    			break;
+					}
+				}
+			}
+			LOGGER.debug("Closing a watcher for directory {}", directoryName);
+		} catch (InterruptedException e) {
+			LOGGER.debug("FolderListener for directory {} has been interrupted", directoryName);
+		} catch (Exception e) {
+			LOGGER.warn("FolderListenerExecutor exception for folder {}", directoryName, e);
+			throw new DlabException("FolderListenerExecutor exception for folder " + directoryName, e);
+		}
     }
 
     private void handleFileAsync(String fileName) {
