@@ -159,7 +159,6 @@ if __name__ == "__main__":
         logging.error('MongoDB configuration script has failed.')
         sys.exit(1)
 
-    run('export DLAB_CONF_DIR={}'.format(dlab_conf_dir))
     sudo('echo DLAB_CONF_DIR={} >> /etc/profile'.format(dlab_conf_dir))
     sudo('echo export DLAB_CONF_DIR >> /etc/profile')
 
