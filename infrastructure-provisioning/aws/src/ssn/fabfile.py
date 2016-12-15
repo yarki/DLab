@@ -287,7 +287,9 @@ def run():
         env.host_string = 'ubuntu@' + instance_hostname
         try:
             put('/root/result.json', '/home/ubuntu/%s.json' % os.environ['request_id'])
-            sudo('mv /home/ubuntu/' + os.environ['request_id'] + '.json /var/log/dlab/ssn/')
+            sudo('mv /home/ubuntu/' + os.environ['request_id'] + '.json /opt/dlab/tmp/result/')
+            put(local_log_filepath, '/home/ubuntu/ssn.log')
+            sudo('mv /home/ubuntu/ssn.log /var/opt/dlab/log/ssn/')
         except:
             print 'Failed to upload response file'
             sys.exit(1)
