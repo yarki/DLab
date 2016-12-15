@@ -1,5 +1,7 @@
 package com.epam.dlab.auth.core;
 
+import com.aegisql.conveyor.State;
+import com.aegisql.conveyor.Testing;
 import com.aegisql.conveyor.cart.command.CancelCommand;
 import com.aegisql.conveyor.utils.caching.CachingConveyor;
 import com.aegisql.conveyor.utils.caching.ImmutableReference;
@@ -9,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /*
@@ -41,6 +45,7 @@ public class LoginCache extends CachingConveyor<String,String,UserInfo> {
         this.setName("UserInfoCache");
         this.setIdleHeartBeat(1, TimeUnit.SECONDS);
         this.setDefaultBuilderTimeout(60, TimeUnit.MINUTES);
+        this.enablePostponeExpirationOnTimeout(false);
         this.enablePostponeExpiration(true);
         this.setExpirationPostponeTime(60,TimeUnit.MINUTES);
         this.setDefaultCartConsumer((b,l,s)-> LOG.debug("UserInfoCache consume {} {}",l,s.get()));

@@ -48,7 +48,7 @@ public class LoginConveyorTest {
         System.out.println("Future now: "+ui);
     }
 
-    @Test(expected = TimeoutException.class)
+    @Test(expected = CancellationException.class)
     public void cacheTest() throws ExecutionException, InterruptedException, TimeoutException {
         LoginCache cache = LoginCache.getInstance();
 System.out.println("---cacheTest");
@@ -68,7 +68,7 @@ System.out.println("---cacheTest");
         f.get();
         //this will take at least 2 seconds
         for(int i = 0; i < 10; i++) {
-            UserInfo ui = cache.getUserInfo("1");
+            UserInfo ui = cache.getUserInfo("2");
             System.out.println(i+": "+ui);
             Thread.sleep(200);
         }
