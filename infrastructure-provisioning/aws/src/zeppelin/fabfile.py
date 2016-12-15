@@ -142,7 +142,7 @@ def run():
     try:
         logging.info('[INSTALLING PREREQUISITES TO ZEPPELIN NOTEBOOK INSTANCE]')
         print('[INSTALLING PREREQUISITES TO ZEPPELIN NOTEBOOK INSTANCE]')
-        N params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
+        params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
         if not run_routine('install_prerequisites', params):
             logging.info('Failed installing apps: apt & pip')
             with open("/root/result.json", 'w') as result:
