@@ -513,18 +513,22 @@ def get_ami_id(ami_name):
 
 def get_iam_profile(profile_name, count=0):
     client = boto3.client('iam')
+    iam_profile = ''
     try:
-        if count < 20:
+        if count < 10:
             response = client.get_instance_profile(InstanceProfileName=profile_name)
-            iam_profile = response.get('InstanceProfileName')
+            iam_profile = response.get('InstanceProfile').get('InstanceProfileName')
+            time.sleep(5)
             print 'IAM profile checked. Creating instance...'
         else:
-            raise Exception("Unable to find IAM profile by name: " + profile_name)
+            print "Unable to find IAM profile by name: " + profile_name
+            return False
     except:
-        count = count + 1
+        count += 1
         print 'IAM profile is not available yet. Waiting...'
-        time.sleep(10)
+        time.sleep(5)
         get_iam_profile(profile_name, count)
+    print iam_profile
     return iam_profile
 
 

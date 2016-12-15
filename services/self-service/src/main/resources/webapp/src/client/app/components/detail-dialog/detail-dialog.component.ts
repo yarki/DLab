@@ -30,20 +30,23 @@ import {DateUtils} from './../../util/dateUtils'
  export class DetailDialog {
    notebook: any;
    upTimeInHours: number;
-   upTimeSince: string = "";
+   upTimeSince: string = '';
+   tooltip: boolean = false;
+
    @ViewChild('bindDialog') bindDialog;
 
- 	open(param, notebook) {
+ 	public open(param, notebook): void {
+    this.tooltip = false;
     this.notebook = notebook;
 
-    if(notebook.time) {
-      this.upTimeInHours = DateUtils.diffBetweenDatesInHours(this.notebook.time);
-      this.upTimeSince = new Date(this.notebook.time).toString();
-    }
-    else {
-      this.upTimeInHours = null;
-      this.upTimeSince = null;
-    }
+    this.upTimeInHours = (notebook.time) ? DateUtils.diffBetweenDatesInHours(this.notebook.time) : 0;
+    this.upTimeSince = (notebook.time) ? new Date(this.notebook.time).toString() : '';
+
     this.bindDialog.open(param);
+   }
+
+   public isEllipsisActive($event): void {
+     if ($event.target.offsetWidth < $event.target.scrollWidth)
+       this.tooltip = true;
    }
  }

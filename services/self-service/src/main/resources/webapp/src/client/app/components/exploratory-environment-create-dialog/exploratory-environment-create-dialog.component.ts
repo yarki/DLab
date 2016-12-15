@@ -38,8 +38,9 @@ export class ExploratoryEnvironmentCreateDialog {
   notebookExist: boolean = false;
   checkValidity: boolean = false;
   templateDescription: string;
-  namePattern = "[-_ a-zA-Z0-9]+";
+  namePattern = "[-_a-zA-Z0-9]+";
   resourceGrid: any;
+  environment_shape: string;
 
   processError: boolean = false;
   errorMessage: string = '';
@@ -48,8 +49,8 @@ export class ExploratoryEnvironmentCreateDialog {
 
   @ViewChild('bindDialog') bindDialog;
   @ViewChild('environment_name') environment_name;
-  @ViewChild('environment_shape') environment_shape;
-
+  @ViewChild('templatesList') templates_list;
+  @ViewChild('shapesList') shapes_list;
 
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
@@ -71,6 +72,22 @@ export class ExploratoryEnvironmentCreateDialog {
     });
   }
 
+  setDefaultParams(): void {
+    this.environment_shape = this.model.selectedItem.shapes[0].type;
+    this.templates_list.setDefaultOptions(this.model.selectedItem.template_name, 'template', 'template_name');
+    this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'shape', 'type');
+  }
+
+  onUpdate($event): void {
+    if($event.model.type === 'template') {
+      this.model.setSelectedTemplate($event.model.index);
+      this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'shape', 'type');
+    }
+
+    if($event.model.type === 'shape')
+      this.environment_shape = $event.model.value.type;
+  }
+
   createExploratoryEnvironment_btnClick($event, data, valid, shape) {
     this.notebookExist = false;
     this.checkValidity = true;
@@ -79,20 +96,15 @@ export class ExploratoryEnvironmentCreateDialog {
       this.notebookExist = true;
       return false;
     }
-
     this.model.setCreatingParams(data.environment_name, shape);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
   }
 
-  templateSelectionChanged(value) {
-    this.model.setSelectedTemplate(value);
-  }
-
-  open(params) {
+  public open(params): void {
     if (!this.bindDialog.isOpened) {
-      this.model = new ExploratoryEnvironmentCreateModel('', '', '', '', (response: Response) => {
+      this.model = new ExploratoryEnvironmentCreateModel('', '', '', (response: Response) => {
         if (response.status === HTTP_STATUS_CODES.OK) {
           this.close();
           this.buildGrid.emit();
@@ -107,12 +119,13 @@ export class ExploratoryEnvironmentCreateDialog {
         },
         () => {
           this.bindDialog.open(params);
+          this.setDefaultParams();
         },
         this.userResourceService);
     }
   }
 
-  close() {
+  public close(): void {
     if (this.bindDialog.isOpened)
       this.bindDialog.close();
   }
