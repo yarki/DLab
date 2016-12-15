@@ -33,7 +33,7 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 args = parser.parse_args()
 
 dlab_conf_dir='/etc/opt/dlab'
-web_path = '/tmp/web_app/'
+web_path = '/opt/dlab/webapp/lib/'
 local_log_filename = "{}_UI.log".format(os.environ['request_id'])
 local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
 logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
