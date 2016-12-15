@@ -28,73 +28,32 @@ import {Component, Input, Output, EventEmitter, ElementRef, ViewChild, ViewEncap
 
 export class Modal {
 
-    // -------------------------------------------------------------------------
-    // Inputs
-    // -------------------------------------------------------------------------
+    @Input() modalClass: string;
+    @Input() title: string;
+    @Input() cancelButtonLabel: string;
+    @Input() submitButtonLabel: string;
+    @Input() hideCloseButton: boolean = false;
+    @Input() closeOnEscape: boolean = true;
 
-    @Input()
-    modalClass: string;
+    @Output() onOpen = new EventEmitter(false);
+    @Output() onClose = new EventEmitter(false);
+    @Output() onSubmit = new EventEmitter(false);
 
-    @Input()
-    closeOnEscape: boolean = true;
-
-    @Input()
-    closeOnOutsideClick: boolean = true;
-
-    @Input()
-    title: string;
-
-    @Input()
-    hideCloseButton = false;
-
-    @Input()
-    cancelButtonLabel: string;
-
-    @Input()
-    submitButtonLabel: string;
-
-    // -------------------------------------------------------------------------
-    // Outputs
-    // -------------------------------------------------------------------------
-
-    @Output()
-    onOpen = new EventEmitter(false);
-
-    @Output()
-    onClose = new EventEmitter(false);
-
-    @Output()
-    onSubmit = new EventEmitter(false);
-
-    // -------------------------------------------------------------------------
-    // Public properties
-    // -------------------------------------------------------------------------
-
-    isOpened = false;
-    onClosing: Function;
-    isHeader = true;
-    isFooter = true;
-
-    // -------------------------------------------------------------------------
-    // Private properties
-    // -------------------------------------------------------------------------
-
-    @ViewChild("modalRoot")
-    private modalRoot: ElementRef;
-
+    @ViewChild('modalRoot') private modalRoot: ElementRef;
     private backdropElement: HTMLElement;
 
-    // -------------------------------------------------------------------------
-    // Constructor
-    // -------------------------------------------------------------------------
+    isOpened: boolean = false;
+    isHeader: boolean = true;
+    isFooter: boolean = true;
+    onClosing: Function;
 
     constructor() {
         this.createBackDrop();
     }
 
-    // -------------------------------------------------------------------------
-    // Lifecycle Methods
-    // -------------------------------------------------------------------------
+    closeOnOutsideClick($event): boolean {
+      return ($event.target && $event.target.id === 'modalRoot')
+    }
 
     ngOnDestroy() {
         document.body.className = document.body.className.replace(/modal-open\b/, "");
@@ -102,11 +61,7 @@ export class Modal {
             document.body.removeChild(this.backdropElement);
     }
 
-    // -------------------------------------------------------------------------
-    // Public Methods
-    // -------------------------------------------------------------------------
-
-    open(option: Object, GridRowModel: Object, ...args: any[]) {
+    public open(option: Object, ...args: any[]) :void {
         if (this.isOpened)
             return;
 
@@ -123,7 +78,7 @@ export class Modal {
         document.body.className += " modal-open";
     }
 
-    close(...args: any[]) {
+    public close(...args: any[]) :void {
         if (!this.isOpened)
             return;
 
@@ -133,14 +88,9 @@ export class Modal {
         this.onClose.emit(args);
         document.body.removeChild(this.backdropElement);
         document.body.className = document.body.className.replace(/modal-open\b/, "");
-    }
 
-    // -------------------------------------------------------------------------
-    // Private Methods
-    // -------------------------------------------------------------------------
-
-    private preventClosing(event: MouseEvent) {
-        event.stopPropagation();
+        if(document.getElementsByClassName('dropdown open').length)
+          document.getElementsByClassName('dropdown open')[0].classList.remove('open');
     }
 
     private createBackDrop() {

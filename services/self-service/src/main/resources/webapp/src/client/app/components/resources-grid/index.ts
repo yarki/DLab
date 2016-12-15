@@ -24,7 +24,7 @@ import { ModalModule } from './../modal/index';
 import { ComputationalResourceCreateDialogModule } from './../computational-resource-create-dialog/index';
 import { ConfirmationDialogModule } from './../confirmation-dialog/index';
 import { DetailDialogModule } from './../detail-dialog/index';
-import { MultiSelectDropdownModule } from './../multi-select-dropdown/index';
+import { MultiSelectDropdownModule } from './../form-controls/multi-select-dropdown/index';
 
 export * from "./resources-grid.component";
 

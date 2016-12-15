@@ -178,6 +178,8 @@ def create_iam_role(role_name, role_profile):
     try:
         conn.create_role(RoleName=role_name, AssumeRolePolicyDocument='{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":["ec2.amazonaws.com"]},"Action":["sts:AssumeRole"]}]}')
         conn.create_instance_profile(InstanceProfileName=role_profile)
+        waiter = conn.get_waiter('instance_profile_exists')
+        waiter.wait(InstanceProfileName=role_profile)
     except botocore.exceptions.ClientError as e_role:
         if e_role.response['Error']['Code'] == 'EntityAlreadyExists':
             print "Instance profile already exists. Reusing..."
@@ -348,10 +350,12 @@ def remove_all_iam_resources(instance_type, scientist=''):
         print "[Removing IAM roles, instance profiles and policies]"
         client = boto3.client('iam')
         roles_list = []
-        for item in client.list_roles().get("Roles"):
+        for item in client.list_roles(MaxItems=250).get("Roles"):
             if os.environ['conf_service_base_name'] in item.get("RoleName"):
                 roles_list.append(item.get('RoleName'))
         if roles_list:
+            roles_list.sort(reverse=True)
+            print roles_list
             for iam_role in roles_list:
                 if '-ssn-Role' in iam_role:
                     if instance_type == 'ssn' or instance_type == 'all':
@@ -496,7 +500,7 @@ def deregister_image(scientist):
         images_list = response.get('Images')
         for i in images_list:
             client.deregister_image(ImageId=i.get('ImageId'))
-            print "Notebook AMI " + i + " has been deregistered successfully"
+            print "Notebook AMI has been deregistered successfully"
     except Exception as err:
         logging.info("Unable to de-register image: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
