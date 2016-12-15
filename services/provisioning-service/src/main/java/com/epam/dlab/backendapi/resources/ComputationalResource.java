@@ -73,6 +73,7 @@ public class ComputationalResource implements DockerCommands {
             long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
             commandExecuter.executeAsync(
                     ui.getName(),
+                    uuid,
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
                                     .withInteractive()
@@ -105,6 +106,7 @@ public class ComputationalResource implements DockerCommands {
         try {
             commandExecuter.executeAsync(
                     ui.getName(),
+                    uuid,
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
                                     .withInteractive()

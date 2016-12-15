@@ -69,6 +69,7 @@ public class DockerResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         commandExecuter.executeAsync(
                 ui.getName(),
+                uuid,
                 new RunDockerCommand()
                         .withName(nameContainer("image", "runner"))
                         .withVolumeForRootKeys(configuration.getKeyDirectory())

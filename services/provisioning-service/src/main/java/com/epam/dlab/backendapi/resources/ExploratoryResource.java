@@ -100,7 +100,7 @@ public class ExploratoryResource implements DockerCommands {
                 .withImage(configuration.getNotebookImage())
                 .withAction(action);
 
-        commandExecuter.executeAsync(username,commandBuilder.buildCommand(runDockerCommand, dto));
+        commandExecuter.executeAsync(username,uuid,commandBuilder.buildCommand(runDockerCommand, dto));
         return uuid;
     }
 

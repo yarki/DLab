@@ -70,6 +70,7 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
                                      getFileHandlerCallback(edgeDto.getIamUser(), uuid));
         commandExecuter.executeAsync(
                 username,
+                uuid,
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
                                 .withName(nameContainer(edgeDto.getEdgeUserName(), "create", "edge"))

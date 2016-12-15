@@ -34,15 +34,15 @@ import java.util.concurrent.ExecutionException;
 public class CommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
 
-    public List<String> executeSync(final String username,String command) throws IOException, InterruptedException, ExecutionException {
+    public List<String> executeSync(final String username,final String uuid,String command) throws IOException, InterruptedException, ExecutionException {
 
-        CompletableFuture<ProcessInfo> f = DlabProcess.getInstance().start(username,command);
+        CompletableFuture<ProcessInfo> f = DlabProcess.getInstance().start(username,uuid, command);
         ProcessInfo pi = f.get();
         return Arrays.asList(pi.getStdOut().split("\n"));
     }
 
-    public void executeAsync(final String username, final String command) {
-        DlabProcess.getInstance().start(username,command);
+    public void executeAsync(final String username, final String uuid, final String command) {
+        DlabProcess.getInstance().start(username,uuid, command);
     }
 
     private String[] createCommand(String command) {

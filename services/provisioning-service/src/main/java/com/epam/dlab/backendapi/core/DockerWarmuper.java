@@ -19,9 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.core;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.commands.CommandExecutor;
-import com.epam.dlab.backendapi.core.commands.DockerCommands;
-import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
+import com.epam.dlab.backendapi.core.commands.*;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
@@ -60,7 +58,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
         folderListenerExecutor.start(configuration.getWarmupDirectory(),
                 configuration.getWarmupPollTimeout(),
                 getFileHandlerCallback());
-        List<String> images = commandExecutor.executeSync("warmup",GET_IMAGES);
+        List<String> images = commandExecutor.executeSync("warmup",DockerCommands.generateUUID(),GET_IMAGES);
         for (String image : images) {
             LOGGER.debug("image: {}", image);
             String uuid = UUID.randomUUID().toString();
@@ -71,7 +69,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
                     .withRequestId(uuid)
                     .withActionDescribe(image)
                     .toCMD();
-            commandExecutor.executeAsync("warmup",command);
+            commandExecutor.executeAsync("warmup",DockerCommands.generateUUID(),command);
         }
     }
 
