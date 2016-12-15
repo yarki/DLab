@@ -168,8 +168,8 @@ def creating_service_directories():
             sudo('mkdir -p /var/opt/dlab/log/edge')
             sudo('mkdir -p /var/opt/dlab/log/notebook')
             sudo('mkdir -p /var/opt/dlab/log/emr')
-            sudo('ln -s /opt/dlab/conf/ /etc/opt/dlab/')
-            sudo('ln -s /var/opt/dlab/log/ /var/log/dlab/')
+            sudo('ln -s /opt/dlab/conf /etc/opt/dlab')
+            sudo('ln -s /var/opt/dlab/log /var/log/dlab')
         return True
     except:
         return False
