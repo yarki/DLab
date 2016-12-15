@@ -78,8 +78,7 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
     }
 
     private void waitFileCompletelyWritten(File file, long before) throws InterruptedException {
-    	// TODO: Remove this method. This issue have fixed in FolderListener class
-        Thread.sleep(fileLengthCheckDelay.toMilliseconds());
+    	Thread.sleep(fileLengthCheckDelay.toMilliseconds());
         long after = file.length();
         if (before != after) {
             waitFileCompletelyWritten(file, after);

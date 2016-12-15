@@ -26,7 +26,12 @@ import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -45,7 +50,8 @@ public class FolderListener implements Runnable {
     private final Duration timeout;
     private final FileHandlerCallback fileHandlerCallback;
     private final Duration fileLengthCheckDelay;
-    //private volatile boolean success;
+    private final Path directoryPath;
+    private final String directoryName;
     private long timeoutExpired;
 
     public FolderListener(String directory, Duration timeout, FileHandlerCallback fileHandlerCallback, Duration fileLengthCheckDelay) {
@@ -53,6 +59,9 @@ public class FolderListener implements Runnable {
         this.timeout = timeout;
         this.fileHandlerCallback = fileHandlerCallback;
         this.fileLengthCheckDelay = fileLengthCheckDelay;
+        
+        directoryPath = Paths.get(directory);
+        directoryName = directoryPath.toAbsolutePath().toString();
     }
 
     @Override
@@ -77,11 +86,30 @@ public class FolderListener implements Runnable {
     	}
     	return false;
     }
+    
+    private void checkFutures(Map<String, CompletableFuture<Boolean>> futureList) {
+    	Iterator<Entry<String, CompletableFuture<Boolean>>> i = futureList.entrySet().iterator();
+    	while (i.hasNext()) { 
+    		Entry<String, CompletableFuture<Boolean>> item = i.next();
+    		String fileName = item.getKey();
+    		CompletableFuture<Boolean> future = item.getValue();
+    		if ( future.isDone() ) {
+    			try {
+					LOGGER.debug("FolderListener for directory {} processed file {} with result {}", directoryName, fileName, future.get());
+				} catch (InterruptedException | ExecutionException e) {
+					// Nothing
+				}
+    			futureList.remove(fileName);
+    		}
+		}
+    	
+    	Iterator<String> keys= futureList.keySet().iterator();
+    	while (keys.hasNext()) { 
+			LOGGER.debug("FolderListener for directory {} still process file {}", directoryName, keys.next());
+		}
+    }
 
     private void pollFile() {
-        Path directoryPath = Paths.get(directory);
-        String directoryName = directoryPath.toAbsolutePath().toString();
-        boolean fileHandled = false;
     	long timeoutMillis = timeout.toMilliseconds();
     	timeoutExpired = System.currentTimeMillis() + timeoutMillis;
     	
@@ -96,6 +124,9 @@ public class FolderListener implements Runnable {
     	}
     	
         LOGGER.debug("Registers a new watcher for directory {} with timeout {} sec", directoryName, timeout.toSeconds());
+        Map<String, CompletableFuture<Boolean>> futureList = new HashMap<String, CompletableFuture<Boolean>>();
+        boolean handleCalled = false; 
+        
 		try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
 			directoryPath.register(watcher, ENTRY_CREATE);
 			LOGGER.debug("Registered a new watcher for directory {}", directoryName);
@@ -110,19 +141,20 @@ public class FolderListener implements Runnable {
 						if (kind == ENTRY_CREATE) {
 							if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
 								LOGGER.debug("Folder listener {} handle file {}", directoryName, fileName);
-								handleFileAsync(fileName);
-								fileHandled = true;
+								handleCalled = true;
+								futureList.put(fileName, handleFileAsync(fileName));
 							}
 						}
 					}
 					watchKey.reset();
 				}
 				if (timeoutExpired < System.currentTimeMillis()) {
-					if ( fileHandled ) {
+					if ( handleCalled ) {
+						checkFutures(futureList);
 						LOGGER.debug("Timeout expired for FolderListener directory {}", directoryName);
 						break;
 					} else {
-						LOGGER.warn("Timeout expired for FolderListener directory {}", directoryName);
+						LOGGER.warn("Timeout expired for FolderListener directory {}. Did not had of files for processing", directoryName);
 						fileHandlerCallback.handleError();
 		    			break;
 					}
@@ -137,9 +169,8 @@ public class FolderListener implements Runnable {
 		}
     }
 
-    private void handleFileAsync(String fileName) {
-        CompletableFuture
-                .supplyAsync(new AsyncFileHandler(fileName, directory, fileHandlerCallback, fileLengthCheckDelay))
-                /*.thenAccept(result -> success = success || result)*/;
+    private CompletableFuture<Boolean> handleFileAsync(String fileName) {
+    	return CompletableFuture
+                .supplyAsync(new AsyncFileHandler(fileName, directory, fileHandlerCallback, fileLengthCheckDelay));
     }
 }
