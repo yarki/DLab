@@ -85,6 +85,8 @@ def start_ss():
     try:
         if not exists('/opt/dlab/tmp/ss_started'):
             supervisor_conf = '/etc/supervisor/conf.d/supervisor_svc.conf'
+            put('/root/templates/ssn.yml', '/tmp/ssn.yml')
+            sudo('mv /tmp/ssn.yml /opt/dlab/conf/')
             put('/root/templates/proxy_location_webapp_template.conf', '/tmp/proxy_location_webapp_template.conf')
             sudo('mv /tmp/proxy_location_webapp_template.conf /opt/dlab/tmp/')
             put('/root/templates/supervisor_svc.conf', '/tmp/supervisor_svc.conf')
