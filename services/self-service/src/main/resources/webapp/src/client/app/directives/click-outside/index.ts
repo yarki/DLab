@@ -16,8 +16,8 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { NgModule, Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ClickOutside } from './click-outside.directive';
 
 export * from './click-outside.directive';

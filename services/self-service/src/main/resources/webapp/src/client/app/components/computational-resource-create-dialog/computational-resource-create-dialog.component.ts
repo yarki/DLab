@@ -16,11 +16,11 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Response } from "@angular/http";
-import { UserResourceService } from "../../services/userResource.service";
-import { ComputationalResourceCreateModel } from "./computational-resource-create.model";
+import { Response } from '@angular/http';
+import { UserResourceService } from '../../services/userResource.service';
+import { ComputationalResourceCreateModel } from './computational-resource-create.model';
 
 import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
@@ -38,8 +38,8 @@ export class ComputationalResourceCreateDialog {
   shapes: any;
   computationalResourceExist: boolean = false;
   checkValidity: boolean = false;
-  clusterNamePattern: string = "[-_a-zA-Z0-9]+";
-  nodeCountPattern: string = "^[1-9]\\d*$";
+  clusterNamePattern: string = '[-_a-zA-Z0-9]+';
+  nodeCountPattern: string = '^[1-9]\\d*$';
 
   processError: boolean = false;
   errorMessage: string = '';
@@ -67,40 +67,23 @@ export class ComputationalResourceCreateDialog {
     this.bindDialog.onClosing = () => this.resetDialog();
   }
 
-  private initFormModel(): void {
-    this.createComputationalResourceForm = this._fb.group({
-      cluster_alias_name: ['', [Validators.required, Validators.pattern(this.clusterNamePattern)]],
-      instance_number: ['1', [Validators.required, Validators.pattern(this.nodeCountPattern)]]
-    });
-  }
-
-  private setDefaultParams(): void {
-    this.shapes = {
-      master_shape: this.model.selectedItem.shapes[0].type,
-      slave_shape: this.model.selectedItem.shapes[0].type
-    };
-    this.templates_list.setDefaultOptions(this.model.selectedItem.version, 'template', 'version');
-    this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'master_shape', 'type');
-    this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'slave_shape', 'type');
-  }
-
   public isNumberKey($event): boolean {
     let charCode = ($event.which) ? $event.which : $event.keyCode;
-      if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-        $event.preventDefault();
-        return false;
-      }
-      return true;
+    if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+      $event.preventDefault();
+      return false;
+    }
+    return true;
   }
 
   public onUpdate($event): void {
-    if($event.model.type === 'template') {
+    if ($event.model.type === 'template') {
       this.model.setSelectedTemplate($event.model.index);
       this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'master_shape', 'type');
       this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'slave_shape', 'type');
     }
 
-    if(this.shapes[$event.model.type])
+    if (this.shapes[$event.model.type])
       this.shapes[$event.model.type] = $event.model.value.type;
   }
 
@@ -120,12 +103,14 @@ export class ComputationalResourceCreateDialog {
   }
 
   public containsComputationalResource(conputational_resource_name: string): boolean {
-    if(conputational_resource_name)
+    if (conputational_resource_name)
       for (var index = 0; index < this.notebook_instance.resources.length; index++)
-        if (conputational_resource_name.toLowerCase() == this.notebook_instance.resources[index].computational_name.toString().toLowerCase())
-            return true;
+        var computational_name = this.notebook_instance.resources[index].computational_name.toString().toLowerCase();
 
-      return false;
+        if (conputational_resource_name.toLowerCase() === computational_name)
+          return true;
+
+    return false;
   }
 
   public open(params, notebook_instance): void {
@@ -158,6 +143,23 @@ export class ComputationalResourceCreateDialog {
   public close(): void {
     if (this.bindDialog.isOpened)
       this.bindDialog.close();
+  }
+
+  private initFormModel(): void {
+    this.createComputationalResourceForm = this._fb.group({
+      cluster_alias_name: ['', [Validators.required, Validators.pattern(this.clusterNamePattern)]],
+      instance_number: ['1', [Validators.required, Validators.pattern(this.nodeCountPattern)]]
+    });
+  }
+
+  private setDefaultParams(): void {
+    this.shapes = {
+      master_shape: this.model.selectedItem.shapes[0].type,
+      slave_shape: this.model.selectedItem.shapes[0].type
+    };
+    this.templates_list.setDefaultOptions(this.model.selectedItem.version, 'template', 'version');
+    this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'master_shape', 'type');
+    this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'slave_shape', 'type');
   }
 
   private resetDialog(): void {

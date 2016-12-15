@@ -24,7 +24,7 @@ import { Input, Output, Component, EventEmitter, ViewEncapsulation} from '@angul
   selector: 'multi-select-dropdown',
   templateUrl: 'multi-select-dropdown.component.html',
   styleUrls: ['./multi-select-dropdown.component.css'],
-  encapsulation : ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None
 })
 
 export class MultiSelectDropdown {
@@ -36,12 +36,12 @@ export class MultiSelectDropdown {
   @Output() selectionChange: EventEmitter<{}> = new EventEmitter();
 
 
-  toggleDropdown() : void {
+  toggleDropdown(): void {
     this.isOpen = !this.isOpen;
   }
 
-  onClickOutside($event:Object) {
-    if($event && $event['value'] === true) {
+  onClickOutside($event: Object) {
+    if ($event && $event['value'] === true) {
       this.isOpen = false;
     }
   }
@@ -56,7 +56,7 @@ export class MultiSelectDropdown {
 
   selectAllOptions($event) {
     this.model = [];
-    this.items.forEach((item) => {this.model.push(item)});
+    this.items.forEach((item) => { this.model.push(item); });
 
     this.onUpdate();
     $event.preventDefault();
@@ -68,8 +68,7 @@ export class MultiSelectDropdown {
     $event.preventDefault();
   }
 
-  onUpdate() : void {
-    this.selectionChange.emit({model : this.model, type: this.type});
-
+  onUpdate(): void {
+    this.selectionChange.emit({ model: this.model, type: this.type });
   }
 }
