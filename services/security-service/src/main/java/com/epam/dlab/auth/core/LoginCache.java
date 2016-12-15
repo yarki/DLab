@@ -4,7 +4,6 @@ import com.aegisql.conveyor.State;
 import com.aegisql.conveyor.Testing;
 import com.aegisql.conveyor.cart.command.CancelCommand;
 import com.aegisql.conveyor.utils.caching.CachingConveyor;
-import com.aegisql.conveyor.utils.caching.ImmutableReference;
 import com.epam.dlab.auth.UserInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +48,12 @@ public class LoginCache extends CachingConveyor<String,String,UserInfo> {
         this.enablePostponeExpiration(true);
         this.setExpirationPostponeTime(60,TimeUnit.MINUTES);
         this.setDefaultCartConsumer((b,l,s)-> LOG.debug("UserInfoCache consume {} {}",l,s.get()));
+        this.setOnTimeoutAction((s)->{
+            LOG.trace("UserInfoCache Timeout {}",s.get());
+        });
+        this.setScrapConsumer(bin->{
+            LOG.debug("UserInfoCache {}: {}", bin.failureType, bin.scrap);
+        });
     }
 
     public void removeUserInfo(String token) {
@@ -65,7 +70,7 @@ public class LoginCache extends CachingConveyor<String,String,UserInfo> {
     }
 
     public void save(UserInfo userInfo) {
-        CompletableFuture<Boolean> cacheFuture = LoginCache.getInstance().createBuild(userInfo.getAccessToken(), ImmutableReference.newInstance(userInfo));
+        CompletableFuture<Boolean> cacheFuture = LoginCache.getInstance().createBuild(userInfo.getAccessToken(), CacheableReference.newInstance(userInfo));
         try {
             if(! cacheFuture.get() ) {
                 throw new Exception("Offer future returned 'false' for "+userInfo);

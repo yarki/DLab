@@ -1,6 +1,5 @@
 package com.epam.dlab.auth.core;
 
-import com.aegisql.conveyor.utils.caching.ImmutableReference;
 import com.amazonaws.services.identitymanagement.model.AccessKeyMetadata;
 import com.epam.dlab.auth.UserInfo;
 import org.junit.After;
@@ -63,7 +62,7 @@ System.out.println("---cacheTest");
         userInfo.setAwsUser(true);
         userInfo.addKey("a","Active");
 
-        CompletableFuture<Boolean> f = cache.createBuild("2", ImmutableReference.newInstance(userInfo));
+        CompletableFuture<Boolean> f = cache.createBuild("2", CacheableReference.newInstance(userInfo));
         CompletableFuture<UserInfo> uif = cache.getFuture("2");
         f.get();
         //this will take at least 2 seconds
