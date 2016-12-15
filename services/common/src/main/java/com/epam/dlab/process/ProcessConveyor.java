@@ -33,6 +33,7 @@ public class ProcessConveyor extends AssemblingConveyor<ProcessId,ProcessStep,Pr
         this.setName("ProcessConveyor");
         this.setIdleHeartBeat(1, TimeUnit.SECONDS);
         this.enablePostponeExpiration(true);
+        this.enablePostponeExpirationOnTimeout(true);
         this.setDefaultCartConsumer((l,v,b)->{
             LOG.warn("default processor for {} {} {}",l,v,b.get());
             if(v instanceof FutureCart) {
