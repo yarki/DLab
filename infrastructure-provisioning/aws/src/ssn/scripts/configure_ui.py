@@ -103,9 +103,15 @@ def start_ss():
             sudo('mkdir -p ' + web_path + 'self-service/')
             sudo('chown -R ubuntu:ubuntu ' + web_path)
             try:
-                local('scp -r -i {} /root/web_app/self-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'self-service/')
-                local('scp -r -i {} /root/web_app/security-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'security-service/')
-                local('scp -r -i {} /root/web_app/provisioning-service/* {}:'.format(args.keyfile, env.host_string) + web_path + 'provisioning-service/')
+                local('scp -r -i {} /root/web_app/self-service/*.jar {}:'.format(args.keyfile, env.host_string) + web_path + 'self-service/')
+                local('scp -r -i {} /root/web_app/security-service/*.jar {}:'.format(args.keyfile, env.host_string) + web_path + 'security-service/')
+                local('scp -r -i {} /root/web_app/provisioning-service/*.jar {}:'.format(args.keyfile, env.host_string) + web_path + 'provisioning-service/')
+                run('mkdir -p /tmp/yml_tmp/')
+                local('scp -r -i {} /root/web_app/self-service/*.yml {}:'.format(args.keyfile, env.host_string) + '/tmp/yml_tmp/')
+                local('scp -r -i {} /root/web_app/security-service/*.yml {}:'.format(args.keyfile, env.host_string) +  '/tmp/yml_tmp/')
+                local('scp -r -i {} /root/web_app/provisioning-service/*.yml {}:'.format(args.keyfile, env.host_string) +  '/tmp/yml_tmp/')
+                sudo('mv /tmp/yml_tmp/* /opt/dlab/conf/')
+                sudo('rmdir /tmp/yml_tmp/')
             except:
                 with open("/root/result.json", 'w') as result:
                     res = {"error": "Unable to upload webapp jars", "conf": os.environ.__dict__}
