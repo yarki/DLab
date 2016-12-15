@@ -39,8 +39,10 @@ spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz
 
 zeppelin_link = "http://mirrors.advancedhosters.com/apache/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-netinst.tgz"
 zeppelin_version = "0.6.2"
+zeppelin_interpreters = "md,python"
 spark_version = "1.6.2"
 hadoop_version = "2.6"
+python3_version = "3.4"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/zeppelin/interpreters/pyspark_local/'
 py3spark_local_path_dir = '/home/ubuntu/.local/share/zeppelin/interpreters/py3spark_local/'
 zeppelin_conf_file = '/home/ubuntu/.local/share/zeppelin/zeppelin_notebook_config.py'
@@ -63,29 +65,12 @@ def prepare_disk():
 def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
-
-def ensure_spark_scala():
-    if not exists('/home/ubuntu/.ensure_dir/spark_scala_ensured'):
+def ensure_jre_jdk():
+    if not exists('/home/ubuntu/.ensure_dir/jre_jdk_ensured'):
         try:
             sudo('apt-get install -y default-jre')
             sudo('apt-get install -y default-jdk')
-            sudo('wget ' + scala_link + ' -O /tmp/scala.deb')
-            sudo('dpkg -i /tmp/scala.deb')
-            sudo('wget ' + spark_link + ' -O /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
-            sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
-            sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
-            sudo('mkdir -p ' + pyspark_local_path_dir)
-            sudo('mkdir -p ' + py3spark_local_path_dir)
-            sudo('touch ' + pyspark_local_path_dir + 'kernel.json')
-            sudo('touch ' + py3spark_local_path_dir + 'kernel.json')
-            put(templates_dir + 'pyspark_local_template.json', '/tmp/pyspark_local_template.json')
-            put(templates_dir + 'py3spark_local_template.json', '/tmp/py3spark_local_template.json')
-            sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
-            sudo('\cp /tmp/py3spark_local_template.json ' + py3spark_local_path_dir + 'kernel.json')
-            sudo('pip install --pre toree --no-cache-dir')
-            sudo('ln -s /opt/spark/ /usr/local/spark')
-            sudo('jupyter toree install')
-            sudo('touch /home/ubuntu/.ensure_dir/spark_scala_ensured')
+            sudo('touch /home/ubuntu/.ensure_dir/jre_jdk_ensured')
         except:
             sys.exit(1)
 
@@ -95,12 +80,9 @@ def ensure_python3_kernel():
         try:
             sudo('apt-get install python3-setuptools')
             sudo('apt install -y python3-pip')
-            sudo('pip3 install ipython ipykernel --no-cache-dir')
-            sudo('python3 -m ipykernel install')
             sudo('add-apt-repository -y ppa:fkrull/deadsnakes')
             sudo('apt update')
-            sudo('apt install -y python3.4 python3.4-dev')
-            sudo('python3.4 -m pip install ipython ipykernel  --upgrade --no-cache-dir')
+            sudo('apt install -y python' + python3_version + ' python' + python3_version +'-dev')
             sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
         except:
             sys.exit(1)
@@ -119,44 +101,9 @@ def ensure_s3_kernel():
         except:
             sys.exit(1)
 
-
-def ensure_r_kernel():
-    if not exists('/home/ubuntu/.ensure_dir/r_kernel_ensured'):
-        try:
-            sudo('apt-get install -y r-base r-base-dev r-cran-rcurl')
-            sudo('apt-get install -y libcurl4-openssl-dev libssl-dev libreadline-dev')
-            sudo('apt-get install -y cmake')
-            #sudo('add-apt-repository -y ppa:webupd8team/java')
-            #sudo('apt-get update')
-            #sudo('echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections')
-            #sudo('echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections')
-            #sudo('apt-get -y install oracle-java8-installer')
-            #sudo('update-java-alternatives -s java-8-oracle')
-            #sudo('apt-get install oracle-java8-set-default')
-            sudo('R CMD javareconf')
-            sudo('cd /root; git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
-            sudo('R -e "install.packages(\'R6\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'pbdZMQ\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'RCurl\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'devtools\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'reshape2\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'caTools\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "library(\'devtools\');install.packages(repos=\'http://cran.us.r-project.org\',c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
-            sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
-            sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
-            sudo('R -e "IRkernel::installspec()"')
-            # sudo('export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin; R -e \'IRkernel::installspec(user = FALSE)\'')
-            # Spark Install
-            sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
-            #sudo('export SPARK_HOME=/usr/local/spark/; cd $SPARK_HOME/R/lib/; sudo R --no-site-file --no-environ --no-save --no-restore CMD INSTALL "SparkR"')
-            sudo('touch /home/ubuntu/.ensure_dir/r_kernel_ensured')
-        except:
-            sys.exit(1)
-
-
 def configure_notebook_server(notebook_name):
     if not exists('/home/ubuntu/.ensure_dir/zeppelin_ensured'):
+        ensure_jre_jdk()
         try:
             sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
             sudo('tar -zxvf /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz -C /opt/')
@@ -165,23 +112,23 @@ def configure_notebook_server(notebook_name):
             sudo('cp /opt/zeppelin/conf/zeppelin-site.xml.template /opt/zeppelin/conf/zeppelin-site.xml')
             sudo('sed -i \"/# export ZEPPELIN_PID_DIR/c\export ZEPPELIN_PID_DIR=/var/run/zeppelin\" /opt/zeppelin/conf/zeppelin-env.sh')
             sudo('sed -i \"/# export ZEPPELIN_IDENT_STRING/c\export ZEPPELIN_IDENT_STRING=notebook\" /opt/zeppelin/conf/zeppelin-env.sh')
-            sudo('chown ubuntu:ubuntu /opt/zeppelin-' + zeppelin_version + '-bin-netinst')
+            put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
+            sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
+            sudo('chown ubuntu:ubuntu -R /opt/zeppelin-' + zeppelin_version + '-bin-netinst')
             sudo('mkdir /var/log/zeppelin')
             sudo('mkdir /var/run/zeppelin')
             sudo('ln -s /var/log/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/logs')
-            sudo('chown ubuntu:ubuntu /var/log/zeppelin')
+            sudo('chown ubuntu:ubuntu -R /var/log/zeppelin')
             sudo('ln -s /var/run/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/run')
-            sudo('chown ubuntu:ubuntu /var/run/zeppelin')
+            sudo('chown ubuntu:ubuntu -R /var/run/zeppelin')
+            sudo('/opt/zeppelin/bin/install-interpreter.sh --name ' + zeppelin_interpreters + ' --proxy_url $http_proxy')
         except:
             sys.exit(1)
-
-        #ensure_spark_scala()
-
         try:
             put(templates_dir + 'zeppelin-notebook.service', '/tmp/zeppelin-notebook.service')
             sudo("chmod 644 /tmp/zeppelin-notebook.service")
             sudo('cp /tmp/zeppelin-notebook.service /etc/systemd/system/zeppelin-notebook.service')
-            sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
+            #sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable zeppelin-notebook")
             sudo("systemctl start zeppelin-notebook")
@@ -189,11 +136,9 @@ def configure_notebook_server(notebook_name):
         except:
             sys.exit(1)
 
-        #ensure_python3_kernel()
+        ensure_python3_kernel()
 
         #ensure_s3_kernel()
-
-        #ensure_r_kernel()
 
 
 ##############
