@@ -48,7 +48,7 @@ public class LoginConveyorTest {
         System.out.println("Future now: "+ui);
     }
 
-    @Test(expected = CancellationException.class)
+    @Test(expected = TimeoutException.class)
     public void cacheTest() throws ExecutionException, InterruptedException, TimeoutException {
         LoginCache cache = LoginCache.getInstance();
 System.out.println("---cacheTest");
