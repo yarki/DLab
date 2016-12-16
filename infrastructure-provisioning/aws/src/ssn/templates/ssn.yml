@@ -1,5 +1,4 @@
 <#assign LOG_ROOT_DIR="/var/opt/dlab/log">
-#<#assign LOG_ROOT_DIR="./log">
 
 mongo:
   host: localhost
