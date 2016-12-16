@@ -20,7 +20,7 @@ import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, ViewEnca
 
 @Component({
   moduleId: module.id,
-  selector: 'modal',
+  selector: 'modal-dialog',
   templateUrl: 'modal.component.html',
   styleUrls: ['./modal.component.css'],
   encapsulation: ViewEncapsulation.None
