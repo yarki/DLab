@@ -28,6 +28,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
+
 public class ProvisioningServiceApplicationConfiguration extends Configuration implements Directories {
     public static final String SELF_SERVICE = "selfService";
 
@@ -86,6 +88,12 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     private int processMaxThreadsPerUser = 5;
     @JsonProperty
     private Duration processTimeout = Duration.hours(3);
+
+    @Valid
+    @NotNull
+    @JsonProperty(SECURITY_SERVICE)
+    private RESTServiceFactory securityFactory;
+
 
     public int getProcessMaxThreadsPerJvm() {
         return processMaxThreadsPerJvm;
@@ -158,4 +166,9 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     public String getKeyLoaderDirectory() {
         return responseDirectory + KEY_LOADER_DIRECTORY;
     }
+
+    public RESTServiceFactory getSecurityFactory() {
+        return securityFactory;
+    }
+
 }

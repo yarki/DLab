@@ -30,10 +30,12 @@ import com.epam.dlab.rest.mappers.RuntimeExceptionMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.name.Names;
 import io.dropwizard.Application;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Environment;
 
+import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 import static com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration.SELF_SERVICE;
 
 public class ProvisioningServiceApplication extends Application<ProvisioningServiceApplicationConfiguration> {
@@ -49,6 +51,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         DlabProcess.getInstance().setMaxProcessesPerUser(configuration.getProcessMaxThreadsPerUser());
         environment.lifecycle().manage(injector.getInstance(DirectoriesCreator.class));
         environment.lifecycle().manage(injector.getInstance(DockerWarmuper.class));
+
         injector.getInstance(SecurityFactory.class).configure(injector, environment);
         JerseyEnvironment jersey = environment.jersey();
         jersey.register(new RuntimeExceptionMapper());
@@ -66,6 +69,8 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
+                bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
+                        .toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE));
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(configuration);
                 bind(MetadataHolder.class).to(DockerWarmuper.class);
                 bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, SELF_SERVICE));
