@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ****************************************************************************/
+/* tslint:disable:no-empty */
 
 import { ConfirmationDialogType } from './confirmation-dialog-type.enum';
 import { Observable } from 'rxjs';

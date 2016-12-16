@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ****************************************************************************/
+/* tslint:disable:no-empty */
 
 import { Response } from '@angular/http';
 import { UserResourceService } from '../../services/userResource.service';
