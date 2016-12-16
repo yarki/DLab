@@ -27,6 +27,7 @@ import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageType;
 import com.google.inject.Inject;
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,5 +77,9 @@ public class DockerResource implements DockerCommands {
                         .toCMD()
         );
         return uuid;
+    }
+
+    public String getCommandLogDirectory() {
+        throw new NotImplementedException("General commands haven't a pre-defined log path");
     }
 }

@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.core.Directories;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.commands.*;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
@@ -93,6 +94,7 @@ public class ExploratoryResource implements DockerCommands {
                 .withName(nameContainer(dto.getNotebookUserName(), action, dto.getExploratoryName()))
                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                 .withVolumeForResponse(configuration.getImagesDirectory())
+                .withVolumeForLog(configuration.getDockerLogDirectory(), getCommandLogDirectory())
                 .withRequestId(uuid)
                 .withCredsKeyName(configuration.getAdminKey())
                 .withImage(configuration.getNotebookImage())
@@ -110,4 +112,7 @@ public class ExploratoryResource implements DockerCommands {
         return nameContainer(user, action.toString(), "exploratory", name);
     }
 
+    public String getCommandLogDirectory() {
+        return Directories.NOTEBOOK_LOG_DIRECTORY;
+    }
 }

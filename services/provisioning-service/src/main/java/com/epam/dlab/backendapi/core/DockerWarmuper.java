@@ -68,6 +68,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
             String command = new RunDockerCommand()
                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                     .withVolumeForResponse(configuration.getWarmupDirectory())
+                    .withVolumeForLog(configuration.getDockerLogDirectory(), getCommandLogDirectory())
                     .withRequestId(uuid)
                     .withActionDescribe(image)
                     .toCMD();
@@ -126,5 +127,10 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     public Set<ImageMetadataDTO> getMetadatas(ImageType type) {
         return metadataDTOs.stream().filter(m -> m.getImageType().equals(type))
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public String getCommandLogDirectory() {
+        return Directories.NOTEBOOK_LOG_DIRECTORY;
     }
 }

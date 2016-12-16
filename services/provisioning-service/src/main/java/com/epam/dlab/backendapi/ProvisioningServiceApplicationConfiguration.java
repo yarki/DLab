@@ -34,6 +34,10 @@ public class ProvisioningServiceApplicationConfiguration extends ServiceConfigur
     @JsonProperty
     private String responseDirectory;
 
+    @NotEmpty
+    @JsonProperty
+    private String dockerLogDirectory;
+
     @JsonProperty
     private Duration warmupPollTimeout = Duration.seconds(3);
 
@@ -118,11 +122,11 @@ public class ProvisioningServiceApplicationConfiguration extends ServiceConfigur
         return responseDirectory + WARMUP_DIRECTORY;
     }
 
-    public String getImagesDirectory() {
-        return responseDirectory + IMAGES_DIRECTORY;
-    }
+    public String getImagesDirectory() { return responseDirectory + IMAGES_DIRECTORY; }
 
     public String getKeyLoaderDirectory() {
         return responseDirectory + KEY_LOADER_DIRECTORY;
     }
+
+    public String getDockerLogDirectory() { return dockerLogDirectory; }
 }

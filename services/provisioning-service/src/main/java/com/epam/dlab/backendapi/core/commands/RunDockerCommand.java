@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.commands;
 
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,7 +30,12 @@ public class RunDockerCommand implements DockerCommand {
 
     private static final String ROOT_KEYS_PATH = "/root/keys";
     private static final String RESPONSE_PATH = "/response";
+    private static final String LOG_PATH = "/logs";
 
+    public RunDockerCommand withVolume(String hostSrcPath, String bindPath) {
+        options.add(String.format("-v %s:%s", hostSrcPath, bindPath));
+        return this;
+    }
 
     public RunDockerCommand withVolumeForRootKeys(String hostSrcPath) {
         return withVolume(hostSrcPath, ROOT_KEYS_PATH);
@@ -39,9 +45,9 @@ public class RunDockerCommand implements DockerCommand {
         return withVolume(hostSrcPath, RESPONSE_PATH);
     }
 
-    public RunDockerCommand withVolume(String hostSrcPath, String bindPath) {
-        options.add(String.format("-v %s:%s", hostSrcPath, bindPath));
-        return this;
+    public RunDockerCommand withVolumeForLog(String hostSrcPath, String logDirectory) {
+        return withVolume(Paths.get(hostSrcPath, logDirectory).toString(),
+                Paths.get(LOG_PATH, logDirectory).toString());
     }
 
     public RunDockerCommand withName(String name) {

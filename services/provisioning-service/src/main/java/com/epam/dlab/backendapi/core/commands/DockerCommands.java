@@ -51,4 +51,6 @@ public interface DockerCommands {
     default String nameContainer(String... names) {
         return String.join("_", names) + "_" + System.currentTimeMillis();
     }
+
+    String getCommandLogDirectory();
 }

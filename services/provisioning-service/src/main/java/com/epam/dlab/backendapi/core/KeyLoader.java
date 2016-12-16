@@ -74,6 +74,7 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
                                 .withName(nameContainer(edgeDto.getEdgeUserName(), "create", "edge"))
                                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                                 .withVolumeForResponse(configuration.getKeyLoaderDirectory())
+                                .withVolumeForLog(configuration.getDockerLogDirectory(), getCommandLogDirectory())
                                 .withRequestId(uuid)
                                 .withCredsKeyName(configuration.getAdminKey())
                                 .withActionCreate(configuration.getEdgeImage())
@@ -126,4 +127,8 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
         JsonNode node = document.get(RESPONSE_NODE).get(RESULT_NODE);
         return MAPPER.readValue(node.toString(), UserAWSCredentialDTO.class);
     }
+
+    @Override
+    public String getCommandLogDirectory() {
+        return Directories.EDGE_LOG_DIRECTORY;}
 }

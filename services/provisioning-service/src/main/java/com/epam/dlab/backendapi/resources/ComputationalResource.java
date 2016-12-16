@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.core.Directories;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.commands.*;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
@@ -76,6 +77,7 @@ public class ComputationalResource implements DockerCommands {
                                     .withName(nameContainer(dto.getEdgeUserName(), CREATE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
+                                    .withVolumeForLog(configuration.getDockerLogDirectory(), getCommandLogDirectory())
                                     .withRequestId(uuid)
                                     .withEc2Role(configuration.getEmrEC2RoleDefault())
                                     .withEmrTimeout(Long.toString(timeout))
@@ -107,6 +109,7 @@ public class ComputationalResource implements DockerCommands {
                                     .withName(nameContainer(dto.getEdgeUserName(), TERMINATE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
+                                    .withVolumeForLog(configuration.getDockerLogDirectory(), getCommandLogDirectory())
                                     .withRequestId(uuid)
                                     .withCredsKeyName(configuration.getAdminKey())
                                     .withActionTerminate(configuration.getEmrImage()),
@@ -127,4 +130,7 @@ public class ComputationalResource implements DockerCommands {
         return nameContainer(user, action.toString(), "computational", name);
     }
 
+    public String getCommandLogDirectory() {
+        return Directories.EMR_LOG_DIRECTORY;
+    }
 }

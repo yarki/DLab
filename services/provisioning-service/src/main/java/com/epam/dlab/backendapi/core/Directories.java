@@ -20,6 +20,9 @@ package com.epam.dlab.backendapi.core;
 
 public interface Directories {
     String WARMUP_DIRECTORY = "/warmup";
-    String IMAGES_DIRECTORY = "/images";
+    String IMAGES_DIRECTORY = "/result";
     String KEY_LOADER_DIRECTORY = "/keyloader";
+    String EDGE_LOG_DIRECTORY = "edge";
+    String NOTEBOOK_LOG_DIRECTORY = "notebook";
+    String EMR_LOG_DIRECTORY = "emr";
 }
