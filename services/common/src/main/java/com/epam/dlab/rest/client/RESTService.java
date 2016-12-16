@@ -45,25 +45,25 @@ public class RESTService {
 
     public <T> T get(String path, Class<T> clazz) {
         Invocation.Builder builder = getBuilder(path);
-        LOG.debug("REST get {}",builder.toString());
+        LOG.debug("REST get {}",path);
         return builder.get(clazz);
     }
 
     public <T> T post(String path, Object parameter, Class<T> clazz) {
         Invocation.Builder builder = getBuilder(path);
-        LOG.debug("REST post {}",builder.toString());
+        LOG.debug("REST post {}",path);
         return builder.post(Entity.json(parameter), clazz);
     }
 
     public <T> T get(String path, String accessToken, Class<T> clazz) {
         Invocation.Builder builder = getBuilder(path,accessToken);
-        LOG.debug("REST get secured {}",accessToken);
+        LOG.debug("REST get secured {} {}",path,accessToken);
         return builder.get(clazz);
     }
 
     public <T> T post(String path, String accessToken, Object parameter, Class<T> clazz) {
         Invocation.Builder builder = getBuilder(path,accessToken);
-        LOG.debug("REST post secured {}",accessToken);
+        LOG.debug("REST post secured {} {}",path,accessToken);
         return builder.post(Entity.json(parameter), clazz);
     }
 
