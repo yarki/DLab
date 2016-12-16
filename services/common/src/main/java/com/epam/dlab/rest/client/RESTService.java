@@ -44,6 +44,14 @@ public class RESTService {
         return getBuilder(path).post(Entity.json(parameter), clazz);
     }
 
+    public <T> T get(String path, String accessToken, Class<T> clazz) {
+        return getBuilder(path).property("access_token",accessToken).get(clazz);
+    }
+
+    public <T> T post(String path, String accessToken, Object parameter, Class<T> clazz) {
+        return getBuilder(path).property("access_token",accessToken).post(Entity.json(parameter), clazz);
+    }
+
     public Invocation.Builder getBuilder(String path) {
         return getWebTarget(path)
                 .request(MediaType.APPLICATION_JSON)

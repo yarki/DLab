@@ -84,7 +84,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withSecurityGroupIds(settingsDAO.getSecurityGroups());
                 LOGGER.debug("created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
-                        .ok(provisioningService.post(EXPLORATORY_CREATE, dto, String.class))
+                        .ok(provisioningService.post(EXPLORATORY_CREATE, userInfo.getAccessToken(), dto, String.class))
                         .build();
             } catch (Throwable t) {
                 infrastructureProvisionDAO.updateExploratoryStatus(createStatusDTO(userInfo.getName(), formDTO.getName(), FAILED));
@@ -136,7 +136,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withKeyDir(settingsDAO.getCredsKeyDir())
                     .withSshUser(settingsDAO.getExploratorySshUser())
                     .withRegion(settingsDAO.getCredsRegion());
-            return provisioningService.post(EXPLORATORY_STOP, dto, String.class);
+            return provisioningService.post(EXPLORATORY_STOP, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
             updateExploratoryStatus(userInfo.getName(), name, FAILED);
             throw new DlabException("Could not stop exploratory environment " + name, t);
@@ -164,7 +164,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(exploratoryId)
                     .withRegion(settingsDAO.getCredsRegion());
-            return provisioningService.post(action, dto, String.class);
+            return provisioningService.post(action, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
             updateExploratoryStatus(userInfo.getName(), name, FAILED);
             throw new DlabException("Could not " + action + " exploratory environment " + name, t);

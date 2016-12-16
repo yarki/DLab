@@ -90,7 +90,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
             UploadFileDTO dto = new UploadFileDTO()
                     .withEdge(edge)
                     .withContent(content);
-            Response response = provisioningService.post(KEY_LOADER, dto, Response.class);
+            Response response = provisioningService.post(KEY_LOADER, userInfo.getAccessToken(), dto, Response.class);
             if (Response.Status.ACCEPTED.getStatusCode() != response.getStatus()) {
                 keyDAO.deleteKey(userInfo.getName());
             }
