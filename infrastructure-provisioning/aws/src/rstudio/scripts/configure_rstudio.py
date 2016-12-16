@@ -66,6 +66,8 @@ def install_rstudio():
             sudo('touch /home/ubuntu/.Rprofile')
             sudo('chown ubuntu:ubuntu /home/ubuntu/.Rprofile')
             sudo('''echo 'library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))' >> /home/ubuntu/.Rprofile''')
+            sudo('R CMD javareconf')
+            sudo('R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
             sudo('rstudio-server start')
             sudo('echo "ubuntu:' + args.rstudio_pass + '" | chpasswd')
             sudo('touch /home/ubuntu/.ensure_dir/rstudio_ensured')
