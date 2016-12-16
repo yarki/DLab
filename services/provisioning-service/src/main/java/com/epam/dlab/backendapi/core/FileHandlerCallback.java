@@ -19,7 +19,9 @@ limitations under the License.
 package com.epam.dlab.backendapi.core;
 
 public interface FileHandlerCallback {
-    boolean checkUUID(String uuid);
+	String getUUID();
+
+	boolean checkUUID(String uuid);
 
     boolean handle(String fileName, byte[] content) throws Exception;
 

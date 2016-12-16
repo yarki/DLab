@@ -97,14 +97,22 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
 
     private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid) {
         return new FileHandlerCallback() {
+        	
+        	private final String uuid = originalUuid;
+        	
+        	@Override
+        	public String getUUID() {
+        		return uuid;
+        	}
+        	
             @Override
             public boolean checkUUID(String uuid) {
-                return originalUuid.equals(uuid);
+                return this.uuid.equals(uuid);
             }
 
             @Override
             public boolean handle(String fileName, byte[] content) throws Exception {
-                LOGGER.debug("Expected {}; processing response {} with content: {}", originalUuid, fileName, new String(content));
+                LOGGER.debug("Expected {}; processing response {} with content: {}", uuid, fileName, new String(content));
                 JsonNode document = MAPPER.readTree(content);
                 UploadFileResultDTO result = new UploadFileResultDTO(user);
                 if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {

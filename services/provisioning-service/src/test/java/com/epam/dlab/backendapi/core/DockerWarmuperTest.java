@@ -64,9 +64,9 @@ public class DockerWarmuperTest {
     @Test
     public void warmupSuccess() throws Exception {
         warmuper.start();
-        warmuper.getFileHandlerCallback()
-                .handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
-        warmuper.getFileHandlerCallback()
+        warmuper.getFileHandlerCallback(getFirstUUID())
+        		.handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
+        warmuper.getFileHandlerCallback(getFirstUUID())
                 .handle(getFileName(), COMPUTATIONAL_TEST_JSON.getBytes());
         assertEquals(exploratoryMetadata, warmuper.getMetadata(ImageType.EXPLORATORY)
                 .toArray(new ImageMetadataDTO[1])[0]);
@@ -74,8 +74,12 @@ public class DockerWarmuperTest {
                 .toArray(new ImageMetadataDTO[1])[0]);
     }
 
+    private String getFirstUUID() {
+    	return warmuper.getUuids().keySet().toArray(new String[1])[0];
+    }
+    
     private String getFileName() {
-        return warmuper.getUuids().keySet().toArray(new String[1])[0] + ".json";
+        return getFirstUUID() + ".json";
     }
 
     private Injector createInjector() {

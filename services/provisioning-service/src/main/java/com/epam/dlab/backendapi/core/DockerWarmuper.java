@@ -51,21 +51,21 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
     private CommandExecutor commandExecutor;
-    private Map<String, String> uuids = new ConcurrentHashMap<>();
+    private Map<String, String> imageList = new ConcurrentHashMap<>();
     private Set<ImageMetadataDTO> metadataDTOs = new ConcurrentHashSet<>();
 
 
     @Override
     public void start() throws Exception {
         LOGGER.debug("warming up docker");
-        folderListenerExecutor.start(configuration.getWarmupDirectory(),
-                configuration.getWarmupPollTimeout(),
-                getFileHandlerCallback());
         List<String> images = commandExecutor.executeSync(GET_IMAGES);
         for (String image : images) {
             String uuid = UUID.randomUUID().toString();
             LOGGER.debug("warming up image: {} with uid {}", image, uuid);
-            uuids.put(uuid, image);
+            imageList.put(uuid, image);
+            folderListenerExecutor.start(configuration.getWarmupDirectory(),
+                    configuration.getWarmupPollTimeout(),
+                    getFileHandlerCallback(uuid));
             String command = new RunDockerCommand()
                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                     .withVolumeForResponse(configuration.getWarmupDirectory())
@@ -75,30 +75,45 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
             commandExecutor.executeAsync(command);
         }
     }
+    
+    public class DockerFileHandlerCallback implements FileHandlerCallback {
+    	private final String uuid;
+    	
+    	public DockerFileHandlerCallback(String uuid) {
+    		this.uuid = uuid;
+    	}
+    	
+    	@Override
+    	public String getUUID() {
+    		return uuid;
+    	}
+    	
+        @Override
+        public boolean checkUUID(String uuid) {
+            return this.uuid.equals(uuid);
+        }
 
-    FileHandlerCallback getFileHandlerCallback() {
-        return new FileHandlerCallback() {
-            @Override
-            public boolean checkUUID(String uuid) {
-                return uuids.containsKey(uuid);
+        @Override
+        public boolean handle(String fileName, byte[] content) {
+            String uuid = DockerCommands.extractUUID(fileName);
+            try {
+                LOGGER.debug("processing response file {} with content {}", fileName, new String(content));
+                addMetadata(content, uuid);
+            } catch (IOException e) {
+            	LOGGER.error("processing response file {} fails", fileName, e);
+            	return false;
             }
+            return true;
+        }
 
-            @Override
-            public boolean handle(String fileName, byte[] content) throws Exception {
-                String uuid = DockerCommands.extractUUID(fileName);
-                if (uuids.containsKey(uuid)) {
-                    LOGGER.debug("processing response file {} with content {}", fileName, new String(content));
-                    addMetadata(content, uuid);
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void handleError() {
-                LOGGER.warn("docker warmupper returned no result");
-            }
-        };
+        @Override
+        public void handleError() {
+            LOGGER.warn("docker warmupper returned no result");
+        }
+    }
+    
+    public DockerFileHandlerCallback getFileHandlerCallback(String uuid) {
+    	return new DockerFileHandlerCallback(uuid);
     }
 
     private void addMetadata(byte[] content, String uuid) throws IOException {
@@ -111,7 +126,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
             metadata = MAPPER.readValue(content, ComputationalMetadataDTO.class);
             metadata.setImageType(ImageType.COMPUTATIONAL);
         }
-        String image = uuids.get(uuid);
+        String image = imageList.get(uuid);
         metadata.setImage(image);
         LOGGER.debug("caching metadata for image {}: {}", image, metadata);
         metadataDTOs.add(metadata);
@@ -122,7 +137,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     }
 
     public Map<String, String> getUuids() {
-        return Collections.unmodifiableMap(uuids);
+        return Collections.unmodifiableMap(imageList);
     }
 
     public Set<ImageMetadataDTO> getMetadata(ImageType type) {
