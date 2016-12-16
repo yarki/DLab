@@ -55,11 +55,11 @@ def cp_key():
 
 def ensure_nginx():
     try:
-        if not exists('/opt/dlab/tmp/nginx_ensured'):
+        if not exists(dlab_path + 'tmp/nginx_ensured'):
             sudo('apt-get -y install nginx')
             sudo('service nginx restart')
             sudo('sysv-rc-conf nginx on')
-            sudo('touch /opt/dlab/tmp/nginx_ensured')
+            sudo('touch ' + dlab_path + 'tmp/nginx_ensured')
         return True
     except:
         return False
@@ -71,8 +71,8 @@ def configure_nginx(config):
         if not exists("/etc/nginx/conf.d/nginx_proxy.conf"):
             sudo('rm -f /etc/nginx/conf.d/*')
             put(config['nginx_template_dir'] + 'nginx_proxy.conf', '/tmp/nginx_proxy.conf')
-            sudo('mv /tmp/nginx_proxy.conf /opt/dlab/tmp/')
-            sudo('\cp /opt/dlab/tmp/nginx_proxy.conf /etc/nginx/conf.d/')
+            sudo('mv /tmp/nginx_proxy.conf ' + dlab_path + 'tmp/')
+            sudo('\cp ' + dlab_path + 'tmp/nginx_proxy.conf /etc/nginx/conf.d/')
             sudo('mkdir -p /etc/nginx/locations')
             sudo('rm -f /etc/nginx/sites-enabled/default')
     except:
@@ -87,8 +87,8 @@ def configure_nginx(config):
                     for line in tpl:
                         out.write(line)
             put("/tmp/%s-tmpproxy_location_jenkins_template.conf" % random_file_part, '/tmp/proxy_location_jenkins.conf')
-            sudo('mv /tmp/proxy_location_jenkins.conf /opt/dlab/tmp/')
-            sudo('\cp /opt/dlab/tmp/proxy_location_jenkins.conf /etc/nginx/locations/')
+            sudo('mv /tmp/proxy_location_jenkins.conf ' + dlab_path + 'tmp/')
+            sudo('\cp ' + dlab_path + 'tmp/proxy_location_jenkins.conf /etc/nginx/locations/')
             sudo("echo 'engineer:" + crypt.crypt(nginx_password, id_generator()) + "' > /etc/nginx/htpasswd")
             with open('jenkins_crids.txt', 'w+') as f:
                 f.write("Jenkins credentials: engineer  / " + nginx_password)
@@ -124,12 +124,12 @@ def place_notebook_automation_scripts():
 
 def ensure_jenkins():
     try:
-        if not exists('/opt/dlab/tmp/jenkins_ensured'):
+        if not exists(dlab_path + 'tmp/jenkins_ensured'):
             sudo('wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | apt-key add -')
             sudo('echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list')
             sudo('apt-get -y update')
             sudo('apt-get -y install jenkins')
-            sudo('touch /opt/dlab/tmp/jenkins_ensured')
+            sudo('touch ' + dlab_path + 'tmp/jenkins_ensured')
         return True
     except:
         return False
@@ -137,7 +137,7 @@ def ensure_jenkins():
 
 def configure_jenkins():
     try:
-        if not exists('/opt/dlab/tmp/jenkins_configured'):
+        if not exists(dlab_path + 'tmp/jenkins_configured'):
             sudo('echo \'JENKINS_ARGS="--prefix=/jenkins --httpPort=8070"\' >> /etc/default/jenkins')
             sudo('rm -rf /var/lib/jenkins/*')
             sudo('mkdir -p /var/lib/jenkins/jobs/')
@@ -147,7 +147,7 @@ def configure_jenkins():
             sudo('/etc/init.d/jenkins stop; sleep 5')
             sudo('sysv-rc-conf jenkins on')
             sudo('service jenkins start')
-            sudo('touch /opt/dlab/tmp/jenkins_configured')
+            sudo('touch ' + dlab_path + '/tmp/jenkins_configured')
             sudo('echo "jenkins ALL = NOPASSWD:ALL" >> /etc/sudoers')
         return True
     except:
@@ -156,19 +156,19 @@ def configure_jenkins():
 
 def creating_service_directories():
     try:
-        if not exists('/opt/dlab/'):
-            sudo('mkdir -p /opt/dlab/')
-            sudo('mkdir -p /opt/dlab/conf')
-            sudo('mkdir -p /opt/dlab/webapp/lib')
-            sudo('mkdir -p /opt/dlab/webapp/static')
-            sudo('mkdir -p /opt/dlab/template')
-            sudo('mkdir -p /opt/dlab/tmp')
-            sudo('mkdir -p /opt/dlab/tmp/result')
+        if not exists(dlab_path):
+            sudo('mkdir -p ' + dlab_path)
+            sudo('mkdir -p ' + dlab_path + 'conf')
+            sudo('mkdir -p ' + dlab_path + 'webapp/lib')
+            sudo('mkdir -p ' + dlab_path + 'webapp/static')
+            sudo('mkdir -p ' + dlab_path + 'template')
+            sudo('mkdir -p ' + dlab_path + 'tmp')
+            sudo('mkdir -p ' + dlab_path + 'tmp/result')
             sudo('mkdir -p /var/opt/dlab/log/ssn')
             sudo('mkdir -p /var/opt/dlab/log/edge')
             sudo('mkdir -p /var/opt/dlab/log/notebook')
             sudo('mkdir -p /var/opt/dlab/log/emr')
-            sudo('ln -s /opt/dlab/conf /etc/opt/dlab')
+            sudo('ln -s ' + dlab_path + 'conf /etc/opt/dlab')
             sudo('ln -s /var/opt/dlab/log /var/log/dlab')
         return True
     except:

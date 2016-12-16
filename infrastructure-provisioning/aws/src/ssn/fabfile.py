@@ -59,6 +59,8 @@ def run():
         region = os.environ['creds_region']
         ssn_ami_id = get_ami_id(os.environ['ssn_ami_name'])
         policy_path = '/root/templates/policy.json'
+        global dlab_path
+        dlab_path = '/opt/dlab/'
 
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
@@ -283,7 +285,7 @@ def run():
         env.host_string = 'ubuntu@' + instance_hostname
         try:
             put('/root/result.json', '/home/ubuntu/%s.json' % os.environ['request_id'])
-            sudo('mv /home/ubuntu/' + os.environ['request_id'] + '.json /opt/dlab/tmp/result/')
+            sudo('mv /home/ubuntu/' + os.environ['request_id'] + '.json ' + dlab_path + 'tmp/result/')
             put(local_log_filepath, '/home/ubuntu/ssn.log')
             sudo('mv /home/ubuntu/ssn.log /var/opt/dlab/log/ssn/')
         except:

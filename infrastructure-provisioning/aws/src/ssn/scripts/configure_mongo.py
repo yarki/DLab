@@ -81,7 +81,7 @@ if __name__ == "__main__":
     mongo_port = read_yml_conf(path,'net','port')
 
     try:
-        with open('/opt/dlab/tmp/instance_shapes.lst', 'r') as source_shapes:
+        with open(dlab_path + 'tmp/instance_shapes.lst', 'r') as source_shapes:
             shapes = json.load(source_shapes)
     except:
         shapes = []
