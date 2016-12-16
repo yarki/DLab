@@ -25,6 +25,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 public class RESTService {
@@ -55,14 +56,14 @@ public class RESTService {
     }
 
     public <T> T get(String path, String accessToken, Class<T> clazz) {
-        Invocation.Builder builder = getBuilder(path).property("access_token",accessToken);
-        LOG.debug("REST get secured {}",builder.toString());
+        Invocation.Builder builder = getBuilder(path,accessToken);
+        LOG.debug("REST get secured {}",accessToken);
         return builder.get(clazz);
     }
 
     public <T> T post(String path, String accessToken, Object parameter, Class<T> clazz) {
-        Invocation.Builder builder = getBuilder(path).property("access_token",accessToken);
-        LOG.debug("REST post secured {}",builder.toString());
+        Invocation.Builder builder = getBuilder(path,accessToken);
+        LOG.debug("REST post secured {}",accessToken);
         return builder.post(Entity.json(parameter), clazz);
     }
 
@@ -70,6 +71,13 @@ public class RESTService {
         return getWebTarget(path)
                 .request(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
+    }
+
+    public Invocation.Builder getBuilder(String path, String token) {
+        return getWebTarget(path)
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION,"Bearer "+token);
     }
 
     public WebTarget getWebTarget(String path) {
