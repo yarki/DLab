@@ -1,5 +1,5 @@
 {
-    "resource": "terminate_emr",
+    "resource": "emr",
     "request_id":"RID",
     "conf_service_base_name":"SBN",
     "creds_region":"CREG",
