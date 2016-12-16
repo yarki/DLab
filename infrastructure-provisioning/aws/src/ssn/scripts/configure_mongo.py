@@ -25,6 +25,7 @@ import yaml, json
 import subprocess
 import time
 import argparse
+import os
 
 path = "/etc/mongod.conf"
 outfile = "/etc/mongo_params.yml"
@@ -81,7 +82,7 @@ if __name__ == "__main__":
     mongo_port = read_yml_conf(path,'net','port')
 
     try:
-        with open(dlab_path + 'tmp/instance_shapes.lst', 'r') as source_shapes:
+        with open(os.environ['ssn_dlab_path'] + 'tmp/instance_shapes.lst', 'r') as source_shapes:
             shapes = json.load(source_shapes)
     except:
         shapes = []
