@@ -18,6 +18,9 @@ limitations under the License.
 
 package com.epam.dlab.rest.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -25,6 +28,9 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
 public class RESTService {
+
+    private final static Logger LOG = LoggerFactory.getLogger(RESTService.class);
+
     private Client client;
     private String url;
 
@@ -45,11 +51,15 @@ public class RESTService {
     }
 
     public <T> T get(String path, String accessToken, Class<T> clazz) {
-        return getBuilder(path).property("access_token",accessToken).get(clazz);
+        Invocation.Builder builder = getBuilder(path).property("access_token",accessToken);
+        LOG.debug("REST get {}",builder.toString());
+        return builder.get(clazz);
     }
 
     public <T> T post(String path, String accessToken, Object parameter, Class<T> clazz) {
-        return getBuilder(path).property("access_token",accessToken).post(Entity.json(parameter), clazz);
+        Invocation.Builder builder = getBuilder(path).property("access_token",accessToken);
+        LOG.debug("REST post {}",builder.toString());
+        return builder.post(Entity.json(parameter), clazz);
     }
 
     public Invocation.Builder getBuilder(String path) {
