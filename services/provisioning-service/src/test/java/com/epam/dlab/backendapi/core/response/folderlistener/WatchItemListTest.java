@@ -46,7 +46,7 @@ public class WatchItemListTest {
 
 		@Override
 		public void handleError() {
-			throw new RuntimeException();
+			System.out.println("handleError called for UUID " + getUUID());
 		}
 	}
 
@@ -65,7 +65,7 @@ public class WatchItemListTest {
 		
 		assertEquals(0, items.size());
 
-		items.append(fHandler, timeoutMillis, fileLengthCheckDelay, false);
+		items.append(fHandler, timeoutMillis, fileLengthCheckDelay);
 		assertEquals(1, items.size());
 		
 		WatchItem item = items.get(0);
@@ -80,7 +80,7 @@ public class WatchItemListTest {
 	@Test
 	public void processItem() throws InterruptedException, ExecutionException {
 		WatchItemList items = new WatchItemList(getDirectory());
-		items.append(fHandler, timeoutMillis, fileLengthCheckDelay, false);
+		items.append(fHandler, timeoutMillis, fileLengthCheckDelay);
 		
 		WatchItem item = items.get(0);
 		
@@ -96,7 +96,7 @@ public class WatchItemListTest {
 	@Test
 	public void processItemAll() throws InterruptedException, ExecutionException {
 		WatchItemList items = new WatchItemList(getDirectory());
-		items.append(fHandler, timeoutMillis, fileLengthCheckDelay, false);
+		items.append(fHandler, timeoutMillis, fileLengthCheckDelay);
 		
 		WatchItem item = items.get(0);
 		

@@ -12,7 +12,7 @@ public class WatchItem implements Comparable<WatchItem> {
 		TIMEOUT_EXPIRED,
 		FILE_CAPTURED,
 		INPROGRESS,
-		IS_DONE, /*See result*/
+		IS_DONE,
 		IS_CANCELED,
 		IS_INTERRUPTED,
 		IS_FAILED
@@ -34,25 +34,12 @@ public class WatchItem implements Comparable<WatchItem> {
 	    setExpiredTimeMillis(timeoutMillis);
 	}
 
-	public WatchItem(FileHandlerCallback fileHandlerCallback, long timeoutMillis, long fileLengthCheckDelay, boolean fileExists) {
-		this.fileHandlerCallback = fileHandlerCallback;
-		this.timeoutMillis = timeoutMillis;
-		this.fileLengthCheckDelay = fileLengthCheckDelay;
-	    setExpiredTimeMillis(timeoutMillis);
-	    
-	    if ( fileExists ) {
-	    	//TODO: Search for file and set fileName or throw Exception FileNotFoundException.
-	    	//When will be implemented to fix WatchItemList.append(...)
-	    	throw new RuntimeException("Not implemented");
-	    }
-	}
-	
 	public int compareTo(WatchItem o) {
-		if ( o == null ) {
+		if (o == null) {
 			return -1;
 		}
-		return ( fileHandlerCallback.checkUUID(o.fileHandlerCallback.getUUID()) ?
-					0 : fileHandlerCallback.getUUID().compareTo(o.fileHandlerCallback.getUUID()) );
+		return (fileHandlerCallback.checkUUID(o.fileHandlerCallback.getUUID()) ?
+					0 : fileHandlerCallback.getUUID().compareTo(o.fileHandlerCallback.getUUID()));
 	}
 	
 	
@@ -73,7 +60,7 @@ public class WatchItem implements Comparable<WatchItem> {
 		return expiredTimeMillis;
 	}
 	
-	protected void setExpiredTimeMillis(long timeout) {
+	private void setExpiredTimeMillis(long timeout) {
 		expiredTimeMillis = System.currentTimeMillis() + timeout;
 	}
 
@@ -81,7 +68,8 @@ public class WatchItem implements Comparable<WatchItem> {
 		return fileName;
 	}
 
-	protected void setFileName(String fileName) {
+	// TODO: Change to protected
+	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
 
@@ -94,7 +82,7 @@ public class WatchItem implements Comparable<WatchItem> {
     		return ItemStatus.IS_CANCELED;
     	}
     	
-    	if ( future.isDone() ) {
+    	if (future.isDone()) {
     		try {
 				futureResult = future.get();
 				return ItemStatus.IS_DONE;

@@ -56,13 +56,15 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
     public Boolean get() {
         Path path = Paths.get(directory, fileName);
         try {
-            if (fileHandlerCallback.handle(fileName, readBytes(path))) {
+        	boolean result = fileHandlerCallback.handle(fileName, readBytes(path));
+            if (result) {
                 Files.deleteIfExists(path);
                 Files.deleteIfExists(getLogFile());
             }
-            return true;
+            return result;
         } catch (Exception e) {
-            LOGGER.debug("Could not handle file {} async", path, e);
+            LOGGER.error("Could not handle file {} async", path, e);
+            fileHandlerCallback.handleError();
         }
         return false;
     }
@@ -73,15 +75,17 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
 
     private byte[] readBytes(Path path) throws IOException, InterruptedException {
         File file = path.toFile();
-        waitFileCompletelyWritten(file, file.length());
+        waitFileCompletelyWritten(file);
         return Files.readAllBytes(path);
     }
 
-    private void waitFileCompletelyWritten(File file, long before) throws InterruptedException {
-    	Thread.sleep(fileLengthCheckDelay.toMilliseconds());
-        long after = file.length();
-        if (before != after) {
-            waitFileCompletelyWritten(file, after);
-        }
+    private void waitFileCompletelyWritten(File file) throws InterruptedException {
+    	long before;
+    	long after = file.length();
+    	do {
+        	before = after;
+    		Thread.sleep(fileLengthCheckDelay.toMilliseconds());
+    		after = file.length();
+    	} while (before != after);
     }
 }

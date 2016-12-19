@@ -63,12 +63,8 @@ public class WatchItemList implements DockerCommands {
 	}
 	
 	
-	public void append(FileHandlerCallback fileHandlerCallback, long timeoutMillis, long fileLengthCheckDelay, boolean fileExists) {
-	    if ( fileExists ) {
-	    	//See WatchItem(..., boolean fileExists)
-	    	throw new RuntimeException("Not implemented");
-	    }
-		WatchItem item = new WatchItem(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay, fileExists);
+	public WatchItem append(FileHandlerCallback fileHandlerCallback, long timeoutMillis, long fileLengthCheckDelay) {
+	    WatchItem item = new WatchItem(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
 		int index = Collections.binarySearch(list, item);
 		if (index < 0) {
 			index = -index;
@@ -78,8 +74,23 @@ public class WatchItemList implements DockerCommands {
 				list.add(index - 1, item);
 			}
 		} else {
-			list.get(index).setExpiredTimeMillis(timeoutMillis);
+			String oldUUID = get(index).getFileHandlerCallback().getUUID();
+			LOGGER.debug("Handler for UUID {} for folder {} will be replaced. Status: {}, Result: {}",
+					oldUUID, directoryFullName, get(index).getStatus(), get(index).getFutureResult());
+			list.set(index, item);
 		}
+		return item;
+	}
+
+	public WatchItem append(FileHandlerCallback fileHandlerCallback, long timeoutMillis, long fileLengthCheckDelay, String fileName) {
+		WatchItem item = null;
+		if (fileName != null && fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
+			item = append(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
+			item.setFileName(fileName);
+		} else {
+			item = append(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
+		}
+		return item;
 	}
 
 	public void remove(int index) {
@@ -102,7 +113,7 @@ public class WatchItemList implements DockerCommands {
 	public WatchItem getItem(String fileName) {
 		String uuid = DockerCommands.extractUUID(fileName);
 		int index = getIndex(uuid);
-		if ( index < 0 ) {
+		if (index < 0) {
 			return null;
 		}
 		return get(index);
@@ -116,12 +127,12 @@ public class WatchItemList implements DockerCommands {
 	}
 	
 	public boolean processItem(WatchItem item) {
-		if ( item.getStatus() == ItemStatus.FILE_CAPTURED ) {
+		if (item.getStatus() == ItemStatus.FILE_CAPTURED) {
 			runAsync(item);
 			return true;
 		}
 		
-		if ( item.isExpired() ) {
+		if (item.isExpired()) {
 			LOGGER.warn("Watch time has expired for UUID {} in folder {}", item.getFileHandlerCallback().getUUID(), directoryFullName);
 		}
 		return false;
@@ -131,13 +142,13 @@ public class WatchItemList implements DockerCommands {
 		int count = 0;
 		for (int i = 0; i < size(); i++) {
 			WatchItem item = get(i);
-			if ( item.getStatus() == ItemStatus.FILE_CAPTURED ) {
-				if ( processItem(item) ) {
+			if (item.getStatus() == ItemStatus.FILE_CAPTURED) {
+				if (processItem(item)) {
 					count++;
 				}
 			}
 		}
-		if ( count > 0 ) {
+		if (count > 0) {
 			LOGGER.debug("Runs processing {} files for folder {}", count, directoryName);
 		}
 		return count;

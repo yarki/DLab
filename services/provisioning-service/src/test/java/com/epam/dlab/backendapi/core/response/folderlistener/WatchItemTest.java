@@ -48,7 +48,7 @@ public class WatchItemTest {
 
 		@Override
 		public void handleError() {
-			throw new RuntimeException();
+			System.out.println("handleError called for UUID " + getUUID());
 		}
 	}
 

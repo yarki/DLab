@@ -22,9 +22,8 @@ import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.dropwizard.util.Duration;
 
-import java.util.concurrent.CompletableFuture;
+import io.dropwizard.util.Duration;
 
 @Singleton
 public class FolderListenerExecutor {
@@ -33,6 +32,6 @@ public class FolderListenerExecutor {
 
 
     public void start(String directory, Duration timeout, FileHandlerCallback fileHandlerCallback) {
-        CompletableFuture.runAsync(new FolderListener(directory, timeout, fileHandlerCallback, configuration.getFileLengthCheckDelay()));
+    	FolderListener.listen(directory, fileHandlerCallback, timeout.toMilliseconds(), configuration.getFileLengthCheckDelay().toMilliseconds());
     }
 }
