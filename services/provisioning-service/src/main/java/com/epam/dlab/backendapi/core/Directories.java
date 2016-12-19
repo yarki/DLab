@@ -19,9 +19,9 @@ limitations under the License.
 package com.epam.dlab.backendapi.core;
 
 public interface Directories {
-    String WARMUP_DIRECTORY = "/warmup";
+    String WARMUP_DIRECTORY = "/result";
     String IMAGES_DIRECTORY = "/result";
-    String KEY_LOADER_DIRECTORY = "/keyloader";
+    String KEY_LOADER_DIRECTORY = "/result";
     String EDGE_LOG_DIRECTORY = "edge";
     String NOTEBOOK_LOG_DIRECTORY = "notebook";
     String EMR_LOG_DIRECTORY = "emr";
