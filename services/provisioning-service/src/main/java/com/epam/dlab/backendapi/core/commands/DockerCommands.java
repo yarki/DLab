@@ -45,7 +45,11 @@ public interface DockerCommands {
     }
 
     static String extractUUID(String fileName) {
-        return fileName.replace(JSON_EXTENSION, "");
+        Integer beginIndex = fileName.lastIndexOf('_');
+        Integer endIndex = fileName.lastIndexOf('.');
+        beginIndex = beginIndex < 0 ? 0 : beginIndex + 1;
+        if(endIndex < 0) endIndex = fileName.length();
+        return fileName.substring(beginIndex, endIndex);
     }
 
     default String nameContainer(String... names) {
