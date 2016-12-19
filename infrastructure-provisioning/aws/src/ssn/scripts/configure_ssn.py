@@ -171,6 +171,9 @@ def creating_service_directories():
             sudo('mkdir -p /var/opt/dlab/log/emr')
             sudo('ln -s ' + os.environ['ssn_dlab_path'] + 'conf /etc/opt/dlab')
             sudo('ln -s /var/opt/dlab/log /var/log/dlab')
+            sudo('chown -R ubuntu:ubuntu /var/opt/dlab/log')
+            sudo('chown -R ubuntu:ubuntu ' + os.environ['ssn_dlab_path'])
+
         return True
     except:
         return False
