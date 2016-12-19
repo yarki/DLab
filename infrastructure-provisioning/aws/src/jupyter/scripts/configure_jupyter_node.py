@@ -35,9 +35,9 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 args = parser.parse_args()
 
 scala_link = "http://www.scala-lang.org/files/archive/scala-2.11.8.deb"
-spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
-spark_version = "1.6.2"
-hadoop_version = "2.6"
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-2.0.2-bin-hadoop2.7.tgz"
+spark_version = "2.0.2"
+hadoop_version = "2.7"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
 py3spark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/py3spark_local/'
 jupyter_conf_file = '/home/ubuntu/.local/share/jupyter/jupyter_notebook_config.py'
