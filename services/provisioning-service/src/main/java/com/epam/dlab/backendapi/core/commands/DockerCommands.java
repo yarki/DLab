@@ -52,5 +52,5 @@ public interface DockerCommands {
         return String.join("_", names) + "_" + System.currentTimeMillis();
     }
 
-    String getCommandLogDirectory();
+    String getResourceType();
 }

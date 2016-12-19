@@ -230,6 +230,11 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
+    public RunDockerCommand withResource(String resourceType) {
+        options.add(String.format("-e \"resource=%s\"", resourceType));
+        return this;
+    }
+
     @Override
     public String toCMD() {
         StringBuilder sb = new StringBuilder(command);

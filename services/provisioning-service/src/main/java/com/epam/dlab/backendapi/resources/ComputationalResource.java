@@ -77,7 +77,8 @@ public class ComputationalResource implements DockerCommands {
                                     .withName(nameContainer(dto.getEdgeUserName(), CREATE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
-                                    .withVolumeForLog(configuration.getDockerLogDirectory(), getCommandLogDirectory())
+                                    .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+                                    .withResource(getResourceType())
                                     .withRequestId(uuid)
                                     .withEc2Role(configuration.getEmrEC2RoleDefault())
                                     .withEmrTimeout(Long.toString(timeout))
@@ -109,7 +110,8 @@ public class ComputationalResource implements DockerCommands {
                                     .withName(nameContainer(dto.getEdgeUserName(), TERMINATE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
-                                    .withVolumeForLog(configuration.getDockerLogDirectory(), getCommandLogDirectory())
+                                    .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+                                    .withResource(getResourceType())
                                     .withRequestId(uuid)
                                     .withCredsKeyName(configuration.getAdminKey())
                                     .withActionTerminate(configuration.getEmrImage()),
@@ -130,7 +132,7 @@ public class ComputationalResource implements DockerCommands {
         return nameContainer(user, action.toString(), "computational", name);
     }
 
-    public String getCommandLogDirectory() {
+    public String getResourceType() {
         return Directories.EMR_LOG_DIRECTORY;
     }
 }

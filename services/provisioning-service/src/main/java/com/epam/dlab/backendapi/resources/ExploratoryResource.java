@@ -94,7 +94,8 @@ public class ExploratoryResource implements DockerCommands {
                 .withName(nameContainer(dto.getNotebookUserName(), action, dto.getExploratoryName()))
                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                 .withVolumeForResponse(configuration.getImagesDirectory())
-                .withVolumeForLog(configuration.getDockerLogDirectory(), getCommandLogDirectory())
+                .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+                .withResource(getResourceType())
                 .withRequestId(uuid)
                 .withCredsKeyName(configuration.getAdminKey())
                 .withImage(configuration.getNotebookImage())
@@ -112,7 +113,7 @@ public class ExploratoryResource implements DockerCommands {
         return nameContainer(user, action.toString(), "exploratory", name);
     }
 
-    public String getCommandLogDirectory() {
+    public String getResourceType() {
         return Directories.NOTEBOOK_LOG_DIRECTORY;
     }
 }

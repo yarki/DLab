@@ -79,7 +79,7 @@ public class DockerResource implements DockerCommands {
         return uuid;
     }
 
-    public String getCommandLogDirectory() {
+    public String getResourceType() {
         throw new NotImplementedException("General commands haven't a pre-defined log path");
     }
 }
