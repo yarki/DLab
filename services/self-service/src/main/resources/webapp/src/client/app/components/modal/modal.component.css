@@ -37,7 +37,7 @@ limitations under the License.
 }
 
 .header-white .modal-header {
-  background: #f6fafe;
+  background: #fff;
 }
 
 .modal .info-label {
@@ -54,7 +54,7 @@ limitations under the License.
 .modal-header {
   padding: 13px 22px;
   background: #f6fafe;
-  border-bottom: 1px solid #f6fafe;
+  border-bottom: 1px solid #edf1f5;
 }
 
 .modal-body {
@@ -173,7 +173,7 @@ limitations under the License.
   text-align: right;
   opacity: 0;
   outline: none;
-  background: #f6fafe;
+  background: #fff;
   cursor: inherit;
   display: block;
 }
@@ -245,7 +245,7 @@ limitations under the License.
 }
 
 .detail-header td {
-  border: 1px solid #f6fafe;
+  border: 1px solid #edf1f5;
   padding: 18px 15px;
   text-align: center;
 }

@@ -23,7 +23,7 @@ limitations under the License.
 .dropdown-multiselect button {
   min-width: 100%;
   text-align: left;
-  background: #f6fafe;
+  background: #fff;
   border: 1px solid #cad2da;
   font-size: 14px;
 }
@@ -93,12 +93,12 @@ limitations under the License.
 
 .dropdown-multiselect .dropdown-menu .filter-actions .select_all:hover {
   color: #4eaf3e;
-  background: #ececec;
+  background: #f9fafb;
 }
 
 .dropdown-multiselect .dropdown-menu .filter-actions .deselect_all:hover {
   color: #f1696e;
-  background: #ececec;
+  background: #f9fafb;
 }
 
 .dropdown-multiselect .dropdown-menu a span {
@@ -119,11 +119,11 @@ limitations under the License.
 .dropdown-multiselect .dropdown-menu::-webkit-scrollbar-track {
   -webkit-box-shadow: none;
   border-radius: 5px;
-  background-color: #ececec;
+  background-color: #f1ecec;
 }
 
 .dropdown-multiselect .dropdown-menu::-webkit-scrollbar-thumb {
   -webkit-box-shadow: inset 1px 1px 6px #9a9393;
-  background-color: #ececec;
+  background-color: #f6fafe;
   border-radius: 5px;
 }

@@ -94,7 +94,7 @@ limitations under the License.
 }
 
 .filter-row .actions button {
-  background: #f9fafb;
+  background: #fff;
   border-color: #35afd5;
   color: #35afd5;
   outline: none;
@@ -113,12 +113,12 @@ limitations under the License.
 }
 
 .dashboard_table tr:nth-child(2n+1) td:first-child {
-  background: #f3fbfd;
+  background: #edf6f9;
 }
 
 .dashboard_table th {
   background: #a1b7d1;
-  color: #f9fafb;
+  color: #fff;
   font-weight: 600;
   line-height: 40px;
   text-transform: uppercase;
@@ -169,7 +169,7 @@ limitations under the License.
 
 .dashboard_table .dropdown-menu li {
   font-size: 14px;
-  border-bottom: 1px solid #f3fbfd;
+  border-bottom: 1px solid #edf1f5;
   padding: 12px 15px;
   cursor: pointer;
   margin: 5px -5px;
