@@ -16,7 +16,7 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { ImageType } from "./imageType.enum";
+import { ImageType } from './imageType.enum';
 import { ResourceShapeModel } from './resourceShape.model';
 
 export class ExploratoryEnvironmentVersionModel {

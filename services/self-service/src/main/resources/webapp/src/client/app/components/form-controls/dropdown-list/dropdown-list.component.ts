@@ -36,7 +36,7 @@ export class DropdownList {
   @Input() items: Array<any>;
   @Output() selectedItem: EventEmitter<{}> = new EventEmitter();
 
-  public selectOptions($event:Event, value:any, index:number): void  {
+  public selectOptions($event: Event, value: any, index: number): void {
     this.label = value[this.byField];
     this.model.value = value;
     this.model.index = index;
@@ -45,8 +45,8 @@ export class DropdownList {
     $event.preventDefault();
   }
 
-  public setDefaultOptions(label:string, type:string, byField:string) {
-    this.model = new DropdownListModel(type, '', 0)
+  public setDefaultOptions(label: string, type: string, byField: string) {
+    this.model = new DropdownListModel(type, '', 0);
     this.label = label;
     this.type = type;
     this.byField = byField;

@@ -23,14 +23,15 @@ import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/do';
 
 @Directive({
-  selector: '[click-outside]'
+  selector: '[clickOutside]'
 })
 
 export class ClickOutside implements OnInit, OnDestroy {
-  private listening: boolean;
-  private globalClick: any;
 
   @Output('clickOutside') clickOutside: EventEmitter<Object>;
+
+  private listening: boolean;
+  private globalClick: any;
 
   constructor(private _elRef: ElementRef) {
     this.listening = false;

@@ -16,13 +16,11 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { Response } from "@angular/http";
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Response } from '@angular/http';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { UserResourceService } from "../../services/userResource.service";
+import { UserResourceService } from '../../services/userResource.service';
 import { ExploratoryEnvironmentCreateModel } from './exploratory-environment-create.model';
-import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
-import { ResourceShapeModel } from '../../models/resourceShape.model';
 
 import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
@@ -38,7 +36,7 @@ export class ExploratoryEnvironmentCreateDialog {
   notebookExist: boolean = false;
   checkValidity: boolean = false;
   templateDescription: string;
-  namePattern = "[-_a-zA-Z0-9]+";
+  namePattern = '[-_a-zA-Z0-9]+';
   resourceGrid: any;
   environment: any;
 
@@ -82,13 +80,13 @@ export class ExploratoryEnvironmentCreateDialog {
   }
 
   onUpdate($event): void {
-    if($event.model.type === 'template') {
+    if ($event.model.type === 'template') {
       this.environment.template = $event.model.value.version;
       this.model.setSelectedTemplate($event.model.index);
       this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'shape', 'type');
     }
 
-    if($event.model.type === 'shape')
+    if ($event.model.type === 'shape')
       this.environment.shape = $event.model.value.type;
   }
 
