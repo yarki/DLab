@@ -175,37 +175,6 @@ limitations under the License.
   margin: 5px -5px;
 }
 
-.dashboard_table .dropdown-menu li.dropdown-close {
-  position: absolute;
-  right: 10px;
-  top: 8px;
-  border: 0 !important;
-  width: 8px !important;
-  height: 15px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  z-index: 1;
-}
-
-.dashboard_table .dropdown-menu li.dropdown-close::before,
-.dashboard_table .dropdown-menu li.dropdown-close::after {
-  content: '';
-  position: absolute;
-  width: 8px;
-  height: 1px;
-  right: 0;
-  top: 0;
-  background: #6a839e;
-}
-
-.dashboard_table .dropdown-menu li.dropdown-close::before {
-  transform: rotate(-45deg) translate(-5px, 5px);
-}
-
-.dashboard_table .dropdown-menu li.dropdown-close::after {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-
 .dashboard_table .dropdown-menu li:last-child {
   border-bottom: 0;
 }
