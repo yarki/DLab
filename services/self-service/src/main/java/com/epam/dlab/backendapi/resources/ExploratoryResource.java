@@ -132,13 +132,20 @@ public class ExploratoryResource implements ExploratoryAPI {
         updateExploratoryStatus(userInfo.getName(), name, exploratoryStatus);
         updateComputationalStatuses(userInfo.getName(), name, computationalStatus);
         try {
-            String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
+            Optional<UserInstanceDTO> opt =
+                    infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), name);
+            if(!opt.isPresent()) {
+                throw new DlabException(String.format("Exploratory instance with name {} not found.", name));
+            }
+
+            UserInstanceDTO userInstance = opt.get();
             ExploratoryStopDTO dto = new ExploratoryStopDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withNotebookImage(userInstance.getImageName())
                     .withExploratoryName(name)
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
-                    .withNotebookInstanceName(exploratoryId)
+                    .withNotebookInstanceName(userInstance.getExploratoryId())
                     .withKeyDir(settingsDAO.getCredsKeyDir())
                     .withSshUser(settingsDAO.getExploratorySshUser())
                     .withRegion(settingsDAO.getCredsRegion());
