@@ -55,9 +55,15 @@ def ensure_libraries_py():
     if not exists('/home/ubuntu/.ensure_dir/ensure_libraries_py_installed'):
         try:
             sudo('export LC_ALL=C')
+            sudo('apt-get install python3-setuptools')
+            sudo('apt install -y python3-pip')
+            sudo('apt-get install -y python-virtualenv')
             sudo('pip2 install -U pip --no-cache-dir')
             sudo('pip2 install boto boto3 --no-cache-dir')
             sudo('pip2 install fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('pip3 install -U pip --no-cache-dir')
+            sudo('pip3 install boto boto3 --no-cache-dir')
+            sudo('pip3 install fabvenv fabric-virtualenv --no-cache-dir')
             sudo('touch /home/ubuntu/.ensure_dir/ensure_libraries_py_installed')
         except:
             sys.exit(1)
