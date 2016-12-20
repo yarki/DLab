@@ -359,7 +359,10 @@ def remove_all_iam_resources(instance_type, scientist=''):
                 if '-ssn-Role' in iam_role:
                     if instance_type == 'ssn' or instance_type == 'all':
                         role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
-                        client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
+                        try:
+                            client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
+                        except:
+                            print 'There is no policy: ' + os.environ['conf_service_base_name'] + '-ssn-Policy'
                         remove_roles_and_profiles(iam_role, role_profile_name)
                 if '-edge-Role' in iam_role:
                     if instance_type == 'edge' and scientist in iam_role:
