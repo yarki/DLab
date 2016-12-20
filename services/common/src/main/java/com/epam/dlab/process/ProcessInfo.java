@@ -21,7 +21,7 @@ import java.util.Collections;
 public class ProcessInfo {
 
     private final ProcessId id;
-    private final String command;
+    private final String[] command;
     private final ProcessStatus status;
     private final String stdOut;
     private final String stdErr;
@@ -32,7 +32,7 @@ public class ProcessInfo {
 
     private final Collection<ProcessInfo> rejectedCommands;
 
-    ProcessInfo(ProcessId id, ProcessStatus status, String command, String stdOut, String stdErr, int exitCode, long startTimeStamp, long infoTimeStamp, Collection<ProcessInfo> rejected, int pid) {
+    ProcessInfo(ProcessId id, ProcessStatus status, String[] command, String stdOut, String stdErr, int exitCode, long startTimeStamp, long infoTimeStamp, Collection<ProcessInfo> rejected, int pid) {
         this.id             = id;
         this.status         = status;
         this.command        = command;
@@ -58,7 +58,7 @@ public class ProcessInfo {
     }
 
     public String getCommand() {
-        return command;
+        return String.join(" ",command);
     }
 
     public ProcessStatus getStatus() {
@@ -101,7 +101,7 @@ public class ProcessInfo {
     public String toString() {
         return "ProcessInfo{" +
                 "id='" + id + '\'' +
-                ", command='" + command + '\'' +
+                ", command='" + getCommand() + '\'' +
                 ", pid=" + pid +
                 ", status=" + status +
                 ", stdOut='" + stdOut + '\'' +

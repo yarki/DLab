@@ -44,7 +44,7 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Timeo
     private final StringBuilder stdOut = new StringBuilder();
     private final StringBuilder stdErr = new StringBuilder();
     private int exitCode = -1;
-    private String command = "N/A";
+    private String[] command = new String[]{"N/A"};
     private Collection<ProcessInfo> rejected = null;
     private int pid = -1;
 
@@ -61,12 +61,12 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Timeo
         this.expirationTime = System.currentTimeMillis() + ttl;
     }
 
-    public static void schedule(ProcessInfoBuilder b, String command) {
+    public static void schedule(ProcessInfoBuilder b, String[] command) {
         b.status = SCHEDULED;
         b.command = command;
     }
 
-    public static void start(ProcessInfoBuilder b, String command) {
+    public static void start(ProcessInfoBuilder b, String[] command) {
         if( b.status == CREATED ) {
             b.status = LAUNCHING;
             b.command = command;
@@ -142,7 +142,7 @@ public class ProcessInfoBuilder implements Supplier<ProcessInfo>, Testing, Timeo
             status = SCHEDULED;
             DlabProcess.getInstance().getExecutorService().execute(()->{
                 try {
-                    p = new ProcessBuilder(command.split("\\s+")).start();
+                    p = new ProcessBuilder(command).start();
                     pid = getPid(p);
                     InputStream stdOutStream = p.getInputStream();
                     DlabProcess.getInstance().getExecutorService().execute(()->{

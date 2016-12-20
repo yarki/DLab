@@ -41,7 +41,7 @@ public class ProcessConveyorTest {
     @Test
     public void testLs() throws Exception {
         ProcessId ls = new ProcessId(user, "ls");
-        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(ls,"ls /");
+        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(ls,"ls /".split(" "));
         ProcessInfo pi = cf.get();
         System.out.println("--- "+pi);
         assertTrue(pi.getStatus().equals(ProcessStatus.FINISHED));
@@ -73,7 +73,7 @@ public class ProcessConveyorTest {
         ArrayList<CompletableFuture<ProcessInfo>> cf = new ArrayList<>();
         DlabProcess.getInstance().setMaxProcessesPerBox(2);
         for(int i = 0; i < 5; i++) {
-            cf.add(DlabProcess.getInstance().start(new ProcessId(user, "ping "+i), pingCommand));
+            cf.add(DlabProcess.getInstance().start(new ProcessId(user, "ping "+i), pingCommand.split(" ")));
         }
         Thread.sleep(100);
         Collection<ProcessId> pIds = DlabProcess.getInstance().getActiveProcesses();
@@ -102,7 +102,7 @@ public class ProcessConveyorTest {
         ProcessId ping = new ProcessId(user, "ping");
         ArrayList<CompletableFuture<ProcessInfo>> cf = new ArrayList<>();
         for(int i = 0; i < 5; i++) {
-            cf.add(DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand));
+            cf.add(DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand.split(" ")));
         }
         Thread.sleep(100);
         Collection<ProcessId> pIds = DlabProcess.getInstance().getActiveProcesses();
@@ -139,7 +139,7 @@ public class ProcessConveyorTest {
         for(int i = 0; i < 10; i++) {
             for(int ii=0; ii<10; ii++) {
                 ping = new ProcessId(user+i, "ping " + (i*10+ii));
-                cf.add(DlabProcess.getInstance().start(ping, pingCommand));
+                cf.add(DlabProcess.getInstance().start(ping, pingCommand.split(" ")));
             }
         }
         Thread.sleep(500);
@@ -173,7 +173,7 @@ public class ProcessConveyorTest {
             pingCommand = "ping -c 50 localhost";
         }
         ProcessId ping = new ProcessId(user, "ping");
-        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand);
+        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand.split(" "));
         Thread.sleep(3000);
         DlabProcess.getInstance().stop(ping);
         ProcessInfo pi = cf.get();
@@ -192,7 +192,7 @@ public class ProcessConveyorTest {
             pingCommand = "ping -c 50 localhost";
         }
         ProcessId ping = new ProcessId(user, "ping");
-        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand);
+        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand.split(" "));
         Thread.sleep(3000);
         DlabProcess.getInstance().kill(ping);
         ProcessInfo pi = cf.get();
@@ -212,7 +212,7 @@ public class ProcessConveyorTest {
         }
         ProcessId ping = new ProcessId(user, "ping");
         DlabProcess.getInstance().setProcessTimeout(5, TimeUnit.SECONDS);
-        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand);
+        CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand.split(" "));
         ProcessInfo pi = cf.get();
         System.out.println("TIMEOUT: "+pi);
         assertEquals(ProcessStatus.TIMEOUT,pi.getStatus());

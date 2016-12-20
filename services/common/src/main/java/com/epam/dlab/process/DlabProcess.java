@@ -68,17 +68,17 @@ public class DlabProcess {
         return perUserService.get(user);
     }
 
-    public CompletableFuture<ProcessInfo> start(ProcessId id, String command){
+    public CompletableFuture<ProcessInfo> start(ProcessId id, String... command){
         CompletableFuture<ProcessInfo> future = processConveyor.createBuildFuture( id, ()-> new ProcessInfoBuilder(id,expirationTime) );
         processConveyor.add(id, future, ProcessStep.FUTURE);
         processConveyor.add(id, command, ProcessStep.START);
         return future;
     }
-    public CompletableFuture<ProcessInfo> start(String username, String uniqDescriptor, String command){
+    public CompletableFuture<ProcessInfo> start(String username, String uniqDescriptor, String... command){
         return start(new ProcessId(username,uniqDescriptor),command);
     }
-    public CompletableFuture<ProcessInfo> start(String username, String command){
-        return start(new ProcessId(username,command),command);
+    public CompletableFuture<ProcessInfo> start(String username, String... command){
+        return start(new ProcessId(username,String.join(" ",command)),command);
     }
 
 
