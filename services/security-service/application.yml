@@ -12,7 +12,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-inactiveUserTimeoutMillSec: 60000
+inactiveUserTimeoutMillSec: 7200000
 ldapConnectionConfig:
 #  ldapHost: localhost
   ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
