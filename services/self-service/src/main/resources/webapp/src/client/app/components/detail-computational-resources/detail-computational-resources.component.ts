@@ -16,26 +16,25 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { Modal } from './../modal/modal.component';
-import {DateUtils} from './../../util/dateUtils'
+import { Component, ViewChild } from '@angular/core';
+import { DateUtils } from './../../util/dateUtils';
 
- @Component({
-   moduleId: module.id,
-   selector: 'detail-computational-resources',
-   templateUrl: 'detail-computational-resources.component.html'
- })
+@Component({
+  moduleId: module.id,
+  selector: 'detail-computational-resources',
+  templateUrl: 'detail-computational-resources.component.html'
+})
 
- export class DetailComputationalResources {
-   resource: any;
-   environment: any;
-   @ViewChild('bindDialog') bindDialog;
+export class DetailComputationalResources {
+  resource: any;
+  environment: any;
+  @ViewChild('bindDialog') bindDialog;
 
-   upTimeInHours: number ;
-   upTimeSince: string = '';
-   tooltip: boolean = false;
+  upTimeInHours: number;
+  upTimeSince: string = '';
+  tooltip: boolean = false;
 
-   public open(param, environment, resource): void {
+  public open(param, environment, resource): void {
     this.tooltip = false;
     this.resource = resource;
     this.environment = environment;
@@ -46,8 +45,8 @@ import {DateUtils} from './../../util/dateUtils'
     this.bindDialog.open(param);
   }
 
-   public isEllipsisActive($event): void {
-     if ($event.target.offsetWidth < $event.target.scrollWidth)
-       this.tooltip = true;
-   }
- }
+  public isEllipsisActive($event): void {
+    if ($event.target.offsetWidth < $event.target.scrollWidth)
+      this.tooltip = true;
+  }
+}
