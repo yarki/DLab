@@ -56,16 +56,23 @@ public class FolderListener implements Runnable {
         try (WatchService watcher = directoryPath.getFileSystem().newWatchService()) {
             directoryPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
             WatchKey watchKey = watcher.poll(timeout.toSeconds(), TimeUnit.SECONDS);
+            LOGGER.debug(String.format("Watching %s directory during next %d seconds...", directoryPath.toString(), timeout.toSeconds()));
+
             if (watchKey != null) {
                 List<WatchEvent<?>> events = watchKey.pollEvents();
                 for (WatchEvent event : events) {
                     String fileName = event.context().toString();
                     if (fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
+                        LOGGER.debug(String.format("Matched new file %s, processing...", fileName));
                         handleFileAsync(fileName);
+                    }
+                    else {
+                        LOGGER.debug(String.format("New file %s does not match the criteria", fileName));
                     }
                     pollFile();
                 }
             } else if (!success) {
+                LOGGER.debug("Failed to handle result file.");
                 fileHandlerCallback.handleError();
             }
         } catch (Exception e) {
