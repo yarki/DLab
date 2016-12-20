@@ -12,7 +12,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
-inactiveUserTimeoutMillSec: 7200000
+inactiveUserTimeoutMillSec: 60000
 ldapConnectionConfig:
 #  ldapHost: localhost
   ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
@@ -85,6 +85,11 @@ ldapSearch:
     #keyStorePassword: changeit
     #certAlias: dlabcert
 server: 
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: /tmp/dlab/log/request-security.log
+        archivedLogFilenamePattern: /tmp/dlab/log/request-security-%d.log
   applicationConnectors:
   - type: http
     port: 8090

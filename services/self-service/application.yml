@@ -24,6 +24,11 @@ provisioningService:
     connectionTimeout: 3s
 
 server:
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: /tmp/dlab/log/request-self.log
+        archivedLogFilenamePattern: /tmp/dlab/log/request-self-%d.log
   rootPath: "/api"
   applicationConnectors:
     - type: http

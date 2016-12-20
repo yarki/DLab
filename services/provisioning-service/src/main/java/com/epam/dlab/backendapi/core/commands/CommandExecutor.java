@@ -42,10 +42,7 @@ public class CommandExecutor {
     }
 
     public void executeAsync(final String username, final String uuid, final String command) {
-        DlabProcess.getInstance().start(username,uuid, command);
+        DlabProcess.getInstance().start(username,uuid, "bash -c " +command);
     }
 
-    private String[] createCommand(String command) {
-        return new String[]{"bash", "-c", command};
-    }
 }
