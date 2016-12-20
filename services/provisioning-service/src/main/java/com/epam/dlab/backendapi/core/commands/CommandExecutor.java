@@ -35,8 +35,7 @@ public class CommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
 
     public List<String> executeSync(final String username,final String uuid,String command) throws IOException, InterruptedException, ExecutionException {
-
-        CompletableFuture<ProcessInfo> f = DlabProcess.getInstance().start(username,uuid, command);
+        CompletableFuture<ProcessInfo> f = DlabProcess.getInstance().start(username,uuid, "bash -c " +command);
         ProcessInfo pi = f.get();
         return Arrays.asList(pi.getStdOut().split("\n"));
     }
