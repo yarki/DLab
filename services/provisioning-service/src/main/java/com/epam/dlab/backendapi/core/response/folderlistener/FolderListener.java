@@ -1,6 +1,7 @@
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -11,7 +12,6 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -143,16 +143,18 @@ public class FolderListener implements Runnable {
 		if (file.exists()) {
     		return true;
     	} else {
-    		LOGGER.debug("Folder listener \"{}\" expect to create it", getDirectoryName());
+    		LOGGER.debug("Folder listener \"{}\" waiting for creating directory", getDirectoryName());
     	}
 
 		long expiredTimeMillis = itemList.get(0).getExpiredTimeMillis();
 		while (expiredTimeMillis >= System.currentTimeMillis()) {
     		Thread.sleep(WAIT_DIR_TIMEOUT_MILLIS);
     		if (file.exists()) {
+        		LOGGER.debug("Folder listener \"{}\" - directory has been created", getDirectoryName());
         		return true;
         	}
     	}
+		LOGGER.error("Folder listener \"{}\" error. Timeout expired and directory not exists", getDirectoryName());
     	return false;
     }
 
@@ -161,7 +163,6 @@ public class FolderListener implements Runnable {
     	
 		try {
     		if (!waitForDirectory()) {
-    			LOGGER.error("Folder listener \"{}\" error. Timeout expired and directory not exists", getDirectoryName());
     			return false;
     		}
     	} catch (InterruptedException e) {
@@ -216,20 +217,17 @@ public class FolderListener implements Runnable {
 				LOGGER.warn("Folder listener \"{}\" remove expired file handler for UUID {}", getDirectoryName(), uuid);
 				break;
 			case IS_DONE:
-				LOGGER.debug("Folder listener \"{}\" remove processed file handler for UUID {}, handler result is {}", getDirectoryName(), uuid, item.getFutureResult());
-				try {
-					item.getFutureResultSync();
-				} catch (InterruptedException e) {
-					LOGGER.debug("Folder listener \"{}\" remove iterrupted file handler for UUID {}, {}", getDirectoryName(), uuid, e);
-				} catch (ExecutionException e) {
-					LOGGER.debug("Folder listener \"{}\" remove iterrupted file handler for UUID {}, {}", getDirectoryName(), uuid, e);
+				if ( item.getFutureResult() ) {
+					LOGGER.debug("Folder listener \"{}\" remove processed file handler for UUID {}, handler result is {}", getDirectoryName(), uuid, item.getFutureResult());
+				} else {
+					LOGGER.warn("Folder listener \"{}\" remove processed file handler for UUID {}, handler result is {}", getDirectoryName(), uuid, item.getFutureResult());
 				}
 				break;
 			case IS_CANCELED:
 				LOGGER.debug("Folder listener \"{}\" remove canceled file handler for UUID {}", getDirectoryName(), uuid);
 				break;
 			case IS_FAILED:
-				LOGGER.debug("Folder listener \"{}\" remove failed file handler for UUID {}", getDirectoryName(), uuid);
+				LOGGER.warn("Folder listener \"{}\" remove failed file handler for UUID {}", getDirectoryName(), uuid);
 				break;
 			case IS_INTERRUPTED:
 				LOGGER.debug("Folder listener \"{}\" remove iterrupted file handler for UUID {}", getDirectoryName(), uuid);
@@ -253,6 +251,7 @@ public class FolderListener implements Runnable {
 				for (int i = 0; i < listeners.size(); i++) {
 					if (listeners.get(i) == this) {
 						listeners.remove(i);
+						LOGGER.trace("Folder listener \"{}\" has been removed from pool", getDirectoryName());
 						return true;
 					}
 				}
@@ -265,10 +264,10 @@ public class FolderListener implements Runnable {
 		try {
 			while (true) {
 				WatchKey key;
-				LOGGER.trace("Folder listener \"{}\" poll attemt with {}", getDirectoryName(), watcher);
+				LOGGER.trace("Folder listener \"{}\" poll calling ...", getDirectoryName());
 				isListen = true;
 				key = watcher.poll(LISTENER_TIMEOUT_MILLLIS, TimeUnit.MILLISECONDS);
-				LOGGER.trace("Folder listener \"{}\" polled", getDirectoryName());
+				LOGGER.trace("Folder listener \"{}\" poll called", getDirectoryName());
 	
 				if (key != null) {
 					for ( WatchEvent<?> event : key.pollEvents() ) {
@@ -318,6 +317,7 @@ public class FolderListener implements Runnable {
     	if (init()) {
 			pollFile();
 		} else {
+			LOGGER.warn("Folder listener has not been initialized for \"{}\"", getDirectoryName());
 			removeListener(true);
 		}
 	}

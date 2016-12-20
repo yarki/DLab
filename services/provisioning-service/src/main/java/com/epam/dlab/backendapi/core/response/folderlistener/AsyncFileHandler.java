@@ -37,7 +37,7 @@ import static com.epam.dlab.backendapi.core.Constants.LOG_EXTENSION;
 
 public final class AsyncFileHandler implements Supplier<Boolean> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncFileHandler.class);
 
 
     private final String fileName;
@@ -58,8 +58,12 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
         try {
         	boolean result = fileHandlerCallback.handle(fileName, readBytes(path));
             if (result) {
-                Files.deleteIfExists(path);
-                Files.deleteIfExists(getLogFile());
+            	try {
+            		Files.deleteIfExists(path);
+            		Files.deleteIfExists(getLogFile());
+            	} catch (IOException e) {
+            		LOGGER.warn("Can't delete file {}", path, e);
+            	}
             }
             return result;
         } catch (Exception e) {
