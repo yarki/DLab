@@ -35,16 +35,27 @@ import java.util.function.Supplier;
 import static com.epam.dlab.backendapi.core.Constants.JSON_EXTENSION;
 import static com.epam.dlab.backendapi.core.Constants.LOG_EXTENSION;
 
+/* Handler for the file processing.
+ */
 public final class AsyncFileHandler implements Supplier<Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncFileHandler.class);
 
-
+    /** File name. */
     private final String fileName;
+    /** Directory name. */
     private final String directory;
+    /** Implement of the file handler. */
     private final FileHandlerCallback fileHandlerCallback;
+    /** Timeout waiting for the file writing. */
     private final Duration fileLengthCheckDelay;
 
+    /** Create instance of the file handler.
+     * @param fileName file name.
+     * @param directory directory name.
+     * @param fileHandlerCallback file handler for processing 
+     * @param fileLengthCheckDelay timeout waiting for the file writing.
+     */
     public AsyncFileHandler(String fileName, String directory, FileHandlerCallback fileHandlerCallback, Duration fileLengthCheckDelay) {
         this.fileName = fileName;
         this.directory = directory;
@@ -73,16 +84,26 @@ public final class AsyncFileHandler implements Supplier<Boolean> {
         return false;
     }
 
+    /** Returns the name of log file. */
     private Path getLogFile() {
         return Paths.get(directory, fileName.replaceAll(JSON_EXTENSION, LOG_EXTENSION));
     }
 
+    /** Returns the content of file.
+     * @param path source file.
+     * @return File content.
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private byte[] readBytes(Path path) throws IOException, InterruptedException {
         File file = path.toFile();
         waitFileCompletelyWritten(file);
         return Files.readAllBytes(path);
     }
 
+    /** Waiting for the file writing. This method is blocking and return control when
+     * the file will no longer resize.
+     * @param file source file. */
     private void waitFileCompletelyWritten(File file) throws InterruptedException {
     	long before;
     	long after = file.length();
