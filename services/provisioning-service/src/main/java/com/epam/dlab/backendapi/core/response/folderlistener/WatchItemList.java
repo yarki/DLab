@@ -1,10 +1,10 @@
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,54 +15,69 @@ import com.epam.dlab.backendapi.core.response.folderlistener.WatchItem.ItemStatu
 
 import io.dropwizard.util.Duration;
 
+/** List of the file handlers for processing.
+ * @author Usein_Faradzhev
+ */
 public class WatchItemList implements DockerCommands {
 	private static final Logger LOGGER = LoggerFactory.getLogger(WatchItemList.class);
 	
+	/** Directory name. */
 	private final String directoryName;
-    private final Path directoryPath;
-    private final String directoryFullName;
+	/** Directory full name. */
+	private final String directoryFullName;
 	
+	/** List of the file handlers. */
 	private final Vector<WatchItem> list = new Vector<WatchItem>();
 	
+	/** UUID of the file handler for search. */
 	private String uuidSearch;
 	
+	/** File handler for search. */
 	private final FileHandlerCallback handlerSearch = new FileHandlerCallback() {
+		@Override
 		public String getUUID() {
 			return uuidSearch;
 		}
 		
+		@Override
 		public boolean checkUUID(String uuid) {
 			return uuidSearch.equals(uuid);
 		}
 
+		@Override
 		public void handleError() { }
 		
+		@Override
 		public boolean handle(String fileName, byte[] content) throws Exception {
 			return false;
 		}
-		
 	};
 
+	/** Creates instance of the file handlers for processing.
+	 * @param directoryName listener directory name.
+	 */
 	public WatchItemList(String directoryName) {
 		this.directoryName = directoryName;
-        this.directoryPath = Paths.get(directoryName);
-        this.directoryFullName = directoryPath.toAbsolutePath().toString();
+        this.directoryFullName = Paths.get(directoryName).toAbsolutePath().toString();
 	}
 	
-	
+	/** Returns directory name. */
 	public String getDirectoryName() {
 		return directoryName;
 	}
 
-	public Path getDirectoryPath() {
-		return directoryPath;
-	}
-
+	/** Returns directory full name. */
 	public String getDirectoryFullName() {
 		return directoryFullName;
 	}
 	
 	
+	/** Appends the file handler to the list and returns it.
+	 * @param fileHandlerCallback File handler for processing.
+	 * @param timeoutMillis Timeout waiting for the file creation in milliseconds.
+	 * @param fileLengthCheckDelay Timeout waiting for the file writing in milliseconds.
+	 * @return Instance of the file handler.
+	 */
 	public WatchItem append(FileHandlerCallback fileHandlerCallback, long timeoutMillis, long fileLengthCheckDelay) {
 	    WatchItem item = new WatchItem(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
 		int index = Collections.binarySearch(list, item);
@@ -82,6 +97,15 @@ public class WatchItemList implements DockerCommands {
 		return item;
 	}
 
+	/** Appends the file handler to the list for the existing file and returns it. If the file name
+	 * is <b>null</b> this means that file does not exist and equal to call method
+	 * {@link WatchItemList#append(FileHandlerCallback, long, long)}.
+	 * @param fileHandlerCallback File handler for processing.
+	 * @param timeoutMillis Timeout waiting for the file creation in milliseconds.
+	 * @param fileLengthCheckDelay Timeout waiting for the file writing in milliseconds.
+	 * @param fileName file name.
+	 * @return Instance of file handler.
+	 */
 	public WatchItem append(FileHandlerCallback fileHandlerCallback, long timeoutMillis, long fileLengthCheckDelay, String fileName) {
 		WatchItem item = null;
 		if (fileName != null && fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
@@ -93,23 +117,35 @@ public class WatchItemList implements DockerCommands {
 		return item;
 	}
 
+	/** Removes the file handler from list.
+	 * @param index index of the file handler.
+	 */
 	public void remove(int index) {
 		list.remove(index);
 	}
 	
+	/** Returns the number of the file handlers in list. */
 	public int size() {
 		return list.size();
 	}
 
+	/** Returns the file handler.
+	 * @param index index of the file handler.
+	 */
 	public WatchItem get(int index) {
 		return list.get(index);
 	}
 	
-	public int getIndex(String uid) {
-		uuidSearch = uid;
+	/** Returns the index of the file handler in the list if it is contained in the list,
+	 * otherwise returns (-(insertion point) - 1).
+	 * @param uid UUID of the file handler. */
+	public int getIndex(String uuid) {
+		uuidSearch = uuid;
 		return Collections.binarySearch(list, new WatchItem(handlerSearch, 0, 0));
 	}
 	
+	/** Returns the instance of the file handler if it contained in the list,
+	 * otherwise returns <b>null</b>. */
 	public WatchItem getItem(String fileName) {
 		String uuid = DockerCommands.extractUUID(fileName);
 		int index = getIndex(uuid);
@@ -119,6 +155,9 @@ public class WatchItemList implements DockerCommands {
 		return get(index);
 	}
 	
+	/** Runs asynchronously the file handler in the {@link ForkJoinPool#commonPool()}.
+	 * @param item the file handler.
+	 */
 	private void runAsync(WatchItem item) {
 		LOGGER.debug("Process file {} for folder {}", item.getFileName(), directoryFullName);
 		item.setFuture(CompletableFuture.supplyAsync(
@@ -126,6 +165,10 @@ public class WatchItemList implements DockerCommands {
 					item.getFileHandlerCallback(), Duration.milliseconds(item.getFileLengthCheckDelay()))));
 	}
 	
+	/** Runs the file processing asynchronously if it have status {@link ItemStatus#FILE_CAPTURED} and returns <b>true</b>,
+	 * otherwise <b>false</b>.
+	 * @param item the file handler.
+	 */
 	public boolean processItem(WatchItem item) {
 		if (item.getStatus() == ItemStatus.FILE_CAPTURED) {
 			runAsync(item);
@@ -138,6 +181,7 @@ public class WatchItemList implements DockerCommands {
 		return false;
 	}
 
+	/** Checks all the file handlers and runs the file processing for it if have status {@link ItemStatus#FILE_CAPTURED}. */
 	public int processItemAll() {
 		int count = 0;
 		for (int i = 0; i < size(); i++) {

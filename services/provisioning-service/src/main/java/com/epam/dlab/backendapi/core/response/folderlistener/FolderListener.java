@@ -21,42 +21,47 @@ import com.epam.dlab.backendapi.core.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.WatchItem.ItemStatus;
 import com.epam.dlab.exceptions.DlabException;
 
+/** Listen the directories for the files creation and runs the file processing by {@link AsyncFileHandler}.
+ * @author Usein_Faradzhev
+ */
 public class FolderListener implements Runnable {
-	
 	private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
 	
+	/** Timeout of the check the file creation in milliseconds. */
 	public static final long LISTENER_TIMEOUT_MILLLIS = 1000;
 	
+	/** Timeout of the idle for the folder listener in milliseconds. */
 	public static final long LISTENER_IDLE_TIMEOUT_MILLLIS = 5000;
 
+	/** Timeout of waiting for the directory creation in milliseconds. */
 	private static final long WAIT_DIR_TIMEOUT_MILLIS = 500; 
 
+	/** List of the folder listeners. */
 	private static final List<FolderListener> listeners = new ArrayList<FolderListener>();
 
-
-	private Thread thread;
 	
-	private WatchItemList itemList;
-	
-	private WatchService watcher;
-	
-	private boolean isListen = false;
-	
-	private long expiredIdleMillis = 0;
-		
-	
-	private FolderListener() {	}
-	
-	private FolderListener(String directoryName) {
-		itemList = new WatchItemList(directoryName);
-	}
-	
-
+	/** Appends the file handler for processing to the folder listener and returns instance of the file handler. 
+	 * @param directoryName Name of directory for listen.
+	 * @param fileHandlerCallback File handler for processing.
+	 * @param timeoutMillis Timeout waiting for the file creation in milliseconds.
+	 * @param fileLengthCheckDelay Timeout waiting for the file writing in milliseconds.
+	 * @return Instance of the file handler.
+	 */
 	public static WatchItem listen(String directoryName, FileHandlerCallback fileHandlerCallback,
 			long timeoutMillis, long fileLengthCheckDelay) {
 		return listen(directoryName, fileHandlerCallback, timeoutMillis, fileLengthCheckDelay, null);
 	}
 
+	/** Appends the file handler for processing to the folder listener for the existing file and returns
+	 * instance of the file handler. If the file name is <b>null</b> this means that file does not exist
+	 * and equal to call method {@link FolderListener#listen(String, FileHandlerCallback, long, long)}. 
+	 * @param directoryName Name of directory for listen.
+	 * @param fileHandlerCallback File handler for processing.
+	 * @param timeoutMillis Timeout waiting for the file creation in milliseconds.
+	 * @param fileLengthCheckDelay Timeout waiting for the file writing in milliseconds.
+	 * @param fileName file name.
+	 * @return Instance of the file handler.
+	 */
 	public static WatchItem listen(String directoryName, FileHandlerCallback fileHandlerCallback,
 			long timeoutMillis, long fileLengthCheckDelay, String fileName) {
 		FolderListener listener;
@@ -88,7 +93,8 @@ public class FolderListener implements Runnable {
 		}
 		return item;
 	}
-	
+
+	/** Terminates all the folder listeners. */
 	public static void terminateAll() {
 		FolderListener[] array;
 		synchronized (listeners) {
@@ -99,19 +105,40 @@ public class FolderListener implements Runnable {
 		}
 	}
 	
+	/** Returns the list of folder listeners. */
 	public static List<FolderListener> getListeners() {
 		return listeners;
 	}
 	
-	public WatchItemList getItemList() {
-		return itemList;
-	}
+
+	/** Thread of the folder listener. */
+	private Thread thread;
+	/** List of the file handles. */
+	private WatchItemList itemList;
+	/** Watch service for the directory. */
+	private WatchService watcher;
+	/** Flag of listening status. */
+	private boolean isListen = false;
+	/** Time when expired of idle for folder listener in milliseconds. */
+	private long expiredIdleMillis = 0;
+		
 	
+	private FolderListener() {	}
+	
+	/** Creates thread of the folder listener
+	 * @param directoryName Name of directory.
+	 */
+	private FolderListener(String directoryName) {
+		itemList = new WatchItemList(directoryName);
+	}
+
+	/** Starts the thread of the folder listener. */
 	protected void start() {
 		thread = new Thread(this, getClass().getSimpleName() + "-" + listeners.size());
 		thread.start();
 	}
 	
+	/** Terminates the thread of the folder listener. */
 	protected void terminate() {
 		if (thread == null) {
 			return;
@@ -125,25 +152,35 @@ public class FolderListener implements Runnable {
 		}
 	}
 	
+	/** Returns <b>true</b> if the folder listener thread is running and is alive, otherwise <b>false</b>. */
 	public boolean isAlive() {
 		return (thread != null ? thread.isAlive() : false);
 	}
 	
+	/** Returns <b>true</b> if the folder listener is listening the folder. */
 	public boolean isListen() {
 		return isListen;
 	}
 	
 	
+	/** Returns the list of the file handlers. */
+	public WatchItemList getItemList() {
+		return itemList;
+	}
+	
+	/** Returns the full name of directory. */
 	public String getDirectoryName() {
 		return itemList.getDirectoryFullName();
 	}
 	
+	/** Waiting for the directory creation and returns <b>true</b> if it exists or created.
+	 * If timeout has expired and directory was not created returns <b>false</b> */
 	private boolean waitForDirectory() throws InterruptedException {
     	File file = new File(getDirectoryName());
 		if (file.exists()) {
     		return true;
     	} else {
-    		LOGGER.debug("Folder listener \"{}\" waiting for creating directory", getDirectoryName());
+    		LOGGER.debug("Folder listener \"{}\" waiting for the directory creation", getDirectoryName());
     	}
 
 		long expiredTimeMillis = itemList.get(0).getExpiredTimeMillis();
@@ -154,10 +191,13 @@ public class FolderListener implements Runnable {
         		return true;
         	}
     	}
-		LOGGER.error("Folder listener \"{}\" error. Timeout expired and directory not exists", getDirectoryName());
+		LOGGER.error("Folder listener \"{}\" error. Timeout has expired and directory does not exist", getDirectoryName());
     	return false;
     }
 
+	/** Initializes the thread of the folder listener. Returns <b>true</b> if the initialization
+	 * completed successfully. Returns <b>false</b> if all the file handlers has been processed
+	 * or initialization fails. */
 	private boolean init() {
 		LOGGER.debug("Folder listener initializing for \"{}\" ...", getDirectoryName());
     	
@@ -179,8 +219,8 @@ public class FolderListener implements Runnable {
 		watcher = null;
 		try {
 			watcher = FileSystems.getDefault().newWatchService();
-			Path dir = Paths.get(getDirectoryName());
-			dir.register(watcher, ENTRY_CREATE);
+			Path path = Paths.get(getDirectoryName());
+			path.register(watcher, ENTRY_CREATE);
 		} catch (IOException e) {
 			if (watcher != null) {
 				try {
@@ -197,6 +237,8 @@ public class FolderListener implements Runnable {
 		return true;
 	}
 	
+	/** Process all the file handlers if need and removes all expired, processed or interrupted
+	 * the file handlers from the list of the file handlers. */
 	private void processStatusItems() {
 		int i = 0;
 		
@@ -245,6 +287,11 @@ public class FolderListener implements Runnable {
 		}
 	}
 	
+	/** Removes the listener from the list of folder listeners if the the file handler list is empty
+	 * and idle time has expired or if <b>force</b> flag has been set to <b>true</b>.
+	 * @param force the flag of remove the folder listener immediately.
+	 * @return <b>true</b> if the folder listener has been removed otherwise <b>false</>.
+	 */
 	private boolean removeListener(boolean force) {
 		synchronized (listeners) {
 			if (force || (itemList.size() == 0 && expiredIdleMillis < System.currentTimeMillis())) {
@@ -260,6 +307,7 @@ public class FolderListener implements Runnable {
 		return false;
 	}
 	
+	/** Waiting for files and process it. */
 	private void pollFile() {
 		try {
 			while (true) {
@@ -320,19 +368,6 @@ public class FolderListener implements Runnable {
 			LOGGER.warn("Folder listener has not been initialized for \"{}\"", getDirectoryName());
 			removeListener(true);
 		}
-	}
-	
-	public static void main(String[] args) throws Exception {
-		/*FolderListener.listen("watch_dir", "DIS_for_Rostelecom_OP442838_POC_119243.key", 10000, false);
-		FolderListener.listen("watch_dir2", "DIS_for_Rostelecom_OP442838_POC_119243.key", 3000, false);
-		Thread.sleep(5000);
-		FolderListener.listen("watch_dir", "2.key", 10000, false);
-		FolderListener.listen("watch_dir2", "3.key", 3000, false);
-		
-		FolderListener.listen("watch_dir", "DIS_for_Rostelecom_OP442838_POC_119243.key", 10000, false);
-		while ( true ) {
-			Thread.sleep(10000);
-		}*/
 	}
 	
 }
