@@ -112,6 +112,10 @@ export class ResourcesGrid implements OnInit {
 
       return isName && isStatus && isShape && isResources;
     });
+
+    // TODO: SAVE TO DB => CREATE USER PREFERENCES
+    // this.createUserPreferences(config);
+
     this.filteredEnvironments = filteredData;
   }
 
@@ -120,6 +124,10 @@ export class ResourcesGrid implements OnInit {
   }
 
   resetFilterConfigurations(): void {
+    // TODO: SUSPEND USER PREFERENCES
+    // this.userResourceService.suspendUserPreferences(ACTION?)
+    // .subscribe((result) => {}, (error) => {console.log('SUSPEND ERROR!!! ', error);});
+
     this.filterForm.resetConfigurations();
     this.buildGrid();
   }
@@ -128,12 +136,10 @@ export class ResourcesGrid implements OnInit {
     this.userResourceService.getUserProvisionedResources()
       .subscribe((result) => {
         this.environments = this.loadEnvironments(result);
-        this.filteredEnvironments = this.environments;
-
-        if (this.environments.length)
-          this.applyFilter_btnClick(this.filterForm);
-
+        // this.filteredEnvironments = this.environments;
         this.getDefaultFilterConfiguration();
+
+        (this.environments.length) ? this.getUserPreferences() : this.filteredEnvironments = null;
       });
   }
 
@@ -158,6 +164,30 @@ export class ResourcesGrid implements OnInit {
           value.edge_node_ip);
       });
     }
+  }
+
+  getUserPreferences(): void {
+    this.userResourceService.getUserPreferences()
+      .subscribe((result) => {
+        this.filteredEnvironments = this.environments;
+
+        this.filterForm = this.loadUserPreferences(result[0]);
+        this.applyFilter_btnClick(this.filterForm);
+      }, (error) => { console.log(error); });
+  }
+
+  loadUserPreferences(config): FilterConfigurationModel {
+    // TODO: check if EMPTY => this.filterForm = new FilterConfigurationModel('', [], [], []);
+    return new FilterConfigurationModel(config.name, config.statuses, config.shapes, config.resources);
+  }
+
+  createUserPreferences(filterConfiguration: FilterConfigurationModel): void {
+    this.userResourceService.createUserPreferences(filterConfiguration)
+      .subscribe((result) => {
+        console.log('create user preferences: ', result);
+      }, (error) => {
+        console.log('CREATE ERROR!!! ', error);
+      });
   }
 
   printDetailEnvironmentModal(data): void {

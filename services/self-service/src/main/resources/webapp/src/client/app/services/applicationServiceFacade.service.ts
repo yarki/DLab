@@ -33,6 +33,7 @@ export class ApplicationServiceFacade {
   private static readonly EXPLORATORY_ENVIRONMENT_TEMPLATES = 'exploratory_environment_templates';
   private static readonly COMPUTATIONAL_RESOURCES_TEMLATES = 'computational_resources_templates';
   private static readonly COMPUTATIONAL_RESOURCES = 'computational_resources';
+  private static readonly USER_PREFERENCES = 'user_preferences';
   private accessTokenKey: string = 'access_token';
   private requestRegistry: Dictionary<string>;
 
@@ -131,6 +132,27 @@ export class ApplicationServiceFacade {
       this.getRequestOptions(true, true));
   }
 
+  public buildGetUserPreferences(): Observable<Response> {
+    return this.buildRequest(RequestMethod.Get,
+      this.requestRegistry.Item(ApplicationServiceFacade.USER_PREFERENCES),
+      null,
+      this.getRequestOptions(true, true));
+  }
+
+  public buildCreateUserPreferences(data): Observable<Response> {
+    return this.buildRequest(RequestMethod.Put,
+      this.requestRegistry.Item(ApplicationServiceFacade.USER_PREFERENCES),
+      data,
+      this.getRequestOptions(true, true));
+  }
+
+  public buildSuspendUserPreferences(data): Observable<Response> {
+    return this.buildRequest(RequestMethod.Delete,
+      this.requestRegistry.Item(ApplicationServiceFacade.USER_PREFERENCES),
+      data,
+      this.getRequestOptions(true, true));
+  }
+
 
   private setupRegistry(): void {
     this.requestRegistry = new Dictionary<string>();
@@ -155,6 +177,10 @@ export class ApplicationServiceFacade {
       '/api/infrastructure_provision/computational_resources');
     this.requestRegistry.Add(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES_TEMLATES,
       '/api/infrastructure_provision/computational_resources_templates');
+
+    // Filtering Configuration
+    this.requestRegistry.Add(ApplicationServiceFacade.USER_PREFERENCES,
+      'app/components/resources-grid/data.json');
   }
 
   private buildRequest(method: RequestMethod, url: string, body: any, opt: RequestOptions): Observable<Response> {
