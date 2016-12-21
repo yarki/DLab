@@ -18,6 +18,11 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
+import java.io.File;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
 import com.google.inject.Inject;
@@ -29,6 +34,8 @@ import io.dropwizard.util.Duration;
  */
 @Singleton
 public class FolderListenerExecutor {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FolderListenerExecutor.class);
+
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
 
@@ -40,6 +47,11 @@ public class FolderListenerExecutor {
      * @param fileHandlerCallback handler for the file processing.
      */
     public void start(String directory, Duration timeout, FileHandlerCallback fileHandlerCallback) {
+    	File file = new File(directory);
+    	if (!file.exists()) {
+    		LOGGER.debug("Folder \"{}\" not exists and will be created");
+    		file.mkdirs();
+    	}
     	FolderListener.listen(directory, fileHandlerCallback, timeout.toMilliseconds(),
     			configuration.getFileLengthCheckDelay().toMilliseconds());
     }
