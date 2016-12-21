@@ -20,13 +20,14 @@ package com.epam.dlab.dto.imagemetadata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class ExploratoryMetadataDTO extends ImageMetadataDTO {
     @JsonProperty(value = "exploratory_environment_versions")
     private List<ExploratoryEnvironmentVersion> exploratoryEnvironmentVersions;
     @JsonProperty(value = "exploratory_environment_shapes")
-    private List<ComputationalResourceShapeDto> exploratoryEnvironmentShapes;
+    private HashMap<String, List<ComputationalResourceShapeDto>> exploratoryEnvironmentShapes;
     @JsonProperty
     protected String image;
     @JsonProperty(value = "request_id")
@@ -59,12 +60,12 @@ public class ExploratoryMetadataDTO extends ImageMetadataDTO {
         this.exploratoryEnvironmentVersions = exploratoryEnvironmentVersions;
     }
 
-    public List<ComputationalResourceShapeDto> getExploratoryEnvironmentShapes() {
+    public HashMap<String, List<ComputationalResourceShapeDto>> getExploratoryEnvironmentShapes() {
         return exploratoryEnvironmentShapes;
     }
 
     public void setExploratoryEnvironmentShapes(
-            List<ComputationalResourceShapeDto> exploratoryEnvironmentShapes) {
+            HashMap<String, List<ComputationalResourceShapeDto>> exploratoryEnvironmentShapes) {
         this.exploratoryEnvironmentShapes = exploratoryEnvironmentShapes;
     }
 
@@ -86,6 +87,8 @@ public class ExploratoryMetadataDTO extends ImageMetadataDTO {
         }
 
         ExploratoryMetadataDTO that = (ExploratoryMetadataDTO) o;
+
+
 
         if (exploratoryEnvironmentVersions != null
                 ? !exploratoryEnvironmentVersions

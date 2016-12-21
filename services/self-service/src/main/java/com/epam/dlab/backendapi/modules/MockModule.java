@@ -25,10 +25,13 @@ import com.epam.dlab.mongo.MongoService;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.DockerAPI;
 import com.epam.dlab.rest.contracts.SecurityAPI;
+import com.epam.dlab.utils.ResourceUtils;
 import com.google.inject.name.Names;
 import io.dropwizard.setup.Environment;
 
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,56 +84,24 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
     }
 
     private ComputationalMetadataDTO prepareEmrImage() {
-        TemplateDTO templateDTO = new TemplateDTO("emr-6.3.0");
-        ArrayList<ApplicationDto> applicationDtos = new ArrayList<>();
-        applicationDtos.add(new ApplicationDto("2.7.1", "Hadoop"));
-        applicationDtos.add(new ApplicationDto("1.6.0", "Spark"));
-        templateDTO.setApplications(applicationDtos);
-
-        TemplateDTO templateDTO1 = new TemplateDTO("emr-5.0.3");
-        applicationDtos = new ArrayList<>();
-        applicationDtos.add(new ApplicationDto("2.7.3", "Hadoop"));
-        applicationDtos.add(new ApplicationDto("2.0.1", "Spark"));
-        applicationDtos.add(new ApplicationDto("2.1.0", "Hive"));
-        templateDTO1.setApplications(applicationDtos);
-
-        ComputationalMetadataDTO imageMetadataDTO = new ComputationalMetadataDTO(
-                "test computational image", "template", "description",
-                "request_id", ImageType.COMPUTATIONAL.getType(),
-                Arrays.asList(templateDTO, templateDTO1));
-
-        List<ComputationalResourceShapeDto> crsList = new ArrayList<>();
-        crsList.add(new ComputationalResourceShapeDto(
-                "cg1.4xlarge", "22.5 GB", 16));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.medium", "4.0 GB", 2));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.large", "8.0 GB", 2));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.large", "8.0 GB", 2));
-
-        imageMetadataDTO.setComputationResourceShapes(crsList);
-        return imageMetadataDTO;
+        try {
+            return ResourceUtils.readResourceAsClass(getClass(),
+                    "/metadata/computational_mock.json",
+                    ComputationalMetadataDTO.class);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     private ExploratoryMetadataDTO prepareJupiterImage() {
-        ExploratoryMetadataDTO imageMetadataDTO = new ExploratoryMetadataDTO();
-        List<ComputationalResourceShapeDto> crsList = new ArrayList<>();
-        crsList.add(new ComputationalResourceShapeDto(
-                "cg1.4xlarge", "22.5 GB", 16));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.medium", "4.0 GB", 2));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.large", "8.0 GB", 2));
-        crsList.add(new ComputationalResourceShapeDto(
-                "t2.large", "8.0 GB", 2));
-
-        List<ExploratoryEnvironmentVersion> eevList = new ArrayList<>();
-        eevList.add(new ExploratoryEnvironmentVersion("Jupyter 1.5", "Base image with jupyter node creation routines",
-                                                      "type", "jupyter-1.6", "AWS"));
-        imageMetadataDTO.setExploratoryEnvironmentShapes(crsList);
-        imageMetadataDTO.setExploratoryEnvironmentVersions(eevList);
-
-        return imageMetadataDTO;
+        try {
+            return ResourceUtils.readResourceAsClass(getClass(),
+                    "/metadata/exploratory_mock.json",
+                    ExploratoryMetadataDTO.class);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 }
