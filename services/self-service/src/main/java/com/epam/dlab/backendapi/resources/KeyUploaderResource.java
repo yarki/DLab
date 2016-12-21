@@ -104,7 +104,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @POST
     @Path("/callback")
     public Response loadKeyResponse(UploadFileResultDTO result) {
-        LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
+        LOGGER.debug("upload key result for user {}, status: {}", result.getUser(), result.isSuccess());
         keyDAO.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
         if (result.isSuccess()) {
             keyDAO.saveCredential(result.getUser(), result.getCredential());

@@ -51,5 +51,10 @@ if __name__ == "__main__":
     with open("/response/edge_{0}_{1}.json".format(os.environ['edge_user_name'], os.environ['request_id']), 'w') as response_file:
         response_file.write(json.dumps(reply))
 
+    try:
+        local('chmod 666 /response/*')
+    except:
+        success = False
+
     if not success:
         sys.exit(1)

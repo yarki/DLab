@@ -56,9 +56,9 @@ public class DockerResource implements DockerCommands {
     @Path("{type}")
     public Set<ImageMetadataDTO> getDockerImages(@PathParam("type") String type) throws
             IOException, InterruptedException {
-        LOGGER.debug("docker statuses asked");
+        LOGGER.debug("docker statuses asked for {}", type);
         return metadataHolder
-                .getMetadatas(ImageType.valueOf(type.toUpperCase()));
+                .getMetadata(ImageType.valueOf(type.toUpperCase()));
     }
 
     @Path("/run")

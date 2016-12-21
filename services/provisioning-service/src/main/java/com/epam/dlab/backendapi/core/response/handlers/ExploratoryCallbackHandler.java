@@ -31,11 +31,17 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     private static final String EXPLORATORY_ID_FIELD = "notebook_name";
     private static final String EXPLORATORY_URL_FIELD = "exploratory_url";
 
-    private String exploratoryName;
+    private final String exploratoryName;
+    private final String uuid;
+    
+    @Override
+    public String getUUID() {
+    	return uuid;
+    }
 
-    @SuppressWarnings("unchecked")
     public ExploratoryCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String exploratoryName) {
         super(selfService, user, originalUuid, action);
+        this.uuid = originalUuid;
         this.exploratoryName = exploratoryName;
     }
 
