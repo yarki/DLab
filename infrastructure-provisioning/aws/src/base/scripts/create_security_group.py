@@ -33,6 +33,8 @@ parser.add_argument('--egress', type=str, default='[]')
 parser.add_argument('--infra_tag_name', type=str, default='')
 parser.add_argument('--infra_tag_value', type=str, default='')
 parser.add_argument('--force', type=bool, default=False)
+parser.add_argument('--nb_sg_name', type=str, default='')
+parser.add_argument('--resource', type=str, default='')
 args = parser.parse_args()
 
 
@@ -66,7 +68,9 @@ if __name__ == "__main__":
                 print "Creating security group %s for vpc %s with tag %s." % (args.name, args.vpc_id, json.dumps(tag))
                 security_group_id = create_security_group(args.name, args.vpc_id, rules, egress, tag)
             if args.force == True:
-                print "Removing old security group."
+                print "Removing old security groups."
+                if args.resource == 'edge':
+                    remove_sgroups(args.nb_sg_name)
                 remove_sgroups(args.infra_tag_value)
                 print "Creating security group %s for vpc %s with tag %s." % (args.name, args.vpc_id, json.dumps(tag))
                 security_group_id = create_security_group(args.name, args.vpc_id, rules, egress, tag)
