@@ -121,8 +121,6 @@ public class FolderListenerTest {
 		//listener = FolderListener.getListeners().get(0);
 		//listener.terminate();
 		FolderListener.terminateAll();
-
-		Thread.sleep(1000);
 	}
 
 }
