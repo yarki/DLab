@@ -78,7 +78,13 @@ def ensure_spark_scala():
             sudo('touch ' + py3spark_local_path_dir + 'kernel.json')
             put(templates_dir + 'pyspark_local_template.json', '/tmp/pyspark_local_template.json')
             put(templates_dir + 'py3spark_local_template.json', '/tmp/py3spark_local_template.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/pyspark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/pyspark_local_template.json')
             sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/py3spark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/py3spark_local_template.json')
             sudo('\cp /tmp/py3spark_local_template.json ' + py3spark_local_path_dir + 'kernel.json')
             sudo('pip install --pre toree --no-cache-dir')
             sudo('ln -s /opt/spark/ /usr/local/spark')
