@@ -85,6 +85,8 @@ def install_rstudio():
             sudo('R -e \'install.packages("tibble", repos = "https://cran.revolutionanalytics.com")\'')
             sudo('wget https://download2.rstudio.org/rstudio-server-1.0.44-amd64.deb')
             sudo('gdebi -n rstudio-server-1.0.44-amd64.deb')
+            sudo('touch /mnt/var')
+            sudo('chown ubuntu:ubuntu /mnt/var')
             sudo('touch /home/ubuntu/.Renviron')
             sudo('chown ubuntu:ubuntu /home/ubuntu/.Renviron')
             sudo('''echo 'SPARK_HOME="''' + local_spark_path + '''"' >> /home/ubuntu/.Renviron''')
