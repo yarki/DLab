@@ -67,7 +67,7 @@ if __name__ == "__main__":
             if security_group_id == '':
                 print "Creating security group %s for vpc %s with tag %s." % (args.name, args.vpc_id, json.dumps(tag))
                 security_group_id = create_security_group(args.name, args.vpc_id, rules, egress, tag)
-            if args.force == True:
+            elif args.force == True:
                 print "Removing old security groups."
                 if args.resource == 'edge':
                     remove_sgroups(args.nb_sg_name)
