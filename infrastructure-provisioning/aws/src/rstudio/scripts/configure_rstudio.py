@@ -23,6 +23,7 @@ from fabric.contrib.files import exists
 import argparse
 import json
 import sys
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
@@ -31,9 +32,9 @@ parser.add_argument('--region', type=str, default='')
 parser.add_argument('--rstudio_pass', type=str, default='')
 args = parser.parse_args()
 
-spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
-spark_version = "1.6.2"
-hadoop_version = "2.6"
+spark_version = os.environ['notebook_spark_version']
+hadoop_version = os.environ['notebook_hadoop_version']
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 local_spark_path = '/opt/spark/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
