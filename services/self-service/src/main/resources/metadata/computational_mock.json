@@ -1,4 +1,5 @@
 {
+  "image": "docker.epmc-bdcc.projects.epam.com/dlab-aws-emr",
   "template_name": "DLab AWS EMR",
   "description": "Image for EMR provisioning",
   "environment_type": "computational",

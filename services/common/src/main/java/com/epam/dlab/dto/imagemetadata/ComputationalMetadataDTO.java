@@ -20,7 +20,9 @@ package com.epam.dlab.dto.imagemetadata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class ComputationalMetadataDTO extends ImageMetadataDTO{
     @JsonProperty(value = "template_name")
@@ -34,7 +36,7 @@ public class ComputationalMetadataDTO extends ImageMetadataDTO{
     @JsonProperty(value = "request_id")
     private String requestId;
     @JsonProperty(value = "computation_resources_shapes")
-    private List<ComputationalResourceShapeDto> computationResourceShapes;
+    private HashMap<String, List<ComputationalResourceShapeDto>> computationResourceShapes;
     @JsonProperty
     protected String image;
 
@@ -101,11 +103,11 @@ public class ComputationalMetadataDTO extends ImageMetadataDTO{
         this.requestId = requestId;
     }
 
-    public List<ComputationalResourceShapeDto> getComputationResourceShapes() {
+    public HashMap<String, List<ComputationalResourceShapeDto>> getComputationResourceShapes() {
         return computationResourceShapes;
     }
 
-    public void setComputationResourceShapes(List<ComputationalResourceShapeDto> computationResourceShapes) {
+    public void setComputationResourceShapes(HashMap<String, List<ComputationalResourceShapeDto>> computationResourceShapes) {
         this.computationResourceShapes = computationResourceShapes;
     }
 
@@ -128,31 +130,13 @@ public class ComputationalMetadataDTO extends ImageMetadataDTO{
 
         ComputationalMetadataDTO that = (ComputationalMetadataDTO) o;
 
-        if (templateName != null ? !templateName.equals(that.templateName)
-                : that.templateName != null) {
-            return false;
-        }
-        if (description != null ? !description.equals(that.description)
-                : that.description != null) {
-            return false;
-        }
-        if (type != null ? !type.equals(that.type) : that.type != null) {
-            return false;
-        }
-        if (templates != null ? !templates.equals(that.templates)
-                : that.templates != null) {
-            return false;
-        }
-        if (requestId != null ? !requestId.equals(that.requestId)
-                : that.requestId != null) {
-            return false;
-        }
-        if (computationResourceShapes != null ? !computationResourceShapes
-                .equals(that.computationResourceShapes)
-                : that.computationResourceShapes != null) {
-            return false;
-        }
-        return image != null ? image.equals(that.image) : that.image == null;
+        return Objects.equals(templateName, that.templateName) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(templates, that.templates) &&
+                Objects.equals(requestId, that.requestId) &&
+                Objects.equals(computationResourceShapes, that.computationResourceShapes) &&
+                Objects.equals(image, that.image);
     }
 
     @Override

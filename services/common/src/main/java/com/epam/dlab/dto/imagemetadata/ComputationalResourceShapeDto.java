@@ -20,9 +20,13 @@ package com.epam.dlab.dto.imagemetadata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class ComputationalResourceShapeDto {
     @JsonProperty(value = "Type")
     private String type;
+    @JsonProperty(value = "Size")
+    private String size;
     @JsonProperty(value = "Ram")
     private String ram;
     @JsonProperty(value = "Cpu")
@@ -31,8 +35,9 @@ public class ComputationalResourceShapeDto {
     public ComputationalResourceShapeDto(){
     }
 
-    public ComputationalResourceShapeDto(String type, String ram, int cpu) {
+    public ComputationalResourceShapeDto(String type, String size, String ram, int cpu) {
         this.type = type;
+        this.size = size;
         this.ram = ram;
         this.cpu = cpu;
     }
@@ -44,6 +49,10 @@ public class ComputationalResourceShapeDto {
     public void setType(String type) {
         this.type = type;
     }
+
+    public String getSize() { return size; }
+
+    public void setSize(String size) { this.size = size; }
 
     public String getRam() {
         return ram;
@@ -72,14 +81,10 @@ public class ComputationalResourceShapeDto {
 
         ComputationalResourceShapeDto that = (ComputationalResourceShapeDto) o;
 
-        if (cpu != that.cpu) {
-            return false;
-        }
-        if (type != null ? !type.equals(that.type) : that.type != null) {
-            return false;
-        }
-        return ram != null ? ram.equals(that.ram) : that.ram == null;
-
+        return Objects.equals(type, that.type) &&
+                Objects.equals(size, that.size) &&
+                Objects.equals(ram, that.ram) &&
+                Objects.equals(cpu, that.cpu);
     }
 
     @Override
