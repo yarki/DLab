@@ -18,6 +18,7 @@
 #
 # ******************************************************************************
 
+from dlab.aws_actions import *
 from fabric.api import *
 from fabric.contrib.files import exists
 import argparse
@@ -138,8 +139,22 @@ if __name__ == "__main__":
             sudo('mkdir /home/ubuntu/.ensure_dir')
     except:
         sys.exit(1)
+
+    print "Mount additional volume"
     prepare_disk()
+
+    print "Install python libraries"
     ensure_libraries_py()
+
+    print "Install RStudio"
     install_rstudio()
+
+    print "Install local Spark"
     ensure_local_spark()
+
+    print "Install local S3 kernels"
     ensure_s3_kernel()
+
+    # for image purpose
+    print "Clean up lock files"
+    remove_apt_lock()
