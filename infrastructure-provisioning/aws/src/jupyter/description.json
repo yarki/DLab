@@ -1,21 +1,20 @@
 {
-  "exploratory_environment_shapes" : [
-    {
-      "Memory optimized" : [
-        {"Size": "S", "Type": "r3.xlarge","Ram": "30.5 GB","Cpu": "4"},
-        {"Size": "M", "Type": "r3.4xlarge","Ram": "122 GB","Cpu": "16"},
-        {"Size": "L", "Type": "r3.8xlarge","Ram": "244 GB","Cpu": "32"}
-      ],
-      "GPU optimized": [
-        {"Size": "M", "Type": "g2.2xlarge","Ram": "15.0 GB","Cpu": "8"}
-      ],
-      "Compute optimized": [
-        {"Size": "S", "Type": "c4.large","Ram": "3.75 GB","Cpu": "2"},
-        {"Size": "M", "Type": "c4.2xlarge","Ram": "15.0 GB","Cpu": "8"},
-        {"Size": "L", "Type": "c4.8xlarge","Ram": "60.0 GB","Cpu": "36"}
-      ]
-    }
-  ],
+  "exploratory_environment_shapes" :
+  {
+    "Memory optimized" : [
+      {"Size": "S", "Type": "r3.xlarge","Ram": "30.5 GB","Cpu": "4"},
+      {"Size": "M", "Type": "r3.4xlarge","Ram": "122 GB","Cpu": "16"},
+      {"Size": "L", "Type": "r3.8xlarge","Ram": "244 GB","Cpu": "32"}
+    ],
+    "GPU optimized": [
+      {"Size": "M", "Type": "g2.2xlarge","Ram": "15.0 GB","Cpu": "8"}
+    ],
+    "Compute optimized": [
+      {"Size": "S", "Type": "c4.large","Ram": "3.75 GB","Cpu": "2"},
+      {"Size": "M", "Type": "c4.2xlarge","Ram": "15.0 GB","Cpu": "8"},
+      {"Size": "L", "Type": "c4.8xlarge","Ram": "60.0 GB","Cpu": "36"}
+    ]
+  },
   "exploratory_environment_versions" :
   [
     {
@@ -23,20 +22,6 @@
       "description": "Base image with jupyter node creation routines",
       "environment_type": "exploratory",
       "version": "jupyter-1.6",
-      "vendor": "AWS"
-    },
-    {
-      "template_name": "R 3.3.2",
-      "description": "Base image with r node creation routines",
-      "environment_type": "exploratory",
-      "version": "r-3.3.2",
-      "vendor": "AWS"
-    },
-    {
-      "template_name": "Zeppelin 0.6.2",
-      "description": "Base image with zeppelin node creation routines",
-      "environment_type": "exploratory",
-      "version": "zeppelin-0.6.2",
       "vendor": "AWS"
     }
   ]

@@ -1,4 +1,5 @@
 {
+  "image": "docker.epmc-bdcc.projects.epam.com/dlab-aws-rstudio",
   "exploratory_environment_shapes" :
   {
     "Memory optimized" : [

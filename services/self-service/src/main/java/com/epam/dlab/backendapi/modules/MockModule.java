@@ -73,11 +73,11 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         RESTService result = mock(RESTService.class);
         when(result.post(eq(KEY_LOADER), any(), eq(Response.class)))
                 .then(invocationOnMock -> Response.accepted().build());
-        when(result.get(eq(DOCKER_EXPLORATORY), any()))
+        when(result.get(eq(DOCKER_EXPLORATORY), eq(ExploratoryMetadataDTO[].class)))
                 .thenReturn(new ExploratoryMetadataDTO[]{
                         prepareJupiterImage()
                 });
-        when(result.get(eq(DOCKER_COMPUTATIONAL), any()))
+        when(result.get(eq(DOCKER_COMPUTATIONAL), eq(ComputationalMetadataDTO[].class)))
                 .thenReturn(new ComputationalMetadataDTO[]{prepareEmrImage()});
         when(result.post(eq(EXPLORATORY_CREATE), any(), eq(String.class))).thenReturn(UUID.randomUUID().toString());
         return result;
@@ -85,9 +85,10 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
 
     private ComputationalMetadataDTO prepareEmrImage() {
         try {
-            return ResourceUtils.readResourceAsClass(getClass(),
+            ComputationalMetadataDTO dto = ResourceUtils.readResourceAsClass(getClass(),
                     "/metadata/computational_mock.json",
                     ComputationalMetadataDTO.class);
+            return dto;
         }
         catch (Exception e) {
             return null;
@@ -96,9 +97,10 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
 
     private ExploratoryMetadataDTO prepareJupiterImage() {
         try {
-            return ResourceUtils.readResourceAsClass(getClass(),
+            ExploratoryMetadataDTO dto = ResourceUtils.readResourceAsClass(getClass(),
                     "/metadata/exploratory_mock.json",
                     ExploratoryMetadataDTO.class);
+            return dto;
         }
         catch (Exception e) {
             return null;
