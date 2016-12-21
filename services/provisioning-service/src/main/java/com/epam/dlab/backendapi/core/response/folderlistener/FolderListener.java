@@ -341,14 +341,14 @@ public class FolderListener implements Runnable {
 							try {
 								WatchItem item = itemList.getItem(fileName);
 								if (item != null && item.getFileName() == null) {
-									LOGGER.debug("Folder listener \"{}\" handle the file {}", getDirectoryName(), fileName);
+									LOGGER.debug("Folder listener \"{}\" handles the file {}", getDirectoryName(), fileName);
 									item.setFileName(fileName);
 									if (itemList.processItem(item)) {
-										LOGGER.debug("Folder listener \"{}\" process the file {}", getDirectoryName(), fileName);
+										LOGGER.debug("Folder listener \"{}\" processes the file {}", getDirectoryName(), fileName);
 									}
 								}
 							} catch (Exception e) {
-								LOGGER.warn("Folder listener \"{}\" has got exception for checks or process the file {}", getDirectoryName(), fileName, e);
+								LOGGER.warn("Folder listener \"{}\" has got exception for check or process the file {}", getDirectoryName(), fileName, e);
 							}
 						}
 					}
