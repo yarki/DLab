@@ -336,15 +336,19 @@ public class FolderListener implements Runnable {
 						WatchEvent.Kind<?> kind = event.kind();
 						if (kind == ENTRY_CREATE) {
 							String fileName = event.context().toString();
-							LOGGER.trace("Folder listener \"{}\" check file {}", getDirectoryName(), fileName);
+							LOGGER.trace("Folder listener \"{}\" checks the file {}", getDirectoryName(), fileName);
 
-							WatchItem item = itemList.getItem(fileName);
-							if (item != null && item.getFileName() == null) {
-								LOGGER.debug("Folder listener \"{}\" handle file {}", getDirectoryName(), fileName);
-								item.setFileName(fileName);
-								if (itemList.processItem(item)) {
-									LOGGER.debug("Folder listener \"{}\" process file {}", getDirectoryName(), fileName);
+							try {
+								WatchItem item = itemList.getItem(fileName);
+								if (item != null && item.getFileName() == null) {
+									LOGGER.debug("Folder listener \"{}\" handle the file {}", getDirectoryName(), fileName);
+									item.setFileName(fileName);
+									if (itemList.processItem(item)) {
+										LOGGER.debug("Folder listener \"{}\" process the file {}", getDirectoryName(), fileName);
+									}
 								}
+							} catch (Exception e) {
+								LOGGER.warn("Folder listener \"{}\" has got exception for checks or process the file {}", getDirectoryName(), fileName, e);
 							}
 						}
 					}
