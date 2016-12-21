@@ -310,6 +310,7 @@ public class FolderListener implements Runnable {
 			if (force || (itemList.size() == 0 && expiredIdleMillis < System.currentTimeMillis())) {
 				for (int i = 0; i < listeners.size(); i++) {
 					if (listeners.get(i) == this) {
+						isListen = false;
 						listeners.remove(i);
 						LOGGER.trace("Folder listener \"{}\" has been removed from pool", getDirectoryName());
 						return true;
@@ -323,10 +324,10 @@ public class FolderListener implements Runnable {
 	/** Waiting for files and process it. */
 	private void pollFile() {
 		try {
+			isListen = true;
 			while (true) {
 				WatchKey key;
 				LOGGER.trace("Folder listener \"{}\" poll calling ...", getDirectoryName());
-				isListen = true;
 				key = watcher.poll(LISTENER_TIMEOUT_MILLLIS, TimeUnit.MILLISECONDS);
 				LOGGER.trace("Folder listener \"{}\" poll called", getDirectoryName());
 	
@@ -364,7 +365,6 @@ public class FolderListener implements Runnable {
 			LOGGER.error("Folder listener for \"{}\" closed with error.", getDirectoryName(), e);
 			throw new DlabException("Folder listener for \"" + getDirectoryName() + "\" closed with error. " + e.getLocalizedMessage(), e);
 		} finally {
-			isListen = false;
 			try {
 				watcher.close();
 			} catch (IOException e) {
