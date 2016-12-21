@@ -118,8 +118,6 @@ public class FolderListenerTest {
 		assertEquals(true, item.getFutureResultSync());
 		assertEquals(true, item.getFutureResult());
 
-		//listener = FolderListener.getListeners().get(0);
-		//listener.terminate();
 		FolderListener.terminateAll();
 	}
 

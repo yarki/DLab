@@ -159,15 +159,9 @@ public class FolderListener implements Runnable {
 	
 	/** Terminates the thread of the folder listener. */
 	protected void terminate() {
-		if (thread == null) {
-			return;
-		}
-		try {
-			thread.join(LISTENER_TIMEOUT_MILLLIS);
+		if (thread != null) {
 			LOGGER.debug("Folder listener \"{}\" will be terminate", getDirectoryName());
 			thread.interrupt();
-		} catch (InterruptedException e) {
-			// Nothing
 		}
 	}
 	
