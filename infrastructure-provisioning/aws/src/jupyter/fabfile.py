@@ -41,6 +41,7 @@ def create_image_from_instance(instance_name='', image_name=''):
         while image.state != 'available':
             local("echo Waiting for image creation; sleep 20")
             image.load()
+        image.create_tags(Tags=[{'Key': 'Name', 'Value': os.environ['conf_service_base_name']}])
         return image.id
     return ''
 

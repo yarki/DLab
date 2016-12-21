@@ -495,7 +495,8 @@ def deregister_image(scientist):
     try:
         client = boto3.client('ec2')
         response = client.describe_images(
-            Filters=[{'Name': 'name', 'Values': ['{}-{}'.format(os.environ['conf_service_base_name'], scientist)]}])
+            Filters=[{'Name': 'name', 'Values': ['{}-{}'.format(os.environ['conf_service_base_name'], scientist)]},
+                     {'Name': 'tag:name', 'Values': [os.environ['conf_service_base_name']]}])
         images_list = response.get('Images')
         if images_list:
             for i in images_list:
