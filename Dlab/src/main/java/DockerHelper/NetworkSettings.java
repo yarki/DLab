@@ -1,0 +1,18 @@
+package DockerHelper;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class NetworkSettings {
+
+    @JsonProperty("Networks")
+    private Networks Networks;
+
+    public Networks getNetworks() {
+        return Networks;
+    }
+
+    public void setNetworks(Networks networks) {
+        this.Networks = networks;
+    }
+    
+}
