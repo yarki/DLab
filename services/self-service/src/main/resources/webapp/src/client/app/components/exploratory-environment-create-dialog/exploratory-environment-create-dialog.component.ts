@@ -83,7 +83,7 @@ export class ExploratoryEnvironmentCreateDialog {
     }
 
     if($event.model.type === 'shape')
-      this.environment.shape = $event.model.value.type;
+      this.environment_shape = $event.model.value.type;
   }
 
   createExploratoryEnvironment_btnClick($event, data, valid, template, shape) {
