@@ -19,26 +19,26 @@ import { ResourceShapeModel } from './resourceShape.model';
 
 export class ResourceShapeTypesModel {
 
-  memory_optimized: Array<ResourceShapeModel>;
-  gpu_optimized: Array<ResourceShapeModel>;
-  compute_optimized: Array<ResourceShapeModel>;
+  Memory_optimized: Array<ResourceShapeModel>;
+  GPU_optimized: Array<ResourceShapeModel>;
+  Compute_optimized: Array<ResourceShapeModel>;
 
   constructor(jsonModel: any) {
-    this.memory_optimized = [];
-    this.gpu_optimized = [];
-    this.compute_optimized = [];
+    this.Memory_optimized = [];
+    this.GPU_optimized = [];
+    this.Compute_optimized = [];
 
-    if(jsonModel['Memory optimized'] && jsonModel['Memory optimized'].length > 0)
+    if (jsonModel['Memory optimized'] && jsonModel['Memory optimized'].length > 0)
       for (let index = 0; index < jsonModel['Memory optimized'].length; index++)
-        this.memory_optimized.push(new ResourceShapeModel(jsonModel['Memory optimized'][index]));
+        this.Memory_optimized.push(new ResourceShapeModel(jsonModel['Memory optimized'][index]));
 
-    if(jsonModel['GPU optimized'] && jsonModel['GPU optimized'].length > 0)
+    if (jsonModel['GPU optimized'] && jsonModel['GPU optimized'].length > 0)
       for (let index = 0; index < jsonModel['GPU optimized'].length; index++)
-        this.gpu_optimized.push(new ResourceShapeModel(jsonModel['GPU optimized'][index]));
+        this.GPU_optimized.push(new ResourceShapeModel(jsonModel['GPU optimized'][index]));
 
-    if(jsonModel['Compute optimized'] && jsonModel['Compute optimized'].length > 0)
+    if (jsonModel['Compute optimized'] && jsonModel['Compute optimized'].length > 0)
       for (let index = 0; index < jsonModel['Compute optimized'].length; index++)
-        this.compute_optimized.push(new ResourceShapeModel(jsonModel['Compute optimized'][index]));
+        this.Compute_optimized.push(new ResourceShapeModel(jsonModel['Compute optimized'][index]));
 
   }
 }

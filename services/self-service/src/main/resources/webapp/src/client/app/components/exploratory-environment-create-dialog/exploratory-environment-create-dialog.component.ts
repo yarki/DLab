@@ -73,17 +73,20 @@ export class ExploratoryEnvironmentCreateDialog {
   setDefaultParams(): void {
     this.environment = {
       template: this.model.selectedItem.version,
-      shape: this.model.selectedItem.shapes[0].type
+      shape: this.model.selectedItem.shapes.Memory_optimized[0].type
     };
-    this.templates_list.setDefaultOptions(this.model.selectedItem.template_name, 'template', 'template_name');
-    this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'shape', 'type');
+    this.templates_list.setDefaultOptions(this.model.exploratoryEnvironmentTemplates,
+      this.model.selectedItem.template_name, 'template', 'template_name', 'array');
+    this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
+      this.model.selectedItem.shapes.Memory_optimized[0].type, 'shape', 'type', 'json');
   }
 
   onUpdate($event): void {
     if ($event.model.type === 'template') {
       this.environment.template = $event.model.value.version;
       this.model.setSelectedTemplate($event.model.index);
-      this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'shape', 'type');
+      this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
+        this.model.selectedItem.shapes.Memory_optimized[0].type, 'shape', 'type', 'json');
     }
 
     if ($event.model.type === 'shape')
