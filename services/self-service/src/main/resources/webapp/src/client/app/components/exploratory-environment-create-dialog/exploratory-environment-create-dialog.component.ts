@@ -86,7 +86,7 @@ export class ExploratoryEnvironmentCreateDialog {
       this.environment_shape = $event.model.value.type;
   }
 
-  createExploratoryEnvironment_btnClick($event, data, valid, template, shape) {
+  createExploratoryEnvironment_btnClick($event, data, valid, template) {
     this.notebookExist = false;
     this.checkValidity = true;
 
@@ -94,7 +94,7 @@ export class ExploratoryEnvironmentCreateDialog {
       this.notebookExist = true;
       return false;
     }
-    this.model.setCreatingParams(data.environment_name, shape);
+    this.model.setCreatingParams(data.environment_name, this.environment_shape);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
