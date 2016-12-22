@@ -98,6 +98,11 @@ def install_rstudio():
             sudo('touch /home/ubuntu/.ensure_dir/rstudio_ensured')
         except:
             sys.exit(1)
+    else:
+        try:
+            sudo('echo "ubuntu:' + args.rstudio_pass + '" | chpasswd')
+        except:
+            sys.exit(1)
 
 
 def ensure_local_spark():
