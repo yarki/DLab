@@ -54,13 +54,9 @@ if __name__ == "__main__":
                 print "The bucket " + args.bucket_name + " has been cleaned successfully"
                 terminate_emr(cluster_id)
                 print "The EMR cluster " + emr_name + " has been terminated successfully"
+                print "Removing EMR kernels from notebook"
+                remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path, emr_version)
         else:
             print "There are no EMR clusters to terminate."
-    except:
-        sys.exit(1)
-
-    print "Removing EMR kernels from notebook"
-    try:
-        remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path, emr_version)
     except:
         sys.exit(1)
