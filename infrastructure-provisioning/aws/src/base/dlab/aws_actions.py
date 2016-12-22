@@ -523,7 +523,7 @@ def deregister_image(scientist):
     try:
         client = boto3.client('ec2')
         response = client.describe_images(
-            Filters=[{'Name': 'name', 'Values': ['{}-{}'.format(os.environ['conf_service_base_name'], scientist)]},
+            Filters=[{'Name': 'name', 'Values': ['{}-{}-*'.format(os.environ['conf_service_base_name'], scientist)]},
                      {'Name': 'tag:name', 'Values': [os.environ['conf_service_base_name']]}])
         images_list = response.get('Images')
         if images_list:
@@ -606,3 +606,12 @@ def remove_route_tables(tag_name):
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
+
+
+def remove_apt_lock():
+    try:
+        sudo('rm -f /var/lib/apt/lists/lock')
+        sudo('rm -f /var/cache/apt/archives/lock')
+        sudo('rm -f /var/lib/dpkg/lock')
+    except:
+        sys.exit(1)

@@ -61,10 +61,6 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
 
     @NotEmpty
     @JsonProperty
-    private String notebookImage;
-
-    @NotEmpty
-    @JsonProperty
     private String emrImage;
 
     @NotEmpty
@@ -79,6 +75,10 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     @NotNull
     @JsonProperty(SELF_SERVICE)
     private RESTServiceFactory selfFactory = new RESTServiceFactory();
+
+    @Valid
+    @JsonProperty
+    private boolean mocked;
 
     public String getKeyDirectory() {
         return keyDirectory;
@@ -108,10 +108,6 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
         return fileLengthCheckDelay;
     }
 
-    public String getNotebookImage() {
-        return notebookImage;
-    }
-
     public String getEmrImage() {
         return emrImage;
     }
@@ -139,4 +135,6 @@ public class ProvisioningServiceApplicationConfiguration extends Configuration i
     public String getKeyLoaderDirectory() {
         return responseDirectory + KEY_LOADER_DIRECTORY;
     }
+
+    public boolean isMocked() { return mocked; }
 }

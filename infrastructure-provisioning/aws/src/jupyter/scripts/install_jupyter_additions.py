@@ -18,6 +18,7 @@
 #
 # ******************************************************************************
 
+from dlab.aws_actions import *
 from fabric.api import *
 from fabric.contrib.files import exists
 import argparse
@@ -99,4 +100,8 @@ if __name__ == "__main__":
 
     print "Installing notebook additions: sbt."
     ensure_sbt()
+
+    # for image purpose
+    print "Clean up lock files"
+    remove_apt_lock()
 

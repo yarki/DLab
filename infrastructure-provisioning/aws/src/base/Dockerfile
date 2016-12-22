@@ -21,12 +21,12 @@ FROM ubuntu:16.04
 # Install any .deb dependecies
 RUN	apt-get update && \
     apt-get -y upgrade && \
-    apt-get -y install python-pip python-dev groff vim less git wget nano libssl-dev && \
+    apt-get -y install python-pip python-dev groff vim less git wget nano libssl-dev libffi-dev libffi6 && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install any python dependencies
 RUN pip install -U pip
-RUN pip install boto3 fabric awscli argparse ujson jupyter
+RUN pip install boto3 fabric fabvenv awscli argparse ujson jupyter
 
 # Configuring ssh for user
 RUN mkdir -p /root/.ssh; echo "Host *" > /root/.ssh/config; \
