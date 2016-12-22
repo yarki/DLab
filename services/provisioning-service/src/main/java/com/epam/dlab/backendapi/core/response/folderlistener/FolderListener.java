@@ -255,47 +255,51 @@ public class FolderListener implements Runnable {
 	private void processStatusItems() {
 		int i = 0;
 		
-		itemList.processItemAll();
-		while (i < itemList.size()) {
-			final WatchItem item = itemList.get(i);
-			final ItemStatus status = item.getStatus();
-			final String uuid = item.getFileHandlerCallback().getUUID();
-			
-			switch (status) {
-			case WAIT_FOR_FILE:
-			case FILE_CAPTURED:
-			case INPROGRESS:
-				// Skip
-				i++;
-				continue;
-			case TIMEOUT_EXPIRED:
-				LOGGER.warn("Folder listener \"{}\" remove expired file handler for UUID {}", getDirectoryName(), uuid);
-				break;
-			case IS_DONE:
-				if ( item.getFutureResult() ) {
-					LOGGER.debug("Folder listener \"{}\" remove processed file handler for UUID {}, handler result is {}", getDirectoryName(), uuid, item.getFutureResult());
-				} else {
-					LOGGER.warn("Folder listener \"{}\" remove processed file handler for UUID {}, handler result is {}", getDirectoryName(), uuid, item.getFutureResult());
-				}
-				break;
-			case IS_CANCELED:
-				LOGGER.debug("Folder listener \"{}\" remove canceled file handler for UUID {}", getDirectoryName(), uuid);
-				break;
-			case IS_FAILED:
-				LOGGER.warn("Folder listener \"{}\" remove failed file handler for UUID {}", getDirectoryName(), uuid);
-				break;
-			case IS_INTERRUPTED:
-				LOGGER.debug("Folder listener \"{}\" remove iterrupted file handler for UUID {}", getDirectoryName(), uuid);
-				break;
-			default:
-				continue;
-			}
-			itemList.remove(i);
-		}
-		
 		if (itemList.size() > 0 ) {
 			expiredIdleMillis = 0;
-		} else if (expiredIdleMillis == 0) {
+		}
+		itemList.processItemAll();
+		
+		synchronized (itemList) {
+			while (i < itemList.size()) {
+				final WatchItem item = itemList.get(i);
+				final ItemStatus status = item.getStatus();
+				final String uuid = item.getFileHandlerCallback().getUUID();
+				
+				switch (status) {
+				case WAIT_FOR_FILE:
+				case FILE_CAPTURED:
+				case INPROGRESS:
+					// Skip
+					i++;
+					continue;
+				case TIMEOUT_EXPIRED:
+					LOGGER.warn("Folder listener \"{}\" remove expired file handler for UUID {}", getDirectoryName(), uuid);
+					break;
+				case IS_DONE:
+					if ( item.getFutureResult() ) {
+						LOGGER.debug("Folder listener \"{}\" remove processed file handler for UUID {}, handler result is {}", getDirectoryName(), uuid, item.getFutureResult());
+					} else {
+						LOGGER.warn("Folder listener \"{}\" remove processed file handler for UUID {}, handler result is {}", getDirectoryName(), uuid, item.getFutureResult());
+					}
+					break;
+				case IS_CANCELED:
+					LOGGER.debug("Folder listener \"{}\" remove canceled file handler for UUID {}", getDirectoryName(), uuid);
+					break;
+				case IS_FAILED:
+					LOGGER.warn("Folder listener \"{}\" remove failed file handler for UUID {}", getDirectoryName(), uuid);
+					break;
+				case IS_INTERRUPTED:
+					LOGGER.debug("Folder listener \"{}\" remove iterrupted file handler for UUID {}", getDirectoryName(), uuid);
+					break;
+				default:
+					continue;
+				}
+				itemList.remove(i);
+			}
+		}
+		
+		if (expiredIdleMillis != 0 && itemList.size() == 0) {
 			expiredIdleMillis = System.currentTimeMillis() + LISTENER_IDLE_TIMEOUT_MILLLIS;
 		}
 	}
@@ -307,12 +311,12 @@ public class FolderListener implements Runnable {
 	 */
 	private boolean removeListener(boolean force) {
 		synchronized (listeners) {
-			if (force || (itemList.size() == 0 && expiredIdleMillis < System.currentTimeMillis())) {
+			if (force || (expiredIdleMillis != 0 && expiredIdleMillis < System.currentTimeMillis())) {
 				for (int i = 0; i < listeners.size(); i++) {
 					if (listeners.get(i) == this) {
 						isListen = false;
 						listeners.remove(i);
-						LOGGER.trace("Folder listener \"{}\" has been removed from pool", getDirectoryName());
+						LOGGER.debug("Folder listener \"{}\" has been removed from pool", getDirectoryName());
 						return true;
 					}
 				}

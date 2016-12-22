@@ -203,11 +203,13 @@ public class WatchItemList {
 	/** Checks all the file handlers and runs the file processing for it if have status {@link ItemStatus#FILE_CAPTURED}. */
 	public int processItemAll() {
 		int count = 0;
-		for (int i = 0; i < size(); i++) {
-			WatchItem item = get(i);
-			if (item.getStatus() == ItemStatus.FILE_CAPTURED) {
-				if (processItem(item)) {
-					count++;
+		synchronized (list) {
+			for (int i = 0; i < size(); i++) {
+				WatchItem item = list.get(i);
+				if (item.getStatus() == ItemStatus.FILE_CAPTURED) {
+					if (processItem(item)) {
+						count++;
+					}
 				}
 			}
 		}

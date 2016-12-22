@@ -119,6 +119,10 @@ public class FolderListenerTest {
 		assertEquals(true, item.getFutureResult());
 
 		FolderListener.terminateAll();
+		while (FolderListener.getListeners().size() > 0) {
+			Thread.sleep(100);
+		}
+		System.out.println("All listen tests passed");
 	}
 
 }
