@@ -16,13 +16,11 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { Response } from "@angular/http";
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Response } from '@angular/http';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { UserResourceService } from "../../services/userResource.service";
+import { UserResourceService } from '../../services/userResource.service';
 import { ExploratoryEnvironmentCreateModel } from './exploratory-environment-create.model';
-import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
-import { ResourceShapeModel } from '../../models/resourceShape.model';
 
 import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
@@ -38,7 +36,7 @@ export class ExploratoryEnvironmentCreateDialog {
   notebookExist: boolean = false;
   checkValidity: boolean = false;
   templateDescription: string;
-  namePattern = "[-_a-zA-Z0-9]+";
+  namePattern = '[-_a-zA-Z0-9]+';
   resourceGrid: any;
   environment_shape: string;
 
@@ -85,10 +83,10 @@ export class ExploratoryEnvironmentCreateDialog {
     }
 
     if($event.model.type === 'shape')
-      this.environment_shape = $event.model.value.type;
+      this.environment.shape = $event.model.value.type;
   }
 
-  createExploratoryEnvironment_btnClick($event, data, valid, shape) {
+  createExploratoryEnvironment_btnClick($event, data, valid, template, shape) {
     this.notebookExist = false;
     this.checkValidity = true;
 

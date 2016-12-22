@@ -25,6 +25,7 @@ import json
 import random
 import string
 import sys
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
@@ -34,10 +35,10 @@ parser.add_argument('--region', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
+spark_version = os.environ['notebook_spark_version']
+hadoop_version = os.environ['notebook_hadoop_version']
 scala_link = "http://www.scala-lang.org/files/archive/scala-2.11.8.deb"
-spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
-spark_version = "1.6.2"
-hadoop_version = "2.6"
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
 py3spark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/py3spark_local/'
 jupyter_conf_file = '/home/ubuntu/.local/share/jupyter/jupyter_notebook_config.py'
@@ -77,7 +78,13 @@ def ensure_spark_scala():
             sudo('touch ' + py3spark_local_path_dir + 'kernel.json')
             put(templates_dir + 'pyspark_local_template.json', '/tmp/pyspark_local_template.json')
             put(templates_dir + 'py3spark_local_template.json', '/tmp/py3spark_local_template.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/pyspark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/pyspark_local_template.json')
             sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/py3spark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/py3spark_local_template.json')
             sudo('\cp /tmp/py3spark_local_template.json ' + py3spark_local_path_dir + 'kernel.json')
             sudo('pip install --pre toree --no-cache-dir')
             sudo('ln -s /opt/spark/ /usr/local/spark')

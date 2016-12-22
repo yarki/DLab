@@ -16,11 +16,11 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { UserResourceService } from "./../../services/userResource.service";
-import {ConfirmationDialogModel} from "./confirmation-dialog.model";
-import {ConfirmationDialogType} from "./confirmation-dialog-type.enum";
-import {Response} from "@angular/http";
+import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
+import { UserResourceService } from './../../services/userResource.service';
+import { ConfirmationDialogModel } from './confirmation-dialog.model';
+import { ConfirmationDialogType } from './confirmation-dialog-type.enum';
+import { Response } from '@angular/http';
 
 import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
@@ -31,7 +31,7 @@ import HTTP_STATUS_CODES from 'http-status-enum';
   templateUrl: 'confirmation-dialog.component.html'
 })
 
-export class confirmationDialog {
+export class ConfirmationDialog {
   model: ConfirmationDialogModel;
   isAliveResources: boolean;
   processError: boolean = false;

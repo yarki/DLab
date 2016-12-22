@@ -15,13 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ****************************************************************************/
+/* tslint:disable:no-empty */
 
-import { Observable } from "rxjs";
-import { Response } from "@angular/http";
-import { UserResourceService } from "../../services/userResource.service";
-import { ExploratoryEnvironmentVersionModel } from "../../models/exploratoryEnvironmentVersion.model";
-import { ResourceShapeModel } from "../../models/resourceShape.model";
-import HTTP_STATUS_CODES from 'http-status-enum';
+import { Observable } from 'rxjs';
+import { Response } from '@angular/http';
+import { UserResourceService } from '../../services/userResource.service';
+import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
+import { ResourceShapeModel } from '../../models/resourceShape.model';
 
 export class ExploratoryEnvironmentCreateModel {
 
@@ -105,12 +105,12 @@ export class ExploratoryEnvironmentCreateModel {
     this.environment_shape = shape;
   }
 
-  public loadTemplates() : void {
-    if(this.exploratoryEnvironmentTemplates.length == 0)
+  public loadTemplates(): void {
+    if (this.exploratoryEnvironmentTemplates.length === 0)
       this.userResourceService.getExploratoryEnvironmentTemplates()
         .subscribe(
         data => {
-          for(let parentIndex = 0; parentIndex < data.length; parentIndex ++) {
+          for (let parentIndex = 0; parentIndex < data.length; parentIndex++) {
 
             let shapeJson = data[parentIndex].exploratory_environment_shapes;
             let exploratoryJson = data[parentIndex].exploratory_environment_versions;
@@ -130,12 +130,12 @@ export class ExploratoryEnvironmentCreateModel {
             this.setSelectedTemplate(0);
           }
 
-          if(this.continueWith)
+          if (this.continueWith)
             this.continueWith();
         });
   }
 
-  public resetModel() : void {
+  public resetModel(): void {
     this.setSelectedTemplate(0);
   }
 }

@@ -16,12 +16,12 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { NgModule, Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { DropdownList } from "./dropdown-list.component";
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DropdownList } from './dropdown-list.component';
 import { ClickOutsideModule } from '../../../directives/click-outside/index';
 
-export * from "./dropdown-list.component";
+export * from './dropdown-list.component';
 
 @NgModule({
   imports: [CommonModule, ClickOutsideModule],

@@ -24,7 +24,7 @@ export class FilterConfigurationModel {
     public resources: Array<any>
   ) { }
 
-  resetConfigurations() : void {
+  resetConfigurations(): void {
     this.name = '';
     this.statuses = [];
     this.shapes = [];
