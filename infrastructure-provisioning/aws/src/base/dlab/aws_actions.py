@@ -356,34 +356,62 @@ def remove_all_iam_resources(instance_type, scientist=''):
             for iam_role in roles_list:
                 if '-ssn-Role' in iam_role:
                     if instance_type == 'ssn' or instance_type == 'all':
-                        role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
                         try:
                             client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
                         except:
                             print 'There is no policy ' + os.environ['conf_service_base_name'] + '-ssn-Policy to delete'
-                        remove_roles_and_profiles(iam_role, role_profile_name)
+                        role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
+                        try:
+                            client.get_instance_profile(InstanceProfileName=role_profile_name)
+                            remove_roles_and_profiles(iam_role, role_profile_name)
+                        except:
+                            print "There is no instance profile for " + iam_role
+                            client.delete_role(RoleName=iam_role)
+                            print "The IAM role " + iam_role + " has been deleted successfully"
                 if '-edge-Role' in iam_role:
                     if instance_type == 'edge' and scientist in iam_role:
                         remove_detach_iam_policies(iam_role, 'delete')
                         role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
-                        remove_roles_and_profiles(iam_role, role_profile_name)
+                        try:
+                            client.get_instance_profile(InstanceProfileName=role_profile_name)
+                            remove_roles_and_profiles(iam_role, role_profile_name)
+                        except:
+                            print "There is no instance profile for " + iam_role
+                            client.delete_role(RoleName=iam_role)
+                            print "The IAM role " + iam_role + " has been deleted successfully"
                     if instance_type == 'all':
                         remove_detach_iam_policies(iam_role, 'delete')
                         role_profile_name = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
-                        for i in role_profile_name:
-                            role_profile_name = i.get('InstanceProfileName')
-                            remove_roles_and_profiles(iam_role, role_profile_name)
+                        if role_profile_name:
+                            for i in role_profile_name:
+                                role_profile_name = i.get('InstanceProfileName')
+                                remove_roles_and_profiles(iam_role, role_profile_name)
+                        else:
+                            print "There is no instance profile for " + iam_role
+                            client.delete_role(RoleName=iam_role)
+                            print "The IAM role " + iam_role + " has been deleted successfully"
                 if '-nb-Role' in iam_role:
                     if instance_type == 'notebook' and scientist in iam_role:
                         remove_detach_iam_policies(iam_role)
                         role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
-                        remove_roles_and_profiles(iam_role, role_profile_name)
+                        try:
+                            client.get_instance_profile(InstanceProfileName=role_profile_name)
+                            remove_roles_and_profiles(iam_role, role_profile_name)
+                        except:
+                            print "There is no instance profile for " + iam_role
+                            client.delete_role(RoleName=iam_role)
+                            print "The IAM role " + iam_role + " has been deleted successfully"
                     if instance_type == 'all':
                         remove_detach_iam_policies(iam_role)
                         role_profile_name = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
-                        for i in role_profile_name:
-                            role_profile_name = i.get('InstanceProfileName')
-                            remove_roles_and_profiles(iam_role, role_profile_name)
+                        if role_profile_name:
+                            for i in role_profile_name:
+                                role_profile_name = i.get('InstanceProfileName')
+                                remove_roles_and_profiles(iam_role, role_profile_name)
+                        else:
+                            print "There is no instance profile for " + iam_role
+                            client.delete_role(RoleName=iam_role)
+                            print "The IAM role " + iam_role + " has been deleted successfully"
         else:
             print "There are no IAM roles instance profiles and policies to delete"
     except Exception as err:
@@ -495,7 +523,8 @@ def deregister_image(scientist):
     try:
         client = boto3.client('ec2')
         response = client.describe_images(
-            Filters=[{'Name': 'name', 'Values': ['{}-{}-*'.format(os.environ['conf_service_base_name'], scientist)]}])
+            Filters=[{'Name': 'name', 'Values': ['{}-{}-*'.format(os.environ['conf_service_base_name'], scientist)]},
+                     {'Name': 'tag-value', 'Values': [os.environ['conf_service_base_name']]}])
         images_list = response.get('Images')
         if images_list:
             for i in images_list:
