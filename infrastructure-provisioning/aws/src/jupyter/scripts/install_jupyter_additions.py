@@ -75,6 +75,7 @@ def ensure_libraries_py3():
             sudo('pip3 install -U pip --no-cache-dir')
             sudo('pip3 install boto boto3 --no-cache-dir')
             sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('jupyter-kernelspec remove -f python3')
             sudo('touch /home/ubuntu/.ensure_dir/ensure_libraries_py3_installed')
         except:
             sys.exit(1)
