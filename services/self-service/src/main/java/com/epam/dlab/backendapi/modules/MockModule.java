@@ -62,6 +62,8 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
                 .toInstance(createAuthenticationService());
         bind(RESTService.class).annotatedWith(Names.named(ServiceConsts.PROVISIONING_SERVICE_NAME))
                 .toInstance(createProvisioningService());
+        /*bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
+                .toInstance(configuration.getProvisioningFactory().build(environment, PROVISIONING_SERVICE));*/
     }
 
     private RESTService createAuthenticationService() {
@@ -121,6 +123,8 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
 
     private ExploratoryMetadataDTO prepareJupiterImage() {
         ExploratoryMetadataDTO imageMetadataDTO = new ExploratoryMetadataDTO();
+        imageMetadataDTO.setImage("docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter");
+
         List<ComputationalResourceShapeDto> crsList = new ArrayList<>();
         crsList.add(new ComputationalResourceShapeDto(
                 "cg1.4xlarge", "22.5 GB", 16));

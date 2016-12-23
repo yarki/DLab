@@ -22,6 +22,7 @@ import boto3
 from fabric.api import *
 import argparse
 import os
+import time
 from fabric.api import lcd
 from fabvenv import virtualenv
 
@@ -39,6 +40,7 @@ args = parser.parse_args()
 
 emr_dir = '/opt/' + args.emr_version + '/jars/'
 kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
+spark_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
 yarn_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/conf/'
 # if args.emr_version == 'emr-4.3.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-4.8.0':
 #     hadoop_version = '2.6'
@@ -232,6 +234,20 @@ def configuring_notebook(args):
     local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
 
 
+def configure_rstudio(args):
+    local("""echo "export R_LIBS_USER='""" + spark_dir + """/R/lib'" >> /home/ubuntu/.bashrc""")
+    local('cat /dev/null > /home/ubuntu/.Renviron')
+    local('''echo 'SPARK_HOME="''' + spark_dir + '''"' >> /home/ubuntu/.Renviron''')
+    local('''echo 'YARN_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
+    local('''echo 'HADOOP_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
+    try:
+        local("sudo rstudio-server stop")
+    except:
+        print "Rstudio already stopped"
+    time.sleep(10)
+    local("sudo rstudio-server start")
+
+
 def installing_python(args):
     s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
@@ -273,3 +289,5 @@ if __name__ == "__main__":
         spark_defaults(args)
         r_kernel(args)
         configuring_notebook(args)
+        if os.path.exists('/home/ubuntu/.ensure_dir/rstudio_ensured'):
+            configure_rstudio(args)

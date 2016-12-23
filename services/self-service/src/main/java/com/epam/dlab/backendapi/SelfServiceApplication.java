@@ -46,6 +46,7 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
     public void initialize(Bootstrap<SelfServiceApplicationConfiguration> bootstrap) {
         super.initialize(bootstrap);
         //bootstrap.addBundle(new AssetsBundle("/webapp/node_modules", "/node_modules", null, "node_modules"));
+        //bootstrap.addBundle(new AssetsBundle("/webapp/dist/dev", "/", "index.html"));
         bootstrap.addBundle(new AssetsBundle("/webapp/dist/prod", "/", "index.html"));
         bootstrap.addBundle(new TemplateConfigBundle(
         		new TemplateConfigBundleConfiguration().fileIncludePath(ServiceUtils.getConfPath())

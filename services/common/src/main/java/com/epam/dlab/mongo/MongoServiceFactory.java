@@ -30,6 +30,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.Collections;
 
+// TODO: Separate configuration and factory responsibilities
 public class MongoServiceFactory {
     @NotEmpty
     @JsonProperty

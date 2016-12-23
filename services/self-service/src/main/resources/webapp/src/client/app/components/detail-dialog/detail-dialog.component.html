@@ -16,7 +16,7 @@ limitations under the License.
 
 ----------------------------------------------------------------------------------------------------------- -->
 
-<modal #bindDialog  modalClass="detail-dialog modal-sm header-white">
+<modal-dialog #bindDialog  modalClass="detail-dialog modal-sm header-white">
   <modal-header></modal-header>
   <modal-content>
     <div *ngIf="notebook">
@@ -41,6 +41,8 @@ limitations under the License.
           <p>Edge Node IP Address {{notebook.ip}}</p>
           <p>Up time {{upTimeInHours}} hour(s) since {{upTimeSince || "not specified."}}</p>
           <p>Open in your browser  <a href="{{notebook.url}}" target="_blank">{{notebook.url}}</a> to access this box after creating a tunnel.</p>
+          <p *ngIf="notebook.username">Node User: {{notebook.username}}</p>
+          <p *ngIf="notebook.password">Password: {{notebook.password}}</p>
           <br/>
           <p>
             <a href="#/help/accessnotebookguide" target="_blank">
@@ -51,4 +53,4 @@ limitations under the License.
       </div>
     </div>
   </modal-content>
-</modal>
+</modal-dialog>

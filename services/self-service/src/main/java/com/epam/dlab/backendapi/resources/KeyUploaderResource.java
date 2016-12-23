@@ -21,7 +21,7 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
-import com.epam.dlab.constants.ServiceConsts;
+import com.epam.dlab.backendapi.domain.KeyUploader;
 import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
@@ -49,21 +49,15 @@ import java.util.stream.Collectors;
 
 @Path("/user/access_key")
 @Produces(MediaType.APPLICATION_JSON)
-public class KeyUploaderResource implements KeyLoaderAPI {
+public class KeyUploaderResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
 
     @Inject
-    private KeyDAO keyDAO;
-    @Inject
-    private SettingsDAO settingsDAO;
-    @Inject
-    @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
-    private RESTService provisioningService;
-
+    private KeyUploader keyUploader;
 
     @GET
     public Response checkKey(@Auth UserInfo userInfo) {
-        return Response.status(keyDAO.findKeyStatus(userInfo).getHttpStatus()).build();
+        return Response.status(keyUploader.checkKey(userInfo).getHttpStatus()).build();
     }
 
     @POST
@@ -72,45 +66,19 @@ public class KeyUploaderResource implements KeyLoaderAPI {
                          @FormDataParam("file") InputStream uploadedInputStream,
                          @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
         LOGGER.debug("upload key for user {}", userInfo.getName());
-        String content = "";
+        String content;
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {
             content = buffer.lines().collect(Collectors.joining("\n"));
         }
-        keyDAO.uploadKey(userInfo.getName(), content);
-        try {
-            EdgeCreateDTO edge = new EdgeCreateDTO()
-                    .withIamUser(userInfo.getName())
-                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                    .withServiceBaseName(settingsDAO.getServiceBaseName())
-                    .withSecurityGroupIds(settingsDAO.getSecurityGroups())
-                    .withRegion(settingsDAO.getCredsRegion())
-                    .withVpcId(settingsDAO.getCredsVpcId())
-                    .withSubnetId(settingsDAO.getCredsSubnetId());
-            UploadFileDTO dto = new UploadFileDTO()
-                    .withEdge(edge)
-                    .withContent(content);
-            Response response = provisioningService.post(KEY_LOADER, dto, Response.class);
-            if (Response.Status.ACCEPTED.getStatusCode() != response.getStatus()) {
-                keyDAO.deleteKey(userInfo.getName());
-            }
-        } catch (Exception e) {
-            keyDAO.deleteKey(userInfo.getName());
-            throw new DlabException("Could not upload the key", e);
-        }
-
+        keyUploader.startKeyUpload(userInfo, content);
         return Response.ok().build();
     }
 
     @POST
     @Path("/callback")
     public Response loadKeyResponse(UploadFileResultDTO result) {
-        LOGGER.debug("upload key result for user {}, status: {}", result.getUser(), result.isSuccess());
-        keyDAO.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
-        if (result.isSuccess()) {
-            keyDAO.saveCredential(result.getUser(), result.getCredential());
-        } else {
-            keyDAO.deleteKey(result.getUser());
-        }
+        LOGGER.debug("upload key result for user {}", result.getUser(), result.isSuccess());
+        keyUploader.onKeyUploadComplete(result);
         return Response.ok().build();
     }
 }

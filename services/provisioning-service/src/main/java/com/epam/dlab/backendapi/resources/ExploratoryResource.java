@@ -21,6 +21,7 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.Directories;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
+import com.epam.dlab.backendapi.core.ICommandExecutor;
 import com.epam.dlab.backendapi.core.commands.*;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.core.response.handlers.ExploratoryCallbackHandler;
@@ -51,7 +52,7 @@ public class ExploratoryResource implements DockerCommands {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecutor commandExecuter;
+    private ICommandExecutor commandExecuter;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject
@@ -98,7 +99,7 @@ public class ExploratoryResource implements DockerCommands {
                 .withResource(getResourceType())
                 .withRequestId(uuid)
                 .withCredsKeyName(configuration.getAdminKey())
-                .withImage(configuration.getNotebookImage())
+                .withImage(dto.getNotebookImage())
                 .withAction(action);
 
         commandExecuter.executeAsync(commandBuilder.buildCommand(runDockerCommand, dto));

@@ -55,7 +55,7 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecutor commandExecuter;
+    private ICommandExecutor commandExecuter;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject

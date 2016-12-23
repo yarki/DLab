@@ -20,7 +20,9 @@ package com.epam.dlab.backendapi;
 
 import com.epam.dlab.ServiceConfiguration;
 import com.epam.dlab.backendapi.core.Directories;
+import com.epam.dlab.rest.client.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -60,10 +62,6 @@ public class ProvisioningServiceApplicationConfiguration extends ServiceConfigur
 
     @NotEmpty
     @JsonProperty
-    private String notebookImage;
-
-    @NotEmpty
-    @JsonProperty
     private String emrImage;
 
     @NotEmpty
@@ -73,6 +71,15 @@ public class ProvisioningServiceApplicationConfiguration extends ServiceConfigur
     @NotEmpty
     @JsonProperty
     private String emrServiceRoleDefault;
+
+    @Valid
+    @NotNull
+    @JsonProperty(SELF_SERVICE)
+    private RESTServiceFactory selfFactory = new RESTServiceFactory();
+
+    @Valid
+    @JsonProperty
+    private boolean mocked;
 
     public String getKeyDirectory() {
         return keyDirectory;
@@ -102,10 +109,6 @@ public class ProvisioningServiceApplicationConfiguration extends ServiceConfigur
         return fileLengthCheckDelay;
     }
 
-    public String getNotebookImage() {
-        return notebookImage;
-    }
-
     public String getEmrImage() {
         return emrImage;
     }
@@ -122,11 +125,15 @@ public class ProvisioningServiceApplicationConfiguration extends ServiceConfigur
         return responseDirectory + WARMUP_DIRECTORY;
     }
 
-    public String getImagesDirectory() { return responseDirectory + IMAGES_DIRECTORY; }
+    public String getImagesDirectory() {
+        return responseDirectory + IMAGES_DIRECTORY;
+    }
 
     public String getKeyLoaderDirectory() {
         return responseDirectory + KEY_LOADER_DIRECTORY;
     }
 
     public String getDockerLogDirectory() { return dockerLogDirectory; }
+
+    public boolean isMocked() { return mocked; }
 }

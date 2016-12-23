@@ -534,4 +534,5 @@ def check_security_group(security_group_name, count=0):
         traceback.print_exc(file=sys.stdout)
 
 
-
+def id_generator(size=10, chars=string.digits + string.ascii_letters):
+    return ''.join(random.choice(chars) for _ in range(size))
