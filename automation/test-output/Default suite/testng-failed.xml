@@ -3,18 +3,11 @@
 <suite guice-stage="DEVELOPMENT" name="Failed suite [Default suite]">
   <test verbose="2" name="Default test">
     <classes>
-      <class name="AutomationTest.TestServices"/>
-    </classes>
-  </test> <!-- Default test -->
-  <test name="Default test(failed)">
-    <classes>
       <class name="AutomationTest.TestServices">
         <methods>
-          <include name="testDLabScenario"/>
-          <include name="Setup"/>
-          <include name="testLogin"/>
+          <include name="testJenkinsJob"/>
         </methods>
       </class> <!-- AutomationTest.TestServices -->
     </classes>
-  </test> <!-- Default test(failed) -->
+  </test> <!-- Default test -->
 </suite> <!-- Failed suite [Default suite] -->
