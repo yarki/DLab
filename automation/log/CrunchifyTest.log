@@ -160,3 +160,9 @@
 2016-12-14 17:31:55 [main] INFO  RetryExec:112 - Retrying request to {}->http://35.165.203.148:22
 2016-12-14 17:31:56 [main] INFO  RetryExec:96 - I/O exception (java.net.SocketException) caught when processing request to {}->http://35.165.203.148:22: Connection reset
 2016-12-14 17:31:56 [main] INFO  RetryExec:112 - Retrying request to {}->http://35.165.203.148:22
+2016-12-23 16:43:20 [main] INFO  DefaultHttpClient:696 - I/O exception (java.io.FileNotFoundException) caught when processing request to {}->http://ec2-35-161-165-147.us-west-2.compute.amazonaws.com:80: D:\var\lib\jenkins\AutoTestData\user.pub (The system cannot find the path specified)
+2016-12-23 16:43:20 [main] INFO  DefaultHttpClient:706 - Retrying request to {}->http://ec2-35-161-165-147.us-west-2.compute.amazonaws.com:80
+2016-12-23 16:43:20 [main] INFO  DefaultHttpClient:696 - I/O exception (java.io.FileNotFoundException) caught when processing request to {}->http://ec2-35-161-165-147.us-west-2.compute.amazonaws.com:80: D:\var\lib\jenkins\AutoTestData\user.pub (The system cannot find the path specified)
+2016-12-23 16:43:20 [main] INFO  DefaultHttpClient:706 - Retrying request to {}->http://ec2-35-161-165-147.us-west-2.compute.amazonaws.com:80
+2016-12-23 16:43:20 [main] INFO  DefaultHttpClient:696 - I/O exception (java.io.FileNotFoundException) caught when processing request to {}->http://ec2-35-161-165-147.us-west-2.compute.amazonaws.com:80: D:\var\lib\jenkins\AutoTestData\user.pub (The system cannot find the path specified)
+2016-12-23 16:43:20 [main] INFO  DefaultHttpClient:706 - Retrying request to {}->http://ec2-35-161-165-147.us-west-2.compute.amazonaws.com:80

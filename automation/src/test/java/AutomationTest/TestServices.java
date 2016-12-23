@@ -75,9 +75,9 @@ public class TestServices {
 
     String gettingStatus;
     Response responseAccessKey;
-    String serviceBaseName;
-    private String jenkinsURL;
-    private String publicIp;
+    String serviceBaseName = "AutoTest201612234208";
+    private String jenkinsURL = "http://ec2-35-161-165-147.us-west-2.compute.amazonaws.com";
+    private String publicIp = "35.161.165.147";
     private static PropertyValue props;
 
     final static Logger logger = Logger.getLogger(TestServices.class.getName());
@@ -94,7 +94,7 @@ public class TestServices {
         props = new PropertyValue();     
     }
     
-    @Test
+    //@Test
     public void testJenkinsJob() throws Exception {
 
         System.out.println("1. Jenkins Job was started");
