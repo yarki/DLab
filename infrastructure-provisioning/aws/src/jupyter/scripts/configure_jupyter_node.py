@@ -157,9 +157,9 @@ def ensure_r_kernel():
             sudo('R -e "IRkernel::installspec()"')
             r_version = sudo("R --version | awk '/version / {print $3}'", capture = True)
             put(templates_dir + 'r_template.json', '/tmp/r_template.json')
+            sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
             sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
-            sudo('sed -i "s|R_VER|{}|g" {}/ir/kernel.json'.format(r_version, kernels_dir))
-            sudo('sed -i "s|SP_VER|{}|g" {}/ir/kernel.json'.format(spark_version, kernels_dir))
             # sudo('export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin; R -e \'IRkernel::installspec(user = FALSE)\'')
             # Spark Install
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
