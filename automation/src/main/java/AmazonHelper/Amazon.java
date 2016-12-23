@@ -5,12 +5,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import DockerHelper.Command;
-import DockerHelper.DockerContainer;
-import DockerHelper.SSHConnect;
-import DockerHelper.Status;
-
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
@@ -51,7 +45,11 @@ public class Amazon {
         System.out.println("Check status of SSN node on Amazon:");
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(instanceName);
         InstanceState instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0).getState();
-
+        
+        do {
+            instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0).getState();
+        } while (instanceState.equals("shutting-down"));
+        
         Assert.assertEquals(instanceState.getName(), expAmazonState, "Amazon instance state is not correct");
         System.out.println("Amazon instance state is " + expAmazonState);           
     }
