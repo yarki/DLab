@@ -110,7 +110,8 @@ def ensure_local_spark():
         try:
             sudo('wget ' + spark_link + ' -O /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
             sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
-            sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
+            sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' ' + local_spark_path)
+            sudo('chown -R ubuntu:ubuntu ' + local_spark_path)
             sudo('touch /home/ubuntu/.ensure_dir/local_spark_ensured')
         except:
             sys.exit(1)
