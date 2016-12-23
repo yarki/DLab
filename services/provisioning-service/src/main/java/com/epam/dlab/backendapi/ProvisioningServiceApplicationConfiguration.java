@@ -26,6 +26,11 @@ import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import static com.epam.dlab.constants.ServiceConsts.SELF_SERVICE_NAME;
+
 public class ProvisioningServiceApplicationConfiguration extends ServiceConfiguration implements Directories {
 
     @NotEmpty
@@ -71,11 +76,6 @@ public class ProvisioningServiceApplicationConfiguration extends ServiceConfigur
     @NotEmpty
     @JsonProperty
     private String emrServiceRoleDefault;
-
-    @Valid
-    @NotNull
-    @JsonProperty(SELF_SERVICE)
-    private RESTServiceFactory selfFactory = new RESTServiceFactory();
 
     @Valid
     @JsonProperty

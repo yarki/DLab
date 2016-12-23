@@ -21,7 +21,6 @@ package com.epam.dlab.backendapi;
 import com.epam.dlab.backendapi.core.*;
 import com.epam.dlab.backendapi.core.commands.CommandExecutor;
 import com.epam.dlab.backendapi.resources.*;
-import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.utils.ServiceUtils;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.mappers.JsonProcessingExceptionMapper;
@@ -37,7 +36,7 @@ import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
-import static com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration.SELF_SERVICE;
+import static com.epam.dlab.constants.ServiceConsts.SELF_SERVICE_NAME;
 
 public class ProvisioningServiceApplication extends Application<ProvisioningServiceApplicationConfiguration> {
     public static void main(String[] args) throws Exception {
@@ -73,7 +72,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
             protected void configure() {
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(configuration);
                 bind(MetadataHolder.class).to(DockerWarmuper.class);
-                bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, SELF_SERVICE));
+                bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, SELF_SERVICE_NAME));
                 bind(ICommandExecutor.class)
                         .to(configuration.isMocked() ? CommandExecutorMock.class : CommandExecutor.class)
                         .asEagerSingleton();
