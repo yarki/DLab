@@ -1,5 +1,7 @@
 package com.epam.dlab.backendapi.resources;
 
+import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SELF_SERVICE;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -19,8 +21,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import io.dropwizard.auth.Auth;
-
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SELF_SERVICE;
 
 
 @Path("/user/settings")

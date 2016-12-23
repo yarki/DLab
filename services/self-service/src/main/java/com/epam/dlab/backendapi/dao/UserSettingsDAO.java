@@ -25,7 +25,6 @@ import org.bson.Document;
 import org.hibernate.validator.constraints.NotBlank;
 
 import com.epam.dlab.auth.UserInfo;
-
 import io.dropwizard.auth.Auth;
 
 /** DAO for the user preferences.
@@ -39,7 +38,11 @@ public class UserSettingsDAO extends BaseDAO {
      * @return value or empty string.
      */
 	private String getValue(String collectionName, String id) {
-		return mongoService.getCollection(collectionName).find(eq(ID, id)).first().getOrDefault(VALUE, EMPTY).toString();
+		return mongoService
+				.getCollection(collectionName)
+				.find(eq(ID, id))
+				.first()
+				.getOrDefault(VALUE, EMPTY).toString();
 	}
 
 	/** Returns the user preferences of UI dashboard.
@@ -47,7 +50,8 @@ public class UserSettingsDAO extends BaseDAO {
 	 * @return JSON content.
 	 */
 	public String getUISettings(@Auth UserInfo userInfo) {
-        return getValue(USER_UI_SETTINGS, userInfo.getName());
+        return getValue(USER_UI_SETTINGS,
+        				userInfo.getName());
     }
     
 	/** Store the user preferences of UI dashboard.
@@ -55,7 +59,9 @@ public class UserSettingsDAO extends BaseDAO {
 	 * @param settings user preferences in JSON format.
 	 */
     public void setUISettings(@Auth UserInfo userInfo, @NotBlank String settings) {
-    	update(USER_UI_SETTINGS, eq(ID, userInfo.getName()), new Document(VALUE, settings));
+    	update(USER_UI_SETTINGS,
+    			eq(ID, userInfo.getName()),
+    			new Document(VALUE, settings));
     }
 
 }
