@@ -20,13 +20,13 @@ import com.google.inject.name.Named;
 
 import io.dropwizard.auth.Auth;
 
+import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SELF_SERVICE;
+
+
 @Path("/user/settings")
 @Produces(MediaType.APPLICATION_JSON)
 public class UserSettingsResource implements SelfServiceAPI {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
-
-	//TODO: Will be change to common constant
-    public static final String SELF_SERVICE = "selfService";
 
     @Inject
     private UserSettingsDAO userSettingsDAO;

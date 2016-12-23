@@ -26,6 +26,7 @@ import io.dropwizard.setup.Environment;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
+import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SELF_SERVICE;
 
 public class ProductionModule extends BaseModule {
     public ProductionModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
@@ -40,5 +41,7 @@ public class ProductionModule extends BaseModule {
                 .toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE));
         bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
                 .toInstance(configuration.getProvisioningFactory().build(environment, PROVISIONING_SERVICE));
+        bind(RESTService.class).annotatedWith(Names.named(SELF_SERVICE))
+        .toInstance(configuration.getProvisioningFactory().build(environment, SELF_SERVICE));
     }
 }
