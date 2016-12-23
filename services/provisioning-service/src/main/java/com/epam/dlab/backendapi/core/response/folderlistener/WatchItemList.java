@@ -34,6 +34,8 @@ import com.epam.dlab.backendapi.core.response.folderlistener.WatchItem.ItemStatu
 
 import io.dropwizard.util.Duration;
 
+import static com.epam.dlab.backendapi.core.Constants.JSON_EXTENSION;
+
 /** List of the file handlers for processing.
  * @author Usein_Faradzhev
  */
@@ -127,9 +129,12 @@ public class WatchItemList {
 	 */
 	public WatchItem append(FileHandlerCallback fileHandlerCallback, long timeoutMillis, long fileLengthCheckDelay, String fileName) {
 		WatchItem item = null;
-		if (fileName != null && fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
-			item = append(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
-			item.setFileName(fileName);
+		if (fileName != null) {
+			if(fileName.endsWith(JSON_EXTENSION) &&
+					fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
+				item = append(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
+				item.setFileName(fileName);
+			}
 		} else {
 			item = append(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
 		}
