@@ -91,7 +91,7 @@ def r_kernel(args):
     text = text.replace('CLUSTERNAME', args.cluster_name)
     text = text.replace('SPARK_PATH', spark_path)
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('R_VER', 'v{}'.format(str(r_version)))
+    text = text.replace('R_VER', 'R-{}'.format(str(r_version)))
     text = text.replace('EMR', args.emr_version)
     if 'emr-4.' in args.emr_version:
         text = text.replace('YRN_CLI_TYPE', 'yarn-client')
@@ -154,6 +154,7 @@ def pyspark_kernel(args):
 
 def toree_kernel(args):
     spark_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
+    scala_version = local("dpkg -l scala | grep scala | awk '{print $3}'", capture=True)
     if args.emr_version == 'emr-4.3.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-4.8.0':
         local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
         kernel_path = kernels_dir + "toree_" + args.cluster_name + "/kernel.json"
@@ -164,6 +165,7 @@ def toree_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
         text = text.replace('EMR', args.emr_version)
+        text = text.replace('SC_VER', scala_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
@@ -181,6 +183,7 @@ def toree_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
         text = text.replace('EMR', args.emr_version)
+        text = text.replace('SC_VER', scala_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
