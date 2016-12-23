@@ -199,6 +199,12 @@ def run():
             },
             {
                 "PrefixListIds": [],
+                "FromPort": 8787,
+                "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}],
+                "ToPort": 8888, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
                 "FromPort": 20888,
                 "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}],
                 "ToPort": 20888, "IpProtocol": "tcp", "UserIdGroupPairs": []
@@ -240,9 +246,9 @@ def run():
                 "ToPort": 443, "IpProtocol": "tcp", "UserIdGroupPairs": []
             }
         ]
-        params = "--name %s --vpc_id %s --security_group_rules '%s' --infra_tag_name %s --infra_tag_value %s --egress '%s'" % \
-                 (edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),
-                  edge_conf['service_base_name'], edge_conf['instance_name'], json.dumps(sg_rules_template_egress))
+        params = "--name {} --vpc_id {} --security_group_rules '{}' --infra_tag_name {} --infra_tag_value {} --egress '{}' --force {} --nb_sg_name {} --resource {}".\
+            format(edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),edge_conf['service_base_name'],
+                   edge_conf['instance_name'], json.dumps(sg_rules_template_egress), True, edge_conf['notebook_instance_name'], 'edge')
         if not run_routine('create_security_group', params):
             logging.info('Failed creating security group for edge node')
             with open("/root/result.json", 'w') as result:
@@ -277,10 +283,9 @@ def run():
             {"IpProtocol": "-1", "IpRanges": [], "UserIdGroupPairs": [{"GroupId": edge_group_id}], "PrefixListIds": []},
             {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "PrefixListIds": []}
         ]
-        params = "--name %s --vpc_id %s --security_group_rules '%s' --egress '%s' --infra_tag_name %s --infra_tag_value %s" % \
-                 (edge_conf['notebook_security_group_name'], edge_conf['vpc_id'],
-                  json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template),
-                  edge_conf['service_base_name'], edge_conf['notebook_instance_name'])
+        params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {}".\
+            format(edge_conf['notebook_security_group_name'], edge_conf['vpc_id'], json.dumps(ingress_sg_rules_template),
+                   json.dumps(egress_sg_rules_template), edge_conf['service_base_name'], edge_conf['notebook_instance_name'], True)
         if not run_routine('create_security_group', params):
             logging.info('Failed creating security group for private subnet')
             with open("/root/result.json", 'w') as result:
@@ -295,8 +300,8 @@ def run():
     except:
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
-        remove_sgroups(edge_conf['instance_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
+        remove_sgroups(edge_conf['instance_name'])
         sys.exit(1)
 
     try:

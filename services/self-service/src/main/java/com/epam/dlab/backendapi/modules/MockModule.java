@@ -59,6 +59,8 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
                 .toInstance(createAuthenticationService());
         bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
                 .toInstance(createProvisioningService());
+        /*bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
+                .toInstance(configuration.getProvisioningFactory().build(environment, PROVISIONING_SERVICE));*/
     }
 
     private RESTService createAuthenticationService() {

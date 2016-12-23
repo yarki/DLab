@@ -19,7 +19,6 @@ limitations under the License.
 package com.epam.dlab.backendapi.core;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.commands.CommandExecutor;
 import com.epam.dlab.backendapi.core.commands.DockerCommands;
 import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
@@ -49,7 +48,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecutor commandExecutor;
+    private ICommandExecutor commandExecutor;
     private Map<String, String> uuids = new ConcurrentHashMap<>();
     private Set<ImageMetadataDTO> metadataDTOs = new ConcurrentHashSet<>();
 

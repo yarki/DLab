@@ -246,7 +246,7 @@ def remove_ec2(tag_name, tag_value):
                 waiter.wait(InstanceIds=[instance.id])
                 print "The instance " + instance.id + " has been terminated successfully"
         else:
-            print "There are no instances with " + tag_value + " name to terminate"
+            print "There are no instances with '" + tag_name + "' tag to terminate"
     except Exception as err:
         logging.info("Unable to remove EC2: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
@@ -346,7 +346,6 @@ def remove_roles_and_profiles(role_name, role_profile_name):
 
 def remove_all_iam_resources(instance_type, scientist=''):
     try:
-        print "[Removing IAM roles, instance profiles and policies]"
         client = boto3.client('iam')
         roles_list = []
         for item in client.list_roles(MaxItems=250).get("Roles"):
@@ -354,37 +353,67 @@ def remove_all_iam_resources(instance_type, scientist=''):
                 roles_list.append(item.get('RoleName'))
         if roles_list:
             roles_list.sort(reverse=True)
-            print roles_list
             for iam_role in roles_list:
                 if '-ssn-Role' in iam_role:
                     if instance_type == 'ssn' or instance_type == 'all':
+                        try:
+                            client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
+                        except:
+                            print 'There is no policy ' + os.environ['conf_service_base_name'] + '-ssn-Policy to delete'
                         role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
-                        client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
-                        remove_roles_and_profiles(iam_role, role_profile_name)
+                        try:
+                            client.get_instance_profile(InstanceProfileName=role_profile_name)
+                            remove_roles_and_profiles(iam_role, role_profile_name)
+                        except:
+                            print "There is no instance profile for " + iam_role
+                            client.delete_role(RoleName=iam_role)
+                            print "The IAM role " + iam_role + " has been deleted successfully"
                 if '-edge-Role' in iam_role:
                     if instance_type == 'edge' and scientist in iam_role:
                         remove_detach_iam_policies(iam_role, 'delete')
                         role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
-                        remove_roles_and_profiles(iam_role, role_profile_name)
+                        try:
+                            client.get_instance_profile(InstanceProfileName=role_profile_name)
+                            remove_roles_and_profiles(iam_role, role_profile_name)
+                        except:
+                            print "There is no instance profile for " + iam_role
+                            client.delete_role(RoleName=iam_role)
+                            print "The IAM role " + iam_role + " has been deleted successfully"
                     if instance_type == 'all':
                         remove_detach_iam_policies(iam_role, 'delete')
                         role_profile_name = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
-                        for i in role_profile_name:
-                            role_profile_name = i.get('InstanceProfileName')
-                            remove_roles_and_profiles(iam_role, role_profile_name)
+                        if role_profile_name:
+                            for i in role_profile_name:
+                                role_profile_name = i.get('InstanceProfileName')
+                                remove_roles_and_profiles(iam_role, role_profile_name)
+                        else:
+                            print "There is no instance profile for " + iam_role
+                            client.delete_role(RoleName=iam_role)
+                            print "The IAM role " + iam_role + " has been deleted successfully"
                 if '-nb-Role' in iam_role:
                     if instance_type == 'notebook' and scientist in iam_role:
                         remove_detach_iam_policies(iam_role)
                         role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
-                        remove_roles_and_profiles(iam_role, role_profile_name)
+                        try:
+                            client.get_instance_profile(InstanceProfileName=role_profile_name)
+                            remove_roles_and_profiles(iam_role, role_profile_name)
+                        except:
+                            print "There is no instance profile for " + iam_role
+                            client.delete_role(RoleName=iam_role)
+                            print "The IAM role " + iam_role + " has been deleted successfully"
                     if instance_type == 'all':
                         remove_detach_iam_policies(iam_role)
                         role_profile_name = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
-                        for i in role_profile_name:
-                            role_profile_name = i.get('InstanceProfileName')
-                            remove_roles_and_profiles(iam_role, role_profile_name)
+                        if role_profile_name:
+                            for i in role_profile_name:
+                                role_profile_name = i.get('InstanceProfileName')
+                                remove_roles_and_profiles(iam_role, role_profile_name)
+                        else:
+                            print "There is no instance profile for " + iam_role
+                            client.delete_role(RoleName=iam_role)
+                            print "The IAM role " + iam_role + " has been deleted successfully"
         else:
-            print "There is no IAM role to delete"
+            print "There are no IAM roles instance profiles and policies to delete"
     except Exception as err:
         logging.info("Unable to remove some of the IAM resources: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
@@ -412,7 +441,6 @@ def s3_cleanup(bucket, cluster_name, user_name):
 
 def remove_s3(bucket_type='all', scientist=''):
     try:
-        print "[Removing S3 buckets]"
         client = boto3.client('s3')
         bucket_list = []
         if bucket_type == 'ssn':
@@ -430,7 +458,6 @@ def remove_s3(bucket_type='all', scientist=''):
             if list_obj is not None:
                 for o in list_obj:
                     list_obj = o.get('Key')
-                    print list_obj
                     client.delete_objects(
                         Bucket=s3bucket,
                         Delete={'Objects': [{'Key': list_obj}]}
@@ -450,16 +477,17 @@ def remove_s3(bucket_type='all', scientist=''):
 
 def remove_subnets(tag_value):
     try:
-        print "[Removing subnets]"
         ec2 = boto3.resource('ec2')
         client = boto3.client('ec2')
         tag_name = os.environ['conf_service_base_name'] + '-Tag'
         subnets = ec2.subnets.filter(
             Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': [tag_value]}])
-        for subnet in subnets:
-            print subnet.id
-            client.delete_subnet(SubnetId=subnet.id)
-            print "The subnet " + subnet.id + " has been deleted successfully"
+        if subnets:
+            for subnet in subnets:
+                client.delete_subnet(SubnetId=subnet.id)
+                print "The subnet " + subnet.id + " has been deleted successfully"
+        else:
+            print "There are no private subnets to delete"
     except Exception as err:
         logging.info("Unable to remove subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
@@ -471,16 +499,17 @@ def remove_subnets(tag_value):
 
 def remove_sgroups(tag_value):
     try:
-        print "[Removing security groups]"
         ec2 = boto3.resource('ec2')
         client = boto3.client('ec2')
         tag_name = os.environ['conf_service_base_name']
         sgs = ec2.security_groups.filter(
             Filters=[{'Name': 'tag:{}'.format(tag_name), 'Values': [tag_value]}])
-        for sg in sgs:
-            print sg.id
-            client.delete_security_group(GroupId=sg.id)
-            print "The security group " + sg.id + " has been deleted successfully"
+        if sgs:
+            for sg in sgs:
+                client.delete_security_group(GroupId=sg.id)
+                print "The security group " + sg.id + " has been deleted successfully"
+        else:
+            print "There are no security groups to delete"
     except Exception as err:
         logging.info("Unable to remove SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
@@ -492,14 +521,17 @@ def remove_sgroups(tag_value):
 
 def deregister_image(scientist):
     try:
-        print "[De-registering images]"
         client = boto3.client('ec2')
         response = client.describe_images(
-            Filters=[{'Name': 'name', 'Values': ['{}-{}-notebook-image'.format(os.environ['conf_service_base_name'], scientist)]}])
+            Filters=[{'Name': 'name', 'Values': ['{}-{}-*'.format(os.environ['conf_service_base_name'], scientist)]},
+                     {'Name': 'tag-value', 'Values': [os.environ['conf_service_base_name']]}])
         images_list = response.get('Images')
-        for i in images_list:
-            client.deregister_image(ImageId=i.get('ImageId'))
-            print "Notebook AMI has been deregistered successfully"
+        if images_list:
+            for i in images_list:
+                client.deregister_image(ImageId=i.get('ImageId'))
+                print "Notebook AMI " + i.get('ImageId') + " has been deregistered successfully"
+        else:
+            print "There is no notebook ami to deregister"
     except Exception as err:
         logging.info("Unable to de-register image: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
@@ -562,9 +594,9 @@ def remove_route_tables(tag_name):
             if rtable:
                 rtable = rtable.get('RouteTableId')
                 client.delete_route_table(RouteTableId=rtable)
-                print "Route table " + rtable + " was removed"
+                print "Route table " + rtable + " has been removed"
             else:
-                print "There is no route table to remove"
+                print "There are no route tables to remove"
     except Exception as err:
         logging.info("Unable to remove route table: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
@@ -574,3 +606,12 @@ def remove_route_tables(tag_name):
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
+
+
+def remove_apt_lock():
+    try:
+        sudo('rm -f /var/lib/apt/lists/lock')
+        sudo('rm -f /var/cache/apt/archives/lock')
+        sudo('rm -f /var/lib/dpkg/lock')
+    except:
+        sys.exit(1)

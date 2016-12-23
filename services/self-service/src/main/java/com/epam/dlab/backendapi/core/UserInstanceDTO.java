@@ -35,6 +35,10 @@ public class UserInstanceDTO {
     private String exploratoryName;
     @JsonProperty("exploratory_id")
     private String exploratoryId;
+    @JsonProperty("image")
+    private String imageName;
+    @JsonProperty("version")
+    private String imageVersion;
     @JsonProperty
     private String status;
     @JsonProperty
@@ -86,6 +90,24 @@ public class UserInstanceDTO {
 
     public UserInstanceDTO withExploratoryId(String exploratoryId) {
         setExploratoryId(exploratoryId);
+        return this;
+    }
+
+    public String getImageName() { return imageName; }
+
+    public void setImageName(String imageName) { this.imageName = imageName; }
+
+    public UserInstanceDTO withImageName(String imageName) {
+        setImageName(imageName);
+        return this;
+    }
+
+    public String getImageVersion() { return imageVersion; }
+
+    public void setImageVersion(String imageVersion) { this.imageVersion = imageVersion; }
+
+    public UserInstanceDTO withImageVersion(String imageVersion) {
+        setImageVersion(imageVersion);
         return this;
     }
 
