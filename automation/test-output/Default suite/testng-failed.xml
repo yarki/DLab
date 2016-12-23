@@ -10,4 +10,14 @@
       </class> <!-- AutomationTest.TestServices -->
     </classes>
   </test> <!-- Default test -->
+  <test name="Default test(failed)">
+    <classes>
+      <class name="AutomationTest.TestServices">
+        <methods>
+          <include name="testJenkinsJob"/>
+          <include name="Setup"/>
+        </methods>
+      </class> <!-- AutomationTest.TestServices -->
+    </classes>
+  </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->
