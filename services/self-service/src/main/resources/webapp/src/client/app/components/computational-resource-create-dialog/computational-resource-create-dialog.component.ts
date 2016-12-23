@@ -80,9 +80,9 @@ export class ComputationalResourceCreateDialog {
     if ($event.model.type === 'template') {
       this.model.setSelectedTemplate($event.model.index);
       this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-        this.model.selectedItem.shapes.Memory_optimized[0].type, 'master_shape', 'type', 'json');
+        this.model.selectedItem.shapes.Memory_optimized[0].description, 'master_shape', 'description', 'json');
       this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-        this.model.selectedItem.shapes.Memory_optimized[0].type, 'slave_shape', 'type', 'json');
+        this.model.selectedItem.shapes.Memory_optimized[0].description, 'slave_shape', 'description', 'json');
     }
 
     if (this.shapes[$event.model.type])
@@ -162,9 +162,9 @@ export class ComputationalResourceCreateDialog {
     this.templates_list.setDefaultOptions(this.model.computationalResourceApplicationTemplates,
       this.model.selectedItem.version, 'template', 'version', 'array');
     this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-      this.model.selectedItem.shapes.Memory_optimized[0].type, 'master_shape', 'type', 'json');
+      this.model.selectedItem.shapes.Memory_optimized[0].description, 'master_shape', 'description', 'json');
     this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-      this.model.selectedItem.shapes.Memory_optimized[0].type, 'slave_shape', 'type', 'json');
+      this.model.selectedItem.shapes.Memory_optimized[0].description, 'slave_shape', 'description', 'json');
   }
 
   private resetDialog(): void {

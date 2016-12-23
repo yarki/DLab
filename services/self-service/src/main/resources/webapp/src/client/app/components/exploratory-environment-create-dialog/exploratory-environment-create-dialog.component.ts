@@ -75,14 +75,14 @@ export class ExploratoryEnvironmentCreateDialog {
     this.templates_list.setDefaultOptions(this.model.exploratoryEnvironmentTemplates,
       this.model.selectedItem.template_name, 'template', 'template_name', 'array');
     this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-      this.model.selectedItem.shapes.Memory_optimized[0].type, 'shape', 'type', 'json');
+      this.model.selectedItem.shapes.Memory_optimized[0].description, 'shape', 'description', 'json');
   }
 
   onUpdate($event): void {
     if($event.model.type === 'template') {
       this.model.setSelectedTemplate($event.model.index);
       this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-        this.model.selectedItem.shapes.Memory_optimized[0].type, 'shape', 'type', 'json');
+        this.model.selectedItem.shapes.Memory_optimized[0].description, 'shape', 'description', 'json');
     }
 
     if($event.model.type === 'shape')

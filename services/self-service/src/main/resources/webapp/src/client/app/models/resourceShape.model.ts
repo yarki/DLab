@@ -21,11 +21,13 @@ export class ResourceShapeModel {
   type: string;
   ram: string;
   cpu: number;
+  description: string;
 
   constructor(jsonModel: any) {
     this.size = jsonModel.Size;
     this.type = jsonModel.Type;
     this.ram = jsonModel.Ram;
     this.cpu = jsonModel.Cpu;
+    this.description = jsonModel.Description;
   }
 }
