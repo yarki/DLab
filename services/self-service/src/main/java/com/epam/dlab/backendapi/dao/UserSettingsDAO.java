@@ -62,7 +62,8 @@ public class UserSettingsDAO extends BaseDAO {
     public void setUISettings(@Auth UserInfo userInfo, @NotBlank String settings) {
     	update(USER_UI_SETTINGS,
     			eq(ID, userInfo.getName()),
-    			new Document(VALUE, convertToBson(settings)));
+    			new Document(VALUE,
+    					Document.parse(settings)));
     }
 
 }

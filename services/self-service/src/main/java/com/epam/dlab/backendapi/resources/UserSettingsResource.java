@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.UserSettingsDAO;
+import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.SelfServiceAPI;
 import com.google.inject.Inject;
@@ -63,7 +64,12 @@ public class UserSettingsResource implements SelfServiceAPI {
     @Path("/save")
     public Response saveSettings(@Auth UserInfo userInfo, @NotBlank String settings) {
         LOGGER.debug("Saves settings for user {}, content is {}", userInfo.getName(), settings);
-        userSettingsDAO.setUISettings(userInfo, settings);
+        try {
+        	userSettingsDAO.setUISettings(userInfo, settings);
+        } catch (Exception e) {
+        	LOGGER.debug("Save settings for user {} fail", userInfo.getName(), e);
+        	throw new DlabException("Save settings for user " + userInfo.getName() + " fail", e);
+        }
         return Response.ok().build();
     }
 }
