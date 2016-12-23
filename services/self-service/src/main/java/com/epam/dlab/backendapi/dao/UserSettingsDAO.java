@@ -38,11 +38,12 @@ public class UserSettingsDAO extends BaseDAO {
      * @return value or empty string.
      */
 	private String getValue(String collectionName, String id) {
-		return mongoService
+		Document d = mongoService
 				.getCollection(collectionName)
 				.find(eq(ID, id))
-				.first()
-				.getOrDefault(VALUE, EMPTY).toString();
+				.first();
+		return (d == null ? EMPTY :
+					d.getOrDefault(VALUE, EMPTY).toString());
 	}
 
 	/** Returns the user preferences of UI dashboard.
@@ -61,7 +62,7 @@ public class UserSettingsDAO extends BaseDAO {
     public void setUISettings(@Auth UserInfo userInfo, @NotBlank String settings) {
     	update(USER_UI_SETTINGS,
     			eq(ID, userInfo.getName()),
-    			new Document(VALUE, settings));
+    			new Document(VALUE, convertToBson(settings)));
     }
 
 }
