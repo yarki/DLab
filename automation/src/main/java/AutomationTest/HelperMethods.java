@@ -17,7 +17,7 @@ public class HelperMethods {
     
     public static String getFilePath(String path) {
                 
-        File file = new File("/AutoTestData/" + path);
+        File file = new File("/var/lib/jenkins/AutoTestData/" + path);
         return file.getAbsolutePath();
         
     }

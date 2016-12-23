@@ -17,7 +17,7 @@ public class PropertyValue {
        
         try {
                 
-                File f1 = new File("/AutoTestData/config.properties");
+                File f1 = new File("/var/lib/jenkins/AutoTestData/config.properties");
                 FileReader fin = new FileReader(f1);
                 Properties pr = new Properties();
                 pr.load(fin);
