@@ -20,9 +20,10 @@ import boto3
 import json
 import time
 import logging
-import sys
 import traceback
-
+import sys
+import random
+import string
 
 def get_instance_hostname(instance_name):
     try:
