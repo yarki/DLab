@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import AutomationTest.HelperMethods;
 import AutomationTest.PropertyValue;
-import Utils.Path;
 
 import org.testng.Assert;
 

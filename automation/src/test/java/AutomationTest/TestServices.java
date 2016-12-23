@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.naming.Context;
-
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.PropertiesCredentials;
@@ -42,20 +40,10 @@ import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.SSLConfig;
-
-import AmazonHelper.Amazon;
-import AmazonHelper.AmazonCredentials;
-import AmazonHelper.AmazonInstanceState;
-import AutomationTest.HelperMethods;
-import AutomationTest.PropertyValue;
-import DataModel.CreateNotebookDto;
-import DataModel.DeployEMRDto;
-import DataModel.LoginDto;
-import Infrastucture.HttpRequest;
-import Repository.Entities;
+import Repository.ContentType;
+import Repository.HttpStatusCode;
+import Repository.Path;
 import ServiceCall.JenkinsCall;
-import Utils.*;
-
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.authentication.FormAuthConfig;
 import com.jayway.restassured.response.Response;
@@ -64,11 +52,14 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-
 import java.util.Scanner;
-
+import AmazonHelper.Amazon;
+import AmazonHelper.AmazonInstanceState;
+import DataModel.CreateNotebookDto;
+import DataModel.DeployEMRDto;
+import DataModel.LoginDto;
 import DockerHelper.*;
-
+import Infrastucture.HttpRequest;
 import org.apache.http.auth.Credentials;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -77,11 +68,10 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import static com.jayway.restassured.RestAssured.given;
-
 import org.newsclub.net.unix.AFUNIXServerSocket;
 import org.newsclub.net.unix.AFUNIXSocketAddress;
+import com.fasterxml.jackson.*;
 
 public class TestServices {
 

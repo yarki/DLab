@@ -1,4 +1,4 @@
-package Utils;
+package Repository;
 
 public class HttpStatusCode {
     
