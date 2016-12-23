@@ -29,7 +29,6 @@ import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Region;
 import com.amazonaws.services.ec2.model.Reservation;
-import com.fasterxml.jackson.*;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.AuthResponse;
@@ -71,7 +70,6 @@ import org.testng.annotations.Test;
 import static com.jayway.restassured.RestAssured.given;
 import org.newsclub.net.unix.AFUNIXServerSocket;
 import org.newsclub.net.unix.AFUNIXSocketAddress;
-import com.fasterxml.jackson.*;
 
 public class TestServices {
 

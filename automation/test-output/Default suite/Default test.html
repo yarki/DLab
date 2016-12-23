@@ -57,9 +57,9 @@ function toggleAllBoxes() {
 <tr>
 <td>Tests passed/Failed/Skipped:</td><td>0/1/0</td>
 </tr><tr>
-<td>Started on:</td><td>Thu Dec 22 18:46:54 EET 2016</td>
+<td>Started on:</td><td>Fri Dec 23 12:27:20 EET 2016</td>
 </tr>
-<tr><td>Total time:</td><td>11 seconds (11899 ms)</td>
+<tr><td>Total time:</td><td>0 seconds (771 ms)</td>
 </tr><tr>
 <td>Included groups:</td><td></td>
 </tr><tr>
@@ -75,11 +75,28 @@ function toggleAllBoxes() {
 <td><b>Instance</b></td>
 </tr>
 <tr>
-<td title='AutomationTest.TestServices.testJenkinsJob()'><b>testJenkinsJob</b><br>Test class: AutomationTest.TestServices</td>
-<td><div><pre>java.lang.Exception: Jenkins job was failed. Build result is not success
-	at ServiceCall.JenkinsCall.setJenkinsURLServiceBaseName(JenkinsCall.java:124)
-	at ServiceCall.JenkinsCall.runJenkinsJob(JenkinsCall.java:68)
-	at AutomationTest.TestServices.testJenkinsJob(TestServices.java:110)
+<td title='AutomationTest.TestServices.testDLabScenario()'><b>testDLabScenario</b><br>Test class: AutomationTest.TestServices</td>
+<td><div><pre>java.lang.IllegalArgumentException: baseURI cannot be null
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:422)
+	at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:80)
+	at org.codehaus.groovy.reflection.CachedConstructor.doConstructorInvoke(CachedConstructor.java:74)
+	at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrap.callConstructor(ConstructorSite.java:84)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:60)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:235)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:247)
+	at com.jayway.restassured.internal.assertion.AssertParameter.notNull(AssertParameter.groovy:26)
+	at com.jayway.restassured.internal.assertion.AssertParameter$notNull.callStatic(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallStatic(CallSiteArray.java:56)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callStatic(AbstractCallSite.java:194)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callStatic(AbstractCallSite.java:214)
+	at com.jayway.restassured.internal.RequestSpecificationImpl.&lt;init&gt;(RequestSpecificationImpl.groovy:124)
+	at com.jayway.restassured.RestAssured.createTestSpecification(RestAssured.java:1447)
+	at com.jayway.restassured.RestAssured.given(RestAssured.java:741)
+	at Infrastucture.HttpRequest.webApiPost(HttpRequest.java:48)
+	at AutomationTest.TestServices.testDLabScenario(TestServices.java:160)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -104,11 +121,28 @@ function toggleAllBoxes() {
 	at org.testng.remote.RemoteTestNG.run(RemoteTestNG.java:113)
 	at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:206)
 	at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:177)
-</pre></div><a href='#' onClick='toggleBox("stack-trace14633842", this, "Click to show all stack frames", "Click to hide stack frames")'>Click to show all stack frames</a>
-<div class='stack-trace' id='stack-trace14633842'><pre>java.lang.Exception: Jenkins job was failed. Build result is not success
-	at ServiceCall.JenkinsCall.setJenkinsURLServiceBaseName(JenkinsCall.java:124)
-	at ServiceCall.JenkinsCall.runJenkinsJob(JenkinsCall.java:68)
-	at AutomationTest.TestServices.testJenkinsJob(TestServices.java:110)
+</pre></div><a href='#' onClick='toggleBox("stack-trace1697752980", this, "Click to show all stack frames", "Click to hide stack frames")'>Click to show all stack frames</a>
+<div class='stack-trace' id='stack-trace1697752980'><pre>java.lang.IllegalArgumentException: baseURI cannot be null
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:422)
+	at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:80)
+	at org.codehaus.groovy.reflection.CachedConstructor.doConstructorInvoke(CachedConstructor.java:74)
+	at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrap.callConstructor(ConstructorSite.java:84)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:60)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:235)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:247)
+	at com.jayway.restassured.internal.assertion.AssertParameter.notNull(AssertParameter.groovy:26)
+	at com.jayway.restassured.internal.assertion.AssertParameter$notNull.callStatic(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallStatic(CallSiteArray.java:56)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callStatic(AbstractCallSite.java:194)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callStatic(AbstractCallSite.java:214)
+	at com.jayway.restassured.internal.RequestSpecificationImpl.&lt;init&gt;(RequestSpecificationImpl.groovy:124)
+	at com.jayway.restassured.RestAssured.createTestSpecification(RestAssured.java:1447)
+	at com.jayway.restassured.RestAssured.given(RestAssured.java:741)
+	at Infrastucture.HttpRequest.webApiPost(HttpRequest.java:48)
+	at AutomationTest.TestServices.testDLabScenario(TestServices.java:160)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -134,8 +168,8 @@ function toggleAllBoxes() {
 	at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:206)
 	at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:177)
 </pre></div></td>
-<td>11</td>
-<td>AutomationTest.TestServices@5f2050f6</td></tr>
+<td>0</td>
+<td>AutomationTest.TestServices@735f7ae5</td></tr>
 </table><p>
 </body>
 </html>

@@ -2,25 +2,42 @@
 <testng-results skipped="0" failed="1" total="1" passed="0">
   <reporter-output>
   </reporter-output>
-  <suite name="Default suite" duration-ms="11899" started-at="2016-12-22T16:46:54Z" finished-at="2016-12-22T16:47:06Z">
+  <suite name="Default suite" duration-ms="771" started-at="2016-12-23T10:27:20Z" finished-at="2016-12-23T10:27:21Z">
     <groups>
     </groups>
-    <test name="Default test" duration-ms="11899" started-at="2016-12-22T16:46:54Z" finished-at="2016-12-22T16:47:06Z">
+    <test name="Default test" duration-ms="771" started-at="2016-12-23T10:27:20Z" finished-at="2016-12-23T10:27:21Z">
       <class name="AutomationTest.TestServices">
-        <test-method status="PASS" signature="Setup()[pri:0, instance:AutomationTest.TestServices@5f2050f6]" name="Setup" is-config="true" duration-ms="47" started-at="2016-12-22T18:46:54Z" finished-at="2016-12-22T18:46:54Z">
+        <test-method status="PASS" signature="Setup()[pri:0, instance:AutomationTest.TestServices@735f7ae5]" name="Setup" is-config="true" duration-ms="47" started-at="2016-12-23T12:27:20Z" finished-at="2016-12-23T12:27:20Z">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- Setup -->
-        <test-method status="FAIL" signature="testJenkinsJob()[pri:0, instance:AutomationTest.TestServices@5f2050f6]" name="testJenkinsJob" duration-ms="11836" started-at="2016-12-22T18:46:54Z" finished-at="2016-12-22T18:47:06Z">
-          <exception class="java.lang.Exception">
+        <test-method status="FAIL" signature="testDLabScenario()[pri:2, instance:AutomationTest.TestServices@735f7ae5]" name="testDLabScenario" duration-ms="724" started-at="2016-12-23T12:27:20Z" finished-at="2016-12-23T12:27:21Z">
+          <exception class="java.lang.IllegalArgumentException">
             <message>
-              <![CDATA[Jenkins job was failed. Build result is not success]]>
+              <![CDATA[baseURI cannot be null]]>
             </message>
             <full-stacktrace>
-              <![CDATA[java.lang.Exception: Jenkins job was failed. Build result is not success
-	at ServiceCall.JenkinsCall.setJenkinsURLServiceBaseName(JenkinsCall.java:124)
-	at ServiceCall.JenkinsCall.runJenkinsJob(JenkinsCall.java:68)
-	at AutomationTest.TestServices.testJenkinsJob(TestServices.java:110)
+              <![CDATA[java.lang.IllegalArgumentException: baseURI cannot be null
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:422)
+	at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:80)
+	at org.codehaus.groovy.reflection.CachedConstructor.doConstructorInvoke(CachedConstructor.java:74)
+	at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrap.callConstructor(ConstructorSite.java:84)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:60)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:235)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:247)
+	at com.jayway.restassured.internal.assertion.AssertParameter.notNull(AssertParameter.groovy:26)
+	at com.jayway.restassured.internal.assertion.AssertParameter$notNull.callStatic(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallStatic(CallSiteArray.java:56)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callStatic(AbstractCallSite.java:194)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callStatic(AbstractCallSite.java:214)
+	at com.jayway.restassured.internal.RequestSpecificationImpl.<init>(RequestSpecificationImpl.groovy:124)
+	at com.jayway.restassured.RestAssured.createTestSpecification(RestAssured.java:1447)
+	at com.jayway.restassured.RestAssured.given(RestAssured.java:741)
+	at Infrastucture.HttpRequest.webApiPost(HttpRequest.java:48)
+	at AutomationTest.TestServices.testDLabScenario(TestServices.java:160)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -47,10 +64,10 @@
 	at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:177)
 ]]>
             </full-stacktrace>
-          </exception> <!-- java.lang.Exception -->
+          </exception> <!-- java.lang.IllegalArgumentException -->
           <reporter-output>
           </reporter-output>
-        </test-method> <!-- testJenkinsJob -->
+        </test-method> <!-- testDLabScenario -->
       </class> <!-- AutomationTest.TestServices -->
     </test> <!-- Default test -->
   </suite> <!-- Default suite -->

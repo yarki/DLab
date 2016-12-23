@@ -5,7 +5,7 @@
     <classes>
       <class name="AutomationTest.TestServices">
         <methods>
-          <include name="testJenkinsJob"/>
+          <include name="testDLabScenario"/>
         </methods>
       </class> <!-- AutomationTest.TestServices -->
     </classes>
@@ -14,7 +14,7 @@
     <classes>
       <class name="AutomationTest.TestServices">
         <methods>
-          <include name="testJenkinsJob"/>
+          <include name="testDLabScenario"/>
           <include name="Setup"/>
         </methods>
       </class> <!-- AutomationTest.TestServices -->
