@@ -27,12 +27,15 @@ limitations under the License.
   border: 1px solid #cad2da;
   font-size: 14px;
 }
+
 .dropdown-multiselect button span {
   color: #999;
 }
+
 .dropdown-multiselect button .selected-items {
   color: #4eaf3e;
 }
+
 .dropdown-multiselect .caret-btn {
   position: absolute;
   top: 0;
@@ -43,7 +46,7 @@ limitations under the License.
   padding: 5px;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background: #F6FAFE;
+  background: #f6fafe;
   border-left: 1px solid #ccc;
   color: #64a5dc;
 }
@@ -63,30 +66,36 @@ limitations under the License.
   padding: 0;
   margin: 0;
 }
+
 .dropdown-multiselect.statuses .dropdown-menu li a,
 .dropdown-multiselect.resources .dropdown-menu li a {
   text-transform: capitalize;
 }
+
 .dropdown-multiselect .dropdown-menu a {
   padding: 10px;
   padding-left: 35px;
   position: relative;
   font-weight: 300;
 }
+
 .dropdown-multiselect .dropdown-menu .filter-actions {
   border-bottom: 1px solid #ececec;
   width: 50%;
   float: left;
   cursor: pointer;
 }
+
 .dropdown-multiselect .dropdown-menu .filter-actions a {
   padding-left: 14px;
   color: #35afd5;
 }
+
 .dropdown-multiselect .dropdown-menu .filter-actions .select_all:hover {
-  color: #49af38;
+  color: #4eaf3e;
   background: #f9fafb;
 }
+
 .dropdown-multiselect .dropdown-menu .filter-actions .deselect_all:hover {
   color: #f1696e;
   background: #f9fafb;
@@ -115,6 +124,6 @@ limitations under the License.
 
 .dropdown-multiselect .dropdown-menu::-webkit-scrollbar-thumb {
   -webkit-box-shadow: inset 1px 1px 6px #9a9393;
-  background-color: #f9fafb;
+  background-color: #f6fafe;
   border-radius: 5px;
 }

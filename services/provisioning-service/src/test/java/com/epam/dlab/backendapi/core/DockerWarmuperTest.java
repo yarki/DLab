@@ -64,18 +64,22 @@ public class DockerWarmuperTest {
     @Test
     public void warmupSuccess() throws Exception {
         warmuper.start();
-        warmuper.getFileHandlerCallback()
-                .handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
-        warmuper.getFileHandlerCallback()
+        warmuper.getFileHandlerCallback(getFirstUUID())
+        		.handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
+        warmuper.getFileHandlerCallback(getFirstUUID())
                 .handle(getFileName(), COMPUTATIONAL_TEST_JSON.getBytes());
-        assertEquals(exploratoryMetadata, warmuper.getMetadatas(ImageType.EXPLORATORY)
+        assertEquals(exploratoryMetadata, warmuper.getMetadata(ImageType.EXPLORATORY)
                 .toArray(new ImageMetadataDTO[1])[0]);
-        assertEquals(computationalMetadata, warmuper.getMetadatas(ImageType.COMPUTATIONAL)
+        assertEquals(computationalMetadata, warmuper.getMetadata(ImageType.COMPUTATIONAL)
                 .toArray(new ImageMetadataDTO[1])[0]);
     }
 
+    private String getFirstUUID() {
+    	return warmuper.getUuids().keySet().toArray(new String[1])[0];
+    }
+    
     private String getFileName() {
-        return warmuper.getUuids().keySet().toArray(new String[1])[0] + ".json";
+        return getFirstUUID() + ".json";
     }
 
     private Injector createInjector() {
@@ -84,7 +88,7 @@ public class DockerWarmuperTest {
             protected void configure() {
                 bind(FolderListenerExecutor.class).toInstance(mock(FolderListenerExecutor.class));
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(createConfiguration());
-                bind(CommandExecutor.class).toInstance(createCommandExecuter());
+                bind(ICommandExecutor.class).toInstance(createCommandExecuter());
             }
         });
     }
@@ -96,8 +100,8 @@ public class DockerWarmuperTest {
         return result;
     }
 
-    private CommandExecutor createCommandExecuter() {
-        CommandExecutor result = mock(CommandExecutor.class);
+    private ICommandExecutor createCommandExecuter() {
+        ICommandExecutor result = mock(ICommandExecutor.class);
         try {
             when(result.executeSync(anyString())).thenReturn(Collections.singletonList("executeResult"));
         } catch (Exception e) {

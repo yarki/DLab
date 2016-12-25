@@ -17,12 +17,12 @@ limitations under the License.
 ----------------------------------------------------------------------------------------------------------- -->
 
 
-<modal #bindDialog modalClass="modal-lg">
+<modal-dialog #bindDialog modalClass="modal-lg">
   <modal-header>
     <h4 class="modal-title" id="myModalLabel">Create analytical tool</h4>
   </modal-header>
   <modal-content>
-  <form [formGroup]="createExploratoryEnvironmentForm" novalidate (submit)="createExploratoryEnvironment_btnClick($event, createExploratoryEnvironmentForm.value, createExploratoryEnvironmentForm.valid, environment.template, environment.shape)">
+  <form [formGroup]="createExploratoryEnvironmentForm" novalidate (submit)="createExploratoryEnvironment_btnClick($event, createExploratoryEnvironmentForm.value, createExploratoryEnvironmentForm.valid)">
     <div class="form-group row">
       <div  class="col-xs-4">
         <label class="control-label">Select template</label>
@@ -62,4 +62,4 @@ limitations under the License.
     </div>
   </form>
   </modal-content>
-</modal>
+</modal-dialog>

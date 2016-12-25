@@ -30,12 +30,20 @@ import static com.epam.dlab.rest.contracts.ApiCallbacks.STATUS_URI;
 public class ExploratoryCallbackHandler extends ResourceCallbackHandler<ExploratoryStatusDTO> {
     private static final String EXPLORATORY_ID_FIELD = "notebook_name";
     private static final String EXPLORATORY_URL_FIELD = "exploratory_url";
+    private static final String EXPLORATORY_USER_FIELD = "exploratory_user";
+    private static final String EXPLORATORY_PASSWORD_FIELD = "exploratory_pass";
 
-    private String exploratoryName;
+    private final String exploratoryName;
+    private final String uuid;
+    
+    @Override
+    public String getUUID() {
+    	return uuid;
+    }
 
-    @SuppressWarnings("unchecked")
     public ExploratoryCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String exploratoryName) {
         super(selfService, user, originalUuid, action);
+        this.uuid = originalUuid;
         this.exploratoryName = exploratoryName;
     }
 
@@ -46,7 +54,9 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     protected ExploratoryStatusDTO parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO baseStatus) {
         return baseStatus
                 .withExploratoryId(getTextValue(resultNode.get(EXPLORATORY_ID_FIELD)))
-                .withExploratoryUrl(getTextValue(resultNode.get(EXPLORATORY_URL_FIELD)));
+                .withExploratoryUrl(getTextValue(resultNode.get(EXPLORATORY_URL_FIELD)))
+                .withExploratoryUser(getTextValue(resultNode.get(EXPLORATORY_USER_FIELD)))
+                .withExploratoryPassword(getTextValue(resultNode.get(EXPLORATORY_PASSWORD_FIELD)));
     }
 
     protected ExploratoryStatusDTO getBaseStatusDTO(UserInstanceStatus status) {

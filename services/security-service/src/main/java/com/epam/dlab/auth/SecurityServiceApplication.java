@@ -19,7 +19,10 @@ limitations under the License.
 package com.epam.dlab.auth;
 
 import com.epam.dlab.auth.resources.LdapAuthenticationService;
+import com.epam.dlab.utils.ServiceUtils;
+
 import de.thomaskrille.dropwizard_template_config.TemplateConfigBundle;
+import de.thomaskrille.dropwizard_template_config.TemplateConfigBundleConfiguration;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -38,7 +41,7 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 		if(args.length != 0 ) {
 			params = args;
 		} else {
-			params = new String[] { "server", "application.yml" };
+			params = new String[] { "server", "security.yml" };
 		}
 		LOG.debug("Starting Security Service Application with params: {}",String.join(",", params));
 		new SecurityServiceApplication().run(params);
@@ -46,7 +49,10 @@ public class SecurityServiceApplication extends Application<SecurityServiceConfi
 
 	@Override
 	public void initialize(Bootstrap<SecurityServiceConfiguration> bootstrap) {
-		bootstrap.addBundle(new TemplateConfigBundle());
+		//bootstrap.addBundle(new TemplateConfigBundle());
+        bootstrap.addBundle(new TemplateConfigBundle(
+        		new TemplateConfigBundleConfiguration().fileIncludePath(ServiceUtils.getConfPath())
+        ));
 	}
 
 	@Override

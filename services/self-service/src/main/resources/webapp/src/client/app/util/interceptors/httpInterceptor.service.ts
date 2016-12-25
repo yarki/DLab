@@ -16,15 +16,16 @@ limitations under the License.
 
 ****************************************************************************/
 
-import {ConnectionBackend, RequestOptions, Http, Request, RequestOptionsArgs, Response, Headers} from "@angular/http";
-import {Router} from "@angular/router";
-import {Observable} from "rxjs";
+import { ConnectionBackend, RequestOptions, Http, Request, RequestOptionsArgs, Response, Headers } from '@angular/http';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import HTTP_STATUS_CODES from 'http-status-enum';
 
 export class HttpInterceptor extends Http {
-  constructor(backend: ConnectionBackend,
-              defaultOptions: RequestOptions,
-              private router: Router) {
+  constructor(
+    backend: ConnectionBackend,
+    defaultOptions: RequestOptions,
+    private router: Router) {
     super(backend, defaultOptions);
   }
 
@@ -33,7 +34,7 @@ export class HttpInterceptor extends Http {
   }
 
   get(url: string, options?: RequestOptionsArgs): Observable<Response> {
-    return this.intercept(super.get(this.addNoCacheToUrl(url),options));
+    return this.intercept(super.get(this.addNoCacheToUrl(url), options));
   }
 
   post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
@@ -48,11 +49,11 @@ export class HttpInterceptor extends Http {
     return this.intercept(super.delete(this.addNoCacheToUrl(url), options));
   }
 
-  getRequestOptionArgs(options?: RequestOptionsArgs) : RequestOptionsArgs {
-    if (options == null)
+  getRequestOptionArgs(options?: RequestOptionsArgs): RequestOptionsArgs {
+    if (options === null)
       options = new RequestOptions();
 
-    if (options.headers == null)
+    if (options.headers === null)
       options.headers = new Headers();
 
     return options;
@@ -62,13 +63,13 @@ export class HttpInterceptor extends Http {
     return observable.catch((err, source) => {
       let url = err.url;
 
-      if (url.indexOf("?") > -1) {
-        url = url.substr(0, url.indexOf("?"));
+      if (url.indexOf('?') > -1) {
+        url = url.substr(0, url.indexOf('?'));
       }
 
-      if ((err.status  === HTTP_STATUS_CODES.FORBIDDEN
+      if ((err.status === HTTP_STATUS_CODES.FORBIDDEN
         || err.status === HTTP_STATUS_CODES.UNAUTHORIZED)
-        && !url.endsWith("login")) {
+        && !url.endsWith('login')) {
         localStorage.removeItem('access_token');
         this.router.navigate(['/login']);
         return Observable.of(err);
@@ -78,10 +79,10 @@ export class HttpInterceptor extends Http {
     });
   }
 
-  private addNoCacheToUrl(url : string) {
-	let separator = url.indexOf('?') === -1 ? '?' : '&';
-	let returnUrl = url+separator+'noCache=' + new Date().getTime();
+  private addNoCacheToUrl(url: string) {
+    let separator = url.indexOf('?') === -1 ? '?' : '&';
+    let returnUrl = url + separator + 'noCache=' + new Date().getTime();
 
-	return returnUrl;
+    return returnUrl;
   }
 }

@@ -55,7 +55,7 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecutor commandExecuter;
+    private ICommandExecutor commandExecuter;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject
@@ -74,6 +74,8 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
                                 .withName(nameContainer(edgeDto.getEdgeUserName(), "create", "edge"))
                                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                                 .withVolumeForResponse(configuration.getKeyLoaderDirectory())
+                                .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+                                .withResource(getResourceType())
                                 .withRequestId(uuid)
                                 .withCredsKeyName(configuration.getAdminKey())
                                 .withActionCreate(configuration.getEdgeImage())
@@ -97,14 +99,22 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
 
     private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid) {
         return new FileHandlerCallback() {
+        	
+        	private final String uuid = originalUuid;
+        	
+        	@Override
+        	public String getUUID() {
+        		return uuid;
+        	}
+        	
             @Override
             public boolean checkUUID(String uuid) {
-                return originalUuid.equals(uuid);
+                return this.uuid.equals(uuid);
             }
 
             @Override
             public boolean handle(String fileName, byte[] content) throws Exception {
-                LOGGER.debug("get file {} actually waited for {}", fileName, originalUuid);
+                LOGGER.debug("Expected {}; processing response {} with content: {}", uuid, fileName, new String(content));
                 JsonNode document = MAPPER.readTree(content);
                 UploadFileResultDTO result = new UploadFileResultDTO(user);
                 if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
@@ -126,4 +136,8 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
         JsonNode node = document.get(RESPONSE_NODE).get(RESULT_NODE);
         return MAPPER.readValue(node.toString(), UserAWSCredentialDTO.class);
     }
+
+    @Override
+    public String getResourceType() {
+        return Directories.EDGE_LOG_DIRECTORY;}
 }

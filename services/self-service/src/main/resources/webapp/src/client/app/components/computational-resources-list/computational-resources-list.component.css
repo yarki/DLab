@@ -31,31 +31,36 @@ limitations under the License.
   text-overflow: ellipsis;
   margin-left: 20px;
 }
+
 .resource_wrap {
   display: block;
   float: none;
   margin-right: 170px;
 }
+
 .source {
   line-height: 30px;
   position: relative;
 }
-.source > div{
+
+.source > div {
   position: relative;
 }
+
 .source .remove_butt {
-  color: #EF5C4B;
+  color: #ef5c4b;
   font-size: 21px;
   font-weight: 600;
-  vertical-align: middle;
   cursor: pointer;
   text-decoration: none;
   float: left;
 }
+
 .source .remove_butt.disabled {
   color: #f5d3d3;
   pointer-events: none;
 }
+
 .arrow_icon {
   position: absolute;
   right: 0;
@@ -63,6 +68,7 @@ limitations under the License.
   color: #748ba3;
   cursor: pointer;
 }
+
 .emt_status {
   margin-right: 30px;
   width: 100px;

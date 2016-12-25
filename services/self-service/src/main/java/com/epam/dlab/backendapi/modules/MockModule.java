@@ -20,7 +20,6 @@ package com.epam.dlab.backendapi.modules;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
-import com.epam.dlab.dto.imagemetadata.*;
 import com.epam.dlab.mongo.MongoService;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.DockerAPI;
@@ -33,11 +32,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
+import com.epam.dlab.constants.ServiceConsts;
+import com.epam.dlab.dto.imagemetadata.ApplicationDto;
+import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ComputationalResourceShapeDto;
+import com.epam.dlab.dto.imagemetadata.ExploratoryEnvironmentVersion;
+import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
+import com.epam.dlab.dto.imagemetadata.ImageType;
+import com.epam.dlab.dto.imagemetadata.TemplateDTO;
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.rest.contracts.ExploratoryAPI.EXPLORATORY_CREATE;
 import static com.epam.dlab.rest.contracts.KeyLoaderAPI.KEY_LOADER;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -54,8 +60,10 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
         bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
                 .toInstance(createAuthenticationService());
-        bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
+        bind(RESTService.class).annotatedWith(Names.named(ServiceConsts.PROVISIONING_SERVICE_NAME))
                 .toInstance(createProvisioningService());
+        /*bind(RESTService.class).annotatedWith(Names.named(PROVISIONING_SERVICE))
+                .toInstance(configuration.getProvisioningFactory().build(environment, PROVISIONING_SERVICE));*/
     }
 
     private RESTService createAuthenticationService() {
@@ -115,6 +123,8 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
 
     private ExploratoryMetadataDTO prepareJupiterImage() {
         ExploratoryMetadataDTO imageMetadataDTO = new ExploratoryMetadataDTO();
+        imageMetadataDTO.setImage("docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter");
+
         List<ComputationalResourceShapeDto> crsList = new ArrayList<>();
         crsList.add(new ComputationalResourceShapeDto(
                 "cg1.4xlarge", "22.5 GB", 16));

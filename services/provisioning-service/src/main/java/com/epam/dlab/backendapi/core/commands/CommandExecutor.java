@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.commands;
 
-import com.google.inject.Singleton;
+import com.epam.dlab.backendapi.core.ICommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +29,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-@Singleton
-public class CommandExecutor {
+public class CommandExecutor implements ICommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
 
+    @Override
     public List<String> executeSync(String command) throws IOException, InterruptedException {
         return execute(command);
     }
 
+    @Override
     public void executeAsync(final String command) {
         CompletableFuture.runAsync(() -> execute(command));
     }

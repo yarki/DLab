@@ -22,6 +22,7 @@ import boto3
 from fabric.api import *
 import argparse
 import os
+import time
 from fabric.api import lcd
 from fabvenv import virtualenv
 
@@ -39,6 +40,7 @@ args = parser.parse_args()
 
 emr_dir = '/opt/' + args.emr_version + '/jars/'
 kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
+spark_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
 yarn_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/conf/'
 # if args.emr_version == 'emr-4.3.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-4.8.0':
 #     hadoop_version = '2.6'
@@ -101,6 +103,7 @@ def r_kernel(args):
         f.write(text)
 
     #local('export HADOOP_CONF_DIR="/opt/{0}/{1}/conf/"; export YARN_CONF_DIR="/opt/{0}/{1}/conf/"; export SPARKR_SUBMIT_ARGS="--master yarn-client sparkr-shell"; export SPARK_HOME="/opt/{0}/{1}/spark/";'.format(args.emr_version, args.cluster_name) + ' export R_LIBS_SITE="${R_LIBS_SITE}:${SPARK_HOME}/R/lib"; R -e "install.packages(\'devtools\',repos=\'http://cran.us.r-project.org\')"; R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"; R CMD javareconf; R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
+    #local('R -e "IRkernel::installspec()"')
 
 
 def pyspark_kernel(args):
@@ -115,6 +118,7 @@ def pyspark_kernel(args):
     text = text.replace('SPARK_PATH', spark_path)
     text = text.replace('PY_VER', '2.7')
     text = text.replace('PY_FULL', '2.7')
+    text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
     text = text.replace('EMR', args.emr_version)
     with open(kernel_path, 'w') as f:
         f.write(text)
@@ -139,6 +143,7 @@ def pyspark_kernel(args):
         text = text.replace('SPARK_PATH', spark_path)
         text = text.replace('PY_VER', python_version[0:3])
         text = text.replace('PY_FULL', python_version[0:5])
+        text = text.replace('PYTHON_PATH', '/opt/python/python' + python_version[:5] + '/bin/python' + python_version[:3])
         text = text.replace('EMR', args.emr_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
@@ -229,6 +234,20 @@ def configuring_notebook(args):
     local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
 
 
+def configure_rstudio(args):
+    local("""echo "export R_LIBS_USER='""" + spark_dir + """/R/lib'" >> /home/ubuntu/.bashrc""")
+    local('cat /dev/null > /home/ubuntu/.Renviron')
+    local('''echo 'SPARK_HOME="''' + spark_dir + '''"' >> /home/ubuntu/.Renviron''')
+    local('''echo 'YARN_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
+    local('''echo 'HADOOP_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
+    try:
+        local("sudo rstudio-server stop")
+    except:
+        print "Rstudio already stopped"
+    time.sleep(10)
+    local("sudo rstudio-server start")
+
+
 def installing_python(args):
     s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
@@ -253,7 +272,7 @@ def installing_python(args):
         pip_command = '/opt/python/python' + python_version + '/bin/pip'+ python_version[:3]
         local(venv_command + ' && sudo -i ' + pip_command + ' install -U pip --no-cache-dir')
         local(venv_command + ' && sudo -i ' + pip_command + ' install ipython ipykernel --no-cache-dir')
-        local(venv_command + ' && sudo -i ' + pip_command + ' install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
+        local(venv_command + ' && sudo -i ' + pip_command + ' install boto boto3 NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
 
 
 if __name__ == "__main__":
@@ -270,3 +289,5 @@ if __name__ == "__main__":
         spark_defaults(args)
         r_kernel(args)
         configuring_notebook(args)
+        if os.path.exists('/home/ubuntu/.ensure_dir/rstudio_ensured'):
+            configure_rstudio(args)
