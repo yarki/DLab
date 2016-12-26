@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class ExploratoryMetadataDTO extends ImageMetadataDTO {
     @JsonProperty("exploratory_environment_versions")
@@ -108,12 +109,8 @@ public class ExploratoryMetadataDTO extends ImageMetadataDTO {
 
     @Override
     public int hashCode() {
-        int result = exploratoryEnvironmentVersions != null
-                ? exploratoryEnvironmentVersions.hashCode() : 0;
-        result = 31 * result + (exploratoryEnvironmentShapes != null
-                ? exploratoryEnvironmentShapes.hashCode() : 0);
-        result = 31 * result + (image != null ? image.hashCode() : 0);
-        result = 31 * result + (requestId != null ? requestId.hashCode() : 0);
-        return result;
+        return Objects.hash(exploratoryEnvironmentVersions,
+                exploratoryEnvironmentShapes,
+                image, requestId);
     }
 }

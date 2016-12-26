@@ -141,15 +141,12 @@ public class ComputationalMetadataDTO extends ImageMetadataDTO{
 
     @Override
     public int hashCode() {
-        int result = templateName != null ? templateName.hashCode() : 0;
-        result = 31 * result + (description != null ? description.hashCode()
-                : 0);
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (templates != null ? templates.hashCode() : 0);
-        result = 31 * result + (requestId != null ? requestId.hashCode() : 0);
-        result = 31 * result + (computationResourceShapes != null
-                ? computationResourceShapes.hashCode() : 0);
-        result = 31 * result + (image != null ? image.hashCode() : 0);
-        return result;
+        return Objects.hash(templateName,
+                description,
+                type,
+                templates,
+                requestId,
+                computationResourceShapes,
+                image);
     }
 }
