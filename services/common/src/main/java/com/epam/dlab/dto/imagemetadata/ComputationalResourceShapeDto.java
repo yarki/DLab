@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.dto.imagemetadata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import java.util.Objects;
 
