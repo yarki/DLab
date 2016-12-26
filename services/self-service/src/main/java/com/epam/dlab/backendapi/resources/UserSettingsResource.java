@@ -20,6 +20,7 @@ package com.epam.dlab.backendapi.resources;
 
 import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SELF_SERVICE;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -43,6 +44,7 @@ import io.dropwizard.auth.Auth;
 
 
 @Path("/user/settings")
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class UserSettingsResource implements SelfServiceAPI {
 	private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
@@ -55,12 +57,10 @@ public class UserSettingsResource implements SelfServiceAPI {
     private RESTService selfService;
     
     @GET
-    public Response getSettings(@Auth UserInfo userInfo) {
-        return Response.ok(
-        		selfService.post(USER_SETTINGS,
-        				userSettingsDAO.getUISettings(userInfo),
-        				String.class))
-        			.build();
+    public String getSettings(@Auth UserInfo userInfo) {
+    	String settings = userSettingsDAO.getUISettings(userInfo);
+    	LOGGER.debug("Returns settings for user {}, content is {}", userInfo.getName(), settings);
+        return settings;
     }
     
     @POST
