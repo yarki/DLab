@@ -20,6 +20,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static com.epam.dlab.backendapi.core.Constants.JSON_EXTENSION;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +42,6 @@ import com.epam.dlab.backendapi.core.response.folderlistener.WatchItem.ItemStatu
 import com.epam.dlab.exceptions.DlabException;
 
 /** Listen the directories for the files creation and runs the file processing by {@link AsyncFileHandler}.
- * @author Usein_Faradzhev
  */
 public class FolderListener implements Runnable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FolderListener.class);
@@ -299,7 +299,7 @@ public class FolderListener implements Runnable {
 			}
 		}
 		
-		if (expiredIdleMillis != 0 && itemList.size() == 0) {
+		if (expiredIdleMillis == 0 && itemList.size() == 0) {
 			expiredIdleMillis = System.currentTimeMillis() + LISTENER_IDLE_TIMEOUT_MILLLIS;
 		}
 	}
@@ -343,12 +343,14 @@ public class FolderListener implements Runnable {
 							LOGGER.trace("Folder listener \"{}\" checks the file {}", getDirectoryName(), fileName);
 
 							try {
-								WatchItem item = itemList.getItem(fileName);
-								if (item != null && item.getFileName() == null) {
-									LOGGER.debug("Folder listener \"{}\" handles the file {}", getDirectoryName(), fileName);
-									item.setFileName(fileName);
-									if (itemList.processItem(item)) {
-										LOGGER.debug("Folder listener \"{}\" processes the file {}", getDirectoryName(), fileName);
+								if (fileName.endsWith(JSON_EXTENSION)) {
+									WatchItem item = itemList.getItem(fileName);
+									if (item != null && item.getFileName() == null) {
+										LOGGER.debug("Folder listener \"{}\" handles the file {}", getDirectoryName(), fileName);
+										item.setFileName(fileName);
+										if (itemList.processItem(item)) {
+											LOGGER.debug("Folder listener \"{}\" processes the file {}", getDirectoryName(), fileName);
+										}
 									}
 								}
 							} catch (Exception e) {

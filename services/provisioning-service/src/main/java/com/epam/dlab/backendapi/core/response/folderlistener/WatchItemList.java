@@ -34,10 +34,7 @@ import com.epam.dlab.backendapi.core.response.folderlistener.WatchItem.ItemStatu
 
 import io.dropwizard.util.Duration;
 
-import static com.epam.dlab.backendapi.core.Constants.JSON_EXTENSION;
-
 /** List of the file handlers for processing.
- * @author Usein_Faradzhev
  */
 public class WatchItemList {
 	private static final Logger LOGGER = LoggerFactory.getLogger(WatchItemList.class);
@@ -101,20 +98,22 @@ public class WatchItemList {
 	 */
 	public WatchItem append(FileHandlerCallback fileHandlerCallback, long timeoutMillis, long fileLengthCheckDelay) {
 	    WatchItem item = new WatchItem(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
-		int index = Collections.binarySearch(list, item);
-		if (index < 0) {
-			index = -index;
-			if (index > list.size()) {
-				list.add(item);
+	    synchronized (this) {
+			int index = Collections.binarySearch(list, item);
+			if (index < 0) {
+				index = -index;
+				if (index > list.size()) {
+					list.add(item);
+				} else {
+					list.add(index - 1, item);
+				}
 			} else {
-				list.add(index - 1, item);
+				String oldUUID = get(index).getFileHandlerCallback().getUUID();
+				LOGGER.debug("Handler for UUID {} for folder {} will be replaced. Status: {}, Result: {}",
+						oldUUID, directoryFullName, get(index).getStatus(), get(index).getFutureResult());
+				list.set(index, item);
 			}
-		} else {
-			String oldUUID = get(index).getFileHandlerCallback().getUUID();
-			LOGGER.debug("Handler for UUID {} for folder {} will be replaced. Status: {}, Result: {}",
-					oldUUID, directoryFullName, get(index).getStatus(), get(index).getFutureResult());
-			list.set(index, item);
-		}
+	    }
 		return item;
 	}
 
@@ -128,15 +127,9 @@ public class WatchItemList {
 	 * @return Instance of file handler.
 	 */
 	public WatchItem append(FileHandlerCallback fileHandlerCallback, long timeoutMillis, long fileLengthCheckDelay, String fileName) {
-		WatchItem item = null;
+		WatchItem item = append(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
 		if (fileName != null) {
-			if(fileName.endsWith(JSON_EXTENSION) &&
-					fileHandlerCallback.checkUUID(DockerCommands.extractUUID(fileName))) {
-				item = append(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
-				item.setFileName(fileName);
-			}
-		} else {
-			item = append(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
+			item.setFileName(fileName);
 		}
 		return item;
 	}
