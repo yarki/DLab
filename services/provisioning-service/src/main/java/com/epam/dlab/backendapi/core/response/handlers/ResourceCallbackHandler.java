@@ -108,8 +108,6 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         }
     }
 
-    ;
-
     private boolean isSuccess(JsonNode document) {
         return OK_STATUS.equals(document.get(STATUS_FIELD).textValue());
     }

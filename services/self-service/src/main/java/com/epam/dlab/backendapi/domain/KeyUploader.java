@@ -35,7 +35,7 @@ import com.google.inject.name.Named;
 
 import javax.ws.rs.core.Response;
 
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
+import static com.epam.dlab.constants.ServiceConsts.PROVISIONING_SERVICE_NAME;
 
 public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
     @Inject
@@ -44,7 +44,7 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
     private SettingsDAO settingsDAO;
 
     @Inject
-    @Named(PROVISIONING_SERVICE)
+    @Named(PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
 
     @Override
