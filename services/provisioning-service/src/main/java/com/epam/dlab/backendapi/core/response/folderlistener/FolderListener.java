@@ -299,7 +299,7 @@ public class FolderListener implements Runnable {
 			}
 		}
 		
-		if (expiredIdleMillis != 0 && itemList.size() == 0) {
+		if (expiredIdleMillis == 0 && itemList.size() == 0) {
 			expiredIdleMillis = System.currentTimeMillis() + LISTENER_IDLE_TIMEOUT_MILLLIS;
 		}
 	}
