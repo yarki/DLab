@@ -24,13 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ExploratoryMetadataDTO extends ImageMetadataDTO {
-    @JsonProperty(value = "exploratory_environment_versions")
+    @JsonProperty("exploratory_environment_versions")
     private List<ExploratoryEnvironmentVersion> exploratoryEnvironmentVersions;
-    @JsonProperty(value = "exploratory_environment_shapes")
+    @JsonProperty("exploratory_environment_shapes")
     private HashMap<String, List<ComputationalResourceShapeDto>> exploratoryEnvironmentShapes;
     @JsonProperty
     protected String image;
-    @JsonProperty(value = "request_id")
+    @JsonProperty("request_id")
     private String requestId;
 
     public ExploratoryMetadataDTO(String imageName) {
@@ -87,8 +87,6 @@ public class ExploratoryMetadataDTO extends ImageMetadataDTO {
         }
 
         ExploratoryMetadataDTO that = (ExploratoryMetadataDTO) o;
-
-
 
         if (exploratoryEnvironmentVersions != null
                 ? !exploratoryEnvironmentVersions

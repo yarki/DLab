@@ -12,6 +12,9 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 #
+
+<#include "ssn.yml">
+
 inactiveUserTimeoutMillSec: 7200000
 ldapConnectionConfig:
 #  ldapHost: localhost
@@ -117,13 +120,6 @@ server:
 userInfoPersistenceEnabled: true
 awsUserIdentificationEnabled: true
 
-mongo:
-  host: localhost
-  port: 27017
-  username: admin
-  password: XS3ms9R3tP
-  database: dlabdb
-
 logging:
   level: INFO
   loggers:
@@ -131,7 +127,9 @@ logging:
     com.epam: DEBUG
     com.aegisql: DEBUG
   appenders:
-    - type: console
+#    - type: console
     - type: file
-      currentLogFilename: /tmp/dlab/log/security.log
-      archivedLogFilenamePattern: /tmp/dlab/log/security-%d.log
+      currentLogFilename: ${LOG_ROOT_DIR}/ssn/security.log
+      archive: true
+      archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/security-%d{yyyy-MM-dd}.log.gz
+      archivedFileCount: 10

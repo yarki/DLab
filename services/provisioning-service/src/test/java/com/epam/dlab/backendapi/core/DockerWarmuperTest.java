@@ -69,18 +69,28 @@ public class DockerWarmuperTest {
     @Test
     public void warmupSuccess() throws Exception {
         warmuper.start();
-        warmuper.getFileHandlerCallback()
-                .handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
-        warmuper.getFileHandlerCallback()
+        warmuper.getFileHandlerCallback(getFirstUUID())
+        		.handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
+        warmuper.getFileHandlerCallback(getFirstUUID())
                 .handle(getFileName(), COMPUTATIONAL_TEST_JSON.getBytes());
-        assertEquals(exploratoryMetadata, warmuper.getMetadatas(ImageType.EXPLORATORY)
-                .toArray(new ImageMetadataDTO[1])[0]);
-        assertEquals(computationalMetadata, warmuper.getMetadatas(ImageType.COMPUTATIONAL)
-                .toArray(new ImageMetadataDTO[1])[0]);
+
+        ImageMetadataDTO testExploratory = warmuper.getMetadata(ImageType.EXPLORATORY)
+                .toArray(new ImageMetadataDTO[1])[0];
+        testExploratory.setImage("executeResult");
+        assertEquals(exploratoryMetadata, testExploratory);
+
+        ImageMetadataDTO testComputational = warmuper.getMetadata(ImageType.COMPUTATIONAL)
+                .toArray(new ImageMetadataDTO[1])[0];
+        testComputational.setImage("executeResult");
+        assertEquals(computationalMetadata, testComputational);
     }
 
+    private String getFirstUUID() {
+    	return warmuper.getUuids().keySet().toArray(new String[1])[0];
+    }
+    
     private String getFileName() {
-        return warmuper.getUuids().keySet().toArray(new String[1])[0] + ".json";
+        return getFirstUUID() + ".json";
     }
 
     private Injector createInjector() {

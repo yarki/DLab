@@ -23,15 +23,10 @@ import sys
 import os
 import json
 from fabric.api import *
+from fabric.contrib.files import exists
 import logging
 from dlab.aws_meta import *
 import traceback
-
-local_log_filename = "%s.log" % os.environ['request_id']
-local_log_filepath = "/response/" + local_log_filename
-logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                    level=logging.DEBUG,
-                    filename=local_log_filepath)
 
 
 def put_to_bucket(bucket_name, local_file, destination_file):
@@ -574,6 +569,9 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                 env.host_string = env.user + "@" + env.hosts
                 sudo('rm -rf  /opt/' + emr_version + '/' + emr_name + '/')
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
+                if exists('/home/ubuntu/.ensure_dir/rstudio_emr_ensured'):
+                    sudo("sed -i '/" + emr_name + "/d' /home/ubuntu/.Renviron")
+                    sudo("sed -i 's|/opt/" + emr_version + '/' + emr_name + "/spark//R/lib:||g' /home/ubuntu/.bashrc")
                 print "Notebook's " + env.hosts + " kernels were removed"
         else:
             print "There are no notebooks to clean kernels."

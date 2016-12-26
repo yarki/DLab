@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ComputationalMetadataDTO extends ImageMetadataDTO{
-    @JsonProperty(value = "template_name")
+    @JsonProperty("template_name")
     private String templateName;
     @JsonProperty
     private String description;
@@ -33,7 +33,7 @@ public class ComputationalMetadataDTO extends ImageMetadataDTO{
     private String type;
     @JsonProperty
     private List<TemplateDTO> templates;
-    @JsonProperty(value = "request_id")
+    @JsonProperty("request_id")
     private String requestId;
     @JsonProperty(value = "computation_resources_shapes")
     private HashMap<String, List<ComputationalResourceShapeDto>> computationResourceShapes;

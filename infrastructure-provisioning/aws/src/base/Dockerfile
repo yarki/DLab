@@ -36,6 +36,10 @@ RUN mkdir -p /root/.ssh; echo "Host *" > /root/.ssh/config; \
     echo "ConnectTimeout=30" >> /root/.ssh/config
 
 RUN mkdir -p /response; chmod a+rwx /response
+RUN mkdir -p /logs/ssn; chmod a+rwx /logs/ssn
+RUN mkdir -p /logs/edge; chmod a+rwx /logs/edge
+RUN mkdir -p /logs/notebook; chmod a+rwx /logs/notebook
+RUN mkdir -p /logs/emr; chmod a+rwx /logs/emr
 
 # Configuring entrypoint script
 ENV PROVISION_CONFIG_DIR /root/conf/

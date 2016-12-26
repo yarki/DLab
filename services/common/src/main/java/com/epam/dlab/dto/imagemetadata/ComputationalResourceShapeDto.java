@@ -23,13 +23,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 public class ComputationalResourceShapeDto {
-    @JsonProperty(value = "Type")
+    @JsonProperty("Type")
     private String type;
-    @JsonProperty(value = "Size")
+    @JsonProperty("Size")
     private String size;
-    @JsonProperty(value = "Ram")
+    @JsonProperty("Ram")
     private String ram;
-    @JsonProperty(value = "Cpu")
+    @JsonProperty("Cpu")
     private int cpu;
 
     public ComputationalResourceShapeDto(){
@@ -93,5 +93,10 @@ public class ComputationalResourceShapeDto {
         result = 31 * result + (ram != null ? ram.hashCode() : 0);
         result = 31 * result + cpu;
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
     }
 }
