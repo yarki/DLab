@@ -419,8 +419,14 @@ def remove_all_iam_resources(instance_type, scientist=''):
 
 
 def s3_cleanup(bucket, cluster_name, user_name):
+    s3_res = boto3.resource('s3')
+    client = boto3.client('s3')
     try:
-        s3_res = boto3.resource('s3')
+        client.head_bucket(Bucket=bucket)
+    except:
+        print "There is no bucket " + bucket + " or you do not permission to access it"
+        sys.exit(0)
+    try:
         resource = s3_res.Bucket(bucket)
         prefix = user_name + '/' + cluster_name + "/"
         for i in resource.objects.filter(Prefix=prefix):
