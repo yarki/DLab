@@ -248,7 +248,7 @@ def configure_rstudio():
             sys.exit(1)
     else:
         try:
-            local("sed -i '/R_LIBS_USER/ { s|:$|&" + spark_dir + "/R/lib:| }' /home/ubuntu/.bashrc")
+            local("sed -i '/R_LIBS_USER/ { s|=\(.*\)|=\\1" + spark_dir + "/R/lib:| }' /home/ubuntu/.bashrc")
             local("sed -i 's/^SPARK_HOME/#SPARK_HOME/' /home/ubuntu/.Renviron")
             local("sed -i 's/^YARN_CONF_DIR/#YARN_CONF_DIR/' /home/ubuntu/.Renviron")
             local("sed -i 's/^HADOOP_CONF_DIR/#HADOOP_CONF_DIR/' /home/ubuntu/.Renviron")
