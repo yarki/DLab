@@ -37,7 +37,7 @@ args = parser.parse_args()
 scala_link = "http://www.scala-lang.org/files/archive/scala-2.11.8.deb"
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
 
-zeppelin_link = "http://mirrors.advancedhosters.com/apache/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-netinst.tgz"
+zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-netinst.tgz"
 zeppelin_version = "0.6.2"
 zeppelin_interpreters = "md,python"
 spark_version = "1.6.2"
@@ -121,7 +121,7 @@ def configure_notebook_server(notebook_name):
             sudo('chown ubuntu:ubuntu -R /var/log/zeppelin')
             sudo('ln -s /var/run/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/run')
             sudo('chown ubuntu:ubuntu -R /var/run/zeppelin')
-            sudo('/opt/zeppelin/bin/install-interpreter.sh --name ' + zeppelin_interpreters + ' --proxy_url $http_proxy')
+            sudo('/opt/zeppelin/bin/install-interpreter.sh --name ' + zeppelin_interpreters + ' --proxy-url $http_proxy')
         except:
             sys.exit(1)
         try:

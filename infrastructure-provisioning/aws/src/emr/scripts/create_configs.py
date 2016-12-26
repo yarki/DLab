@@ -258,6 +258,18 @@ def configure_rstudio():
             local('echo \'HADOOP_CONF_DIR="' + yarn_dir + '"\' >> /home/ubuntu/.Renviron')
         except:
             sys.exit(1)
+def configure_zeppelin_emr_interpreter()
+    if not os.path.exists('/home/ubuntu/.ensure_dir/zeppelin_emr_ensured'):
+        try:
+            local("curl http://localhost:8080")
+            local('touch /home/ubuntu/.ensure_dir/zeppelin_emr_ensured')
+        except:
+            sys.exit(1)
+    else:
+        try:
+            local("curl http://localhost:8080")
+        except:
+            sys.exit(1)
 
 
 def installing_python(args):
@@ -303,3 +315,5 @@ if __name__ == "__main__":
         configuring_notebook(args)
         if os.path.exists('/home/ubuntu/.ensure_dir/rstudio_ensured'):
             configure_rstudio()
+        if os.path.exists('/home/ubuntu/.ensure_dir/zeppelin_ensured'):
+            configure_zeppelin_emr_interpreter()
