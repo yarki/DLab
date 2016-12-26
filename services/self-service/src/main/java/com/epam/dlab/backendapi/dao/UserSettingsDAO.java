@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.dao;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import org.bson.Document;
@@ -30,7 +31,7 @@ import io.dropwizard.auth.Auth;
 /** DAO for the user preferences.
  */
 public class UserSettingsDAO extends BaseDAO {
-    private static final String VALUE = "value";
+    private static final String VALUE = "userSettings";
 
     /** Returns a value or empty string from collection.
      * @param collectionName name of collection.
@@ -62,8 +63,7 @@ public class UserSettingsDAO extends BaseDAO {
     public void setUISettings(@Auth UserInfo userInfo, @NotBlank String settings) {
     	update(USER_UI_SETTINGS,
     			eq(ID, userInfo.getName()),
-    			new Document(VALUE,
-    					Document.parse(settings)));
+    			set(VALUE, settings));
     }
 
 }

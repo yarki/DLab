@@ -57,7 +57,10 @@ public class UserSettingsResource implements SelfServiceAPI {
     @GET
     public Response getSettings(@Auth UserInfo userInfo) {
         return Response.ok(
-        		selfService.post(USER_SETTINGS, userSettingsDAO.getUISettings(userInfo), String.class)).build();
+        		selfService.post(USER_SETTINGS,
+        				userSettingsDAO.getUISettings(userInfo),
+        				String.class))
+        			.build();
     }
     
     @POST
