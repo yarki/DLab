@@ -1,61 +1,75 @@
 package AutomationTest;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 public class PropertyValue {
+	
+    public static final String JENKINS_USERNANE="JENKINS_USERNANE";
+    public static final String JENKINS_PASSWORD="JENKINS_PASSWORD";
+    public static final String USERNANE="USERNANE";
+    public static final String PASSWORD="PASSWORD";
+    public static final String NOT_IAM_USERNAME="NOT_IAM_USERNAME";
+    public static final String NOT_IAM_PASSWORD="NOT_IAM_PASSWORD";
+    public static final String NOT_DLAB_USERNAME="NOT_DLAB_USERNAME";
+    public static final String NOT_DLAB_PASSWORD="NOT_DLAB_PASSWORD";
+    public static final String JENKINS_JOB_URL="JENKINS_JOB_URL";
+    public static final String USER_FOR_ACTIVATE_KEY="USER_FOR_ACTIVATE_KEY";
+    public static final String PASSWORD_FOR_ACTIVATE_KEY="PASSWORD_FOR_ACTIVATE_KEY";
     
-    String result = "";
-    InputStream inputStream;
+    public static final String TEST_BEFORE_SLEEP_SECONDS="TEST_BEFORE_SLEEP_SECONDS";
+    public static final String TEST_AFTER_SLEEP_SECONDS="TEST_AFTER_SLEEP_SECONDS";
 
-    
-    public String getPropValues(String propName) throws IOException {
-       
+    private static Properties props = null;
+	
+	public static String get(String propertyName) {
+		return get(propertyName, "");
+	}
+
+	public static String get(String propertyName, String defaultValue) {
+		if (props == null) {
+			loadProperties();
+		}
+		return props.getProperty(propertyName, defaultValue);
+	}
+	
+	public static int get(String propertyName, int defaultValue) {
+		if (props == null) {
+			loadProperties();
+		}
+		String s = props.getProperty(propertyName, String.valueOf(defaultValue)); 
+		return Integer.parseInt(s);
+	}
+	
+	private static void printProperty(String propertyName) {
+		System.out.println(propertyName + " is " + props.getProperty(propertyName));
+	}
+	
+    public static void loadProperties() {
         try {
-                
                 File f1 = new File("/var/lib/jenkins/AutoTestData/config.properties");
                 FileReader fin = new FileReader(f1);
-                Properties pr = new Properties();
-                pr.load(fin);
-                               
-                result = pr.getProperty(propName);
-                
-                  String JENKINS_USERNANE=pr.getProperty("JENKINS_USERNANE");
-                  String  JENKINS_PASSWORD=pr.getProperty("JENKINS_PASSWORD");
-                  String  USERNANE=pr.getProperty("USERNANE");
-                  String  PASSWORD=pr.getProperty("PASSWORD");
-                  String  NOT_IAM_USERNAME=pr.getProperty("NOT_IAM_USERNAME");
-                  String  NOT_IAM_PASSWORD=pr.getProperty("NOT_IAM_PASSWORD");
-                  String  NOT_DLAB_USERNAME=pr.getProperty("NOT_DLAB_USERNAME");
-                  String  NOT_DLAB_PASSWORD=pr.getProperty("NOT_DLAB_PASSWORD");
-                  String JENKINS_JOB_URL=pr.getProperty("JENKINS_JOB_URL");
-                  String  USER_FOR_ACTIVATE_KEY=pr.getProperty("USER_FOR_ACTIVATE_KEY");
-                  String  PASSWORD_FOR_ACTIVATE_KEY=pr.getProperty("PASSWORD_FOR_ACTIVATE_KEY") ;
-                  
-                  System.out.println("JENKINS_USERNANE is " + JENKINS_USERNANE);
-                  System.out.println("JENKINS_PASSWORD is " + JENKINS_PASSWORD);
-                  System.out.println("USERNANE is " + USERNANE);
-                  System.out.println("PASSWORD is " + PASSWORD);
-                  System.out.println("NOT_IAM_USERNAME is " + NOT_IAM_USERNAME);
-                  System.out.println("NOT_IAM_PASSWORD is " + NOT_IAM_PASSWORD);
-                  System.out.println("NOT_DLAB_USERNAME is " + NOT_DLAB_USERNAME);
-                  System.out.println("NOT_DLAB_PASSWORD is " + NOT_DLAB_PASSWORD);
-                  System.out.println("JENKINS_JOB_URL is " + JENKINS_JOB_URL);
-                  System.out.println("USER_FOR_ACTIVATE_KEY is " + USER_FOR_ACTIVATE_KEY);
-                  System.out.println("PASSWORD_FOR_ACTIVATE_KEY is " + PASSWORD_FOR_ACTIVATE_KEY);
-                 
-                
-                if (result == null) throw new Exception ("Value from property file is equal null");
-                 
-        
+                props = new Properties();
+                props.load(fin);
         } catch (Exception e) {
                 System.out.println("Exception: " + e);
         }
-        return result;
+        
+        printProperty(JENKINS_USERNANE);
+        printProperty(JENKINS_PASSWORD);
+        printProperty(USERNANE);
+        printProperty(PASSWORD);
+        printProperty(NOT_IAM_USERNAME);
+        printProperty(NOT_IAM_PASSWORD);
+        printProperty(NOT_DLAB_USERNAME);
+        printProperty(NOT_DLAB_PASSWORD);
+        printProperty(JENKINS_JOB_URL);
+        printProperty(USER_FOR_ACTIVATE_KEY);
+        printProperty(PASSWORD_FOR_ACTIVATE_KEY);
+        
+        printProperty(TEST_BEFORE_SLEEP_SECONDS);
+        printProperty(TEST_AFTER_SLEEP_SECONDS);
     }
 }
 

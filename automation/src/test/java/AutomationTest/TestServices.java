@@ -65,6 +65,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static com.jayway.restassured.RestAssured.given;
@@ -78,24 +79,38 @@ public class TestServices {
     String serviceBaseName;
     private String jenkinsURL;
     private String publicIp;
-    private static PropertyValue props;
 
     final static Logger logger = Logger.getLogger(TestServices.class.getName());
     
+
+    private static void sleep(String propertyName) throws InterruptedException {
+    	int timeout = PropertyValue.get(PropertyValue.TEST_BEFORE_SLEEP_SECONDS, 0);
+    	if (timeout > 0) {
+    		Thread.sleep(timeout / 1000);
+    	}
+    }
+
     @BeforeClass
-    public static void Setup() {
+    public static void Setup() throws InterruptedException {
         // loading log4j.xml file
         DOMConfigurator.configure("log4j.xml");
-        props = new PropertyValue();     
+        sleep(PropertyValue.TEST_BEFORE_SLEEP_SECONDS);
     }
+    
+    @AfterTest
+    public static void Cleanup() throws InterruptedException {
+        sleep(PropertyValue.TEST_AFTER_SLEEP_SECONDS);
+    }
+    
+    
     
     @Test
     public void testJenkinsJob() throws Exception {
 
         System.out.println("1. Jenkins Job was started");
        
-        JenkinsCall jenkins = new JenkinsCall(props.getPropValues("JENKINS_USERNANE"), props.getPropValues("JENKINS_PASSWORD"));
-        String buildNumber = jenkins.runJenkinsJob(props.getPropValues("JENKINS_JOB_URL"));
+        JenkinsCall jenkins = new JenkinsCall(PropertyValue.get(PropertyValue.JENKINS_USERNANE), PropertyValue.get(PropertyValue.JENKINS_PASSWORD));
+        String buildNumber = jenkins.runJenkinsJob(PropertyValue.get(PropertyValue.JENKINS_JOB_URL));
         jenkinsURL = jenkins.getJenkinsURL().replaceAll(" ", "");
         serviceBaseName = jenkins.getServiceBaseName().replaceAll(" ", "");
         Assert.assertNotNull(jenkinsURL, "Jenkins URL was not generated");
@@ -121,27 +136,27 @@ public class TestServices {
         
         System.out.println("2. Check login");
         System.out.println("3. Check validation");
-        LoginDto notIAMUserRequestBody = new LoginDto(props.getPropValues("NOT_IAM_USERNAME"), props.getPropValues("NOT_IAM_PASSWORD"), "");
+        LoginDto notIAMUserRequestBody = new LoginDto(PropertyValue.get(PropertyValue.NOT_IAM_USERNAME), PropertyValue.get(PropertyValue.NOT_IAM_PASSWORD), "");
         Response responseNotIAMUser = new HttpRequest().webApiPost(Path.LOGIN, ContentType.JSON, notIAMUserRequestBody);
         Assert.assertEquals(responseNotIAMUser.statusCode(), HttpStatusCode.Unauthorized);
         Assert.assertEquals(responseNotIAMUser.getBody().asString(), "Please contact AWS administrator to create corresponding IAM User");
         
-        LoginDto notDLABUserRequestBody = new LoginDto(props.getPropValues("NOT_DLAB_USERNAME"), props.getPropValues("NOT_DLAB_PASSWORD"), "");
+        LoginDto notDLABUserRequestBody = new LoginDto(PropertyValue.get(PropertyValue.NOT_DLAB_USERNAME), PropertyValue.get(PropertyValue.NOT_DLAB_PASSWORD), "");
         Response responseNotDLABUser = new HttpRequest().webApiPost(Path.LOGIN, ContentType.JSON, notDLABUserRequestBody);
         Assert.assertEquals(responseNotDLABUser.statusCode(), HttpStatusCode.Unauthorized);
         Assert.assertEquals(responseNotDLABUser.getBody().asString(), "Username or password are not valid");
         
-        LoginDto forActivateAccessKey = new LoginDto(props.getPropValues("USER_FOR_ACTIVATE_KEY"), props.getPropValues("PASSWORD_FOR_ACTIVATE_KEY"), "");
+        LoginDto forActivateAccessKey = new LoginDto(PropertyValue.get(PropertyValue.USER_FOR_ACTIVATE_KEY), PropertyValue.get(PropertyValue.PASSWORD_FOR_ACTIVATE_KEY), "");
         Response responseForActivateAccessKey = new HttpRequest().webApiPost(Path.LOGIN, ContentType.JSON, forActivateAccessKey);
         Assert.assertEquals(responseForActivateAccessKey.statusCode(), HttpStatusCode.Unauthorized);
         Assert.assertEquals(responseForActivateAccessKey.getBody().asString(), "Please contact AWS administrator to activate your Access Key");
        
-        LoginDto testUserRequestBody = new LoginDto(props.getPropValues("USERNANE"), props.getPropValues("PASSWORD"), "");
+        LoginDto testUserRequestBody = new LoginDto(PropertyValue.get(PropertyValue.USERNANE), PropertyValue.get(PropertyValue.PASSWORD), "");
         Response responseTestUser = new HttpRequest().webApiPost(Path.LOGIN, ContentType.JSON, testUserRequestBody);
         Assert.assertEquals(responseTestUser.statusCode(), HttpStatusCode.OK);
                
         System.out.println("4. Check logout");
-        LoginDto testUserLogin = new LoginDto(props.getPropValues("USERNANE"), props.getPropValues("PASSWORD"), "");
+        LoginDto testUserLogin = new LoginDto(PropertyValue.get(PropertyValue.USERNANE), PropertyValue.get(PropertyValue.PASSWORD), "");
         responseTestUser = new HttpRequest().webApiPost(Path.LOGIN, ContentType.JSON, testUserLogin);
         Response responseLogout = new HttpRequest().webApiPost(Path.LOGOUT, ContentType.ANY);
         Assert.assertEquals(responseLogout.statusCode(), HttpStatusCode.OK);
@@ -153,7 +168,7 @@ public class TestServices {
         String noteBookName = "Notebook" + HelperMethods.generateRandomValue();
         String emrName = "EMR" + HelperMethods.generateRandomValue();
         RestAssured.baseURI = jenkinsURL;
-        LoginDto testUserRequestBody = new LoginDto(props.getPropValues("USERNANE"), props.getPropValues("PASSWORD"), "");
+        LoginDto testUserRequestBody = new LoginDto(PropertyValue.get(PropertyValue.USERNANE), PropertyValue.get(PropertyValue.PASSWORD), "");
         
         System.out.println("5. Upload Key");
         Response responseTestUser = new HttpRequest().webApiPost(Path.LOGIN, ContentType.JSON, testUserRequestBody);

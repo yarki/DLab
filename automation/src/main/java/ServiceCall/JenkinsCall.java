@@ -70,8 +70,7 @@ public class JenkinsCall {
     }
 
     public String getBuildNumber() throws Exception {
-        PropertyValue props = new PropertyValue();    
-        String builName = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(props.getPropValues("JENKINS_USERNANE"), props.getPropValues("JENKINS_PASSWORD"), config).
+        String builName = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.get(PropertyValue.JENKINS_USERNANE), PropertyValue.get(PropertyValue.JENKINS_PASSWORD), config).
             contentType("application/x-www-form-urlencoded").
             when(). 
             get("lastBuild").getBody().htmlPath().getString("html.head.title");
@@ -87,9 +86,8 @@ public class JenkinsCall {
     
     public String getBuildResult() throws Exception {
         //wait until job return build result     
-        PropertyValue props = new PropertyValue();    
         do{            
-            buildResult = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(props.getPropValues("JENKINS_USERNANE"), props.getPropValues("JENKINS_PASSWORD"), config).
+            buildResult = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.get(PropertyValue.JENKINS_USERNANE), PropertyValue.get(PropertyValue.JENKINS_PASSWORD), config).
                 contentType(ContentType.JSON).
                 when(). 
                 get(buildNumber + "/api/json?pretty=true").getBody().jsonPath().getString("result");
@@ -100,10 +98,9 @@ public class JenkinsCall {
     public void setJenkinsURLServiceBaseName() throws Exception {
            
         String jenkinsHoleURL;
-        PropertyValue props = new PropertyValue();    
         if(buildResult.equals("SUCCESS")){
 
-            jenkinsHoleURL = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(props.getPropValues("JENKINS_USERNANE"), props.getPropValues("JENKINS_PASSWORD"), config).
+            jenkinsHoleURL = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.get(PropertyValue.JENKINS_USERNANE), PropertyValue.get(PropertyValue.JENKINS_PASSWORD), config).
             contentType(ContentType.TEXT).
             when(). 
             get(buildNumber + "/logText/progressiveText?start=0").getBody().prettyPrint();
