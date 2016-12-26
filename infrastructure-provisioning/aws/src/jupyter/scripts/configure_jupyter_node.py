@@ -148,6 +148,7 @@ def ensure_r_kernel():
             sudo('R -e "install.packages(\'reshape2\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'caTools\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'ggplot2\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "library(\'devtools\');install.packages(repos=\'http://cran.us.r-project.org\',c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
