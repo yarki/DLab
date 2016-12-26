@@ -68,10 +68,16 @@ public class DockerWarmuperTest {
         		.handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
         warmuper.getFileHandlerCallback(getFirstUUID())
                 .handle(getFileName(), COMPUTATIONAL_TEST_JSON.getBytes());
-        assertEquals(exploratoryMetadata, warmuper.getMetadata(ImageType.EXPLORATORY)
-                .toArray(new ImageMetadataDTO[1])[0]);
-        assertEquals(computationalMetadata, warmuper.getMetadata(ImageType.COMPUTATIONAL)
-                .toArray(new ImageMetadataDTO[1])[0]);
+
+        ImageMetadataDTO testExploratory = warmuper.getMetadata(ImageType.EXPLORATORY)
+                .toArray(new ImageMetadataDTO[1])[0];
+        testExploratory.setImage("executeResult");
+        assertEquals(exploratoryMetadata, testExploratory);
+
+        ImageMetadataDTO testComputational = warmuper.getMetadata(ImageType.COMPUTATIONAL)
+                .toArray(new ImageMetadataDTO[1])[0];
+        testComputational.setImage("executeResult");
+        assertEquals(computationalMetadata, testComputational);
     }
 
     private String getFirstUUID() {
