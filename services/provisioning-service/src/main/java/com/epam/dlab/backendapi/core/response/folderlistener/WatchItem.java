@@ -25,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
 
 /** Class to store the file handler for processing.
- * @author Usein_Faradzhev
  */
 public class WatchItem implements Comparable<WatchItem> {
 	
