@@ -25,6 +25,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.UpdateOptions;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -70,6 +72,15 @@ class BaseDAO implements MongoCollections {
 
     protected void update(String collection, Bson condition, Bson value) {
         mongoService.getCollection(collection).updateOne(condition, value);
+    }
+    
+    protected void update(String collection, Bson condition, Bson value, boolean isUpsert) {
+    	if (isUpsert) {
+    		mongoService.getCollection(collection).updateOne(condition, value,
+    				new UpdateOptions().upsert(isUpsert));
+    	} else {
+    		mongoService.getCollection(collection).updateOne(condition, value);
+    	}
     }
 
     protected FindIterable<Document> find(String collection, Bson condition) {
