@@ -79,8 +79,10 @@ export class ComputationalResourceCreateDialog {
   public onUpdate($event): void {
     if ($event.model.type === 'template') {
       this.model.setSelectedTemplate($event.model.index);
-      this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'master_shape', 'type');
-      this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'slave_shape', 'type');
+      this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
+        this.model.selectedItem.shapes.Memory_optimized[0].description, 'master_shape', 'description', 'json');
+      this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
+        this.model.selectedItem.shapes.Memory_optimized[0].description, 'slave_shape', 'description', 'json');
     }
 
     if (this.shapes[$event.model.type])
@@ -154,12 +156,15 @@ export class ComputationalResourceCreateDialog {
 
   private setDefaultParams(): void {
     this.shapes = {
-      master_shape: this.model.selectedItem.shapes[0].type,
-      slave_shape: this.model.selectedItem.shapes[0].type
+      master_shape: this.model.selectedItem.shapes.Memory_optimized[0].type,
+      slave_shape: this.model.selectedItem.shapes.Memory_optimized[0].type
     };
-    this.templates_list.setDefaultOptions(this.model.selectedItem.version, 'template', 'version');
-    this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'master_shape', 'type');
-    this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'slave_shape', 'type');
+    this.templates_list.setDefaultOptions(this.model.computationalResourceApplicationTemplates,
+      this.model.selectedItem.version, 'template', 'version', 'array');
+    this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
+      this.model.selectedItem.shapes.Memory_optimized[0].description, 'master_shape', 'description', 'json');
+    this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
+      this.model.selectedItem.shapes.Memory_optimized[0].description, 'slave_shape', 'description', 'json');
   }
 
   private resetDialog(): void {
