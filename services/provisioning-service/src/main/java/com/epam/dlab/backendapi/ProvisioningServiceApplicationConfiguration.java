@@ -22,14 +22,13 @@ import com.epam.dlab.ServiceConfiguration;
 import com.epam.dlab.backendapi.core.Directories;
 import com.epam.dlab.rest.client.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import static com.epam.dlab.constants.ServiceConsts.SELF_SERVICE_NAME;
+import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 
 public class ProvisioningServiceApplicationConfiguration extends ServiceConfiguration implements Directories {
 
@@ -136,4 +135,32 @@ public class ProvisioningServiceApplicationConfiguration extends ServiceConfigur
     public String getDockerLogDirectory() { return dockerLogDirectory; }
 
     public boolean isMocked() { return mocked; }
+
+    @JsonProperty
+    private int processMaxThreadsPerJvm = 50;
+    @JsonProperty
+    private int processMaxThreadsPerUser = 5;
+    @JsonProperty
+    private Duration processTimeout = Duration.hours(3);
+
+    public int getProcessMaxThreadsPerJvm() {
+        return processMaxThreadsPerJvm;
+    }
+
+    public int getProcessMaxThreadsPerUser() {
+        return processMaxThreadsPerUser;
+    }
+
+    public Duration getProcessTimeout() {
+        return processTimeout;
+    }
+
+    @Valid
+    @NotNull
+    @JsonProperty(SECURITY_SERVICE)
+    private RESTServiceFactory securityFactory;
+
+    public RESTServiceFactory getSecurityFactory() {
+        return securityFactory;
+    }
 }

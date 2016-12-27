@@ -18,9 +18,11 @@ limitations under the License.
 
 package com.epam.dlab.backendapi;
 
+import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.core.*;
 import com.epam.dlab.backendapi.core.commands.CommandExecutor;
 import com.epam.dlab.backendapi.resources.*;
+import com.epam.dlab.process.DlabProcess;
 import com.epam.dlab.utils.ServiceUtils;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.mappers.JsonProcessingExceptionMapper;
@@ -29,12 +31,14 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+import com.google.inject.name.Names;
 import de.thomaskrille.dropwizard_template_config.TemplateConfigBundle;
 import de.thomaskrille.dropwizard_template_config.TemplateConfigBundleConfiguration;
 import io.dropwizard.Application;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 
 import static com.epam.dlab.constants.ServiceConsts.SELF_SERVICE_NAME;
 
@@ -52,7 +56,11 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
 
     @Override
     public void run(ProvisioningServiceApplicationConfiguration configuration, Environment environment) throws Exception {
+        DlabProcess.getInstance().setProcessTimeout(configuration.getProcessTimeout());
+        DlabProcess.getInstance().setMaxProcessesPerBox(configuration.getProcessMaxThreadsPerJvm());
+        DlabProcess.getInstance().setMaxProcessesPerUser(configuration.getProcessMaxThreadsPerUser());
         Injector injector = createInjector(configuration, environment);
+        injector.getInstance(SecurityFactory.class).configure(injector, environment);
         environment.lifecycle().manage(injector.getInstance(DirectoriesCreator.class));
         environment.lifecycle().manage(injector.getInstance(DockerWarmuper.class));
         JerseyEnvironment jersey = environment.jersey();
@@ -73,6 +81,8 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(configuration);
                 bind(MetadataHolder.class).to(DockerWarmuper.class);
                 bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, SELF_SERVICE_NAME));
+                bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
+                        .toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE));
                 bind(ICommandExecutor.class)
                         .to(configuration.isMocked() ? CommandExecutorMock.class : CommandExecutor.class)
                         .asEagerSingleton();

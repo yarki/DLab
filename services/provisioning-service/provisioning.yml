@@ -16,18 +16,35 @@ emrImage: docker.epmc-bdcc.projects.epam.com/dlab-aws-emr
 emrEC2RoleDefault: EMR_EC2_DefaultRole
 emrServiceRoleDefault: EMR_DefaultRole
 
+processMaxThreadsPerJvm: 50
+processMaxThreadsPerUser: 5
+processTimeout: 180m
+
 server:
-  applicationConnectors:
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: /tmp/dlab/log/request-provisioning.log
+        archivedLogFilenamePattern: /tmp/dlab/log/request-provisioning-%d.log  applicationConnectors:
     - type: http
       port: 8084
   adminConnectors:
     - type: http
       port: 8085
 
+securityService:
+  protocol: http
+  host: localhost
+  port: 8090
+  jerseyClient:
+    timeout: 10s
+    connectionTimeout: 10s
+
 logging:
   level: INFO
   loggers:
     com.epam: DEBUG
+    com.aegisql: DEBUG
   appenders:
 #    - type: console
     - type: file
