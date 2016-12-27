@@ -55,6 +55,7 @@ public class JenkinsCall {
         //wait until build is not in queue
         String buildinQueue;
         do{            
+            Thread.sleep(1000);
             buildinQueue = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth()
                 .form(jenkinsUserName, jenkinsPassword, config).
                 contentType(ContentType.XML).

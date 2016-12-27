@@ -6,6 +6,9 @@ import java.util.Properties;
 
 public class PropertyValue {
 	
+	public static final String CONFIG_FILE_NAME="/var/lib/jenkins/AutoTestData/config.properties";
+//	public static final String CONFIG_FILE_NAME="config.properties";
+	
     public static final String JENKINS_USERNANE="JENKINS_USERNANE";
     public static final String JENKINS_PASSWORD="JENKINS_PASSWORD";
     public static final String USERNANE="USERNANE";
@@ -48,12 +51,12 @@ public class PropertyValue {
 	
     public static void loadProperties() {
         try {
-                File f1 = new File("/var/lib/jenkins/AutoTestData/config.properties");
+                File f1 = new File(CONFIG_FILE_NAME);
                 FileReader fin = new FileReader(f1);
                 props = new Properties();
                 props.load(fin);
         } catch (Exception e) {
-                System.out.println("Exception: " + e);
+                e.printStackTrace();
         }
         
         printProperty(JENKINS_USERNANE);
