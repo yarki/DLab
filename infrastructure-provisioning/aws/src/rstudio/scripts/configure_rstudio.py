@@ -78,7 +78,7 @@ def install_rstudio():
             sudo('apt-get install -y default-jdk')
             sudo('apt-get install -y r-base')
             sudo('apt-get install -y gdebi-core')
-            sudo('apt-get install -y r-cran-rjava r-cran-evaluate r-cran-formatr r-cran-yaml r-cran-rcpp r-cran-catools r-cran-jsonlite')
+            sudo('apt-get install -y r-cran-rjava r-cran-evaluate r-cran-formatr r-cran-yaml r-cran-rcpp r-cran-catools r-cran-jsonlite r-cran-ggplot2')
             sudo('R CMD javareconf')
             sudo('R -e \'install.packages("rmarkdown", repos = "https://cran.revolutionanalytics.com")\'')
             sudo('R -e \'install.packages("base64enc", repos = "https://cran.revolutionanalytics.com")\'')
