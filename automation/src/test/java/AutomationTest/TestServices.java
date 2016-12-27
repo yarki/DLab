@@ -138,6 +138,7 @@ public class TestServices {
         
         System.out.println("2. Check login");
         System.out.println("3. Check validation");
+        Thread.sleep(timeout * 1000);
         LoginDto notIAMUserRequestBody = new LoginDto(PropertyValue.get(PropertyValue.NOT_IAM_USERNAME), PropertyValue.get(PropertyValue.NOT_IAM_PASSWORD), "");
         Response responseNotIAMUser = new HttpRequest().webApiPost(Path.LOGIN, ContentType.JSON, notIAMUserRequestBody);
         Assert.assertEquals(responseNotIAMUser.statusCode(), HttpStatusCode.Unauthorized);
