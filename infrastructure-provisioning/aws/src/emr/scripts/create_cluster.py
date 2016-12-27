@@ -81,7 +81,7 @@ out.close()
 
 
 def get_object_count(bucket, prefix):
-    s3_cli = boto3.client('s3')
+    s3_cli = boto3.client('s3', config=Config(signature_version='s3v4'))
     content = s3_cli.get_paginator('list_objects')
     file_list = []
     try:
@@ -107,7 +107,7 @@ def upload_user_key(args):
 
 
 def remove_user_key(args):
-    client = boto3.client('s3')
+    client = boto3.client('s3', config=Config(signature_version='s3v4'))
     client.delete_object(Bucket=args.s3_bucket, Key=os.environ['edge_user_name'] + '.pub')
 
 
