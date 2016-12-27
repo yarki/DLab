@@ -258,12 +258,14 @@ def configure_rstudio():
             local('echo \'HADOOP_CONF_DIR="' + yarn_dir + '"\' >> /home/ubuntu/.Renviron')
         except:
             sys.exit(1)
+
 def configure_zeppelin_emr_interpreter(args):
     try:
         local('echo \"Configuring emr path for Zeppelin\"')
-        sudo('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt' + args.emr_version + '\/' +  args.cluster_name + '\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
-        sudo('sed -i \"s/^export HADOOP_CONF_DIR.*/export HADOOP_CONF_DIR=\/opt' + args.emr_version + '\/' +  args.cluster_name + '\/conf/\" /opt/zeppelin/conf/zeppelin-env.sh')
-        sudo('service zeppelin-notebook restart')
+        local('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/' + args.emr_version + '\/' +  args.cluster_name + '\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
+        local('sed -i \"s/^export HADOOP_CONF_DIR.*/export HADOOP_CONF_DIR=\/opt\/' + args.emr_version + '\/' +  args.cluster_name + '\/conf/\" /opt/' + args.emr_version + '/' +  args.cluster_name + '/spark/conf/spark-env.sh')
+        local('service zeppelin-notebook restart')
+        local('sleep 5')
     except:
             sys.exit(1)
     if not os.path.exists('/home/ubuntu/.ensure_dir/emr_interpreter_ensured'):
