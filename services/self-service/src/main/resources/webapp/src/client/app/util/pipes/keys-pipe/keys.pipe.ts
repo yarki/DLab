@@ -16,29 +16,16 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { ImageType } from './imageType.enum';
-import { ResourceShapeTypesModel } from './resourceShapeTypes.model';
+import {Pipe, PipeTransform} from '@angular/core';
 
-export class ExploratoryEnvironmentVersionModel {
-  image: string;
-  template_name: string;
-  description: string;
-  environment_type: ImageType;
-  version: string;
-  vendor: string;
-  shapes: ResourceShapeTypesModel;
+@Pipe({ name: 'keys' })
 
-  constructor(
-    parentImage: string,
-    jsonModel:any,
-    shapes: ResourceShapeTypesModel
-  ) {
-    this.image = parentImage;
-    this.template_name = jsonModel.template_name;
-    this.description = jsonModel.description;
-    this.environment_type = ImageType.EXPLORATORY;
-    this.version = jsonModel.version;
-    this.vendor = jsonModel.vendor;
-    this.shapes = shapes;
+export class KeysPipe implements PipeTransform {
+  transform(value, args: string[]): any {
+    let keys = [];
+    for (let key in value) {
+      keys.push({ key: key, value: value[key]});
+    }
+    return keys;
   }
 }

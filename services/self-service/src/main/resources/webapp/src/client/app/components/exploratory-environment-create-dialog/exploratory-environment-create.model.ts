@@ -21,14 +21,15 @@ import { Observable } from 'rxjs';
 import { Response } from '@angular/http';
 import { UserResourceService } from '../../services/userResource.service';
 import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
-import { ResourceShapeModel } from '../../models/resourceShape.model';
+import { ResourceShapeTypesModel } from '../../models/resourceShapeTypes.model';
 
 export class ExploratoryEnvironmentCreateModel {
 
   confirmAction: Function;
   selectedItemChanged: Function;
 
-  selectedItem: ExploratoryEnvironmentVersionModel = new ExploratoryEnvironmentVersionModel('', {}, []);
+
+  selectedItem: ExploratoryEnvironmentVersionModel = new ExploratoryEnvironmentVersionModel('', {}, new ResourceShapeTypesModel({}));
   exploratoryEnvironmentTemplates: Array<ExploratoryEnvironmentVersionModel> = [];
 
   private environment_image: string;
@@ -92,14 +93,11 @@ export class ExploratoryEnvironmentCreateModel {
 
             let shapeJson = data[parentIndex].exploratory_environment_shapes;
             let exploratoryJson = data[parentIndex].exploratory_environment_versions;
-            let shapeArr = new Array<ResourceShapeModel>();
-
-            for (let index = 0; index < shapeJson.length; index++)
-              shapeArr.push(new ResourceShapeModel(shapeJson[index]));
+            let shapeObj: ResourceShapeTypesModel = new ResourceShapeTypesModel(shapeJson);
 
             for (let index = 0; index < exploratoryJson.length; index++)
               this.exploratoryEnvironmentTemplates.push(
-                new ExploratoryEnvironmentVersionModel(data[parentIndex].image, exploratoryJson[index], shapeArr));
+                new ExploratoryEnvironmentVersionModel(data[parentIndex].image, exploratoryJson[index], shapeObj));
           }
           if(this.exploratoryEnvironmentTemplates.length > 0) {
             this.exploratoryEnvironmentTemplates.sort(function(t1, t2) {

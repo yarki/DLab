@@ -78,7 +78,7 @@ def install_rstudio():
             sudo('apt-get install -y default-jdk')
             sudo('apt-get install -y r-base')
             sudo('apt-get install -y gdebi-core')
-            sudo('apt-get install -y r-cran-rjava r-cran-evaluate r-cran-formatr r-cran-yaml r-cran-rcpp r-cran-catools r-cran-jsonlite')
+            sudo('apt-get install -y r-cran-rjava r-cran-evaluate r-cran-formatr r-cran-yaml r-cran-rcpp r-cran-catools r-cran-jsonlite r-cran-ggplot2')
             sudo('R CMD javareconf')
             sudo('R -e \'install.packages("rmarkdown", repos = "https://cran.revolutionanalytics.com")\'')
             sudo('R -e \'install.packages("base64enc", repos = "https://cran.revolutionanalytics.com")\'')
@@ -95,6 +95,9 @@ def install_rstudio():
             sudo('''echo 'library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))' >> /home/ubuntu/.Rprofile''')
             sudo('rstudio-server start')
             sudo('echo "ubuntu:' + args.rstudio_pass + '" | chpasswd')
+            sudo("sed -i '/exit 0/d' /etc/rc.local")
+            sudo('''bash -c "echo \'sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/ubuntu/.Renviron\' >> /etc/rc.local"''')
+            sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
             sudo('touch /home/ubuntu/.ensure_dir/rstudio_ensured')
         except:
             sys.exit(1)
