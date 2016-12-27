@@ -155,12 +155,4 @@ public class ProvisioningServiceApplicationConfiguration extends ServiceConfigur
         return processTimeout;
     }
 
-    @Valid
-    @NotNull
-    @JsonProperty(SECURITY_SERVICE)
-    private RESTServiceFactory securityFactory;
-
-    public RESTServiceFactory getSecurityFactory() {
-        return securityFactory;
-    }
 }

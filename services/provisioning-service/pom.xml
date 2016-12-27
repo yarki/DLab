@@ -34,6 +34,11 @@
             <version>${org.mockito.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.epam.dlab</groupId>
+            <artifactId>self-service</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
