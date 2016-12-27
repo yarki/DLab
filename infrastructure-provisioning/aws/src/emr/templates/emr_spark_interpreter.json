@@ -14,7 +14,7 @@
     "zeppelin.pyspark.python": "python",
     "zeppelin.dep.localrepo": "local-repo",
     "zeppelin.dep.additionalRemoteRepository": "spark-packages,http://dl.bintray.com/spark-packages/maven,false;",
-    "spark.home": "/opt/EMRVERSION/CLUSTERNAME",
+    "spark.home": "/opt/EMRVERSION/CLUSTERNAME/spark",
     "spark.yarn.jar": ""
   },
   "dependencies": [],

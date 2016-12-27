@@ -264,13 +264,13 @@ def configure_zeppelin_emr_interpreter(args):
             local('echo \"Configuring emr interpreter for Zeppelin\"')
             template_file = "/tmp/emr_spark_interpreter.json"
             fr = open(template_file, 'r+')
-            text = f.read()
+            text = fr.read()
             text = text.replace('CLUSTERNAME', args.cluster_name)
             text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
             text = text.replace('EMRVERSION', args.emr_version)
             fw = open(template_file, 'w')
             fw.write(text)
-            f.close()
+            fw.close()
             local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d @/tmp/emr_spark_interpreter.json http://localhost:8080/api/interpreter/setting")
             local('touch /home/ubuntu/.ensure_dir/zeppelin_emr_ensured')
         except:
