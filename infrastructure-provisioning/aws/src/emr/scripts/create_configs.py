@@ -259,9 +259,16 @@ def configure_rstudio():
         except:
             sys.exit(1)
 def configure_zeppelin_emr_interpreter(args):
-    if not os.path.exists('/home/ubuntu/.ensure_dir/zeppelin_emr_ensured'):
+    try:
+        local('echo \"Configuring emr path for Zeppelin\"')
+        sudo('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt' + args.emr_version + '\/' +  args.cluster_name + '\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
+        sudo('sed -i \"s/^export HADOOP_CONF_DIR.*/export HADOOP_CONF_DIR=\/opt' + args.emr_version + '\/' +  args.cluster_name + '\/conf/\" /opt/zeppelin/conf/zeppelin-env.sh')
+        sudo('service zeppelin-notebook restart')
+    except:
+            sys.exit(1)
+    if not os.path.exists('/home/ubuntu/.ensure_dir/emr_interpreter_ensured'):
         try:
-            local('echo \"Configuring emr interpreter for Zeppelin\"')
+            local('echo \"Configuring emr spark interpreter for Zeppelin\"')
             template_file = "/tmp/emr_spark_interpreter.json"
             fr = open(template_file, 'r+')
             text = fr.read()
@@ -272,12 +279,7 @@ def configure_zeppelin_emr_interpreter(args):
             fw.write(text)
             fw.close()
             local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d @/tmp/emr_spark_interpreter.json http://localhost:8080/api/interpreter/setting")
-            local('touch /home/ubuntu/.ensure_dir/zeppelin_emr_ensured')
-        except:
-            sys.exit(1)
-    else:
-        try:
-            local("curl http://localhost:8080")
+            local('touch /home/ubuntu/.ensure_dir/emr_interpreter_ensured')
         except:
             sys.exit(1)
 
