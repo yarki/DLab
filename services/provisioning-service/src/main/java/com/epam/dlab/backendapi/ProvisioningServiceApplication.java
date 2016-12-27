@@ -22,6 +22,7 @@ import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.core.*;
 import com.epam.dlab.backendapi.core.commands.CommandExecutor;
 import com.epam.dlab.backendapi.resources.*;
+import com.epam.dlab.mongo.MongoService;
 import com.epam.dlab.process.DlabProcess;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.mappers.JsonProcessingExceptionMapper;
@@ -80,6 +81,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
             protected void configure() {
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(configuration);
                 bind(MetadataHolder.class).to(DockerWarmuper.class);
+                bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
                 bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, SELF_SERVICE_NAME));
                 bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE_NAME))
                         .toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE_NAME));
