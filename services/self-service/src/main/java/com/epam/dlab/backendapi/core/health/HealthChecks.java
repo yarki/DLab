@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.health;
 
+// TODO: Not used?
 public class HealthChecks {
     public static final String MONGO_HEALTH_CHECKER = "mongoHealthChecker";
     public static final String PROVISIONING_HEALTH_CHECKER = "provisioningHealthChecker";

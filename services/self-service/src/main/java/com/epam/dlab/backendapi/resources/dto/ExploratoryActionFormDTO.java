@@ -21,6 +21,7 @@ package com.epam.dlab.backendapi.resources.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
+/** TODO: Not used? */
 public class ExploratoryActionFormDTO {
     @NotBlank
     @JsonProperty("notebook_instance_name")

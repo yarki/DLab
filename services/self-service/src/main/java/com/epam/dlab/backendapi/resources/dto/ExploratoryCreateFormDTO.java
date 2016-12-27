@@ -21,6 +21,8 @@ package com.epam.dlab.backendapi.resources.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
+/** Stores info about new exploratory.
+ */
 public class ExploratoryCreateFormDTO {
     @NotBlank
     @JsonProperty
@@ -34,26 +36,32 @@ public class ExploratoryCreateFormDTO {
     @JsonProperty
     private String version;
 
+    /** Returns name of notebook. */
     public String getName() {
         return name;
     }
 
+    /** Sets name of notebook. */
     public void setName(String name) {
         this.name = name;
     }
 
+    /** Returns name of shape. */
     public String getShape() {
         return shape;
     }
 
+    /** Sets name of shape. */
     public void setShape(String shape) {
         this.shape = shape;
     }
 
+    /** Returns version. */
     public String getVersion() {
         return version;
     }
 
+    /** Sets version. */
     public void setVersion(String version) {
         this.version = version;
     }

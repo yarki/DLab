@@ -28,6 +28,8 @@ import javax.validation.constraints.NotNull;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 
+/** Configuration for Self Service.
+ */
 public class SelfServiceApplicationConfiguration extends Configuration {
     public static final String MONGO = "mongo";
     public static final String PROVISIONING_SERVICE = "provisioningService";
@@ -51,19 +53,27 @@ public class SelfServiceApplicationConfiguration extends Configuration {
     @JsonProperty(PROVISIONING_SERVICE)
     private RESTServiceFactory provisioningFactory = new RESTServiceFactory();
 
-
+    /** Returns <b>true</b> if service is a mock.
+     * @return
+     */
     public boolean isMocked() {
         return mocked;
     }
 
+    /** Returns the factory for Mongo database service.
+     */
     public MongoServiceFactory getMongoFactory() {
         return mongoFactory;
     }
 
+    /** Returns the factory for security service. 
+     */
     public RESTServiceFactory getSecurityFactory() {
         return securityFactory;
     }
 
+    /** Returns the factory for provisioning service. 
+     */
     public RESTServiceFactory getProvisioningFactory() {
         return provisioningFactory;
     }
