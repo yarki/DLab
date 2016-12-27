@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserAWSCredentialDTO {
+	public static final String USER_OWN_BUCKET_NAME = "user_own_bicket_name";
+	
     @JsonProperty
     private String hostname;
     @JsonProperty("public_ip")
@@ -31,8 +33,8 @@ public class UserAWSCredentialDTO {
     private String ip;
     @JsonProperty("key_name")
     private String keyName;
-    @JsonProperty("user_own_bicket_name")
-    private String userOwnBicketName;
+    @JsonProperty(USER_OWN_BUCKET_NAME)
+    private String userOwnBucketName;
     @JsonProperty("tunnel_port")
     private String tunnelPort;
     @JsonProperty("socks_port")
@@ -48,5 +50,9 @@ public class UserAWSCredentialDTO {
 
     public String getPublicIp() {
         return publicIp;
+    }
+    
+    public String getUserOwnBucketName() {
+    	return userOwnBucketName;
     }
 }
