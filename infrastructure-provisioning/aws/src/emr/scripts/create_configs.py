@@ -258,17 +258,17 @@ def configure_rstudio():
             local('echo \'HADOOP_CONF_DIR="' + yarn_dir + '"\' >> /home/ubuntu/.Renviron')
         except:
             sys.exit(1)
-def configure_zeppelin_emr_interpreter()
+def configure_zeppelin_emr_interpreter(args):
     if not os.path.exists('/home/ubuntu/.ensure_dir/zeppelin_emr_ensured'):
         try:
-           template_file = "/tmp/emr_spark_interpreter.json"
-           with open(template_file, 'w') as f:
-               text = f.read()
-               text = text.replace('CLUSTERNAME', args.cluster_name)
-               text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
-               text = text.replace('EMRVERSION', args.emr_version)
-               f.write(text)
-            local("curl -H "Content-Type: application/json" -X POST -d @/tmp/emr_spark_interpreter.json http://localhost:8080/api/interpreter/setting")
+            template_file = "/tmp/emr_spark_interpreter.json"
+            with open(template_file, 'w') as f:
+                text = f.read()
+                text = text.replace('CLUSTERNAME', args.cluster_name)
+                text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
+                text = text.replace('EMRVERSION', args.emr_version)
+                f.write(text)
+            local("curl -H 'Content-Type: application/json' -X POST -d @/tmp/emr_spark_interpreter.json http://localhost:8080/api/interpreter/setting")
             local('touch /home/ubuntu/.ensure_dir/zeppelin_emr_ensured')
         except:
             sys.exit(1)
@@ -323,4 +323,4 @@ if __name__ == "__main__":
         if os.path.exists('/home/ubuntu/.ensure_dir/rstudio_ensured'):
             configure_rstudio()
         if os.path.exists('/home/ubuntu/.ensure_dir/zeppelin_ensured'):
-            configure_zeppelin_emr_interpreter()
+            configure_zeppelin_emr_interpreter(args)
