@@ -47,7 +47,7 @@ def ensure_libraries_py2():
     if not exists('/home/ubuntu/.ensure_dir/ensure_libraries_py2_installed'):
         try:
             sudo('export LC_ALL=C')
-            sudo('apt-get install -y libjpeg8-dev zlib1g-dev')
+            sudo('apt-get install -y libjpeg8-dev zlib1g-dev virtualenv')
             sudo('pip2 install -U pip --no-cache-dir')
             sudo('pip2 install boto boto3 --no-cache-dir')
             sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn fabvenv fabric-virtualenv --no-cache-dir')
