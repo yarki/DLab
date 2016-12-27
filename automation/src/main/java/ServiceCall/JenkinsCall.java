@@ -61,6 +61,7 @@ public class JenkinsCall {
                 contentType(ContentType.XML).
                 when(). 
                 get("api/xml").getBody().xmlPath().getString("freeStyleProject.inQueue");
+            // TODO: Add max timeout
         }while(buildinQueue.endsWith("true"));
 
         getBuildNumber();

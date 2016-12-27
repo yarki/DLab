@@ -24,16 +24,17 @@ public class PropertyValue {
     public static final String TEST_BEFORE_SLEEP_SECONDS="TEST_BEFORE_SLEEP_SECONDS";
     public static final String TEST_AFTER_SLEEP_SECONDS="TEST_AFTER_SLEEP_SECONDS";
 
-    private static Properties props = null;
+    private static final Properties props = new Properties();
+    
+    static {
+    	loadProperties();
+    }
 	
 	public static String get(String propertyName) {
 		return get(propertyName, "");
 	}
 
 	public static String get(String propertyName, String defaultValue) {
-		if (props == null) {
-			loadProperties();
-		}
 		return props.getProperty(propertyName, defaultValue);
 	}
 	
@@ -53,10 +54,9 @@ public class PropertyValue {
         try {
                 File f1 = new File(CONFIG_FILE_NAME);
                 FileReader fin = new FileReader(f1);
-                props = new Properties();
                 props.load(fin);
         } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException("Load properties from \"" + CONFIG_FILE_NAME + "\" fail", e);
         }
         
         printProperty(JENKINS_USERNANE);
