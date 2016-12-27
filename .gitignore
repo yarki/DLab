@@ -7,3 +7,6 @@ target
 .classpath
 .project
 .settings
+/automation/bin
+/services/common/bin
+/services/security-service/bin

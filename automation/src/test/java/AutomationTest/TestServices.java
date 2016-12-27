@@ -86,7 +86,9 @@ public class TestServices {
     private static void sleep(String propertyName) throws InterruptedException {
     	int timeout = PropertyValue.get(PropertyValue.TEST_BEFORE_SLEEP_SECONDS, 0);
     	if (timeout > 0) {
-    		Thread.sleep(timeout / 1000);
+    		logger.info("Waiting for timeout " + timeout + " seconds.");
+    		Thread.sleep(timeout * 1000);
+    		logger.info("Timeout is completed.");
     	}
     }
 
