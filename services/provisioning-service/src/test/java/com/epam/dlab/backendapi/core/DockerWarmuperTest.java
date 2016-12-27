@@ -32,6 +32,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.anyString;
@@ -45,37 +47,50 @@ public class DockerWarmuperTest {
             "executeResult");
     private ComputationalMetadataDTO computationalMetadata = new
             ComputationalMetadataDTO("executeResult");
-    private static final String EXPLORATORY_TEST_JSON = "{\"exploratory_environment_shapes\" : [ {\"Type\":\"cg1.4xlarge\",\"Ram\": \"22.5 GB\",\"Cpu\": \"16\"}]}";
+    private static final String EXPLORATORY_TEST_JSON = "{\"exploratory_environment_shapes\" : { \"Category\" : [ {\"Size\":\"L\", \"Type\":\"cg1.4xlarge\",\"Ram\": \"22.5 GB\",\"Cpu\": \"16\"}]}}";
     private static final String COMPUTATIONAL_TEST_JSON = "{\"template_name\":\"DLab AWS EMR\"}";
 
     @Before
     public void setup() {
         createInjector().injectMembers(this);
         ComputationalResourceShapeDto computationalResourceShapeDto = new ComputationalResourceShapeDto();
+        computationalResourceShapeDto.setSize("L");
         computationalResourceShapeDto.setType("cg1.4xlarge");
         computationalResourceShapeDto.setRam("22.5 GB");
         computationalResourceShapeDto.setCpu(16);
-        ArrayList<ComputationalResourceShapeDto> metadataList = new ArrayList<>();
-        metadataList.add(computationalResourceShapeDto);
-        exploratoryMetadata.setExploratoryEnvironmentShapes(metadataList);
+        List<ComputationalResourceShapeDto> metadataArray = new ArrayList<>();
+        metadataArray.add(computationalResourceShapeDto);
+        HashMap<String, List<ComputationalResourceShapeDto>> map = new HashMap<>();
+        map.put("Category", metadataArray);
+        exploratoryMetadata.setExploratoryEnvironmentShapes(map);
         computationalMetadata.setTemplateName("DLab AWS EMR");
     }
 
     @Test
     public void warmupSuccess() throws Exception {
         warmuper.start();
-        warmuper.getFileHandlerCallback()
-                .handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
-        warmuper.getFileHandlerCallback()
+        warmuper.getFileHandlerCallback(getFirstUUID())
+        		.handle(getFileName(), EXPLORATORY_TEST_JSON.getBytes());
+        warmuper.getFileHandlerCallback(getFirstUUID())
                 .handle(getFileName(), COMPUTATIONAL_TEST_JSON.getBytes());
-        assertEquals(exploratoryMetadata, warmuper.getMetadatas(ImageType.EXPLORATORY)
-                .toArray(new ImageMetadataDTO[1])[0]);
-        assertEquals(computationalMetadata, warmuper.getMetadatas(ImageType.COMPUTATIONAL)
-                .toArray(new ImageMetadataDTO[1])[0]);
+
+        ImageMetadataDTO testExploratory = warmuper.getMetadata(ImageType.EXPLORATORY)
+                .toArray(new ImageMetadataDTO[1])[0];
+        testExploratory.setImage("executeResult");
+        assertEquals(exploratoryMetadata, testExploratory);
+
+        ImageMetadataDTO testComputational = warmuper.getMetadata(ImageType.COMPUTATIONAL)
+                .toArray(new ImageMetadataDTO[1])[0];
+        testComputational.setImage("executeResult");
+        assertEquals(computationalMetadata, testComputational);
     }
 
+    private String getFirstUUID() {
+    	return warmuper.getUuids().keySet().toArray(new String[1])[0];
+    }
+    
     private String getFileName() {
-        return warmuper.getUuids().keySet().toArray(new String[1])[0] + ".json";
+        return getFirstUUID() + ".json";
     }
 
     private Injector createInjector() {
@@ -84,7 +99,7 @@ public class DockerWarmuperTest {
             protected void configure() {
                 bind(FolderListenerExecutor.class).toInstance(mock(FolderListenerExecutor.class));
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(createConfiguration());
-                bind(CommandExecutor.class).toInstance(createCommandExecuter());
+                bind(ICommandExecutor.class).toInstance(createCommandExecuter());
             }
         });
     }
@@ -96,8 +111,8 @@ public class DockerWarmuperTest {
         return result;
     }
 
-    private CommandExecutor createCommandExecuter() {
-        CommandExecutor result = mock(CommandExecutor.class);
+    private ICommandExecutor createCommandExecuter() {
+        ICommandExecutor result = mock(ICommandExecutor.class);
         try {
             when(result.executeSync(anyString(),anyString(),anyString())).thenReturn(Collections.singletonList("executeResult"));
         } catch (Exception e) {

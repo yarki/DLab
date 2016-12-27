@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.health;
 
+import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.contracts.HealthChecker;
 import com.epam.dlab.mongo.MongoHealthChecker;
 import com.epam.dlab.mongo.MongoService;
@@ -27,7 +28,6 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 import static com.epam.dlab.backendapi.core.health.HealthChecks.MONGO_HEALTH_CHECKER;
 import static com.epam.dlab.backendapi.core.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
 
@@ -47,7 +47,7 @@ public class HealthModule extends AbstractModule {
     @Provides
     @Singleton
     @Named(PROVISIONING_HEALTH_CHECKER)
-    public HealthChecker provisioningHealthChecker(@Named(PROVISIONING_SERVICE) RESTService provisioningService) {
+    public HealthChecker provisioningHealthChecker(@Named(ServiceConsts.PROVISIONING_SERVICE_NAME) RESTService provisioningService) {
         return new ProvisioningHealthChecker(provisioningService);
     }
 }

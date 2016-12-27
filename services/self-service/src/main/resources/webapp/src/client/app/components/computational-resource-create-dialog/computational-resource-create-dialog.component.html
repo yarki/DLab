@@ -27,7 +27,7 @@ limitations under the License.
           <label class="control-label">Select template</label>
         </div>
         <div class="col-xs-8">
-          <dropdown-list #templatesList (selectedItem)="onUpdate($event)" [items]="model.computationalResourceApplicationTemplates"></dropdown-list>
+          <dropdown-list #templatesList (selectedItem)="onUpdate($event)"></dropdown-list>
         </div>
       </div>
       <div class="form-group row">
@@ -54,7 +54,7 @@ limitations under the License.
           <label class="control-label">Master Instance shape</label>
         </div>
         <div class="col-xs-8">
-          <dropdown-list #masterShapesList (selectedItem)="onUpdate($event)" [items]="model.selectedItem.shapes"></dropdown-list>
+          <dropdown-list #masterShapesList (selectedItem)="onUpdate($event)"></dropdown-list>
         </div>
       </div>
       <div class="form-group row">
@@ -62,7 +62,7 @@ limitations under the License.
           <label class="control-label">Slave Instance shape</label>
         </div>
         <div class="col-xs-8">
-          <dropdown-list #shapesSlaveList (selectedItem)="onUpdate($event)" [items]="model.selectedItem.shapes"></dropdown-list>
+          <dropdown-list #shapesSlaveList (selectedItem)="onUpdate($event)"></dropdown-list>
         </div>
       </div>
       <div class="text-right" *ngIf="processError">

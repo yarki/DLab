@@ -17,13 +17,14 @@ limitations under the License.
 ****************************************************************************/
 
 export class ResourcesGridRowModel {
-  constructor(
-    public name: Array<any>,
-    public status: string,
-    public shape: string,
-    public resources: Array<any>,
-    public time: string,
-    public url: string,
-    public ip: string
-  ) { }
+  constructor(public name:Array<any>,
+              public status: string,
+              public shape: string,
+              public resources:Array<any>,
+              public time:string,
+              public url:string,
+              public ip:string,
+              public username:string,
+              public password:string
+            ) { }
 }

@@ -27,8 +27,8 @@ from fabric.api import *
 
 
 def run():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -176,6 +176,7 @@ def run():
         print('[CONFIGURING DOCKER AT SSN INSTANCE]')
         additional_config = [{"name": "base", "tag": "latest"},
                              {"name": "jupyter", "tag": "latest"},
+                             {"name": "rstudio", "tag": "latest"},
                              {"name": "edge", "tag": "latest"},
                              {"name": "emr", "tag": "latest"}, ]
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
@@ -283,6 +284,9 @@ def run():
         env.host_string = 'ubuntu@' + instance_hostname
         try:
             put('/root/result.json', '/home/ubuntu/%s.json' % os.environ['request_id'])
+            sudo('mv /home/ubuntu/' + os.environ['request_id'] + '.json ' + os.environ['ssn_dlab_path'] + 'tmp/result/')
+            put(local_log_filepath, '/home/ubuntu/ssn.log')
+            sudo('mv /home/ubuntu/ssn.log /var/opt/dlab/log/ssn/')
         except:
             print 'Failed to upload response file'
             sys.exit(1)
@@ -299,11 +303,9 @@ def run():
         remove_s3(instance)
         sys.exit(1)
 
-
-# Main function for terminating all aws resources per service_base_name
 def terminate():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)

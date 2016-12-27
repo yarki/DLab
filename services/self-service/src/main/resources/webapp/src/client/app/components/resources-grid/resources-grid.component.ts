@@ -146,19 +146,21 @@ export class ResourcesGrid implements OnInit {
     return false;
   }
 
-  loadEnvironments(exploratoryList: Array<any>): Array<ResourcesGridRowModel> {
-    if (exploratoryList) {
-      return exploratoryList.map((value) => {
-        return new ResourcesGridRowModel(value.exploratory_name,
-          value.status,
-          value.shape,
-          value.computational_resources,
-          value.up_time,
-          value.exploratory_url,
-          value.edge_node_ip);
-      });
-    }
-  }
+  loadEnvironments(exploratoryList: Array<any>) : Array<ResourcesGridRowModel> {
+     if (exploratoryList) {
+       return exploratoryList.map((value) => {
+         return new ResourcesGridRowModel(value.exploratory_name,
+           value.status,
+           value.shape,
+           value.computational_resources,
+           value.up_time,
+           value.exploratory_url,
+           value.edge_node_ip,
+           value.exploratory_user,
+           value.exploratory_pass);
+       });
+     }
+   }
 
   printDetailEnvironmentModal(data): void {
     this.detailDialog.open({ isFooter: false }, data);
