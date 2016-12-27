@@ -70,7 +70,7 @@ public class ComputationalResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(CREATE, uuid, dto));
+                getFileHandlerCallback(CREATE, uuid, dto,ui.getAccessToken()));
         try {
             long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
             commandExecuter.executeAsync(
@@ -106,7 +106,7 @@ public class ComputationalResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(TERMINATE, uuid, dto));
+                getFileHandlerCallback(TERMINATE, uuid, dto, ui.getAccessToken()));
         try {
             commandExecuter.executeAsync(
                     ui.getName(),
@@ -131,8 +131,8 @@ public class ComputationalResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO dto) {
-        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName(), dto.getComputationalName());
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO dto,String accessToken) {
+        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName(), dto.getComputationalName(),accessToken);
     }
 
     private String nameContainer(String user, DockerAction action, String name) {

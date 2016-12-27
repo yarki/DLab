@@ -61,13 +61,13 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
     @Inject
     private RESTService selfService;
 
-    public String uploadKey(String username, UploadFileDTO dto) throws IOException, InterruptedException {
+    public String uploadKey(String username, String token, UploadFileDTO dto) throws IOException, InterruptedException {
         saveKeyToFile(dto);
         String uuid = DockerCommands.generateUUID();
         EdgeCreateDTO edgeDto = dto.getEdge();
         folderListenerExecutor.start(configuration.getKeyLoaderDirectory(),
                                      configuration.getKeyLoaderPollTimeout(),
-                                     getFileHandlerCallback(edgeDto.getIamUser(), uuid));
+                                     getFileHandlerCallback(edgeDto.getIamUser(), token, uuid));
         commandExecuter.executeAsync(
                 username,
                 uuid,
@@ -99,7 +99,7 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
         Files.write(keyFilePath, dto.getContent().getBytes());
     }
 
-    private FileHandlerCallback getFileHandlerCallback(String user, String originalUuid) {
+    private FileHandlerCallback getFileHandlerCallback(String user, String accessToken, String originalUuid) {
         return new FileHandlerCallback() {
         	
         	private final String uuid = originalUuid;
@@ -122,13 +122,13 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
                 if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
                     result.setSuccessAndCredential(extractCredential(document));
                 }
-                selfService.post(KEY_LOADER, result, UploadFileResultDTO.class);
+                selfService.post(KEY_LOADER, accessToken, result, UploadFileResultDTO.class);
                 return result.isSuccess();
             }
 
             @Override
             public void handleError() {
-                selfService.post(KEY_LOADER, new UploadFileResultDTO(user), UploadFileResultDTO.class);
+                selfService.post(KEY_LOADER, accessToken, new UploadFileResultDTO(user), UploadFileResultDTO.class);
             }
         };
 

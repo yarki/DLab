@@ -46,7 +46,7 @@ public class KeyLoaderResource {
     @POST
     public Response loadKey(@Auth UserInfo ui, UploadFileDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("load key for user {}", dto.getEdge().getIamUser());
-        keyLoader.uploadKey(ui.getName(), dto);
+        keyLoader.uploadKey(ui.getName(), ui.getAccessToken(), dto);
         return Response.accepted().build();
     }
 }
