@@ -20,15 +20,11 @@ package com.epam.dlab.backendapi;
 
 import com.epam.dlab.ServiceConfiguration;
 import com.epam.dlab.backendapi.core.Directories;
-import com.epam.dlab.rest.client.RESTServiceFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.util.Duration;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 
 public class ProvisioningServiceApplicationConfiguration extends ServiceConfiguration implements Directories {
 
