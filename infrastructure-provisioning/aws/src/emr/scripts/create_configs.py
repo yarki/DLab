@@ -19,6 +19,7 @@
 # ******************************************************************************
 
 import boto3
+from botocore.client import Config
 from fabric.api import *
 import argparse
 import os

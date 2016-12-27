@@ -20,6 +20,7 @@
 
 # v1.3 from 05/10/2016
 import boto3
+from botocore.client import Config
 import argparse
 import re
 import time

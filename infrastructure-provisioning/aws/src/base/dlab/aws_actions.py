@@ -18,6 +18,7 @@
 
 import boto3
 import botocore
+from botocore.client import Config
 import time
 import sys
 import os
