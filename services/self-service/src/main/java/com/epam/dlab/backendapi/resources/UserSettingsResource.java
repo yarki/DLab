@@ -47,7 +47,7 @@ import io.dropwizard.auth.Auth;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class UserSettingsResource implements SelfServiceAPI {
-	private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserSettingsResource.class);
 
     @Inject
     private UserSettingsDAO userSettingsDAO;
