@@ -33,14 +33,6 @@ server:
     - type: http
       port: 8085
 
-securityService:
-  protocol: http
-  host: localhost
-  port: 8090
-  jerseyClient:
-    timeout: 10s
-    connectionTimeout: 10s
-
 logging:
   level: INFO
   loggers:
