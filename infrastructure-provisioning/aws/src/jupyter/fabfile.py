@@ -36,7 +36,7 @@ def create_image_from_instance(instance_name='', image_name=''):
     for instance in instances:
         image = instance.create_image(Name=image_name,
                                       Description='Automatically created image for notebook server',
-                                      NoReboot=True)
+                                      NoReboot=False)
         image.load()
         while image.state != 'available':
             local("echo Waiting for image creation; sleep 20")
