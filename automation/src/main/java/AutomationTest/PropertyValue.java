@@ -56,7 +56,7 @@ public class PropertyValue {
                 FileReader fin = new FileReader(f1);
                 props.load(fin);
         } catch (Exception e) {
-                throw new RuntimeException("Load properties from \"" + CONFIG_FILE_NAME + "\" fail", e);
+                throw new RuntimeException("Load properties from \"" + CONFIG_FILE_NAME + "\" fails. " + e.getLocalizedMessage(), e);
         }
         
         printProperty(JENKINS_USERNANE);

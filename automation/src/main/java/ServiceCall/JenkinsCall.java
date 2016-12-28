@@ -19,7 +19,7 @@ public class JenkinsCall {
     private String jenkinsUserName;
     private String jenkinsPassword;
     private String buildNumber;
-    private String jenkinsURL;
+    private String ssnURL;
     private String serviceBaseName;
     private String buildResult; 
     
@@ -34,8 +34,8 @@ public class JenkinsCall {
         
     }
     
-    public String getJenkinsURL() {
-        return jenkinsURL;
+    public String getSsnURL() {
+        return ssnURL;
     }
 
     public String getServiceBaseName() {
@@ -54,7 +54,7 @@ public class JenkinsCall {
         Assert.assertEquals(responsePostJob.statusCode(), 200);
         //wait until build is not in queue
         String buildinQueue;
-        do{            
+        do{
             Thread.sleep(1000);
             buildinQueue = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth()
                 .form(jenkinsUserName, jenkinsPassword, config).
@@ -110,7 +110,7 @@ public class JenkinsCall {
             Pattern pattern1 = Pattern.compile("Jenkins URL:(.+)");      
             Matcher matcher1 = pattern1.matcher(jenkinsHoleURL);
             if(matcher1.find()) {
-                jenkinsURL = matcher1.group(1).replaceAll("/jenkins", "");         
+                ssnURL = matcher1.group(1).replaceAll("/jenkins", "");         
             }
             
             Pattern pattern2 = Pattern.compile("Service base name:(.+)");      
