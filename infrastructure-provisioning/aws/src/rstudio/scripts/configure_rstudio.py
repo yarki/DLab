@@ -165,7 +165,3 @@ if __name__ == "__main__":
 
     print "Install local S3 kernels"
     ensure_s3_kernel()
-
-    # for image purpose
-    print "Clean up lock files"
-    remove_apt_lock()
