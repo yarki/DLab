@@ -24,8 +24,8 @@ server:
   requestLog:
     appenders:
       - type: file
-        currentLogFilename: /tmp/dlab/log/request-provisioning.log
-        archivedLogFilenamePattern: /tmp/dlab/log/request-provisioning-%d.log
+        currentLogFilename: ${LOG_ROOT_DIR}/ssn/request-provisioning.log
+        archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/request-provisioning-%d.log
   applicationConnectors:
     - type: http
       port: 8084

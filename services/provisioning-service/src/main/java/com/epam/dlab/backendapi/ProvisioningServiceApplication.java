@@ -66,7 +66,6 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         JerseyEnvironment jersey = environment.jersey();
         jersey.register(new RuntimeExceptionMapper());
         jersey.register(new JsonProcessingExceptionMapper());
-        jersey.register(injector.getInstance(SecurityResource.class));
         jersey.register(injector.getInstance(DockerResource.class));
         jersey.register(injector.getInstance(KeyLoaderResource.class));
         jersey.register(injector.getInstance(KeyLoaderResource.class));
@@ -83,7 +82,8 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
                 bind(MetadataHolder.class).to(DockerWarmuper.class);
                 bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
                 bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, SELF_SERVICE_NAME));
-                bind(RESTService.class).toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE_NAME));
+                bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE_NAME))
+                        .toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE_NAME));
                 bind(ICommandExecutor.class)
                         .to(configuration.isMocked() ? CommandExecutorMock.class : CommandExecutor.class)
                         .asEagerSingleton();
