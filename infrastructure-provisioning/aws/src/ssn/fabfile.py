@@ -311,7 +311,7 @@ def terminate():
                         filename=local_log_filepath)
 
     # generating variables dictionary
-    create_aws_config_files()
+    create_aws_config_files(generate_full_config=True)
     print 'Generating infrastructure names and tags'
     ssn_conf = dict()
     ssn_conf['service_base_name'] = os.environ['conf_service_base_name']
