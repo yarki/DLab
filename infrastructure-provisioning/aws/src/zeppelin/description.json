@@ -1,4 +1,4 @@
-A{
+{
   "exploratory_environment_shapes" :
   {
     "Memory optimized" : [
@@ -18,7 +18,7 @@ A{
   "exploratory_environment_versions" :
   [
     {
-      "template_name": "Zeppeli 0.6.2",
+      "template_name": "Zeppelin 0.6.2",
       "description": "Base image with zeppeli node creation routines",
       "environment_type": "exploratory",
       "version": "zeppelin-0.6.2",
