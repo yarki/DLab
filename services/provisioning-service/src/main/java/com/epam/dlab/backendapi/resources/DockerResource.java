@@ -28,6 +28,7 @@ import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageType;
 import com.google.inject.Inject;
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +57,9 @@ public class DockerResource implements DockerCommands {
     @Path("{type}")
     public Set<ImageMetadataDTO> getDockerImages(@PathParam("type") String type) throws
             IOException, InterruptedException {
-        LOGGER.debug("docker statuses asked");
+        LOGGER.debug("docker statuses asked for {}", type);
         return metadataHolder
-                .getMetadatas(ImageType.valueOf(type.toUpperCase()));
+                .getMetadata(ImageType.valueOf(type.toUpperCase()));
     }
 
     @Path("/run")
@@ -77,5 +78,9 @@ public class DockerResource implements DockerCommands {
                         .toCMD()
         );
         return uuid;
+    }
+
+    public String getResourceType() {
+        throw new NotImplementedException("General commands haven't a pre-defined log path");
     }
 }

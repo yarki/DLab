@@ -27,8 +27,8 @@ from dlab.aws_actions import *
 
 
 def status():
-    local_log_filename = "{}.log".format(os.environ['request_id'])
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/edge/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -61,8 +61,8 @@ def status():
 
 
 def run():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/edge/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -121,7 +121,7 @@ def run():
         print '[CREATE SUBNET]'
         params = "--vpc_id '%s' --infra_tag_name %s --infra_tag_value %s --username %s" % \
                  (edge_conf['vpc_id'], edge_conf['tag_name'], edge_conf['service_base_name'], os.environ['edge_user_name'])
-        if not run_routine('create_subnet', params):
+        if not run_routine('create_subnet', params, 'edge'):
             logging.info('Failed creating subnet')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to create subnet", "conf": edge_conf}
@@ -141,7 +141,7 @@ def run():
         params = "--role_name %s --role_profile_name %s --policy_name %s" % \
                  (edge_conf['role_name'], edge_conf['role_profile_name'],
                   edge_conf['policy_name'])
-        if not run_routine('create_role_policy', params):
+        if not run_routine('create_role_policy', params, 'edge'):
             logging.info('Failed creating roles')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to creating roles", "conf": edge_conf}
@@ -157,7 +157,7 @@ def run():
         params = "--role_name %s --role_profile_name %s --policy_name %s" % \
                  (edge_conf['notebook_role_name'], edge_conf['notebook_role_profile_name'],
                   edge_conf['notebook_policy_name'])
-        if not run_routine('create_role_policy', params):
+        if not run_routine('create_role_policy', params, 'edge'):
             logging.info('Failed creating roles')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to creating roles", "conf": edge_conf}
@@ -249,7 +249,7 @@ def run():
         params = "--name {} --vpc_id {} --security_group_rules '{}' --infra_tag_name {} --infra_tag_value {} --egress '{}' --force {} --nb_sg_name {} --resource {}".\
             format(edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),edge_conf['service_base_name'],
                    edge_conf['instance_name'], json.dumps(sg_rules_template_egress), True, edge_conf['notebook_instance_name'], 'edge')
-        if not run_routine('create_security_group', params):
+        if not run_routine('create_security_group', params, 'edge'):
             logging.info('Failed creating security group for edge node')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed creating security group for edge node", "conf": edge_conf}
@@ -286,7 +286,7 @@ def run():
         params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {}".\
             format(edge_conf['notebook_security_group_name'], edge_conf['vpc_id'], json.dumps(ingress_sg_rules_template),
                    json.dumps(egress_sg_rules_template), edge_conf['service_base_name'], edge_conf['notebook_instance_name'], True)
-        if not run_routine('create_security_group', params):
+        if not run_routine('create_security_group', params, 'edge'):
             logging.info('Failed creating security group for private subnet')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed creating security group for private subnet", "conf": edge_conf}
@@ -310,7 +310,7 @@ def run():
         params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s --region %s" % \
                  (edge_conf['bucket_name'], edge_conf['service_base_name'], edge_conf['instance_name'] + "bucket",
                   edge_conf['region'])
-        if not run_routine('create_bucket', params):
+        if not run_routine('create_bucket', params, 'edge'):
             logging.info('Failed creating bucket')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to create bucket", "conf": edge_conf}
@@ -329,7 +329,7 @@ def run():
         print('[CREATING BUCKET POLICY FOR USER INSTANCES]')
         params = '--bucket_name {} --ssn_bucket_name {} --username {} --edge_role_name {} --notebook_role_name {} --service_base_name {}'.format(
             edge_conf['bucket_name'], edge_conf['ssn_bucket_name'], os.environ['edge_user_name'], edge_conf['role_name'], edge_conf['notebook_role_name'],  edge_conf['service_base_name'])
-        if not run_routine('create_policy', params):
+        if not run_routine('create_policy', params, 'edge'):
             logging.info('Failed creating bucket policy')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to create bucket policy", "conf": edge_conf}
@@ -352,7 +352,7 @@ def run():
                  (edge_conf['instance_name'], edge_conf['ami_id'], edge_conf['instance_size'], edge_conf['key_name'],
                   edge_group_id, edge_conf['public_subnet_id'], edge_conf['role_profile_name'],
                   edge_conf['tag_name'], edge_conf['instance_name'])
-        if not run_routine('create_instance', params):
+        if not run_routine('create_instance', params, 'edge'):
             logging.info('Failed creating instance')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to create instance", "conf": edge_conf}
@@ -377,7 +377,7 @@ def run():
         print '[INSTALLING PREREQUISITES]'
         logging.info('[INSTALLING PREREQUISITES]')
         params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
-        if not run_routine('install_prerequisites', params):
+        if not run_routine('install_prerequisites', params, 'edge'):
             logging.info('Failed installing apps: apt & pip')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing apps: apt & pip", "conf": edge_conf}
@@ -400,7 +400,7 @@ def run():
                              "template_file": "/root/templates/squid.conf"}
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, keyfile_name, json.dumps(additional_config))
-        if not run_routine('configure_http_proxy', params):
+        if not run_routine('configure_http_proxy', params, 'edge'):
             logging.info('Failed installing http proxy')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing http proxy", "conf": edge_conf}
@@ -423,7 +423,7 @@ def run():
                              "template_file": "/root/templates/danted.conf"}
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, keyfile_name, json.dumps(additional_config))
-        if not run_routine('configure_socks_proxy', params):
+        if not run_routine('configure_socks_proxy', params, 'edge'):
             logging.info('Failed installing socks proxy')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing socks proxy", "conf": edge_conf}
@@ -447,7 +447,7 @@ def run():
                              "user_keydir": "/root/keys/"}
         params = "--hostname {} --keyfile {} --additional_config '{}'".format(
             instance_hostname, keyfile_name, json.dumps(additional_config))
-        if not run_routine('install_user_key', params):
+        if not run_routine('install_user_key', params, 'edge'):
             logging.info('Failed installing user key')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing users key", "conf": edge_conf}
@@ -501,8 +501,8 @@ def run():
 
 # Main function for terminating EDGE node and exploratory environment if exists
 def terminate():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/edge/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -523,7 +523,7 @@ def terminate():
         print '[TERMINATE EDGE]'
         params = "--user_name %s --tag_name %s --tag_value %s --edge_sg %s --nb_sg %s" % \
                  (edge_conf['user_name'], edge_conf['tag_name'], edge_conf['tag_value'], edge_conf['edge_sg'], edge_conf['nb_sg'])
-        if not run_routine('terminate_edge', params):
+        if not run_routine('terminate_edge', params, 'edge'):
             logging.info('Failed to terminate edge')
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to terminate edge", "conf": edge_conf}

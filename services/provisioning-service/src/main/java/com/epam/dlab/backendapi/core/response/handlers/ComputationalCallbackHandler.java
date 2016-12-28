@@ -30,12 +30,18 @@ import static com.epam.dlab.rest.contracts.ApiCallbacks.STATUS_URI;
 public class ComputationalCallbackHandler extends ResourceCallbackHandler<ComputationalStatusDTO> {
     private static final String COMPUTATIONAL_ID_FIELD = "hostname";
 
-    private String exploratoryName;
-    private String computationalName;
+    private final String exploratoryName;
+    private final String computationalName;
+    private final String uuid; 
 
-    @SuppressWarnings("unchecked")
+    @Override
+    public String getUUID() {
+    	return uuid;
+    }
+    
     public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String exploratoryName, String computationalName) {
         super(selfService, user, originalUuid, action);
+    	this.uuid = originalUuid;
         this.exploratoryName = exploratoryName;
         this.computationalName = computationalName;
     }

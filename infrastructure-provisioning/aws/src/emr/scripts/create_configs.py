@@ -22,8 +22,10 @@ import boto3
 from fabric.api import *
 import argparse
 import os
+import sys
 import time
 from fabric.api import lcd
+from fabric.contrib.files import exists
 from fabvenv import virtualenv
 
 parser = argparse.ArgumentParser()
@@ -103,6 +105,7 @@ def r_kernel(args):
         f.write(text)
 
     #local('export HADOOP_CONF_DIR="/opt/{0}/{1}/conf/"; export YARN_CONF_DIR="/opt/{0}/{1}/conf/"; export SPARKR_SUBMIT_ARGS="--master yarn-client sparkr-shell"; export SPARK_HOME="/opt/{0}/{1}/spark/";'.format(args.emr_version, args.cluster_name) + ' export R_LIBS_SITE="${R_LIBS_SITE}:${SPARK_HOME}/R/lib"; R -e "install.packages(\'devtools\',repos=\'http://cran.us.r-project.org\')"; R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"; R CMD javareconf; R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
+    #local('R -e "IRkernel::installspec()"')
 
 
 def pyspark_kernel(args):
@@ -236,18 +239,28 @@ def configuring_notebook(args):
     local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
 
 
-def configure_rstudio(args):
-    local("""echo "export R_LIBS_USER='""" + spark_dir + """/R/lib'" >> /home/ubuntu/.bashrc""")
-    local('cat /dev/null > /home/ubuntu/.Renviron')
-    local('''echo 'SPARK_HOME="''' + spark_dir + '''"' >> /home/ubuntu/.Renviron''')
-    local('''echo 'YARN_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
-    local('''echo 'HADOOP_CONF_DIR="''' + yarn_dir + '''"' >> /home/ubuntu/.Renviron''')
-    try:
-        local("sudo rstudio-server stop")
-    except:
-        print "Rstudio already stopped"
-    time.sleep(10)
-    local("sudo rstudio-server start")
+def configure_rstudio():
+    if not os.path.exists('/home/ubuntu/.ensure_dir/rstudio_emr_ensured'):
+        try:
+            local('echo "export R_LIBS_USER=' + spark_dir + '/R/lib:" >> /home/ubuntu/.bashrc')
+            local("sed -i 's/^SPARK_HOME/#SPARK_HOME/' /home/ubuntu/.Renviron")
+            local('echo \'SPARK_HOME="' + spark_dir + '"\' >> /home/ubuntu/.Renviron')
+            local('echo \'YARN_CONF_DIR="' + yarn_dir + '"\' >> /home/ubuntu/.Renviron')
+            local('echo \'HADOOP_CONF_DIR="' + yarn_dir + '"\' >> /home/ubuntu/.Renviron')
+            local('touch /home/ubuntu/.ensure_dir/rstudio_emr_ensured')
+        except:
+            sys.exit(1)
+    else:
+        try:
+            local("sed -i '/R_LIBS_USER/ { s|=\(.*\)|=\\1" + spark_dir + "/R/lib:| }' /home/ubuntu/.bashrc")
+            local("sed -i 's/^SPARK_HOME/#SPARK_HOME/' /home/ubuntu/.Renviron")
+            local("sed -i 's/^YARN_CONF_DIR/#YARN_CONF_DIR/' /home/ubuntu/.Renviron")
+            local("sed -i 's/^HADOOP_CONF_DIR/#HADOOP_CONF_DIR/' /home/ubuntu/.Renviron")
+            local('echo \'SPARK_HOME="' + spark_dir + '"\' >> /home/ubuntu/.Renviron')
+            local('echo \'YARN_CONF_DIR="' + yarn_dir + '"\' >> /home/ubuntu/.Renviron')
+            local('echo \'HADOOP_CONF_DIR="' + yarn_dir + '"\' >> /home/ubuntu/.Renviron')
+        except:
+            sys.exit(1)
 
 
 def installing_python(args):
@@ -292,4 +305,4 @@ if __name__ == "__main__":
         r_kernel(args)
         configuring_notebook(args)
         if os.path.exists('/home/ubuntu/.ensure_dir/rstudio_ensured'):
-            configure_rstudio(args)
+            configure_rstudio()

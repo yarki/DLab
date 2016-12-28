@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.core;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.core.commands.CommandExecutor;
 import com.epam.dlab.backendapi.core.commands.DockerCommands;
 import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
@@ -42,75 +43,94 @@ import java.util.stream.Collectors;
 @Singleton
 public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
+    public static final String EXPLORATORY_RESPONSE_MARKER = "exploratory_environment_shapes";
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private ICommandExecutor commandExecutor;
-    private Map<String, String> uuids = new ConcurrentHashMap<>();
+    private CommandExecutor commandExecutor;
+    private Map<String, String> imageList = new ConcurrentHashMap<>();
     private Set<ImageMetadataDTO> metadataDTOs = new ConcurrentHashSet<>();
 
 
     @Override
     public void start() throws Exception {
-        LOGGER.debug("docker warm up start");
-        folderListenerExecutor.start(configuration.getWarmupDirectory(),
-                configuration.getWarmupPollTimeout(),
-                getFileHandlerCallback());
+        LOGGER.debug("warming up docker");
         List<String> images = commandExecutor.executeSync(GET_IMAGES);
         for (String image : images) {
-            LOGGER.debug("image: {}", image);
             String uuid = UUID.randomUUID().toString();
-            uuids.put(uuid, image);
+            LOGGER.debug("warming up image: {} with uid {}", image, uuid);
+            imageList.put(uuid, image);
+            folderListenerExecutor.start(configuration.getWarmupDirectory(),
+                    configuration.getWarmupPollTimeout(),
+                    getFileHandlerCallback(uuid));
             String command = new RunDockerCommand()
                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                     .withVolumeForResponse(configuration.getWarmupDirectory())
+                    .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+                    .withResource(getResourceType())
                     .withRequestId(uuid)
                     .withActionDescribe(image)
                     .toCMD();
             commandExecutor.executeAsync(command);
         }
     }
+    
+    public class DockerFileHandlerCallback implements FileHandlerCallback {
+    	private final String uuid;
+    	
+    	public DockerFileHandlerCallback(String uuid) {
+    		this.uuid = uuid;
+    	}
+    	
+    	@Override
+    	public String getUUID() {
+    		return uuid;
+    	}
+    	
+        @Override
+        public boolean checkUUID(String uuid) {
+            return this.uuid.equals(uuid);
+        }
 
-    FileHandlerCallback getFileHandlerCallback() {
-        return new FileHandlerCallback() {
-            @Override
-            public boolean checkUUID(String uuid) {
-                return uuids.containsKey(uuid);
+        @Override
+        public boolean handle(String fileName, byte[] content) {
+            String uuid = DockerCommands.extractUUID(fileName);
+            try {
+                LOGGER.debug("processing response file {} with content {}", fileName, new String(content));
+                addMetadata(content, uuid);
+            } catch (IOException e) {
+            	LOGGER.error("processing response file {} fails", fileName, e);
+            	return false;
             }
+            return true;
+        }
 
-            @Override
-            public boolean handle(String fileName, byte[] content) throws Exception {
-                String uuid = DockerCommands.extractUUID(fileName);
-                if (uuids.containsKey(uuid)) {
-                    LOGGER.debug("handle file {}", fileName);
-                    addMetadata(content, uuid);
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void handleError() {
-                LOGGER.warn("docker warmuper returned no result");
-            }
-        };
+        @Override
+        public void handleError() {
+            LOGGER.warn("docker warmupper returned no result");
+        }
+    }
+    
+    public DockerFileHandlerCallback getFileHandlerCallback(String uuid) {
+    	return new DockerFileHandlerCallback(uuid);
     }
 
     private void addMetadata(byte[] content, String uuid) throws IOException {
         final JsonNode jsonNode = MAPPER.readTree(content);
         ImageMetadataDTO metadata;
-        if (jsonNode.has("exploratory_environment_shapes")) {
+        if (jsonNode.has(EXPLORATORY_RESPONSE_MARKER)) {
             metadata = MAPPER.readValue(content, ExploratoryMetadataDTO.class);
             metadata.setImageType(ImageType.EXPLORATORY);
         } else {
-            metadata = MAPPER
-                    .readValue(content, ComputationalMetadataDTO.class);
+            metadata = MAPPER.readValue(content, ComputationalMetadataDTO.class);
             metadata.setImageType(ImageType.COMPUTATIONAL);
         }
-        metadata.setImage(uuids.get(uuid));
+        String image = imageList.get(uuid);
+        metadata.setImage(image);
+        LOGGER.debug("caching metadata for image {}: {}", image, metadata);
         metadataDTOs.add(metadata);
     }
 
@@ -119,11 +139,16 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     }
 
     public Map<String, String> getUuids() {
-        return Collections.unmodifiableMap(uuids);
+        return Collections.unmodifiableMap(imageList);
     }
 
-    public Set<ImageMetadataDTO> getMetadatas(ImageType type) {
+    public Set<ImageMetadataDTO> getMetadata(ImageType type) {
         return metadataDTOs.stream().filter(m -> m.getImageType().equals(type))
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public String getResourceType() {
+        return Directories.NOTEBOOK_LOG_DIRECTORY;
     }
 }

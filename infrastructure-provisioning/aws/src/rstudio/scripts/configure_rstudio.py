@@ -78,7 +78,7 @@ def install_rstudio():
             sudo('apt-get install -y default-jdk')
             sudo('apt-get install -y r-base')
             sudo('apt-get install -y gdebi-core')
-            sudo('apt-get install -y r-cran-rjava r-cran-evaluate r-cran-formatr r-cran-yaml r-cran-rcpp r-cran-catools r-cran-jsonlite')
+            sudo('apt-get install -y r-cran-rjava r-cran-evaluate r-cran-formatr r-cran-yaml r-cran-rcpp r-cran-catools r-cran-jsonlite r-cran-ggplot2')
             sudo('R CMD javareconf')
             sudo('R -e \'install.packages("rmarkdown", repos = "https://cran.revolutionanalytics.com")\'')
             sudo('R -e \'install.packages("base64enc", repos = "https://cran.revolutionanalytics.com")\'')
@@ -95,7 +95,15 @@ def install_rstudio():
             sudo('''echo 'library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))' >> /home/ubuntu/.Rprofile''')
             sudo('rstudio-server start')
             sudo('echo "ubuntu:' + args.rstudio_pass + '" | chpasswd')
+            sudo("sed -i '/exit 0/d' /etc/rc.local")
+            sudo('''bash -c "echo \'sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/ubuntu/.Renviron\' >> /etc/rc.local"''')
+            sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
             sudo('touch /home/ubuntu/.ensure_dir/rstudio_ensured')
+        except:
+            sys.exit(1)
+    else:
+        try:
+            sudo('echo "ubuntu:' + args.rstudio_pass + '" | chpasswd')
         except:
             sys.exit(1)
 
@@ -105,7 +113,8 @@ def ensure_local_spark():
         try:
             sudo('wget ' + spark_link + ' -O /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
             sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
-            sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
+            sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' ' + local_spark_path)
+            sudo('chown -R ubuntu:ubuntu ' + local_spark_path)
             sudo('touch /home/ubuntu/.ensure_dir/local_spark_ensured')
         except:
             sys.exit(1)
