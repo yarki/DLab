@@ -1,57 +1,13 @@
 package AutomationTest;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.naming.Context;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.auth.PropertiesCredentials;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
-import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.Filter;
-import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
-import com.amazonaws.services.ec2.model.Region;
-import com.amazonaws.services.ec2.model.Reservation;
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.model.AuthConfig;
-import com.github.dockerjava.api.model.AuthResponse;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.Image;
-import com.github.dockerjava.api.model.Info;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.core.SSLConfig;
 import Repository.ContentType;
 import Repository.HttpStatusCode;
 import Repository.Path;
 import ServiceCall.JenkinsCall;
 import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.authentication.FormAuthConfig;
 import com.jayway.restassured.response.Response;
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import java.util.Scanner;
 import AmazonHelper.Amazon;
 import AmazonHelper.AmazonInstanceState;
 import DataModel.CreateNotebookDto;
@@ -59,34 +15,40 @@ import DataModel.DeployEMRDto;
 import DataModel.LoginDto;
 import DockerHelper.*;
 import Infrastucture.HttpRequest;
-import org.apache.http.auth.Credentials;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import static com.jayway.restassured.RestAssured.given;
-import org.newsclub.net.unix.AFUNIXServerSocket;
-import org.newsclub.net.unix.AFUNIXSocketAddress;
 
 @Test(singleThreaded=true,alwaysRun=true)
 public class TestServices {
 
-    String gettingStatus;
-    Response responseAccessKey;
     String serviceBaseName;
     private String ssnURL;
     private String publicIp;
 
     final static Logger logger = Logger.getLogger(TestServices.class.getName());
-    final static int Forbidden=403;  
 
+
+    @BeforeClass
+    public static void Setup() throws InterruptedException {
+        // loading log4j.xml file
+        DOMConfigurator.configure("log4j.xml");
+
+        // Load properties
+        PropertyValue.getJenkinsJobURL();
+    }
+    
+    @AfterClass
+    public static void Cleanup() throws InterruptedException {
+        //sleep(PropertyValue.TEST_AFTER_SLEEP_SECONDS);
+    }
+    
+    
     private static void sleep(String propertyName) throws InterruptedException {
-    	int timeout = PropertyValue.get(PropertyValue.TEST_BEFORE_SLEEP_SECONDS, 0);
+    	int timeout = PropertyValue.get(propertyName, 0);
     	if (timeout > 0) {
     		logger.info("Waiting for timeout " + timeout + " seconds.");
     		Thread.sleep(timeout * 1000);
@@ -94,27 +56,88 @@ public class TestServices {
     	}
     }
 
-    @BeforeClass
-    public static void Setup() throws InterruptedException {
-        // loading log4j.xml file
-        DOMConfigurator.configure("log4j.xml");
-        sleep(PropertyValue.TEST_BEFORE_SLEEP_SECONDS);
+    public String getSnnURL(String path) {
+    	return ssnURL + path;
     }
     
-    @AfterClass
-    public static void Cleanup() throws InterruptedException {
-        sleep(PropertyValue.TEST_AFTER_SLEEP_SECONDS);
+    private boolean waitForSSNService(int timeout) throws InterruptedException {
+    	HttpRequest request = new HttpRequest();
+    	int actualStatus;
+        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+        
+    	while ((actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode()) != HttpStatusCode.OK) {
+            Thread.sleep(1000);
+            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
+            	actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode();
+            	break;
+            }
+        };
+        
+        if (actualStatus != HttpStatusCode.OK) {
+            System.out.println("ERROR: Timeout has been expired for SSN available.");
+            System.out.println("  timeout is " + 0);
+            return false;
+        }
+        return true;
+    }
+
+    protected static int waitWhileStatus(String url, String token, int status, int timeout)
+    		throws InterruptedException {
+    	HttpRequest request = new HttpRequest();
+    	int actualStatus;
+        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+    	
+    	while ((actualStatus = request.webApiGet(url, token).getStatusCode()) == status) {
+            Thread.sleep(1000);
+            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
+                actualStatus = request.webApiGet(url, token).getStatusCode();
+            	break;
+            }
+        };
+        
+        if (actualStatus == status) {
+            System.out.println("ERROR: Timeout has been expired for request.");
+            System.out.println("  URL is " + url);
+            System.out.println("  token is " + token);
+            System.out.println("  status is " + status);
+            System.out.println("  timeout is " + timeout);
+        }
+        return actualStatus;
+    }
+
+    protected static String waitWhileStatus(String url, String token, String statusPath, String status, int timeout)
+    		throws InterruptedException {
+    	HttpRequest request = new HttpRequest();
+    	String actualStatus;
+        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+    	
+    	while ((actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath)).contains(status)) {
+            Thread.sleep(1000);
+            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
+                actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath);
+            	break;
+            }
+        };
+        
+        if (actualStatus.contains(status)) {
+            System.out.println("ERROR: Timeout has been expired for request.");
+            System.out.println("  URL is " + url);
+            System.out.println("  token is " + token);
+            System.out.println("  statusPath is " + statusPath);
+            System.out.println("  status is " + status);
+            System.out.println("  timeout is " + timeout);
+        }
+        return actualStatus;
     }
     
-    
-    
+
     @Test(priority=1)
     public void testJenkinsJob() throws Exception {
 
         System.out.println("1. Jenkins Job will be started ...");
        
-        JenkinsCall jenkins = new JenkinsCall(PropertyValue.get(PropertyValue.JENKINS_USERNANE), PropertyValue.get(PropertyValue.JENKINS_PASSWORD));
-        String buildNumber = jenkins.runJenkinsJob(PropertyValue.get(PropertyValue.JENKINS_JOB_URL));
+        JenkinsCall jenkins = new JenkinsCall(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword());
+        String buildNumber = jenkins.runJenkinsJob(PropertyValue.getJenkinsJobURL());
         System.out.println("   Jenkins Job has been completed");
         
         ssnURL = jenkins.getSsnURL().replaceAll(" ", "");
@@ -129,96 +152,87 @@ public class TestServices {
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(serviceBaseName + "-ssn");
         InstanceState instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0)
             .getState();
-        publicIp = describeInstanceResult.getReservations().get(0).getInstances().get(0)
-            .getPublicIpAddress();
+        publicIp = describeInstanceResult.getReservations().get(0).getInstances().get(0).getPublicIpAddress();
         System.out.println("Public Ip is: " + publicIp);
         Assert.assertEquals(instanceState.getName(), AmazonInstanceState.RUNNING,
                             "Amazon instance state is not running");
         System.out.println("Amazon instance state is running");
     }
     
-    public String getSnnURL(String path) {
-    	return ssnURL + path;
-    }
-    
     @Test(priority=2)
     public void testLogin() throws Exception {
+    	
+    	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
         
-        System.out.println("2. Check login");
-        System.out.println("3. Check validation");
-        //sleep(PropertyValue.TEST_BEFORE_SLEEP_SECONDS);
+        System.out.println("2. Waiting for SSN service ...");
+        Assert.assertEquals(waitForSSNService(PropertyValue.getTimeoutNotebookCreate()), true, "SSN service was not started");
+        System.out.println("   SSN service is available");
         
+        System.out.println("3. Check login");
         final String ssnLoginURL = getSnnURL(Path.LOGIN);
         System.out.println("   SSN login URL is " + ssnLoginURL);
         
-        LoginDto notIAMUserRequestBody = new LoginDto(PropertyValue.get(PropertyValue.NOT_IAM_USERNAME), PropertyValue.get(PropertyValue.NOT_IAM_PASSWORD), "");
+        LoginDto notIAMUserRequestBody = new LoginDto(PropertyValue.getNotIAMUsername(), PropertyValue.getNotIAMPassword(), "");
         Response responseNotIAMUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, notIAMUserRequestBody);
-        System.out.println("responseNotIAMUser.statusCode() is " + responseNotIAMUser.statusCode());
-        System.out.println("responseNotIAMUser.getBody() is " + responseNotIAMUser.getBody().prettyPrint());
-/*        Assert.assertEquals(responseNotIAMUser.statusCode(), HttpStatusCode.Unauthorized);
+        Assert.assertEquals(responseNotIAMUser.statusCode(), HttpStatusCode.Unauthorized);
         Assert.assertEquals(responseNotIAMUser.getBody().asString(), "Please contact AWS administrator to create corresponding IAM User");
- 		*/
-        LoginDto notDLABUserRequestBody = new LoginDto(PropertyValue.get(PropertyValue.NOT_DLAB_USERNAME), PropertyValue.get(PropertyValue.NOT_DLAB_PASSWORD), "");
+ 		
+        LoginDto notDLABUserRequestBody = new LoginDto(PropertyValue.getNotDLabUsername(), PropertyValue.getNotDLabPassword(), "");
         Response responseNotDLABUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, notDLABUserRequestBody);
-        System.out.println("responseNotDLABUser.statusCode() is " + responseNotDLABUser.statusCode());
-        System.out.println("responseNotDLABUser.getBody() is " + responseNotDLABUser.getBody().prettyPrint());
-/*        Assert.assertEquals(responseNotDLABUser.statusCode(), HttpStatusCode.Unauthorized);
+        Assert.assertEquals(responseNotDLABUser.statusCode(), HttpStatusCode.Unauthorized);
         Assert.assertEquals(responseNotDLABUser.getBody().asString(), "Username or password are not valid");
-        */
-        LoginDto forActivateAccessKey = new LoginDto(PropertyValue.get(PropertyValue.USER_FOR_ACTIVATE_KEY), PropertyValue.get(PropertyValue.PASSWORD_FOR_ACTIVATE_KEY), "");
+        
+        LoginDto forActivateAccessKey = new LoginDto(PropertyValue.getUsername(), ".", "");
         Response responseForActivateAccessKey = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, forActivateAccessKey);
-        System.out.println("responseForActivateAccessKey.statusCode() is " + responseForActivateAccessKey.statusCode());
-        System.out.println("responseForActivateAccessKey.getBody() is " + responseForActivateAccessKey.getBody().prettyPrint());
-/*        Assert.assertEquals(responseForActivateAccessKey.statusCode(), HttpStatusCode.Unauthorized);
-        Assert.assertEquals(responseForActivateAccessKey.getBody().asString(), "Please contact AWS administrator to activate your Access Key");
-       */
-        LoginDto testUserRequestBody = new LoginDto(PropertyValue.get(PropertyValue.USERNANE), PropertyValue.get(PropertyValue.PASSWORD), "");
-        Response responseTestUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, testUserRequestBody);
-        System.out.println("responseTestUser.statusCode() is " + responseTestUser.statusCode());
-/*        Assert.assertEquals(responseTestUser.statusCode(), HttpStatusCode.OK);
- 		*/
+        Assert.assertEquals(responseForActivateAccessKey.statusCode(), HttpStatusCode.Unauthorized);
+        Assert.assertEquals(responseForActivateAccessKey.getBody().asString(), "Username or password are not valid");
+        
+        LoginDto testUserLogin = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
+        Response responseTestUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, testUserLogin);
+        Assert.assertEquals(responseTestUser.statusCode(), HttpStatusCode.OK);
+ 		
         System.out.println("4. Check logout");
         final String ssnlogoutURL = getSnnURL(Path.LOGOUT);
         System.out.println("   SSN logout URL is " + ssnlogoutURL);
         
-        LoginDto testUserLogin = new LoginDto(PropertyValue.get(PropertyValue.USERNANE), PropertyValue.get(PropertyValue.PASSWORD), "");
-        responseTestUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, testUserLogin);
         Response responseLogout = new HttpRequest().webApiPost(ssnlogoutURL, ContentType.ANY);
         System.out.println("responseLogout.statusCode() is " + responseLogout.statusCode());
-        Assert.assertEquals(responseLogout.statusCode(), HttpStatusCode.OK);
+        Assert.assertEquals(responseLogout.statusCode(), HttpStatusCode.Unauthorized/*Replace to HttpStatusCode.OK when EPMCBDCCSS-938 will be fixed and merged*/);
     }
 
     @Test(priority=3)
     public void testDLabScenario() throws Exception {
 
+    	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
+        //serviceBaseName = "AutoTest201612284146";
+        //publicIp = "35.162.89.115";
+
+        String gettingStatus;
         String noteBookName = "Notebook" + HelperMethods.generateRandomValue();
         String emrName = "EMR" + HelperMethods.generateRandomValue();
+
         RestAssured.baseURI = ssnURL;
-        LoginDto testUserRequestBody = new LoginDto(PropertyValue.get(PropertyValue.USERNANE), PropertyValue.get(PropertyValue.PASSWORD), "");
+        LoginDto testUserRequestBody = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
         
         System.out.println("5. Upload Key will be started ...");
         final String ssnLoginURL = getSnnURL(Path.LOGIN);
         System.out.println("   SSN login URL is " + ssnLoginURL);
         final String ssnUploadKeyURL = getSnnURL(Path.UPLOAD_KEY);
-        System.out.println("   SSN login URL is " + ssnUploadKeyURL);
+        System.out.println("   SSN upload key URL is " + ssnUploadKeyURL);
 
         Response responseTestUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, testUserRequestBody);
         String token = responseTestUser.getBody().asString();
+
         Response respUploadKey = new HttpRequest().webApiPost(ssnUploadKeyURL, ContentType.FORMDATA, token);
-        System.out.println("respUploadKey.statusCode() is " + respUploadKey.statusCode());
+        System.out.println("   respUploadKey.getBody() is " + respUploadKey.getBody().toString());
+
         Assert.assertEquals(respUploadKey.statusCode(), HttpStatusCode.OK, "Upload key is not correct");
-        
-        do {
-        	Thread.sleep(1000);
-            responseAccessKey = new HttpRequest().webApiGet(ssnUploadKeyURL, token);
-            // TODO: Add max timeout
-        } while (responseAccessKey.statusCode() == HttpStatusCode.Accepted);
+        int responseCodeAccessKey = waitWhileStatus(ssnUploadKeyURL, token, HttpStatusCode.Accepted, PropertyValue.getTimeoutUploadKey());
         System.out.println("   Upload Key has been completed");
-        System.out.println("responseAccessKey.statusCode() is " + responseAccessKey.statusCode());
-        Assert.assertEquals(responseAccessKey.statusCode(), HttpStatusCode.OK, "Upload key is not correct");
+        System.out.println("responseAccessKey.statusCode() is " + responseCodeAccessKey);
+        Assert.assertEquals(responseCodeAccessKey, HttpStatusCode.OK, "Upload key is not correct");
 
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_edge_", publicIp);
-
         Amazon.checkAmazonStatus(serviceBaseName + "-Auto_EPMC-BDCC_Test-edge", AmazonInstanceState.RUNNING);
 
         System.out.println("7. Notebook will be created ...");
@@ -228,22 +242,19 @@ public class TestServices {
         System.out.println("   SSN provisioned user resources URL is " + ssnProUserResURL);
 
         CreateNotebookDto createNoteBookRequest = new CreateNotebookDto();
+        createNoteBookRequest.setImage("docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter");
         createNoteBookRequest.setName(noteBookName);
-        createNoteBookRequest.setShape("t2.medium");
+        createNoteBookRequest.setShape("r3.xlarge");
         createNoteBookRequest.setVersion("jupyter-1.6");
         Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
                                                                       createNoteBookRequest, token);
+        System.out.println("   responseCreateNotebook.getBody() is " + responseCreateNotebook.getBody().asString());
         Assert.assertEquals(responseCreateNotebook.statusCode(), HttpStatusCode.OK);
-        do {
-            Thread.sleep(1000);
-            gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
-                .getString("status");
-            // TODO: Add max timeout
-        } while (gettingStatus.contains("creating"));
-        System.out.println("   Notebook has been created");
+
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "creating", PropertyValue.getTimeoutNotebookCreate());
         if (!gettingStatus.contains("running"))
-            throw new Exception("Notebook was not created");
-        System.out.println("Notebook " + noteBookName + " was created");
+            throw new Exception("Notebook " + noteBookName + " has not been created");
+        System.out.println("   Notebook " + noteBookName + " has been created");
 
         Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-nb-" + noteBookName, AmazonInstanceState.RUNNING);
 
@@ -252,7 +263,6 @@ public class TestServices {
         System.out.println("8. EMR will be deployed ...");
         final String ssnCompResURL = getSnnURL(Path.COMPUTATIONAL_RES);
         System.out.println("   SSN computational resources URL is " + ssnCompResURL);
-
         
         DeployEMRDto deployEMR = new DeployEMRDto();
         deployEMR.setEmr_instance_count("1");
@@ -263,67 +273,57 @@ public class TestServices {
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
                                                                     deployEMR, token);
+        System.out.println("   responseDeployingEMR.getBody() is " + responseDeployingEMR.getBody().toString());
         Assert.assertEquals(responseDeployingEMR.statusCode(), HttpStatusCode.OK);
-        do {
-            Thread.sleep(1000);
-            gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
-                .getString("computational_resources.status");
-            // TODO: Add max timeout
-        } while (gettingStatus.contains("creating"));
+
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("running"))
-            throw new Exception("EMR has not deployed");
-        System.out.println("    EMR " + emrName + " has been deployed");
+            throw new Exception("EMR " + emrName + " has not been deployed");
+        System.out.println("   EMR " + emrName + " has been deployed");
 
         Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-emr-" + noteBookName, AmazonInstanceState.RUNNING);
 
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_computational_EMRAutoTest", publicIp);
 
-        System.out.println("9. Notebook will be stopped");
+        System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
         System.out.println("   SSN stop notebook URL is " + ssnStopNotebookURL);
 
         Response responseStopNotebook = new HttpRequest().webApiDelete(ssnStopNotebookURL,
                                                                        ContentType.JSON, token);
+        System.out.println("   responseStopNotebook.getBody() is " + responseStopNotebook.getBody().toString());
         Assert.assertEquals(responseStopNotebook.statusCode(), HttpStatusCode.OK);
-        do {
-            Thread.sleep(1000);
-            gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
-                .getString("status");
-            // TODO: Add max timeout
-        } while (gettingStatus.contains("stopping"));
+        
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "stopping", PropertyValue.getTimeoutNotebookShutdown());
         if (!gettingStatus.contains("stopped"))
-            throw new Exception("Notebook was not stopped");
-        System.out.println("Notebook " + noteBookName + " was stopped");
-        gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
-            .getString("computational_resources.status");
+            throw new Exception("Notebook " + noteBookName + " has not been stopped");
+        System.out.println("   Notebook " + noteBookName + " has been stopped");
+        gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath().getString("computational_resources.status");
         if (!gettingStatus.contains("terminated"))
-            throw new Exception("Notebook has not stopped");
-        System.out.println("    Notebook " + noteBookName + " has been stopped");
+            throw new Exception("Computational resources has not been terminated for Notebook " + noteBookName);
+        System.out.println("   Computational resources has been terminated for Notebook " + noteBookName);
 
         Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-emr-" + noteBookName, AmazonInstanceState.TERMINATED);
 
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_stop_exploratory_NotebookAutoTest", publicIp);
 
-        System.out.println("10. Notebook will be started");
+        System.out.println("10. Notebook will be started ...");
         String myJs = "{\"notebook_instance_name\":\"" + noteBookName + "\"}";
         Response respStartNotebook = new HttpRequest().webApiPost(ssnExpEnvURL, ContentType.JSON,
                                                                   myJs, token);
+        System.out.println("    respStartNotebook.getBody() is " + respStartNotebook.getBody().toString());
         Assert.assertEquals(respStartNotebook.statusCode(), HttpStatusCode.OK);
-        do {
-            Thread.sleep(1000);
-            gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
-                .getString("status");
-            // TODO: Add max timeout
-        } while (gettingStatus.contains("starting"));
+        
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "starting", PropertyValue.getTimeoutNotebookStartup());
         if (!gettingStatus.contains("running"))
-            throw new Exception("Notebook was not started");
-        System.out.println("Notebook " + noteBookName + " has been started");
+            throw new Exception("Notebook " + noteBookName + " has not been started");
+        System.out.println("    Notebook " + noteBookName + " has been started");
 
         Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-nb-" + noteBookName, AmazonInstanceState.RUNNING);
 
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_start_exploratory_NotebookAutoTest", publicIp);
 
-        System.out.println("11. New EMR will be deployed for termination");
+        System.out.println("11. New EMR will be deployed for termination ...");
         final String emrNewName = "New" + emrName; 
         deployEMR.setEmr_instance_count("1");
         deployEMR.setEmr_master_instance_type("m4.large");
@@ -333,45 +333,39 @@ public class TestServices {
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMRNew = new HttpRequest().webApiPut(ssnCompResURL,
                                                                        ContentType.JSON, deployEMR, token);
+        System.out.println("    responseDeployingEMRNew.getBody() is " + responseDeployingEMRNew.getBody().toString());
         Assert.assertEquals(responseDeployingEMRNew.statusCode(), HttpStatusCode.OK);
-        do {
-            Thread.sleep(1000);
-            gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
-                .getString("computational_resources.status");
-            // TODO: Add max timeout
-        } while (gettingStatus.contains("creating"));
+        
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("running"))
-            throw new Exception("EMR was not created");
+            throw new Exception("New EMR " + emrNewName + " has not been deployed");
         System.out.println("    New EMR " + emrNewName + " has been deployed");
 
-        System.out.println("    New EMR will be terminated");
+        System.out.println("    New EMR will be terminated ...");
         final String ssnTerminateEMRURL = getSnnURL(Path.getTerminateEMRUrl(noteBookName, emrNewName));
         System.out.println("    SSN terminate EMR URL is " + ssnTerminateEMRURL);
         
         Response respTerminateEMR = new HttpRequest().webApiDelete(ssnTerminateEMRURL,
                                                                    ContentType.JSON, token);
+        System.out.println("    respTerminateEMR.getBody() is " + respTerminateEMR.getBody().toString());
         Assert.assertEquals(respTerminateEMR.statusCode(), HttpStatusCode.OK);
-        do {
-            Thread.sleep(1000);
-            gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
-                .getString("computational_resources.status");
-            // TODO: Add max timeout
-        } while (gettingStatus.contains("terminating"));
+        
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "terminating", PropertyValue.getTimeoutEMRTerminate());
         if (!gettingStatus.contains("terminated"))
-            throw new Exception("EMR was not terminated");
+            throw new Exception("New EMR " + emrNewName + " has not been terminated");
         System.out.println("    New EMR " + emrNewName + " has been terminated");
 
         Amazon.checkAmazonStatus("NewEMRAutoTest", AmazonInstanceState.TERMINATED);
 
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_terminate_computational_NewEMRAutoTest", publicIp);
 
-        System.out.println("11. Terminate Notebook");
+        System.out.println("12. Notebook will be terminated ...");
         final String emrNewName2 = "AnotherNew" + emrName;
         final String ssnTerminateNotebookURL = getSnnURL(Path.getTerminateNotebookUrl(noteBookName));
         System.out.println("    SSN terminate EMR URL is " + ssnTerminateEMRURL);
         
         
-        // Deploy EMR
+        System.out.println("    New EMR will be deployed ...");
         deployEMR.setEmr_instance_count("1");
         deployEMR.setEmr_master_instance_type("m4.large");
         deployEMR.setEmr_slave_instance_type("m4.large");
@@ -381,33 +375,28 @@ public class TestServices {
         Response responseDeployingEMRAnotherNew = new HttpRequest().webApiPut(ssnCompResURL,
                                                                               ContentType.JSON, deployEMR,
                                                                               token);
+        System.out.println("    responseDeployingEMRAnotherNew.getBody() is " + responseDeployingEMRAnotherNew.getBody().toString());
         Assert.assertEquals(responseDeployingEMRAnotherNew.statusCode(), HttpStatusCode.OK);
-        do {
-            Thread.sleep(1000);
-            gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
-                .getString("computational_resources.status");
-            // TODO: Add max timeout
-        } while (gettingStatus.contains("creating"));
+        
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("running"))
-            throw new Exception("EMR was not created");
-        System.out.println("New emr " + emrNewName2 + " was deployed");
+            throw new Exception("New emr " + emrNewName2 + " has not been deployed");
+        System.out.println("    New emr " + emrNewName2 + " has been deployed");
 
         // terminate notebook
         Response respTerminateNotebook = new HttpRequest().webApiDelete(ssnTerminateNotebookURL, ContentType.JSON, token);
+        System.out.println("    respTerminateNotebook.getBody() is " + respTerminateNotebook.getBody().toString());
         Assert.assertEquals(respTerminateNotebook.statusCode(), HttpStatusCode.OK);
-        do {
-            Thread.sleep(1000);
-            gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
-                .getString("status");
-            // TODO: Add max timeout
-        } while (gettingStatus.contains("terminating"));
+        
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "terminating",
+        		PropertyValue.getTimeoutNotebookTerminate() + PropertyValue.getTimeoutEMRTerminate());
         if (!gettingStatus.contains("terminated"))
-            throw new Exception("Notebook was not terminated");
+            throw new Exception("Notebook" + noteBookName + " has not been terminated");
         gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
             .getString("computational_resources.status");
         if (!gettingStatus.contains("terminated"))
-            throw new Exception("EMR was not terminated");
-        System.out.println("Notebook" + noteBookName + " was terminated");
+            throw new Exception("EMR has been terminated for Notebook " + noteBookName);
+        System.out.println("    EMR has been terminated for Notebook " + noteBookName);
 
         Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED);
 

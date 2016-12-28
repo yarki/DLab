@@ -4,7 +4,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import AutomationTest.*;
-
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.authentication.FormAuthConfig;
 import com.jayway.restassured.http.ContentType;
@@ -41,6 +40,34 @@ public class JenkinsCall {
     public String getServiceBaseName() {
         return serviceBaseName;
     }
+    
+    private String getQueueStatus() {
+    	return given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth()
+                .form(jenkinsUserName, jenkinsPassword, config).
+                contentType(ContentType.XML).
+                when(). 
+                get("api/xml").getBody().xmlPath().getString("freeStyleProject.inQueue");
+    }
+
+    private boolean waitForJenkinsStartup(int timeout) throws InterruptedException {
+    	String actualStatus;
+        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+        
+    	while ((actualStatus = getQueueStatus()).endsWith("true")) {
+            Thread.sleep(1000);
+            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
+            	actualStatus = getQueueStatus();
+            	break;
+            }
+        };
+        
+        if (actualStatus.endsWith("true")) {
+            System.out.println("ERROR: Timeout has been expired for Jenkins");
+            System.out.println("  timeout is " + 0);
+            return false;
+        }
+        return true;
+    }
 
     public String runJenkinsJob(String jenkinsJobURL) throws Exception {
         RestAssured.baseURI = jenkinsJobURL;
@@ -52,18 +79,10 @@ public class JenkinsCall {
             when(). 
             post(jenkinsJobURL + "build");
         Assert.assertEquals(responsePostJob.statusCode(), 200);
+        
         //wait until build is not in queue
-        String buildinQueue;
-        do{
-            Thread.sleep(1000);
-            buildinQueue = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth()
-                .form(jenkinsUserName, jenkinsPassword, config).
-                contentType(ContentType.XML).
-                when(). 
-                get("api/xml").getBody().xmlPath().getString("freeStyleProject.inQueue");
-            // TODO: Add max timeout
-        }while(buildinQueue.endsWith("true"));
-
+        waitForJenkinsStartup(PropertyValue.getTimeoutJenkinsAutotest());
+        
         getBuildNumber();
         getBuildResult();
         setJenkinsURLServiceBaseName();
@@ -72,7 +91,7 @@ public class JenkinsCall {
     }
 
     public String getBuildNumber() throws Exception {
-        String builName = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.get(PropertyValue.JENKINS_USERNANE), PropertyValue.get(PropertyValue.JENKINS_PASSWORD), config).
+        String builName = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config).
             contentType("application/x-www-form-urlencoded").
             when(). 
             get("lastBuild").getBody().htmlPath().getString("html.head.title");
@@ -89,7 +108,7 @@ public class JenkinsCall {
     public String getBuildResult() throws Exception {
         //wait until job return build result     
         do{            
-            buildResult = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.get(PropertyValue.JENKINS_USERNANE), PropertyValue.get(PropertyValue.JENKINS_PASSWORD), config).
+            buildResult = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config).
                 contentType(ContentType.JSON).
                 when(). 
                 get(buildNumber + "/api/json?pretty=true").getBody().jsonPath().getString("result");
@@ -102,7 +121,7 @@ public class JenkinsCall {
         String jenkinsHoleURL;
         if(buildResult.equals("SUCCESS")){
 
-            jenkinsHoleURL = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.get(PropertyValue.JENKINS_USERNANE), PropertyValue.get(PropertyValue.JENKINS_PASSWORD), config).
+            jenkinsHoleURL = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config).
             contentType(ContentType.TEXT).
             when(). 
             get(buildNumber + "/logText/progressiveText?start=0").getBody().prettyPrint();

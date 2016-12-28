@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import AutomationTest.HelperMethods;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -21,6 +19,8 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import AutomationTest.PropertyValue;
+
 public class SSHConnect {
     
     public static Session getConnect(String username, String host, int port) throws JSchException {
@@ -30,8 +30,7 @@ public class SSHConnect {
         Properties config = new Properties(); 
         config.put("StrictHostKeyChecking", "no");
         
-        String prvkey = HelperMethods.getFilePath("BDCC-DSS-POC.ppk");
-        jsch.addIdentity(prvkey);
+        jsch.addIdentity(PropertyValue.getAccessKeyPrivFileName());
         session = jsch.getSession(username, host, port);
         session.setConfig(config);
         session.connect();
