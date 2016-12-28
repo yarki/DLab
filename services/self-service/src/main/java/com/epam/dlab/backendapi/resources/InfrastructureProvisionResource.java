@@ -85,14 +85,14 @@ public class InfrastructureProvisionResource implements DockerAPI {
     @Path("/computational_resources_templates")
     public Iterable<ComputationalMetadataDTO> getComputationalTemplates(@Auth UserInfo userInfo) {
         LOGGER.debug("loading computational templates for user {}", userInfo.getName());
-        return getComputationalTemplates();
+        return getComputationalTemplates(userInfo.getAccessToken());
     }
 
     @GET
     @Path("/exploratory_environment_templates")
     public Iterable<ExploratoryMetadataDTO> getExploratoryTemplates(@Auth UserInfo userInfo) {
         LOGGER.debug("loading exploratory templates for user {}", userInfo.getName());
-        List<ExploratoryMetadataDTO> list = Lists.newArrayList(getExploratoryTemplates());
+        List<ExploratoryMetadataDTO> list = Lists.newArrayList(getExploratoryTemplates(userInfo.getAccessToken()));
         list.forEach(m -> {
             int separatorIndex = m.getImage().indexOf(":");
             if(separatorIndex > 0) {
@@ -102,13 +102,13 @@ public class InfrastructureProvisionResource implements DockerAPI {
         return list;
     }
 
-    private Iterable<ExploratoryMetadataDTO> getExploratoryTemplates() {
-        return Stream.of(provisioningService.get(DOCKER_EXPLORATORY, ExploratoryMetadataDTO[].class))
+    private Iterable<ExploratoryMetadataDTO> getExploratoryTemplates(String accessToken) {
+        return Stream.of(provisioningService.get(DOCKER_EXPLORATORY, accessToken, ExploratoryMetadataDTO[].class))
                 .collect(Collectors.toSet());
     }
 
-    private Iterable<ComputationalMetadataDTO> getComputationalTemplates() {
-        return Stream.of(provisioningService.get(DOCKER_COMPUTATIONAL, ComputationalMetadataDTO[].class))
+    private Iterable<ComputationalMetadataDTO> getComputationalTemplates(String accessToken) {
+        return Stream.of(provisioningService.get(DOCKER_COMPUTATIONAL, accessToken, ComputationalMetadataDTO[].class))
                 .collect(Collectors.toSet());
     }
 }
