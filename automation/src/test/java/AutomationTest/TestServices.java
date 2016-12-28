@@ -146,7 +146,7 @@ public class TestServices {
         
         System.out.println("2. Check login");
         System.out.println("3. Check validation");
-        //sleep(PropertyValue.TEST_BEFORE_SLEEP_SECONDS);
+        sleep(PropertyValue.TEST_BEFORE_SLEEP_SECONDS);
         
         final String ssnLoginURL = getSnnURL(Path.LOGIN);
         System.out.println("   SSN login URL is " + ssnLoginURL);
