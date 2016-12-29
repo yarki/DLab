@@ -62,7 +62,7 @@ def run():
         vpc_cidr = '172.31.0.0/16'
         sg_name = instance_name + '-SG'
 
-        if os.environ['creds_vpc_id'] == '':
+        if os.environ['creds_vpc_id'] == '' or os.environ['creds_vpc_id'] == 'PUT_YOUR_VALUE_HERE':
             try:
                 params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, instance_name)
                 if not run_routine('create_vpc', params):
@@ -77,7 +77,7 @@ def run():
                 sys.exit(1)
             #os.environ['creds_vpc_id'] = create_vpc('172.31.0.0/16', tag_name)
 
-        if os.environ['creds_subnet_id'] == '':
+        if os.environ['creds_subnet_id'] == '' or os.environ['creds_subnet_id'] == 'PUT_YOUR_VALUE_HERE':
             try:
                 params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {}".format(os.environ['creds_vpc_id'], 'ssn', tag_name, instance_name)
                 if not run_routine('create_subnet', params):
@@ -93,7 +93,7 @@ def run():
                 sys.exit(1)
             #os.environ['creds_subnet_id'] = create_subnet(os.environ['creds_vpc_id'], tag_name)
 
-        if os.environ['creds_security_groups_ids'] == '':
+        if os.environ['creds_security_groups_ids'] == '' or os.environ['creds_security_groups_ids'] == 'PUT_YOUR_VALUE_HERE':
             try:
                 ingress_sg_rules_template = [
                     {"IpProtocol": "tcp", "FromPort": "80", "ToPort": "80", "CidrIp": "0.0.0.0/0"},
