@@ -262,6 +262,7 @@ def configure_rstudio():
 def configure_zeppelin_emr_interpreter(args):
     try:
         local('echo \"Configuring emr path for Zeppelin\"')
+        local('sed -i \"/^# export SPARK_HOME/c\export SPARK_HOME\" /opt/zeppelin/conf/zeppelin-env.sh')
         local('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/' + args.emr_version + '\/' +  args.cluster_name + '\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
         local('sed -i \"s/^export HADOOP_CONF_DIR.*/export HADOOP_CONF_DIR=\/opt\/' + args.emr_version + '\/' +  args.cluster_name + '\/conf/\" /opt/' + args.emr_version + '/' +  args.cluster_name + '/spark/conf/spark-env.sh')
         local('service zeppelin-notebook restart')
