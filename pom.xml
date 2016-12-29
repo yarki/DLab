@@ -43,7 +43,7 @@
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
         <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
     </properties>
-
+    
     <dependencies>
         <dependency>
             <groupId>io.dropwizard</groupId>
@@ -60,7 +60,11 @@
             <artifactId>guice</artifactId>
             <version>${com.google.inject.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>de.thomaskrille</groupId>
+            <artifactId>dropwizard-template-config</artifactId>
+            <version>1.4.0</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

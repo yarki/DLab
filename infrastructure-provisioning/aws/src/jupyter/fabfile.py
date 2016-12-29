@@ -36,11 +36,12 @@ def create_image_from_instance(instance_name='', image_name=''):
     for instance in instances:
         image = instance.create_image(Name=image_name,
                                       Description='Automatically created image for notebook server',
-                                      NoReboot=True)
+                                      NoReboot=False)
         image.load()
         while image.state != 'available':
             local("echo Waiting for image creation; sleep 20")
             image.load()
+        image.create_tags(Tags=[{'Key': 'Name', 'Value': os.environ['conf_service_base_name']}])
         return image.id
     return ''
 
@@ -52,8 +53,8 @@ def run():
     logging.getLogger('boto3').setLevel(logging.DEBUG)
 
     instance_class = 'notebook'
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -73,7 +74,7 @@ def run():
     notebook_config['user_keyname'] = os.environ['notebook_user_name']
     # notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
     #     'notebook_user_name'] + '-nb-' + str(provide_index('EC2', '{}-Tag'.format(os.environ['conf_service_base_name']), '{}-{}-nb'.format(os.environ['conf_service_base_name'], os.environ['notebook_user_name'])))
-    notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ['notebook_user_name'] + "-" + notebook_config['exploratory_name'] + "-nb-" + notebook_config['uuid']
+    notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ['notebook_user_name'] + "-nb-" + notebook_config['exploratory_name'] + "-" + notebook_config['uuid']
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-notebook-image'
     notebook_config['role_profile_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
@@ -209,13 +210,13 @@ def run():
         sys.exit(1)
 
     # checking the need for image creation
-    #ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
-    #if ami_id == '':
-    #    print "Looks like it's first time we configure notebook server. Creating image."
-    #    image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
-    #                                          image_name=notebook_config['expected_ami_name'])
-    #    if image_id != '':
-    #        print "Image was successfully created. It's ID is " + image_id
+    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
+    if ami_id == '':
+        print "Looks like it's first time we configure notebook server. Creating image."
+        image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
+                                              image_name=notebook_config['expected_ami_name'])
+        if image_id != '':
+            print "Image was successfully created. It's ID is " + image_id
 
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')
@@ -251,8 +252,8 @@ def run():
 
 # Main function for terminating exploratory environment
 def terminate():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -296,8 +297,8 @@ def terminate():
 
 # Main function for stopping notebook server
 def stop():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -343,8 +344,8 @@ def stop():
 
 # Main function for starting notebook server
 def start():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)

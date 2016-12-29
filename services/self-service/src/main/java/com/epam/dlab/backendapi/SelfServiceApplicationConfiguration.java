@@ -18,64 +18,23 @@ limitations under the License.
 
 package com.epam.dlab.backendapi;
 
-import com.epam.dlab.mongo.MongoServiceFactory;
-import com.epam.dlab.rest.client.RESTServiceFactory;
+import com.epam.dlab.ServiceConfiguration;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 
 /** Configuration for Self Service.
  */
-public class SelfServiceApplicationConfiguration extends Configuration {
-    public static final String MONGO = "mongo";
-    public static final String PROVISIONING_SERVICE = "provisioningService";
+public class SelfServiceApplicationConfiguration extends ServiceConfiguration {
 
     @Valid
     @JsonProperty
     private boolean mocked;
 
-    @Valid
-    @NotNull
-    @JsonProperty(MONGO)
-    private MongoServiceFactory mongoFactory = new MongoServiceFactory();
 
-    @Valid
-    @NotNull
-    @JsonProperty(SECURITY_SERVICE)
-    private RESTServiceFactory securityFactory;
-
-    @Valid
-    @NotNull
-    @JsonProperty(PROVISIONING_SERVICE)
-    private RESTServiceFactory provisioningFactory = new RESTServiceFactory();
-
-    /** Returns <b>true</b> if service is a mock.
-     * @return
-     */
+    /** Returns <b>true</b> if service is a mock. */
     public boolean isMocked() {
         return mocked;
     }
-
-    /** Returns the factory for Mongo database service.
-     */
-    public MongoServiceFactory getMongoFactory() {
-        return mongoFactory;
-    }
-
-    /** Returns the factory for security service. 
-     */
-    public RESTServiceFactory getSecurityFactory() {
-        return securityFactory;
-    }
-
-    /** Returns the factory for provisioning service. 
-     */
-    public RESTServiceFactory getProvisioningFactory() {
-        return provisioningFactory;
-    }
-
+    
 }

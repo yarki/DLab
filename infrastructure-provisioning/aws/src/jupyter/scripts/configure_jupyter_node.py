@@ -25,6 +25,7 @@ import json
 import random
 import string
 import sys
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
@@ -34,13 +35,15 @@ parser.add_argument('--region', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
-scala_link = "http://www.scala-lang.org/files/archive/scala-2.11.8.deb"
-spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
-spark_version = "1.6.2"
-hadoop_version = "2.6"
+spark_version = os.environ['notebook_spark_version']
+hadoop_version = os.environ['notebook_hadoop_version']
+scala_version = '2.11.8'
+scala_link = "http://www.scala-lang.org/files/archive/scala-" + scala_version + ".deb"
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
 py3spark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/py3spark_local/'
 jupyter_conf_file = '/home/ubuntu/.local/share/jupyter/jupyter_notebook_config.py'
+scala_kernel_path = '/usr/local/share/jupyter/kernels/apache_toree_scala/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 
@@ -77,11 +80,21 @@ def ensure_spark_scala():
             sudo('touch ' + py3spark_local_path_dir + 'kernel.json')
             put(templates_dir + 'pyspark_local_template.json', '/tmp/pyspark_local_template.json')
             put(templates_dir + 'py3spark_local_template.json', '/tmp/py3spark_local_template.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/pyspark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/pyspark_local_template.json')
             sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/py3spark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/py3spark_local_template.json')
             sudo('\cp /tmp/py3spark_local_template.json ' + py3spark_local_path_dir + 'kernel.json')
             sudo('pip install --pre toree --no-cache-dir')
             sudo('ln -s /opt/spark/ /usr/local/spark')
             sudo('jupyter toree install')
+            sudo('mv ' + scala_kernel_path + 'lib/* /tmp/')
+            put(templates_dir + 'toree-assembly-0.2.0.jar', '/tmp/toree-assembly-0.2.0.jar')
+            sudo('mv /tmp/toree-assembly-0.2.0.jar ' + scala_kernel_path + 'lib/')
+            sudo('sed -i "s|Apache Toree - Scala|Local Apache Toree - Scala (Scala-' + scala_version + ', Spark-' + spark_version + ')|g" ' + scala_kernel_path + 'kernel.json')
             sudo('touch /home/ubuntu/.ensure_dir/spark_scala_ensured')
         except:
             sys.exit(1)
@@ -94,10 +107,7 @@ def ensure_python3_kernel():
             sudo('apt install -y python3-pip')
             sudo('pip3 install ipython ipykernel --no-cache-dir')
             sudo('python3 -m ipykernel install')
-            sudo('add-apt-repository -y ppa:fkrull/deadsnakes')
-            sudo('apt update')
-            sudo('apt install -y python3.4 python3.4-dev')
-            sudo('python3.4 -m pip install ipython ipykernel  --upgrade --no-cache-dir')
+            sudo('apt-get install -y libssl-dev python-virtualenv')
             sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
         except:
             sys.exit(1)
@@ -118,6 +128,8 @@ def ensure_s3_kernel():
 
 
 def ensure_r_kernel():
+    templates_dir = '/root/templates/'
+    kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
     if not exists('/home/ubuntu/.ensure_dir/r_kernel_ensured'):
         try:
             sudo('apt-get install -y r-base r-base-dev r-cran-rcurl')
@@ -139,10 +151,16 @@ def ensure_r_kernel():
             sudo('R -e "install.packages(\'reshape2\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'caTools\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'ggplot2\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "library(\'devtools\');install.packages(repos=\'http://cran.us.r-project.org\',c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
             sudo('R -e "IRkernel::installspec()"')
+            r_version = sudo("R --version | awk '/version / {print $3}'", capture = True)
+            put(templates_dir + 'r_template.json', '/tmp/r_template.json')
+            sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
+            sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
             # sudo('export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin; R -e \'IRkernel::installspec(user = FALSE)\'')
             # Spark Install
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
@@ -161,8 +179,9 @@ def configure_notebook_server(notebook_name):
             sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
             sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
-            sudo('echo \'c.NotebookApp.cookie_secret = "' + id_generator() + '"\' >> ' + jupyter_conf_file)
+            sudo('echo \'c.NotebookApp.cookie_secret = b"' + id_generator() + '"\' >> ' + jupyter_conf_file)
             sudo('''echo "c.NotebookApp.token = u''" >> ''' + jupyter_conf_file)
+            sudo('echo \'c.KernelSpecManager.ensure_native_kernel = False\' >> ' + jupyter_conf_file)
         except:
             sys.exit(1)
 
@@ -186,7 +205,14 @@ def configure_notebook_server(notebook_name):
         ensure_s3_kernel()
 
         ensure_r_kernel()
-
+    else:
+        try:
+            sudo("sed -i '/^c.NotebookApp.base_url/d' " + jupyter_conf_file)
+            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
+            sudo("systemctl stop jupyter-notebook; sleep 5")
+            sudo("systemctl start jupyter-notebook")
+        except:
+            sys.exit(1)
 
 ##############
 # Run script #

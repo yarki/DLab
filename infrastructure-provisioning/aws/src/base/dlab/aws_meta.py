@@ -21,26 +21,9 @@ import json
 import time
 import logging
 import traceback
-import os
 import sys
-
-
-local_log_filename = "%s.log" % os.environ['request_id']
-local_log_filepath = "/response/" + local_log_filename
-logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                    level=logging.DEBUG,
-                    filename=local_log_filepath)
-import logging
-import os
-import sys
-import traceback
-
-local_log_filename = "%s.log" % os.environ['request_id']
-local_log_filepath = "/response/" + local_log_filename
-logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                    level=logging.DEBUG,
-                    filename=local_log_filepath)
-
+import random
+import string
 
 def get_instance_hostname(instance_name):
     try:
@@ -511,18 +494,22 @@ def get_ami_id(ami_name):
 
 def get_iam_profile(profile_name, count=0):
     client = boto3.client('iam')
+    iam_profile = ''
     try:
-        if count < 20:
+        if count < 10:
             response = client.get_instance_profile(InstanceProfileName=profile_name)
-            iam_profile = response.get('InstanceProfileName')
+            iam_profile = response.get('InstanceProfile').get('InstanceProfileName')
+            time.sleep(5)
             print 'IAM profile checked. Creating instance...'
         else:
-            raise Exception("Unable to find IAM profile by name: " + profile_name)
+            print "Unable to find IAM profile by name: " + profile_name
+            return False
     except:
-        count = count + 1
+        count += 1
         print 'IAM profile is not available yet. Waiting...'
-        time.sleep(10)
+        time.sleep(5)
         get_iam_profile(profile_name, count)
+    print iam_profile
     return iam_profile
 
 
@@ -548,4 +535,5 @@ def check_security_group(security_group_name, count=0):
         traceback.print_exc(file=sys.stdout)
 
 
-
+def id_generator(size=10, chars=string.digits + string.ascii_letters):
+    return ''.join(random.choice(chars) for _ in range(size))

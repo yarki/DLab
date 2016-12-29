@@ -78,13 +78,12 @@ limitations under the License.
         </span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">
-            <li class="dropdown-close"></li>
             <li (click)="exploratoryAction(env, 'stop')" *ngIf="env.status.toLowerCase() != 'stopped' &&
                                                          env.status != 'stopping'">Stop</li>
             <li (click)="exploratoryAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped' ||
                                                         env.status == 'stopping'">Run</li>
             <li (click)="exploratoryAction(env, 'terminate')" *ngIf="env.status.toLowerCase() == 'running' || env.status.toLowerCase() == 'stopped'">Terminate</li>
-            <li (click)="exploratoryAction(env, 'deploy')" *ngIf="env.status != 'stopping' && env.status != 'stopped'">Deploy EMR</li>
+            <li (click)="exploratoryAction(env, 'deploy')" *ngIf="env.status != 'stopping' && env.status != 'stopped' && env.status != 'starting'">Deploy EMR</li>
           </ul>
         </div>
       </div>

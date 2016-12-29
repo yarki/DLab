@@ -26,6 +26,10 @@ import org.hibernate.validator.constraints.NotBlank;
 public class ExploratoryCreateFormDTO {
     @NotBlank
     @JsonProperty
+    private String image;
+
+    @NotBlank
+    @JsonProperty
     private String name;
 
     @NotBlank
@@ -35,6 +39,16 @@ public class ExploratoryCreateFormDTO {
     @NotBlank
     @JsonProperty
     private String version;
+
+    /** Returns the image name of notebook. */
+    public String getImage() {
+    	return image;
+    }
+
+    /** Sets the image name of notebook. */
+    public void setImage(String image) {
+    	this.image = image;
+    }
 
     /** Returns name of notebook. */
     public String getName() {

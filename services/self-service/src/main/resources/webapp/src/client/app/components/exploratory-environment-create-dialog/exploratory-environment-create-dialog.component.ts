@@ -16,13 +16,11 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { Response } from "@angular/http";
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Response } from '@angular/http';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { UserResourceService } from "../../services/userResource.service";
+import { UserResourceService } from '../../services/userResource.service';
 import { ExploratoryEnvironmentCreateModel } from './exploratory-environment-create.model';
-import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
-import { ResourceShapeModel } from '../../models/resourceShape.model';
 
 import { ErrorMapUtils } from './../../util/errorMapUtils';
 import HTTP_STATUS_CODES from 'http-status-enum';
@@ -38,9 +36,9 @@ export class ExploratoryEnvironmentCreateDialog {
   notebookExist: boolean = false;
   checkValidity: boolean = false;
   templateDescription: string;
-  namePattern = "[-_ a-zA-Z0-9]+";
+  namePattern = '[-_a-zA-Z0-9]+';
   resourceGrid: any;
-  environment: any;
+  environment_shape: string;
 
   processError: boolean = false;
   errorMessage: string = '';
@@ -73,26 +71,25 @@ export class ExploratoryEnvironmentCreateDialog {
   }
 
   setDefaultParams(): void {
-    this.environment = {
-      template: this.model.selectedItem.version,
-      shape: this.model.selectedItem.shapes[0].type
-    };
-    this.templates_list.setDefaultOptions(this.model.selectedItem.template_name, 'template', 'template_name');
-    this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'shape', 'type');
+    this.environment_shape = this.model.selectedItem.shapes.Memory_optimized[0].type;
+    this.templates_list.setDefaultOptions(this.model.exploratoryEnvironmentTemplates,
+      this.model.selectedItem.template_name, 'template', 'template_name', 'array');
+    this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
+      this.model.selectedItem.shapes.Memory_optimized[0].description, 'shape', 'description', 'json');
   }
 
   onUpdate($event): void {
     if($event.model.type === 'template') {
-      this.environment.template = $event.model.value.version;
       this.model.setSelectedTemplate($event.model.index);
-      this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes[0].type, 'shape', 'type');
+      this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
+        this.model.selectedItem.shapes.Memory_optimized[0].description, 'shape', 'description', 'json');
     }
 
     if($event.model.type === 'shape')
-      this.environment.shape = $event.model.value.type;
+      this.environment_shape = $event.model.value.type;
   }
 
-  createExploratoryEnvironment_btnClick($event, data, valid, template, shape) {
+  createExploratoryEnvironment_btnClick($event, data, valid, template) {
     this.notebookExist = false;
     this.checkValidity = true;
 
@@ -100,7 +97,7 @@ export class ExploratoryEnvironmentCreateDialog {
       this.notebookExist = true;
       return false;
     }
-    this.model.setCreatingParams(template, data.environment_name, shape);
+    this.model.setCreatingParams(data.environment_name, this.environment_shape);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
@@ -108,7 +105,7 @@ export class ExploratoryEnvironmentCreateDialog {
 
   public open(params): void {
     if (!this.bindDialog.isOpened) {
-      this.model = new ExploratoryEnvironmentCreateModel('', '', '', (response: Response) => {
+      this.model = new ExploratoryEnvironmentCreateModel('', '', '', '', (response: Response) => {
         if (response.status === HTTP_STATUS_CODES.OK) {
           this.close();
           this.buildGrid.emit();

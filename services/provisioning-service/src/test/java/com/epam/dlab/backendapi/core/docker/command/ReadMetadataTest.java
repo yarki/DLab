@@ -21,14 +21,12 @@ package com.epam.dlab.backendapi.core.docker.command;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
+import com.epam.dlab.utils.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static com.epam.dlab.backendapi.core.commands.DockerCommands.MAPPER;
+import java.net.URISyntaxException;
 
 public class ReadMetadataTest {
     private static final String EMR_METADATA_DESCRIPTION_JSON = "/metadata/description.json";
@@ -36,24 +34,21 @@ public class ReadMetadataTest {
 
 
     @Test
-    public void readEmrMetadataTest() throws IOException {
-        ImageMetadataDTO imageMetadataDTO = MAPPER.readValue(
-                readTestResource(EMR_METADATA_DESCRIPTION_JSON),
-                ComputationalMetadataDTO.class);
+    public void readEmrMetadataTest() throws IOException, URISyntaxException {
+        ImageMetadataDTO imageMetadataDTO =
+                ResourceUtils.readResourceAsClass(getClass(),
+                        EMR_METADATA_DESCRIPTION_JSON,
+                        ComputationalMetadataDTO.class);
 
         Assert.assertNotNull(imageMetadataDTO);
     }
 
     @Test
-    public void readJupiterMetadataTest() throws IOException {
-        ImageMetadataDTO imageMetadataDTO = MAPPER.readValue(
-                readTestResource(JUPITER_METADATA_DESCRIPTION_JSON),
+    public void readJupiterMetadataTest() throws IOException, URISyntaxException {
+        ImageMetadataDTO imageMetadataDTO =
+                ResourceUtils.readResourceAsClass(getClass(),
+                    JUPITER_METADATA_DESCRIPTION_JSON,
                 ExploratoryMetadataDTO.class);
         Assert.assertNotNull(imageMetadataDTO);
-    }
-
-    private String readTestResource(String testResourceName) throws IOException {
-        String file = getClass().getResource(testResourceName).getFile();
-        return new String(Files.readAllBytes(Paths.get(file)));
     }
 }

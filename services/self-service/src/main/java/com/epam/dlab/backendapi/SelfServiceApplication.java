@@ -22,10 +22,14 @@ import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.dao.IndexCreator;
 import com.epam.dlab.backendapi.modules.ModuleFactory;
 import com.epam.dlab.backendapi.resources.*;
+import com.epam.dlab.utils.ServiceUtils;
 import com.epam.dlab.rest.mappers.JsonProcessingExceptionMapper;
 import com.epam.dlab.rest.mappers.RuntimeExceptionMapper;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+
+import de.thomaskrille.dropwizard_template_config.TemplateConfigBundle;
+import de.thomaskrille.dropwizard_template_config.TemplateConfigBundleConfiguration;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
@@ -44,7 +48,11 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
     public void initialize(Bootstrap<SelfServiceApplicationConfiguration> bootstrap) {
         super.initialize(bootstrap);
         //bootstrap.addBundle(new AssetsBundle("/webapp/node_modules", "/node_modules", null, "node_modules"));
+        //bootstrap.addBundle(new AssetsBundle("/webapp/dist/dev", "/", "index.html"));
         bootstrap.addBundle(new AssetsBundle("/webapp/dist/prod", "/", "index.html"));
+        bootstrap.addBundle(new TemplateConfigBundle(
+        		new TemplateConfigBundleConfiguration().fileIncludePath(ServiceUtils.getConfPath())
+        ));
     }
 
     @Override

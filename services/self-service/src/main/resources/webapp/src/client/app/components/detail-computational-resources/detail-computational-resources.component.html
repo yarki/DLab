@@ -16,14 +16,17 @@ limitations under the License.
 
 ----------------------------------------------------------------------------------------------------------- -->
 
-<modal #bindDialog  modalClass="detail-dialog modal-sm header-white">
+<modal-dialog #bindDialog  modalClass="detail-dialog modal-sm header-white">
   <modal-header></modal-header>
   <modal-content>
     <div *ngIf="resource">
       <div class="detail-header-wrap">
         <table class="detail-header">
           <tr>
-            <td class="modal-title">{{resource.computational_name}}</td>
+            <td class="tooltip-wrap" (mouseover)="isEllipsisActive($event)">
+              <div class="hint-title">{{resource.computational_name}}</div>
+              <div class="tooltip" [style.visibility]="tooltip ? 'visible': 'hidden'">{{resource.computational_name}}</div>
+            </td>
               <td>
                 <span class="status" [ngClass]="resource.status || ''">
                   {{resource.status}}
@@ -61,4 +64,4 @@ limitations under the License.
       </div>
     </div>
   </modal-content>
-</modal>
+</modal-dialog>

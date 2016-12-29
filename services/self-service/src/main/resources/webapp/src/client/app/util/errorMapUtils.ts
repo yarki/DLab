@@ -21,6 +21,6 @@ export class ErrorMapUtils {
     if(errorCode)
       var defaultStatus = 'Error status [' + errorCode.status + ']. ';
 
-      return defaultStatus.concat(errorCode.statusText);;
+      return defaultStatus.concat(errorCode.statusText);
   }
 }
