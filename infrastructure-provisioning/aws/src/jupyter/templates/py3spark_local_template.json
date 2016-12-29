@@ -7,7 +7,7 @@
   "{connection_file}"
  ],
  "language": "python",
- "display_name": "LocalPySpark (Python-3.5 / Spark-SP_VER )",
+ "display_name": "Local PySpark (Python-3.5 / Spark-SP_VER )",
  "env": {
   "PYSPARK_PYTHON": "python3.5",
   "SPARK_HOME": "/opt/spark/",

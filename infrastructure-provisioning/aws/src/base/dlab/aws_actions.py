@@ -611,12 +611,3 @@ def remove_route_tables(tag_name):
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
-
-
-def remove_apt_lock():
-    try:
-        sudo('rm -f /var/lib/apt/lists/lock')
-        sudo('rm -f /var/cache/apt/archives/lock')
-        sudo('rm -f /var/lib/dpkg/lock')
-    except:
-        sys.exit(1)

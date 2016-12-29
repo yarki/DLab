@@ -1,6 +1,6 @@
 {
   "language": "scala",
-  "display_name": "Apache Toree - Scala (SPARK_VERSION) [CLUSTER]",
+  "display_name": "Apache Toree - Scala (Scala-SC_VER, SPARK_VERSION) [CLUSTER]",
   "env": {
     "__TOREE_SPARK_OPTS__": "--master=yarn --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info",
     "SPARK_HOME": "SPARK_PATH",
