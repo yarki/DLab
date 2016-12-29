@@ -44,13 +44,13 @@ public class Amazon {
         
         System.out.println("Check status of SSN node on Amazon:");
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(instanceName);
-        InstanceState instanceState;
+        String instanceState;
         
         do {
-            instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0).getState();
+            instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0).getState().getName();
         } while (instanceState.equals("shutting-down"));
         
-        Assert.assertEquals(instanceState.getName(), expAmazonState, "Amazon instance state is not correct");
+        Assert.assertEquals(instanceState, expAmazonState, "Amazon instance state is not correct");
         System.out.println("Amazon instance state is " + expAmazonState);           
     }
 }
