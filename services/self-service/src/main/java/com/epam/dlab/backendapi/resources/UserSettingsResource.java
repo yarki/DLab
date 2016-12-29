@@ -18,8 +18,6 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
-import static com.epam.dlab.constants.ServiceConsts.SELF_SERVICE_NAME;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -35,11 +33,8 @@ import org.slf4j.LoggerFactory;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.UserSettingsDAO;
 import com.epam.dlab.exceptions.DlabException;
-import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.SelfServiceAPI;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 import io.dropwizard.auth.Auth;
 
 
@@ -51,10 +46,6 @@ public class UserSettingsResource implements SelfServiceAPI {
 
     @Inject
     private UserSettingsDAO userSettingsDAO;
-    
-    @Inject
-    @Named(SELF_SERVICE_NAME)
-    private RESTService selfService;
     
     @GET
     public String getSettings(@Auth UserInfo userInfo) {
