@@ -288,7 +288,7 @@ def get_vpc_by_cidr(cidr):
 def get_vpc_by_tag(tag_name, tag_value):
     try:
         ec2 = boto3.resource('ec2')
-        for vpc in ec2.vpcs.filter(Filters=[{'Key': tag_name, 'Value': tag_value}]):
+        for vpc in ec2.vpcs.filter(Filters=[{'Name': tag_name, 'Values': [tag_value]}]):
             return vpc.id
         return ''
     except Exception as err:
