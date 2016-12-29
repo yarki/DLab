@@ -157,7 +157,8 @@ export class ResourcesGrid implements OnInit {
            value.exploratory_url,
            value.edge_node_ip,
            value.exploratory_user,
-           value.exploratory_pass);
+           value.exploratory_pass,
+           value.user_own_bicket_name);
        });
      }
    }
