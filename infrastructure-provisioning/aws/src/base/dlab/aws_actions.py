@@ -442,36 +442,32 @@ def s3_cleanup(bucket, cluster_name, user_name):
 
 
 def remove_s3(bucket_type='all', scientist=''):
-    client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
-    bucket_list = []
-    if bucket_type == 'ssn':
-        bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
-    elif bucket_type == 'edge':
-        bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
-    else:
-        bucket_name = (os.environ['conf_service_base_name']).lower().replace('_', '-')
     try:
+        client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
+        bucket_list = []
+        if bucket_type == 'ssn':
+            bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
+        elif bucket_type == 'edge':
+            bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
+        else:
+            bucket_name = (os.environ['conf_service_base_name']).lower().replace('_', '-')
         for item in client.list_buckets().get('Buckets'):
             if bucket_name in item.get('Name'):
-                try:
-                    client.head_bucket(Bucket=item.get('Name'))
-                except:
-                    print "There is no bucket " + bucket_name + " or you do not permission to access it"
-                    sys.exit(0)
                 bucket_list.append(item.get('Name'))
         for s3bucket in bucket_list:
-            list_obj = client.list_objects(Bucket=s3bucket)
-            list_obj = list_obj.get('Contents')
-            if list_obj is not None:
-                for o in list_obj:
-                    list_obj = o.get('Key')
-                    client.delete_objects(
-                        Bucket=s3bucket,
-                        Delete={'Objects': [{'Key': list_obj}]}
-                    )
-                print "The S3 bucket " + s3bucket + " has been cleaned"
-            client.delete_bucket(Bucket=s3bucket)
-            print "The S3 bucket " + s3bucket + " has been deleted successfully"
+            if s3bucket:
+                list_obj = client.list_objects(Bucket=s3bucket)
+                list_obj = list_obj.get('Contents')
+                if list_obj is not None:
+                    for o in list_obj:
+                        list_obj = o.get('Key')
+                        client.delete_objects(
+                            Bucket=s3bucket,
+                            Delete={'Objects': [{'Key': list_obj}]}
+                        )
+                    print "The S3 bucket " + s3bucket + " has been cleaned"
+                client.delete_bucket(Bucket=s3bucket)
+                print "The S3 bucket " + s3bucket + " has been deleted successfully"
         print "There are no more buckets to delete"
     except Exception as err:
         logging.info("Unable to remove S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
