@@ -156,7 +156,7 @@ def ensure_r_kernel():
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
             sudo('R -e "IRkernel::installspec()"')
-            r_version = sudo("R --version | awk '/version / {print $3}'", capture = True)
+            r_version = sudo("R --version | awk '/version / {print $3}'")
             put(templates_dir + 'r_template.json', '/tmp/r_template.json')
             sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
             sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
@@ -211,6 +211,7 @@ def configure_notebook_server(notebook_name):
         try:
             sudo("sed -i '/^c.NotebookApp.base_url/d' " + jupyter_conf_file)
             sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
+            sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
             sudo("systemctl stop jupyter-notebook; sleep 5")
             sudo("systemctl start jupyter-notebook")
         except:
