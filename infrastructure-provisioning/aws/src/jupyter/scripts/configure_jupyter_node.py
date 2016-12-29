@@ -165,6 +165,7 @@ def ensure_r_kernel():
             # Spark Install
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
             #sudo('export SPARK_HOME=/usr/local/spark/; cd $SPARK_HOME/R/lib/; sudo R --no-site-file --no-environ --no-save --no-restore CMD INSTALL "SparkR"')
+            sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
             sudo('touch /home/ubuntu/.ensure_dir/r_kernel_ensured')
         except:
             sys.exit(1)
@@ -211,7 +212,6 @@ def configure_notebook_server(notebook_name):
         try:
             sudo("sed -i '/^c.NotebookApp.base_url/d' " + jupyter_conf_file)
             sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
-            sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
             sudo("systemctl stop jupyter-notebook; sleep 5")
             sudo("systemctl start jupyter-notebook")
         except:
