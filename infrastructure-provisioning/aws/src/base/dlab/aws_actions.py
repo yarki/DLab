@@ -115,7 +115,7 @@ def create_subnet(vpc_id, subnet, tag):
 def enable_auto_assign_ip(subnet_id):
     try:
         client = boto3.client('ec2')
-        client.modify_subnet_attribute(SubnetId=subnet_id, MapPublicIpOnLaunch={'Value': True})
+        client.modify_subnet_attribute(subnetId=subnet_id, MapPublicIpOnLaunch={'Value': True})
     except Exception as err:
         logging.info("Unable to create Subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
