@@ -112,6 +112,20 @@ def create_subnet(vpc_id, subnet, tag):
         traceback.print_exc(file=sys.stdout)
 
 
+def enable_auto_assign_ip(subnet_id):
+    try:
+        client = boto3.client('ec2')
+        client.modify_subnet_attribute(SubnetId=subnet_id, MapPublicIpOnLaunch={'Value': True})
+    except Exception as err:
+        logging.info("Unable to create Subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to create Subnet",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
 def create_instance(definitions, instance_tag):
     try:
         ec2 = boto3.resource('ec2')
