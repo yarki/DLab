@@ -44,7 +44,7 @@ public class Amazon {
         
         System.out.println("Check status of SSN node on Amazon:");
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(instanceName);
-        InstanceState instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0).getState();
+        InstanceState instanceState;
         
         do {
             instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0).getState();
