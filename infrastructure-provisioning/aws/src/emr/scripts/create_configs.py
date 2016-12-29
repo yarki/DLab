@@ -68,14 +68,14 @@ def prepare():
 
 def jars(args):
     print "Downloading jars..."
-    s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
     s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
     local('tar -zhxvf /tmp/jars.tar.gz -C ' + emr_dir)
 
 
 def yarn(args):
     print "Downloading yarn configuration..."
-    s3client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
+    s3client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
     s3resource = boto3.resource('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
     get_files(s3client, s3resource, args.user_name + '/' + args.cluster_name + '/config/', args.bucket, yarn_dir)
     local('sudo mv ' + yarn_dir + args.user_name + '/' + args.cluster_name + '/config/* ' + yarn_dir)
@@ -129,7 +129,7 @@ def pyspark_kernel(args):
     local(
         "PYJ=`find /opt/" + args.emr_version + "/" + args.cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
     local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-    s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
     with file('/tmp/python_version') as f:
         python_version = f.read()
@@ -262,7 +262,7 @@ def configure_rstudio():
 
 
 def installing_python(args):
-    s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
     with file('/tmp/python_version') as f:
         python_version = f.read()
