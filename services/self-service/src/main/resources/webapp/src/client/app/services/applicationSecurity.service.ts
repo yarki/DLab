@@ -52,9 +52,11 @@ export class ApplicationSecurityService {
     let authToken = this.getAuthToken();
 
     if (!!authToken) {
-      this.clearAuthToken();
       return this.serviceFacade
         .buildLogoutRequest()
+        .finally(() => {
+          this.clearAuthToken();
+        })
         .map((response: Response) => {
           return response.status === HTTP_STATUS_CODES.OK;
         }, this);

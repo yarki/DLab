@@ -37,11 +37,13 @@ args = parser.parse_args()
 
 spark_version = os.environ['notebook_spark_version']
 hadoop_version = os.environ['notebook_hadoop_version']
-scala_link = "http://www.scala-lang.org/files/archive/scala-2.11.8.deb"
+scala_version = '2.11.8'
+scala_link = "http://www.scala-lang.org/files/archive/scala-" + scala_version + ".deb"
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/pyspark_local/'
 py3spark_local_path_dir = '/home/ubuntu/.local/share/jupyter/kernels/py3spark_local/'
 jupyter_conf_file = '/home/ubuntu/.local/share/jupyter/jupyter_notebook_config.py'
+scala_kernel_path = '/usr/local/share/jupyter/kernels/apache_toree_scala/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 
@@ -89,9 +91,10 @@ def ensure_spark_scala():
             sudo('pip install --pre toree --no-cache-dir')
             sudo('ln -s /opt/spark/ /usr/local/spark')
             sudo('jupyter toree install')
-            sudo('mv /usr/local/share/jupyter/kernels/apache_toree_scala/lib/* /tmp/')
+            sudo('mv ' + scala_kernel_path + 'lib/* /tmp/')
             put(templates_dir + 'toree-assembly-0.2.0.jar', '/tmp/toree-assembly-0.2.0.jar')
-            sudo('mv /tmp/toree-assembly-0.2.0.jar /usr/local/share/jupyter/kernels/apache_toree_scala/lib/')
+            sudo('mv /tmp/toree-assembly-0.2.0.jar ' + scala_kernel_path + 'lib/')
+            sudo('sed -i "s|Apache Toree - Scala|Local Apache Toree - Scala (Scala-' + scala_version + ', Spark-' + spark_version + ')|g" ' + scala_kernel_path + 'kernel.json')
             sudo('touch /home/ubuntu/.ensure_dir/spark_scala_ensured')
         except:
             sys.exit(1)
@@ -148,16 +151,21 @@ def ensure_r_kernel():
             sudo('R -e "install.packages(\'reshape2\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'caTools\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'ggplot2\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "library(\'devtools\');install.packages(repos=\'http://cran.us.r-project.org\',c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
             sudo('R -e "IRkernel::installspec()"')
+            r_version = sudo("R --version | awk '/version / {print $3}'")
             put(templates_dir + 'r_template.json', '/tmp/r_template.json')
+            sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
             sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
             # sudo('export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin; R -e \'IRkernel::installspec(user = FALSE)\'')
             # Spark Install
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
             #sudo('export SPARK_HOME=/usr/local/spark/; cd $SPARK_HOME/R/lib/; sudo R --no-site-file --no-environ --no-save --no-restore CMD INSTALL "SparkR"')
+            sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
             sudo('touch /home/ubuntu/.ensure_dir/r_kernel_ensured')
         except:
             sys.exit(1)
@@ -186,6 +194,8 @@ def configure_notebook_server(notebook_name):
             sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
             sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
             sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
+            sudo('mkdir /mnt/var')
+            sudo('chown ubuntu:ubuntu /mnt/var')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable jupyter-notebook")
             sudo("systemctl start jupyter-notebook")
