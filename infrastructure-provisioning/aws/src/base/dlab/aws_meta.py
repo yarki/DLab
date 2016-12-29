@@ -245,14 +245,17 @@ def get_subnet_by_cidr(cidr):
         traceback.print_exc(file=sys.stdout)
 
 
-def get_subnet_by_tag(tag):
+def get_subnet_by_tag(tag, subnet_id=False):
     try:
         ec2 = boto3.resource('ec2')
         for subnet in ec2.subnets.filter(Filters=[
             {'Name': 'tag-key', 'Values': [tag.get('Key')]},
             {'Name': 'tag-value', 'Values': [tag.get('Value')]}
         ]):
-            return subnet.cidr_block
+            if subnet_id:
+                return subnet.id
+            else:
+                return subnet.cidr_block
         return ''
     except Exception as err:
         logging.error("Error with getting Subnet CIDR block by tag: " + str(err) + "\n Traceback: " + traceback.print_exc(
@@ -276,6 +279,23 @@ def get_vpc_by_cidr(cidr):
             file=sys.stdout))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Error with getting VPC ID by CIDR",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def get_vpc_by_tag(tag_name, tag_value):
+    try:
+        ec2 = boto3.resource('ec2')
+        for vpc in ec2.vpcs.filter(Filters=[{'Key': tag_name, 'Value': tag_value}]):
+            return vpc.id
+        return ''
+    except Exception as err:
+        logging.error("Error with getting VPC ID by tag: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Error with getting VPC ID by tag",
                    "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))

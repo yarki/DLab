@@ -59,6 +59,64 @@ def run():
         region = os.environ['creds_region']
         ssn_ami_id = get_ami_id(os.environ['ssn_ami_name'])
         policy_path = '/root/templates/policy.json'
+        vpc_cidr = '172.31.0.0/16'
+        sg_name = instance_name + '-SG'
+
+        if os.environ['creds_vpc_id'] == '':
+            try:
+                params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, instance_name)
+                if not run_routine('create_vpc', params):
+                    logging.info('Failed to create VPC')
+                    with open("/root/result.json", 'w') as result:
+                        res = {"error": "Failed to create VPC"}
+                        print json.dumps(res)
+                        result.write(json.dumps(res))
+                    sys.exit(1)
+                os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, instance_name)
+            except:
+                sys.exit(1)
+            #os.environ['creds_vpc_id'] = create_vpc('172.31.0.0/16', tag_name)
+
+        if os.environ['creds_subnet_id'] == '':
+            try:
+                params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {}".format(os.environ['creds_vpc_id'], 'ssn', tag_name, instance_name)
+                if not run_routine('create_subnet', params):
+                    logging.info('Failed to create Subnet')
+                    with open("/root/result.json", 'w') as result:
+                        res = {"error": "Failed to create Subnet"}
+                        print json.dumps(res)
+                        result.write(json.dumps(res))
+                    sys.exit(1)
+                tag = {"Key": tag_name, "Value": "{}-{}-subnet".format(instance_name, 'ssn')}
+                os.environ['creds_subnet_id'] = get_subnet_by_tag(tag, True)
+            except:
+                sys.exit(1)
+            #os.environ['creds_subnet_id'] = create_subnet(os.environ['creds_vpc_id'], tag_name)
+
+        if os.environ['creds_security_groups_ids'] == '':
+            try:
+                ingress_sg_rules_template = [
+                    {"IpProtocol": "tcp", "FromPort": "80", "ToPort": "80", "CidrIp": "0.0.0.0/0"},
+                    {"IpProtocol": "tcp", "FromPort": "8080", "ToPort": "8080", "CidrIp": "0.0.0.0/0"},
+                    {"IpProtocol": "tcp", "FromPort": "22", "ToPort": "22", "CidrIp": "0.0.0.0/0"},
+                    {"IpProtocol": "tcp", "FromPort": "3128", "ToPort": "3128", "CidrIp": vpc_cidr},
+                    {"IpProtocol": "tcp", "FromPort": "443", "ToPort": "443", "CidrIp": '0.0.0.0/0'},
+                    {"IpProtocol": "icmp", "FromPort": "-1", "ToPort": "-1", "CidrIp": '0.0.0.0/0'}
+                ]
+                egress_sg_rules_template = [
+                    {"IpProtocol": "-1", "FromPort": "-1", "ToPort": "-1", "CidrIp": "0.0.0.0/0"},
+                ]
+                params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {}". \
+                    format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), tag_name, instance_name, False)
+                if not run_routine('create_security_group', params):
+                    logging.info('Failed creating security group for SSN')
+                    with open("/root/result.json", 'w') as result:
+                        res = {"error": "Failed creating security group for SSN"}
+                        print json.dumps(res)
+                        result.write(json.dumps(res))
+                    sys.exit(1)
+            except:
+                sys.exit(1)
 
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
