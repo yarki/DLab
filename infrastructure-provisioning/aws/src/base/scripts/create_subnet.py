@@ -33,6 +33,7 @@ parser.add_argument('--vpc_id', type=str, default='')
 parser.add_argument('--username', type=str, default='')
 parser.add_argument('--infra_tag_name', type=str, default='')
 parser.add_argument('--infra_tag_value', type=str, default='')
+parser.add_argument('--prefix', type=str, default='24')
 args = parser.parse_args()
 
 
@@ -65,7 +66,7 @@ if __name__ == "__main__":
                 position = end
             #print 'position: ' + str(position)
 
-        subnet_cidr = '{}.{}.{}.0/24'.format(cidr.split('.')[0], cidr.split('.')[1], position)
+        subnet_cidr = '{}.{}.{}.0/{}'.format(cidr.split('.')[0], cidr.split('.')[1], position, args.prefix)
         subnet_id = get_subnet_by_cidr(subnet_cidr)
         subnet_check = get_subnet_by_tag(tag)
         if not subnet_check:
