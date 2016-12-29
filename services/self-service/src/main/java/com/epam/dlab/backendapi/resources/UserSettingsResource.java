@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.SELF_SERVICE;
+import static com.epam.dlab.constants.ServiceConsts.SELF_SERVICE_NAME;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -53,7 +53,7 @@ public class UserSettingsResource implements SelfServiceAPI {
     private UserSettingsDAO userSettingsDAO;
     
     @Inject
-    @Named(SELF_SERVICE)
+    @Named(SELF_SERVICE_NAME)
     private RESTService selfService;
     
     @GET

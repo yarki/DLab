@@ -1,0 +1,26 @@
+{
+  "image": "docker.epmc-bdcc.projects.epam.com/dlab-aws-emr",
+  "template_name": "DLab AWS EMR",
+  "description": "Image for EMR provisioning",
+  "environment_type": "computational",
+  "computation_resources_shapes":
+  {
+    "Memory optimized" : [
+      {"Size": "S", "Type": "r3.xlarge","Ram": "30.5 GB","Cpu": "4"},
+      {"Size": "M", "Type": "r3.4xlarge","Ram": "122 GB","Cpu": "16"},
+      {"Size": "L", "Type": "r3.8xlarge","Ram": "244 GB","Cpu": "32"}
+    ],
+    "GPU optimized": [
+      {"Size": "M", "Type": "g2.2xlarge","Ram": "15.0 GB","Cpu": "8"}
+    ],
+    "Compute optimized": [
+      {"Size": "S", "Type": "c4.large","Ram": "3.75 GB","Cpu": "2"},
+      {"Size": "M", "Type": "c4.2xlarge","Ram": "15.0 GB","Cpu": "8"},
+      {"Size": "L", "Type": "c4.8xlarge","Ram": "60.0 GB","Cpu": "36"}
+    ]
+  },
+  "templates":
+  [
+    {"version":"emr-5.2.0", "applications": [{"Name":"Hadoop", "Version": "2.7.3"}, {"Name":"Spark", "Version": "2.0.2"}, {"Name":"Hive", "Version": "2.1.0"}]}
+  ]
+}

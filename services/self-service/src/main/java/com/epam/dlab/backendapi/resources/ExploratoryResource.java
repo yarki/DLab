@@ -23,6 +23,7 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
+import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.backendapi.resources.dto.ExploratoryActionFormDTO;
 import com.epam.dlab.backendapi.resources.dto.ExploratoryCreateFormDTO;
 import com.epam.dlab.dto.StatusBaseDTO;
@@ -47,8 +48,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.util.Optional;
+
 import static com.epam.dlab.UserInstanceStatus.*;
-import static com.epam.dlab.backendapi.SelfServiceApplicationConfiguration.PROVISIONING_SERVICE;
 
 @Path("/infrastructure_provision/exploratory_environment")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -61,16 +63,19 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Inject
     private InfrastructureProvisionDAO infrastructureProvisionDAO;
     @Inject
-    @Named(PROVISIONING_SERVICE)
+    @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
 
     @PUT
     public Response create(@Auth UserInfo userInfo, @Valid @NotNull ExploratoryCreateFormDTO formDTO) {
-        LOGGER.debug("creating exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
+        LOGGER.debug("creating exploratory environment {} with name {} for user {}",
+                formDTO.getImage(), formDTO.getName(), userInfo.getName());
         boolean isAdded = infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
                 .withUser(userInfo.getName())
                 .withExploratoryName(formDTO.getName())
                 .withStatus(CREATING.toString())
+                .withImageName(formDTO.getImage())
+                .withImageVersion(formDTO.getVersion())
                 .withShape(formDTO.getShape()));
         if (isAdded) {
             try {
@@ -79,6 +84,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withExploratoryName(formDTO.getName())
                         .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
+                        .withNotebookImage(formDTO.getImage())
                         .withNotebookInstanceType(formDTO.getShape())
                         .withRegion(settingsDAO.getCredsRegion())
                         .withSecurityGroupIds(settingsDAO.getSecurityGroups());
@@ -126,13 +132,20 @@ public class ExploratoryResource implements ExploratoryAPI {
         updateExploratoryStatus(userInfo.getName(), name, exploratoryStatus);
         updateComputationalStatuses(userInfo.getName(), name, computationalStatus);
         try {
-            String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
+            Optional<UserInstanceDTO> opt =
+                    infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), name);
+            if(!opt.isPresent()) {
+                throw new DlabException(String.format("Exploratory instance with name {} not found.", name));
+            }
+
+            UserInstanceDTO userInstance = opt.get();
             ExploratoryStopDTO dto = new ExploratoryStopDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withNotebookImage(userInstance.getImageName())
                     .withExploratoryName(name)
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
-                    .withNotebookInstanceName(exploratoryId)
+                    .withNotebookInstanceName(userInstance.getExploratoryId())
                     .withKeyDir(settingsDAO.getCredsKeyDir())
                     .withSshUser(settingsDAO.getExploratorySshUser())
                     .withRegion(settingsDAO.getCredsRegion());
@@ -154,15 +167,21 @@ public class ExploratoryResource implements ExploratoryAPI {
     }
 
     private String action(UserInfo userInfo, String name, String action, UserInstanceStatus status) {
-        updateExploratoryStatus(userInfo.getName(), name, status);
         try {
-            String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), name);
+            updateExploratoryStatus(userInfo.getName(), name, status);
+            Optional<UserInstanceDTO> opt =
+                    infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), name);
+            if(!opt.isPresent())
+                throw new DlabException(String.format("Exploratory instance with name {} not found.", name));
+
+            UserInstanceDTO userInstance = opt.get();
             ExploratoryActionDTO dto = new ExploratoryActionDTO<>()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withNotebookImage(userInstance.getImageName())
                     .withExploratoryName(name)
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
-                    .withNotebookInstanceName(exploratoryId)
+                    .withNotebookInstanceName(userInstance.getExploratoryId())
                     .withRegion(settingsDAO.getCredsRegion());
             return provisioningService.post(action, dto, String.class);
         } catch (Throwable t) {

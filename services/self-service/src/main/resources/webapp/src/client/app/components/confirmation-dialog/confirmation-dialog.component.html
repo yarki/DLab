@@ -17,7 +17,7 @@ limitations under the License.
 ----------------------------------------------------------------------------------------------------------- -->
 
 
-<modal #bindDialog modalClass="confirmation-dialog modal-md">
+<modal-dialog #bindDialog modalClass="confirmation-dialog modal-md">
   <modal-header>
     <h4 class="modal-title">Exploratory Environment: {{model.notebook.name}}</h4>
   </modal-header>
@@ -51,4 +51,4 @@ limitations under the License.
         <button type="button" class="btn btn-success" (click)="model.confirmAction()">Yes</button>
       </div>
   </modal-content>
-</modal>
+</modal-dialog>
