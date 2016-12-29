@@ -33,7 +33,7 @@ public class KeyDAO extends BaseDAO {
     }
 
     public void updateKey(String user, String status) {
-        update(USER_KEYS, eq(ID, user), set(STATUS, status));
+        updateOne(USER_KEYS, eq(ID, user), set(STATUS, status));
     }
 
     public void deleteKey(String user) {
@@ -45,13 +45,13 @@ public class KeyDAO extends BaseDAO {
     }
 
     public String getUserEdgeIP(String user) {
-        return find(USER_AWS_CREDENTIALS, eq(ID, user), UserAWSCredentialDTO.class)
+        return findOne(USER_AWS_CREDENTIALS, eq(ID, user), UserAWSCredentialDTO.class)
                 .orElse(new UserAWSCredentialDTO())
                 .getPublicIp();
     }
 
     public KeyLoadStatus findKeyStatus(UserInfo userInfo) {
-        return find(USER_KEYS, eq(ID, userInfo.getName()), UserKeyDTO.class)
+        return findOne(USER_KEYS, eq(ID, userInfo.getName()), UserKeyDTO.class)
                 .map(UserKeyDTO::getStatus)
                 .map(KeyLoadStatus::findByStatus)
                 .orElse(KeyLoadStatus.NONE);

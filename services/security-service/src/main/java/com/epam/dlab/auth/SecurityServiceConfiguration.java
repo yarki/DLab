@@ -18,23 +18,19 @@ limitations under the License.
 
 package com.epam.dlab.auth;
 
-import com.epam.dlab.auth.dao.Request;
-import com.epam.dlab.mongo.MongoServiceFactory;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
-import org.apache.directory.ldap.client.api.LdapConnectionConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SecurityServiceConfiguration extends Configuration {
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	private static final String MONGO = "mongo";
+import com.epam.dlab.auth.dao.Request;
+import com.epam.dlab.ServiceConfiguration;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class SecurityServiceConfiguration extends ServiceConfiguration {
 
 	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
@@ -70,7 +66,7 @@ public class SecurityServiceConfiguration extends Configuration {
 	private String ldapBindTemplate;
 	
 	@JsonProperty
-	private Map<String,String> ldapConnectionConfig = new HashMap<>();
+	private Map<String,String> ldapConnectionConfig = new HashMap<String, String>();
 	private LdapConnectionConfig _ldapConnectionConfig;
 	
 	public LdapConnectionConfig getLdapConnectionConfig() {
@@ -91,14 +87,6 @@ public class SecurityServiceConfiguration extends Configuration {
 		return ldapBindTemplate;
 	}
 	
-  @Valid
-  @NotNull
-  @JsonProperty(MONGO)
-  private MongoServiceFactory mongoFactory = new MongoServiceFactory();
-	public MongoServiceFactory getMongoFactory() {
-        return mongoFactory;
-    }
-
 	public boolean isAwsUserIdentificationEnabled() {
 		return awsUserIdentificationEnabled;
 	}

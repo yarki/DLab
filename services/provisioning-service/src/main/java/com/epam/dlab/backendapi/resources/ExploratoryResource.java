@@ -19,7 +19,9 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.core.Directories;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
+import com.epam.dlab.backendapi.core.ICommandExecutor;
 import com.epam.dlab.backendapi.core.commands.*;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.core.response.handlers.ExploratoryCallbackHandler;
@@ -50,7 +52,7 @@ public class ExploratoryResource implements DockerCommands {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private CommandExecutor commandExecuter;
+    private ICommandExecutor commandExecuter;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject
@@ -93,9 +95,11 @@ public class ExploratoryResource implements DockerCommands {
                 .withName(nameContainer(dto.getNotebookUserName(), action, dto.getExploratoryName()))
                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                 .withVolumeForResponse(configuration.getImagesDirectory())
+                .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+                .withResource(getResourceType())
                 .withRequestId(uuid)
                 .withCredsKeyName(configuration.getAdminKey())
-                .withImage(configuration.getNotebookImage())
+                .withImage(dto.getNotebookImage())
                 .withAction(action);
 
         commandExecuter.executeAsync(commandBuilder.buildCommand(runDockerCommand, dto));
@@ -110,4 +114,7 @@ public class ExploratoryResource implements DockerCommands {
         return nameContainer(user, action.toString(), "exploratory", name);
     }
 
+    public String getResourceType() {
+        return Directories.NOTEBOOK_LOG_DIRECTORY;
+    }
 }

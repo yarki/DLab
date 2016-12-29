@@ -21,26 +21,9 @@ import json
 import time
 import logging
 import traceback
-import os
 import sys
-
-
-local_log_filename = "%s.log" % os.environ['request_id']
-local_log_filepath = "/response/" + local_log_filename
-logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                    level=logging.DEBUG,
-                    filename=local_log_filepath)
-import logging
-import os
-import sys
-import traceback
-
-local_log_filename = "%s.log" % os.environ['request_id']
-local_log_filepath = "/response/" + local_log_filename
-logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                    level=logging.DEBUG,
-                    filename=local_log_filepath)
-
+import random
+import string
 
 def get_instance_hostname(instance_name):
     try:
@@ -552,4 +535,5 @@ def check_security_group(security_group_name, count=0):
         traceback.print_exc(file=sys.stdout)
 
 
-
+def id_generator(size=10, chars=string.digits + string.ascii_letters):
+    return ''.join(random.choice(chars) for _ in range(size))
