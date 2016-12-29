@@ -193,6 +193,8 @@ def configure_notebook_server(notebook_name):
             sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
             sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
             sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
+            sudo('mkdir /mnt/var')
+            sudo('chown ubuntu:ubuntu /mnt/var')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable jupyter-notebook")
             sudo("systemctl start jupyter-notebook")
