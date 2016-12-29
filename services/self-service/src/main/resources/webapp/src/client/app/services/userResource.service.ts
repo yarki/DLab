@@ -88,16 +88,10 @@ export class UserResourceService {
       .map((response: Response) => response.json());
   }
 
-  public createUserPreferences(data): Observable<Response> {
+  public updateUserPreferences(data): Observable<Response> {
     let body = JSON.stringify(data);
     return this.applicationServiceFacade
-      .buildCreateUserPreferences(body)
-      .map((response: Response) => response);
-  }
-
-  public suspendUserPreferences(data): Observable<Response> {
-    return this.applicationServiceFacade
-      .buildSuspendUserPreferences(data)
+      .buildUpdateUserPreferences(body)
       .map((response: Response) => response);
   }
 }

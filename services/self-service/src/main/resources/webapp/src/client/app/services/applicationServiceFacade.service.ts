@@ -34,6 +34,7 @@ export class ApplicationServiceFacade {
   private static readonly COMPUTATIONAL_RESOURCES_TEMLATES = 'computational_resources_templates';
   private static readonly COMPUTATIONAL_RESOURCES = 'computational_resources';
   private static readonly USER_PREFERENCES = 'user_preferences';
+  private static readonly USER_PREFERENCES_UPDATE = 'user_preferences_update';
   private accessTokenKey: string = 'access_token';
   private requestRegistry: Dictionary<string>;
 
@@ -139,16 +140,9 @@ export class ApplicationServiceFacade {
       this.getRequestOptions(true, true));
   }
 
-  public buildCreateUserPreferences(data): Observable<Response> {
-    return this.buildRequest(RequestMethod.Put,
-      this.requestRegistry.Item(ApplicationServiceFacade.USER_PREFERENCES),
-      data,
-      this.getRequestOptions(true, true));
-  }
-
-  public buildSuspendUserPreferences(data): Observable<Response> {
-    return this.buildRequest(RequestMethod.Delete,
-      this.requestRegistry.Item(ApplicationServiceFacade.USER_PREFERENCES),
+  public buildUpdateUserPreferences(data): Observable<Response> {
+    return this.buildRequest(RequestMethod.Post,
+      this.requestRegistry.Item(ApplicationServiceFacade.USER_PREFERENCES_UPDATE),
       data,
       this.getRequestOptions(true, true));
   }
@@ -179,8 +173,8 @@ export class ApplicationServiceFacade {
       '/api/infrastructure_provision/computational_resources_templates');
 
     // Filtering Configuration
-    this.requestRegistry.Add(ApplicationServiceFacade.USER_PREFERENCES,
-      'app/components/resources-grid/data.json');
+    this.requestRegistry.Add(ApplicationServiceFacade.USER_PREFERENCES, '/api/user/settings');
+    this.requestRegistry.Add(ApplicationServiceFacade.USER_PREFERENCES_UPDATE, '/api/user/settings/save');
   }
 
   private buildRequest(method: RequestMethod, url: string, body: any, opt: RequestOptions): Observable<Response> {
