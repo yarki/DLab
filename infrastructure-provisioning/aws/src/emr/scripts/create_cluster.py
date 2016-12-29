@@ -97,12 +97,12 @@ def get_object_count(bucket, prefix):
 
 
 def upload_jars_parser(args):
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource('s3', config=Config(signature_version='s3v4'))
     s3.meta.client.upload_file('/root/scripts/jars_parser.sh', args.s3_bucket, 'jars_parser.sh')
 
 
 def upload_user_key(args):
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource('s3', config=Config(signature_version='s3v4'))
     s3.meta.client.upload_file(os.environ['creds_key_dir'] + '/' + os.environ['edge_user_name'] + '.pub', args.s3_bucket, os.environ['edge_user_name'] + '/' + os.environ['edge_user_name'] + '.pub')
     s3.meta.client.upload_file('/root/scripts/key_importer.sh', args.s3_bucket, 'key_importer.sh')
 

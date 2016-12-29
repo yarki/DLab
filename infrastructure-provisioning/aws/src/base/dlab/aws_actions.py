@@ -48,7 +48,7 @@ def put_to_bucket(bucket_name, local_file, destination_file):
 
 def create_s3_bucket(bucket_name, tag, region):
     try:
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', config=Config(signature_version='s3v4'))
         bucket = s3.create_bucket(Bucket=bucket_name,
                                   CreateBucketConfiguration={'LocationConstraint': region})
         tagging = bucket.Tagging()
@@ -420,7 +420,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
 
 
 def s3_cleanup(bucket, cluster_name, user_name):
-    s3_res = boto3.resource('s3')
+    s3_res = boto3.resource('s3', config=Config(signature_version='s3v4'))
     client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
     try:
         client.head_bucket(Bucket=bucket)
