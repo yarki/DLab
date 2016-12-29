@@ -468,7 +468,7 @@ def remove_s3(bucket_type='all', scientist=''):
                     print "The S3 bucket " + s3bucket + " has been cleaned"
                 client.delete_bucket(Bucket=s3bucket)
                 print "The S3 bucket " + s3bucket + " has been deleted successfully"
-        print "There are no more buckets to delete"
+        print "There are no buckets to delete"
     except Exception as err:
         logging.info("Unable to remove S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
