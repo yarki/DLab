@@ -87,7 +87,7 @@ if __name__ == "__main__":
             route_table.associate_with_subnet(SubnetId=subnet_id)
         else:
             print "Subnet ID " + subnet_id
-            os.environ['ssn_subnet_id'] = subnet_id
+            os.system('export ssn_subnet_id="' + subnet_id + '"')
             print "OS subnet ID " + os.environ['creds_subnet_id']
         success = True
     except:
