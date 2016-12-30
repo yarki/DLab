@@ -86,8 +86,6 @@ if __name__ == "__main__":
             route_table = ec2.RouteTable(rt)
             route_table.associate_with_subnet(SubnetId=subnet_id)
         else:
-            global ssn_subnet_id
-            ssn_subnet_id = subnet_id
             print "Subnet ID " + subnet_id
             os.environ['creds_subnet_id'] = subnet_id
             print "OS subnet ID " + os.environ['creds_subnet_id']
