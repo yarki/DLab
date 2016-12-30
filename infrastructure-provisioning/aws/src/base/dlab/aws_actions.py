@@ -356,11 +356,12 @@ def remove_all_iam_resources(instance_type, scientist=''):
                             client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
                         except:
                             print 'There is no policy ' + os.environ['conf_service_base_name'] + '-ssn-Policy to delete'
-                        role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
-                        try:
-                            client.get_instance_profile(InstanceProfileName=role_profile_name)
-                            remove_roles_and_profiles(iam_role, role_profile_name)
-                        except:
+                        role_profiles = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
+                        if role_profiles:
+                            for i in role_profiles:
+                                role_profile_name = i.get('InstanceProfileName')
+                                remove_roles_and_profiles(iam_role, role_profile_name)
+                        else:
                             print "There is no instance profile for " + iam_role
                             client.delete_role(RoleName=iam_role)
                             print "The IAM role " + iam_role + " has been deleted successfully"
