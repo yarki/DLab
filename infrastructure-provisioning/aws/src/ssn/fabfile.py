@@ -89,7 +89,8 @@ def run():
                     sys.exit(1)
                 tag = {"Key": tag_name, "Value": "{}-{}-subnet".format(instance_name, 'ssn')}
                 #os.environ['creds_subnet_id'] = get_subnet_by_tag(tag, True)
-                print "ENABEEEEEEEEEE ------->>>>>====== " + os.environ['ssn_subnet_id']
+                print "ENABEEEEEEEEEE ------->>>>>====== "
+                print os.environ['ssn_subnet_id']
                 enable_auto_assign_ip(os.environ['creds_subnet_id'])
             except:
                 sys.exit(1)
