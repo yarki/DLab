@@ -228,10 +228,13 @@ def get_role_by_name(role_name):
         traceback.print_exc(file=sys.stdout)
 
 
-def get_subnet_by_cidr(cidr):
+def get_subnet_by_cidr(cidr, vpc_id='*'):
     try:
         ec2 = boto3.resource('ec2')
-        for subnet in ec2.subnets.filter(Filters=[{'Name': 'cidrBlock', 'Values': [cidr]}]):
+        for subnet in ec2.subnets.filter(Filters=[
+            {'Name': 'cidrBlock', 'Values': [cidr]},
+            {'Name': 'vpc-id', 'Values': [vpc_id]}
+        ]):
             return subnet.id
         return ''
     except Exception as err:
@@ -245,12 +248,13 @@ def get_subnet_by_cidr(cidr):
         traceback.print_exc(file=sys.stdout)
 
 
-def get_subnet_by_tag(tag, subnet_id=False):
+def get_subnet_by_tag(tag, subnet_id=False, vpc_id='*'):
     try:
         ec2 = boto3.resource('ec2')
         for subnet in ec2.subnets.filter(Filters=[
             {'Name': 'tag-key', 'Values': [tag.get('Key')]},
-            {'Name': 'tag-value', 'Values': [tag.get('Value')]}
+            {'Name': 'tag-value', 'Values': [tag.get('Value')]},
+            {'Name': 'vpc-id', 'Values': [vpc_id]}
         ]):
             if subnet_id:
                 return subnet.id

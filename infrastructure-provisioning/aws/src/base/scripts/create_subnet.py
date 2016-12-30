@@ -68,8 +68,12 @@ if __name__ == "__main__":
             #print 'position: ' + str(position)
 
         subnet_cidr = '{}.{}.{}.0/{}'.format(cidr.split('.')[0], cidr.split('.')[1], position, args.prefix)
-        subnet_id = get_subnet_by_cidr(subnet_cidr)
-        subnet_check = get_subnet_by_tag(tag)
+        if ssn:
+            subnet_id = get_subnet_by_cidr(subnet_cidr, args.vpc_id)
+            subnet_check = get_subnet_by_tag(tag, False, args.vpc_id)
+        else:
+            subnet_id = get_subnet_by_cidr(subnet_cidr)
+            subnet_check = get_subnet_by_tag(tag)
         if not subnet_check:
             if subnet_id == '':
                 print "Creating subnet %s in vpc %s with tag %s." % \
