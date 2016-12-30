@@ -86,11 +86,8 @@ if __name__ == "__main__":
             route_table = ec2.RouteTable(rt)
             route_table.associate_with_subnet(SubnetId=subnet_id)
         else:
-            print "Subnet ID " + subnet_id
-            print "Path: " + os.environ['ssn_dlab_path']
             with open('/tmp/ssn_subnet_id', 'w') as f:
                 f.write(subnet_id)
-            print "OS subnet ID " + os.environ['creds_subnet_id']
         success = True
     except:
         success = False

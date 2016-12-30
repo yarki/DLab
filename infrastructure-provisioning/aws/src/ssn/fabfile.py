@@ -87,25 +87,21 @@ def run():
                         print json.dumps(res)
                         result.write(json.dumps(res))
                     sys.exit(1)
-                tag = {"Key": tag_name, "Value": "{}-{}-subnet".format(instance_name, 'ssn')}
-                #os.environ['creds_subnet_id'] = get_subnet_by_tag(tag, True)
                 with open('/tmp/ssn_subnet_id', 'r') as f:
                     os.environ['creds_subnet_id'] = f.read()
-                print "ENABEEEEEEEEEE ------->>>>>====== " + os.environ['creds_subnet_id']
                 enable_auto_assign_ip(os.environ['creds_subnet_id'])
             except:
                 sys.exit(1)
-            #os.environ['creds_subnet_id'] = create_subnet(os.environ['creds_vpc_id'], tag_name)
 
         if os.environ['creds_security_groups_ids'] == '' or os.environ['creds_security_groups_ids'] == 'PUT_YOUR_VALUE_HERE':
             try:
                 ingress_sg_rules_template = [
-                    {"IpProtocol": "tcp", "FromPort": "80", "ToPort": "80", "CidrIp": "0.0.0.0/0"},
-                    {"IpProtocol": "tcp", "FromPort": "8080", "ToPort": "8080", "CidrIp": "0.0.0.0/0"},
-                    {"IpProtocol": "tcp", "FromPort": "22", "ToPort": "22", "CidrIp": "0.0.0.0/0"},
-                    {"IpProtocol": "tcp", "FromPort": "3128", "ToPort": "3128", "CidrIp": vpc_cidr},
-                    {"IpProtocol": "tcp", "FromPort": "443", "ToPort": "443", "CidrIp": '0.0.0.0/0'},
-                    {"IpProtocol": "icmp", "FromPort": "-1", "ToPort": "-1", "CidrIp": '0.0.0.0/0'}
+                    {"IpProtocol": "tcp", "FromPort": "80", "ToPort": "80", "IpRanges": []},
+                    {"IpProtocol": "tcp", "FromPort": "8080", "ToPort": "8080", "IpRanges": []},
+                    {"IpProtocol": "tcp", "FromPort": "22", "ToPort": "22", "IpRanges": []},
+                    {"IpProtocol": "tcp", "FromPort": "3128", "ToPort": "3128", "IpRanges": [{"CidrIp": vpc_cidr}]},
+                    {"IpProtocol": "tcp", "FromPort": "443", "ToPort": "443", "IpRanges": []},
+                    {"IpProtocol": "icmp", "FromPort": "-1", "ToPort": "-1", "IpRanges": []}
                 ]
                 egress_sg_rules_template = [
                     {"IpProtocol": "-1", "FromPort": "-1", "ToPort": "-1", "CidrIp": "0.0.0.0/0"},
