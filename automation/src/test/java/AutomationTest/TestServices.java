@@ -62,7 +62,8 @@ public class TestServices {
         //sleep(PropertyValue.TEST_AFTER_SLEEP_SECONDS);
     }
     
-    //TODO copyFileToSSN and copyFileToNotebook
+    //TODO 
+    // please finished copyFileToSSN, copyFileToNotebook and BUCKET_NAME
     public void testPyton(String ssnIP, String noteBookIp, String serviceBaseName, String emrName) throws JSchException, IOException {
 
         Session session = SSHConnect.getConnect("ubuntu", ssnIP, 22);
@@ -327,6 +328,9 @@ public class TestServices {
         Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-emr-" + noteBookName, AmazonInstanceState.RUNNING);
 
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_computational_EMRAutoTest", publicIp);
+        
+        //run python script
+        testPyton(publicIp, notebookIp, serviceBaseName, emrName);
 
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
