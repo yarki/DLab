@@ -148,7 +148,6 @@ def run():
                 with open('/tmp/ssn_sg_id', 'r') as f:
                     os.environ['creds_security_groups_ids'] = f.read()
             except:
-                remove_vpc(os.environ['creds_vpc_id'])
                 sys.exit(1)
 
         logging.info('[CREATE ROLES]')
