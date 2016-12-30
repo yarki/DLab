@@ -88,7 +88,7 @@ if __name__ == "__main__":
         else:
             print "Subnet ID " + subnet_id
             print "Path: " + os.environ['ssn_dlab_path']
-            with open(os.environ['ssn_dlab_path'] + 'tmp/ssn_subnet_id', 'w') as f:
+            with open('/tmp/ssn_subnet_id', 'w') as f:
                 f.write(subnet_id)
             print "OS subnet ID " + os.environ['creds_subnet_id']
         success = True
