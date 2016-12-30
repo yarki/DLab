@@ -88,6 +88,7 @@ if __name__ == "__main__":
         else:
             print "Subnet ID " + subnet_id
             ssn_subnet_id = subnet_id
+            print "Global " + ssn_subnet_id
             print "OS subnet ID " + os.environ['creds_subnet_id']
         success = True
     except:
