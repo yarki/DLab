@@ -1,13 +1,27 @@
 package AutomationTest;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.InstanceState;
+
 import Repository.ContentType;
 import Repository.HttpStatusCode;
 import Repository.Path;
 import ServiceCall.JenkinsCall;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+
 import AmazonHelper.Amazon;
 import AmazonHelper.AmazonInstanceState;
 import DataModel.CreateNotebookDto;
@@ -15,6 +29,7 @@ import DataModel.DeployEMRDto;
 import DataModel.LoginDto;
 import DockerHelper.*;
 import Infrastucture.HttpRequest;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.testng.Assert;
@@ -28,6 +43,7 @@ public class TestServices {
     String serviceBaseName;
     private String ssnURL;
     private String publicIp;
+    private String notebookIp;
 
     final static Logger logger = Logger.getLogger(TestServices.class.getName());
 
@@ -44,6 +60,26 @@ public class TestServices {
     @AfterClass
     public static void Cleanup() throws InterruptedException {
         //sleep(PropertyValue.TEST_AFTER_SLEEP_SECONDS);
+    }
+    
+    //TODO copyFileToSSN and copyFileToNotebook
+    public void testPyton(String ssnIP, String noteBookIp, String serviceBaseName, String emrName) throws JSchException, IOException {
+
+        Session session = SSHConnect.getConnect("ubuntu", ssnIP, 22);
+        InputStream copyFileToSSN = SSHConnect.setCommand(session, "scp -i /var/lib/jenkins/AutoTestData/train.csv ubuntu@" +ssnIP+ ":~/"); 
+        InputStream copyFileToNotebook = SSHConnect.setCommand(session, "scp -i PATH_TO_KEY FILE_PATH ubuntu@" + noteBookIp + ":/tmp/"); 
+        
+        InputStream connectToNotebook = SSHConnect.setCommand(session, "ssh ubuntu@" + noteBookIp + " -i keys/BDCC-DSS-POC.pem");  
+        
+        String BUCKET_NAME = serviceBaseName + "[username]-[bucket]";
+        InputStream runScript = SSHConnect.setCommand(session, "/usr/bin/python /tmp/pyspark_test.py --bucket BUCKET_NAME --cluster_name " + emrName);  
+        
+        InputStream getStatus = SSHConnect.setCommand(session, "echo $?");  
+        
+        BufferedReader reader = new BufferedReader(new InputStreamReader(getStatus));         
+        String actualStatus = reader.readLine();
+        
+        Assert.assertEquals(actualStatus, "0", "The python script work not correct");
     }
     
     
@@ -259,6 +295,13 @@ public class TestServices {
         Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-nb-" + noteBookName, AmazonInstanceState.RUNNING);
 
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_exploratory_NotebookAutoTest", publicIp);
+        
+        //get notebook IP
+        DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(noteBookName);
+        InstanceState instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0)
+            .getState();
+        notebookIp = describeInstanceResult.getReservations().get(0).getInstances().get(0).getPrivateIpAddress();
+        
 
         System.out.println("8. EMR will be deployed ...");
         final String ssnCompResURL = getSnnURL(Path.COMPUTATIONAL_RES);
