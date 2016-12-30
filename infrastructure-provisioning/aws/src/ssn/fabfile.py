@@ -73,7 +73,6 @@ def run():
                         result.write(json.dumps(res))
                     sys.exit(1)
                 os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, instance_name)
-                print "VPC ----> " + os.environ['creds_vpc_id']
             except:
                 sys.exit(1)
 
@@ -163,6 +162,7 @@ def run():
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
+        print "HERE-----------------------------------------------!!!!"
     except:
         try:
             remove_sgroups(instance_name)
