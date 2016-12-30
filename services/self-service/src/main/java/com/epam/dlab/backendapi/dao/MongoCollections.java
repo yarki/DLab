@@ -26,4 +26,5 @@ public interface MongoCollections {
     String USER_AWS_CREDENTIALS = "userAWSCredentials";
     String USER_INSTANCES = "userInstances";
     String SHAPES = "shapes";
+    String USER_UI_SETTINGS = "userUISettings";
 }
