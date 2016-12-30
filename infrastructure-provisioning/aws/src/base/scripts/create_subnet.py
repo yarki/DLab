@@ -89,6 +89,7 @@ if __name__ == "__main__":
             print "Subnet ID " + subnet_id
             os.system('export ssn_subnet_id="' + subnet_id + '"')
             print os.environ['ssn_subnet_id']
+            ssn_subnet_id = subnet_id
             print "OS subnet ID " + os.environ['creds_subnet_id']
         success = True
     except:
