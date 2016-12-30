@@ -23,8 +23,14 @@ import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Singleton;
 import org.bson.Document;
 
+/** DAO write the attempt of user login into DLab.
+ * */
 @Singleton
 public class SecurityDAO extends BaseDAO {
+	
+	/** Write the attempt of user login into Mongo database.
+	 * @param credentials user credentials.
+	 */
     public void writeLoginAttempt(UserCredentialDTO credentials) {
         insertOne(LOGIN_ATTEMPTS,
                 () -> new Document("login", credentials.getUsername()).append("iamlogin", UsernameUtils.removeDomain(credentials.getUsername())));

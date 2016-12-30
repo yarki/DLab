@@ -60,26 +60,8 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         return and(eq(USER, user), eq(EXPLORATORY_NAME, exploratoryName));
     }
 
-    public static Bson computationalCondition(String user,
-                                              String exploratoryName,
-                                              String computationalName) {
-        return and(exploratoryCondition(user, exploratoryName),
-                elemMatch(COMPUTATIONAL_RESOURCES, eq(COMPUTATIONAL_NAME, computationalName)));
-    }
-
-    public static Bson computationalConditionUnwind(String user,
-                                                    String exploratoryName,
-                                                    String computationalName) {
-        return and(exploratoryCondition(user, exploratoryName),
-                eq(computationalFieldDotted(COMPUTATIONAL_NAME), computationalName));
-    }
-
-    public static String computationalFieldFilter(String fieldName) {
+    private static String computationalFieldFilter(String fieldName) {
         return COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + fieldName;
-    }
-
-    public static String computationalFieldDotted(String fieldName) {
-        return COMPUTATIONAL_RESOURCES + FIELD_DELIMETER + fieldName;
     }
 
     public Iterable<Document> find(String user) {
@@ -90,6 +72,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         return mongoService.getCollection(SHAPES).find();
     }
 
+    /** Finds and returns the unique id for exploratory.
+     * @param user user name.
+     * @param exploratoryName the name of exploratory.
+     */
     public String fetchExploratoryId(String user, String exploratoryName) {
         return findOne(USER_INSTANCES,
                 exploratoryCondition(user, exploratoryName),
@@ -98,6 +84,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 .getOrDefault(EXPLORATORY_ID, EMPTY).toString();
     }
 
+    /** Finds and returns the status of exploratory.
+     * @param user user name.
+     * @param exploratoryName the name of exploratory.
+     */
     public UserInstanceStatus fetchExploratoryStatus(String user, String exploratoryName) {
         return UserInstanceStatus.of(
                 findOne(USER_INSTANCES,
@@ -107,6 +97,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                         .getOrDefault(STATUS, EMPTY).toString());
     }
 
+    /** Finds and returns the info of exploratory.
+     * @param user user name.
+     * @param exploratoryName the name of exploratory.
+     */
     public Optional<UserInstanceDTO> fetchExploratoryFields(String user, String exploratoryName) {
         return findOne(USER_INSTANCES,
                 exploratoryCondition(user, exploratoryName),
@@ -114,21 +108,34 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 UserInstanceDTO.class);
     }
 
+    /** Inserts the info about notebook into Mongo database.
+     * @param dto the info about notebook 
+     * @return <b>true</b> if operation was successful, otherwise <b>false</b>.
+     */
     public boolean insertExploratory(UserInstanceDTO dto) {
         try {
             insertOne(USER_INSTANCES, dto);
             return true;
         } catch (MongoWriteException e) {
+        	// TODO: Lost error message
             return false;
         }
     }
 
-    public UpdateResult updateExploratoryStatus(StatusBaseDTO dto) {
+    /** Updates the status of exploratory in Mongo database.
+     * @param dto object of exploratory status info.
+     * @return The result of an update operation.
+     */
+    public UpdateResult updateExploratoryStatus(StatusBaseDTO<?> dto) {
         return updateOne(USER_INSTANCES,
                 exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                 set(STATUS, dto.getStatus()));
     }
 
+    /** Updates the info of exploratory in Mongo database.
+     * @param dto object of exploratory status info.
+     * @return The result of an update operation.
+     */
     public UpdateResult updateExploratoryFields(ExploratoryStatusDTO dto) {
         Document values = new Document(STATUS, dto.getStatus()).append(UPTIME, dto.getUptime());
         if (dto.getExploratoryId() != null) {
@@ -148,9 +155,18 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 new Document(SET, values));
     }
 
+    /** Add the user's computational resource for notebook into database.
+     * @param user user name.
+     * @param exploratoryName name of exploratory.
+     * @param computationalDTO object of computational resource.
+     * @return <b>true</b> if operation was successful, otherwise <b>false</b>.
+     */
     public boolean addComputational(String user, String exploratoryName, UserComputationalResourceDTO computationalDTO) {
         Optional<Document> optional = findOne(USER_INSTANCES,
-                computationalCondition(user, exploratoryName, computationalDTO.getComputationalName()));
+        		and(exploratoryCondition(user, exploratoryName),
+                        elemMatch(COMPUTATIONAL_RESOURCES,
+                        		eq(COMPUTATIONAL_NAME, computationalDTO.getComputationalName())))
+                );
 
         if (!optional.isPresent()) {
             updateOne(USER_INSTANCES,
@@ -162,6 +178,11 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
     }
 
+    /** Finds and returns the unique id for computational resource.
+     * @param user user name.
+     * @param exploratoryName the name of exploratory.
+     * @param computationalName name of computational resource.
+     */
     public String fetchComputationalId(String user, String exploratoryName, String computationalName) {
         Document doc = findOne(USER_INSTANCES,
                 exploratoryCondition(user, exploratoryName),
@@ -171,26 +192,29 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 computationalFieldFilter(COMPUTATIONAL_ID), EMPTY).toString();
     }
 
-    public UpdateResult updateComputationalStatus(ComputationalStatusDTO dto) {
-        return updateComputationalStatus(dto.getUser(), dto.getExploratoryName(), dto.getComputationalName(), dto.getStatus(), false);
-    }
-
-    private UpdateResult updateComputationalStatus(String user, String exploratoryName, String computationalName, String status, boolean clearUptime) {
+    /** Updates the status of computational resource in Mongo database.
+     * @param dto object of computational resource status.
+     * @return The result of an update operation.
+     */
+    public UpdateResult updateComputationalStatus(ComputationalStatusDTO dto) throws DlabException {
         try {
-            Document values = new Document(computationalFieldFilter(STATUS), status);
-            if (clearUptime) {
-                values.append(computationalFieldFilter(UPTIME), null);
-            }
+            Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus());
             return updateOne(USER_INSTANCES,
-                    and(exploratoryCondition(user, exploratoryName),
-                            elemMatch(COMPUTATIONAL_RESOURCES, and(eq(COMPUTATIONAL_NAME, computationalName), not(eq(STATUS, TERMINATED.toString()))))),
+                    and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
+                            elemMatch(COMPUTATIONAL_RESOURCES,
+                            		and(eq(COMPUTATIONAL_NAME, dto.getComputationalName()),
+                            				not(eq(STATUS, TERMINATED.toString()))))),
                     new Document(SET, values));
         } catch (Throwable t) {
             throw new DlabException("Could not update computational resource status", t);
         }
     }
 
-    public UpdateResult updateComputationalStatusesForExploratory(StatusBaseDTO dto) {
+    /** Updates the status of exploratory notebooks in Mongo database.
+     * @param dto object of exploratory status info.
+     * @return The result of an update operation.
+     */
+    public UpdateResult updateComputationalStatusesForExploratory(StatusBaseDTO<?> dto) {
         Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus());
         values.append(computationalFieldFilter(UPTIME), null);
         long modifiedCount;
@@ -210,7 +234,11 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         return result;
     }
 
-    public UpdateResult updateComputationalFields(ComputationalStatusDTO dto) {
+    /** Updates the info of computational resource in Mongo database.
+     * @param dto object of computational resource status.
+     * @return The result of an update operation.
+     */
+    public UpdateResult updateComputationalFields(ComputationalStatusDTO dto) throws DlabException {
         try {
             Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus())
                     .append(computationalFieldFilter(UPTIME), dto.getUptime());
