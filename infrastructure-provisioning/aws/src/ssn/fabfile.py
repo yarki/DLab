@@ -149,7 +149,7 @@ def run():
                     os.environ['creds_security_groups_ids'] = f.read()
             except:
                 sys.exit(1)
-
+        print "HERE-----------------------------------------------!!!!"
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
         params = "--role_name %s --role_profile_name %s --policy_name %s --policy_file_name %s" % \
@@ -162,7 +162,6 @@ def run():
                 print json.dumps(res)
                 result.write(json.dumps(res))
             sys.exit(1)
-        print "HERE-----------------------------------------------!!!!"
     except:
         try:
             remove_sgroups(instance_name)
