@@ -79,8 +79,6 @@ def run():
 
         if os.environ['creds_subnet_id'] == '' or os.environ['creds_subnet_id'] == 'PUT_YOUR_VALUE_HERE':
             try:
-                global ssn_subnet_id
-                #ssn_subnet_id = 'none'
                 params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {} --prefix {} --ssn {}".format(os.environ['creds_vpc_id'], 'ssn', tag_name, instance_name, '20', True)
                 if not run_routine('create_subnet', params):
                     logging.info('Failed to create Subnet')
@@ -91,8 +89,9 @@ def run():
                     sys.exit(1)
                 tag = {"Key": tag_name, "Value": "{}-{}-subnet".format(instance_name, 'ssn')}
                 #os.environ['creds_subnet_id'] = get_subnet_by_tag(tag, True)
-                print "ENABEEEEEEEEEE ------->>>>>====== "
-                print ssn_subnet_id
+                with open(os.environ['ssn_dlab_path'] + 'tmp/ssn_subnet_id', 'r') as f:
+                    os.environ['creds_subnet_id'] = f.read()
+                print "ENABEEEEEEEEEE ------->>>>>====== " + os.environ['creds_subnet_id']
                 enable_auto_assign_ip(os.environ['creds_subnet_id'])
             except:
                 sys.exit(1)
