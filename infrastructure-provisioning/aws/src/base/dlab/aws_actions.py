@@ -360,7 +360,8 @@ def remove_all_iam_resources(instance_type, scientist=''):
                         if role_profiles:
                             for i in role_profiles:
                                 role_profile_name = i.get('InstanceProfileName')
-                                remove_roles_and_profiles(iam_role, role_profile_name)
+                                if role_profile_name == os.environ['conf_service_base_name'] + '-ssn-Profile':
+                                    remove_roles_and_profiles(iam_role, role_profile_name)
                         else:
                             print "There is no instance profile for " + iam_role
                             client.delete_role(RoleName=iam_role)
