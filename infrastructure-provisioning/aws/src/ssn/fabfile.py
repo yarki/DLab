@@ -75,7 +75,6 @@ def run():
                 os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, instance_name)
             except:
                 sys.exit(1)
-            #os.environ['creds_vpc_id'] = create_vpc('172.31.0.0/16', tag_name)
 
         if os.environ['creds_subnet_id'] == '' or os.environ['creds_subnet_id'] == 'PUT_YOUR_VALUE_HERE':
             try:
@@ -91,48 +90,49 @@ def run():
                     os.environ['creds_subnet_id'] = f.read()
                 enable_auto_assign_ip(os.environ['creds_subnet_id'])
             except:
+                remove_vpc(os.environ['creds_vpc_id'])
                 sys.exit(1)
 
         if os.environ['creds_security_groups_ids'] == '' or os.environ['creds_security_groups_ids'] == 'PUT_YOUR_VALUE_HERE':
             try:
                 ingress_sg_rules_template = [
-            {
-                "PrefixListIds": [],
-                "FromPort": 80,
-                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
-                "ToPort": 80, "IpProtocol": "tcp", "UserIdGroupPairs": []
-            },
-            {
-                "PrefixListIds": [],
-                "FromPort": 8080,
-                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
-                "ToPort": 8080, "IpProtocol": "tcp", "UserIdGroupPairs": []
-            },
-            {
-                "PrefixListIds": [],
-                "FromPort": 22,
-                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
-                "ToPort": 22, "IpProtocol": "tcp", "UserIdGroupPairs": []
-            },
-            {
-                "PrefixListIds": [],
-                "FromPort": 3128,
-                "IpRanges": [{"CidrIp": vpc_cidr}],
-                "ToPort": 3128, "IpProtocol": "tcp", "UserIdGroupPairs": []
-            },
-            {
-                "PrefixListIds": [],
-                "FromPort": 443,
-                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
-                "ToPort": 443, "IpProtocol": "tcp", "UserIdGroupPairs": []
-            },
-            {
-                "PrefixListIds": [],
-                "FromPort": -1,
-                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
-                "ToPort": -1, "IpProtocol": "icmp", "UserIdGroupPairs": []
-            }
-        ]
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 80,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 80, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 8080,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 8080, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 22,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 22, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 3128,
+                        "IpRanges": [{"CidrIp": vpc_cidr}],
+                        "ToPort": 3128, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 443,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 443, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": -1,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": -1, "IpProtocol": "icmp", "UserIdGroupPairs": []
+                    }
+                ]
                 egress_sg_rules_template = [
                     {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}
                 ]
@@ -145,7 +145,10 @@ def run():
                         print json.dumps(res)
                         result.write(json.dumps(res))
                     sys.exit(1)
+                with open('/tmp/ssn_sg_id', 'r') as f:
+                    os.environ['creds_security_groups_ids'] = f.read()
             except:
+                remove_vpc(os.environ['creds_vpc_id'])
                 sys.exit(1)
 
         logging.info('[CREATE ROLES]')
@@ -161,6 +164,10 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        try:
+            remove_sgroups(instance_name)
+        except:
+            print "Pre-defined security group exists. Removing SG for SSN will be removed."
         sys.exit(1)
 
     try:
@@ -177,6 +184,10 @@ def run():
             sys.exit(1)
     except:
         remove_all_iam_resources(instance)
+        try:
+            remove_sgroups(instance_name)
+        except:
+            print "Pre-defined security group exists. Removing SG for SSN will be removed."
         sys.exit(1)
 
     try:
@@ -194,6 +205,10 @@ def run():
             sys.exit(1)
     except:
         remove_all_iam_resources(instance)
+        try:
+            remove_sgroups(instance_name)
+        except:
+            print "Pre-defined security group exists. Removing SG for SSN will be removed."
         sys.exit(1)
 
     try:
@@ -215,6 +230,10 @@ def run():
     except:
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        try:
+            remove_sgroups(instance_name)
+        except:
+            print "Pre-defined security group exists. Removing SG for SSN will be removed."
         sys.exit(1)
 
     try:
@@ -237,6 +256,10 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        try:
+            remove_sgroups(instance_name)
+        except:
+            print "Pre-defined security group exists. Removing SG for SSN will be removed."
         sys.exit(1)
 
     try:
@@ -257,6 +280,10 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        try:
+            remove_sgroups(instance_name)
+        except:
+            print "Pre-defined security group exists. Removing SG for SSN will be removed."
         sys.exit(1)
 
     try:
@@ -281,6 +308,10 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        try:
+            remove_sgroups(instance_name)
+        except:
+            print "Pre-defined security group exists. Removing SG for SSN will be removed."
         sys.exit(1)
 
     try:
@@ -301,6 +332,10 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        try:
+            remove_sgroups(instance_name)
+        except:
+            print "Pre-defined security group exists. Removing SG for SSN will be removed."
         sys.exit(1)
 
     try:
@@ -318,6 +353,10 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        try:
+            remove_sgroups(instance_name)
+        except:
+            print "Pre-defined security group exists. Removing SG for SSN will be removed."
         sys.exit(1)
 
     try:
@@ -389,6 +428,10 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        try:
+            remove_sgroups(instance_name)
+        except:
+            print "Pre-defined security group exists. Removing SG for SSN will be removed."
         sys.exit(1)
 
 def terminate():

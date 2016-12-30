@@ -78,6 +78,18 @@ def create_vpc(vpc_cidr, tag):
         traceback.print_exc(file=sys.stdout)
 
 
+def remove_vpc(vpc_id):
+    try:
+        client = boto3.client('ec2')
+        client.delete_vpc(VpcId=vpc_id)
+    except Exception as err:
+        logging.info("Unable to remove VPC: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove VPC", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
 def create_tag(resource, tag):
     try:
         ec2 = boto3.client('ec2')
