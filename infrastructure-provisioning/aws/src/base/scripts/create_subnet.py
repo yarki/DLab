@@ -68,7 +68,7 @@ if __name__ == "__main__":
             #print 'position: ' + str(position)
 
         subnet_cidr = '{}.{}.{}.0/{}'.format(cidr.split('.')[0], cidr.split('.')[1], position, args.prefix)
-        if ssn:
+        if args.ssn:
             subnet_id = get_subnet_by_cidr(subnet_cidr, args.vpc_id)
             subnet_check = get_subnet_by_tag(tag, False, args.vpc_id)
         else:
