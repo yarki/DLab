@@ -96,8 +96,43 @@ def run():
         if os.environ['creds_security_groups_ids'] == '' or os.environ['creds_security_groups_ids'] == 'PUT_YOUR_VALUE_HERE':
             try:
                 ingress_sg_rules_template = [
-                    {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}
-                ]
+            {
+                "PrefixListIds": [],
+                "FromPort": 80,
+                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                "ToPort": 80, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
+                "FromPort": 8080,
+                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                "ToPort": 8080, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
+                "FromPort": 22,
+                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                "ToPort": 22, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
+                "FromPort": 3128,
+                "IpRanges": [{"CidrIp": vpc_cidr}],
+                "ToPort": 3128, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
+                "FromPort": 443,
+                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                "ToPort": 443, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
+                "FromPort": -1,
+                "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                "ToPort": -1, "IpProtocol": "icmp", "UserIdGroupPairs": []
+            }
+        ]
                 egress_sg_rules_template = [
                     {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}
                 ]
