@@ -55,7 +55,6 @@ public class UserSettingsResource implements SelfServiceAPI {
     }
     
     @POST
-    @Path("/save")
     public Response saveSettings(@Auth UserInfo userInfo, @NotBlank String settings) {
         LOGGER.debug("Saves settings for user {}, content is {}", userInfo.getName(), settings);
         try {
