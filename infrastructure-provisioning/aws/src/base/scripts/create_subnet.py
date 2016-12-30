@@ -85,6 +85,8 @@ if __name__ == "__main__":
             rt = get_route_table_by_tag(args.infra_tag_name, args.infra_tag_value)
             route_table = ec2.RouteTable(rt)
             route_table.associate_with_subnet(SubnetId=subnet_id)
+        else:
+            os.environ['creds_subnet_id'] = subnet_id
         success = True
     except:
         success = False
