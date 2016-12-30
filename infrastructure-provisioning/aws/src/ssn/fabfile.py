@@ -96,15 +96,10 @@ def run():
         if os.environ['creds_security_groups_ids'] == '' or os.environ['creds_security_groups_ids'] == 'PUT_YOUR_VALUE_HERE':
             try:
                 ingress_sg_rules_template = [
-                    {"IpProtocol": "tcp", "FromPort": "80", "ToPort": "80", "IpRanges": [], "PrefixListIds": []},
-                    {"IpProtocol": "tcp", "FromPort": "8080", "ToPort": "8080", "IpRanges": [], "PrefixListIds": []},
-                    {"IpProtocol": "tcp", "FromPort": "22", "ToPort": "22", "IpRanges": [], "PrefixListIds": []},
-                    {"IpProtocol": "tcp", "FromPort": "3128", "ToPort": "3128", "IpRanges": [{"CidrIp": vpc_cidr}], "PrefixListIds": []},
-                    {"IpProtocol": "tcp", "FromPort": "443", "ToPort": "443", "IpRanges": [], "PrefixListIds": []},
-                    {"IpProtocol": "icmp", "FromPort": "-1", "ToPort": "-1", "IpRanges": [], "PrefixListIds": []}
+                    {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}
                 ]
                 egress_sg_rules_template = [
-                    {"IpProtocol": "-1", "FromPort": "-1", "ToPort": "-1", "CidrIp": "0.0.0.0/0"},
+                    {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}
                 ]
                 params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {}". \
                     format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), tag_name, instance_name, False)
