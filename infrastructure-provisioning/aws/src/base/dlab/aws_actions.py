@@ -78,6 +78,21 @@ def create_vpc(vpc_cidr, tag):
         traceback.print_exc(file=sys.stdout)
 
 
+def enable_vpc_dns(vpc_id):
+    try:
+        client = boto3.client('ec2')
+        client.modify_vpc_attribute(VpcId=vpc_id,
+                                    EnableDnsSupport={'Value': True},
+                                    EnableDnsHostnames={'Value': True})
+    except Exception as err:
+        logging.info("Unable to modify VPC attributes: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to modify VPC attributes", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
 def remove_vpc(vpc_id):
     try:
         client = boto3.client('ec2')

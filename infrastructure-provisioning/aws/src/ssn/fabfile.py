@@ -73,6 +73,7 @@ def run():
                         result.write(json.dumps(res))
                     sys.exit(1)
                 os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, instance_name)
+                enable_vpc_dns(os.environ['creds_vpc_id'])
             except:
                 sys.exit(1)
 
