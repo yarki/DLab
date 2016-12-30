@@ -66,6 +66,7 @@ public class TestServices {
     // please finished copyFileToSSN, copyFileToNotebook and BUCKET_NAME
     public void testPyton(String ssnIP, String noteBookIp, String serviceBaseName, String emrName) throws JSchException, IOException {
 
+        System.out.println("Python script will be started ...");
         Session session = SSHConnect.getConnect("ubuntu", ssnIP, 22);
         InputStream copyFileToSSN = SSHConnect.setCommand(session, "scp -i /var/lib/jenkins/AutoTestData/train.csv ubuntu@" +ssnIP+ ":~/"); 
         InputStream copyFileToNotebook = SSHConnect.setCommand(session, "scp -i PATH_TO_KEY FILE_PATH ubuntu@" + noteBookIp + ":/tmp/"); 
@@ -80,7 +81,8 @@ public class TestServices {
         BufferedReader reader = new BufferedReader(new InputStreamReader(getStatus));         
         String actualStatus = reader.readLine();
         
-        Assert.assertEquals(actualStatus, "0", "The python script work not correct");
+        Assert.assertEquals(actualStatus, "0", "The python script works not correct");
+        System.out.println("Python script was work correct ");
     }
     
     
@@ -330,7 +332,8 @@ public class TestServices {
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_computational_EMRAutoTest", publicIp);
         
         //run python script
-        testPyton(publicIp, notebookIp, serviceBaseName, emrName);
+        //TODO
+        //testPyton(publicIp, notebookIp, serviceBaseName, emrName);
 
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
