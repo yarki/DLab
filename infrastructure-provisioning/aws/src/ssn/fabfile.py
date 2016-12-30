@@ -136,8 +136,8 @@ def run():
                 egress_sg_rules_template = [
                     {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}
                 ]
-                params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {}". \
-                    format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), tag_name, instance_name, False)
+                params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {} --ssn {}". \
+                    format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), tag_name, instance_name, False, True)
                 if not run_routine('create_security_group', params):
                     logging.info('Failed creating security group for SSN')
                     with open("/root/result.json", 'w') as result:
@@ -145,7 +145,6 @@ def run():
                         print json.dumps(res)
                         result.write(json.dumps(res))
                     sys.exit(1)
-                print "HERE-----------------------------------------------!!!!"
                 with open('/tmp/ssn_sg_id', 'r') as f:
                     os.environ['creds_security_groups_ids'] = f.read()
             except:
