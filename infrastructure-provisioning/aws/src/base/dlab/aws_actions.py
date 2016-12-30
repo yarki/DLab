@@ -450,10 +450,13 @@ def remove_s3(bucket_type='all', scientist=''):
         elif bucket_type == 'edge':
             bucket_name = (os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-bucket').lower().replace('_', '-')
         else:
-            bucket_name = (os.environ['conf_service_base_name']).lower().replace('_', '-') + '-'
+            bucket_name = (os.environ['conf_service_base_name']).lower().replace('_', '-')
         for item in client.list_buckets().get('Buckets'):
             if bucket_name in item.get('Name'):
-                bucket_list.append(item.get('Name'))
+                for i in client.get_bucket_tagging(Bucket=item.get('Name')).get('TagSet'):
+                    i.get('Key')
+                    if i.get('Key') == (os.environ['conf_service_base_name']).lower().replace('_', '-') + '-Tag':
+                        bucket_list.append(item.get('Name'))
         for s3bucket in bucket_list:
             if s3bucket:
                 list_obj = client.list_objects(Bucket=s3bucket)

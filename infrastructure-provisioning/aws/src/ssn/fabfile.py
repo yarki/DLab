@@ -95,7 +95,7 @@ def run():
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
         params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s --region %s" % \
-                 (user_bucket_name, tag_name, "bucket", region)
+                 (user_bucket_name, tag_name, user_bucket_name, region)
 
         if not run_routine('create_bucket', params):
             logging.info('Unable to create bucket')
