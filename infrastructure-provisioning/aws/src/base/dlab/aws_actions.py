@@ -82,7 +82,6 @@ def enable_vpc_dns(vpc_id):
     try:
         client = boto3.client('ec2')
         client.modify_vpc_attribute(VpcId=vpc_id,
-                                    EnableDnsSupport={'Value': True},
                                     EnableDnsHostnames={'Value': True})
     except Exception as err:
         logging.info("Unable to modify VPC attributes: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
