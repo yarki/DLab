@@ -260,7 +260,7 @@ class BaseDAO implements MongoCollections {
         for(int i = 1; i < fieldParts.length; ++i) {
             if(fieldParts[i].equals("$")
                     && val instanceof ArrayList) {
-                 ArrayList array = (ArrayList) val;
+                 ArrayList<?> array = (ArrayList<?>) val;
                 if(array.isEmpty()) {
                     break;
                 }

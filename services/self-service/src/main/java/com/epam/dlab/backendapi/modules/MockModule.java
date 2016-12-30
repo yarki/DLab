@@ -29,20 +29,10 @@ import com.google.inject.name.Names;
 import io.dropwizard.setup.Environment;
 
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import com.epam.dlab.constants.ServiceConsts;
-import com.epam.dlab.dto.imagemetadata.ApplicationDto;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
-import com.epam.dlab.dto.imagemetadata.ComputationalResourceShapeDto;
-import com.epam.dlab.dto.imagemetadata.ExploratoryEnvironmentVersion;
 import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
-import com.epam.dlab.dto.imagemetadata.ImageType;
-import com.epam.dlab.dto.imagemetadata.TemplateDTO;
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 import static com.epam.dlab.rest.contracts.ExploratoryAPI.EXPLORATORY_CREATE;
 import static com.epam.dlab.rest.contracts.KeyLoaderAPI.KEY_LOADER;
@@ -52,7 +42,14 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/** Mock class for an application configuration of SelfService for tests.
+ */
 public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
+	
+	/** Instantiates an application configuration of SelfService for tests.
+     * @param configuration application configuration of SelfService.
+     * @param environment environment of SelfService.
+     */
     public MockModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
         super(configuration, environment);
     }
@@ -69,6 +66,8 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
                 .toInstance(configuration.getProvisioningFactory().build(environment, PROVISIONING_SERVICE));*/
     }
 
+    /** Creates and returns the mock object for authentication service.
+     */
     private RESTService createAuthenticationService() {
         RESTService result = mock(RESTService.class);
         when(result.post(eq(LOGIN), any(), any())).then(invocationOnMock -> Response.ok("token123").build());
@@ -77,6 +76,8 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         return result;
     }
 
+    /** Creates and returns the mock object for provisioning service.
+     */
     private RESTService createProvisioningService() {
         RESTService result = mock(RESTService.class);
         when(result.post(eq(KEY_LOADER), any(), eq(Response.class)))
@@ -91,6 +92,7 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         return result;
     }
 
+    /** Creates and returns the computational metadata for EMR. */
     private ComputationalMetadataDTO prepareEmrImage() {
         try {
             ComputationalMetadataDTO dto = ResourceUtils.readResourceAsClass(getClass(),
@@ -103,6 +105,7 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         }
     }
 
+    /** Creates and returns the exploratory metadata for Jupiter. */
     private ExploratoryMetadataDTO prepareJupiterImage() {
         try {
             ExploratoryMetadataDTO dto = ResourceUtils.readResourceAsClass(getClass(),

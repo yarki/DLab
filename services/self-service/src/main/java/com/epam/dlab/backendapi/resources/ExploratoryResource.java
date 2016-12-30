@@ -52,6 +52,8 @@ import java.util.Optional;
 
 import static com.epam.dlab.UserInstanceStatus.*;
 
+/** Provides the REST API for the exploratory.
+ */
 @Path("/infrastructure_provision/exploratory_environment")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -175,7 +177,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                 throw new DlabException(String.format("Exploratory instance with name {} not found.", name));
 
             UserInstanceDTO userInstance = opt.get();
-            ExploratoryActionDTO dto = new ExploratoryActionDTO<>()
+            ExploratoryActionDTO<?> dto = new ExploratoryActionDTO<>()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookImage(userInstance.getImageName())
                     .withExploratoryName(name)
@@ -190,7 +192,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         }
     }
 
-    private StatusBaseDTO createStatusDTO(String user, String name, UserInstanceStatus status) {
+    private StatusBaseDTO<?> createStatusDTO(String user, String name, UserInstanceStatus status) {
         return new ExploratoryStatusDTO()
                 .withUser(user)
                 .withExploratoryName(name)
@@ -199,12 +201,12 @@ public class ExploratoryResource implements ExploratoryAPI {
 
     private void updateComputationalStatuses(String user, String exploratoryName, UserInstanceStatus status) {
         LOGGER.debug("updating status for all computational resources of {} for user {}: {}", exploratoryName, user, status);
-        StatusBaseDTO exploratoryStatus = createStatusDTO(user, exploratoryName, status);
+        StatusBaseDTO<?> exploratoryStatus = createStatusDTO(user, exploratoryName, status);
         infrastructureProvisionDAO.updateComputationalStatusesForExploratory(exploratoryStatus);
     }
 
     private void updateExploratoryStatus(String user, String exploratoryName, UserInstanceStatus status) {
-        StatusBaseDTO exploratoryStatus = createStatusDTO(user, exploratoryName, status);
+        StatusBaseDTO<?> exploratoryStatus = createStatusDTO(user, exploratoryName, status);
         infrastructureProvisionDAO.updateExploratoryStatus(exploratoryStatus);
     }
 
