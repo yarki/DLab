@@ -89,7 +89,7 @@ public class ComputationalResource implements ComputationalAPI {
                 ;
                 LOGGER.debug("created computational resource {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
-                        .ok(provisioningService.post(EMR_CREATE, dto, String.class))
+                        .ok(provisioningService.post(EMR_CREATE, userInfo.getAccessToken(), dto, String.class))
                         .build();
             } catch (Throwable t) {
                 updateComputationalStatus(userInfo.getName(), formDTO.getNotebookName(), formDTO.getName(), FAILED);
@@ -128,7 +128,7 @@ public class ComputationalResource implements ComputationalAPI {
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withRegion(settingsDAO.getCredsRegion());
-            return provisioningService.post(EMR_TERMINATE, dto, String.class);
+            return provisioningService.post(EMR_TERMINATE, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
             updateComputationalStatus(userInfo.getName(), exploratoryName, computationalName, FAILED);
             throw new DlabException("Could not terminate computational resource " + computationalName, t);
