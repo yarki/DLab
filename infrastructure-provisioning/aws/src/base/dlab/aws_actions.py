@@ -343,9 +343,10 @@ def remove_roles_and_profiles(role_name, role_profile_name):
 def remove_all_iam_resources(instance_type, scientist=''):
     try:
         client = boto3.client('iam')
+        service_base_name = os.environ['conf_service_base_name'].lower().replace('-', '_')
         roles_list = []
         for item in client.list_roles(MaxItems=250).get("Roles"):
-            if os.environ['conf_service_base_name'] + '-' in item.get("RoleName"):
+            if service_base_name + '-' in item.get("RoleName"):
                 roles_list.append(item.get('RoleName'))
         if roles_list:
             roles_list.sort(reverse=True)
@@ -353,14 +354,14 @@ def remove_all_iam_resources(instance_type, scientist=''):
                 if '-ssn-Role' in iam_role:
                     if instance_type == 'ssn' or instance_type == 'all':
                         try:
-                            client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'].lower().replace('-', '_') + '-ssn-Policy')
+                            client.delete_role_policy(RoleName=iam_role, PolicyName=service_base_name + '-ssn-Policy')
                         except:
-                            print 'There is no policy ' + os.environ['conf_service_base_name'] + '-ssn-Policy to delete'
+                            print 'There is no policy ' + service_base_name + '-ssn-Policy to delete'
                         role_profiles = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
                         if role_profiles:
                             for i in role_profiles:
                                 role_profile_name = i.get('InstanceProfileName')
-                                if role_profile_name == os.environ['conf_service_base_name'].lower().replace('-', '_') + '-ssn-Profile':
+                                if role_profile_name == service_base_name + '-ssn-Profile':
                                     remove_roles_and_profiles(iam_role, role_profile_name)
                         else:
                             print "There is no instance profile for " + iam_role
@@ -411,7 +412,33 @@ def remove_all_iam_resources(instance_type, scientist=''):
                             client.delete_role(RoleName=iam_role)
                             print "The IAM role " + iam_role + " has been deleted successfully"
         else:
-            print "There are no IAM roles and policies to delete"
+            print "There are no IAM roles to delete. Checking instance profiles..."
+        profile_list = []
+        for item in client.list_instance_profiles(MaxItems=250).get("InstanceProfiles"):
+            if service_base_name + '-' in item.get("InstanceProfileName"):
+                profile_list.append(item.get('InstanceProfileName'))
+        if profile_list:
+            for instance_profile in profile_list:
+                if '-ssn-Profile' in instance_profile:
+                    if instance_type == 'ssn' or instance_type == 'all':
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                if '-edge-Role' in instance_profile:
+                    if instance_type == 'edge' and scientist in instance_profile:
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                    if instance_type == 'all':
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                if '-nb-Role' in instance_profile:
+                    if instance_type == 'notebook' and scientist in instance_profile:
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                    if instance_type == 'all':
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+        else:
+            print "There are no instance profiles to delete"
     except Exception as err:
         logging.info("Unable to remove some of the IAM resources: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
