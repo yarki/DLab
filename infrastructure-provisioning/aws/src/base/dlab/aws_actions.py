@@ -345,7 +345,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
         client = boto3.client('iam')
         roles_list = []
         for item in client.list_roles(MaxItems=250).get("Roles"):
-            if os.environ['conf_service_base_name'] in item.get("RoleName"):
+            if os.environ['conf_service_base_name'] + '-' in item.get("RoleName"):
                 roles_list.append(item.get('RoleName'))
         if roles_list:
             roles_list.sort(reverse=True)
@@ -353,14 +353,14 @@ def remove_all_iam_resources(instance_type, scientist=''):
                 if '-ssn-Role' in iam_role:
                     if instance_type == 'ssn' or instance_type == 'all':
                         try:
-                            client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
+                            client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'].lower().replace('-', '_') + '-ssn-Policy')
                         except:
                             print 'There is no policy ' + os.environ['conf_service_base_name'] + '-ssn-Policy to delete'
                         role_profiles = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
                         if role_profiles:
                             for i in role_profiles:
                                 role_profile_name = i.get('InstanceProfileName')
-                                if role_profile_name == os.environ['conf_service_base_name'] + '-ssn-Profile':
+                                if role_profile_name == os.environ['conf_service_base_name'].lower().replace('-', '_') + '-ssn-Profile':
                                     remove_roles_and_profiles(iam_role, role_profile_name)
                         else:
                             print "There is no instance profile for " + iam_role
@@ -369,7 +369,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
                 if '-edge-Role' in iam_role:
                     if instance_type == 'edge' and scientist in iam_role:
                         remove_detach_iam_policies(iam_role, 'delete')
-                        role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
+                        role_profile_name = os.environ['conf_service_base_name'].lower().replace('-', '_') + '-' + '{}'.format(scientist) + '-edge-Profile'
                         try:
                             client.get_instance_profile(InstanceProfileName=role_profile_name)
                             remove_roles_and_profiles(iam_role, role_profile_name)
@@ -391,7 +391,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
                 if '-nb-Role' in iam_role:
                     if instance_type == 'notebook' and scientist in iam_role:
                         remove_detach_iam_policies(iam_role)
-                        role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
+                        role_profile_name = os.environ['conf_service_base_name'].lower().replace('-', '_') + '-' + "{}".format(scientist) + '-nb-Profile'
                         try:
                             client.get_instance_profile(InstanceProfileName=role_profile_name)
                             remove_roles_and_profiles(iam_role, role_profile_name)
@@ -411,7 +411,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
                             client.delete_role(RoleName=iam_role)
                             print "The IAM role " + iam_role + " has been deleted successfully"
         else:
-            print "There are no IAM roles instance profiles and policies to delete"
+            print "There are no IAM roles and policies to delete"
     except Exception as err:
         logging.info("Unable to remove some of the IAM resources: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
