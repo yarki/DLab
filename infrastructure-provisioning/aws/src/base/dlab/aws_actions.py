@@ -104,6 +104,7 @@ def remove_vpc(vpc_id):
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
 
+
 def create_tag(resource, tag):
     try:
         ec2 = boto3.client('ec2')
@@ -117,6 +118,25 @@ def create_tag(resource, tag):
         logging.info("Unable to create Tag: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to create Tag", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def create_rt(vpc_id, infra_tag_name, infra_tag_value):
+    try:
+        tag = {"Key": infra_tag_name, "Value": infra_tag_value}
+        route_table = []
+        ec2 = boto3.client('ec2')
+        route_table.append(ec2.create_route_table(
+            VpcId=vpc_id
+        )['RouteTable']['RouteTableId'])
+        print 'Created Route-Table with ID: {}'.format(route_table)
+        create_tag(route_table, json.dumps(tag))
+    except Exception as err:
+        logging.info("Unable to create Route Table: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to create Route Table", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)

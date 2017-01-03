@@ -90,6 +90,7 @@ def run():
                 with open('/tmp/ssn_subnet_id', 'r') as f:
                     os.environ['creds_subnet_id'] = f.read()
                 enable_auto_assign_ip(os.environ['creds_subnet_id'])
+                create_rt(os.environ['creds_vpc_id'], tag_name, instance_name)
             except:
                 remove_vpc(os.environ['creds_vpc_id'])
                 sys.exit(1)
