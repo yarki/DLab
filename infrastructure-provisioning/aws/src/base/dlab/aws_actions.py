@@ -128,9 +128,7 @@ def create_rt(vpc_id, infra_tag_name, infra_tag_value):
         tag = {"Key": infra_tag_name, "Value": infra_tag_value}
         route_table = []
         ec2 = boto3.client('ec2')
-        route_table.append(ec2.create_route_table(
-            VpcId=vpc_id
-        )['RouteTable']['RouteTableId'])
+        route_table.append(ec2.create_route_table(VpcId=vpc_id)['RouteTable']['RouteTableId'])
         print 'Created Route-Table with ID: {}'.format(route_table)
         create_tag(route_table, json.dumps(tag))
         return route_table
