@@ -484,7 +484,7 @@ def remove_s3(bucket_type='all', scientist=''):
             if bucket_name in item.get('Name'):
                 for i in client.get_bucket_tagging(Bucket=item.get('Name')).get('TagSet'):
                     i.get('Key')
-                    if i.get('Key') == (os.environ['conf_service_base_name']).lower().replace('_', '-') + '-Tag':
+                    if i.get('Key') == os.environ['conf_service_base_name'] + '-Tag':
                         bucket_list.append(item.get('Name'))
         for s3bucket in bucket_list:
             if s3bucket:
