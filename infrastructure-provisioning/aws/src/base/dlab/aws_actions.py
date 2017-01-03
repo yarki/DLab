@@ -130,6 +130,7 @@ def create_rt(vpc_id, infra_tag_name, infra_tag_value):
         ec2 = boto3.client('ec2')
         rt = ec2.create_route_table(VpcId=vpc_id)
         rt_id = rt.get('RouteTable').get('RouteTableId')
+        route_table.append(rt_id)
         print 'Created Route-Table with ID: {}'.format(rt_id)
         create_tag(route_table, json.dumps(tag))
         ig = ec2.create_internet_gateway()
