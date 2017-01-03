@@ -1,9 +1,6 @@
 package DockerHelper;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -47,6 +44,73 @@ public class SSHConnect {
         channelExec.connect();
         return in;
     }
+
+    public static AckStatus copyLocalFileToRemote(Session session, String localPath, String remotePath)
+            throws JSchException, IOException {
+
+        AckStatus status;
+        ChannelExec channel = (ChannelExec) session.openChannel("exec");
+        try {
+            String command = "scp -t " + remotePath;
+            channel.setCommand(command);
+
+            // get I/O streams for remote scp
+            OutputStream out = channel.getOutputStream();
+            try {
+                InputStream in = channel.getInputStream();
+                channel.connect();
+
+                status = checkAck(in);
+                if (!status.isOk()) {
+                    return status;
+                }
+
+                File localFile = new File(localPath);
+
+                // send "C0644 filesize filename", where filename should not include '/'
+                long fileSize = localFile.length();
+                command = "C0644 " + fileSize + " ";
+                command += (localPath.lastIndexOf('/') > 0 ?
+                     localPath.substring(localPath.lastIndexOf('/') + 1) : localPath);
+                command += "\n";
+                out.write(command.getBytes());
+                out.flush();
+
+                status = checkAck(in);
+                if (!status.isOk()) {
+                    return status;
+                }
+
+                // send a content of localPath
+                FileInputStream fis = new FileInputStream(localPath);
+                byte[] buf = new byte[1024];
+                try {
+                    while (true) {
+                        int len = fis.read(buf, 0, buf.length);
+                        if (len <= 0) break;
+                        out.write(buf, 0, len); //out.flush();
+                    }
+                }
+                finally {
+                    fis.close();
+                }
+
+                // send '\0'
+                buf[0] = 0;
+                out.write(buf, 0, 1);
+                out.flush();
+
+                status = checkAck(in);
+            }
+            finally {
+                out.close();
+            }
+        }
+        finally {
+            channel.disconnect();
+        }
+        return status;
+    }
     
     public static List<DockerContainer> getdockerContainerList(InputStream in) throws JsonParseException, JsonMappingException, IOException{
         
@@ -85,6 +149,30 @@ public class SSHConnect {
          
         }
         return dockerContainer;
+    }
+
+    static AckStatus checkAck(InputStream in) throws IOException{
+        int status = in.read();
+        String message = "";
+
+        // b may be 0 for success,
+        //          1 for error,
+        //          2 for fatal error,
+        //          -1
+        if(status == 1 || status == 2){
+            StringBuffer sb=new StringBuffer();
+            int c;
+
+            do {
+                c=in.read();
+                sb.append((char)c);
+            }
+            while(c!='\n');
+
+            message = sb.toString();
+            System.out.println(message);
+        }
+        return new AckStatus(status, message);
     }
 
 }

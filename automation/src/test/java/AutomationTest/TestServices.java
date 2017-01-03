@@ -68,7 +68,9 @@ public class TestServices {
 
         System.out.println("Python script will be started ...");
         Session session = SSHConnect.getConnect("ubuntu", ssnIP, 22);
-        InputStream copyFileToSSN = SSHConnect.setCommand(session, "scp -i /var/lib/jenkins/AutoTestData/train.csv ubuntu@" +ssnIP+ ":~/"); 
+        AckStatus status = SSHConnect.copyLocalFileToRemote(session, "/var/lib/jenkins/AutoTestData/train.csv", "/tmp/train.csv");
+
+
         InputStream copyFileToNotebook = SSHConnect.setCommand(session, "scp -i PATH_TO_KEY FILE_PATH ubuntu@" + noteBookIp + ":/tmp/"); 
         
         InputStream connectToNotebook = SSHConnect.setCommand(session, "ssh ubuntu@" + noteBookIp + " -i keys/BDCC-DSS-POC.pem");  
