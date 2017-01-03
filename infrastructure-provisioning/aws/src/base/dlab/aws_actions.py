@@ -133,7 +133,7 @@ def create_rt(vpc_id, infra_tag_name, infra_tag_value):
         )['RouteTable']['RouteTableId'])
         print 'Created Route-Table with ID: {}'.format(route_table)
         create_tag(route_table, json.dumps(tag))
-        return  route_table
+        return route_table
     except Exception as err:
         logging.info("Unable to create Route Table: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
