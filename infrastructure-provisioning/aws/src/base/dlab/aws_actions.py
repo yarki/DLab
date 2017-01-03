@@ -18,6 +18,7 @@
 
 import boto3
 import botocore
+from botocore.client import Config
 import time
 import sys
 import os
@@ -31,7 +32,7 @@ import traceback
 
 def put_to_bucket(bucket_name, local_file, destination_file):
     try:
-        s3 = boto3.client('s3')
+        s3 = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
         with open(local_file, 'rb') as data:
             s3.upload_fileobj(data, bucket_name, destination_file)
         return True
@@ -47,7 +48,7 @@ def put_to_bucket(bucket_name, local_file, destination_file):
 
 def create_s3_bucket(bucket_name, tag, region):
     try:
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', config=Config(signature_version='s3v4'))
         bucket = s3.create_bucket(Bucket=bucket_name,
                                   CreateBucketConfiguration={'LocationConstraint': region})
         tagging = bucket.Tagging()
@@ -419,8 +420,8 @@ def remove_all_iam_resources(instance_type, scientist=''):
 
 
 def s3_cleanup(bucket, cluster_name, user_name):
-    s3_res = boto3.resource('s3')
-    client = boto3.client('s3')
+    s3_res = boto3.resource('s3', config=Config(signature_version='s3v4'))
+    client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
     try:
         client.head_bucket(Bucket=bucket)
     except:
@@ -442,7 +443,7 @@ def s3_cleanup(bucket, cluster_name, user_name):
 
 def remove_s3(bucket_type='all', scientist=''):
     try:
-        client = boto3.client('s3')
+        client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
         bucket_list = []
         if bucket_type == 'ssn':
             bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
@@ -454,19 +455,21 @@ def remove_s3(bucket_type='all', scientist=''):
             if bucket_name in item.get('Name'):
                 bucket_list.append(item.get('Name'))
         for s3bucket in bucket_list:
-            list_obj = client.list_objects(Bucket=s3bucket)
-            list_obj = list_obj.get('Contents')
-            if list_obj is not None:
-                for o in list_obj:
-                    list_obj = o.get('Key')
-                    client.delete_objects(
-                        Bucket=s3bucket,
-                        Delete={'Objects': [{'Key': list_obj}]}
-                    )
-                print "The S3 bucket " + s3bucket + " has been cleaned"
-            client.delete_bucket(Bucket=s3bucket)
-            print "The S3 bucket " + s3bucket + " has been deleted successfully"
-        print "There are no more buckets to delete"
+            if s3bucket:
+                list_obj = client.list_objects(Bucket=s3bucket)
+                list_obj = list_obj.get('Contents')
+                if list_obj is not None:
+                    for o in list_obj:
+                        list_obj = o.get('Key')
+                        client.delete_objects(
+                            Bucket=s3bucket,
+                            Delete={'Objects': [{'Key': list_obj}]}
+                        )
+                    print "The S3 bucket " + s3bucket + " has been cleaned"
+                client.delete_bucket(Bucket=s3bucket)
+                print "The S3 bucket " + s3bucket + " has been deleted successfully"
+            else:
+                print "There are no buckets to delete"
     except Exception as err:
         logging.info("Unable to remove S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:

@@ -18,6 +18,20 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.dao;
 
+import static com.mongodb.client.model.Aggregates.unwind;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
 import com.epam.dlab.backendapi.dao.databind.IsoDateModule;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.mongo.MongoService;
@@ -28,18 +42,8 @@ import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoIterable;
-import com.mongodb.client.model.InsertOneOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
-import org.apache.commons.lang3.StringUtils;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Supplier;
-
-import static com.mongodb.client.model.Aggregates.unwind;
 
 class BaseDAO implements MongoCollections {
     protected static final ObjectMapper MAPPER = new ObjectMapper()
@@ -128,6 +132,15 @@ class BaseDAO implements MongoCollections {
                                Bson condition) {
         FindIterable<Document> found = find(collection, condition);
         return limitOne(found);
+    }
+    
+    protected void update(String collection, Bson condition, Bson value, boolean isUpsert) {
+    	if (isUpsert) {
+    		mongoService.getCollection(collection).updateOne(condition, value,
+    				new UpdateOptions().upsert(isUpsert));
+    	} else {
+    		mongoService.getCollection(collection).updateOne(condition, value);
+    	}
     }
 
     protected Optional<Document> findOne(String collection,

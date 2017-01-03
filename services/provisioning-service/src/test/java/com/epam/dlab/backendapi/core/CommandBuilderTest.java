@@ -62,7 +62,7 @@ public class CommandBuilderTest {
 
     @Test
     public void extractUUIDSuccess() {
-        String uuid = DockerCommands.extractUUID("edge_Oleksandr_Melnychuk1_2fa2fec8-4d30-4563-b78a-ab1f7539c862.json");
+        String uuid = DockerCommands.extractUUID("edge_user_name_2fa2fec8-4d30-4563-b78a-ab1f7539c862.json");
         assertEquals("2fa2fec8-4d30-4563-b78a-ab1f7539c862", uuid);
     }
 }

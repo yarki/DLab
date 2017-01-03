@@ -23,8 +23,7 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class UserResourceService {
-  constructor(private applicationServiceFacade: ApplicationServiceFacade) {
-  }
+  constructor(private applicationServiceFacade: ApplicationServiceFacade) { }
 
   public getExploratoryEnvironmentTemplates(): Observable<any> {
     return this.applicationServiceFacade
@@ -80,6 +79,19 @@ export class UserResourceService {
     let body = JSON.stringify('/' + notebookName + '/' + computationalResourceName + '/terminate');
     return this.applicationServiceFacade
       .buildDeleteComputationalResourcesRequest(body)
+      .map((response: Response) => response);
+  }
+
+  public getUserPreferences(): Observable<Response> {
+    return this.applicationServiceFacade
+      .buildGetUserPreferences()
+      .map((response: Response) => response.json());
+  }
+
+  public updateUserPreferences(data): Observable<Response> {
+    let body = JSON.stringify(data);
+    return this.applicationServiceFacade
+      .buildUpdateUserPreferences(body)
       .map((response: Response) => response);
   }
 }
