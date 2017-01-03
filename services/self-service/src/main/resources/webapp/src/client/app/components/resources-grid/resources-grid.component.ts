@@ -134,7 +134,7 @@ export class ResourcesGrid implements OnInit {
         this.environments = this.loadEnvironments(result);
         this.getDefaultFilterConfiguration();
 
-        (this.environments.length) ? this.getUserPreferences() : this.filteredEnvironments = null;
+        (this.environments.length) ? this.getUserPreferences() : this.filteredEnvironments = [];
       });
   }
 
