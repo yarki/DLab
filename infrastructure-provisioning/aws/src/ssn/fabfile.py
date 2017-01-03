@@ -74,18 +74,9 @@ def run():
                     sys.exit(1)
                 os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, instance_name)
                 enable_vpc_dns(os.environ['creds_vpc_id'])
-                #result_rt = create_rt(os.environ['creds_vpc_id'], tag_name, instance_name)
-                #print "HERE+++++++++"
-                #print "ROUTE TABLE ====" + result_rt
-                params = "--vpc_id {} --region {} --infra_tag_name {} --infra_tag_value {}".format(
-                    os.environ['creds_vpc_id'], os.environ['creds_region'], tag_name, instance_name)
-                if not run_routine('create_endpoint', params):
-                    logging.info('Unable to create SSN Endpoint')
-                    with open("/root/result.json", 'w') as result:
-                        res = {"error": "Unable to create an SSN endpoint", "conf": os.environ.__dict__}
-                        print json.dumps(res)
-                        result.write(json.dumps(res))
-                    sys.exit(1)
+                result_rt = create_rt(os.environ['creds_vpc_id'], tag_name, instance_name)
+                print "HERE+++++++++"
+                print "ROUTE TABLE ====" + result_rt
             except:
                 sys.exit(1)
 

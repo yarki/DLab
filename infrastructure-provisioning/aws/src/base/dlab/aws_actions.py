@@ -128,10 +128,15 @@ def create_rt(vpc_id, infra_tag_name, infra_tag_value):
         tag = {"Key": infra_tag_name, "Value": infra_tag_value}
         route_table = []
         ec2 = boto3.client('ec2')
-        route_table.append(ec2.create_route_table(VpcId=vpc_id)['RouteTable']['RouteTableId'])
-        print 'Created Route-Table with ID: {}'.format(route_table)
+        rt = ec2.create_route_table(VpcId=vpc_id)
+        rt_id = rt.get('RouteTable').get('RouteTableId')
+        print 'Created Route-Table with ID: {}'.format(rt_id)
         create_tag(route_table, json.dumps(tag))
-        return route_table
+        ig = ec2.create_internet_gateway()
+        ig_id = ig.get('InternetGateway').get('InternetGatewayId')
+        ec2.attach_internet_gateway(InternetGatewayId=ig_id, VpcId=vpc_id)
+        ec2.create_route(DestinationCidrBlock='0.0.0.0/0', RouteTableId=rt_id, GatewayId=ig_id)
+        return rt_id
     except Exception as err:
         logging.info("Unable to create Route Table: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
