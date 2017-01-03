@@ -423,14 +423,14 @@ def remove_all_iam_resources(instance_type, scientist=''):
                     if instance_type == 'ssn' or instance_type == 'all':
                         client.delete_instance_profile(InstanceProfileName=instance_profile)
                         print "The instance profile " + instance_profile + " has been deleted successfully"
-                if '-edge-Role' in instance_profile:
+                if '-edge-Profile' in instance_profile:
                     if instance_type == 'edge' and scientist in instance_profile:
                         client.delete_instance_profile(InstanceProfileName=instance_profile)
                         print "The instance profile " + instance_profile + " has been deleted successfully"
                     if instance_type == 'all':
                         client.delete_instance_profile(InstanceProfileName=instance_profile)
                         print "The instance profile " + instance_profile + " has been deleted successfully"
-                if '-nb-Role' in instance_profile:
+                if '-nb-Profile' in instance_profile:
                     if instance_type == 'notebook' and scientist in instance_profile:
                         client.delete_instance_profile(InstanceProfileName=instance_profile)
                         print "The instance profile " + instance_profile + " has been deleted successfully"
