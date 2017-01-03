@@ -37,7 +37,7 @@ logging:
   level: INFO
   loggers:
     com.epam: DEBUG
-    com.aegisql: DEBUG
+    com.aegisql: INFO
   appenders:
 #    - type: console
     - type: file
