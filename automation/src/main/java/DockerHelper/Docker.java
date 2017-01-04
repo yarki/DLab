@@ -11,12 +11,13 @@ import org.testng.Assert;
 
 public class Docker {
     
-    public static void checkDockerStatus(String dockerImageName, String publicIP) throws IOException, JSchException{
+    public static void checkDockerStatus(String dockerImageName, String publicIP)
+            throws IOException, JSchException, InterruptedException {
         
         System.out.println("Check status of instanse on Docker:");
         
         Session session = SSHConnect.getConnect("ubuntu", publicIP, 22);            
-        InputStream in = SSHConnect.setCommand(session, Command.GET_CONTAINERS);    
+        InputStream in = SSHConnect.setCommand(session, Command.GET_CONTAINERS).getInputStream();
         List<DockerContainer> dockerContainerList = SSHConnect.getdockerContainerList(in);
         
         DockerContainer dockerContainer = SSHConnect.getDockerContainer(dockerContainerList, dockerImageName);

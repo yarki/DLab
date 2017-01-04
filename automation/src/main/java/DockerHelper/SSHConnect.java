@@ -21,8 +21,7 @@ import AutomationTest.PropertyValue;
 public class SSHConnect {
     
     public static Session getConnect(String username, String host, int port) throws JSchException {
-        Session session = null;
-        Channel channel = null;
+        Session session;
         JSch jsch = new JSch();
         Properties config = new Properties(); 
         config.put("StrictHostKeyChecking", "no");
@@ -31,87 +30,39 @@ public class SSHConnect {
         session = jsch.getSession(username, host, port);
         session.setConfig(config);
         session.connect();
-        channel = session.openChannel("sftp");
-        System.out.println("Getting connected");
-        channel.connect();
+
+        System.out.println(String.format("Getting connected to %s:%d", host, port));
+        return session;
+    }
+
+    public static Session getForwardedConnect(String username, String hostAlias, int port) throws JSchException {
+        Session session;
+        JSch jsch = new JSch();
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+
+        jsch.addIdentity(PropertyValue.getAccessKeyPrivFileName());
+        session = jsch.getSession(username, "127.0.0.1", port);
+        session.setConfig(config);
+        session.setHostKeyAlias(hostAlias);
+        session.connect();
+        System.out.println(String.format("Getting connected to %s through 127.0.0.1:%d", hostAlias, port));
         return session;
     }
     
-    public static InputStream setCommand(Session session, String command) throws JSchException, IOException {
+    public static ChannelExec setCommand(Session session, String command)
+            throws JSchException, IOException, InterruptedException {
+
         ChannelExec channelExec = (ChannelExec)session.openChannel("exec");
-        InputStream in = channelExec.getInputStream();
         channelExec.setCommand(command);
         channelExec.connect();
-        return in;
+
+        while(!channelExec.isClosed()) {
+            Thread.sleep(1000);
+        }
+        return channelExec;
     }
 
-    public static AckStatus copyLocalFileToRemote(Session session, String localPath, String remotePath)
-            throws JSchException, IOException {
-
-        AckStatus status;
-        ChannelExec channel = (ChannelExec) session.openChannel("exec");
-        try {
-            String command = "scp -t " + remotePath;
-            channel.setCommand(command);
-
-            // get I/O streams for remote scp
-            OutputStream out = channel.getOutputStream();
-            try {
-                InputStream in = channel.getInputStream();
-                channel.connect();
-
-                status = checkAck(in);
-                if (!status.isOk()) {
-                    return status;
-                }
-
-                File localFile = new File(localPath);
-
-                // send "C0644 filesize filename", where filename should not include '/'
-                long fileSize = localFile.length();
-                command = "C0644 " + fileSize + " ";
-                command += (localPath.lastIndexOf('/') > 0 ?
-                     localPath.substring(localPath.lastIndexOf('/') + 1) : localPath);
-                command += "\n";
-                out.write(command.getBytes());
-                out.flush();
-
-                status = checkAck(in);
-                if (!status.isOk()) {
-                    return status;
-                }
-
-                // send a content of localPath
-                FileInputStream fis = new FileInputStream(localPath);
-                byte[] buf = new byte[1024];
-                try {
-                    while (true) {
-                        int len = fis.read(buf, 0, buf.length);
-                        if (len <= 0) break;
-                        out.write(buf, 0, len); //out.flush();
-                    }
-                }
-                finally {
-                    fis.close();
-                }
-
-                // send '\0'
-                buf[0] = 0;
-                out.write(buf, 0, 1);
-                out.flush();
-
-                status = checkAck(in);
-            }
-            finally {
-                out.close();
-            }
-        }
-        finally {
-            channel.disconnect();
-        }
-        return status;
-    }
-    
     public static List<DockerContainer> getdockerContainerList(InputStream in) throws JsonParseException, JsonMappingException, IOException{
         
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));         
@@ -151,8 +102,10 @@ public class SSHConnect {
         return dockerContainer;
     }
 
-    static AckStatus checkAck(InputStream in) throws IOException{
-        int status = in.read();
+    public static AckStatus checkAck(ChannelExec channel) throws IOException{
+        InputStream in = channel.getInputStream();
+
+        int status = channel.getExitStatus();
         String message = "";
 
         // b may be 0 for success,

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
+import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
@@ -61,30 +63,90 @@ public class TestServices {
     public static void Cleanup() throws InterruptedException {
         //sleep(PropertyValue.TEST_AFTER_SLEEP_SECONDS);
     }
-    
-    //TODO 
-    // please finished copyFileToSSN, copyFileToNotebook and BUCKET_NAME
-    public void testPyton(String ssnIP, String noteBookIp, String serviceBaseName, String emrName) throws JSchException, IOException {
 
-        System.out.println("Python script will be started ...");
-        Session session = SSHConnect.getConnect("ubuntu", ssnIP, 22);
-        AckStatus status = SSHConnect.copyLocalFileToRemote(session, "/var/lib/jenkins/AutoTestData/train.csv", "/tmp/train.csv");
+    public void testPyton(String ssnIP, String noteBookIp, String serviceBaseName, String emrName)
+            throws JSchException, IOException, InterruptedException {
 
+        String sourceDir = "/var/lib/jenkins/AutoTestData";
+        String csvFilename = "train.csv";
+        String pyFilename = "pyspark_test.py";
+        String copyToSSNCommand = "scp -i %s %s ubuntu@%s:~/";
+        String copyToNotebookCommand = "scp -i %s ~/%s ubuntu@%s:/tmp/";
 
-        InputStream copyFileToNotebook = SSHConnect.setCommand(session, "scp -i PATH_TO_KEY FILE_PATH ubuntu@" + noteBookIp + ":/tmp/"); 
-        
-        InputStream connectToNotebook = SSHConnect.setCommand(session, "ssh ubuntu@" + noteBookIp + " -i keys/BDCC-DSS-POC.pem");  
-        
-        String BUCKET_NAME = serviceBaseName + "[username]-[bucket]";
-        InputStream runScript = SSHConnect.setCommand(session, "/usr/bin/python /tmp/pyspark_test.py --bucket BUCKET_NAME --cluster_name " + emrName);  
-        
-        InputStream getStatus = SSHConnect.setCommand(session, "echo $?");  
-        
-        BufferedReader reader = new BufferedReader(new InputStreamReader(getStatus));         
-        String actualStatus = reader.readLine();
-        
-        Assert.assertEquals(actualStatus, "0", "The python script works not correct");
-        System.out.println("Python script was work correct ");
+        System.out.println("Copying files to SSN...");
+        String pathToKey = PropertyValue.getAccessKeyPrivFileName();
+
+        System.out.println(String.format("Copying %s...", csvFilename));
+        String command = String.format(copyToSSNCommand,
+                pathToKey,
+                Paths.get(sourceDir, csvFilename).toString(),
+                ssnIP);
+        AckStatus status = HelperMethods.executeCommand(command);
+        System.out.println(String.format("Copied %s: %s", csvFilename, status.toString()));
+        Assert.assertTrue(status.isOk());
+
+        System.out.println(String.format("Copying %s...", pyFilename));
+        command = String.format(copyToSSNCommand,
+                pathToKey,
+                Paths.get(sourceDir, pyFilename).toString(),
+                ssnIP);
+        status = HelperMethods.executeCommand(command);
+        System.out.println(String.format("Copied %s: %s", pyFilename, status.toString()));
+        Assert.assertTrue(status.isOk());
+
+        System.out.println(String.format("Copying files to Notebook %s...", noteBookIp));
+        Session ssnSession = SSHConnect.getConnect("ubuntu", ssnIP, 22);
+
+        try {
+            String pathToKeySSN = PropertyValue.getAccessKeyPrivFileNameSSN();
+            System.out.println(String.format("Copying %s...", csvFilename));
+            command = String.format(copyToNotebookCommand,
+                    pathToKeySSN,
+                    csvFilename,
+                    noteBookIp);
+            ChannelExec copyResult = SSHConnect.setCommand(ssnSession, command);
+            status = SSHConnect.checkAck(copyResult);
+            System.out.println(String.format("Copied %s: %s", csvFilename, status.toString()));
+            Assert.assertTrue(status.isOk());
+
+            System.out.println(String.format("Copying %s...", pyFilename));
+            command = String.format(copyToNotebookCommand,
+                    pathToKeySSN,
+                    pyFilename,
+                    noteBookIp);
+            copyResult = SSHConnect.setCommand(ssnSession, command);
+            status = SSHConnect.checkAck(copyResult);
+            System.out.println(String.format("Copied %s: %s", pyFilename, status.toString()));
+            Assert.assertTrue(status.isOk());
+
+            System.out.println(String.format("Port forwarding to notebook %s...", noteBookIp));
+            int assingedPort = ssnSession.setPortForwardingL(0, noteBookIp, 22);
+            System.out.println(String.format("Port forwarded localhost:%s -> %s:22", assingedPort, noteBookIp));
+
+            Session notebookSession = SSHConnect.getForwardedConnect("ubuntu", noteBookIp, assingedPort);
+
+            try {
+                String notebookUsername = PropertyValue.getNotDLabUsername().replaceAll("@.*", "");
+                String bucketName = String.format("%s-%s-bucket", serviceBaseName, notebookUsername).replace('_', '-').toLowerCase();
+                command = String.format("/usr/bin/python %s --bucket %s --cluster_name %s",
+                        Paths.get("/tmp", pyFilename).toString(),
+                        bucketName,
+                        emrName);
+                System.out.println(String.format("Executing command %s...", command));
+                ChannelExec runScript = SSHConnect.setCommand(notebookSession, command);
+                status = SSHConnect.checkAck(runScript);
+                System.out.println(String.format("Executed command: %s", status.toString()));
+                Assert.assertTrue(status.isOk(), "The python script works not correct");
+
+                System.out.println("Python script was work correct ");
+            }
+            finally {
+                notebookSession.disconnect();
+            }
+        }
+        finally {
+            ssnSession.disconnect();
+        }
     }
     
     
@@ -334,8 +396,7 @@ public class TestServices {
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_computational_EMRAutoTest", publicIp);
         
         //run python script
-        //TODO
-        //testPyton(publicIp, notebookIp, serviceBaseName, emrName);
+        testPyton(publicIp, notebookIp, serviceBaseName, emrName);
 
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));

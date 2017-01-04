@@ -43,4 +43,9 @@ public class AckStatus {
     public boolean isOk() {
         return status == 0;
     }
+
+    @Override
+    public String toString() {
+        return isOk() ? "OK" : message;
+    }
 }

@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.util.Properties;
 
 public class PropertyValue {
-	
+
 	public static final String CONFIG_FILE_NAME="/var/lib/jenkins/AutoTestData/config.properties";
 //	private static final String CONFIG_FILE_NAME="config.properties";
 	
@@ -22,6 +22,7 @@ public class PropertyValue {
 	private static final String PASSWORD_FOR_ACTIVATE_KEY="PASSWORD_FOR_ACTIVATE_KEY";
 	private static final String ACCESS_KEY_PRIV_FILE_NAME="ACCESS_KEY_PRIV_FILE_NAME";
 	private static final String ACCESS_KEY_PUB_FILE_NAME="ACCESS_KEY_PUB_FILE_NAME";
+    private static final String ACCESS_KEY_PRIV_FILE_NAME_SSN="ACCESS_KEY_PRIV_FILE_NAME_SSN";
     
 	public static final String TEST_BEFORE_SLEEP_SECONDS="TEST_BEFORE_SLEEP_SECONDS";
 	public static final String TEST_AFTER_SLEEP_SECONDS="TEST_AFTER_SLEEP_SECONDS";
@@ -89,6 +90,7 @@ public class PropertyValue {
         printProperty(PASSWORD_FOR_ACTIVATE_KEY);
         printProperty(ACCESS_KEY_PRIV_FILE_NAME);
         printProperty(ACCESS_KEY_PUB_FILE_NAME);
+        printProperty(ACCESS_KEY_PRIV_FILE_NAME_SSN);
         
         printProperty(TEST_BEFORE_SLEEP_SECONDS);
         printProperty(TEST_AFTER_SLEEP_SECONDS);
@@ -156,6 +158,11 @@ public class PropertyValue {
 
     public static final String getAccessKeyPubFileName() {
     	File file = new File(get(ACCESS_KEY_PUB_FILE_NAME));
+        return file.getAbsolutePath();
+    }
+
+    public static final String getAccessKeyPrivFileNameSSN() {
+        File file = new File(get(ACCESS_KEY_PRIV_FILE_NAME_SSN));
         return file.getAbsolutePath();
     }
 
