@@ -157,7 +157,7 @@ def run():
                     {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}
                 ]
                 params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {} --ssn {}". \
-                    format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), tag_name, service_base_name, False, True)
+                    format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), service_base_name, tag_name, False, True)
                 if not run_routine('create_security_group', params):
                     logging.info('Failed creating security group for SSN')
                     with open("/root/result.json", 'w') as result:
@@ -188,7 +188,7 @@ def run():
             sys.exit(1)
     except:
         if pre_defined_sg:
-            remove_sgroups(service_base_name)
+            remove_sgroups(tag_name)
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
@@ -211,7 +211,7 @@ def run():
     except:
         remove_all_iam_resources(instance)
         if pre_defined_sg:
-            remove_sgroups(service_base_name)
+            remove_sgroups(tag_name)
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
@@ -235,7 +235,7 @@ def run():
     except:
         remove_all_iam_resources(instance)
         if pre_defined_sg:
-            remove_sgroups(service_base_name)
+            remove_sgroups(tag_name)
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
@@ -263,7 +263,7 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(service_base_name)
+            remove_sgroups(tag_name)
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
@@ -292,7 +292,7 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(service_base_name)
+            remove_sgroups(tag_name)
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
@@ -319,7 +319,7 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(service_base_name)
+            remove_sgroups(tag_name)
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
@@ -350,7 +350,7 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(service_base_name)
+            remove_sgroups(tag_name)
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
@@ -377,7 +377,7 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(service_base_name)
+            remove_sgroups(tag_name)
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
@@ -401,7 +401,7 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(service_base_name)
+            remove_sgroups(tag_name)
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
@@ -479,7 +479,7 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(service_base_name)
+            remove_sgroups(tag_name)
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
