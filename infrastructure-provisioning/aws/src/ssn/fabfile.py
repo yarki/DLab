@@ -103,6 +103,10 @@ def run():
                 if pre_defined_vpc:
                     remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
                     remove_route_tables(tag_name, True)
+                    try:
+                        remove_subnets(service_base_name + "-ssn-subnet")
+                    except:
+                        print "Subnet hasn't been created."
                     remove_vpc(os.environ['creds_vpc_id'])
                 sys.exit(1)
 
