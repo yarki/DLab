@@ -35,6 +35,7 @@ parser.add_argument('--infra_tag_value', type=str, default='')
 parser.add_argument('--force', type=bool, default=False)
 parser.add_argument('--nb_sg_name', type=str, default='')
 parser.add_argument('--resource', type=str, default='')
+parser.add_argument('--ssn', type=bool, default=False)
 args = parser.parse_args()
 
 
@@ -77,6 +78,9 @@ if __name__ == "__main__":
             else:
                 print "REQUESTED SECURITY GROUP WITH NAME %s ALREADY EXISTS" % args.name
             print "SECURITY_GROUP_ID " + security_group_id
+            if args.ssn:
+                with open('/tmp/ssn_sg_id', 'w') as f:
+                    f.write(security_group_id)
             success = True
         except:
             success = False
