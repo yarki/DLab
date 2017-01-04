@@ -18,6 +18,7 @@
 
 import boto3
 import botocore
+from botocore.client import Config
 import time
 import sys
 import os
@@ -31,7 +32,7 @@ import traceback
 
 def put_to_bucket(bucket_name, local_file, destination_file):
     try:
-        s3 = boto3.client('s3')
+        s3 = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
         with open(local_file, 'rb') as data:
             s3.upload_fileobj(data, bucket_name, destination_file)
         return True
@@ -47,7 +48,7 @@ def put_to_bucket(bucket_name, local_file, destination_file):
 
 def create_s3_bucket(bucket_name, tag, region):
     try:
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', config=Config(signature_version='s3v4'))
         bucket = s3.create_bucket(Bucket=bucket_name,
                                   CreateBucketConfiguration={'LocationConstraint': region})
         tagging = bucket.Tagging()
@@ -78,6 +79,34 @@ def create_vpc(vpc_cidr, tag):
         traceback.print_exc(file=sys.stdout)
 
 
+def enable_vpc_dns(vpc_id):
+    try:
+        client = boto3.client('ec2')
+        client.modify_vpc_attribute(VpcId=vpc_id,
+                                    EnableDnsHostnames={'Value': True})
+    except Exception as err:
+        logging.info("Unable to modify VPC attributes: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to modify VPC attributes", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def remove_vpc(vpc_id):
+    try:
+        client = boto3.client('ec2')
+        client.delete_vpc(VpcId=vpc_id)
+        print "VPC " + vpc_id + " has been removed"
+    except Exception as err:
+        logging.info("Unable to remove VPC: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove VPC", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
 def create_tag(resource, tag):
     try:
         ec2 = boto3.client('ec2')
@@ -96,6 +125,33 @@ def create_tag(resource, tag):
         traceback.print_exc(file=sys.stdout)
 
 
+def create_rt(vpc_id, infra_tag_name, infra_tag_value):
+    try:
+        tag = {"Key": infra_tag_name, "Value": infra_tag_value}
+        route_table = []
+        ec2 = boto3.client('ec2')
+        rt = ec2.create_route_table(VpcId=vpc_id)
+        rt_id = rt.get('RouteTable').get('RouteTableId')
+        route_table.append(rt_id)
+        print 'Created Route-Table with ID: {}'.format(rt_id)
+        create_tag(route_table, json.dumps(tag))
+        ig = ec2.create_internet_gateway()
+        ig_id = ig.get('InternetGateway').get('InternetGatewayId')
+        route_table = []
+        route_table.append(ig_id)
+        create_tag(route_table, json.dumps(tag))
+        ec2.attach_internet_gateway(InternetGatewayId=ig_id, VpcId=vpc_id)
+        ec2.create_route(DestinationCidrBlock='0.0.0.0/0', RouteTableId=rt_id, GatewayId=ig_id)
+        return rt_id
+    except Exception as err:
+        logging.info("Unable to create Route Table: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to create Route Table", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
 def create_subnet(vpc_id, subnet, tag):
     try:
         ec2 = boto3.resource('ec2')
@@ -107,6 +163,20 @@ def create_subnet(vpc_id, subnet, tag):
         logging.info("Unable to create Subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to create Subnet", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def enable_auto_assign_ip(subnet_id):
+    try:
+        client = boto3.client('ec2')
+        client.modify_subnet_attribute(MapPublicIpOnLaunch={'Value': True}, SubnetId=subnet_id)
+    except Exception as err:
+        logging.info("Unable to create Subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to create Subnet",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
@@ -342,9 +412,10 @@ def remove_roles_and_profiles(role_name, role_profile_name):
 def remove_all_iam_resources(instance_type, scientist=''):
     try:
         client = boto3.client('iam')
+        service_base_name = os.environ['conf_service_base_name'].lower().replace('-', '_')
         roles_list = []
         for item in client.list_roles(MaxItems=250).get("Roles"):
-            if os.environ['conf_service_base_name'] in item.get("RoleName"):
+            if service_base_name + '-' in item.get("RoleName"):
                 roles_list.append(item.get('RoleName'))
         if roles_list:
             roles_list.sort(reverse=True)
@@ -352,21 +423,23 @@ def remove_all_iam_resources(instance_type, scientist=''):
                 if '-ssn-Role' in iam_role:
                     if instance_type == 'ssn' or instance_type == 'all':
                         try:
-                            client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
+                            client.delete_role_policy(RoleName=iam_role, PolicyName=service_base_name + '-ssn-Policy')
                         except:
-                            print 'There is no policy ' + os.environ['conf_service_base_name'] + '-ssn-Policy to delete'
-                        role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
-                        try:
-                            client.get_instance_profile(InstanceProfileName=role_profile_name)
-                            remove_roles_and_profiles(iam_role, role_profile_name)
-                        except:
+                            print 'There is no policy ' + service_base_name + '-ssn-Policy to delete'
+                        role_profiles = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
+                        if role_profiles:
+                            for i in role_profiles:
+                                role_profile_name = i.get('InstanceProfileName')
+                                if role_profile_name == service_base_name + '-ssn-Profile':
+                                    remove_roles_and_profiles(iam_role, role_profile_name)
+                        else:
                             print "There is no instance profile for " + iam_role
                             client.delete_role(RoleName=iam_role)
                             print "The IAM role " + iam_role + " has been deleted successfully"
                 if '-edge-Role' in iam_role:
                     if instance_type == 'edge' and scientist in iam_role:
                         remove_detach_iam_policies(iam_role, 'delete')
-                        role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
+                        role_profile_name = os.environ['conf_service_base_name'].lower().replace('-', '_') + '-' + '{}'.format(scientist) + '-edge-Profile'
                         try:
                             client.get_instance_profile(InstanceProfileName=role_profile_name)
                             remove_roles_and_profiles(iam_role, role_profile_name)
@@ -388,7 +461,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
                 if '-nb-Role' in iam_role:
                     if instance_type == 'notebook' and scientist in iam_role:
                         remove_detach_iam_policies(iam_role)
-                        role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
+                        role_profile_name = os.environ['conf_service_base_name'].lower().replace('-', '_') + '-' + "{}".format(scientist) + '-nb-Profile'
                         try:
                             client.get_instance_profile(InstanceProfileName=role_profile_name)
                             remove_roles_and_profiles(iam_role, role_profile_name)
@@ -408,7 +481,33 @@ def remove_all_iam_resources(instance_type, scientist=''):
                             client.delete_role(RoleName=iam_role)
                             print "The IAM role " + iam_role + " has been deleted successfully"
         else:
-            print "There are no IAM roles instance profiles and policies to delete"
+            print "There are no IAM roles to delete. Checking instance profiles..."
+        profile_list = []
+        for item in client.list_instance_profiles(MaxItems=250).get("InstanceProfiles"):
+            if service_base_name + '-' in item.get("InstanceProfileName"):
+                profile_list.append(item.get('InstanceProfileName'))
+        if profile_list:
+            for instance_profile in profile_list:
+                if '-ssn-Profile' in instance_profile:
+                    if instance_type == 'ssn' or instance_type == 'all':
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                if '-edge-Profile' in instance_profile:
+                    if instance_type == 'edge' and scientist in instance_profile:
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                    if instance_type == 'all':
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                if '-nb-Profile' in instance_profile:
+                    if instance_type == 'notebook' and scientist in instance_profile:
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                    if instance_type == 'all':
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+        else:
+            print "There are no instance profiles to delete"
     except Exception as err:
         logging.info("Unable to remove some of the IAM resources: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
@@ -419,8 +518,8 @@ def remove_all_iam_resources(instance_type, scientist=''):
 
 
 def s3_cleanup(bucket, cluster_name, user_name):
-    s3_res = boto3.resource('s3')
-    client = boto3.client('s3')
+    s3_res = boto3.resource('s3', config=Config(signature_version='s3v4'))
+    client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
     try:
         client.head_bucket(Bucket=bucket)
     except:
@@ -442,7 +541,7 @@ def s3_cleanup(bucket, cluster_name, user_name):
 
 def remove_s3(bucket_type='all', scientist=''):
     try:
-        client = boto3.client('s3')
+        client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
         bucket_list = []
         if bucket_type == 'ssn':
             bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
@@ -452,21 +551,26 @@ def remove_s3(bucket_type='all', scientist=''):
             bucket_name = (os.environ['conf_service_base_name']).lower().replace('_', '-')
         for item in client.list_buckets().get('Buckets'):
             if bucket_name in item.get('Name'):
-                bucket_list.append(item.get('Name'))
+                for i in client.get_bucket_tagging(Bucket=item.get('Name')).get('TagSet'):
+                    i.get('Key')
+                    if i.get('Key') == os.environ['conf_service_base_name'] + '-Tag':
+                        bucket_list.append(item.get('Name'))
         for s3bucket in bucket_list:
-            list_obj = client.list_objects(Bucket=s3bucket)
-            list_obj = list_obj.get('Contents')
-            if list_obj is not None:
-                for o in list_obj:
-                    list_obj = o.get('Key')
-                    client.delete_objects(
-                        Bucket=s3bucket,
-                        Delete={'Objects': [{'Key': list_obj}]}
-                    )
-                print "The S3 bucket " + s3bucket + " has been cleaned"
-            client.delete_bucket(Bucket=s3bucket)
-            print "The S3 bucket " + s3bucket + " has been deleted successfully"
-        print "There are no more buckets to delete"
+            if s3bucket:
+                list_obj = client.list_objects(Bucket=s3bucket)
+                list_obj = list_obj.get('Contents')
+                if list_obj is not None:
+                    for o in list_obj:
+                        list_obj = o.get('Key')
+                        client.delete_objects(
+                            Bucket=s3bucket,
+                            Delete={'Objects': [{'Key': list_obj}]}
+                        )
+                    print "The S3 bucket " + s3bucket + " has been cleaned"
+                client.delete_bucket(Bucket=s3bucket)
+                print "The S3 bucket " + s3bucket + " has been deleted successfully"
+            else:
+                print "There are no buckets to delete"
     except Exception as err:
         logging.info("Unable to remove S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
@@ -594,13 +698,18 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
         traceback.print_exc(file=sys.stdout)
 
 
-def remove_route_tables(tag_name):
+def remove_route_tables(tag_name, ssn=False):
     try:
         client = boto3.client('ec2')
         rtables = client.describe_route_tables(Filters=[{'Name': 'tag-key', 'Values': [tag_name]}]).get('RouteTables')
         for rtable in rtables:
             if rtable:
+                rtable_associations = rtable.get('Associations')
                 rtable = rtable.get('RouteTableId')
+                if ssn:
+                    for association in rtable_associations:
+                        client.disassociate_route_table(AssociationId=association.get('RouteTableAssociationId'))
+                        print "Association " + association.get('RouteTableAssociationId') + " has been removed"
                 client.delete_route_table(RouteTableId=rtable)
                 print "Route table " + rtable + " has been removed"
             else:
@@ -616,10 +725,44 @@ def remove_route_tables(tag_name):
         traceback.print_exc(file=sys.stdout)
 
 
-def remove_apt_lock():
+def remove_internet_gateways(vpc_id, tag_name, tag_value):
     try:
-        sudo('rm -f /var/lib/apt/lists/lock')
-        sudo('rm -f /var/cache/apt/archives/lock')
-        sudo('rm -f /var/lib/dpkg/lock')
-    except:
-        sys.exit(1)
+        ig_id = ''
+        client = boto3.client('ec2')
+        response = client.describe_internet_gateways(
+            Filters=[
+                {'Name': 'tag-key', 'Values': [tag_name]},
+                {'Name': 'tag-value', 'Values': [tag_value]}]).get('InternetGateways')
+        for i in response:
+            ig_id = i.get('InternetGatewayId')
+        client.detach_internet_gateway(InternetGatewayId=ig_id,VpcId=vpc_id)
+        print "Internet gateway " + ig_id + " has been detached from VPC " + vpc_id
+        client.delete_internet_gateway(InternetGatewayId=ig_id)
+        print "Internet gateway " + ig_id + " has been deleted successfully"
+    except Exception as err:
+        logging.info("Unable to remove internet gateway: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove internet gateway",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def remove_vpc_endpoints(vpc_id):
+    try:
+        client = boto3.client('ec2')
+        response = client.describe_vpc_endpoints(Filters=[{'Name': 'vpc-id', 'Values': [vpc_id]}]).get('VpcEndpoints')
+        for i in response:
+            client.delete_vpc_endpoints(VpcEndpointIds=[i.get('VpcEndpointId')])
+            print "VPC Endpoint " + i.get('VpcEndpointId') + " has been removed successfully"
+    except Exception as err:
+        logging.info("Unable to remove VPC Endpoint: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove VPC Endpoint",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)

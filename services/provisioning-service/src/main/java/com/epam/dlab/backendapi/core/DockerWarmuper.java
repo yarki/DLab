@@ -58,7 +58,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
     @Override
     public void start() throws Exception {
         LOGGER.debug("warming up docker");
-        List<String> images = commandExecutor.executeSync(GET_IMAGES);
+        List<String> images = commandExecutor.executeSync("warmup",DockerCommands.generateUUID(),GET_IMAGES);
         for (String image : images) {
             String uuid = UUID.randomUUID().toString();
             LOGGER.debug("warming up image: {} with uid {}", image, uuid);
@@ -74,7 +74,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
                     .withRequestId(uuid)
                     .withActionDescribe(image)
                     .toCMD();
-            commandExecutor.executeAsync(command);
+            commandExecutor.executeAsync("warmup",DockerCommands.generateUUID(),command);
         }
     }
     

@@ -17,6 +17,7 @@
 # ******************************************************************************
 
 import boto3
+from botocore.client import Config
 import json
 import time
 import logging
@@ -98,7 +99,7 @@ def get_route_tables(vpc, tags):
 
 def get_bucket_by_name(bucket_name):
     try:
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', config=Config(signature_version='s3v4'))
         for bucket in s3.buckets.all():
             if bucket.name == bucket_name:
                 return bucket.name
@@ -228,10 +229,13 @@ def get_role_by_name(role_name):
         traceback.print_exc(file=sys.stdout)
 
 
-def get_subnet_by_cidr(cidr):
+def get_subnet_by_cidr(cidr, vpc_id='*'):
     try:
         ec2 = boto3.resource('ec2')
-        for subnet in ec2.subnets.filter(Filters=[{'Name': 'cidrBlock', 'Values': [cidr]}]):
+        for subnet in ec2.subnets.filter(Filters=[
+            {'Name': 'cidrBlock', 'Values': [cidr]},
+            {'Name': 'vpc-id', 'Values': [vpc_id]}
+        ]):
             return subnet.id
         return ''
     except Exception as err:
@@ -245,14 +249,18 @@ def get_subnet_by_cidr(cidr):
         traceback.print_exc(file=sys.stdout)
 
 
-def get_subnet_by_tag(tag):
+def get_subnet_by_tag(tag, subnet_id=False, vpc_id='*'):
     try:
         ec2 = boto3.resource('ec2')
         for subnet in ec2.subnets.filter(Filters=[
             {'Name': 'tag-key', 'Values': [tag.get('Key')]},
-            {'Name': 'tag-value', 'Values': [tag.get('Value')]}
+            {'Name': 'tag-value', 'Values': [tag.get('Value')]},
+            {'Name': 'vpc-id', 'Values': [vpc_id]}
         ]):
-            return subnet.cidr_block
+            if subnet_id:
+                return subnet.id
+            else:
+                return subnet.cidr_block
         return ''
     except Exception as err:
         logging.error("Error with getting Subnet CIDR block by tag: " + str(err) + "\n Traceback: " + traceback.print_exc(
@@ -276,6 +284,23 @@ def get_vpc_by_cidr(cidr):
             file=sys.stdout))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Error with getting VPC ID by CIDR",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def get_vpc_by_tag(tag_name, tag_value):
+    try:
+        ec2 = boto3.resource('ec2')
+        for vpc in ec2.vpcs.filter(Filters=[{'Name': 'tag-key', 'Values': [tag_name]}, {'Name': 'tag-value', 'Values': [tag_value]}]):
+            return vpc.id
+        return ''
+    except Exception as err:
+        logging.error("Error with getting VPC ID by tag: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Error with getting VPC ID by tag",
                    "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))

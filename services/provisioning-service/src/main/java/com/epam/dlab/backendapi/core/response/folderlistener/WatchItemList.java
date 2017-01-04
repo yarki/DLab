@@ -155,7 +155,7 @@ public class WatchItemList {
 	
 	/** Returns the index of the file handler in the list if it is contained in the list,
 	 * otherwise returns (-(insertion point) - 1).
-	 * @param uid UUID of the file handler. */
+	 * @param uuid UUID of the file handler. */
 	public int getIndex(String uuid) {
 		uuidSearch = uuid;
 		return Collections.binarySearch(list, new WatchItem(handlerSearch, 0, 0));

@@ -1,6 +1,23 @@
+/***************************************************************************
+
+ Copyright (c) 2016, EPAM SYSTEMS INC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ ****************************************************************************/
+
 package com.epam.dlab.auth.core;
 
-import com.aegisql.conveyor.utils.caching.ImmutableReference;
 import com.amazonaws.services.identitymanagement.model.AccessKeyMetadata;
 import com.epam.dlab.auth.UserInfo;
 import org.junit.After;
@@ -10,9 +27,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 
-/**
- * Created by Mikhail_Teplitskiy on 11/10/2016.
- */
 public class LoginConveyorTest {
 
     LoginConveyor lc = new LoginConveyor();
@@ -63,12 +77,12 @@ System.out.println("---cacheTest");
         userInfo.setAwsUser(true);
         userInfo.addKey("a","Active");
 
-        CompletableFuture<Boolean> f = cache.createBuild("2", new ImmutableReference<>(userInfo));
+        CompletableFuture<Boolean> f = cache.createBuild("2", CacheableReference.newInstance(userInfo));
         CompletableFuture<UserInfo> uif = cache.getFuture("2");
         f.get();
         //this will take at least 2 seconds
         for(int i = 0; i < 10; i++) {
-            UserInfo ui = cache.getUserInfo("1");
+            UserInfo ui = cache.getUserInfo("2");
             System.out.println(i+": "+ui);
             Thread.sleep(200);
         }

@@ -19,6 +19,7 @@
 # ******************************************************************************
 
 import boto3
+from botocore.client import Config
 from fabric.api import *
 import argparse
 import os
@@ -52,7 +53,7 @@ yarn_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/conf/'
 
 
 def install_emr_spark(args):
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/spark.tar.gz', '/tmp/spark.tar.gz')
     local('sudo tar -zhxvf /tmp/spark.tar.gz -C /opt/' + args.emr_version + '/' + args.cluster_name + '/')
 
@@ -67,15 +68,15 @@ def prepare():
 
 def jars(args):
     print "Downloading jars..."
-    s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
     s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
     local('tar -zhxvf /tmp/jars.tar.gz -C ' + emr_dir)
 
 
 def yarn(args):
     print "Downloading yarn configuration..."
-    s3client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
-    s3resource = boto3.resource('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
+    s3client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
+    s3resource = boto3.resource('s3', config=Config(signature_version='s3v4'))
     get_files(s3client, s3resource, args.user_name + '/' + args.cluster_name + '/config/', args.bucket, yarn_dir)
     local('sudo mv ' + yarn_dir + args.user_name + '/' + args.cluster_name + '/config/* ' + yarn_dir)
     local('sudo rm -rf ' + yarn_dir + args.user_name + '/')
@@ -93,7 +94,7 @@ def r_kernel(args):
     text = text.replace('CLUSTERNAME', args.cluster_name)
     text = text.replace('SPARK_PATH', spark_path)
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('R_VER', 'v{}'.format(str(r_version)))
+    text = text.replace('R_VER', 'R-{}'.format(str(r_version)))
     text = text.replace('EMR', args.emr_version)
     if 'emr-4.' in args.emr_version:
         text = text.replace('YRN_CLI_TYPE', 'yarn-client')
@@ -128,7 +129,7 @@ def pyspark_kernel(args):
     local(
         "PYJ=`find /opt/" + args.emr_version + "/" + args.cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
     local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-    s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
     with file('/tmp/python_version') as f:
         python_version = f.read()
@@ -157,6 +158,7 @@ def pyspark_kernel(args):
 
 def toree_kernel(args):
     spark_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
+    scala_version = local("dpkg -l scala | grep scala | awk '{print $3}'", capture=True)
     if args.emr_version == 'emr-4.3.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-4.8.0':
         local('mkdir -p ' + kernels_dir + 'toree_' + args.cluster_name + '/')
         kernel_path = kernels_dir + "toree_" + args.cluster_name + "/kernel.json"
@@ -167,6 +169,7 @@ def toree_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
         text = text.replace('EMR', args.emr_version)
+        text = text.replace('SC_VER', scala_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
@@ -184,6 +187,7 @@ def toree_kernel(args):
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
         text = text.replace('EMR', args.emr_version)
+        text = text.replace('SC_VER', scala_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
@@ -292,7 +296,7 @@ def configure_zeppelin_emr_interpreter(args):
 
 
 def installing_python(args):
-    s3_client = boto3.client('s3', endpoint_url='https://s3-{}.amazonaws.com'.format(args.region))
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
     with file('/tmp/python_version') as f:
         python_version = f.read()

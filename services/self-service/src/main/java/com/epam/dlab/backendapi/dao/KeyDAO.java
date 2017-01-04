@@ -43,11 +43,12 @@ public class KeyDAO extends BaseDAO {
     public void saveCredential(String user, UserAWSCredentialDTO credential) {
         insertOne(USER_AWS_CREDENTIALS, credential, user);
     }
-
-    public String getUserEdgeIP(String user) {
-        return findOne(USER_AWS_CREDENTIALS, eq(ID, user), UserAWSCredentialDTO.class)
-                .orElse(new UserAWSCredentialDTO())
-                .getPublicIp();
+    
+    public UserAWSCredentialDTO getUserAWSCredential(String user) {
+    	return findOne(USER_AWS_CREDENTIALS,
+    			eq(ID, user),
+    			UserAWSCredentialDTO.class)
+    			.orElse(new UserAWSCredentialDTO());
     }
 
     public KeyLoadStatus findKeyStatus(UserInfo userInfo) {
