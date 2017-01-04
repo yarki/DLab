@@ -1,6 +1,5 @@
-/***************************************************************************
-
-Copyright (c) 2016, EPAM SYSTEMS INC
+/*
+Copyright 2016 EPAM Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,12 +12,18 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+*/
+package com.epam.dlab.process;
 
-****************************************************************************/
-
-package com.epam.dlab.rest.contracts;
-
-public interface SelfServiceAPI {
-    String KEY_LOADER = "api/user/access_key/callback";
-    String USER_SETTINGS = "api/user/settings";
+public enum ProcessStatus {
+    CREATED,
+    LAUNCHING,
+    RUNNING,
+    STOPPED,
+    KILLED,
+    TIMEOUT,
+    FINISHED,
+    REJECTED,
+    FAILED,
+    SCHEDULED
 }

@@ -53,7 +53,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     private Class<T> resultType;
 
     @SuppressWarnings("unchecked")
-    public ResourceCallbackHandler(RESTService selfService, String user, String originalUuid, DockerAction action) {
+    public ResourceCallbackHandler(RESTService selfService, String user, String accessToken, String originalUuid, DockerAction action) {
         this.selfService = selfService;
         this.user = user;
         this.originalUuid = originalUuid;
