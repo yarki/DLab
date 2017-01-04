@@ -61,9 +61,14 @@ def run():
         policy_path = '/root/templates/policy.json'
         vpc_cidr = '172.31.0.0/16'
         sg_name = instance_name + '-SG'
+        pre_defined_vpc = False
+        pre_defined_sg = False
 
         if os.environ['creds_vpc_id'] == '' or os.environ['creds_vpc_id'] == 'PUT_YOUR_VALUE_HERE':
             try:
+                pre_defined_vpc = True
+                logging.info('[CREATE VPC AND ROUTE TABLE]')
+                print '[CREATE VPC AND ROUTE TABLE]'
                 params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, instance_name)
                 if not run_routine('create_vpc', params):
                     logging.info('Failed to create VPC')
@@ -75,13 +80,14 @@ def run():
                 os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, instance_name)
                 enable_vpc_dns(os.environ['creds_vpc_id'])
                 result_rt = create_rt(os.environ['creds_vpc_id'], tag_name, instance_name)
-                print "HERE+++++++++"
-                print "ROUTE TABLE ====" + result_rt
             except:
                 sys.exit(1)
 
         if os.environ['creds_subnet_id'] == '' or os.environ['creds_subnet_id'] == 'PUT_YOUR_VALUE_HERE':
             try:
+                pre_defined_vpc = True
+                logging.info('[CREATE SUBNET]')
+                print '[CREATE SUBNET]'
                 params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {} --prefix {} --ssn {}".format(os.environ['creds_vpc_id'], 'ssn', tag_name, instance_name, '20', True)
                 if not run_routine('create_subnet', params):
                     logging.info('Failed to create Subnet')
@@ -94,11 +100,16 @@ def run():
                     os.environ['creds_subnet_id'] = f.read()
                 enable_auto_assign_ip(os.environ['creds_subnet_id'])
             except:
-                remove_vpc(os.environ['creds_vpc_id'])
+                if pre_defined_vpc:
+                    remove_route_tables(tag_name)
+                    remove_vpc(os.environ['creds_vpc_id'])
                 sys.exit(1)
 
         if os.environ['creds_security_groups_ids'] == '' or os.environ['creds_security_groups_ids'] == 'PUT_YOUR_VALUE_HERE':
             try:
+                pre_defined_sg = True
+                logging.info('[CREATE SG FOR SSN]')
+                print '[CREATE SG FOR SSN]'
                 ingress_sg_rules_template = [
                     {
                         "PrefixListIds": [],
@@ -152,6 +163,10 @@ def run():
                 with open('/tmp/ssn_sg_id', 'r') as f:
                     os.environ['creds_security_groups_ids'] = f.read()
             except:
+                if pre_defined_vpc:
+                    remove_subnets(instance_name)
+                    remove_route_tables(tag_name)
+                    remove_vpc(os.environ['creds_vpc_id'])
                 sys.exit(1)
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
@@ -166,10 +181,12 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
-        try:
+        if pre_defined_sg:
             remove_sgroups(instance_name)
-        except:
-            print "Pre-defined security group exists. Removing SG for SSN will be removed."
+        if pre_defined_vpc:
+            remove_subnets(instance_name)
+            remove_route_tables(tag_name)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -186,10 +203,12 @@ def run():
             sys.exit(1)
     except:
         remove_all_iam_resources(instance)
-        try:
+        if pre_defined_sg:
             remove_sgroups(instance_name)
-        except:
-            print "Pre-defined security group exists. Removing SG for SSN will be removed."
+        if pre_defined_vpc:
+            remove_subnets(instance_name)
+            remove_route_tables(tag_name)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -207,10 +226,12 @@ def run():
             sys.exit(1)
     except:
         remove_all_iam_resources(instance)
-        try:
+        if pre_defined_sg:
             remove_sgroups(instance_name)
-        except:
-            print "Pre-defined security group exists. Removing SG for SSN will be removed."
+        if pre_defined_vpc:
+            remove_subnets(instance_name)
+            remove_route_tables(tag_name)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -232,10 +253,12 @@ def run():
     except:
         remove_all_iam_resources(instance)
         remove_s3(instance)
-        try:
+        if pre_defined_sg:
             remove_sgroups(instance_name)
-        except:
-            print "Pre-defined security group exists. Removing SG for SSN will be removed."
+        if pre_defined_vpc:
+            remove_subnets(instance_name)
+            remove_route_tables(tag_name)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -258,10 +281,12 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
-        try:
+        if pre_defined_sg:
             remove_sgroups(instance_name)
-        except:
-            print "Pre-defined security group exists. Removing SG for SSN will be removed."
+        if pre_defined_vpc:
+            remove_subnets(instance_name)
+            remove_route_tables(tag_name)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -282,10 +307,12 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
-        try:
+        if pre_defined_sg:
             remove_sgroups(instance_name)
-        except:
-            print "Pre-defined security group exists. Removing SG for SSN will be removed."
+        if pre_defined_vpc:
+            remove_subnets(instance_name)
+            remove_route_tables(tag_name)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -310,10 +337,12 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
-        try:
+        if pre_defined_sg:
             remove_sgroups(instance_name)
-        except:
-            print "Pre-defined security group exists. Removing SG for SSN will be removed."
+        if pre_defined_vpc:
+            remove_subnets(instance_name)
+            remove_route_tables(tag_name)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -334,10 +363,12 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
-        try:
+        if pre_defined_sg:
             remove_sgroups(instance_name)
-        except:
-            print "Pre-defined security group exists. Removing SG for SSN will be removed."
+        if pre_defined_vpc:
+            remove_subnets(instance_name)
+            remove_route_tables(tag_name)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -355,10 +386,12 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
-        try:
+        if pre_defined_sg:
             remove_sgroups(instance_name)
-        except:
-            print "Pre-defined security group exists. Removing SG for SSN will be removed."
+        if pre_defined_vpc:
+            remove_subnets(instance_name)
+            remove_route_tables(tag_name)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -430,10 +463,12 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
-        try:
+        if pre_defined_sg:
             remove_sgroups(instance_name)
-        except:
-            print "Pre-defined security group exists. Removing SG for SSN will be removed."
+        if pre_defined_vpc:
+            remove_subnets(instance_name)
+            remove_route_tables(tag_name)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
 def terminate():

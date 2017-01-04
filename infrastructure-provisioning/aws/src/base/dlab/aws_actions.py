@@ -135,6 +135,9 @@ def create_rt(vpc_id, infra_tag_name, infra_tag_value):
         create_tag(route_table, json.dumps(tag))
         ig = ec2.create_internet_gateway()
         ig_id = ig.get('InternetGateway').get('InternetGatewayId')
+        route_table = []
+        route_table.append(ig_id)
+        create_tag(route_table, json.dumps(tag))
         ec2.attach_internet_gateway(InternetGatewayId=ig_id, VpcId=vpc_id)
         ec2.create_route(DestinationCidrBlock='0.0.0.0/0', RouteTableId=rt_id, GatewayId=ig_id)
         return rt_id
@@ -675,3 +678,6 @@ def remove_route_tables(tag_name):
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
+
+#def remove_internet_gateways():
+
