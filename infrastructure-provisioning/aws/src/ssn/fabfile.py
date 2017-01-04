@@ -79,7 +79,7 @@ def run():
                     sys.exit(1)
                 os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, instance_name)
                 enable_vpc_dns(os.environ['creds_vpc_id'])
-                result_rt = create_rt(os.environ['creds_vpc_id'], tag_name, instance_name)
+                rt_id = create_rt(os.environ['creds_vpc_id'], tag_name, instance_name)
             except:
                 sys.exit(1)
 
@@ -102,7 +102,7 @@ def run():
             except:
                 if pre_defined_vpc:
                     remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-                    remove_route_tables(tag_name)
+                    remove_route_tables(tag_name, True)
                     remove_vpc(os.environ['creds_vpc_id'])
                 sys.exit(1)
 
@@ -167,7 +167,7 @@ def run():
                 if pre_defined_vpc:
                     remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
                     remove_subnets(instance_name)
-                    remove_route_tables(tag_name)
+                    remove_route_tables(tag_name, True)
                     remove_vpc(os.environ['creds_vpc_id'])
                 sys.exit(1)
         logging.info('[CREATE ROLES]')
@@ -188,7 +188,7 @@ def run():
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
             remove_subnets(instance_name)
-            remove_route_tables(tag_name)
+            remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
@@ -211,7 +211,7 @@ def run():
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
             remove_subnets(instance_name)
-            remove_route_tables(tag_name)
+            remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
@@ -235,7 +235,7 @@ def run():
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
             remove_subnets(instance_name)
-            remove_route_tables(tag_name)
+            remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
@@ -263,7 +263,7 @@ def run():
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
             remove_subnets(instance_name)
-            remove_route_tables(tag_name)
+            remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
@@ -292,7 +292,7 @@ def run():
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
             remove_subnets(instance_name)
-            remove_route_tables(tag_name)
+            remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
@@ -319,7 +319,7 @@ def run():
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
             remove_subnets(instance_name)
-            remove_route_tables(tag_name)
+            remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
@@ -350,7 +350,7 @@ def run():
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
             remove_subnets(instance_name)
-            remove_route_tables(tag_name)
+            remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
@@ -377,7 +377,7 @@ def run():
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
             remove_subnets(instance_name)
-            remove_route_tables(tag_name)
+            remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
@@ -401,7 +401,7 @@ def run():
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
             remove_subnets(instance_name)
-            remove_route_tables(tag_name)
+            remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
@@ -479,9 +479,10 @@ def run():
         if pre_defined_vpc:
             remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
             remove_subnets(instance_name)
-            remove_route_tables(tag_name)
+            remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
+
 
 def terminate():
     local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
