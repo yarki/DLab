@@ -69,7 +69,7 @@ def run():
                 pre_defined_vpc = True
                 logging.info('[CREATE VPC AND ROUTE TABLE]')
                 print '[CREATE VPC AND ROUTE TABLE]'
-                params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, instance_name)
+                params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, service_base_name)
                 if not run_routine('create_vpc', params):
                     logging.info('Failed to create VPC')
                     with open("/root/result.json", 'w') as result:
@@ -77,9 +77,9 @@ def run():
                         print json.dumps(res)
                         result.write(json.dumps(res))
                     sys.exit(1)
-                os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, instance_name)
+                os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
                 enable_vpc_dns(os.environ['creds_vpc_id'])
-                rt_id = create_rt(os.environ['creds_vpc_id'], tag_name, instance_name)
+                rt_id = create_rt(os.environ['creds_vpc_id'], tag_name, service_base_name)
             except:
                 sys.exit(1)
 
@@ -101,10 +101,10 @@ def run():
                 enable_auto_assign_ip(os.environ['creds_subnet_id'])
             except:
                 if pre_defined_vpc:
-                    remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
+                    remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
                     remove_route_tables(tag_name, True)
                     try:
-                        remove_subnets(service_base_name + "-ssn-subnet")
+                        remove_subnets(service_base_name + "-subnet")
                     except:
                         print "Subnet hasn't been created."
                     remove_vpc(os.environ['creds_vpc_id'])
@@ -157,7 +157,7 @@ def run():
                     {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}
                 ]
                 params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {} --ssn {}". \
-                    format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), tag_name, instance_name, False, True)
+                    format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), tag_name, service_base_name, False, True)
                 if not run_routine('create_security_group', params):
                     logging.info('Failed creating security group for SSN')
                     with open("/root/result.json", 'w') as result:
@@ -169,8 +169,8 @@ def run():
                     os.environ['creds_security_groups_ids'] = f.read()
             except:
                 if pre_defined_vpc:
-                    remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-                    remove_subnets(service_base_name + "-ssn-subnet")
+                    remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+                    remove_subnets(service_base_name + "-subnet")
                     remove_route_tables(tag_name, True)
                     remove_vpc(os.environ['creds_vpc_id'])
                 sys.exit(1)
@@ -188,10 +188,10 @@ def run():
             sys.exit(1)
     except:
         if pre_defined_sg:
-            remove_sgroups(instance_name)
+            remove_sgroups(service_base_name)
         if pre_defined_vpc:
-            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-            remove_subnets(service_base_name + "-ssn-subnet")
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
@@ -211,10 +211,10 @@ def run():
     except:
         remove_all_iam_resources(instance)
         if pre_defined_sg:
-            remove_sgroups(instance_name)
+            remove_sgroups(service_base_name)
         if pre_defined_vpc:
-            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-            remove_subnets(service_base_name + "-ssn-subnet")
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
@@ -235,10 +235,10 @@ def run():
     except:
         remove_all_iam_resources(instance)
         if pre_defined_sg:
-            remove_sgroups(instance_name)
+            remove_sgroups(service_base_name)
         if pre_defined_vpc:
-            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-            remove_subnets(service_base_name + "-ssn-subnet")
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
@@ -263,10 +263,10 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(instance_name)
+            remove_sgroups(service_base_name)
         if pre_defined_vpc:
-            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-            remove_subnets(service_base_name + "-ssn-subnet")
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
@@ -292,10 +292,10 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(instance_name)
+            remove_sgroups(service_base_name)
         if pre_defined_vpc:
-            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-            remove_subnets(service_base_name + "-ssn-subnet")
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
@@ -319,10 +319,10 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(instance_name)
+            remove_sgroups(service_base_name)
         if pre_defined_vpc:
-            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-            remove_subnets(service_base_name + "-ssn-subnet")
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
@@ -350,10 +350,10 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(instance_name)
+            remove_sgroups(service_base_name)
         if pre_defined_vpc:
-            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-            remove_subnets(service_base_name + "-ssn-subnet")
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
@@ -377,10 +377,10 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(instance_name)
+            remove_sgroups(service_base_name)
         if pre_defined_vpc:
-            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-            remove_subnets(service_base_name + "-ssn-subnet")
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
@@ -401,10 +401,10 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(instance_name)
+            remove_sgroups(service_base_name)
         if pre_defined_vpc:
-            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-            remove_subnets(service_base_name + "-ssn-subnet")
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
@@ -479,10 +479,10 @@ def run():
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
-            remove_sgroups(instance_name)
+            remove_sgroups(service_base_name)
         if pre_defined_vpc:
-            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, instance_name)
-            remove_subnets(service_base_name + "-ssn-subnet")
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)

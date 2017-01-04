@@ -40,7 +40,10 @@ args = parser.parse_args()
 
 if __name__ == "__main__":
     success = False
-    tag = {"Key": args.infra_tag_name, "Value": "{}-{}-subnet".format(args.infra_tag_value, args.username)}
+    if args.ssn:
+        tag = {"Key": args.infra_tag_name, "Value": "{}-subnet".format(args.infra_tag_value)}
+    else:
+        tag = {"Key": args.infra_tag_name, "Value": "{}-{}-subnet".format(args.infra_tag_value, args.username)}
     try:
         ec2 = boto3.resource('ec2')
         vpc = ec2.Vpc(args.vpc_id)
