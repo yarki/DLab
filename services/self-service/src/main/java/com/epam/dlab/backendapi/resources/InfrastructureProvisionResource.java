@@ -24,6 +24,7 @@ import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
+import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.DockerAPI;
 import com.google.common.collect.Lists;
@@ -39,7 +40,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Collections;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -64,13 +65,20 @@ public class InfrastructureProvisionResource implements DockerAPI {
     @Path("/provisioned_user_resources")
     public Iterable<Document> getList(@Auth UserInfo userInfo) {
         LOGGER.debug("loading notebooks for user {}", userInfo.getName());
-        String ip = keyDAO.getUserEdgeIP(userInfo.getName());
-        return appendEdgeIp(dao.find(userInfo.getName()), ip);
+        Iterable<Document> documents = appendEdgeInfo(dao.find(userInfo.getName()), userInfo.getName());
+        documents.forEach(d -> {
+        	int i = 0;
+        	LOGGER.debug("Notebook[{}]: {}", ++i, d);
+        	});
+        return documents;
     }
 
-    private List<Document> appendEdgeIp(Iterable<Document> documents, String ip) {
+    private List<Document> appendEdgeInfo(Iterable<Document> documents, String username) {
+        UserAWSCredentialDTO cred = keyDAO.getUserAWSCredential(username);
         return StreamSupport.stream(documents.spliterator(), false)
-                .map(document -> document.append(EDGE_IP, ip))
+                .map(document -> document
+                		.append(EDGE_IP, cred.getPublicIp())
+                		.append(UserAWSCredentialDTO.USER_OWN_BUCKET_NAME, cred.getUserOwnBucketName()))
                 .collect(Collectors.toList());
     }
 
@@ -85,14 +93,14 @@ public class InfrastructureProvisionResource implements DockerAPI {
     @Path("/computational_resources_templates")
     public Iterable<ComputationalMetadataDTO> getComputationalTemplates(@Auth UserInfo userInfo) {
         LOGGER.debug("loading computational templates for user {}", userInfo.getName());
-        return getComputationalTemplates();
+        return getComputationalTemplates(userInfo.getAccessToken());
     }
 
     @GET
     @Path("/exploratory_environment_templates")
     public Iterable<ExploratoryMetadataDTO> getExploratoryTemplates(@Auth UserInfo userInfo) {
         LOGGER.debug("loading exploratory templates for user {}", userInfo.getName());
-        List<ExploratoryMetadataDTO> list = Lists.newArrayList(getExploratoryTemplates());
+        List<ExploratoryMetadataDTO> list = Lists.newArrayList(getExploratoryTemplates(userInfo.getAccessToken()));
         list.forEach(m -> {
             int separatorIndex = m.getImage().indexOf(":");
             if(separatorIndex > 0) {
@@ -102,13 +110,13 @@ public class InfrastructureProvisionResource implements DockerAPI {
         return list;
     }
 
-    private Iterable<ExploratoryMetadataDTO> getExploratoryTemplates() {
-        return Stream.of(provisioningService.get(DOCKER_EXPLORATORY, ExploratoryMetadataDTO[].class))
+    private Iterable<ExploratoryMetadataDTO> getExploratoryTemplates(String accessToken) {
+        return Stream.of(provisioningService.get(DOCKER_EXPLORATORY, accessToken, ExploratoryMetadataDTO[].class))
                 .collect(Collectors.toSet());
     }
 
-    private Iterable<ComputationalMetadataDTO> getComputationalTemplates() {
-        return Stream.of(provisioningService.get(DOCKER_COMPUTATIONAL, ComputationalMetadataDTO[].class))
+    private Iterable<ComputationalMetadataDTO> getComputationalTemplates(String accessToken) {
+        return Stream.of(provisioningService.get(DOCKER_COMPUTATIONAL, accessToken, ComputationalMetadataDTO[].class))
                 .collect(Collectors.toSet());
     }
 }

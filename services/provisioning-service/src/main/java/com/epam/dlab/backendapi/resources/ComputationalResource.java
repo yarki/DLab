@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.Directories;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
@@ -31,6 +32,7 @@ import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.google.inject.Inject;
+import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,15 +65,17 @@ public class ComputationalResource implements DockerCommands {
 
     @Path("/create")
     @POST
-    public String create(ComputationalCreateDTO dto) throws IOException, InterruptedException {
+    public String create(@Auth UserInfo ui, ComputationalCreateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("create computational resources cluster");
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(CREATE, uuid, dto));
+                getFileHandlerCallback(CREATE, uuid, dto,ui.getAccessToken()));
         try {
             long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
             commandExecuter.executeAsync(
+                    ui.getName(),
+                    uuid,
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
                                     .withInteractive()
@@ -97,14 +101,16 @@ public class ComputationalResource implements DockerCommands {
 
     @Path("/terminate")
     @POST
-    public String terminate(ComputationalTerminateDTO dto) throws IOException, InterruptedException {
+    public String terminate(@Auth UserInfo ui, ComputationalTerminateDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("terminate computational resources cluster");
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(TERMINATE, uuid, dto));
+                getFileHandlerCallback(TERMINATE, uuid, dto, ui.getAccessToken()));
         try {
             commandExecuter.executeAsync(
+                    ui.getName(),
+                    uuid,
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
                                     .withInteractive()
@@ -125,8 +131,8 @@ public class ComputationalResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO dto) {
-        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName(), dto.getComputationalName());
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO dto,String accessToken) {
+        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName(), dto.getComputationalName(),accessToken);
     }
 
     private String nameContainer(String user, DockerAction action, String name) {

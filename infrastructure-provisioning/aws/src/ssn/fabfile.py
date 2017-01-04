@@ -50,9 +50,9 @@ def run():
         logging.info('[DERIVING NAMES]')
         print '[DERIVING NAMES]'
         service_base_name = os.environ['conf_service_base_name']
-        role_name = service_base_name + '-ssn-Role'
-        role_profile_name = service_base_name + '-ssn-Profile'
-        policy_name = service_base_name + '-ssn-Policy'
+        role_name = service_base_name.lower().replace('-', '_') + '-ssn-Role'
+        role_profile_name = service_base_name.lower().replace('-', '_') + '-ssn-Profile'
+        policy_name = service_base_name.lower().replace('-', '_') + '-ssn-Policy'
         user_bucket_name = (service_base_name + '-ssn-bucket').lower().replace('_', '-')
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn'
@@ -223,7 +223,7 @@ def run():
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
         params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s --region %s" % \
-                 (user_bucket_name, tag_name, "bucket", region)
+                 (user_bucket_name, tag_name, user_bucket_name, region)
 
         if not run_routine('create_bucket', params):
             logging.info('Unable to create bucket')

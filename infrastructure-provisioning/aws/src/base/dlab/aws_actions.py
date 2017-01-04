@@ -18,6 +18,7 @@
 
 import boto3
 import botocore
+from botocore.client import Config
 import time
 import sys
 import os
@@ -31,7 +32,7 @@ import traceback
 
 def put_to_bucket(bucket_name, local_file, destination_file):
     try:
-        s3 = boto3.client('s3')
+        s3 = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
         with open(local_file, 'rb') as data:
             s3.upload_fileobj(data, bucket_name, destination_file)
         return True
@@ -47,7 +48,7 @@ def put_to_bucket(bucket_name, local_file, destination_file):
 
 def create_s3_bucket(bucket_name, tag, region):
     try:
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', config=Config(signature_version='s3v4'))
         bucket = s3.create_bucket(Bucket=bucket_name,
                                   CreateBucketConfiguration={'LocationConstraint': region})
         tagging = bucket.Tagging()
@@ -411,9 +412,10 @@ def remove_roles_and_profiles(role_name, role_profile_name):
 def remove_all_iam_resources(instance_type, scientist=''):
     try:
         client = boto3.client('iam')
+        service_base_name = os.environ['conf_service_base_name'].lower().replace('-', '_')
         roles_list = []
         for item in client.list_roles(MaxItems=250).get("Roles"):
-            if os.environ['conf_service_base_name'] in item.get("RoleName"):
+            if service_base_name + '-' in item.get("RoleName"):
                 roles_list.append(item.get('RoleName'))
         if roles_list:
             roles_list.sort(reverse=True)
@@ -421,21 +423,23 @@ def remove_all_iam_resources(instance_type, scientist=''):
                 if '-ssn-Role' in iam_role:
                     if instance_type == 'ssn' or instance_type == 'all':
                         try:
-                            client.delete_role_policy(RoleName=iam_role, PolicyName=os.environ['conf_service_base_name'] + '-ssn-Policy')
+                            client.delete_role_policy(RoleName=iam_role, PolicyName=service_base_name + '-ssn-Policy')
                         except:
-                            print 'There is no policy ' + os.environ['conf_service_base_name'] + '-ssn-Policy to delete'
-                        role_profile_name = os.environ['conf_service_base_name'] + '-ssn-Profile'
-                        try:
-                            client.get_instance_profile(InstanceProfileName=role_profile_name)
-                            remove_roles_and_profiles(iam_role, role_profile_name)
-                        except:
+                            print 'There is no policy ' + service_base_name + '-ssn-Policy to delete'
+                        role_profiles = client.list_instance_profiles_for_role(RoleName=iam_role).get('InstanceProfiles')
+                        if role_profiles:
+                            for i in role_profiles:
+                                role_profile_name = i.get('InstanceProfileName')
+                                if role_profile_name == service_base_name + '-ssn-Profile':
+                                    remove_roles_and_profiles(iam_role, role_profile_name)
+                        else:
                             print "There is no instance profile for " + iam_role
                             client.delete_role(RoleName=iam_role)
                             print "The IAM role " + iam_role + " has been deleted successfully"
                 if '-edge-Role' in iam_role:
                     if instance_type == 'edge' and scientist in iam_role:
                         remove_detach_iam_policies(iam_role, 'delete')
-                        role_profile_name = os.environ['conf_service_base_name'] + '-' + '{}'.format(scientist) + '-edge-Profile'
+                        role_profile_name = os.environ['conf_service_base_name'].lower().replace('-', '_') + '-' + '{}'.format(scientist) + '-edge-Profile'
                         try:
                             client.get_instance_profile(InstanceProfileName=role_profile_name)
                             remove_roles_and_profiles(iam_role, role_profile_name)
@@ -457,7 +461,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
                 if '-nb-Role' in iam_role:
                     if instance_type == 'notebook' and scientist in iam_role:
                         remove_detach_iam_policies(iam_role)
-                        role_profile_name = os.environ['conf_service_base_name'] + '-' + "{}".format(scientist) + '-nb-Profile'
+                        role_profile_name = os.environ['conf_service_base_name'].lower().replace('-', '_') + '-' + "{}".format(scientist) + '-nb-Profile'
                         try:
                             client.get_instance_profile(InstanceProfileName=role_profile_name)
                             remove_roles_and_profiles(iam_role, role_profile_name)
@@ -477,7 +481,33 @@ def remove_all_iam_resources(instance_type, scientist=''):
                             client.delete_role(RoleName=iam_role)
                             print "The IAM role " + iam_role + " has been deleted successfully"
         else:
-            print "There are no IAM roles instance profiles and policies to delete"
+            print "There are no IAM roles to delete. Checking instance profiles..."
+        profile_list = []
+        for item in client.list_instance_profiles(MaxItems=250).get("InstanceProfiles"):
+            if service_base_name + '-' in item.get("InstanceProfileName"):
+                profile_list.append(item.get('InstanceProfileName'))
+        if profile_list:
+            for instance_profile in profile_list:
+                if '-ssn-Profile' in instance_profile:
+                    if instance_type == 'ssn' or instance_type == 'all':
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                if '-edge-Profile' in instance_profile:
+                    if instance_type == 'edge' and scientist in instance_profile:
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                    if instance_type == 'all':
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                if '-nb-Profile' in instance_profile:
+                    if instance_type == 'notebook' and scientist in instance_profile:
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+                    if instance_type == 'all':
+                        client.delete_instance_profile(InstanceProfileName=instance_profile)
+                        print "The instance profile " + instance_profile + " has been deleted successfully"
+        else:
+            print "There are no instance profiles to delete"
     except Exception as err:
         logging.info("Unable to remove some of the IAM resources: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
@@ -488,8 +518,8 @@ def remove_all_iam_resources(instance_type, scientist=''):
 
 
 def s3_cleanup(bucket, cluster_name, user_name):
-    s3_res = boto3.resource('s3')
-    client = boto3.client('s3')
+    s3_res = boto3.resource('s3', config=Config(signature_version='s3v4'))
+    client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
     try:
         client.head_bucket(Bucket=bucket)
     except:
@@ -511,7 +541,7 @@ def s3_cleanup(bucket, cluster_name, user_name):
 
 def remove_s3(bucket_type='all', scientist=''):
     try:
-        client = boto3.client('s3')
+        client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
         bucket_list = []
         if bucket_type == 'ssn':
             bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
@@ -521,21 +551,26 @@ def remove_s3(bucket_type='all', scientist=''):
             bucket_name = (os.environ['conf_service_base_name']).lower().replace('_', '-')
         for item in client.list_buckets().get('Buckets'):
             if bucket_name in item.get('Name'):
-                bucket_list.append(item.get('Name'))
+                for i in client.get_bucket_tagging(Bucket=item.get('Name')).get('TagSet'):
+                    i.get('Key')
+                    if i.get('Key') == os.environ['conf_service_base_name'] + '-Tag':
+                        bucket_list.append(item.get('Name'))
         for s3bucket in bucket_list:
-            list_obj = client.list_objects(Bucket=s3bucket)
-            list_obj = list_obj.get('Contents')
-            if list_obj is not None:
-                for o in list_obj:
-                    list_obj = o.get('Key')
-                    client.delete_objects(
-                        Bucket=s3bucket,
-                        Delete={'Objects': [{'Key': list_obj}]}
-                    )
-                print "The S3 bucket " + s3bucket + " has been cleaned"
-            client.delete_bucket(Bucket=s3bucket)
-            print "The S3 bucket " + s3bucket + " has been deleted successfully"
-        print "There are no more buckets to delete"
+            if s3bucket:
+                list_obj = client.list_objects(Bucket=s3bucket)
+                list_obj = list_obj.get('Contents')
+                if list_obj is not None:
+                    for o in list_obj:
+                        list_obj = o.get('Key')
+                        client.delete_objects(
+                            Bucket=s3bucket,
+                            Delete={'Objects': [{'Key': list_obj}]}
+                        )
+                    print "The S3 bucket " + s3bucket + " has been cleaned"
+                client.delete_bucket(Bucket=s3bucket)
+                print "The S3 bucket " + s3bucket + " has been deleted successfully"
+            else:
+                print "There are no buckets to delete"
     except Exception as err:
         logging.info("Unable to remove S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:

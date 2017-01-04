@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ****************************************************************************/
+/* tslint:disable:no-empty */
 
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { UserResourceService } from './../../services/userResource.service';
@@ -112,6 +113,8 @@ export class ResourcesGrid implements OnInit {
 
       return isName && isStatus && isShape && isResources;
     });
+
+    this.updateUserPreferences(config);
     this.filteredEnvironments = filteredData;
   }
 
@@ -121,6 +124,7 @@ export class ResourcesGrid implements OnInit {
 
   resetFilterConfigurations(): void {
     this.filterForm.resetConfigurations();
+    this.updateUserPreferences(this.filterForm);
     this.buildGrid();
   }
 
@@ -128,12 +132,9 @@ export class ResourcesGrid implements OnInit {
     this.userResourceService.getUserProvisionedResources()
       .subscribe((result) => {
         this.environments = this.loadEnvironments(result);
-        this.filteredEnvironments = this.environments;
-
-        if (this.environments.length)
-          this.applyFilter_btnClick(this.filterForm);
-
         this.getDefaultFilterConfiguration();
+
+        (this.environments.length) ? this.getUserPreferences() : this.filteredEnvironments = [];
       });
   }
 
@@ -146,21 +147,46 @@ export class ResourcesGrid implements OnInit {
     return false;
   }
 
-  loadEnvironments(exploratoryList: Array<any>) : Array<ResourcesGridRowModel> {
-     if (exploratoryList) {
-       return exploratoryList.map((value) => {
-         return new ResourcesGridRowModel(value.exploratory_name,
-           value.status,
-           value.shape,
-           value.computational_resources,
-           value.up_time,
-           value.exploratory_url,
-           value.edge_node_ip,
-           value.exploratory_user,
-           value.exploratory_pass);
-       });
-     }
-   }
+  loadEnvironments(exploratoryList: Array<any>): Array<ResourcesGridRowModel> {
+    if (exploratoryList) {
+      return exploratoryList.map((value) => {
+        return new ResourcesGridRowModel(value.exploratory_name,
+          value.status,
+          value.shape,
+          value.computational_resources,
+          value.up_time,
+          value.exploratory_url,
+          value.edge_node_ip,
+          value.exploratory_user,
+          value.exploratory_pass,
+          value.user_own_bicket_name);
+      });
+    }
+  }
+
+  getUserPreferences(): void {
+    this.userResourceService.getUserPreferences()
+      .subscribe((result) => {
+        this.filterForm = this.loadUserPreferences(result);
+        this.applyFilter_btnClick(this.filterForm);
+      }, (error) => {
+        // FIXME: to avoid SyntaxError: in case of empty database
+        this.applyFilter_btnClick(this.filterForm);
+        console.log('GET USER PREFERENCES ERROR', error);
+      });
+  }
+
+  loadUserPreferences(config): FilterConfigurationModel {
+    return new FilterConfigurationModel(config.name, config.statuses, config.shapes, config.resources);
+  }
+
+  updateUserPreferences(filterConfiguration: FilterConfigurationModel): void {
+    this.userResourceService.updateUserPreferences(filterConfiguration)
+      .subscribe((result) => { },
+      (error) => {
+        console.log('UPDATE USER PREFERENCES ERROR ', error);
+      });
+  }
 
   printDetailEnvironmentModal(data): void {
     this.detailDialog.open({ isFooter: false }, data);
