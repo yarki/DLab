@@ -46,6 +46,14 @@ def run():
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.INFO,
                         filename=local_log_filepath)
+
+    edge_status = get_instance_status(
+        os.environ['conf_service_base_name'] + '-' + os.environ['edge_user_name'] + '-edge')
+    if edge_status != 'running':
+        logging.info('ERROR: Edge node is unavailable! Aborting...')
+        print 'ERROR: Edge node is unavailable! Aborting...'
+        sys.exit(1)
+
     try:
         os.environ['exploratory_name']
     except:

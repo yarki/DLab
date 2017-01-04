@@ -59,6 +59,11 @@ def run():
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
+    edge_status = get_instance_status(os.environ['conf_service_base_name'] + '-' + os.environ['notebook_user_name'] + '-edge')
+    if edge_status != 'running':
+        logging.info('ERROR: Edge node is unavailable! Aborting...')
+        print 'ERROR: Edge node is unavailable! Aborting...'
+        sys.exit(1)
     # generating variables dictionary
     create_aws_config_files()
     print 'Generating infrastructure names and tags'
