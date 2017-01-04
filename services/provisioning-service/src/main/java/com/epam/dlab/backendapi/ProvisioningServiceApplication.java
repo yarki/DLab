@@ -80,7 +80,6 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
             protected void configure() {
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(configuration);
                 bind(MetadataHolder.class).to(DockerWarmuper.class);
-                bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
                 bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, SELF_SERVICE_NAME));
                 bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE_NAME))
                         .toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE_NAME));
