@@ -680,7 +680,7 @@ def remove_route_tables(tag_name):
         traceback.print_exc(file=sys.stdout)
 
 
-def remove_internet_gateways(tag_name, tag_value):
+def remove_internet_gateways(vpc_id, tag_name, tag_value):
     try:
         ig_id = ''
         client = boto3.client('ec2')
@@ -690,7 +690,10 @@ def remove_internet_gateways(tag_name, tag_value):
                 {'Name': 'tag-value', 'Values': [tag_value]}]).get('InternetGateways')
         for i in response:
             ig_id = i.get('InternetGatewayId')
+        client.detach_internet_gateway(InternetGatewayId=ig_id,VpcId=vpc_id)
+        print "Internet gateway " + ig_id + " has been detached from VPC " + vpc_id
         client.delete_internet_gateway(InternetGatewayId=ig_id)
+        print "Internet gateway " + ig_id + " has been deleted successfully"
     except Exception as err:
         logging.info("Unable to remove internet gateway: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
