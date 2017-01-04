@@ -709,3 +709,21 @@ def remove_internet_gateways(vpc_id, tag_name, tag_value):
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
+
+
+def remove_vpc_endpoints(vpc_id):
+    try:
+        client = boto3.client('ec2')
+        response = client.describe_vpc_endpoints(Filters=[{'Name': 'vpc-id', 'Values': [vpc_id]}]).get('VpcEndpoints')
+        for i in response:
+            client.delete_vpc_endpoints(VpcEndpointIds=[i.get('VpcEndpointId')])
+            print "VPC Endpoint " + i.get('VpcEndpointId') + " has been removed successfully"
+    except Exception as err:
+        logging.info("Unable to remove VPC Endpoint: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove VPC Endpoint",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
