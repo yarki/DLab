@@ -81,12 +81,14 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
         RESTService result = mock(RESTService.class);
         when(result.post(eq(KEY_LOADER), any(), eq(Response.class)))
                 .then(invocationOnMock -> Response.accepted().build());
-        when(result.get(eq(DOCKER_EXPLORATORY), eq(ExploratoryMetadataDTO[].class)))
+        when(result.get(eq(DOCKER_EXPLORATORY), any(), eq(ExploratoryMetadataDTO[].class)))
                 .thenReturn(new ExploratoryMetadataDTO[]{
                         prepareJupiterImage()
                 });
-        when(result.get(eq(DOCKER_COMPUTATIONAL), eq(ComputationalMetadataDTO[].class)))
-                .thenReturn(new ComputationalMetadataDTO[]{prepareEmrImage()});
+        when(result.get(eq(DOCKER_COMPUTATIONAL), any(), eq(ComputationalMetadataDTO[].class)))
+                .thenReturn(new ComputationalMetadataDTO[]{
+                        prepareEmrImage()
+                });
         when(result.post(eq(EXPLORATORY_CREATE), any(), eq(String.class))).thenReturn(UUID.randomUUID().toString());
         return result;
     }
