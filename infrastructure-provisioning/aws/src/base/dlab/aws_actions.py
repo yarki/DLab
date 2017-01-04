@@ -96,6 +96,7 @@ def remove_vpc(vpc_id):
     try:
         client = boto3.client('ec2')
         client.delete_vpc(VpcId=vpc_id)
+        print "VPC " + vpc_id + " has been removed"
     except Exception as err:
         logging.info("Unable to remove VPC: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
