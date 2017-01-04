@@ -118,6 +118,21 @@ export class ResourcesGrid implements OnInit {
     this.filteredEnvironments = filteredData;
   }
 
+  hideIneffectual(): void {
+    let filteredData = (<any>Object).assign({}, this.filterConfiguration);
+
+    for (let index in filteredData) {
+      if (filteredData[index] instanceof Array)
+        filteredData[index] = filteredData[index].filter((item: string) => {
+          return (item !== 'failed' && item !== 'terminated' && item !== 'terminating');
+        });
+    }
+
+    this.filterForm = this.loadUserPreferences(filteredData);
+    this.applyFilter_btnClick(this.filterForm);
+  }
+
+
   onUpdate($event) {
     this.filterForm[$event.type] = $event.model;
   }

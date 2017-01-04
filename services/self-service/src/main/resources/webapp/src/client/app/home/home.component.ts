@@ -67,6 +67,9 @@ export class HomeComponent implements OnInit {
   public refreshGrid(): void {
     this.resourcesGrid.buildGrid();
   }
+  public hideIneffectual(): void {
+    this.resourcesGrid.hideIneffectual();
+  }
 
   private checkInfrastructureCreationProgress() {
     this.userAccessKeyService.checkUserAccessKey()
