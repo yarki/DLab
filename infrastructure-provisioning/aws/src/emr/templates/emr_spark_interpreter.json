@@ -1,5 +1,5 @@
 {
-  "name": "emr_EMRVERSION_spark",
+  "name": "EMRVERSION_spark",
   "group": "spark",
   "properties": {
     "args": "",
