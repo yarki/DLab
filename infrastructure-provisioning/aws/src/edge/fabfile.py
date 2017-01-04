@@ -199,6 +199,12 @@ def run():
             },
             {
                 "PrefixListIds": [],
+                "FromPort": 8080,
+                "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}],
+                "ToPort": 8080, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
                 "FromPort": 8787,
                 "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}],
                 "ToPort": 8888, "IpProtocol": "tcp", "UserIdGroupPairs": []
