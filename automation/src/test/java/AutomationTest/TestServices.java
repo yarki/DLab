@@ -141,24 +141,39 @@ public class TestServices {
 
         RestAssured.baseURI = ssnURL;
         LoginDto testUserRequestBody = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
-        
-        System.out.println("5. Upload Key will be started ...");
+
+        System.out.println("5. Logging user in...");
+
         final String ssnLoginURL = getSnnURL(Path.LOGIN);
         System.out.println("   SSN login URL is " + ssnLoginURL);
+
         final String ssnUploadKeyURL = getSnnURL(Path.UPLOAD_KEY);
         System.out.println("   SSN upload key URL is " + ssnUploadKeyURL);
 
         Response responseTestUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, testUserRequestBody);
+        Assert.assertEquals(HttpStatusCode.OK, responseTestUser.getStatusCode(), "Failed to login");
         String token = responseTestUser.getBody().asString();
+        System.out.println("   Logged in. Obtained token: " + token);
 
-        Response respUploadKey = new HttpRequest().webApiPost(ssnUploadKeyURL, ContentType.FORMDATA, token);
-        System.out.println("   respUploadKey.getBody() is " + respUploadKey.getBody().toString());
+        System.out.println("5.a Checking for user Key...");
+        Response respCheckKey = new HttpRequest().webApiGet(ssnUploadKeyURL, token);
 
-        Assert.assertEquals(respUploadKey.statusCode(), HttpStatusCode.OK, "Upload key is not correct");
-        int responseCodeAccessKey = waitWhileStatus(ssnUploadKeyURL, token, HttpStatusCode.Accepted, PropertyValue.getTimeoutUploadKey());
-        System.out.println("   Upload Key has been completed");
-        System.out.println("responseAccessKey.statusCode() is " + responseCodeAccessKey);
-        Assert.assertEquals(responseCodeAccessKey, HttpStatusCode.OK, "Upload key is not correct");
+        if(respCheckKey.getStatusCode() == HttpStatusCode.NotFound) {
+            System.out.println("5.b Upload Key will be started ...");
+
+            Response respUploadKey = new HttpRequest().webApiPost(ssnUploadKeyURL, ContentType.FORMDATA, token);
+            System.out.println("   respUploadKey.getBody() is " + respUploadKey.getBody().toString());
+
+            Assert.assertEquals(respUploadKey.statusCode(), HttpStatusCode.OK, "Upload key is not correct");
+            int responseCodeAccessKey = waitWhileStatus(ssnUploadKeyURL, token, HttpStatusCode.Accepted, PropertyValue.getTimeoutUploadKey());
+            System.out.println("   Upload Key has been completed");
+            System.out.println("responseAccessKey.statusCode() is " + responseCodeAccessKey);
+            Assert.assertEquals(responseCodeAccessKey, HttpStatusCode.OK, "Upload key is not correct");
+        } else if (respCheckKey.getStatusCode() == HttpStatusCode.OK){
+            System.out.println("   Key has been uploaded already");
+        } else {
+            Assert.assertEquals(200, respCheckKey.getStatusCode(), "Failed to check User Key.");
+        }
 
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_edge_", publicIp);
         Amazon.checkAmazonStatus(serviceBaseName + "-Auto_EPMC-BDCC_Test-edge", AmazonInstanceState.RUNNING);
