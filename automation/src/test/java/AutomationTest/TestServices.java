@@ -54,185 +54,19 @@ public class TestServices {
         //sleep(PropertyValue.TEST_AFTER_SLEEP_SECONDS);
     }
 
-
-    private static void testPython(String ssnIP, String noteBookIp, String serviceBaseName, String emrName)
-            throws JSchException, IOException, InterruptedException {
-
-        String sourceDir = "/var/lib/jenkins/AutoTestData";
-        String csvFilename = "train.csv";
-        String pyFilename = "pyspark_test.py";
-        String copyToSSNCommand = "scp -i %s %s ubuntu@%s:~/";
-        String copyToNotebookCommand = "scp -i %s ~/%s ubuntu@%s:/tmp/";
-
-        System.out.println("Copying files to SSN...");
-        String pathToKey = PropertyValue.getAccessKeyPrivFileName();
-
-        System.out.println(String.format("Copying %s...", csvFilename));
-        String command = String.format(copyToSSNCommand,
-                pathToKey,
-                Paths.get(sourceDir, csvFilename).toString(),
-                ssnIP);
-        AckStatus status = HelperMethods.executeCommand(command);
-        System.out.println(String.format("Copied %s: %s", csvFilename, status.toString()));
-        Assert.assertTrue(status.isOk());
-
-        System.out.println(String.format("Copying %s...", pyFilename));
-        command = String.format(copyToSSNCommand,
-                pathToKey,
-                Paths.get(sourceDir, pyFilename).toString(),
-                ssnIP);
-        status = HelperMethods.executeCommand(command);
-        System.out.println(String.format("Copied %s: %s", pyFilename, status.toString()));
-        Assert.assertTrue(status.isOk());
-
-        System.out.println(String.format("Copying files to Notebook %s...", noteBookIp));
-        Session ssnSession = SSHConnect.getConnect("ubuntu", ssnIP, 22);
-
-        try {
-            String pathToKeySSN = PropertyValue.getAccessKeyPrivFileNameSSN();
-            System.out.println(String.format("Copying %s...", csvFilename));
-            command = String.format(copyToNotebookCommand,
-                    pathToKeySSN,
-                    csvFilename,
-                    noteBookIp);
-            ChannelExec copyResult = SSHConnect.setCommand(ssnSession, command);
-            status = SSHConnect.checkAck(copyResult);
-            System.out.println(String.format("Copied %s: %s", csvFilename, status.toString()));
-            Assert.assertTrue(status.isOk());
-
-            System.out.println(String.format("Copying %s...", pyFilename));
-            command = String.format(copyToNotebookCommand,
-                    pathToKeySSN,
-                    pyFilename,
-                    noteBookIp);
-            copyResult = SSHConnect.setCommand(ssnSession, command);
-            status = SSHConnect.checkAck(copyResult);
-            System.out.println(String.format("Copied %s: %s", pyFilename, status.toString()));
-            Assert.assertTrue(status.isOk());
-
-            System.out.println(String.format("Port forwarding to notebook %s...", noteBookIp));
-            int assignedPort = ssnSession.setPortForwardingL(0, noteBookIp, 22);
-            System.out.println(String.format("Port forwarded localhost:%s -> %s:22", assignedPort, noteBookIp));
-
-            Session notebookSession = SSHConnect.getForwardedConnect("ubuntu", noteBookIp, assignedPort);
-
-            try {
-                String notebookUsername = PropertyValue.getNotDLabUsername().replaceAll("@.*", "");
-                String bucketName = String.format("%s-%s-bucket", serviceBaseName, notebookUsername).replace('_', '-').toLowerCase();
-                command = String.format("/usr/bin/python %s --bucket %s --cluster_name %s",
-                        Paths.get("/tmp", pyFilename).toString(),
-                        bucketName,
-                        emrName);
-                System.out.println(String.format("Executing command %s...", command));
-                ChannelExec runScript = SSHConnect.setCommand(notebookSession, command);
-                status = SSHConnect.checkAck(runScript);
-                System.out.println(String.format("Executed command: %s", status.toString()));
-                Assert.assertTrue(status.isOk(), "The python script works not correct");
-
-                System.out.println("Python script was work correct ");
-            }
-            finally {
-                notebookSession.disconnect();
-            }
-        }
-        finally {
-            ssnSession.disconnect();
-        }
-    }
-    
-    
-    private static void sleep(String propertyName) throws InterruptedException {
-    	int timeout = PropertyValue.get(propertyName, 0);
-    	if (timeout > 0) {
-    		logger.info("Waiting for timeout " + timeout + " seconds.");
-    		Thread.sleep(timeout * 1000);
-    		logger.info("Timeout is completed.");
-    	}
-    }
-
-    private String getSnnURL(String path) {
-    	return ssnURL + path;
-    }
-    
-    private boolean waitForSSNService(int timeout) throws InterruptedException {
-    	HttpRequest request = new HttpRequest();
-    	int actualStatus;
-        long expiredTime = System.currentTimeMillis() + timeout * 1000;
-        
-    	while ((actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode()) != HttpStatusCode.OK) {
-            Thread.sleep(1000);
-            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
-            	actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode();
-            	break;
-            }
-        }
-        
-        if (actualStatus != HttpStatusCode.OK) {
-            System.out.println("ERROR: Timeout has been expired for SSN available.");
-            System.out.println("  timeout is " + 0);
-            return false;
-        }
-        return true;
-    }
-
-    private static int waitWhileStatus(String url, String token, int status, int timeout)
-    		throws InterruptedException {
-    	HttpRequest request = new HttpRequest();
-    	int actualStatus;
-        long expiredTime = System.currentTimeMillis() + timeout * 1000;
-    	
-    	while ((actualStatus = request.webApiGet(url, token).getStatusCode()) == status) {
-            Thread.sleep(1000);
-            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
-                actualStatus = request.webApiGet(url, token).getStatusCode();
-            	break;
-            }
-        }
-        
-        if (actualStatus == status) {
-            System.out.println("ERROR: Timeout has been expired for request.");
-            System.out.println("  URL is " + url);
-            System.out.println("  token is " + token);
-            System.out.println("  status is " + status);
-            System.out.println("  timeout is " + timeout);
-        }
-        return actualStatus;
-    }
-
-    private static String waitWhileStatus(String url, String token, String statusPath, String status, int timeout)
-    		throws InterruptedException {
-    	HttpRequest request = new HttpRequest();
-    	String actualStatus;
-        long expiredTime = System.currentTimeMillis() + timeout * 1000;
-    	
-    	while ((actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath)).contains(status)) {
-            Thread.sleep(1000);
-            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
-                actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath);
-            	break;
-            }
-        }
-        
-        if (actualStatus.contains(status)) {
-            System.out.println("ERROR: Timeout has been expired for request.");
-            System.out.println("  URL is " + url);
-            System.out.println("  token is " + token);
-            System.out.println("  statusPath is " + statusPath);
-            System.out.println("  status is " + status);
-            System.out.println("  timeout is " + timeout);
-        }
-        return actualStatus;
-    }
-    
-
     @Test(priority=1)
     public void testJenkinsJob() throws Exception {
 
-        System.out.println("1. Jenkins Job will be started ...");
+        /* System.out.println("1. Jenkins Job will be started ...");
        
         JenkinsCall jenkins = new JenkinsCall(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword());
         String buildNumber = jenkins.runJenkinsJob(PropertyValue.getJenkinsJobURL());
-        System.out.println("   Jenkins Job has been completed");
+        System.out.println("   Jenkins Job has been completed"); */
+
+        System.out.println("1. Looking for last Jenkins Job ...");
+        JenkinsCall jenkins = new JenkinsCall(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword());
+        String buildNumber = jenkins.runJenkinsJob(PropertyValue.getJenkinsJobURL());
+        System.out.println("   Jenkins Job found:");
         
         ssnURL = jenkins.getSsnURL().replaceAll(" ", "");
         serviceBaseName = jenkins.getServiceBaseName().replaceAll(" ", "");
@@ -505,5 +339,174 @@ public class TestServices {
         Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED);
 
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_terminate_exploratory_NotebookAutoTestt", publicIp);
+    }
+
+    private static void testPython(String ssnIP, String noteBookIp, String serviceBaseName, String emrName)
+            throws JSchException, IOException, InterruptedException {
+
+        String sourceDir = "/var/lib/jenkins/AutoTestData";
+        String csvFilename = "train.csv";
+        String pyFilename = "pyspark_test.py";
+        String copyToSSNCommand = "scp -i %s %s ubuntu@%s:~/";
+        String copyToNotebookCommand = "scp -i %s ~/%s ubuntu@%s:/tmp/";
+
+        System.out.println("Copying files to SSN...");
+        String pathToKey = PropertyValue.getAccessKeyPrivFileName();
+
+        System.out.println(String.format("Copying %s...", csvFilename));
+        String command = String.format(copyToSSNCommand,
+                pathToKey,
+                Paths.get(sourceDir, csvFilename).toString(),
+                ssnIP);
+        AckStatus status = HelperMethods.executeCommand(command);
+        System.out.println(String.format("Copied %s: %s", csvFilename, status.toString()));
+        Assert.assertTrue(status.isOk());
+
+        System.out.println(String.format("Copying %s...", pyFilename));
+        command = String.format(copyToSSNCommand,
+                pathToKey,
+                Paths.get(sourceDir, pyFilename).toString(),
+                ssnIP);
+        status = HelperMethods.executeCommand(command);
+        System.out.println(String.format("Copied %s: %s", pyFilename, status.toString()));
+        Assert.assertTrue(status.isOk());
+
+        System.out.println(String.format("Copying files to Notebook %s...", noteBookIp));
+        Session ssnSession = SSHConnect.getConnect("ubuntu", ssnIP, 22);
+
+        try {
+            String pathToKeySSN = PropertyValue.getAccessKeyPrivFileNameSSN();
+            System.out.println(String.format("Copying %s...", csvFilename));
+            command = String.format(copyToNotebookCommand,
+                    pathToKeySSN,
+                    csvFilename,
+                    noteBookIp);
+            ChannelExec copyResult = SSHConnect.setCommand(ssnSession, command);
+            status = SSHConnect.checkAck(copyResult);
+            System.out.println(String.format("Copied %s: %s", csvFilename, status.toString()));
+            Assert.assertTrue(status.isOk());
+
+            System.out.println(String.format("Copying %s...", pyFilename));
+            command = String.format(copyToNotebookCommand,
+                    pathToKeySSN,
+                    pyFilename,
+                    noteBookIp);
+            copyResult = SSHConnect.setCommand(ssnSession, command);
+            status = SSHConnect.checkAck(copyResult);
+            System.out.println(String.format("Copied %s: %s", pyFilename, status.toString()));
+            Assert.assertTrue(status.isOk());
+
+            System.out.println(String.format("Port forwarding to notebook %s...", noteBookIp));
+            int assignedPort = ssnSession.setPortForwardingL(0, noteBookIp, 22);
+            System.out.println(String.format("Port forwarded localhost:%s -> %s:22", assignedPort, noteBookIp));
+
+            Session notebookSession = SSHConnect.getForwardedConnect("ubuntu", noteBookIp, assignedPort);
+
+            try {
+                String notebookUsername = PropertyValue.getNotDLabUsername().replaceAll("@.*", "");
+                String bucketName = String.format("%s-%s-bucket", serviceBaseName, notebookUsername).replace('_', '-').toLowerCase();
+                command = String.format("/usr/bin/python %s --bucket %s --cluster_name %s",
+                        Paths.get("/tmp", pyFilename).toString(),
+                        bucketName,
+                        emrName);
+                System.out.println(String.format("Executing command %s...", command));
+                ChannelExec runScript = SSHConnect.setCommand(notebookSession, command);
+                status = SSHConnect.checkAck(runScript);
+                System.out.println(String.format("Executed command: %s", status.toString()));
+                Assert.assertTrue(status.isOk(), "The python script works not correct");
+
+                System.out.println("Python script was work correct ");
+            }
+            finally {
+                notebookSession.disconnect();
+            }
+        }
+        finally {
+            ssnSession.disconnect();
+        }
+    }
+
+
+    private static void sleep(String propertyName) throws InterruptedException {
+        int timeout = PropertyValue.get(propertyName, 0);
+        if (timeout > 0) {
+            logger.info("Waiting for timeout " + timeout + " seconds.");
+            Thread.sleep(timeout * 1000);
+            logger.info("Timeout is completed.");
+        }
+    }
+
+    private String getSnnURL(String path) {
+        return ssnURL + path;
+    }
+
+    private boolean waitForSSNService(int timeout) throws InterruptedException {
+        HttpRequest request = new HttpRequest();
+        int actualStatus;
+        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+
+        while ((actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode()) != HttpStatusCode.OK) {
+            Thread.sleep(1000);
+            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
+                actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode();
+                break;
+            }
+        }
+
+        if (actualStatus != HttpStatusCode.OK) {
+            System.out.println("ERROR: Timeout has been expired for SSN available.");
+            System.out.println("  timeout is " + 0);
+            return false;
+        }
+        return true;
+    }
+
+    private static int waitWhileStatus(String url, String token, int status, int timeout)
+            throws InterruptedException {
+        HttpRequest request = new HttpRequest();
+        int actualStatus;
+        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+
+        while ((actualStatus = request.webApiGet(url, token).getStatusCode()) == status) {
+            Thread.sleep(1000);
+            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
+                actualStatus = request.webApiGet(url, token).getStatusCode();
+                break;
+            }
+        }
+
+        if (actualStatus == status) {
+            System.out.println("ERROR: Timeout has been expired for request.");
+            System.out.println("  URL is " + url);
+            System.out.println("  token is " + token);
+            System.out.println("  status is " + status);
+            System.out.println("  timeout is " + timeout);
+        }
+        return actualStatus;
+    }
+
+    private static String waitWhileStatus(String url, String token, String statusPath, String status, int timeout)
+            throws InterruptedException {
+        HttpRequest request = new HttpRequest();
+        String actualStatus;
+        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+
+        while ((actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath)).contains(status)) {
+            Thread.sleep(1000);
+            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
+                actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath);
+                break;
+            }
+        }
+
+        if (actualStatus.contains(status)) {
+            System.out.println("ERROR: Timeout has been expired for request.");
+            System.out.println("  URL is " + url);
+            System.out.println("  token is " + token);
+            System.out.println("  statusPath is " + statusPath);
+            System.out.println("  status is " + status);
+            System.out.println("  timeout is " + timeout);
+        }
+        return actualStatus;
     }
 }
