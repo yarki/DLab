@@ -249,18 +249,28 @@ def get_subnet_by_cidr(cidr, vpc_id='*'):
         traceback.print_exc(file=sys.stdout)
 
 
-def get_subnet_by_tag(tag, subnet_id=False, vpc_id='*'):
+def get_subnet_by_tag(tag, subnet_id=False, vpc_id=''):
     try:
         ec2 = boto3.resource('ec2')
-        for subnet in ec2.subnets.filter(Filters=[
-            {'Name': 'tag-key', 'Values': [tag.get('Key')]},
-            {'Name': 'tag-value', 'Values': [tag.get('Value')]},
-            {'Name': 'vpc-id', 'Values': [vpc_id]}
-        ]):
-            if subnet_id:
-                return subnet.id
-            else:
-                return subnet.cidr_block
+        if vpc_id:
+            for subnet in ec2.subnets.filter(Filters=[
+                {'Name': 'tag-key', 'Values': [tag.get('Key')]},
+                {'Name': 'tag-value', 'Values': [tag.get('Value')]},
+                {'Name': 'vpc-id', 'Values': [vpc_id]}
+            ]):
+                if subnet_id:
+                    return subnet.id
+                else:
+                    return subnet.cidr_block
+        else:
+            for subnet in ec2.subnets.filter(Filters=[
+                {'Name': 'tag-key', 'Values': [tag.get('Key')]},
+                {'Name': 'tag-value', 'Values': [tag.get('Value')]}
+            ]):
+                if subnet_id:
+                    return subnet.id
+                else:
+                    return subnet.cidr_block
         return ''
     except Exception as err:
         logging.error("Error with getting Subnet CIDR block by tag: " + str(err) + "\n Traceback: " + traceback.print_exc(
