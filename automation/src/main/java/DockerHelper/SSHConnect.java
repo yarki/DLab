@@ -57,9 +57,6 @@ public class SSHConnect {
         channelExec.setCommand(command);
         channelExec.connect();
 
-        while(!channelExec.isClosed()) {
-            Thread.sleep(1000);
-        }
         return channelExec;
     }
 
