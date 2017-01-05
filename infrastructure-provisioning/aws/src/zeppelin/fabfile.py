@@ -71,8 +71,6 @@ def run():
     notebook_config['instance_type'] = os.environ['notebook_instance_type']
     notebook_config['key_name'] = os.environ['creds_key_name']
     notebook_config['user_keyname'] = os.environ['notebook_user_name']
-    # notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
-    #     'notebook_user_name'] + '-nb-' + str(provide_index('EC2', '{}-Tag'.format(os.environ['conf_service_base_name']), '{}-{}-nb'.format(os.environ['conf_service_base_name'], os.environ['notebook_user_name'])))
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ['notebook_user_name'] + "-" + notebook_config['exploratory_name'] + "-nb-" + notebook_config['uuid']
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-notebook-image'

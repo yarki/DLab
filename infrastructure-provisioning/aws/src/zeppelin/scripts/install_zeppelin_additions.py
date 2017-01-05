@@ -84,8 +84,3 @@ if __name__ == "__main__":
 
     print "Installing notebook additions: matplotlib."
     ensure_matplot()
-
-    # for image purpose
-    print "Clean up lock files"
-    remove_apt_lock()
-
