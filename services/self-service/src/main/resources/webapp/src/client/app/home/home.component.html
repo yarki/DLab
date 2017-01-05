@@ -26,8 +26,10 @@ limitations under the License.
     <button class="btn btn_refresh pull-right" (click)="refreshGrid()">
       <span class="glyphicon glyphicon-refresh"></span> Refresh
     </button>
-    <button class="btn btn_hide pull-right" (click)="hideIneffectual()">
-      <span class="glyphicon glyphicon-eye-close"></span> Hide useless
+    <button class="btn btn_hide pull-right">
+      <span class="glyphicon" [ngClass]="!resourcesGrid.activeFiltering ? 'glyphicon-eye-close' : 'glyphicon-eye-open'"></span>
+      <span *ngIf="!resourcesGrid.activeFiltering" (click)="hideIneffectual()">Show active</span>
+      <span *ngIf="resourcesGrid.activeFiltering" (click)="showAllEnvironments()">Show all</span>
     </button>
     <span *ngIf="userUploadAccessKeyState == 500" class="alert alert-danger">Error happened during user access key upload. Please try to reupload the key.</span>
   </div>

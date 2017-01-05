@@ -70,6 +70,9 @@ export class HomeComponent implements OnInit {
   public hideIneffectual(): void {
     this.resourcesGrid.hideIneffectual();
   }
+  public showAllEnvironments(): void {
+    this.resourcesGrid.resetFilterConfigurations();
+  }
 
   private checkInfrastructureCreationProgress() {
     this.userAccessKeyService.checkUserAccessKey()
