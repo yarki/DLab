@@ -229,14 +229,20 @@ def get_role_by_name(role_name):
         traceback.print_exc(file=sys.stdout)
 
 
-def get_subnet_by_cidr(cidr, vpc_id='*'):
+def get_subnet_by_cidr(cidr, vpc_id=''):
     try:
         ec2 = boto3.resource('ec2')
-        for subnet in ec2.subnets.filter(Filters=[
-            {'Name': 'cidrBlock', 'Values': [cidr]},
-            {'Name': 'vpc-id', 'Values': [vpc_id]}
-        ]):
-            return subnet.id
+        if vpc_id:
+            for subnet in ec2.subnets.filter(Filters=[
+                {'Name': 'cidrBlock', 'Values': [cidr]},
+                {'Name': 'vpc-id', 'Values': [vpc_id]}
+            ]):
+                return subnet.id
+        else:
+            for subnet in ec2.subnets.filter(Filters=[
+                {'Name': 'cidrBlock', 'Values': [cidr]}
+            ]):
+                return subnet.id
         return ''
     except Exception as err:
         logging.error("Error with getting Subnet ID by CIDR: " + str(err) + "\n Traceback: " + traceback.print_exc(
