@@ -54,7 +54,8 @@ public class TestServices {
         //sleep(PropertyValue.TEST_AFTER_SLEEP_SECONDS);
     }
 
-    public void testPyton(String ssnIP, String noteBookIp, String serviceBaseName, String emrName)
+
+    private static void testPython(String ssnIP, String noteBookIp, String serviceBaseName, String emrName)
             throws JSchException, IOException, InterruptedException {
 
         String sourceDir = "/var/lib/jenkins/AutoTestData";
@@ -149,7 +150,7 @@ public class TestServices {
     	}
     }
 
-    public String getSnnURL(String path) {
+    private String getSnnURL(String path) {
     	return ssnURL + path;
     }
     
@@ -386,7 +387,7 @@ public class TestServices {
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_computational_EMRAutoTest", publicIp);
         
         //run python script
-        testPyton(publicIp, notebookIp, serviceBaseName, emrName);
+        testPython(publicIp, notebookIp, serviceBaseName, emrName);
 
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
