@@ -1,37 +1,25 @@
 package AutomationTest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.InstanceState;
-
-import Repository.ContentType;
-import Repository.HttpStatusCode;
-import Repository.Path;
-import ServiceCall.JenkinsCall;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Response;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-
 import AmazonHelper.Amazon;
 import AmazonHelper.AmazonInstanceState;
 import DataModel.CreateNotebookDto;
 import DataModel.DeployEMRDto;
 import DataModel.LoginDto;
-import DockerHelper.*;
+import DockerHelper.AckStatus;
+import DockerHelper.Docker;
+import DockerHelper.SSHConnect;
 import Infrastucture.HttpRequest;
-
+import Repository.ContentType;
+import Repository.HttpStatusCode;
+import Repository.Path;
+import ServiceCall.JenkinsCall;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.InstanceState;
+import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.response.Response;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.testng.Assert;
@@ -39,15 +27,17 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
 @Test(singleThreaded=true,alwaysRun=true)
 public class TestServices {
 
-    String serviceBaseName;
+    private String serviceBaseName;
     private String ssnURL;
     private String publicIp;
-    private String notebookIp;
 
-    final static Logger logger = Logger.getLogger(TestServices.class.getName());
+    private final static Logger logger = Logger.getLogger(TestServices.class.getName());
 
 
     @BeforeClass
@@ -120,10 +110,10 @@ public class TestServices {
             Assert.assertTrue(status.isOk());
 
             System.out.println(String.format("Port forwarding to notebook %s...", noteBookIp));
-            int assingedPort = ssnSession.setPortForwardingL(0, noteBookIp, 22);
-            System.out.println(String.format("Port forwarded localhost:%s -> %s:22", assingedPort, noteBookIp));
+            int assignedPort = ssnSession.setPortForwardingL(0, noteBookIp, 22);
+            System.out.println(String.format("Port forwarded localhost:%s -> %s:22", assignedPort, noteBookIp));
 
-            Session notebookSession = SSHConnect.getForwardedConnect("ubuntu", noteBookIp, assingedPort);
+            Session notebookSession = SSHConnect.getForwardedConnect("ubuntu", noteBookIp, assignedPort);
 
             try {
                 String notebookUsername = PropertyValue.getNotDLabUsername().replaceAll("@.*", "");
@@ -174,7 +164,7 @@ public class TestServices {
             	actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode();
             	break;
             }
-        };
+        }
         
         if (actualStatus != HttpStatusCode.OK) {
             System.out.println("ERROR: Timeout has been expired for SSN available.");
@@ -184,7 +174,7 @@ public class TestServices {
         return true;
     }
 
-    protected static int waitWhileStatus(String url, String token, int status, int timeout)
+    private static int waitWhileStatus(String url, String token, int status, int timeout)
     		throws InterruptedException {
     	HttpRequest request = new HttpRequest();
     	int actualStatus;
@@ -196,7 +186,7 @@ public class TestServices {
                 actualStatus = request.webApiGet(url, token).getStatusCode();
             	break;
             }
-        };
+        }
         
         if (actualStatus == status) {
             System.out.println("ERROR: Timeout has been expired for request.");
@@ -208,7 +198,7 @@ public class TestServices {
         return actualStatus;
     }
 
-    protected static String waitWhileStatus(String url, String token, String statusPath, String status, int timeout)
+    private static String waitWhileStatus(String url, String token, String statusPath, String status, int timeout)
     		throws InterruptedException {
     	HttpRequest request = new HttpRequest();
     	String actualStatus;
@@ -220,7 +210,7 @@ public class TestServices {
                 actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath);
             	break;
             }
-        };
+        }
         
         if (actualStatus.contains(status)) {
             System.out.println("ERROR: Timeout has been expired for request.");
@@ -367,7 +357,7 @@ public class TestServices {
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(noteBookName);
         InstanceState instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0)
             .getState();
-        notebookIp = describeInstanceResult.getReservations().get(0).getInstances().get(0).getPrivateIpAddress();
+        String notebookIp = describeInstanceResult.getReservations().get(0).getInstances().get(0).getPrivateIpAddress();
         
 
         System.out.println("8. EMR will be deployed ...");
