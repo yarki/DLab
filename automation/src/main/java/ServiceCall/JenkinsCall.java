@@ -91,6 +91,8 @@ public class JenkinsCall {
     }
 
     public String getLastJenkinsJob(String jenkinsJobURL) throws Exception {
+        RestAssured.baseURI = jenkinsJobURL;
+
         getBuildNumber();
         getBuildResult();
         setJenkinsURLServiceBaseName();
