@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# ***************************************************************************
+# *****************************************************************************
 #
 # Copyright (c) 2016, EPAM SYSTEMS INC
 #
@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# ***************************************************************************
+# ******************************************************************************
 
 from pymongo import MongoClient
 import random
@@ -25,12 +25,15 @@ import yaml, json
 import subprocess
 import time
 import argparse
+import os
 
 path = "/etc/mongod.conf"
 outfile = "/etc/mongo_params.yml"
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--region', type=str, default='')
+parser.add_argument('--vpc', type=str, default='')
+parser.add_argument('--subnet', type=str, default='')
 parser.add_argument('--base_name', type=str, default='')
 parser.add_argument('--sg', type=str, default='')
 args = parser.parse_args()
@@ -73,12 +76,13 @@ def add_2_yml_config(path,section,param,value):
         return False
 
 if __name__ == "__main__":
-    mongo_passwd = id_generator()
+    # mongo_passwd = id_generator()
+    mongo_passwd = "XS3ms9R3tP"
     mongo_ip = read_yml_conf(path,'net','bindIp')
     mongo_port = read_yml_conf(path,'net','port')
 
     try:
-        with open('/tmp/instance_shapes.lst', 'r') as source_shapes:
+        with open(os.environ['ssn_dlab_path'] + 'tmp/instance_shapes.lst', 'r') as source_shapes:
             shapes = json.load(source_shapes)
     except:
         shapes = []
@@ -92,9 +96,14 @@ if __name__ == "__main__":
         time.sleep(5)
         client.dlabdb.add_user('admin', mongo_passwd, roles=[{'role':'userAdminAnyDatabase','db':'admin'}])
         client.dlabdb.command('grantRolesToUser', "admin", roles=["readWrite"])
-        client.dlabdb.settings.insert_one({"_id": "aws_region", "value": args.region})
+        client.dlabdb.settings.insert_one({"_id": "creds_region", "value": args.region})
+        client.dlabdb.settings.insert_one({"_id": "creds_vpc_id", "value": args.vpc})
+        client.dlabdb.settings.insert_one({"_id": "creds_subnet_id", "value": args.subnet})
         client.dlabdb.settings.insert_one({"_id": "service_base_name", "value": args.base_name})
         client.dlabdb.settings.insert_one({"_id": "security_groups_ids", "value": args.sg})
+        client.dlabdb.settings.insert_one({"_id": "notebook_ssh_user", "value": "ubuntu"})
+        client.dlabdb.settings.insert_one({"_id": "creds_key_dir", "value": "/root/keys"})
+        client.dlabdb.security.insert({ "expireAt": "1" }, { "expireAfterSeconds": "3600" })
         client.dlabdb.shapes.insert(shapes)
         if add_2_yml_config(path,'security','authorization','enabled'):
             command = ['service', 'mongod', 'restart']

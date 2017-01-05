@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# ***************************************************************************
+# *****************************************************************************
 #
 # Copyright (c) 2016, EPAM SYSTEMS INC
 #
@@ -16,10 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# ***************************************************************************
+# ******************************************************************************
 
 import argparse
 import json
+import datetime
 from fabric.api import *
 from dlab.aws_actions import *
 from dlab.aws_meta import *
@@ -44,27 +45,33 @@ if __name__ == "__main__":
 
     # Get Notebook List
     notebooks = []
-    nbs_list = get_ec2_list('{}-Tag'.format(args.service_base_name))
+    nbs_list = get_ec2_list('{}-Tag'.format(args.service_base_name), '{}-{}-nb'.format(args.service_base_name, args.user_name))
     for i in nbs_list:
         notebook = {}
         notebook['Id'] = i.id
+        notebook['Exploratory_fqdn'] = i.private_dns_name
         for tag in i.tags:
             if tag['Key'] == 'Name':
                 notebook['Name'] = tag['Value']
         notebook['Shape'] = i.instance_type
         notebook['Status'] = i.state['Name']
+        nbs_start_time = i.launch_time.replace(tzinfo=None)
+        notebook['Exploratory_uptime'] = str(datetime.datetime.now() - nbs_start_time)
         emr_list = get_emr_list(notebook['Name'], 'Value')
         resources = []
         for j in emr_list:
             emr = {}
             emr['id'] = j
-            emr['status'] =  get_emr_info(j, 'Status')['State']
+            emr['name'] = get_emr_info(j, 'Name')
+            emr['status'] = get_emr_info(j, 'Status')['State']
             counter = 0
             for instance in get_ec2_list('Notebook', notebook['Name']):
                 counter +=1
                 emr['shape'] = instance.instance_type
             emr['nodes_count'] = counter
-            emr['type'] =  get_emr_info(j, 'ReleaseLabel')
+            emr['type'] = get_emr_info(j, 'ReleaseLabel')
+            emr_start_time = get_emr_info(j, 'Status')['Timeline']['CreationDateTime'].replace(tzinfo=None)
+            emr['computational_uptime'] = str(datetime.datetime.now() - emr_start_time)
             resources.append(emr)
         notebook['computeresources'] = resources
         notebooks.append(notebook)
@@ -72,7 +79,8 @@ if __name__ == "__main__":
     edge['Notebooks'] = notebooks
     data.append(edge)
 
-    filename = '{}.json'.format(args.request_id)
+    # filename = '{}.json'.format(args.request_id)
+    filename = 'result.json'
     with open('/root/' + filename, 'w') as outfile:
         json.dump(data, outfile)
 

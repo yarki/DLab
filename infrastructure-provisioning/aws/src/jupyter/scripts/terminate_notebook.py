@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# ***************************************************************************
+# *****************************************************************************
 #
 # Copyright (c) 2016, EPAM SYSTEMS INC
 #
@@ -16,13 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# ***************************************************************************
+# ******************************************************************************
 
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import boto3
 import argparse
 import sys
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket_name', type=str)
@@ -45,8 +46,10 @@ if __name__ == "__main__":
                 cluster = client.describe_cluster(ClusterId=cluster_id)
                 cluster = cluster.get("Cluster")
                 emr_name = cluster.get('Name')
-                s3_cleanup(args.bucket_name, emr_name)
+                print 'Cleaning bucket from configs for cluster {}'.format(emr_name)
+                s3_cleanup(args.bucket_name, emr_name, os.environ['notebook_user_name'])
                 print "The bucket " + args.bucket_name + " has been cleaned successfully"
+                print 'Terminating cluster {}'.format(emr_name)
                 terminate_emr(cluster_id)
                 print "The EMR cluster " + emr_name + " has been terminated successfully"
         else:

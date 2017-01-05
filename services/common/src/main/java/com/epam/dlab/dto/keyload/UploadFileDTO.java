@@ -1,48 +1,45 @@
 /***************************************************************************
 
- Copyright (c) 2016, EPAM SYSTEMS INC
+Copyright (c) 2016, EPAM SYSTEMS INC
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
- http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
- ****************************************************************************/
+****************************************************************************/
 
 package com.epam.dlab.dto.keyload;
 
+import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UploadFileDTO {
     @JsonProperty
-    private String user;
+    private EdgeCreateDTO edge;
     @JsonProperty
     private String content;
-    @JsonProperty("conf_service_base_name")
-    private String serviceBaseName;
-    @JsonProperty("security_group")
-    private String securityGroup;
 
     public UploadFileDTO() {
     }
 
-    public String getUser() {
-        return user;
+    public EdgeCreateDTO getEdge() {
+        return edge;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setEdge(EdgeCreateDTO edge) {
+        this.edge = edge;
     }
 
-    public UploadFileDTO withUser(String user) {
-        setUser(user);
+    public UploadFileDTO withEdge(EdgeCreateDTO edge) {
+        setEdge(edge);
         return this;
     }
 
@@ -59,29 +56,4 @@ public class UploadFileDTO {
         return this;
     }
 
-    public String getServiceBaseName() {
-        return serviceBaseName;
-    }
-
-    public void setServiceBaseName(String serviceBaseName) {
-        this.serviceBaseName = serviceBaseName;
-    }
-
-    public UploadFileDTO withServiceBaseName(String serviceBaseName) {
-        setServiceBaseName(serviceBaseName);
-        return this;
-    }
-
-    public String getSecurityGroup() {
-        return securityGroup;
-    }
-
-    public void setSecurityGroup(String securityGroup) {
-        this.securityGroup = securityGroup;
-    }
-
-    public UploadFileDTO withSecurityGroup(String securityGroup) {
-        setSecurityGroup(securityGroup);
-        return this;
-    }
 }

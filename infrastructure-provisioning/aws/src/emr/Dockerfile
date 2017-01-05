@@ -1,4 +1,4 @@
-# ***************************************************************************
+# *****************************************************************************
 #
 # Copyright (c) 2016, EPAM SYSTEMS INC
 #
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# ***************************************************************************
+# ******************************************************************************
 
 FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 

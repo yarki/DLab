@@ -16,63 +16,61 @@ limitations under the License.
 
 ****************************************************************************/
 
- import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
- import { UserResourceService } from "./../../services/userResource.service";
- import { Modal } from './../modal/modal.component';
+import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
+import { UserResourceService } from './../../services/userResource.service';
+import { ConfirmationDialogModel } from './confirmation-dialog.model';
+import { ConfirmationDialogType } from './confirmation-dialog-type.enum';
+import { Response } from '@angular/http';
 
- @Component({
-   moduleId: module.id,
-   selector: 'confirmation-dialog',
-   templateUrl: 'confirmation-dialog.component.html'
- })
+import { ErrorMapUtils } from './../../util/errorMapUtils';
+import HTTP_STATUS_CODES from 'http-status-enum';
 
- export class confirmationDialog {
-   notebook: any;
-   stopText:string = `Notebook server will be stopped and all connected EMR instances will be terminated.`;
-   terminateText:string = `Notebook server and all connected EMR instances will be terminated.`;
-   action:string;
+@Component({
+  moduleId: module.id,
+  selector: 'confirmation-dialog',
+  templateUrl: 'confirmation-dialog.component.html'
+})
 
+export class ConfirmationDialog {
+  model: ConfirmationDialogModel;
+  isAliveResources: boolean;
+  processError: boolean = false;
+  errorMessage: string = '';
 
-   @ViewChild('bindDialog') bindDialog;
-   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
+  @ViewChild('bindDialog') bindDialog;
+  @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
+  constructor(private userResourceService: UserResourceService) {
+    this.model = ConfirmationDialogModel.getDefault();
+  }
 
-   constructor(
-    private userResourceService: UserResourceService
-    ) { }
+  ngOnInit() {
+    this.bindDialog.onClosing = () => this.resetDialog();
+  }
 
-   open(param, notebook, action) {
-     this.bindDialog.open(param);
-     this.notebook = notebook;
-     this.action = action;
-   }
-   close() {
-     this.bindDialog.close();
-   }
+  public open(param, notebook: any, type: ConfirmationDialogType) {
+    this.model = new ConfirmationDialogModel(type, notebook, (response: Response) => {
+      if (response.status === HTTP_STATUS_CODES.OK) {
+        this.close();
+        this.buildGrid.emit();
+      }
+    },
+      (response: Response) => {
+        this.processError = true;
+        this.errorMessage = ErrorMapUtils.setErrorMessage(response);
+      },
+      this.userResourceService);
 
-   stop() {
-     let url = "/" + this.notebook.name + "/stop";
+    this.bindDialog.open(param);
+    this.isAliveResources = this.model.isAliveResources(notebook.resources);
+  }
 
-     this.userResourceService
-        .suspendExploratoryEnvironment(url)
-        .subscribe((result) => {
-          console.log('stopUsernotebook result: ', result);
+  public close() {
+    this.bindDialog.close();
+  }
 
-          this.close();
-          this.buildGrid.emit();
-        });
-   }
-
-   terminate(){
-     let url = "/" + this.notebook.name + "/terminate";
-
-     this.userResourceService
-        .suspendExploratoryEnvironment(url)
-        .subscribe((result) => {
-          console.log('terminateUsernotebook result: ', result);
-
-          this.close();
-          this.buildGrid.emit();
-        });
-   }
- }
+  private resetDialog(): void {
+    this.processError = false;
+    this.errorMessage = '';
+  }
+}

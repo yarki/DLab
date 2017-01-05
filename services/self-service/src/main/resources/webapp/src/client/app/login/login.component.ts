@@ -17,10 +17,9 @@ limitations under the License.
 ****************************************************************************/
 
 import { Component } from '@angular/core';
-
-import { LoginModel } from "./loginModel";
-import {AppRoutingService} from "../routing/appRouting.service";
-import {ApplicationSecurityService} from "../services/applicationSecurity.service";
+import { LoginModel } from './loginModel';
+import { AppRoutingService } from '../routing/appRouting.service';
+import { ApplicationSecurityService } from '../services/applicationSecurity.service';
 
 @Component({
   moduleId: module.id,
@@ -31,33 +30,30 @@ import {ApplicationSecurityService} from "../services/applicationSecurity.servic
 })
 
 export class LoginComponent {
-  model = new LoginModel ('', '');
+  model = new LoginModel('', '');
   error = '';
   loading = false;
-  userPattern = "/S+";
-  //
-  // Override
-  //
+  userPattern = '\\w+.*\\w+';
 
-  constructor(private applicationSecurityService: ApplicationSecurityService, private appRoutingService : AppRoutingService) {}
+  constructor(
+    private applicationSecurityService: ApplicationSecurityService,
+    private appRoutingService : AppRoutingService
+  ) { }
 
   ngOnInit() {
-    this.applicationSecurityService.isLoggedIn().subscribe(result => {
+    this.applicationSecurityService.isLoggedIn()
+      .subscribe(result => {
       if (result)
         this.appRoutingService.redirectToHomePage();
     });
   }
-
-  //
-  // Handlers
-  //
 
   login_btnClick() {
     this.error = '';
     this.loading = true;
 
     this.applicationSecurityService
-      .login(this.model.username, this.model.password)
+      .login(this.model)
       .subscribe((result) => {
         if (result) {
           this.appRoutingService.redirectToHomePage();
@@ -66,14 +62,8 @@ export class LoginComponent {
 
         return false;
       }, (err) => {
-          if(err.status == 401){
-            this.error = 'Username or password is incorrect.';
-            this.loading = false;
-          }
-          else {
-            this.error = 'System failure. Please contact administrator.';
-            this.loading = false;
-          }
+          this.error = err.text();
+          this.loading = false;
         });
 
     return false;

@@ -1,36 +1,38 @@
 /***************************************************************************
 
- Copyright (c) 2016, EPAM SYSTEMS INC
+Copyright (c) 2016, EPAM SYSTEMS INC
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
- http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
- ****************************************************************************/
-
+****************************************************************************/
 
 package com.epam.dlab.backendapi.resources;
 
-import com.epam.dlab.auth.SecurityAPI;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.SecurityDAO;
-import com.epam.dlab.client.restclient.RESTService;
 import com.epam.dlab.dto.UserCredentialDTO;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.SecurityAPI;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -54,22 +56,30 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
 
     @POST
     @Path("/login")
-    public Response login(UserCredentialDTO credential) {
+    public Response login(@NotNull UserCredentialDTO credential) {
         LOGGER.debug("Try login user = {}", credential.getUsername());
-        dao.writeLoginAttempt(credential);
-        return securityService.post(LOGIN, credential, Response.class);
+        try {
+            dao.writeLoginAttempt(credential);
+            return securityService.post(LOGIN, credential, Response.class);
+        } catch (Throwable t) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(t.getMessage()).build();
+        }
     }
 
     @POST
     @Path("/logout")
     public Response logout(@Auth UserInfo userInfo) {
         LOGGER.debug("Try logout accessToken {}", userInfo.getAccessToken());
-        return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
+        try {
+            return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
+        } catch(Throwable t) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(t.getMessage()).build();
+        }
     }
 
     @POST
     @Path("/authorize")
-    public Response authorize(@Auth UserInfo userInfo, String username) {
+    public Response authorize(@Auth UserInfo userInfo, @Valid @NotBlank String username) {
         LOGGER.debug("Try authorize accessToken {}", userInfo.getAccessToken());
         return Response
                 .status(userInfo.getName().toLowerCase().equals(username.toLowerCase()) ?

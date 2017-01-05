@@ -17,77 +17,81 @@ limitations under the License.
 ****************************************************************************/
 
 import { Injectable } from '@angular/core';
-import {Response} from '@angular/http';
-import {ApplicationServiceFacade} from "./applicationServiceFacade.service";
+import { Response } from '@angular/http';
+import { ApplicationServiceFacade } from './applicationServiceFacade.service';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class UserResourceService {
-  constructor(private applicationServiceFacade: ApplicationServiceFacade) {
-  }
+  constructor(private applicationServiceFacade: ApplicationServiceFacade) { }
 
-  getExploratoryEnvironmentTemplates()
-  {
+  public getExploratoryEnvironmentTemplates(): Observable<any> {
     return this.applicationServiceFacade
       .buildGetExploratoryEnvironmentTemplatesRequest()
-      .map(( res:Response ) => res.json())
+      .map((res: Response) => res.json())
       .catch((error: any) => error);
   }
 
-  getComputationalResourcesTemplates()
-  {
+  public getComputationalResourcesTemplates(): Observable<any> {
     return this.applicationServiceFacade
       .buildGetComputationalResourcesTemplatesRequest()
-      .map(( res:Response ) => res.json())
+      .map((res: Response) => res.json())
       .catch((error: any) => error);
   }
 
-  getSupportedResourcesShapes()
-  {
-    return this.applicationServiceFacade
-      .buildGetSupportedComputationalResourcesShapesRequest()
-      .map(( res:Response ) => res.json())
-      .catch((error: any) => error);
-  }
-
-  getUserProvisionedResources() {
+  public getUserProvisionedResources(): Observable<any> {
     return this.applicationServiceFacade
       .buildGetUserProvisionedResourcesRequest()
-      .map((response:Response ) => response.json())
+      .map((response: Response) => response.json())
       .catch((error: any) => error);
   }
 
-  createExploratoryEnvironment(data) {
+  public createExploratoryEnvironment(data): Observable<Response> {
     let body = JSON.stringify(data);
     return this.applicationServiceFacade
       .buildCreateExploratoryEnvironmentRequest(body)
-      .map((response:Response ) => response);
+      .map((response: Response) => response);
   }
 
-  runExploratoryEnvironment(data) {
+  public runExploratoryEnvironment(data): Observable<Response> {
     let body = JSON.stringify(data);
     return this.applicationServiceFacade
       .buildRunExploratoryEnvironmentRequest(body)
-      .map((response:Response ) => response);
+      .map((response: Response) => response);
   }
 
-  suspendExploratoryEnvironment(data) {
-    let body = JSON.stringify(data);
+  public suspendExploratoryEnvironment(notebook: any, action): Observable<Response> {
+    let url = '/' + notebook.name + '/' + action;
+
     return this.applicationServiceFacade
-      .buildSuspendExploratoryEnvironmentRequest(body)
-      .map((response:Response ) => response);
+      .buildSuspendExploratoryEnvironmentRequest(JSON.stringify(url))
+      .map((response: Response) => response);
   }
 
-  createComputationalResource(data) {
+  public createComputationalResource(data): Observable<Response> {
     let body = JSON.stringify(data);
     return this.applicationServiceFacade
       .buildCreateComputationalResourcesRequest(body)
-      .map((response:Response ) => response);
+      .map((response: Response) => response);
   }
 
-  suspendComputationalResource(data) {
-    let body = JSON.stringify(data);
+  public suspendComputationalResource(notebookName: string, computationalResourceName: string): Observable<Response> {
+    let body = JSON.stringify('/' + notebookName + '/' + computationalResourceName + '/terminate');
     return this.applicationServiceFacade
       .buildDeleteComputationalResourcesRequest(body)
-      .map((response:Response ) => response);
+      .map((response: Response) => response);
+  }
+
+  public getUserPreferences(): Observable<Response> {
+    return this.applicationServiceFacade
+      .buildGetUserPreferences()
+      .map((response: Response) => response.json());
+  }
+
+  public updateUserPreferences(data): Observable<Response> {
+    let body = JSON.stringify(data);
+    return this.applicationServiceFacade
+      .buildUpdateUserPreferences(body)
+      .map((response: Response) => response);
   }
 }

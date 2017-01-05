@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# ***************************************************************************
+# *****************************************************************************
 #
 # Copyright (c) 2016, EPAM SYSTEMS INC
 #
@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# ***************************************************************************
+# ******************************************************************************
 
 import argparse
 from fabric.api import *
@@ -30,6 +30,7 @@ parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--dry_run', type=str, default='false')
 parser.add_argument('--emr_version', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
+parser.add_argument('--region', type=str, default='')
 parser.add_argument('--notebook_ip', type=str, default='')
 args = parser.parse_args()
 
@@ -38,6 +39,7 @@ def configure_notebook():
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
     put(templates_dir + 'pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
+    put(templates_dir + 'r_emr_template.json', '/tmp/r_emr_template.json')
     put(templates_dir + 'spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
     put(templates_dir + 'toree_emr_template.json','/tmp/toree_emr_template.json')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
@@ -86,4 +88,4 @@ if __name__ == "__main__":
     configure_notebook()
     spark_version = get_spark_version()
     hadoop_version = get_hadoop_version()
-    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version + ' --hadoop_version ' + hadoop_version)
+    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version + ' --hadoop_version ' + hadoop_version + ' --region ' + args.region + ' --excluded_lines ' + os.environ['emr_excluded_spark_properties'] + ' --user_name ' + os.environ['edge_user_name'])
