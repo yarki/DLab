@@ -28,12 +28,13 @@ class RoutineException(Exception):
 
 def ensure_apt(requisites):
     try:
-        if not exists('/tmp/apt_upgraded'):
+        if not exists('/home/ubuntu/.ensure_dir/apt_upgraded'):
             sudo('apt-get update')
-            sudo('apt-get -y upgrade')
+            sudo('apt-get -y install ' + requisites)
+            sudo('unattended-upgrades -v')
             sudo('export LC_ALL=C')
-            sudo('touch /tmp/apt_upgraded')
-        sudo('apt-get -y install ' + requisites)
+            sudo('mkdir /home/ubuntu/.ensure_dir')
+            sudo('touch /home/ubuntu/.ensure_dir/apt_upgraded')
         return True
     except:
         return False
@@ -41,12 +42,12 @@ def ensure_apt(requisites):
 
 def ensure_pip(requisites):
     try:
-        if not exists('/tmp/pip_path_added'):
+        if not exists('/home/ubuntu/.ensure_dir/pip_path_added'):
             sudo('echo PATH=$PATH:/usr/local/bin/:/opt/spark/bin/ >> /etc/profile')
             sudo('echo export PATH >> /etc/profile')
-            sudo('touch /tmp/pip_path_added')
             sudo('pip install -U pip --no-cache-dir')
-        sudo('pip install -U ' + requisites + ' --no-cache-dir')
+            sudo('pip install -U ' + requisites + ' --no-cache-dir')
+            sudo('touch /home/ubuntu/.ensure_dir/pip_path_added')
         return True
     except:
         return False
