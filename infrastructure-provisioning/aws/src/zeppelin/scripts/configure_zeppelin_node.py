@@ -71,7 +71,7 @@ def ensure_jre_jdk():
 def ensure_s3_libs():
     if not exists('/home/ubuntu/.ensure_dir/zp_s3_lib_ensured'):
         try:
-            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-core//aws-java-sdk-core-1.10.75.jar')
+            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-core/1.10.75/aws-java-sdk-core-1.10.75.jar')
             sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.6.0/hadoop-aws-2.6.0.jar')
             sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-s3/1.10.75/aws-java-sdk-s3-1.10.75.jar')
             sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.5/lzo-hadoop-1.0.5.jar')
