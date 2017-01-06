@@ -362,8 +362,8 @@ public class TestServices {
         String sourceDir = "/var/lib/jenkins/AutoTestData";
         String csvFilename = "train.csv";
         String pyFilename = "pyspark_test.py";
-        String copyToSSNCommand = "scp -i %s %s ubuntu@%s:~/";
-        String copyToNotebookCommand = "scp -i %s ~/%s ubuntu@%s:/tmp/";
+        String copyToSSNCommand = "scp -i %s -o 'StrictHostKeyChecking no' %s ubuntu@%s:~/";
+        String copyToNotebookCommand = "scp -i %s -o 'StrictHostKeyChecking no' ~/%s ubuntu@%s:/tmp/";
 
         System.out.println("Copying files to SSN...");
         String pathToKey = PropertyValue.getAccessKeyPrivFileName();

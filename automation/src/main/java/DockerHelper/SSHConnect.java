@@ -52,6 +52,7 @@ public class SSHConnect {
     
     public static ChannelExec setCommand(Session session, String command)
             throws JSchException, IOException, InterruptedException {
+        System.out.printf("Setting command: %s", command);
 
         ChannelExec channelExec = (ChannelExec)session.openChannel("exec");
         channelExec.setCommand(command);
