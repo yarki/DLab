@@ -34,19 +34,13 @@ parser.add_argument('--region', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
-scala_link = "http://www.scala-lang.org/files/archive/scala-2.11.8.deb"
-spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-1.6.2-bin-hadoop2.6.tgz"
-
 zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-netinst.tgz"
 zeppelin_version = "0.6.2"
 zeppelin_interpreters = "md,python"
-spark_version = "1.6.2"
-hadoop_version = "2.6"
 python3_version = "3.4"
 pyspark_local_path_dir = '/home/ubuntu/.local/share/zeppelin/interpreters/pyspark_local/'
 py3spark_local_path_dir = '/home/ubuntu/.local/share/zeppelin/interpreters/py3spark_local/'
 zeppelin_conf_file = '/home/ubuntu/.local/share/zeppelin/zeppelin_notebook_config.py'
-s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 
 
@@ -74,6 +68,18 @@ def ensure_jre_jdk():
         except:
             sys.exit(1)
 
+def ensure_s3_libs():
+    if not exists('/home/ubuntu/.ensure_dir/zp_s3_lib_ensured'):
+        try:
+            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-core/1.11.76/aws-java-sdk-core-1.11.76.jar')
+            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.7.3/hadoop-aws-2.7.3.jar')
+            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-s3/1.11.76/aws-java-sdk-s3-1.11.76.jar')
+            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.5/lzo-hadoop-1.0.5.jar')
+            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2.jar')
+            sudo('touch /home/ubuntu/.ensure_dir/zp_s3_lib_ensured')
+        except:
+            sys.exit(1)
+
 
 def ensure_python3_kernel():
     if not exists('/home/ubuntu/.ensure_dir/python3_kernel_ensured'):
@@ -88,19 +94,6 @@ def ensure_python3_kernel():
             sys.exit(1)
 
 
-def ensure_s3_kernel():
-    if not exists('/home/ubuntu/.ensure_dir/s3_kernel_ensured'):
-        try:
-            sudo('mkdir -p ' + s3_jars_dir)
-            put(templates_dir + 'jars/local_jars.tar.gz', '/tmp/local_jars.tar.gz')
-            sudo('tar -xzf /tmp/local_jars.tar.gz -C ' + s3_jars_dir)
-            put(templates_dir + 'spark-defaults_local.conf', '/tmp/spark-defaults_local.conf')
-            sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/spark-defaults_local.conf".format(args.region))
-            sudo('\cp /tmp/spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
-            sudo('touch /home/ubuntu/.ensure_dir/s3_kernel_ensured')
-        except:
-            sys.exit(1)
-
 def configure_notebook_server(notebook_name):
     if not exists('/home/ubuntu/.ensure_dir/zeppelin_ensured'):
         ensure_jre_jdk()
@@ -114,7 +107,6 @@ def configure_notebook_server(notebook_name):
             sudo('sed -i \"/# export ZEPPELIN_IDENT_STRING/c\export ZEPPELIN_IDENT_STRING=notebook\" /opt/zeppelin/conf/zeppelin-env.sh')
             put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
             sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
-            sudo('chown ubuntu:ubuntu -R /opt/zeppelin-' + zeppelin_version + '-bin-netinst')
             sudo('mkdir /var/log/zeppelin')
             sudo('mkdir /var/run/zeppelin')
             sudo('ln -s /var/log/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/logs')
@@ -122,13 +114,14 @@ def configure_notebook_server(notebook_name):
             sudo('ln -s /var/run/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/run')
             sudo('chown ubuntu:ubuntu -R /var/run/zeppelin')
             sudo('/opt/zeppelin/bin/install-interpreter.sh --name ' + zeppelin_interpreters + ' --proxy-url $http_proxy')
+            ensure_s3_libs()
+            sudo('chown ubuntu:ubuntu -R /opt/zeppelin-' + zeppelin_version + '-bin-netinst')
         except:
             sys.exit(1)
         try:
             put(templates_dir + 'zeppelin-notebook.service', '/tmp/zeppelin-notebook.service')
             sudo("chmod 644 /tmp/zeppelin-notebook.service")
             sudo('cp /tmp/zeppelin-notebook.service /etc/systemd/system/zeppelin-notebook.service')
-            #sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable zeppelin-notebook")
             sudo("systemctl start zeppelin-notebook")
@@ -137,8 +130,6 @@ def configure_notebook_server(notebook_name):
             sys.exit(1)
 
         ensure_python3_kernel()
-
-        #ensure_s3_kernel()
 
 
 ##############

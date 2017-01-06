@@ -71,7 +71,7 @@ def run():
     notebook_config['instance_type'] = os.environ['notebook_instance_type']
     notebook_config['key_name'] = os.environ['creds_key_name']
     notebook_config['user_keyname'] = os.environ['notebook_user_name']
-    notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ['notebook_user_name'] + "-" + notebook_config['exploratory_name'] + "-nb-" + notebook_config['uuid']
+    notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ['notebook_user_name'] + "-" + notebook_config['exploratory_name'] + "-zeppelin-nb-" + notebook_config['uuid']
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-notebook-image'
     notebook_config['role_profile_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
@@ -94,7 +94,7 @@ def run():
 
     # launching instance for notebook server
     try:
-        logging.info('[CREATE IINSTANCE]')
+        logging.info('[CREATE INSTANCE]')
         print '[CREATE ZEPPELIN NOTEBOOK INSTANCE]'
         params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
                  "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s --instance_class %s --instance_disk_size %s" % \
