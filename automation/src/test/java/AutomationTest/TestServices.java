@@ -418,7 +418,7 @@ public class TestServices {
             Session notebookSession = SSHConnect.getForwardedConnect("ubuntu", noteBookIp, assignedPort);
 
             try {
-                String notebookUsername = PropertyValue.getNotDLabUsername().replaceAll("@.*", "");
+                String notebookUsername = PropertyValue.getUsername().replaceAll("@.*", "");
                 String bucketName = String.format("%s-%s-bucket", serviceBaseName, notebookUsername).replace('_', '-').toLowerCase();
                 command = String.format("/usr/bin/python %s --bucket %s --cluster_name %s",
                         Paths.get("/tmp", pyFilename).toString(),
