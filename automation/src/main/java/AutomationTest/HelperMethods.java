@@ -16,6 +16,7 @@ public class HelperMethods {
     }
 
     public static AckStatus executeCommand(String command) throws IOException, InterruptedException {
+        System.out.printf("Executing command: $s", command);
         Process process = Runtime.getRuntime().exec(command);
         int status = process.waitFor();
         String message = "";
