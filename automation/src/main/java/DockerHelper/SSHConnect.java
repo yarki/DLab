@@ -100,10 +100,15 @@ public class SSHConnect {
         return dockerContainer;
     }
 
-    public static AckStatus checkAck(ChannelExec channel) throws IOException{
+    public static AckStatus checkAck(ChannelExec channel) throws IOException, InterruptedException {
         InputStream in = channel.getInputStream();
 
-        int status = channel.getExitStatus();
+        int status;
+        while(channel.getExitStatus() == -1) {
+            Thread.sleep(1000);
+        }
+        status = channel.getExitStatus();
+
         String message = "";
 
         // b may be 0 for success,
