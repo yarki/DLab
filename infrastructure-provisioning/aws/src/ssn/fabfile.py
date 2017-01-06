@@ -279,7 +279,7 @@ def run():
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         params = "--hostname %s --keyfile %s " \
-                 "--pip_packages 'boto3 argparse fabric jupyter awscli'" % \
+                 "--pip_packages 'boto3 argparse fabric jupyter awscli pymongo'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
         if not run_routine('install_prerequisites', params):
