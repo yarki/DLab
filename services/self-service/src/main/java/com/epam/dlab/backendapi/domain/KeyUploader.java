@@ -55,7 +55,8 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
     private RESTService provisioningService;
 
     @Override
-    public KeyLoadStatus checkKey(UserInfo userInfo) {
+    public KeyLoadStatus checkKey(UserInfo userInfo) throws DlabException {
+    	LOGGER.debug("Find the status of the user key for {}", userInfo.getName());
         return keyDAO.findKeyStatus(userInfo.getName());
     }
 
@@ -88,13 +89,13 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
     }
 
     @Override
-    public void onKeyUploadComplete(UploadFileResultDTO result) {
-    	LOGGER.debug("The upload of the user key for user {} has been completed, status is ", result.getUser(), result.isSuccess());
-        keyDAO.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
-        if (result.isSuccess()) {
-            keyDAO.saveCredential(result.getUser(), result.getCredential());
+    public void onKeyUploadComplete(UploadFileResultDTO uploadKeyResult) throws DlabException {
+    	LOGGER.debug("The upload of the user key for user {} has been completed, status is ", uploadKeyResult.getUser(), uploadKeyResult.isSuccess());
+        keyDAO.updateKey(uploadKeyResult.getUser(), KeyLoadStatus.getStatus(uploadKeyResult.isSuccess()));
+        if (uploadKeyResult.isSuccess()) {
+            keyDAO.saveCredential(uploadKeyResult.getUser(), uploadKeyResult.getCredential());
         } else {
-            keyDAO.deleteKey(result.getUser());
+            keyDAO.deleteKey(uploadKeyResult.getUser());
         }
     }
 }

@@ -45,6 +45,9 @@ public class InfrasctructureResource {
     @Named(PROVISIONING_HEALTH_CHECKER)
     private HealthChecker provisioningHealthChecker;
 
+    /** Returns the status of infrastructure: database and provisioning service.
+     * @param userInfo user info.
+     */
     @GET
     @Path("/status")
     public HealthStatusDTO status(@Auth UserInfo userInfo) {

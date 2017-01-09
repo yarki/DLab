@@ -63,32 +63,35 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
     @POST
     @Path("/login")
     public Response login(@NotNull UserCredentialDTO credential) {
-        LOGGER.debug("Try login user = {}", credential.getUsername());
+        LOGGER.debug("Try login for user {}", credential.getUsername());
         try {
             dao.writeLoginAttempt(credential);
             return securityService.post(LOGIN, credential, Response.class);
         } catch (Throwable t) {
+        	LOGGER.warn("Try login for user {} fail: {}", credential.getUsername(), t.getLocalizedMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(t.getMessage()).build();
         }
     }
 
-    /** Logout method for the dlab user.
-     * @param credential user credential.
+    /** Logout method for the DLab user.
+     * @param userInfo user info.
      * @return 200 OK or 403 Forbidden.
      */
     @POST
     @Path("/logout")
     public Response logout(@Auth UserInfo userInfo) {
-        LOGGER.debug("Try logout accessToken {}", userInfo.getAccessToken());
+        LOGGER.debug("Try logout for accessToken {}", userInfo.getAccessToken());
         try {
             return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
         } catch(Throwable t) {
+        	LOGGER.warn("Try logout for accessToken {}", userInfo.getAccessToken(), t.getLocalizedMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(t.getMessage()).build();
         }
     }
 
     /** Authorize method for the dlab user.
-     * @param credential user credential.
+     * @param userInfo user info.
+     * @param username user name.
      * @return 500 Internal Server Error if post response fails.
      */
     @POST

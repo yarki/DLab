@@ -29,8 +29,9 @@ public interface IKeyUploader {
 
 	/** Returns the status of user key.
 	 * @param userInfo user info.
+	 * @exception DlabException When the check the status of user key fails.
 	 */
-    KeyLoadStatus checkKey(UserInfo userInfo);
+    KeyLoadStatus checkKey(UserInfo userInfo) throws DlabException ;
 
 	/** Starts upload of user key to notebook.
 	 * @param userInfo user info.

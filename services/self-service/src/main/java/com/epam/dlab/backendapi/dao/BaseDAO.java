@@ -18,30 +18,40 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.dao;
 
+import static com.mongodb.client.model.Aggregates.unwind;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.dlab.backendapi.dao.databind.IsoDateModule;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.mongo.MongoService;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import com.mongodb.MongoException;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.result.UpdateResult;
-import org.apache.commons.lang3.StringUtils;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Supplier;
-
-import static com.mongodb.client.model.Aggregates.unwind;
 
 /** Implements the base API for Mongo database.
  */
 class BaseDAO implements MongoCollections {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseDAO.class);
+
     protected static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true)
             .registerModule(new IsoDateModule());
@@ -59,8 +69,9 @@ class BaseDAO implements MongoCollections {
     /** Inserts the document into the collection.
      * @param collection collection name.
      * @param supplier document.
+     * @exception DlabException
      */
-    protected void insertOne(String collection, Supplier<Document> supplier) {
+    protected void insertOne(String collection, Supplier<Document> supplier) throws DlabException {
         insertOne(collection, supplier, generateUUID());
     }
 
@@ -68,18 +79,26 @@ class BaseDAO implements MongoCollections {
      * @param collection collection name.
      * @param document document.
      * @param uuid unique id.
+     * @exception DlabException
      */
-    protected void insertOne(String collection, Supplier<Document> document, String uuid) {
-        mongoService.getCollection(collection).insertOne(document.get()
+    protected void insertOne(String collection, Supplier<Document> document, String uuid) throws DlabException {
+    	try {
+    		mongoService.getCollection(collection)
+    			.insertOne(document.get()
                 .append(ID, uuid)
                 .append(TIMESTAMP, new Date()));
+    	} catch (MongoException e) {
+    		LOGGER.warn("Insert to Mongo DB fails: {}", e.getLocalizedMessage(), e);
+    		throw new DlabException("Insert to Mongo DB fails: " + e.getLocalizedMessage(), e);
+    	}
     }
 
     /** Serializes the object and inserts into the collection.
      * @param collection collection name.
      * @param supplier document.
+     * @exception DlabException
      */
-    protected void insertOne(String collection, Object object) {
+    protected void insertOne(String collection, Object object) throws DlabException {
         insertOne(collection, object, generateUUID());
     }
 
@@ -87,29 +106,50 @@ class BaseDAO implements MongoCollections {
      * @param collection collection name.
      * @param supplier document.
      * @param uuid unique id.
+     * @exception DlabException
      */
-    protected void insertOne(String collection, Object object, String uuid) {
-        mongoService.getCollection(collection).insertOne(convertToBson(object)
+    protected void insertOne(String collection, Object object, String uuid) throws DlabException {
+    	try {
+    		mongoService.getCollection(collection)
+    			.insertOne(convertToBson(object)
                 .append(ID, uuid)
                 .append(TIMESTAMP, new Date()));
+    	} catch (MongoException e) {
+    		LOGGER.warn("Insert to Mongo DB fails: {}", e.getLocalizedMessage(), e);
+    		throw new DlabException("Insert to Mongo DB fails: " + e.getLocalizedMessage(), e);
+    	}
     }
 
     /** Updates single document in the collection by condition.
      * @param collection collection name.
      * @param condition condition for search documents in collection.
      * @param document document.
+     * @exception DlabException
      */
-    protected UpdateResult updateOne(String collection, Bson condition, Bson document) {
-        return mongoService.getCollection(collection).updateOne(condition, document);
+    protected UpdateResult updateOne(String collection, Bson condition, Bson document) throws DlabException {
+    	try {
+    		return mongoService.getCollection(collection)
+    			.updateOne(condition, document);
+    	} catch (MongoException e) {
+    		LOGGER.warn("Update Mongo DB fails: {}", e.getLocalizedMessage(), e);
+    		throw new DlabException("Insert to Mongo DB fails: " + e.getLocalizedMessage(), e);
+    	}
     }
 
     /** Updates all documents in the collection by condition.
      * @param collection collection name.
      * @param condition condition for search documents in collection.
      * @param document document.
+     * @exception DlabException
      */
-    protected UpdateResult updateMany(String collection, Bson condition, Bson document) {
-        return mongoService.getCollection(collection).updateMany(condition, document);
+    protected UpdateResult updateMany(String collection, Bson condition, Bson document) throws DlabException {
+    	try {
+        	return mongoService.getCollection(collection)
+        		.updateMany(condition, document);
+		} catch (MongoException e) {
+			LOGGER.warn("Update Mongo DB fails: {}", e.getLocalizedMessage(), e);
+			throw new DlabException("Insert to Mongo DB fails: " + e.getLocalizedMessage(), e);
+		}
     }
 
     /** Finds and returns documents from the collection by condition.
@@ -224,7 +264,7 @@ class BaseDAO implements MongoCollections {
      * @exception DlabException if have more than one aggregated documents.
      */
     Optional<Document> aggregateOne(String collection,
-                                          List<? extends Bson> pipeline) {
+                                          List<? extends Bson> pipeline) throws DlabException {
         MongoIterable<Document> found = aggregate(collection, pipeline);
         return limitOne(found);
     }

@@ -24,6 +24,7 @@ import static com.mongodb.client.model.Updates.set;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.dto.keyload.UserKeyDTO;
+import com.epam.dlab.exceptions.DlabException;
 
 /** DAO for manage the user key.
  */
@@ -32,8 +33,9 @@ public class KeyDAO extends BaseDAO {
 	/** Write the user key to Mongo database.
 	 * @param user user name
 	 * @param content key
+	 * @exception DlabException
 	 */
-    public void uploadKey(final String user, String content) {
+    public void uploadKey(final String user, String content) throws DlabException {
         UserKeyDTO key = new UserKeyDTO().withContent(content).withStatus(KeyLoadStatus.NEW.getStatus());
         insertOne(USER_KEYS, key, user);
     }
@@ -41,8 +43,9 @@ public class KeyDAO extends BaseDAO {
 	/** Write the status of user key to Mongo database.
 	 * @param user user name
 	 * @param status the status of user key.
+	 * @exception DlabException
 	 */
-    public void updateKey(String user, String status) {
+    public void updateKey(String user, String status) throws DlabException {
         updateOne(USER_KEYS, eq(ID, user), set(STATUS, status));
     }
 
@@ -56,15 +59,17 @@ public class KeyDAO extends BaseDAO {
 	/** Write the credential of user to Mongo database.
 	 * @param user user name
 	 * @param credential the credential of user
+	 * @exception DlabException
 	 */
-    public void saveCredential(String user, UserAWSCredentialDTO credential) {
+    public void saveCredential(String user, UserAWSCredentialDTO credential) throws DlabException {
         insertOne(USER_AWS_CREDENTIALS, credential, user);
     }
 
 	/** Finds and returns the IP address of EDGE notebook for user.
 	 * @param user user name
+	 * @exception DlabException
 	 */
-    public String getUserEdgeIP(String user) {
+    public String getUserEdgeIP(String user) throws DlabException {
         return findOne(USER_AWS_CREDENTIALS, eq(ID, user), UserAWSCredentialDTO.class)
                 .orElse(new UserAWSCredentialDTO())
                 .getPublicIp();
@@ -72,8 +77,9 @@ public class KeyDAO extends BaseDAO {
 
 	/** Finds and returns the status of user key.
 	 * @param user user name
+	 * @exception DlabException
 	 */
-    public KeyLoadStatus findKeyStatus(String user) {
+    public KeyLoadStatus findKeyStatus(String user) throws DlabException {
         return findOne(USER_KEYS, eq(ID, user), UserKeyDTO.class)
                 .map(UserKeyDTO::getStatus)
                 .map(KeyLoadStatus::findByStatus)

@@ -94,7 +94,6 @@ public class ComputationalResource implements ComputationalAPI {
                         .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
                         .withRegion(settingsDAO.getCredsRegion());
-                ;
                 return Response
                         .ok(provisioningService.post(EMR_CREATE, dto, String.class))
                         .build();

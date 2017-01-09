@@ -20,6 +20,8 @@ package com.epam.dlab.backendapi.dao;
 
 import org.bson.Document;
 
+import com.epam.dlab.exceptions.DlabException;
+
 /** DAO write attempt of Docker {@link com.epam.dlab.backendapi.resources.DockerResource}
  * */
 public class DockerDAO extends BaseDAO {
@@ -28,8 +30,9 @@ public class DockerDAO extends BaseDAO {
     /** Write the attempt of docker action.
      * @param user user name.
      * @param action action of docker.
+     * @exception DlabException
      */
-    public void writeDockerAttempt(String user, String action) {
+    public void writeDockerAttempt(String user, String action) throws DlabException {
         insertOne(DOCKER_ATTEMPTS, () -> new Document(USER, user).append("action", action));
     }
 }

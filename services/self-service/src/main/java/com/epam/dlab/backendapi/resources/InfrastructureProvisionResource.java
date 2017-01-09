@@ -39,9 +39,9 @@ import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
+import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.DockerAPI;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -54,7 +54,7 @@ import io.dropwizard.auth.Auth;
 @Produces(MediaType.APPLICATION_JSON)
 public class InfrastructureProvisionResource implements DockerAPI {
     public static final String EDGE_IP = "edge_node_ip";
-    private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InfrastructureProvisionResource.class);
 
     @Inject
     private InfrastructureProvisionDAO dao;
@@ -64,12 +64,20 @@ public class InfrastructureProvisionResource implements DockerAPI {
     @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
 
+    /** Returns the list of the provisioned user resources.
+     * @param userInfo user info.
+     */
     @GET
     @Path("/provisioned_user_resources")
     public Iterable<Document> getList(@Auth UserInfo userInfo) {
-        LOGGER.debug("loading notebooks for user {}", userInfo.getName());
-        String ip = keyDAO.getUserEdgeIP(userInfo.getName());
-        return appendEdgeIp(dao.find(userInfo.getName()), ip);
+        LOGGER.debug("Loading list of provisioned resources for user {}", userInfo.getName());
+        try {
+        	String ip = keyDAO.getUserEdgeIP(userInfo.getName());
+        	return appendEdgeIp(dao.find(userInfo.getName()), ip);
+        } catch (Throwable t) {
+        	LOGGER.warn("Could not load list of provisioned resources for user: {}", userInfo.getName(), t.getLocalizedMessage(), t);
+            throw new DlabException("Could not load list of provisioned resources for user " + userInfo.getName(), t);
+        }
     }
 
     private List<Document> appendEdgeIp(Iterable<Document> documents, String ip) {
@@ -78,41 +86,57 @@ public class InfrastructureProvisionResource implements DockerAPI {
                 .collect(Collectors.toList());
     }
 
+    /** Returns the list of the shapes for user.
+     * @param userInfo user info.
+     */
     @GET
     @Path("/computational_resources_shapes")
     public Iterable<Document> getShapes(@Auth UserInfo userInfo) {
-        LOGGER.debug("loading shapes for user {}", userInfo.getName());
-        return dao.findShapes();
+        LOGGER.debug("Loading list of shapes for user {}", userInfo.getName());
+        try {
+        	return dao.findShapes();
+        } catch (Throwable t) {
+        	LOGGER.warn("Could not load list of shapes for user: {}", userInfo.getName(), t.getLocalizedMessage(), t);
+            throw new DlabException("Could not load list of shapes for user " + userInfo.getName(), t);
+        }
     }
 
+    /** Returns the list of the computational resources templates for user.
+     * @param userInfo user info.
+     */
     @GET
     @Path("/computational_resources_templates")
     public Iterable<ComputationalMetadataDTO> getComputationalTemplates(@Auth UserInfo userInfo) {
-        LOGGER.debug("loading computational templates for user {}", userInfo.getName());
-        return getComputationalTemplates();
+        LOGGER.debug("Loading list of computational templates for user {}", userInfo.getName());
+        try {
+        	return Stream.of(provisioningService.get(DOCKER_COMPUTATIONAL, ComputationalMetadataDTO[].class))
+                .collect(Collectors.toSet());
+        } catch (Throwable t) {
+        	LOGGER.warn("Could not load list of computational templates for user: {}", userInfo.getName(), t.getLocalizedMessage(), t);
+            throw new DlabException("Could not load list of computational templates for user " + userInfo.getName(), t);
+        }
     }
 
+    /** Returns the list of the exploratory environment templates for user.
+     * @param userInfo user info.
+     */
     @GET
     @Path("/exploratory_environment_templates")
     public Iterable<ExploratoryMetadataDTO> getExploratoryTemplates(@Auth UserInfo userInfo) {
-        LOGGER.debug("loading exploratory templates for user {}", userInfo.getName());
-        List<ExploratoryMetadataDTO> list = Lists.newArrayList(getExploratoryTemplates());
-        list.forEach(m -> {
-            int separatorIndex = m.getImage().indexOf(":");
-            if(separatorIndex > 0) {
-                m.setImage(m.getImage().substring(0, separatorIndex));
-            }
-        });
-        return list;
-    }
-
-    private Iterable<ExploratoryMetadataDTO> getExploratoryTemplates() {
-        return Stream.of(provisioningService.get(DOCKER_EXPLORATORY, ExploratoryMetadataDTO[].class))
-                .collect(Collectors.toSet());
-    }
-
-    private Iterable<ComputationalMetadataDTO> getComputationalTemplates() {
-        return Stream.of(provisioningService.get(DOCKER_COMPUTATIONAL, ComputationalMetadataDTO[].class))
-                .collect(Collectors.toSet());
+        LOGGER.debug("Loading list of exploratory templates for user {}", userInfo.getName());
+        try {
+	        List<ExploratoryMetadataDTO> list = Stream.of(provisioningService.get(DOCKER_EXPLORATORY, ExploratoryMetadataDTO[].class))
+	        		.collect(Collectors.toList());
+	        list.forEach(m -> {
+	            int separatorIndex = m.getImage().indexOf(":");
+	            if(separatorIndex > 0) {
+	                m.setImage(m.getImage().substring(0, separatorIndex));
+	            }
+	        });
+	        return list;
+        } catch (Throwable t) {
+        	LOGGER.warn("Could not load list of exploratory templates for user: {}", userInfo.getName(), t.getLocalizedMessage(), t);
+            throw new DlabException("Could not load list of exploratory templates for user " + userInfo.getName(), t);
+        }
     }
 }

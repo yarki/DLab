@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.dao;
 
 import com.epam.dlab.dto.UserCredentialDTO;
+import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Singleton;
 import org.bson.Document;
@@ -30,8 +31,9 @@ public class SecurityDAO extends BaseDAO {
 	
 	/** Write the attempt of user login into Mongo database.
 	 * @param credentials user credentials.
+	 * @exception DlabException
 	 */
-    public void writeLoginAttempt(UserCredentialDTO credentials) {
+    public void writeLoginAttempt(UserCredentialDTO credentials) throws DlabException {
         insertOne(LOGIN_ATTEMPTS,
                 () -> new Document("login", credentials.getUsername()).append("iamlogin", UsernameUtils.removeDomain(credentials.getUsername())));
     }
