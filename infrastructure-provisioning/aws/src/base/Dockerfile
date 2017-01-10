@@ -26,7 +26,7 @@ RUN	apt-get update && \
 
 # Install any python dependencies
 RUN pip install -U pip
-RUN pip install boto3 fabric fabvenv awscli argparse ujson jupyter
+RUN pip install boto3 fabric fabvenv awscli argparse ujson jupyter pymongo
 
 # Configuring ssh for user
 RUN mkdir -p /root/.ssh; echo "Host *" > /root/.ssh/config; \
