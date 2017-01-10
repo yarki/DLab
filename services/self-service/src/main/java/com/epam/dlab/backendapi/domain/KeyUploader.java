@@ -56,7 +56,7 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
 
     @Override
     public KeyLoadStatus checkKey(UserInfo userInfo) throws DlabException {
-    	LOGGER.debug("Find the status of the user key for {}", userInfo.getName());
+    	LOGGER.trace("Find the status of the user key for {}", userInfo.getName());
         return keyDAO.findKeyStatus(userInfo.getName());
     }
 

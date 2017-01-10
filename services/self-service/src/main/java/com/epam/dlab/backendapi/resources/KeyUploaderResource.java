@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.domain.KeyUploader;
+import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.google.inject.Inject;
@@ -68,14 +69,15 @@ public class KeyUploaderResource {
     @GET
     public Response checkKey(@Auth UserInfo userInfo) {
     	LOGGER.debug("Check the status of the user key for {}", userInfo.getName());
-    	Status status;
+    	KeyLoadStatus status;
     	try {
-    		status = keyUploader.checkKey(userInfo).getHttpStatus();
+    		status = keyUploader.checkKey(userInfo);
+        	LOGGER.debug("The status of the user key for {} is {}", userInfo.getName(), status.name());
     	} catch (DlabException e) {
-    		LOGGER.warn("Check the status of the user key for {} fails", userInfo.getName(), e);
-    		status = Status.INTERNAL_SERVER_ERROR;
+    		LOGGER.warn("Check the status of the user key for {} fails: ", userInfo.getName(), e.getLocalizedMessage(), e);
+    		status = KeyLoadStatus.ERROR;
     	}
-		return Response.status(status).build();
+		return Response.status(status.getHttpStatus()).build();
     }
 
     /** Uploads the user key to server. Stores the user key to database and calls the post method
