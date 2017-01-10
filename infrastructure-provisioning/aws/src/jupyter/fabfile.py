@@ -66,6 +66,7 @@ def run():
     if edge_status != 'running':
         logging.info('ERROR: Edge node is unavailable! Aborting...')
         print 'ERROR: Edge node is unavailable! Aborting...'
+        put_resource_status('edge', 'Unavailable')
         sys.exit(1)
     print 'Generating infrastructure names and tags'
     notebook_config = dict()
