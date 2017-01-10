@@ -96,11 +96,11 @@ def create_aws_config_files(generate_full_config=False):
         return False
 
 
-def put_resource_status(resource, status):
+def put_resource_status(resource, status, instance):
     env['connection_attempts'] = 100
     keyfile = "/root/keys/" + os.environ['creds_key_name'] + ".pem"
     hostname = get_instance_hostname(os.environ['conf_service_base_name'] + '-ssn')
     env.key_filename = [keyfile]
     env.host_string = 'ubuntu@' + hostname
-    sudo('python ' + os.environ['ssn_dlab_path'] + 'tmp/resource_status.py --resource {} --status {}'.format(resource, status))
+    sudo('python ' + os.environ[instance + '_dlab_path'] + 'tmp/resource_status.py --resource {} --status {}'.format(resource, status))
 
