@@ -69,15 +69,31 @@ function terminateDlab(){
     docker.epmc-bdcc.projects.epam.com/dlab-aws-ssn --action "$Action"
 }
 
-if [ "$Action" = "create" ]; then
-  if buildFrontend; then echo "Front-end build was successfull, moving to next step!"; else exit 1; fi
-  if buildServices; then echo "Services build was successfull, moving to next step!"; else exit 1; fi
-  if buildDockers; then echo "Docker images build was successfull, moving to next step!"; else exit 1; fi
-  deployDlab
+case "$Action" in
 
-elif [ "$Action" = "terminate" ]; then
-  terminateDlab
+  build)
+    if buildFrontend; then echo "Front-end build was successfull, moving to next step!"; else exit 1; fi
+    if buildServices; then echo "Services build was successfull, moving to next step!"; else exit 1; fi
+    if buildDockers; then echo "Docker images build was successfull, moving to next step!"; else exit 1; fi
+    ;;
 
-else
-  echo "Wrong action parameter! Valid parameters are: \"create\" and \"terminate\""
-fi
+  deploy)
+    if deployDlab; then echo "Dlab deploy was successfull, moving to next step!"; else exit 1; fi
+    ;;
+
+  create)
+    if buildFrontend; then echo "Front-end build was successfull, moving to next step!"; else exit 1; fi
+    if buildServices; then echo "Services build was successfull, moving to next step!"; else exit 1; fi
+    if buildDockers; then echo "Docker images build was successfull, moving to next step!"; else exit 1; fi
+    if deployDlab; then echo "Dlab deploy was successfull, moving to next step!"; else exit 1; fi
+    ;;
+
+  terminate)
+    terminateDlab
+    ;;
+
+  *)
+    echo "Wrong action parameter! Valid parameters are: \"build\",\"deploy\",\"create\",\"terminate\""
+    ;;
+
+esac
