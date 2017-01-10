@@ -29,6 +29,8 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     private String user;
     @JsonProperty("exploratory_name")
     private String exploratoryName;
+    @JsonProperty("exploratory_template_name")
+    private String exploratoryTemplateName;
     @JsonProperty
     private String status;
     @JsonProperty("up_time")
@@ -60,6 +62,20 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @SuppressWarnings("unchecked")
     public T withExploratoryName(String exploratoryName) {
         setExploratoryName(exploratoryName);
+        return (T) this;
+    }
+
+    public String getExploratoryTemplateName() {
+        return exploratoryTemplateName;
+    }
+
+    public void setExploratoryTemplateName(String exploratoryTemplateName) {
+        this.exploratoryTemplateName = exploratoryTemplateName;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withExploratoryTemplateName(String exploratoryTemplateName) {
+        setExploratoryTemplateName(exploratoryTemplateName);
         return (T) this;
     }
 
