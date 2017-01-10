@@ -19,21 +19,42 @@
 # ******************************************************************************
 
 from fabric.api import *
+from fabric.contrib.files import exists
 import argparse
 import json
-from dlab.fab import *
 import sys
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
+parser.add_argument('--instance_name', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
-parser.add_argument('--apt_packages', type=str, default='linux-headers-generic python-pip python-dev groff vim less git wget sysv-rc-conf libssl-dev unattended-upgrades')
-parser.add_argument('--pip_packages', type=str, default='boto3 argparse fabric jupyter awscli')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
 
+def enable_proxy(proxy_host, proxy_port):
+    if not exists('/tmp/proxy_enabled'):
+        try:
+            proxy_string = "http://%s:%s" % (proxy_host, proxy_port)
+            sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
+            sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
+            sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
+            sudo('touch /tmp/proxy_enabled ')
+        except:
+            sys.exit(1)
+
+
+def renew_gpg_key():
+    try:
+        sudo('mv /etc/apt/trusted.gpg /etc/apt/trusted.bkp')
+        sudo('apt-key update')
+    except:
+        sys.exit(1)
+
+
+##############
+# Run script #
+##############
 if __name__ == "__main__":
     print "Configure connections"
     env['connection_attempts'] = 100
@@ -41,13 +62,8 @@ if __name__ == "__main__":
     env.host_string = 'ubuntu@' + args.hostname
     deeper_config = json.loads(args.additional_config)
 
-    print "Updating repositories and installing requested tools: " + args.apt_packages
-    if not ensure_apt(args.apt_packages):
-        sys.exit(1)
+    print "Enabling proxy for notebook server for repositories access."
+    enable_proxy(deeper_config['proxy_host'], deeper_config['proxy_port'])
 
-    print "Installing python packages: " + args.pip_packages
-    if not ensure_pip(args.pip_packages):
-        sys.exit(1)
-
-    sys.exit(0)
-
+    print "Renewing gpg key"
+    renew_gpg_key()
