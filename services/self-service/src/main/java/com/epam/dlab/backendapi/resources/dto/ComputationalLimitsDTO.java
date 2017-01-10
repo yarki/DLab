@@ -16,31 +16,31 @@ limitations under the License.
 
 ****************************************************************************/
 
-package com.epam.dlab.backendapi;
+package com.epam.dlab.backendapi.resources.dto;
 
-import com.epam.dlab.ServiceConfiguration;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.Valid;
-
-public class SelfServiceApplicationConfiguration extends ServiceConfiguration {
-
-    @Valid
-    @JsonProperty
-    private boolean mocked;
-    
-    @Valid
-    @JsonProperty
+/** Stores limits for creation of the computational resources.
+ */
+public class ComputationalLimitsDTO {
+    @NotBlank
+    @JsonProperty("max_emr_instance_count")
     private int maxEmrInstanceCount;
 
-
-    public boolean isMocked() {
-        return mocked;
-    }
-    
     /** Returns the maximum number of slave EMR instances than could be created. */
     public int getMaxEmrInstanceCount() {
     	return maxEmrInstanceCount;
     }
     
+    /** Sets the maximum number of EMR instances than could be created. */
+    public void setMaxEmrInstanceCount(int maxEmrInstanceCount) {
+    	this.maxEmrInstanceCount = maxEmrInstanceCount;
+    }
+    
+    /** Sets the maximum number of EMR instances than could be created. */
+    public ComputationalLimitsDTO withMaxEmrInstanceCount(int maxEmrInstanceCount) {
+    	this.maxEmrInstanceCount = maxEmrInstanceCount;
+    	return this;
+    }
 }

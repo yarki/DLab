@@ -20,11 +20,13 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.backendapi.resources.dto.ComputationalCreateFormDTO;
+import com.epam.dlab.backendapi.resources.dto.ComputationalLimitsDTO;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
@@ -60,10 +62,29 @@ public class ComputationalResource implements ComputationalAPI {
     @Inject
     @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
+    @Inject
+    private SelfServiceApplicationConfiguration configuration;
 
+
+    /** Returns the limits for creation the computational resources.
+     * @param userInfo user info.
+     */
+    @GET
+    @Path("/limits")
+    public ComputationalLimitsDTO getLimits(@Auth UserInfo userInfo) {
+    	return new ComputationalLimitsDTO()
+    			.withMaxEmrInstanceCount(configuration.getMaxEmrInstanceCount());
+    }
+    
     @PUT
-    public Response create(@Auth UserInfo userInfo, @Valid @NotNull ComputationalCreateFormDTO formDTO) {
+    public Response create(@Auth UserInfo userInfo, @Valid @NotNull ComputationalCreateFormDTO formDTO) throws DlabException {
         LOGGER.debug("creating computational resource {} for user {}", formDTO.getName(), userInfo.getName());
+        if (Integer.parseInt(formDTO.getInstanceCount()) > configuration.getMaxEmrInstanceCount()) {
+            LOGGER.warn("Creating computational resource {} for user {} fail: Limit exceeded to creation slave instances. Maximum is {}",
+            		formDTO.getName(), userInfo.getName(), configuration.getMaxEmrInstanceCount());
+            throw new DlabException("Limit exceeded to creation slave instances. Maximum is " + configuration.getMaxEmrInstanceCount() + ".");
+        }
+        
         boolean isAdded = infrastructureProvisionDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
                         .withComputationalName(formDTO.getName())
