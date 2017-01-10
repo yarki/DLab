@@ -119,7 +119,7 @@ export class ResourcesGrid implements OnInit {
     this.filteredEnvironments = filteredData;
   }
 
-  hideIneffectual(): void {
+  showActiveInstances(): void {
     let filteredData = (<any>Object).assign({}, this.filterConfiguration);
 
     for (let index in filteredData) {

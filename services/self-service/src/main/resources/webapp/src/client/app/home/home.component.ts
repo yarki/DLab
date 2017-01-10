@@ -67,11 +67,13 @@ export class HomeComponent implements OnInit {
   public refreshGrid(): void {
     this.resourcesGrid.buildGrid();
   }
-  public hideIneffectual(): void {
-    this.resourcesGrid.hideIneffectual();
-  }
-  public showAllEnvironments(): void {
-    this.resourcesGrid.resetFilterConfigurations();
+
+  public toggleFiltering(): void {
+    if (this.resourcesGrid.activeFiltering) {
+      this.resourcesGrid.resetFilterConfigurations();
+    } else {
+      this.resourcesGrid.showActiveInstances();
+    }
   }
 
   private checkInfrastructureCreationProgress() {
