@@ -73,6 +73,8 @@ def configure_mongo():
             sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
         local('scp -i {} /root/templates/instance_shapes.lst {}:/tmp/instance_shapes.lst'.format(args.keyfile, env.host_string))
         sudo('mv /tmp/instance_shapes.lst ' + os.environ['ssn_dlab_path'] + 'tmp/')
+        local('scp -i {} /root/scripts/resource_status.py {}:/tmp/resource_status.py'.format(args.keyfile, env.host_string))
+        sudo('mv /tmp/resource_status.py ' + os.environ['ssn_dlab_path'] + 'tmp/')
         local('scp -i {} /root/scripts/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
         sudo('mv /tmp/configure_mongo.py ' + os.environ['ssn_dlab_path'] + 'tmp/')
         sudo('python ' + os.environ['ssn_dlab_path'] + 'tmp/configure_mongo.py --region {} --base_name {} --sg "{}" --vpc {} --subnet {}'.format(os.environ['creds_region'], os.environ['conf_service_base_name'], os.environ['creds_security_groups_ids'].replace(" ", ""), os.environ['creds_vpc_id'], os.environ['creds_subnet_id']))

@@ -20,8 +20,6 @@ from fabric.api import *
 from fabric.contrib.files import exists
 import logging
 import os
-from pymongo import MongoClient
-import yaml
 
 
 class RoutineException(Exception):
@@ -96,22 +94,11 @@ def create_aws_config_files(generate_full_config=False):
         return False
 
 
-def read_yml_conf(path, section, param):
-    try:
-        with open(path, 'r') as config_yml:
-            config = yaml.load(config_yml)
-        result = config[section][param]
-        return result
-    except:
-        print "File does not exist"
-        return ''
-
-
 def put_resource_status(resource, status):
-    path = "/etc/mongod.conf"
-    outfile = "/etc/mongo_params.yml"
-    mongo_ip = read_yml_conf(path, 'net', 'bindIp')
-    mongo_port = read_yml_conf(path, 'net', 'port')
-    client = MongoClient(mongo_ip + ':' + str(mongo_port))
-    client.dlabdb.statuses.save({"_id": resource, "value": status})
+    env['connection_attempts'] = 100
+    keyfile = "/root/keys/" + os.environ['creds_key_name'] + ".pem"
+    hostname = get_instance_hostname(os.environ['conf_service_base_name'] + '-ssn')
+    env.key_filename = [keyfile]
+    env.host_string = 'ubuntu@' + hostname
+    sudo('python ' + os.environ['ssn_dlab_path'] + 'tmp/resource_status.py --resource {} --status {}'.format(resource, status))
 
