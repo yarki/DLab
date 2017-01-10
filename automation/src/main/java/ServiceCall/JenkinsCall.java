@@ -91,23 +91,24 @@ public class JenkinsCall {
     }
 
     public String getBuildNumber() throws Exception {
-        String builName = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config).
+    	String buildName = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config).
             contentType("application/x-www-form-urlencoded").
             when(). 
             get("lastBuild").getBody().htmlPath().getString("html.head.title");
         
-        Pattern pattern = Pattern.compile("\\d+(?!\\d+)");      
-        Matcher matcher = pattern.matcher(builName);
+        Pattern pattern = Pattern.compile("\\s#\\d+(?!\\d+)\\s");      
+        Matcher matcher = pattern.matcher(buildName);
         if(matcher.find()) {
-            buildNumber = matcher.group();         
+            buildNumber = matcher.group().substring(2).trim();         
         }
         else throw new Exception("Jenkins job was failed. There is no buildNumber");
+        System.out.println("Jenkins build number is " + buildNumber);
         return buildNumber;
     }
     
     public String getBuildResult() throws Exception {
         //wait until job return build result     
-        do{            
+        do{
             buildResult = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config).
                 contentType(ContentType.JSON).
                 when(). 

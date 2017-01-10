@@ -23,9 +23,6 @@ public class PropertyValue {
 	private static final String ACCESS_KEY_PRIV_FILE_NAME="ACCESS_KEY_PRIV_FILE_NAME";
 	private static final String ACCESS_KEY_PUB_FILE_NAME="ACCESS_KEY_PUB_FILE_NAME";
     
-	public static final String TEST_BEFORE_SLEEP_SECONDS="TEST_BEFORE_SLEEP_SECONDS";
-	public static final String TEST_AFTER_SLEEP_SECONDS="TEST_AFTER_SLEEP_SECONDS";
-	
 	public static final String TIMEOUT_JENKINS_AUTOTEST="TIMEOUT_JENKINS_AUTOTEST";
 	public static final String TIMEOUT_SSN_CREATE="TIMEOUT_SSN_CREATE";
 	public static final String TIMEOUT_UPLOAD_KEY="TIMEOUT_UPLOAD_KEY";
@@ -89,9 +86,6 @@ public class PropertyValue {
         printProperty(PASSWORD_FOR_ACTIVATE_KEY);
         printProperty(ACCESS_KEY_PRIV_FILE_NAME);
         printProperty(ACCESS_KEY_PUB_FILE_NAME);
-        
-        printProperty(TEST_BEFORE_SLEEP_SECONDS);
-        printProperty(TEST_AFTER_SLEEP_SECONDS);
         
         printProperty(TIMEOUT_JENKINS_AUTOTEST);
         printProperty(TIMEOUT_SSN_CREATE);

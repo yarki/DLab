@@ -43,19 +43,9 @@ public class TestServices {
     
     @AfterClass
     public static void Cleanup() throws InterruptedException {
-        //sleep(PropertyValue.TEST_AFTER_SLEEP_SECONDS);
     }
     
     
-    private static void sleep(String propertyName) throws InterruptedException {
-    	int timeout = PropertyValue.get(propertyName, 0);
-    	if (timeout > 0) {
-    		logger.info("Waiting for timeout " + timeout + " seconds.");
-    		Thread.sleep(timeout * 1000);
-    		logger.info("Timeout is completed.");
-    	}
-    }
-
     public String getSnnURL(String path) {
     	return ssnURL + path;
     }
@@ -204,8 +194,8 @@ public class TestServices {
     public void testDLabScenario() throws Exception {
 
     	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
-        //serviceBaseName = "AutoTest201612284146";
-        //publicIp = "35.162.89.115";
+        //serviceBaseName = "usein1012-1";
+        //publicIp = "35.167.85.223";
 
         String gettingStatus;
         String noteBookName = "Notebook" + HelperMethods.generateRandomValue();
@@ -224,7 +214,7 @@ public class TestServices {
         String token = responseTestUser.getBody().asString();
 
         Response respUploadKey = new HttpRequest().webApiPost(ssnUploadKeyURL, ContentType.FORMDATA, token);
-        System.out.println("   respUploadKey.getBody() is " + respUploadKey.getBody().toString());
+        System.out.println("   respUploadKey.getBody() is " + respUploadKey.getBody().asString());
 
         Assert.assertEquals(respUploadKey.statusCode(), HttpStatusCode.OK, "Upload key is not correct");
         int responseCodeAccessKey = waitWhileStatus(ssnUploadKeyURL, token, HttpStatusCode.Accepted, PropertyValue.getTimeoutUploadKey());
@@ -273,7 +263,7 @@ public class TestServices {
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
                                                                     deployEMR, token);
-        System.out.println("   responseDeployingEMR.getBody() is " + responseDeployingEMR.getBody().toString());
+        System.out.println("   responseDeployingEMR.getBody() is " + responseDeployingEMR.getBody().asString());
         Assert.assertEquals(responseDeployingEMR.statusCode(), HttpStatusCode.OK);
 
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
@@ -291,7 +281,7 @@ public class TestServices {
 
         Response responseStopNotebook = new HttpRequest().webApiDelete(ssnStopNotebookURL,
                                                                        ContentType.JSON, token);
-        System.out.println("   responseStopNotebook.getBody() is " + responseStopNotebook.getBody().toString());
+        System.out.println("   responseStopNotebook.getBody() is " + responseStopNotebook.getBody().asString());
         Assert.assertEquals(responseStopNotebook.statusCode(), HttpStatusCode.OK);
         
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "stopping", PropertyValue.getTimeoutNotebookShutdown());
@@ -311,7 +301,7 @@ public class TestServices {
         String myJs = "{\"notebook_instance_name\":\"" + noteBookName + "\"}";
         Response respStartNotebook = new HttpRequest().webApiPost(ssnExpEnvURL, ContentType.JSON,
                                                                   myJs, token);
-        System.out.println("    respStartNotebook.getBody() is " + respStartNotebook.getBody().toString());
+        System.out.println("    respStartNotebook.getBody() is " + respStartNotebook.getBody().asString());
         Assert.assertEquals(respStartNotebook.statusCode(), HttpStatusCode.OK);
         
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "starting", PropertyValue.getTimeoutNotebookStartup());
@@ -333,7 +323,7 @@ public class TestServices {
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMRNew = new HttpRequest().webApiPut(ssnCompResURL,
                                                                        ContentType.JSON, deployEMR, token);
-        System.out.println("    responseDeployingEMRNew.getBody() is " + responseDeployingEMRNew.getBody().toString());
+        System.out.println("    responseDeployingEMRNew.getBody() is " + responseDeployingEMRNew.getBody().asString());
         Assert.assertEquals(responseDeployingEMRNew.statusCode(), HttpStatusCode.OK);
         
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
@@ -347,7 +337,7 @@ public class TestServices {
         
         Response respTerminateEMR = new HttpRequest().webApiDelete(ssnTerminateEMRURL,
                                                                    ContentType.JSON, token);
-        System.out.println("    respTerminateEMR.getBody() is " + respTerminateEMR.getBody().toString());
+        System.out.println("    respTerminateEMR.getBody() is " + respTerminateEMR.getBody().asString());
         Assert.assertEquals(respTerminateEMR.statusCode(), HttpStatusCode.OK);
         
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "terminating", PropertyValue.getTimeoutEMRTerminate());
@@ -375,7 +365,7 @@ public class TestServices {
         Response responseDeployingEMRAnotherNew = new HttpRequest().webApiPut(ssnCompResURL,
                                                                               ContentType.JSON, deployEMR,
                                                                               token);
-        System.out.println("    responseDeployingEMRAnotherNew.getBody() is " + responseDeployingEMRAnotherNew.getBody().toString());
+        System.out.println("    responseDeployingEMRAnotherNew.getBody() is " + responseDeployingEMRAnotherNew.getBody().asString());
         Assert.assertEquals(responseDeployingEMRAnotherNew.statusCode(), HttpStatusCode.OK);
         
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
@@ -385,7 +375,7 @@ public class TestServices {
 
         // terminate notebook
         Response respTerminateNotebook = new HttpRequest().webApiDelete(ssnTerminateNotebookURL, ContentType.JSON, token);
-        System.out.println("    respTerminateNotebook.getBody() is " + respTerminateNotebook.getBody().toString());
+        System.out.println("    respTerminateNotebook.getBody() is " + respTerminateNotebook.getBody().asString());
         Assert.assertEquals(respTerminateNotebook.statusCode(), HttpStatusCode.OK);
         
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "terminating",
