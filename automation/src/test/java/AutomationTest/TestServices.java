@@ -219,7 +219,7 @@ public class TestServices {
         System.out.println("   SSN computational resources URL is " + ssnCompResURL);
         
         DeployEMRDto deployEMR = new DeployEMRDto();
-        deployEMR.setEmr_instance_count("1");
+        deployEMR.setEmr_instance_count("3");
         deployEMR.setEmr_master_instance_type("m4.large");
         deployEMR.setEmr_slave_instance_type("m4.large");
         deployEMR.setEmr_version("emr-4.3.0");
@@ -360,60 +360,58 @@ public class TestServices {
         Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_terminate_exploratory_NotebookAutoTestt", publicIp);
     }
 
+    private static void copyFileToSSN(String filename, String ip) throws IOException, InterruptedException {
+        String sourceDir = "/var/lib/jenkins/AutoTestData";
+        String copyToSSNCommand = "scp -i %s -o 'StrictHostKeyChecking no' %s ubuntu@%s:~/";
+
+        System.out.println(String.format("Copying %s...", filename));
+        String command = String.format(copyToSSNCommand,
+        		PropertyValue.getAccessKeyPrivFileName(),
+                Paths.get(sourceDir, filename).toString(),
+                ip);
+        AckStatus status = HelperMethods.executeCommand(command);
+        System.out.println(String.format("Copied %s: %s", filename, status.toString()));
+        Assert.assertTrue(status.isOk());
+    }
+    
+    private static void copyFileToNotebook(Session session, String filename, String ip) throws JSchException, IOException, InterruptedException {
+    	String copyToNotebookCommand = "scp -i %s -o 'StrictHostKeyChecking no' ~/%s ubuntu@%s:/tmp/";
+    	String command = String.format(copyToNotebookCommand,
+    			PropertyValue.getAccessKeyPrivFileNameSSN(),
+                filename,
+                ip);
+        
+        System.out.println(String.format("Copying %s...", filename));
+        ChannelExec copyResult = SSHConnect.setCommand(session, command);
+        AckStatus status = SSHConnect.checkAck(copyResult);
+        System.out.println(String.format("Copied %s: %s", filename, status.toString()));
+        Assert.assertTrue(status.isOk());
+    }
+    
     private static void testPython(String ssnIP, String noteBookIp, String serviceBaseName, String emrName)
             throws JSchException, IOException, InterruptedException {
 
-        String sourceDir = "/var/lib/jenkins/AutoTestData";
-        String csvFilename = "train.csv";
-        String pyFilename = "pyspark_test.py";
-        String copyToSSNCommand = "scp -i %s -o 'StrictHostKeyChecking no' %s ubuntu@%s:~/";
-        String copyToNotebookCommand = "scp -i %s -o 'StrictHostKeyChecking no' ~/%s ubuntu@%s:/tmp/";
+    	String [] files = {
+    			"train.csv",
+    			"pyspark_test.py",
+    			"tests.ipynb"
+    			};
+    	String pyFilename = "pyspark_test.py";
 
         System.out.println("Copying files to SSN...");
-        String pathToKey = PropertyValue.getAccessKeyPrivFileName();
-
-        System.out.println(String.format("Copying %s...", csvFilename));
-        String command = String.format(copyToSSNCommand,
-                pathToKey,
-                Paths.get(sourceDir, csvFilename).toString(),
-                ssnIP);
-        AckStatus status = HelperMethods.executeCommand(command);
-        System.out.println(String.format("Copied %s: %s", csvFilename, status.toString()));
-        Assert.assertTrue(status.isOk());
-
-        System.out.println(String.format("Copying %s...", pyFilename));
-        command = String.format(copyToSSNCommand,
-                pathToKey,
-                Paths.get(sourceDir, pyFilename).toString(),
-                ssnIP);
-        status = HelperMethods.executeCommand(command);
-        System.out.println(String.format("Copied %s: %s", pyFilename, status.toString()));
-        Assert.assertTrue(status.isOk());
-
+        for (String filename : files) {
+            copyFileToSSN(filename, ssnIP);
+		}
+        
         System.out.println(String.format("Copying files to Notebook %s...", noteBookIp));
         Session ssnSession = SSHConnect.getConnect("ubuntu", ssnIP, 22);
 
+        String command;
+        AckStatus status;
         try {
-            String pathToKeySSN = PropertyValue.getAccessKeyPrivFileNameSSN();
-            System.out.println(String.format("Copying %s...", csvFilename));
-            command = String.format(copyToNotebookCommand,
-                    pathToKeySSN,
-                    csvFilename,
-                    noteBookIp);
-            ChannelExec copyResult = SSHConnect.setCommand(ssnSession, command);
-            status = SSHConnect.checkAck(copyResult);
-            System.out.println(String.format("Copied %s: %s", csvFilename, status.toString()));
-            Assert.assertTrue(status.isOk());
-
-            System.out.println(String.format("Copying %s...", pyFilename));
-            command = String.format(copyToNotebookCommand,
-                    pathToKeySSN,
-                    pyFilename,
-                    noteBookIp);
-            copyResult = SSHConnect.setCommand(ssnSession, command);
-            status = SSHConnect.checkAck(copyResult);
-            System.out.println(String.format("Copied %s: %s", pyFilename, status.toString()));
-            Assert.assertTrue(status.isOk());
+            for (String filename : files) {
+            	copyFileToNotebook(ssnSession, filename, noteBookIp);
+    		}
 
             System.out.println(String.format("Port forwarding to notebook %s...", noteBookIp));
             int assignedPort = ssnSession.setPortForwardingL(0, noteBookIp, 22);
