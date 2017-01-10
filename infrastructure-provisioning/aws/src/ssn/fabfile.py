@@ -279,7 +279,7 @@ def run():
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         params = "--hostname %s --keyfile %s " \
-                 "--pip_packages 'boto3 argparse fabric jupyter awscli'" % \
+                 "--pip_packages 'boto3 argparse fabric jupyter awscli pymongo'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
         if not run_routine('install_prerequisites', params):
@@ -338,7 +338,8 @@ def run():
                              {"name": "jupyter", "tag": "latest"},
                              {"name": "rstudio", "tag": "latest"},
                              {"name": "edge", "tag": "latest"},
-                             {"name": "emr", "tag": "latest"}, ]
+                             {"name": "emr", "tag": "latest"},
+                             {"name": "zeppelin", "tag": "latest"}, ]
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
 

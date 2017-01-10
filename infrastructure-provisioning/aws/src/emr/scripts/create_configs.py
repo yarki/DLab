@@ -263,6 +263,37 @@ def configure_rstudio():
         except:
             sys.exit(1)
 
+def configure_zeppelin_emr_interpreter(args):
+    try:
+        spark_libs = "/opt/" + args.emr_version + "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-core*.jar /opt/" + args.emr_version + "/jars/usr/lib/hadoop/hadoop-aws*.jar /opt/" + args.emr_version + "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-s3-*.jar /opt/" + args.emr_version + "/jars/usr/lib/hadoop-lzo/lib/hadoop-lzo-*.jar"
+        local('echo \"Configuring emr path for Zeppelin\"')
+        local('sed -i \"/^# export SPARK_HOME/c\export SPARK_HOME\" /opt/zeppelin/conf/zeppelin-env.sh')
+        local('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/' + args.emr_version + '\/' +  args.cluster_name + '\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
+        local('sed -i \"s/^export HADOOP_CONF_DIR.*/export HADOOP_CONF_DIR=\/opt\/' + args.emr_version + '\/' +  args.cluster_name + '\/conf/\" /opt/' + args.emr_version + '/' +  args.cluster_name + '/spark/conf/spark-env.sh')
+        local('echo \"spark.jars $(ls ' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/' + args.emr_version + '/' +  args.cluster_name + '/spark/conf/spark-defaults.conf')
+        local('echo \"spark.executorEnv.PYTHONPATH pyspark.zip:py4j-src.zip\" >> /opt/' + args.emr_version + '/' +  args.cluster_name + '/spark/conf/spark-defaults.conf')
+        local('sed -i \'/spark.yarn.dist.files/s/$/,file:\/opt\/' + args.emr_version + '\/' +  args.cluster_name + '\/spark\/python\/lib\/py4j-src.zip,file:\/opt\/' + args.emr_version + '\/' +  args.cluster_name + '\/spark\/python\/lib\/pyspark.zip/\' /opt/' + args.emr_version + '/' +  args.cluster_name + '/spark/conf/spark-defaults.conf')
+        local('service zeppelin-notebook restart')
+        local('sleep 5')
+    except:
+            sys.exit(1)
+    if not os.path.exists('/home/ubuntu/.ensure_dir/emr_interpreter_ensured'):
+        try:
+            local('echo \"Configuring emr spark interpreter for Zeppelin\"')
+            template_file = "/tmp/emr_spark_interpreter.json"
+            fr = open(template_file, 'r+')
+            text = fr.read()
+            text = text.replace('CLUSTERNAME', args.cluster_name)
+            text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
+            text = text.replace('EMRVERSION', args.emr_version)
+            fw = open(template_file, 'w')
+            fw.write(text)
+            fw.close()
+            local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d @/tmp/emr_spark_interpreter.json http://localhost:8080/api/interpreter/setting")
+            local('touch /home/ubuntu/.ensure_dir/emr_interpreter_ensured')
+        except:
+            sys.exit(1)
+
 
 def installing_python(args):
     s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
@@ -307,3 +338,5 @@ if __name__ == "__main__":
         configuring_notebook(args)
         if os.path.exists('/home/ubuntu/.ensure_dir/rstudio_ensured'):
             configure_rstudio()
+        if os.path.exists('/home/ubuntu/.ensure_dir/zeppelin_ensured'):
+            configure_zeppelin_emr_interpreter(args)
