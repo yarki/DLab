@@ -1,4 +1,4 @@
-<!---------------------------------------------------------------------------
+<!------------------------------------------------------------------------------------------------------------
 
 Copyright (c) 2016, EPAM SYSTEMS INC
 
@@ -14,33 +14,44 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-------------------------------------------------------------------------- -->
+----------------------------------------------------------------------------------------------------------- -->
 
-<modal #bindDialog  modalClass="detail-dialog modal-sm header-white">
+<modal-dialog #bindDialog  modalClass="detail-dialog modal-sm header-white">
   <modal-header></modal-header>
   <modal-content>
     <div *ngIf="notebook">
       <div class="detail-header-wrap">
         <table class="detail-header">
           <tr>
-            <td class="modal-title">{{notebook.name}}</td>
-            <td class="success_color">{{notebook.status}}</td>
+            <td class="tooltip-wrap" (mouseover)="isEllipsisActive($event)">
+              <div class="hint-title">{{notebook.name}}</div>
+              <div class="tooltip" [style.visibility]="tooltip ? 'visible': 'hidden'">{{notebook.name}}</div>
+            </td>
+              <td>
+                <span class="status"ngClass="{{notebook.status || ''}}">
+                  {{notebook.status}}
+                </span>
+              </td>
             <td>{{notebook.shape}}</td>
           </tr>
         </table>
       </div>
       <div class="row">
-        <div class="col-xs-12">
-          <p>Up time 18 hours since Mon 12:00 EST, Sept 5, 2016</p>
-          <p>Open in your browser  <a href="http://10.0.15.1:8080">http://10.0.15.1:8080</a> to access this box after creating a tunnel.</p>
+        <div class="col-xs-12 detail-info">
+          <p>Edge Node IP Address {{notebook.ip}}</p>
+          <p>Up time {{upTimeInHours}} hour(s) since {{upTimeSince || "not specified."}}</p>
+          <p>Open in your browser  <a href="{{notebook.url}}" target="_blank">{{notebook.url}}</a> to access this box after creating a tunnel.</p>
+          <p *ngIf="notebook.username">Node User: <strong>{{notebook.username}}</strong></p>
+          <p *ngIf="notebook.password">Password: <strong>{{notebook.password}}</strong></p>
+          <p *ngIf="notebook.bucket_name">Data Bucket: <strong>{{notebook.bucket_name}}</strong></p>
           <br/>
           <p>
-            <a href="#">
-              <small><span class="glyphicon glyphicon-question-sign"></span>Read instruction how to create the tunnel</small>
+            <a href="#/help/accessnotebookguide" target="_blank">
+              <small class="helper_instruction">Read instruction how to create the tunnel</small>
             </a>
           </p>
         </div>
       </div>
     </div>
   </modal-content>
-</modal>
+</modal-dialog>

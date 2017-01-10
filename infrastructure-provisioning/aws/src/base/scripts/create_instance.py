@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# ***************************************************************************
+# *****************************************************************************
 #
 # Copyright (c) 2016, EPAM SYSTEMS INC
 #
@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# ***************************************************************************
+# ******************************************************************************
 
 import argparse
 import json
@@ -36,6 +36,8 @@ parser.add_argument('--iam_profile', type=str, default='')
 parser.add_argument('--infra_tag_name', type=str, default='')
 parser.add_argument('--infra_tag_value', type=str, default='')
 parser.add_argument('--user_data_file', type=str, default='')
+parser.add_argument('--instance_class', type=str, default='')
+parser.add_argument('--instance_disk_size', type=str, default='')
 args = parser.parse_args()
 
 

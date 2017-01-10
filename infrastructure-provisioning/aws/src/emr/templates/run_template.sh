@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# ***************************************************************************
+# *****************************************************************************
 #
 # Copyright (c) 2016, EPAM SYSTEMS INC
 #
@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# ***************************************************************************
+# ******************************************************************************
 
 PROG_HOME="/home/ubuntu/.local/share/jupyter/kernels/toree_CLUSTER/"
 

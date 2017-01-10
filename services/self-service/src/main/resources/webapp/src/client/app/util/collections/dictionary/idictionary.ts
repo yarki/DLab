@@ -16,8 +16,6 @@ limitations under the License.
 
 ****************************************************************************/
 
-
-
 export interface IDictionary <T> {
   Add(key: string, value: T);
   ContainsKey(key: string): boolean;

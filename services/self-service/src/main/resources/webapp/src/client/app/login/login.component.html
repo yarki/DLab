@@ -1,4 +1,5 @@
-<!---------------------------------------------------------------------------
+
+<!------------------------------------------------------------------------------------------------------------
 
 Copyright (c) 2016, EPAM SYSTEMS INC
 
@@ -14,7 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-------------------------------------------------------------------------- -->
+----------------------------------------------------------------------------------------------------------- -->
 
 <div class="login_page">
   <div class="content">
@@ -26,7 +27,7 @@ limitations under the License.
         <span class="input-group-addon" id="sizing-addon2">
             <span class="login-icon icon-username"></span>
         </span>
-        <input type="text" class="form-control" name="username" [(ngModel)]="model.username" (pattern)="userPattern" #username="ngModel" required placeholder="Username" />
+        <input type="text" class="form-control" name="username" [(ngModel)]="model.username" [pattern]="userPattern" #username="ngModel" placeholder="Username" />
       </div>
       <div class="input-group">
           <span class="input-group-addon" id="sizing-addon2">

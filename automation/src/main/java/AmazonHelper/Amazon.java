@@ -1,9 +1,6 @@
 package AmazonHelper;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -13,10 +10,6 @@ import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Filter;
-import com.amazonaws.services.ec2.model.InstanceState;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-
 import org.testng.Assert;
 
 public class Amazon {
@@ -44,13 +37,21 @@ public class Amazon {
         
         System.out.println("Check status of SSN node " + instanceName + " on Amazon:");
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(instanceName);
-        InstanceState instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0).getState();
+        String instanceState;
+        
+        Assert.assertEquals(describeInstanceResult.getReservations().size(), 1, "Instance in Amazon not found");
         
         do {
-            instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0).getState();
+            instanceState = describeInstanceResult
+            	.getReservations()
+            	.get(0)
+            	.getInstances()
+            	.get(0)
+            	.getState()
+            	.getName();
         } while (instanceState.equals("shutting-down"));
         
-        Assert.assertEquals(instanceState.getName(), expAmazonState, "Amazon instance state is not correct");
-        System.out.println("Amazon instance " + instanceName + " state is " + expAmazonState);           
+        Assert.assertEquals(instanceState, expAmazonState, "Amazon instance state is not correct");
+        System.out.println("Amazon instance state is " + expAmazonState);           
     }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
@@ -11,13 +12,17 @@ import org.testng.Assert;
 
 public class Docker {
     
-    public static void checkDockerStatus(String dockerImageName, String publicIP) throws IOException, JSchException{
+    public static void checkDockerStatus(String dockerImageName, String publicIP)
+            throws IOException, JSchException, InterruptedException {
         
         System.out.println("Check status of instanse on Docker:");
         
-        Session session = SSHConnect.getConnect("ubuntu", publicIP, 22);            
-        InputStream in = SSHConnect.setCommand(session, Command.GET_CONTAINERS);    
+        Session session = SSHConnect.getConnect("ubuntu", publicIP, 22);
+        ChannelExec getResult = SSHConnect.setCommand(session, Command.GET_CONTAINERS);
+        InputStream in = getResult.getInputStream();
         List<DockerContainer> dockerContainerList = SSHConnect.getdockerContainerList(in);
+        AckStatus status = SSHConnect.checkAck(getResult);
+        Assert.assertTrue(status.isOk());
         
         DockerContainer dockerContainer = SSHConnect.getDockerContainer(dockerContainerList, dockerImageName);
 

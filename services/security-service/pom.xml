@@ -29,6 +29,13 @@
 			<artifactId>jackson-core</artifactId>
 			<version>2.7.6</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.7.6</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
@@ -39,7 +46,17 @@
 			<artifactId>mongo-java-driver</artifactId>
 			<version>${org.mongodb.version}</version>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-iam</artifactId>
+			<version>1.11.48</version>
+		</dependency>
+		<dependency>
+			<groupId>de.thomaskrille</groupId>
+			<artifactId>dropwizard-template-config</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+    </dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -58,7 +75,7 @@
 									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.epam.dlab.auth.ldap.SecurityServiceApplication</mainClass>
+									<mainClass>com.epam.dlab.auth.SecurityServiceApplication</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>

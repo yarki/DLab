@@ -90,11 +90,24 @@ public class JenkinsCall {
         return buildNumber;
     }
 
+    public String getLastJenkinsJob(String jenkinsJobURL) throws Exception {
+        RestAssured.baseURI = jenkinsJobURL;
+
+        getBuildNumber();
+        getBuildResult();
+        setJenkinsURLServiceBaseName();
+
+        return buildNumber;
+    }
+
     public String getBuildNumber() throws Exception {
-    	String buildName = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config).
-            contentType("application/x-www-form-urlencoded").
-            when(). 
-            get("lastBuild").getBody().htmlPath().getString("html.head.title");
+        String buildName = given()
+                .header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==")
+                .auth()
+                .form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config)
+                .contentType("application/x-www-form-urlencoded")
+                .when()
+                .get("lastBuild").getBody().htmlPath().getString("html.head.title");
         
         Pattern pattern = Pattern.compile("\\s#\\d+(?!\\d+)\\s");      
         Matcher matcher = pattern.matcher(buildName);

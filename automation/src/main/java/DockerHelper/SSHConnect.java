@@ -1,9 +1,6 @@
 package DockerHelper;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,8 +21,7 @@ import AutomationTest.PropertyValue;
 public class SSHConnect {
     
     public static Session getConnect(String username, String host, int port) throws JSchException {
-        Session session = null;
-        Channel channel = null;
+        Session session;
         JSch jsch = new JSch();
         Properties config = new Properties(); 
         config.put("StrictHostKeyChecking", "no");
@@ -34,20 +30,37 @@ public class SSHConnect {
         session = jsch.getSession(username, host, port);
         session.setConfig(config);
         session.connect();
-        channel = session.openChannel("sftp");
-        System.out.println("Getting connected");
-        channel.connect();
+
+        System.out.println(String.format("Getting connected to %s:%d", host, port));
+        return session;
+    }
+
+    public static Session getForwardedConnect(String username, String hostAlias, int port) throws JSchException {
+        Session session;
+        JSch jsch = new JSch();
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+
+        jsch.addIdentity(PropertyValue.getAccessKeyPrivFileName());
+        session = jsch.getSession(username, "127.0.0.1", port);
+        session.setConfig(config);
+        session.setHostKeyAlias(hostAlias);
+        session.connect();
+        System.out.println(String.format("Getting connected to %s through 127.0.0.1:%d", hostAlias, port));
         return session;
     }
     
-    public static InputStream setCommand(Session session, String command) throws JSchException, IOException {
+    public static ChannelExec setCommand(Session session, String command)
+            throws JSchException, IOException, InterruptedException {
+        System.out.println(String.format("Setting command: %s", command));
+
         ChannelExec channelExec = (ChannelExec)session.openChannel("exec");
-        InputStream in = channelExec.getInputStream();
         channelExec.setCommand(command);
         channelExec.connect();
-        return in;
+
+        return channelExec;
     }
-    
+
     public static List<DockerContainer> getdockerContainerList(InputStream in) throws JsonParseException, JsonMappingException, IOException{
         
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));         
@@ -85,6 +98,37 @@ public class SSHConnect {
          
         }
         return dockerContainer;
+    }
+
+    public static AckStatus checkAck(ChannelExec channel) throws IOException, InterruptedException {
+        InputStream in = channel.getInputStream();
+
+        int status;
+        while(channel.getExitStatus() == -1) {
+            Thread.sleep(1000);
+        }
+        status = channel.getExitStatus();
+
+        String message = "";
+
+        // b may be 0 for success,
+        //          1 for error,
+        //          2 for fatal error,
+        //          -1
+        if(status == 1 || status == 2){
+            StringBuffer sb=new StringBuffer();
+            int c;
+
+            do {
+                c=in.read();
+                sb.append((char)c);
+            }
+            while(c!='\n');
+
+            message = sb.toString();
+            System.out.println(message);
+        }
+        return new AckStatus(status, message);
     }
 
 }

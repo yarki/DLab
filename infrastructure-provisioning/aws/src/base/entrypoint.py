@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# ***************************************************************************
+# *****************************************************************************
 #
 # Copyright (c) 2016, EPAM SYSTEMS INC
 #
@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# ***************************************************************************
+# ******************************************************************************
 
 import os
 from ConfigParser import SafeConfigParser
@@ -46,11 +46,11 @@ def get_from_stdin():
 
 if __name__ == "__main__":
     # Get request ID as if it will need everywhere
-    request_id = 'generic'
+    request_id = 'ssn'
     try:
         request_id = os.environ['request_id']
     except:
-        os.environ['request_id'] = 'generic'
+        os.environ['request_id'] = 'ssn'
 
     # Get config from STDIN
     stdin_contents = get_from_stdin()
@@ -91,11 +91,7 @@ if __name__ == "__main__":
                     varname = "%s_%s" % (section, option)
                     os.environ[varname] = config.get(section, option)
 
-    # Pre-execution steps: dumping config to stdout and checking for dry running
-    print "[FULL DOCKER CONFIGURATION OPTIONS]"
-    for item in os.environ:
-        print "%s  =  %s\n" % (item, os.environ[item])
-
+    # Pre-execution steps: checking for dry running
     dry_run = False
     try:
         if os.environ['dry_run'] == 'true':

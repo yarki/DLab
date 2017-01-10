@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# ***************************************************************************
+# *****************************************************************************
 #
 # Copyright (c) 2016, EPAM SYSTEMS INC
 #
@@ -16,27 +16,59 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# ***************************************************************************
+# ******************************************************************************
 
 import json
+import time
+from fabric.api import *
 from dlab.fab import *
 from dlab.aws_meta import *
+from dlab.aws_actions import *
 import sys
+import os
+import uuid
+import logging
+
+
+def emr_waiter(tag_name):
+    if len(get_emr_list(tag_name, 'Value', False, True)) > 0 or os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
+        with hide('stderr', 'running', 'warnings'):
+            local("echo 'Some EMR cluster is still being created, waiting..'")
+        time.sleep(60)
+        emr_waiter(tag_name)
+    else:
+        return True
 
 
 def run():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.INFO,
                         filename=local_log_filepath)
-
+    try:
+        os.environ['exploratory_name']
+    except:
+        os.environ['exploratory_name'] = ''
+    if os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
+        time.sleep(30)
     create_aws_config_files()
-    index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag')
+    #index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag', '{}-{}-emr'.format(os.environ['conf_service_base_name'], os.environ['edge_user_name']))
+    #time_stamp = int(time.time())
     print 'Generating infrastructure names and tags'
     emr_conf = dict()
+    emr_conf['uuid'] = str(uuid.uuid4())[:5]
+    try:
+        emr_conf['exploratory_name'] = os.environ['exploratory_name']
+    except:
+        emr_conf['exploratory_name'] = ''
+    try:
+        emr_conf['computational_name'] = os.environ['computational_name']
+    except:
+        emr_conf['computational_name'] = ''
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
     emr_conf['service_base_name'] = os.environ['conf_service_base_name']
+    emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
     emr_conf['key_name'] = os.environ['creds_key_name']
     emr_conf['region'] = os.environ['creds_region']
     emr_conf['release_label'] = os.environ['emr_version']
@@ -47,14 +79,19 @@ def run():
     emr_conf['role_service_name'] = os.environ['emr_service_role']
     emr_conf['role_ec2_name'] = os.environ['emr_ec2_role']
 
-    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index) + ', ' \
-                       + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index)\
+    #emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp) + ', ' \
+    #                   + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)\
+    #                   + ', Notebook=' + os.environ['notebook_name']
+    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid'] + ', ' \
+                       + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']\
                        + ', Notebook=' + os.environ['notebook_name']
-    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(index)
+    #emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)
+    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
 
     tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
     emr_conf['subnet_cidr'] = get_subnet_by_tag(tag)
+    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
 
     try:
         emr_conf['emr_timeout'] = os.environ['emr_timeout']
@@ -72,12 +109,22 @@ def run():
           json.dumps(emr_conf, sort_keys=True, indent=4, separators=(',', ': '))
     logging.info(json.dumps(emr_conf))
 
+    try:
+        emr_waiter(os.environ['notebook_name'])
+        local('touch /response/.emr_creating_' + os.environ['exploratory_name'])
+    except:
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "EMR waiter fail", "conf": emr_conf}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
     with hide('stderr', 'running', 'warnings'):
-        local("echo Waitning for changes to propagate; sleep 10")
+        local("echo Waiting for changes to propagate; sleep 10")
 
     try:
-        logging.info('[CREATE EMR CLUSTER]')
-        print '[CREATE EMR CLUSTER]'
+        logging.info('[Creating EMR Cluster]')
+        print '[Creating EMR Cluster]'
         params = "--name {} --applications '{}' --master_instance_type {} --slave_instance_type {} --instance_count {} --ssh_key {} --release_label {} --emr_timeout {} " \
                  "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --region {} --tags '{}'".format(
             emr_conf['cluster_name'], emr_conf['apps'], emr_conf['master_instance_type'], emr_conf['slave_instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'], emr_conf['emr_timeout'],
@@ -92,13 +139,15 @@ def run():
 
         cluster_name = emr_conf['cluster_name']
         keyfile_name = "/root/keys/%s.pem" % emr_conf['key_name']
+        local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
     except:
+        local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
         sys.exit(1)
 
     try:
         logging.info('[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]')
         print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
-        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {}".format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'], keyfile_name, emr_conf['notebook_ip'])
+        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {} --region {}".format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'], keyfile_name, emr_conf['notebook_ip'], emr_conf['region'])
         if not run_routine('install_emr_kernels', params):
             logging.info('Failed installing EMR kernels')
             with open("/root/result.json", 'w') as result:
@@ -107,15 +156,28 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        emr_id = get_emr_id_by_name(emr_conf['cluster_name'])
+        terminate_emr(emr_id)
+        remove_kernels(emr_conf['cluster_name'],emr_conf['tag_name'],os.environ['notebook_name'],'ubuntu',emr_conf['key_path'], emr_conf['release_label'])
         sys.exit(1)
 
     try:
+        logging.info('[SUMMARY]')
+        print '[SUMMARY]'
+        print "Service base name: " + emr_conf['service_base_name']
+        print "Cluster name: " + emr_conf['cluster_name']
+        print "Key name: " + emr_conf['key_name']
+        print "Region: " + emr_conf['region']
+        print "EMR version: " + emr_conf['release_label']
+        print "EMR master node shape: " + emr_conf['master_instance_type']
+        print "EMR slave node shape: " + emr_conf['slave_instance_type']
+        print "Instance count: " + emr_conf['instance_count']
+        print "Notebook IP address: " + emr_conf['notebook_ip']
+        print "Bucket name: " + emr_conf['bucket_name']
         with open("/root/result.json", 'w') as result:
             res = {"hostname": cluster_name,
                    "key_name": emr_conf['key_name'],
                    "user_own_bucket_name": emr_conf['bucket_name'],
-                   "exploratory_name": emr_conf['exploratory_name'],
-                   "computational_name": emr_conf['computational_name'],
                    "Action": "Create new EMR cluster"}
             print json.dumps(res)
             result.write(json.dumps(res))
@@ -127,8 +189,8 @@ def run():
 
 
 def terminate():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -142,15 +204,8 @@ def terminate():
     emr_conf['notebook_name'] = os.environ['notebook_instance_name']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     emr_conf['ssh_user'] = os.environ['notebook_ssh_user']
-    emr_conf['key_path'] = os.environ['creds_key_dir'] + os.environ['creds_key_name'] + '.pem'
+    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
-
-    try:
-        emr_conf['exploratory_name'] = os.environ['exploratory_name']
-        emr_conf['computational_name'] = os.environ['computational_name']
-    except:
-        emr_conf['exploratory_name'] = ''
-        emr_conf['computational_name'] = ''
 
     try:
         logging.info('[TERMINATE EMR CLUSTER]')
@@ -171,10 +226,8 @@ def terminate():
     try:
         with open("/root/result.json", 'w') as result:
             res = {"EMR_name": emr_conf['emr_name'],
-                   "NBs_name": emr_conf['notebook_name'],
+                   "notebook_name": emr_conf['notebook_name'],
                    "user_own_bucket_name": emr_conf['bucket_name'],
-                   "exploratory_name": emr_conf['exploratory_name'],
-                   "computational_name": emr_conf['computational_name'],
                    "Action": "Terminate EMR cluster"}
             print json.dumps(res)
             result.write(json.dumps(res))

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# ***************************************************************************
+# *****************************************************************************
 #
 # Copyright (c) 2016, EPAM SYSTEMS INC
 #
@@ -16,13 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# ***************************************************************************
+# ******************************************************************************
 
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import boto3
 import argparse
 import sys
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--emr_name', type=str)
@@ -41,24 +42,21 @@ args = parser.parse_args()
 if __name__ == "__main__":
     print 'Terminating EMR cluster and cleaning EMR config from S3 bucket'
     try:
-        clusters_list = get_emr_list(args.nb_tag_value, 'Value')
+        clusters_list = get_emr_list(args.emr_name, 'Value')
         if clusters_list:
             for cluster_id in clusters_list:
                 client = boto3.client('emr')
                 cluster = client.describe_cluster(ClusterId=cluster_id)
                 cluster = cluster.get("Cluster")
                 emr_name = cluster.get('Name')
-                s3_cleanup(args.bucket_name, emr_name)
+                emr_version = cluster.get('ReleaseLabel')
+                s3_cleanup(args.bucket_name, emr_name, os.environ['edge_user_name'])
                 print "The bucket " + args.bucket_name + " has been cleaned successfully"
                 terminate_emr(cluster_id)
                 print "The EMR cluster " + emr_name + " has been terminated successfully"
+                print "Removing EMR kernels from notebook"
+                remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path, emr_version)
         else:
             print "There are no EMR clusters to terminate."
-    except:
-        sys.exit(1)
-
-    print "Removing EMR kernels from notebook"
-    try:
-        remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path)
     except:
         sys.exit(1)
