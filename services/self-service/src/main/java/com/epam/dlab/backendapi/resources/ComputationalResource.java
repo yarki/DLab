@@ -73,16 +73,19 @@ public class ComputationalResource implements ComputationalAPI {
     @Path("/limits")
     public ComputationalLimitsDTO getLimits(@Auth UserInfo userInfo) {
     	return new ComputationalLimitsDTO()
+    			.withMinEmrInstanceCount(configuration.getMinEmrInstanceCount())
     			.withMaxEmrInstanceCount(configuration.getMaxEmrInstanceCount());
     }
     
     @PUT
     public Response create(@Auth UserInfo userInfo, @Valid @NotNull ComputationalCreateFormDTO formDTO) throws DlabException {
         LOGGER.debug("creating computational resource {} for user {}", formDTO.getName(), userInfo.getName());
-        if (Integer.parseInt(formDTO.getInstanceCount()) > configuration.getMaxEmrInstanceCount()) {
-            LOGGER.warn("Creating computational resource {} for user {} fail: Limit exceeded to creation slave instances. Maximum is {}",
-            		formDTO.getName(), userInfo.getName(), configuration.getMaxEmrInstanceCount());
-            throw new DlabException("Limit exceeded to creation slave instances. Maximum is " + configuration.getMaxEmrInstanceCount() + ".");
+        int slaveInstanceCount = Integer.parseInt(formDTO.getInstanceCount());
+        if (slaveInstanceCount < configuration.getMinEmrInstanceCount() || slaveInstanceCount > configuration.getMaxEmrInstanceCount()) {
+            LOGGER.warn("Creating computational resource {} for user {} fail: Limit exceeded to creation slave instances. Minimum is {}, maximum is {}",
+            		formDTO.getName(), userInfo.getName(), configuration.getMinEmrInstanceCount(), configuration.getMaxEmrInstanceCount());
+            throw new DlabException("Limit exceeded to creation slave instances. Minimum is " + configuration.getMinEmrInstanceCount() +
+            		", maximum is " + configuration.getMaxEmrInstanceCount() + ".");
         }
         
         boolean isAdded = infrastructureProvisionDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),

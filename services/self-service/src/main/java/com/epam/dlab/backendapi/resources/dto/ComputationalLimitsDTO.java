@@ -25,8 +25,28 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 public class ComputationalLimitsDTO {
     @NotBlank
+    @JsonProperty("min_emr_instance_count")
+    private int minEmrInstanceCount;
+
+    @NotBlank
     @JsonProperty("max_emr_instance_count")
     private int maxEmrInstanceCount;
+
+    /** Returns the minimum number of slave EMR instances than could be created. */
+    public int getMinEmrInstanceCount() {
+    	return minEmrInstanceCount;
+    }
+    
+    /** Sets the minimum number of EMR instances than could be created. */
+    public void setMinEmrInstanceCount(int minEmrInstanceCount) {
+    	this.minEmrInstanceCount = minEmrInstanceCount;
+    }
+    
+    /** Sets the minimum number of EMR instances than could be created. */
+    public ComputationalLimitsDTO withMinEmrInstanceCount(int minEmrInstanceCount) {
+    	this.minEmrInstanceCount = minEmrInstanceCount;
+    	return this;
+    }
 
     /** Returns the maximum number of slave EMR instances than could be created. */
     public int getMaxEmrInstanceCount() {
