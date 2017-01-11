@@ -105,7 +105,7 @@ export class ExploratoryEnvironmentCreateDialog {
 
   public open(params): void {
     if (!this.bindDialog.isOpened) {
-      this.model = new ExploratoryEnvironmentCreateModel('', '', '', '', (response: Response) => {
+      this.model = new ExploratoryEnvironmentCreateModel('', '', '', '', '', (response: Response) => {
         if (response.status === HTTP_STATUS_CODES.OK) {
           this.close();
           this.buildGrid.emit();

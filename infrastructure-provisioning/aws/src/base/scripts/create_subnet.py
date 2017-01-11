@@ -33,12 +33,17 @@ parser.add_argument('--vpc_id', type=str, default='')
 parser.add_argument('--username', type=str, default='')
 parser.add_argument('--infra_tag_name', type=str, default='')
 parser.add_argument('--infra_tag_value', type=str, default='')
+parser.add_argument('--prefix', type=str, default='24')
+parser.add_argument('--ssn', type=bool, default=False)
 args = parser.parse_args()
 
 
 if __name__ == "__main__":
     success = False
-    tag = {"Key": args.infra_tag_name, "Value": "{}-{}-subnet".format(args.infra_tag_value, args.username)}
+    if args.ssn:
+        tag = {"Key": args.infra_tag_name, "Value": "{}-subnet".format(args.infra_tag_value)}
+    else:
+        tag = {"Key": args.infra_tag_name, "Value": "{}-{}-subnet".format(args.infra_tag_value, args.username)}
     try:
         ec2 = boto3.resource('ec2')
         vpc = ec2.Vpc(args.vpc_id)
@@ -65,9 +70,13 @@ if __name__ == "__main__":
                 position = end
             #print 'position: ' + str(position)
 
-        subnet_cidr = '{}.{}.{}.0/24'.format(cidr.split('.')[0], cidr.split('.')[1], position)
-        subnet_id = get_subnet_by_cidr(subnet_cidr)
-        subnet_check = get_subnet_by_tag(tag)
+        subnet_cidr = '{}.{}.{}.0/{}'.format(cidr.split('.')[0], cidr.split('.')[1], position, args.prefix)
+        if args.ssn:
+            subnet_id = get_subnet_by_cidr(subnet_cidr, args.vpc_id)
+            subnet_check = get_subnet_by_tag(tag, False, args.vpc_id)
+        else:
+            subnet_id = get_subnet_by_cidr(subnet_cidr)
+            subnet_check = get_subnet_by_tag(tag)
         if not subnet_check:
             if subnet_id == '':
                 print "Creating subnet %s in vpc %s with tag %s." % \
@@ -77,11 +86,20 @@ if __name__ == "__main__":
             print "REQUESTED SUBNET ALREADY EXISTS. USING CIDR {}".format(subnet_check)
             subnet_id = get_subnet_by_cidr(subnet_check)
         print "SUBNET_ID: " + subnet_id
-        print "Associating route_table with the subnet"
-        ec2 = boto3.resource('ec2')
-        rt = get_route_table_by_tag(args.infra_tag_name, args.infra_tag_value)
-        route_table = ec2.RouteTable(rt)
-        route_table.associate_with_subnet(SubnetId=subnet_id)
+        if not args.ssn:
+            print "Associating route_table with the subnet"
+            ec2 = boto3.resource('ec2')
+            rt = get_route_table_by_tag(args.infra_tag_name, args.infra_tag_value)
+            route_table = ec2.RouteTable(rt)
+            route_table.associate_with_subnet(SubnetId=subnet_id)
+        else:
+            print "Associating route_table with the subnet"
+            ec2 = boto3.resource('ec2')
+            rt = get_route_table_by_tag(args.infra_tag_name, args.infra_tag_value)
+            route_table = ec2.RouteTable(rt)
+            route_table.associate_with_subnet(SubnetId=subnet_id)
+            with open('/tmp/ssn_subnet_id', 'w') as f:
+                f.write(subnet_id)
         success = True
     except:
         success = False
