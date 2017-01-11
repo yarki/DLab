@@ -130,13 +130,10 @@ def run():
             emr_conf['cluster_name'], emr_conf['apps'], emr_conf['master_instance_type'], emr_conf['slave_instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'], emr_conf['emr_timeout'],
             emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], 'ubuntu', emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'])
         local("~/scripts/%s.py %s" % ('create_cluster', params))
-        #if not run_routine('create_cluster', params):
-        #    logging.info('Failed creating EMR Cluster')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to create EMR Cluster", "conf": emr_conf}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
 
         cluster_name = emr_conf['cluster_name']
         keyfile_name = "/root/keys/%s.pem" % emr_conf['key_name']
@@ -150,13 +147,10 @@ def run():
         print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
         params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {} --region {}".format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'], keyfile_name, emr_conf['notebook_ip'], emr_conf['region'])
         local("~/scripts/%s.py %s" % ('install_emr_kernels', params))
-        #if not run_routine('install_emr_kernels', params):
-        #    logging.info('Failed installing EMR kernels')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed installing EMR kernels", "conf": emr_conf}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         emr_id = get_emr_id_by_name(emr_conf['cluster_name'])
         terminate_emr(emr_id)
@@ -216,13 +210,10 @@ def terminate():
                  (emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['key_path'], emr_conf['ssh_user'],
                   emr_conf['tag_name'], emr_conf['notebook_name'])
         local("~/scripts/%s.py %s" % ('terminate_emr', params))
-        #if not run_routine('terminate_emr', params):
-        #    logging.info('Failed to terminate EMR cluster')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to terminate EMR cluster", "conf": emr_conf}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         sys.exit(1)
 

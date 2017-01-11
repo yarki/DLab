@@ -408,13 +408,10 @@ def run():
 #        params = "--hostname %s --keyfile %s --additional_config '%s'" % \
 #                 (instance_hostname, keyfile_name, json.dumps(additional_config))
 #        local("~/scripts/%s.py %s" % ('configure_socks_proxy', params))
-#        #if not run_routine('configure_socks_proxy', params, 'edge'):
-#        #    logging.info('Failed installing socks proxy')
 #        with open("/root/result.json", 'w') as result:
 #            res = {"error": "Failed installing socks proxy", "conf": edge_conf}
 #            print json.dumps(res)
 #            result.write(json.dumps(res))
-#        #    sys.exit(1)
 #    except:
 #        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
 #        remove_all_iam_resources('edge', os.environ['edge_user_name'])
