@@ -387,7 +387,7 @@ def run():
         with open("/root/result.json", 'w') as result:
              res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
              print json.dumps(res)
-            result.write(json.dumps(res))
+             result.write(json.dumps(res))
         #    sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
