@@ -24,13 +24,14 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 
-@Test(singleThreaded=true,alwaysRun=true)
+@Test(singleThreaded=true)
 public class TestServices {
 
     private String serviceBaseName;
@@ -394,7 +395,9 @@ public class TestServices {
     	String [] files = {
     			"train.csv",
     			"pyspark_test.py",
-    			"tests.ipynb"
+    			"tests.ipynb",
+    			"R.ipynb",
+    			"SCALA.ipynb"
     			};
     	String pyFilename = "pyspark_test.py";
 
