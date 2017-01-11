@@ -71,13 +71,10 @@ def run():
                 print '[CREATE VPC AND ROUTE TABLE]'
                 params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, service_base_name)
                 local("~/scripts/%s.py %s" % ('create_vpc', params))
-                #if not run_routine('create_vpc', params):
-                #    logging.info('Failed to create VPC')
                 with open("/root/result.json", 'w') as result:
                     res = {"error": "Failed to create VPC"}
                     print json.dumps(res)
                     result.write(json.dumps(res))
-                #sys.exit(1)
                 os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
                 enable_vpc_dns(os.environ['creds_vpc_id'])
                 rt_id = create_rt(os.environ['creds_vpc_id'], tag_name, service_base_name)
@@ -91,13 +88,10 @@ def run():
                 print '[CREATE SUBNET]'
                 params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {} --prefix {} --ssn {}".format(os.environ['creds_vpc_id'], 'ssn', tag_name, service_base_name, '20', True)
                 local("~/scripts/%s.py %s" % ('create_subnet', params))
-                #if not run_routine('create_subnet', params):
-                #    logging.info('Failed to create Subnet')
                 with open("/root/result.json", 'w') as result:
                     res = {"error": "Failed to create Subnet"}
                     print json.dumps(res)
                     result.write(json.dumps(res))
-                #   sys.exit(1)
                 with open('/tmp/ssn_subnet_id', 'r') as f:
                     os.environ['creds_subnet_id'] = f.read()
                 enable_auto_assign_ip(os.environ['creds_subnet_id'])
@@ -161,13 +155,10 @@ def run():
                 params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {} --ssn {}". \
                     format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), service_base_name, tag_name, False, True)
                 local("~/scripts/%s.py %s" % ('create_security_group', params))
-                #if not run_routine('create_security_group', params):
-                #    logging.info('Failed creating security group for SSN')
                 with open("/root/result.json", 'w') as result:
                      res = {"error": "Failed creating security group for SSN"}
                      print json.dumps(res)
                      result.write(json.dumps(res))
-                #    sys.exit(1)
                 with open('/tmp/ssn_sg_id', 'r') as f:
                     os.environ['creds_security_groups_ids'] = f.read()
             except:
@@ -183,13 +174,10 @@ def run():
                  (role_name, role_profile_name, policy_name, policy_path)
 
         local("~/scripts/%s.py %s" % ('create_role_policy', params))
-        #if not run_routine('create_role_policy', params):
-        #    logging.info('Unable to create roles')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         if pre_defined_sg:
             remove_sgroups(tag_name)
@@ -206,13 +194,10 @@ def run():
         params = "--vpc_id {} --region {} --infra_tag_name {} --infra_tag_value {}".format(
             os.environ['creds_vpc_id'], os.environ['creds_region'], tag_name, service_base_name)
         local("~/scripts/%s.py %s" % ('create_endpoint', params))
-        #if not run_routine('create_endpoint', params):
-        #    logging.info('Unable to create Endpoint')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to create an endpoint", "conf": os.environ.__dict__}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         remove_all_iam_resources(instance)
         if pre_defined_sg:
@@ -231,13 +216,10 @@ def run():
                  (user_bucket_name, tag_name, user_bucket_name, region)
 
         local("~/scripts/%s.py %s" % ('create_bucket', params))
-        #if not run_routine('create_bucket', params):
-        #    logging.info('Unable to create bucket')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         remove_all_iam_resources(instance)
         if pre_defined_sg:
@@ -260,13 +242,10 @@ def run():
                   os.environ['creds_subnet_id'], role_profile_name, tag_name, instance_name)
 
         local("~/scripts/%s.py %s" % ('create_instance', params))
-        #if not run_routine('create_instance', params):
-        #    logging.info('Unable to create ssn instance')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to create ssn instance", "conf": os.environ.__dict__}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -290,13 +269,10 @@ def run():
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
         local("~/scripts/%s.py %s" % ('install_prerequisites', params))
-        #if not run_routine('install_prerequisites', params):
-        #    logging.info('Failed installing software: pip, apt')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed installing software: pip, apt", "conf": os.environ.__dict__}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
@@ -319,13 +295,10 @@ def run():
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
 
         local("~/scripts/%s.py %s" % ('configure_ssn', params))
-        #if not run_routine('configure_ssn', params):
-        #    logging.info('Failed configuring ssn')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed configuring ssn", "conf": os.environ.__dict__}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
@@ -353,13 +326,10 @@ def run():
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
 
         local("~/scripts/%s.py %s" % ('configure_docker', params))
-        #if not run_routine('configure_docker', params):
-        #    logging.info('Unable to configure docker')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to configure docker", "conf": os.environ.__dict__}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
@@ -382,13 +352,10 @@ def run():
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
         local("~/scripts/%s.py %s" % ('install_prerequisites', params))
-        #if not run_routine('install_prerequisites', params):
-        #    logging.info('Unable to preconfigure ui')
         with open("/root/result.json", 'w') as result:
              res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
              print json.dumps(res)
              result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
@@ -408,13 +375,10 @@ def run():
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
         local("~/scripts/%s.py %s" % ('configure_ui', params))
-        #if not run_routine('configure_ui', params):
-        #    logging.info('Unable to upload UI')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to upload UI", "conf": os.environ.__dict__}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
@@ -494,7 +458,6 @@ def run():
         if os.environ['ops_lifecycle_stage'] == 'prod':
             params += "--key_id %s" % os.environ['creds_access_key']
             local("~/scripts/%s.py %s" % ('finalize', params))
-            #run_routine('finalize', params)
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
@@ -532,13 +495,10 @@ def terminate():
         params = "--tag_name %s --edge_sg %s --nb_sg %s" % \
                  (ssn_conf['tag_name'], ssn_conf['edge_sg'], ssn_conf['nb_sg'])
         local("~/scripts/%s.py %s" % ('terminate_aws_resources', params))
-        #if not run_routine('terminate_aws_resources', params):
-        #   logging.info('Failed to terminate ssn')
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to terminate ssn", "conf": ssn_conf}
             print json.dumps(res)
             result.write(json.dumps(res))
-        #    sys.exit(1)
     except:
         sys.exit(1)
 
