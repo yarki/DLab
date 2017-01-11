@@ -50,16 +50,130 @@ def run():
         logging.info('[DERIVING NAMES]')
         print '[DERIVING NAMES]'
         service_base_name = os.environ['conf_service_base_name']
-        role_name = service_base_name + '-ssn-Role'
-        role_profile_name = service_base_name + '-ssn-Profile'
-        policy_name = service_base_name + '-ssn-Policy'
+        role_name = service_base_name.lower().replace('-', '_') + '-ssn-Role'
+        role_profile_name = service_base_name.lower().replace('-', '_') + '-ssn-Profile'
+        policy_name = service_base_name.lower().replace('-', '_') + '-ssn-Policy'
         user_bucket_name = (service_base_name + '-ssn-bucket').lower().replace('_', '-')
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn'
         region = os.environ['creds_region']
         ssn_ami_id = get_ami_id(os.environ['ssn_ami_name'])
         policy_path = '/root/templates/policy.json'
+        vpc_cidr = '172.31.0.0/16'
+        sg_name = instance_name + '-SG'
+        pre_defined_vpc = False
+        pre_defined_sg = False
 
+        if os.environ['creds_vpc_id'] == '' or os.environ['creds_vpc_id'] == 'PUT_YOUR_VALUE_HERE':
+            try:
+                pre_defined_vpc = True
+                logging.info('[CREATE VPC AND ROUTE TABLE]')
+                print '[CREATE VPC AND ROUTE TABLE]'
+                params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, service_base_name)
+                if not run_routine('create_vpc', params):
+                    logging.info('Failed to create VPC')
+                    with open("/root/result.json", 'w') as result:
+                        res = {"error": "Failed to create VPC"}
+                        print json.dumps(res)
+                        result.write(json.dumps(res))
+                    sys.exit(1)
+                os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
+                enable_vpc_dns(os.environ['creds_vpc_id'])
+                rt_id = create_rt(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            except:
+                sys.exit(1)
+
+        if os.environ['creds_subnet_id'] == '' or os.environ['creds_subnet_id'] == 'PUT_YOUR_VALUE_HERE':
+            try:
+                pre_defined_vpc = True
+                logging.info('[CREATE SUBNET]')
+                print '[CREATE SUBNET]'
+                params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {} --prefix {} --ssn {}".format(os.environ['creds_vpc_id'], 'ssn', tag_name, service_base_name, '20', True)
+                if not run_routine('create_subnet', params):
+                    logging.info('Failed to create Subnet')
+                    with open("/root/result.json", 'w') as result:
+                        res = {"error": "Failed to create Subnet"}
+                        print json.dumps(res)
+                        result.write(json.dumps(res))
+                    sys.exit(1)
+                with open('/tmp/ssn_subnet_id', 'r') as f:
+                    os.environ['creds_subnet_id'] = f.read()
+                enable_auto_assign_ip(os.environ['creds_subnet_id'])
+            except:
+                if pre_defined_vpc:
+                    remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+                    remove_route_tables(tag_name, True)
+                    try:
+                        remove_subnets(service_base_name + "-subnet")
+                    except:
+                        print "Subnet hasn't been created."
+                    remove_vpc(os.environ['creds_vpc_id'])
+                sys.exit(1)
+
+        if os.environ['creds_security_groups_ids'] == '' or os.environ['creds_security_groups_ids'] == 'PUT_YOUR_VALUE_HERE':
+            try:
+                pre_defined_sg = True
+                logging.info('[CREATE SG FOR SSN]')
+                print '[CREATE SG FOR SSN]'
+                ingress_sg_rules_template = [
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 80,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 80, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 8080,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 8080, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 22,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 22, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 3128,
+                        "IpRanges": [{"CidrIp": vpc_cidr}],
+                        "ToPort": 3128, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 443,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 443, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": -1,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": -1, "IpProtocol": "icmp", "UserIdGroupPairs": []
+                    }
+                ]
+                egress_sg_rules_template = [
+                    {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}
+                ]
+                params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {} --ssn {}". \
+                    format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), service_base_name, tag_name, False, True)
+                if not run_routine('create_security_group', params):
+                    logging.info('Failed creating security group for SSN')
+                    with open("/root/result.json", 'w') as result:
+                        res = {"error": "Failed creating security group for SSN"}
+                        print json.dumps(res)
+                        result.write(json.dumps(res))
+                    sys.exit(1)
+                with open('/tmp/ssn_sg_id', 'r') as f:
+                    os.environ['creds_security_groups_ids'] = f.read()
+            except:
+                if pre_defined_vpc:
+                    remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+                    remove_subnets(service_base_name + "-subnet")
+                    remove_route_tables(tag_name, True)
+                    remove_vpc(os.environ['creds_vpc_id'])
+                sys.exit(1)
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
         params = "--role_name %s --role_profile_name %s --policy_name %s --policy_file_name %s" % \
@@ -73,6 +187,13 @@ def run():
                 result.write(json.dumps(res))
             sys.exit(1)
     except:
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -89,13 +210,20 @@ def run():
             sys.exit(1)
     except:
         remove_all_iam_resources(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
         params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s --region %s" % \
-                 (user_bucket_name, tag_name, "bucket", region)
+                 (user_bucket_name, tag_name, user_bucket_name, region)
 
         if not run_routine('create_bucket', params):
             logging.info('Unable to create bucket')
@@ -106,6 +234,14 @@ def run():
             sys.exit(1)
     except:
         remove_all_iam_resources(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -127,6 +263,14 @@ def run():
     except:
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -135,7 +279,7 @@ def run():
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         params = "--hostname %s --keyfile %s " \
-                 "--pip_packages 'boto3 argparse fabric jupyter awscli'" % \
+                 "--pip_packages 'boto3 argparse fabric jupyter awscli pymongo'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
         if not run_routine('install_prerequisites', params):
@@ -149,6 +293,14 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -169,6 +321,14 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -178,7 +338,8 @@ def run():
                              {"name": "jupyter", "tag": "latest"},
                              {"name": "rstudio", "tag": "latest"},
                              {"name": "edge", "tag": "latest"},
-                             {"name": "emr", "tag": "latest"}, ]
+                             {"name": "emr", "tag": "latest"},
+                             {"name": "zeppelin", "tag": "latest"}, ]
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
 
@@ -193,6 +354,14 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -213,6 +382,14 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -230,6 +407,14 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -301,7 +486,16 @@ def run():
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
+
 
 def terminate():
     local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])

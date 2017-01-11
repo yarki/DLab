@@ -95,7 +95,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withIamUserName(userInfo.getName())
                         .withRegion(settingsDAO.getCredsRegion());
                 return Response
-                        .ok(provisioningService.post(EMR_CREATE, dto, String.class))
+                        .ok(provisioningService.post(EMR_CREATE, userInfo.getAccessToken(), dto, String.class))
                         .build();
             } catch (Throwable t) {
             	try {
@@ -158,7 +158,7 @@ public class ComputationalResource implements ComputationalAPI {
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withRegion(settingsDAO.getCredsRegion());
-            return provisioningService.post(EMR_TERMINATE, dto, String.class);
+            return provisioningService.post(EMR_TERMINATE, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
         	try {
         		updateComputationalStatus(userInfo.getName(), exploratoryName, computationalName, FAILED);

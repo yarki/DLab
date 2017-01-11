@@ -45,6 +45,7 @@ import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoIterable;
+import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
 
 /** Implements the base API for Mongo database.
@@ -208,6 +209,15 @@ class BaseDAO implements MongoCollections {
     protected Optional<Document> findOne(String collection, Bson condition) throws DlabException {
         FindIterable<Document> found = find(collection, condition);
         return limitOne(found);
+    }
+    
+    protected void update(String collection, Bson condition, Bson value, boolean isUpsert) {
+    	if (isUpsert) {
+    		mongoService.getCollection(collection).updateOne(condition, value,
+    				new UpdateOptions().upsert(isUpsert));
+    	} else {
+    		mongoService.getCollection(collection).updateOne(condition, value);
+    	}
     }
 
     /** Finds and returns one document with the specified fields from the collection by condition.

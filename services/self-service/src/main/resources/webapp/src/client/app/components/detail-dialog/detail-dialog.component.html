@@ -41,8 +41,9 @@ limitations under the License.
           <p>Edge Node IP Address {{notebook.ip}}</p>
           <p>Up time {{upTimeInHours}} hour(s) since {{upTimeSince || "not specified."}}</p>
           <p>Open in your browser  <a href="{{notebook.url}}" target="_blank">{{notebook.url}}</a> to access this box after creating a tunnel.</p>
-          <p *ngIf="notebook.username">Node User: {{notebook.username}}</p>
-          <p *ngIf="notebook.password">Password: {{notebook.password}}</p>
+          <p *ngIf="notebook.username">Node User: <strong>{{notebook.username}}</strong></p>
+          <p *ngIf="notebook.password">Password: <strong>{{notebook.password}}</strong></p>
+          <p *ngIf="notebook.bucket_name">Data Bucket: <strong>{{notebook.bucket_name}}</strong></p>
           <br/>
           <p>
             <a href="#/help/accessnotebookguide" target="_blank">

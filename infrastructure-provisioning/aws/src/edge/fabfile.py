@@ -86,9 +86,9 @@ def run():
     edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
     edge_conf['bucket_name'] = (edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-bucket').lower().replace('_', '-')
     edge_conf['ssn_bucket_name'] = (edge_conf['service_base_name'] + "-ssn-bucket").lower().replace('_', '-')
-    edge_conf['role_name'] = edge_conf['instance_name'] + '-Role'
-    edge_conf['role_profile_name'] = edge_conf['instance_name'] + '-Profile'
-    edge_conf['policy_name'] = edge_conf['instance_name'] + '-Policy'
+    edge_conf['role_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-edge-Role'
+    edge_conf['role_profile_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-edge-Profile'
+    edge_conf['policy_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-edge-Policy'
     edge_conf['edge_security_group_name'] = edge_conf['instance_name'] + '-SG'
     edge_conf['security_group_rules'] = [{"IpProtocol": "-1",
                                           "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
@@ -97,9 +97,9 @@ def run():
 
     # Notebook \ EMR config
     edge_conf['notebook_instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb'
-    edge_conf['notebook_role_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Role'
-    edge_conf['notebook_policy_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Policy'
-    edge_conf['notebook_role_profile_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-Profile'
+    edge_conf['notebook_role_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-nb-Role'
+    edge_conf['notebook_policy_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-nb-Policy'
+    edge_conf['notebook_role_profile_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-nb-Profile'
     edge_conf['notebook_security_group_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-SG'
     edge_conf['notebook_security_group_rules'] = [{"IpProtocol": "-1",
                                                    "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
@@ -196,6 +196,12 @@ def run():
                 "FromPort": 8888,
                 "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}],
                 "ToPort": 8888, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
+                "FromPort": 8080,
+                "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}],
+                "ToPort": 8080, "IpProtocol": "tcp", "UserIdGroupPairs": []
             },
             {
                 "PrefixListIds": [],
@@ -308,7 +314,7 @@ def run():
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
         params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s --region %s" % \
-                 (edge_conf['bucket_name'], edge_conf['service_base_name'], edge_conf['instance_name'] + "bucket",
+                 (edge_conf['bucket_name'], edge_conf['tag_name'], edge_conf['bucket_name'],
                   edge_conf['region'])
         if not run_routine('create_bucket', params, 'edge'):
             logging.info('Failed creating bucket')

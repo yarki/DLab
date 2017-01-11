@@ -156,7 +156,7 @@ def ensure_r_kernel():
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
             sudo('R -e "IRkernel::installspec()"')
-            r_version = sudo("R --version | awk '/version / {print $3}'", capture = True)
+            r_version = sudo("R --version | awk '/version / {print $3}'")
             put(templates_dir + 'r_template.json', '/tmp/r_template.json')
             sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
             sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
@@ -165,6 +165,7 @@ def ensure_r_kernel():
             # Spark Install
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
             #sudo('export SPARK_HOME=/usr/local/spark/; cd $SPARK_HOME/R/lib/; sudo R --no-site-file --no-environ --no-save --no-restore CMD INSTALL "SparkR"')
+            sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
             sudo('touch /home/ubuntu/.ensure_dir/r_kernel_ensured')
         except:
             sys.exit(1)
@@ -193,6 +194,8 @@ def configure_notebook_server(notebook_name):
             sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
             sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
             sudo('chown -R ubuntu:ubuntu /home/ubuntu/.local')
+            sudo('mkdir /mnt/var')
+            sudo('chown ubuntu:ubuntu /mnt/var')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable jupyter-notebook")
             sudo("systemctl start jupyter-notebook")

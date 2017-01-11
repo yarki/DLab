@@ -73,6 +73,13 @@ public class KeyDAO extends BaseDAO {
         return findOne(USER_AWS_CREDENTIALS, eq(ID, user), UserAWSCredentialDTO.class)
                 .orElse(new UserAWSCredentialDTO())
                 .getPublicIp();
+	}
+    
+    public UserAWSCredentialDTO getUserAWSCredential(String user) {
+    	return findOne(USER_AWS_CREDENTIALS,
+    			eq(ID, user),
+    			UserAWSCredentialDTO.class)
+    			.orElse(new UserAWSCredentialDTO());
     }
 
 	/** Finds and returns the status of user key.

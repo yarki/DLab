@@ -61,11 +61,11 @@ public class DockerResource implements MongoCollections, DockerAPI {
      */
     @POST
     @Path("/run")
-    public String run(@Auth UserInfo userInfo, @NotBlank String image) {
+    public String run(@Auth UserInfo userInfo, @NotBlank String image) throws DlabException {
         LOGGER.debug("Run docker image {} for user {}", image, userInfo.getName());
         try {
         	dao.writeDockerAttempt(userInfo.getName(), DockerDAO.RUN);
-        	return provisioningService.post(DOCKER_RUN, image, String.class);
+        	return provisioningService.post(DOCKER_RUN, userInfo.getAccessToken(), image, String.class);
         } catch (Throwable t) {
         	LOGGER.warn("Could not run docker image {} for user {}: {}", image, userInfo.getName(), t.getLocalizedMessage(), t);
             throw new DlabException("Could not run docker image  " + image + " for user " + userInfo.getName(), t);

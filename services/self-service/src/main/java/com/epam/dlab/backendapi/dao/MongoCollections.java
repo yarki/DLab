@@ -34,4 +34,5 @@ public interface MongoCollections {
     String USER_INSTANCES = "userInstances";
     /** Name of shapes. */
     String SHAPES = "shapes";
+    String USER_UI_SETTINGS = "userUISettings";
 }
