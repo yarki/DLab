@@ -34,18 +34,20 @@ export class ExploratoryEnvironmentCreateModel {
 
   private environment_image: string;
   private environment_name: string;
+  private environment_template_name: string;
   private environment_version: string;
   private environment_shape: string;
   private userResourceService: UserResourceService;
   private continueWith: Function;
 
   static getDefault(userResourceService): ExploratoryEnvironmentCreateModel {
-    return new ExploratoryEnvironmentCreateModel('', '', '', '', () => { }, () => { }, null, null, userResourceService);
+    return new ExploratoryEnvironmentCreateModel('', '', '', '', '', () => { }, () => { }, null, null, userResourceService);
   }
 
   constructor(
     environment_image: string,
     environment_name: string,
+    environment_template_name: string,
     environment_version: string,
     environment_shape: string,
     fnProcessResults: any,
@@ -59,6 +61,7 @@ export class ExploratoryEnvironmentCreateModel {
     this.continueWith = continueWith;
     this.prepareModel(environment_image,
       environment_name,
+      environment_template_name,
       environment_version,
       environment_shape,
       fnProcessResults, fnProcessErrors);
@@ -80,6 +83,7 @@ export class ExploratoryEnvironmentCreateModel {
   public setCreatingParams(name, shape) : void {
     this.environment_image = this.selectedItem.image;
     this.environment_version = this.selectedItem.version;
+    this.environment_template_name = this.selectedItem.template_name;
     this.environment_name = name;
     this.environment_shape = shape;
   }
@@ -118,6 +122,7 @@ export class ExploratoryEnvironmentCreateModel {
   private createExploratoryEnvironment(): Observable<Response> {
     return this.userResourceService.createExploratoryEnvironment({
       image: this.environment_image,
+      templateName: this.environment_template_name,
       name: this.environment_name,
       shape: this.environment_shape,
       version: this.environment_version
@@ -127,6 +132,7 @@ export class ExploratoryEnvironmentCreateModel {
   private prepareModel(
     environment_image: string,
     environment_name: string,
+    environment_template_name: string,
     environment_version: string,
     environment_shape: string,
     fnProcessResults: any, fnProcessErrors: any): void {

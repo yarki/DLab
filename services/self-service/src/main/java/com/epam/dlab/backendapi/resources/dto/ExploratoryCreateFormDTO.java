@@ -28,6 +28,10 @@ public class ExploratoryCreateFormDTO {
 
     @NotBlank
     @JsonProperty
+    private String templateName;
+
+    @NotBlank
+    @JsonProperty
     private String name;
 
     @NotBlank
@@ -41,6 +45,10 @@ public class ExploratoryCreateFormDTO {
     public String getImage() { return image; }
 
     public void setImage(String image) { this.image = image; }
+
+    public String getTemplateName() { return templateName; }
+
+    public void setTemplateName(String templateName) { this.templateName = templateName; }
 
     public String getName() {
         return name;
