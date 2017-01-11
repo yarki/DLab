@@ -39,7 +39,9 @@ fi
 /bin/tar -zhcvf /tmp/spark.tar.gz -C /usr/lib/ spark
 md5sum /tmp/jars.tar.gz > /tmp/jars-checksum.chk
 md5sum /tmp/spark.tar.gz > /tmp/spark-checksum.chk
-aws s3 cp /tmp/jars.tar.gz /tmp/jars-checksum.chk s3://$BUCKET_NAME/jars/$EMR_VERSION/ --endpoint-url https://s3-$REGION.amazonaws.com --region $REGION
+aws s3 cp /tmp/jars.tar.gz s3://$BUCKET_NAME/jars/$EMR_VERSION/ --endpoint-url https://s3-$REGION.amazonaws.com --region $REGION
+aws s3 cp /tmp/jars-checksum.chk s3://$BUCKET_NAME/jars/$EMR_VERSION/ --endpoint-url https://s3-$REGION.amazonaws.com --region $REGION
 aws s3 cp $SPARK_DEF_PATH s3://$BUCKET_NAME/$USER_NAME/$CLUSTER_NAME/ --endpoint-url https://s3-$REGION.amazonaws.com --region $REGION
 aws s3 cp /tmp/python_version s3://$BUCKET_NAME/$USER_NAME/$CLUSTER_NAME/ --endpoint-url https://s3-$REGION.amazonaws.com --region $REGION
-aws s3 cp /tmp/spark.tar.gz /tmp/spark-checksum.chk s3://$BUCKET_NAME/$USER_NAME/$CLUSTER_NAME/ --endpoint-url https://s3-$REGION.amazonaws.com --region $REGION
+aws s3 cp /tmp/spark.tar.gz s3://$BUCKET_NAME/$USER_NAME/$CLUSTER_NAME/ --endpoint-url https://s3-$REGION.amazonaws.com --region $REGION
+aws s3 cp /tmp/spark-checksum.chk s3://$BUCKET_NAME/$USER_NAME/$CLUSTER_NAME/ --endpoint-url https://s3-$REGION.amazonaws.com --region $REGION
