@@ -48,7 +48,7 @@ if __name__ == "__main__":
             route_table = get_route_tables(args.vpc_id, json.dumps(tag))
             if not route_table:
                 route_table.append(ec2.create_route_table(
-                    VpcId = args.vpc_id + '11'
+                    VpcId = args.vpc_id
                 )['RouteTable']['RouteTableId'])
                 print 'Created Route-Table with ID: {}'.format(route_table)
                 create_tag(route_table, json.dumps(tag))
