@@ -63,4 +63,15 @@ public class ComputationalLimitsDTO {
     	this.maxEmrInstanceCount = maxEmrInstanceCount;
     	return this;
     }
+    
+    @Override
+    public String toString() {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("{minEmrInstanceCount=");
+    	sb.append(minEmrInstanceCount);
+    	sb.append(", maxEmrInstanceCount=");
+    	sb.append(maxEmrInstanceCount);
+    	sb.append("}");
+    	return sb.toString();
+    }
 }

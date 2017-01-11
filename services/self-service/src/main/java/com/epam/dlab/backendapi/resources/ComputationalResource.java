@@ -72,9 +72,11 @@ public class ComputationalResource implements ComputationalAPI {
     @GET
     @Path("/limits")
     public ComputationalLimitsDTO getLimits(@Auth UserInfo userInfo) {
-    	return new ComputationalLimitsDTO()
+    	ComputationalLimitsDTO limits = new ComputationalLimitsDTO()
     			.withMinEmrInstanceCount(configuration.getMinEmrInstanceCount())
     			.withMaxEmrInstanceCount(configuration.getMaxEmrInstanceCount());
+    	LOGGER.debug("Returns limits for user {}: {}", userInfo.getName(), limits.toString());
+        return limits;
     }
     
     @PUT
