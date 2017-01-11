@@ -29,20 +29,10 @@ import com.google.inject.name.Names;
 import io.dropwizard.setup.Environment;
 
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import com.epam.dlab.constants.ServiceConsts;
-import com.epam.dlab.dto.imagemetadata.ApplicationDto;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
-import com.epam.dlab.dto.imagemetadata.ComputationalResourceShapeDto;
-import com.epam.dlab.dto.imagemetadata.ExploratoryEnvironmentVersion;
 import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
-import com.epam.dlab.dto.imagemetadata.ImageType;
-import com.epam.dlab.dto.imagemetadata.TemplateDTO;
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 import static com.epam.dlab.rest.contracts.ExploratoryAPI.EXPLORATORY_CREATE;
 import static com.epam.dlab.rest.contracts.KeyLoaderAPI.KEY_LOADER;
@@ -60,6 +50,7 @@ public class MockModule extends BaseModule implements SecurityAPI, DockerAPI {
     @Override
     protected void configure() {
         super.configure();
+        bind(SelfServiceApplicationConfiguration.class).toInstance(configuration);
         bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
         bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
                 .toInstance(createAuthenticationService());

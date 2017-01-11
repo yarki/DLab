@@ -19,6 +19,8 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 /** Stores limits for creation of the computational resources.
@@ -66,12 +68,9 @@ public class ComputationalLimitsDTO {
     
     @Override
     public String toString() {
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("{minEmrInstanceCount=");
-    	sb.append(minEmrInstanceCount);
-    	sb.append(", maxEmrInstanceCount=");
-    	sb.append(maxEmrInstanceCount);
-    	sb.append("}");
-    	return sb.toString();
+    	return MoreObjects.toStringHelper(this)
+        .add("minEmrInstanceCount", minEmrInstanceCount)
+        .add("maxEmrInstanceCount", maxEmrInstanceCount)
+        .toString();
     }
 }
