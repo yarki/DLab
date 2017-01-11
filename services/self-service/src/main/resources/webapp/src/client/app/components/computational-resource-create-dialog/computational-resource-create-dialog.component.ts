@@ -192,6 +192,7 @@ export class ComputationalResourceCreateDialog {
     this.errorMessage = '';
 
     this.initFormModel();
+    this.getComputationalResourceLimits();
     this.model.resetModel();
   }
 }
