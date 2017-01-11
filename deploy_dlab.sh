@@ -58,7 +58,7 @@ function deployDlab(){
         -e "creds_region=us-west-2" -e "creds_vpc_id=vpc-588a2c3d" -e "creds_subnet_id=subnet-1e6c9347" \
         -e "creds_security_groups_ids=sg-e338c89a" -e "creds_key_name=BDCC-DSS-POC" -e "conf_service_base_name=$Infrastructure_Tag" \
         -e "creds_access_key=$Access_Key_ID" -e "creds_secret_access_key=$Secret_Access_Key" \
-        docker.epmc-bdcc.projects.epam.com/dlab-aws-ssn --action "$Action"
+        docker.epmc-bdcc.projects.epam.com/dlab-aws-ssn --action "$1"
 }
 
 function terminateDlab(){
@@ -66,7 +66,7 @@ function terminateDlab(){
   sudo docker run -i -v /root/BDCC-DSS-POC.pem:/root/keys/BDCC-DSS-POC.pem \
     -e "creds_region=$Region" -e "conf_service_base_name=$Infrastructure_Tag" \
     -e "resource=ssn" -e "creds_access_key=$Access_Key_ID" -e "creds_secret_access_key=$Secret_Access_Key" \
-    docker.epmc-bdcc.projects.epam.com/dlab-aws-ssn --action "$Action"
+    docker.epmc-bdcc.projects.epam.com/dlab-aws-ssn --action "$1"
 }
 
 case "$Action" in
@@ -78,18 +78,18 @@ case "$Action" in
     ;;
 
   deploy)
-    if deployDlab; then echo "Dlab deploy was successfull, moving to next step!"; else exit 1; fi
+    if deployDlab "create"; then echo "Dlab deploy was successfull, moving to next step!"; else exit 1; fi
     ;;
 
   create)
     if buildFrontend; then echo "Front-end build was successfull, moving to next step!"; else exit 1; fi
     if buildServices; then echo "Services build was successfull, moving to next step!"; else exit 1; fi
     if buildDockers; then echo "Docker images build was successfull, moving to next step!"; else exit 1; fi
-    if deployDlab; then echo "Dlab deploy was successfull, moving to next step!"; else exit 1; fi
+    if deployDlab "create"; then echo "Dlab deploy was successfull, moving to next step!"; else exit 1; fi
     ;;
 
   terminate)
-    terminateDlab
+    terminateDlab "terminate"
     ;;
 
   *)
