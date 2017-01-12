@@ -44,6 +44,9 @@ export class ComputationalResourceCreateDialog {
   processError: boolean = false;
   errorMessage: string = '';
 
+  public minInstanceNumber: number;
+  public maxInstanceNumber: number;
+
   public createComputationalResourceForm: FormGroup;
 
   @ViewChild('bindDialog') bindDialog;
@@ -64,6 +67,7 @@ export class ComputationalResourceCreateDialog {
 
   ngOnInit() {
     this.initFormModel();
+    this.getComputationalResourceLimits();
     this.bindDialog.onClosing = () => this.resetDialog();
   }
 
@@ -150,12 +154,26 @@ export class ComputationalResourceCreateDialog {
   private initFormModel(): void {
     this.createComputationalResourceForm = this._fb.group({
       cluster_alias_name: ['', [Validators.required, Validators.pattern(this.clusterNamePattern)]],
-      instance_number: ['1', [Validators.required, Validators.pattern(this.nodeCountPattern)]]
+      instance_number: ['', [Validators.required, Validators.pattern(this.nodeCountPattern), this.validInstanceNumberRange.bind(this)]]
     });
   }
 
   private shapePlaceholder(resourceShapes, byField: string): string {
     for (var index in resourceShapes) return resourceShapes[index][0][byField];
+  }
+
+  private getComputationalResourceLimits(): void {
+    this.userResourceService.getComputationalResourcesLimits()
+      .subscribe((limits) => {
+        this.minInstanceNumber = limits.min_emr_instance_count;
+        this.maxInstanceNumber = limits.max_emr_instance_count;
+
+        this.createComputationalResourceForm.controls['instance_number'].setValue(this.minInstanceNumber);
+      });
+  }
+
+  private validInstanceNumberRange(control) {
+    return control.value >= this.minInstanceNumber && control.value <= this.maxInstanceNumber ? null : { valid: false };
   }
 
   private setDefaultParams(): void {
@@ -178,6 +196,7 @@ export class ComputationalResourceCreateDialog {
     this.errorMessage = '';
 
     this.initFormModel();
+    this.getComputationalResourceLimits();
     this.model.resetModel();
   }
 }

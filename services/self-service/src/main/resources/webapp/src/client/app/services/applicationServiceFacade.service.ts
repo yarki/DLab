@@ -33,6 +33,7 @@ export class ApplicationServiceFacade {
   private static readonly EXPLORATORY_ENVIRONMENT_TEMPLATES = 'exploratory_environment_templates';
   private static readonly COMPUTATIONAL_RESOURCES_TEMLATES = 'computational_resources_templates';
   private static readonly COMPUTATIONAL_RESOURCES = 'computational_resources';
+  private static readonly COMPUTATIONAL_RESOURCES_LIMITS = 'computational_resources_limits';
   private static readonly USER_PREFERENCES = 'user_preferences';
   private accessTokenKey: string = 'access_token';
   private requestRegistry: Dictionary<string>;
@@ -93,6 +94,13 @@ export class ApplicationServiceFacade {
   public buildGetComputationalResourcesTemplatesRequest(): Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
       this.requestRegistry.Item(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES_TEMLATES),
+      null,
+      this.getRequestOptions(true, true));
+  }
+
+  public buildGetComputationalResourcesLimits(): Observable<Response> {
+    return this.buildRequest(RequestMethod.Get,
+      this.requestRegistry.Item(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES_LIMITS),
       null,
       this.getRequestOptions(true, true));
   }
@@ -170,6 +178,8 @@ export class ApplicationServiceFacade {
       '/api/infrastructure_provision/computational_resources');
     this.requestRegistry.Add(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES_TEMLATES,
       '/api/infrastructure_provision/computational_resources_templates');
+    this.requestRegistry.Add(ApplicationServiceFacade.COMPUTATIONAL_RESOURCES_LIMITS,
+      '/api/infrastructure_provision/computational_resources/limits');
 
     // Filtering Configuration
     this.requestRegistry.Add(ApplicationServiceFacade.USER_PREFERENCES, '/api/user/settings');
