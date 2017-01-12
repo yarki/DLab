@@ -144,7 +144,7 @@ public class TestServices {
 
         String gettingStatus;
         String noteBookName = "Notebook" + HelperMethods.generateRandomValue();
-        String emrName = "EMR" + HelperMethods.generateRandomValue();
+        String emrName = "eimr" + HelperMethods.generateRandomValue();
         final String nodePrefix = PropertyValue.getUsernameSimple();
 
         RestAssured.baseURI = ssnURL;
