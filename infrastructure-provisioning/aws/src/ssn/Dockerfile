@@ -18,9 +18,10 @@
 
 FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
+ARG OS
 COPY ssn/ /root/
-COPY general/scripts/OS/ssn_lib.py /usr/lib/python2.7/dlab/ssn_lib.py
-COPY general/templates/OS/* /root/templates/
+COPY general/scripts/${OS}/ssn_lib.py /usr/lib/python2.7/dlab/ssn_lib.py
+COPY general/templates/${OS}/* /root/templates/
 
 RUN chmod 755 /root/fabfile.py; \
     chmod 755 /root/scripts/*; \
