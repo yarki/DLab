@@ -57,7 +57,7 @@ COPY base/ /root
 COPY general/conf/* /root/conf/
 COPY general/scripts/common/* /root/scripts/
 COPY general/templates/common/* /root/templates/
-COPY general/api/*.py /bin
+COPY general/api/*.py /bin/
 COPY general/lib/* /usr/lib/python2.7/dlab/
 RUN chmod a+x /root/*.py
 
