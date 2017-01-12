@@ -46,11 +46,13 @@ RUN mkdir -p /logs/emr; chmod a+rwx /logs/emr
 ENV PROVISION_CONFIG_DIR /root/conf/
 ENV KEYFILE_DIR /root/keys/
 ENV AWS_DIR /root/.aws
+
 RUN mkdir -p /root/conf
 RUN mkdir -p /root/scripts
 RUN mkdir -p /root/templates
 RUN mkdir -p /usr/lib/python2.7/dlab
 RUN mkdir -p /root/keys/.ssh
+
 COPY . /root
 COPY ../general/conf/* /root/conf/
 COPY ../general/scripts/common/* /root/scripts/
