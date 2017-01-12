@@ -364,7 +364,7 @@ def run():
     try:
         print '[INSTALLING PREREQUISITES]'
         logging.info('[INSTALLING PREREQUISITES]')
-        params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
+        params = "--hostname {} --keyfile {} --user {}".format(instance_hostname, keyfile_name, os.environ['general_os_user'])
         local("~/scripts/%s.py %s" % ('install_prerequisites', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed installing apps: apt & pip", "conf": edge_conf}
@@ -384,8 +384,8 @@ def run():
         logging.info('[INSTALLING HTTP PROXY]')
         additional_config = {"exploratory_subnet": edge_conf['private_subnet_cidr'],
                              "template_file": "/root/templates/squid.conf"}
-        params = "--hostname %s --keyfile %s --additional_config '%s'" % \
-                 (instance_hostname, keyfile_name, json.dumps(additional_config))
+        params = "--hostname %s --keyfile %s --additional_config '%s' --user %s" % \
+                 (instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['general_os_user'])
         local("~/scripts/%s.py %s" % ('configure_http_proxy', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed installing http proxy", "conf": edge_conf}
@@ -427,8 +427,8 @@ def run():
         logging.info('[INSTALLING USERs KEY]')
         additional_config = {"user_keyname": edge_conf['user_keyname'],
                              "user_keydir": "/root/keys/"}
-        params = "--hostname {} --keyfile {} --additional_config '{}'".format(
-            instance_hostname, keyfile_name, json.dumps(additional_config))
+        params = "--hostname {} --keyfile {} --additional_config '{}' --user {}".format(
+            instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['general_os_user'])
         local("~/scripts/%s.py %s" % ('install_user_key', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed installing users key", "conf": edge_conf}
