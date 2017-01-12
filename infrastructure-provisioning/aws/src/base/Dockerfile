@@ -55,12 +55,12 @@ RUN mkdir -p /root/keys/.ssh
 
 RUN pwd
 
-COPY ../base/ /root
-COPY ../general/conf/* /root/conf/
-COPY ../general/scripts/common/* /root/scripts/
-COPY ../general/templates/common/* /root/templates/
-COPY ../general/api/*.py /bin
-COPY ../general/lib/* /usr/lib/python2.7/dlab/
+COPY base/ /root
+COPY general/conf/* /root/conf/
+COPY general/scripts/common/* /root/scripts/
+COPY general/templates/common/* /root/templates/
+COPY general/api/*.py /bin
+COPY general/lib/* /usr/lib/python2.7/dlab/
 RUN chmod a+x /root/*.py
 
 ENTRYPOINT ["/root/entrypoint.py"]
