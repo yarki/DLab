@@ -393,7 +393,7 @@ public class TestServices {
             throws JSchException, IOException, InterruptedException {
 
     	String [] files = {
-    			"kernel_test.py",
+    			"kernels_test.py",
     			"train.csv",
     			"PYTHON.ipynb",
     			"R.ipynb",
