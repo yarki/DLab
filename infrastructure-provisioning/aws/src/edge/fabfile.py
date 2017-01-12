@@ -39,16 +39,16 @@ def status():
     # Base config
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['user_name'] = os.environ['edge_user_name']
-    edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
-    edge_conf['key_name'] = os.environ['creds_key_name']
+    #edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
+    #edge_conf['key_name'] = os.environ['creds_key_name']
 
-    instance_hostname = get_instance_hostname(edge_conf['instance_name'])
-    keyfile_name = "/root/keys/{}.pem".format(edge_conf['key_name'])
+    #instance_hostname = get_instance_hostname(edge_conf['instance_name'])
+    #keyfile_name = "/root/keys/{}.pem".format(edge_conf['key_name'])
 
     try:
         logging.info('[COLLECT DATA]')
         print '[COLLECTING DATA]'
-        params = "--hostname '{}' --keyfile '{}' --service_base_name '{}' --user_name '{}' --request_id {}".format(instance_hostname, keyfile_name, edge_conf['service_base_name'], edge_conf['user_name'], os.environ['request_id'])
+        params = "--service_base_name '{}' --user_name '{}'".format(edge_conf['service_base_name'], edge_conf['user_name'])
         local("~/scripts/%s.py %s" % ('collect_data', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to collect necessary information", "conf": edge_conf}
