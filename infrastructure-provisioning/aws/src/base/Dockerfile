@@ -35,13 +35,14 @@ RUN mkdir -p /root/.ssh; echo "Host *" > /root/.ssh/config; \
     echo "GlobalKnownHostsFile=/dev/null" >> /root/.ssh/config; \
     echo "ConnectTimeout=30" >> /root/.ssh/config
 
+# Configuring log directories
 RUN mkdir -p /response; chmod a+rwx /response
 RUN mkdir -p /logs/ssn; chmod a+rwx /logs/ssn
 RUN mkdir -p /logs/edge; chmod a+rwx /logs/edge
 RUN mkdir -p /logs/notebook; chmod a+rwx /logs/notebook
 RUN mkdir -p /logs/emr; chmod a+rwx /logs/emr
 
-# Configuring entrypoint script
+# Copying all base scripts to docker
 ENV PROVISION_CONFIG_DIR /root/conf/
 ENV KEYFILE_DIR /root/keys/
 ENV AWS_DIR /root/.aws
@@ -49,11 +50,10 @@ RUN mkdir -p /root/conf
 RUN mkdir -p /root/templates
 RUN mkdir -p /root/keys/.ssh
 COPY . /root
-COPY ../root/api /root/api
+COPY ../root/api/*.py /bin
 COPY ../root/conf /root/conf
 COPY ../root/scripts/general /root/scripts
 COPY ../root/lib /usr/lib/python2.7/dlab
 RUN chmod a+x /root/*.py
 
-# Entrypoint
 ENTRYPOINT ["/root/entrypoint.py"]
