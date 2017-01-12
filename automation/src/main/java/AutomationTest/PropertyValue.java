@@ -112,6 +112,12 @@ public class PropertyValue {
     public static final String getUsername() {
     	return get(USERNAME);
     }
+    
+    public static String getUsernameSimple() {
+    	String s = get(USERNAME);
+		int i = s.indexOf('@');
+		return (i == -1 ? s : s.substring(0, i));
+	}
 
     public static final String getPassword() {
     	return get(PASSWORD);
