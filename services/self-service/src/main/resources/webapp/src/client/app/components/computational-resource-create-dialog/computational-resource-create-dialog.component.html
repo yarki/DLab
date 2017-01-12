@@ -45,8 +45,10 @@ limitations under the License.
           <label class="control-label">Total Instance number</label>
         </div>
         <div class="col-xs-8">
-          <input type="number" class="form-control" min="1" max="999" formControlName="instance_number" (keypress)="isNumberKey($event)" />
-          <span class="danger_color" *ngIf="!createComputationalResourceForm.controls.instance_number.valid">Only integer values greater than 0 are allowed</span>
+          <input type="number" class="form-control" min="{{minInstanceNumber}}" max="{{maxInstanceNumber}}" formControlName="instance_number" (keypress)="isNumberKey($event)" />
+          <span class="danger_color" *ngIf="!createComputationalResourceForm.controls.instance_number.valid">
+            Only integer values greater than or equal to {{minInstanceNumber}} and less than {{maxInstanceNumber}} are allowed
+          </span>
         </div>
       </div>
       <div class="form-group row">
