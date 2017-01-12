@@ -25,7 +25,7 @@ COPY general/templates/${OS}/* /root/templates/
 
 RUN chmod 755 /root/fabfile.py; \
     chmod 755 /root/scripts/*; \
-    chmod a+x /root/entrypoint.py; \
+    chmod a+x /root/entrypoint.py;
 
 RUN mkdir /project_tree
 COPY . /project_tree
