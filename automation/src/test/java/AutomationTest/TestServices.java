@@ -14,7 +14,9 @@ import Repository.HttpStatusCode;
 import Repository.Path;
 import ServiceCall.JenkinsCall;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
+import com.amazonaws.services.ec2.model.Tag;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 import com.jcraft.jsch.ChannelExec;
@@ -54,6 +56,7 @@ public class TestServices {
     public static void Cleanup() throws InterruptedException {
     }
 
+    
     @Test(priority=1)
     public void testJenkinsJob() throws Exception {
 
@@ -142,6 +145,7 @@ public class TestServices {
         String gettingStatus;
         String noteBookName = "Notebook" + HelperMethods.generateRandomValue();
         String emrName = "EMR" + HelperMethods.generateRandomValue();
+        final String nodePrefix = PropertyValue.getUsernameSimple();
 
         RestAssured.baseURI = ssnURL;
         LoginDto testUserRequestBody = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
@@ -179,8 +183,8 @@ public class TestServices {
             Assert.assertEquals(200, respCheckKey.getStatusCode(), "Failed to check User Key.");
         }
 
-        Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_edge_", publicIp);
-        Amazon.checkAmazonStatus(serviceBaseName + "-Auto_EPMC-BDCC_Test-edge", AmazonInstanceState.RUNNING);
+        Docker.checkDockerStatus(nodePrefix + "_create_edge_", publicIp);
+        Amazon.checkAmazonStatus(serviceBaseName + "-" + nodePrefix + "-edge", AmazonInstanceState.RUNNING);
 
         System.out.println("7. Notebook will be created ...");
         final String ssnExpEnvURL = getSnnURL(Path.EXP_ENVIRONMENT);
@@ -204,9 +208,9 @@ public class TestServices {
             throw new Exception("Notebook " + noteBookName + " has not been created");
         System.out.println("   Notebook " + noteBookName + " has been created");
 
-        Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-nb-" + noteBookName, AmazonInstanceState.RUNNING);
+        Amazon.checkAmazonStatus(nodePrefix + "-nb-" + noteBookName, AmazonInstanceState.RUNNING);
 
-        Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_exploratory_NotebookAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_create_exploratory_NotebookAutoTest", publicIp);
         
         //get notebook IP
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(noteBookName);
@@ -236,12 +240,12 @@ public class TestServices {
             throw new Exception("EMR " + emrName + " has not been deployed");
         System.out.println("   EMR " + emrName + " has been deployed");
 
-        Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-emr-" + noteBookName, AmazonInstanceState.RUNNING);
+        Amazon.checkAmazonStatus(nodePrefix + "-emr-" + noteBookName, AmazonInstanceState.RUNNING);
 
-        Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_create_computational_EMRAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
         
         //run python script
-        testPython(publicIp, notebookIp, serviceBaseName, emrName);
+        testPython(publicIp, notebookIp, serviceBaseName, emrName, getEmrClusterName(emrName));
 
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
@@ -261,9 +265,9 @@ public class TestServices {
             throw new Exception("Computational resources has not been terminated for Notebook " + noteBookName);
         System.out.println("   Computational resources has been terminated for Notebook " + noteBookName);
 
-        Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-emr-" + noteBookName, AmazonInstanceState.TERMINATED);
+        Amazon.checkAmazonStatus(nodePrefix + "-emr-" + noteBookName, AmazonInstanceState.TERMINATED);
 
-        Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_stop_exploratory_NotebookAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_stop_exploratory_NotebookAutoTest", publicIp);
 
         System.out.println("10. Notebook will be started ...");
         String myJs = "{\"notebook_instance_name\":\"" + noteBookName + "\"}";
@@ -277,9 +281,9 @@ public class TestServices {
             throw new Exception("Notebook " + noteBookName + " has not been started");
         System.out.println("    Notebook " + noteBookName + " has been started");
 
-        Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-nb-" + noteBookName, AmazonInstanceState.RUNNING);
+        Amazon.checkAmazonStatus(nodePrefix + "-nb-" + noteBookName, AmazonInstanceState.RUNNING);
 
-        Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_start_exploratory_NotebookAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_start_exploratory_NotebookAutoTest", publicIp);
 
         System.out.println("11. New EMR will be deployed for termination ...");
         final String emrNewName = "New" + emrName; 
@@ -315,7 +319,7 @@ public class TestServices {
 
         Amazon.checkAmazonStatus("NewEMRAutoTest", AmazonInstanceState.TERMINATED);
 
-        Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_terminate_computational_NewEMRAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_terminate_computational_NewEMRAutoTest", publicIp);
 
         System.out.println("12. Notebook will be terminated ...");
         final String emrNewName2 = "AnotherNew" + emrName;
@@ -356,11 +360,25 @@ public class TestServices {
             throw new Exception("EMR has been terminated for Notebook " + noteBookName);
         System.out.println("    EMR has been terminated for Notebook " + noteBookName);
 
-        Amazon.checkAmazonStatus("Auto_EPMC-BDCC_Test-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED);
+        Amazon.checkAmazonStatus(nodePrefix + "-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED);
 
-        Docker.checkDockerStatus("Auto_EPMC-BDCC_Test_terminate_exploratory_NotebookAutoTestt", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_terminate_exploratory_NotebookAutoTestt", publicIp);
     }
 
+    private static String getEmrClusterName(String emrName) throws Exception {
+        Instance instance = Amazon.getInstanceResult(emrName)
+        		.getReservations()
+        		.get(0)
+        		.getInstances()
+        		.get(0);
+        for (Tag tag : instance.getTags()) {
+			if (tag.getKey().equals("Name")) {
+		        return tag.getValue();
+			}
+		}
+        throw new Exception("Could not detect cluster name for EMR " + emrName);
+    }    	
+    	
     private static void copyFileToSSN(String filename, String ip) throws IOException, InterruptedException {
         String sourceDir = "/var/lib/jenkins/AutoTestData";
         String copyToSSNCommand = "scp -i %s -o 'StrictHostKeyChecking no' %s ubuntu@%s:~/";
@@ -389,8 +407,9 @@ public class TestServices {
         Assert.assertTrue(status.isOk());
     }
     
-    private static void testPython(String ssnIP, String noteBookIp, String serviceBaseName, String emrName)
+    private static void testPython(String ssnIP, String noteBookIp, String serviceBaseName, String emrName, String cluster_name)
             throws JSchException, IOException, InterruptedException {
+    	final String nodePrefix = PropertyValue.getUsernameSimple();
 
     	String [] files = {
     			"kernels_test.py",
@@ -423,12 +442,11 @@ public class TestServices {
             Session notebookSession = SSHConnect.getForwardedConnect("ubuntu", noteBookIp, assignedPort);
 
             try {
-                String notebookUsername = PropertyValue.getUsername().replaceAll("@.*", "");
-                String bucketName = String.format("%s-%s-bucket", serviceBaseName, notebookUsername).replace('_', '-').toLowerCase();
+                String bucketName = String.format("%s-%s-bucket", serviceBaseName, nodePrefix).replace('_', '-').toLowerCase();
                 command = String.format("/usr/bin/python %s --bucket %s --cluster_name %s",
                         Paths.get("/tmp", pyFilename).toString(),
                         bucketName,
-                        emrName);
+                        cluster_name);
                 System.out.println(String.format("Executing command %s...", command));
                 ChannelExec runScript = SSHConnect.setCommand(notebookSession, command);
                 status = SSHConnect.checkAck(runScript);
