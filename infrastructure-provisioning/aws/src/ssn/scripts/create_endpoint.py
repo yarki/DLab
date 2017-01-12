@@ -24,6 +24,7 @@ from dlab.aws_actions import *
 from dlab.aws_meta import *
 import sys, os
 import boto3, botocore
+from dlab.ssn_lib import *
 
 
 parser = argparse.ArgumentParser()

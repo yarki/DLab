@@ -23,6 +23,7 @@ from dlab.aws_actions import *
 import boto3
 import argparse
 import sys
+from dlab.ssn_lib import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--tag_name', type=str)

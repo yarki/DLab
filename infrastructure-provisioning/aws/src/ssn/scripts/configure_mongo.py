@@ -26,6 +26,7 @@ import subprocess
 import time
 import argparse
 import os
+from dlab.ssn_lib import *
 
 path = "/etc/mongod.conf"
 outfile = "/etc/mongo_params.yml"

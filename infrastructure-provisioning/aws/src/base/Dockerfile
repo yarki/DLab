@@ -46,13 +46,15 @@ ENV PROVISION_CONFIG_DIR /root/conf/
 ENV KEYFILE_DIR /root/keys/
 ENV AWS_DIR /root/.aws
 RUN mkdir -p /root/conf
+RUN mkdir -p /root/api
 RUN mkdir -p /root/templates
 RUN mkdir -p /root/keys/.ssh
 COPY . /root
-COPY ../root/api /root/api
-COPY ../root/conf /root/conf
-COPY ../root/scripts/general /root/scripts
-COPY ../root/lib /usr/lib/python2.7/dlab
+COPY ../general/api/* /root/api/
+COPY ../general/conf/* /root/conf/
+COPY ../general/lib /usr/lib/python2.7/dlab
+COPY ../general/scripts/common/* /root/scripts/
+COPY ../general/templates/common/* /root/templates/
 RUN chmod a+x /root/*.py
 
 # Entrypoint
