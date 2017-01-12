@@ -75,7 +75,7 @@ def run():
         'notebook_user_name'] + "-nb-" + notebook_config['exploratory_name'] + notebook_config['uuid']
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-rstudio-notebook-image'
-    notebook_config['role_profile_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
+    notebook_config['role_profile_name'] = os.environ['conf_service_base_name'].lower().replace('-', '_') + "-" + os.environ[
         'notebook_user_name'] + "-nb-Profile"
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + "-nb-SG"
