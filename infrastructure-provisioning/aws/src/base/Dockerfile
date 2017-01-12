@@ -49,7 +49,10 @@ RUN mkdir -p /root/conf
 RUN mkdir -p /root/templates
 RUN mkdir -p /root/keys/.ssh
 COPY . /root
-COPY dlab /usr/lib/python2.7/dlab
+COPY ../root/api /root/api
+COPY ../root/conf /root/conf
+COPY ../root/scripts/general /root/scripts
+COPY ../root/lib /usr/lib/python2.7/dlab
 RUN chmod a+x /root/*.py
 
 # Entrypoint
