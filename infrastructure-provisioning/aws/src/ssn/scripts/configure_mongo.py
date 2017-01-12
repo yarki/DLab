@@ -54,27 +54,6 @@ def read_yml_conf(path, section, param):
         return ''
 
 
-def add_2_yml_config(path,section,param,value):
-    try:
-        try:
-            with open(path, 'r') as config_yml_r:
-                config_orig = yaml.load(config_yml_r)
-        except:
-            config_orig = {}
-        sections = []
-        for i in config_orig:
-            sections.append(i)
-        if section in sections:
-            config_orig[section].update({param:value})
-        else:
-            config_orig.update({section:{param:value}})
-        with open(path, 'w') as outfile_yml_w:
-            yaml.dump(config_orig, outfile_yml_w, default_flow_style=True)
-        return True
-    except:
-        print "Could not write the target file"
-        return False
-
 if __name__ == "__main__":
     # mongo_passwd = id_generator()
     mongo_passwd = "XS3ms9R3tP"
@@ -101,7 +80,7 @@ if __name__ == "__main__":
         client.dlabdb.settings.insert_one({"_id": "creds_subnet_id", "value": args.subnet})
         client.dlabdb.settings.insert_one({"_id": "service_base_name", "value": args.base_name})
         client.dlabdb.settings.insert_one({"_id": "security_groups_ids", "value": args.sg})
-        client.dlabdb.settings.insert_one({"_id": "notebook_ssh_user", "value": "ubuntu"})
+        client.dlabdb.settings.insert_one({"_id": "notebook_ssh_user", "value": os.environ['general_os_user']})
         client.dlabdb.settings.insert_one({"_id": "creds_key_dir", "value": "/root/keys"})
         client.dlabdb.security.insert({ "expireAt": "1" }, { "expireAfterSeconds": "3600" })
         client.dlabdb.shapes.insert(shapes)

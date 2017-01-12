@@ -438,19 +438,8 @@ def run():
             f.write(json.dumps(res))
 
         print 'Upload response file'
-        instance_hostname = get_instance_hostname(instance_name)
-        print 'Connect to SSN instance with hostname: ' + instance_hostname + 'and name: ' + instance_name
-        env['connection_attempts'] = 100
-        env.key_filename = "/root/keys/%s.pem" % os.environ['creds_key_name']
-        env.host_string = 'ubuntu@' + instance_hostname
-        try:
-            put('/root/result.json', '/home/ubuntu/%s.json' % os.environ['request_id'])
-            sudo('mv /home/ubuntu/' + os.environ['request_id'] + '.json ' + os.environ['ssn_dlab_path'] + 'tmp/result/')
-            put(local_log_filepath, '/home/ubuntu/ssn.log')
-            sudo('mv /home/ubuntu/ssn.log /var/opt/dlab/log/ssn/')
-        except:
-            print 'Failed to upload response file'
-            sys.exit(1)
+        params = "--instance_name {} --local_log_filepath {}".format(instance_name, local_log_filepath)
+        local("~/scripts/%s.py %s" % ('upload_response_file', params))
 
         logging.info('[FINALIZE]')
         print('[FINALIZE]')
