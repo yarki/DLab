@@ -51,7 +51,7 @@ RUN mkdir -p /root/api
 RUN mkdir -p /root/templates
 RUN mkdir -p /root/keys/.ssh
 COPY . /root
-COPY ../root/api/*.py /bin
+COPY ../general/api/*.py /bin
 COPY ../general/api/* /root/api/
 COPY ../general/conf/* /root/conf/
 COPY ../general/lib /usr/lib/python2.7/dlab
