@@ -60,5 +60,6 @@ COPY general/templates/common/* /root/templates/
 COPY general/api/*.py /bin/
 COPY general/lib/* /usr/lib/python2.7/dlab/
 RUN chmod a+x /root/*.py
+RUN chmod a+x /bin/*.py
 
 ENTRYPOINT ["/root/entrypoint.py"]
