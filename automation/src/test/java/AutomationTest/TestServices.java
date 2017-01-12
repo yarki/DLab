@@ -78,7 +78,6 @@ public class TestServices {
 
         System.out.println("Check status of SSN node on Amazon:");
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(serviceBaseName + "-ssn");
-        Assert.assertEquals(describeInstanceResult.getReservations().size(), 1, "SSN node in Amazon not found");
         InstanceState instanceState = describeInstanceResult
         	.getReservations()
         	.get(0)
@@ -136,9 +135,9 @@ public class TestServices {
     @Test(priority=3)
     public void testDLabScenario() throws Exception {
 
-    	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
-        //serviceBaseName = "AutoTest201612284146";
-        //publicIp = "35.162.89.115";
+    	//ssnURL = "http://ec2-35-164-76-52.us-west-2.compute.amazonaws.com";
+        //serviceBaseName = "autotest_jan11";
+        //publicIp = "35.164.76.52";
 
         String gettingStatus;
         String noteBookName = "Notebook" + HelperMethods.generateRandomValue();
@@ -191,6 +190,7 @@ public class TestServices {
 
         CreateNotebookDto createNoteBookRequest = new CreateNotebookDto();
         createNoteBookRequest.setImage("docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter");
+        createNoteBookRequest.setTemplateName("Jupyter 1.5");
         createNoteBookRequest.setName(noteBookName);
         createNoteBookRequest.setShape("r3.xlarge");
         createNoteBookRequest.setVersion("jupyter-1.6");
@@ -393,13 +393,13 @@ public class TestServices {
             throws JSchException, IOException, InterruptedException {
 
     	String [] files = {
+    			"kernel_test.py",
     			"train.csv",
-    			"pyspark_test.py",
-    			"tests.ipynb",
+    			"PYTHON.ipynb",
     			"R.ipynb",
     			"SCALA.ipynb"
     			};
-    	String pyFilename = "pyspark_test.py";
+    	String pyFilename = files[0];
 
         System.out.println("Copying files to SSN...");
         for (String filename : files) {

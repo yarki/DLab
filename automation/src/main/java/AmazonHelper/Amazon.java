@@ -14,7 +14,7 @@ import org.testng.Assert;
 
 public class Amazon {
     
-    public static DescribeInstancesResult getInstanceResult(String instanceName){
+    public static DescribeInstancesResult getInstanceResult(String instanceName) throws Exception {
 
             AWSCredentials _credentials = new BasicAWSCredentials(AmazonCredentials.ACCESS_KEY, AmazonCredentials.SECRET_KEY);
             AmazonEC2 _ec2 = new AmazonEC2Client(_credentials);
@@ -29,6 +29,11 @@ public class Amazon {
             DescribeInstancesRequest describeInstanceRequest = new DescribeInstancesRequest().withFilters(filter);
            
             DescribeInstancesResult describeInstanceResult = _ec2.describeInstances(describeInstanceRequest);
+            
+            if (describeInstanceResult.getReservations().size() == 0) {
+            	throw new Exception("Instance "+ instanceName + " in Amazon not found");
+            }
+            
             return describeInstanceResult;
   
     }
@@ -38,8 +43,6 @@ public class Amazon {
         System.out.println("Check status of SSN node " + instanceName + " on Amazon:");
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(instanceName);
         String instanceState;
-        
-        Assert.assertEquals(describeInstanceResult.getReservations().size(), 1, "Instance in Amazon not found");
         
         do {
             instanceState = describeInstanceResult

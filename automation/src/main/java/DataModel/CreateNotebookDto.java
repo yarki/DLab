@@ -4,6 +4,7 @@ public class CreateNotebookDto {
     
 	private String image;
     private String name;
+    private String templateName;
     private String shape;
     private String version;
     
@@ -32,17 +33,19 @@ public class CreateNotebookDto {
         this.shape = shape;
     }
     
+	public String getTemplateName() {
+		return templateName;
+	}
+
+	public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
+
     public String getVersion() {
         return version;
     }
     
     public void setVersion(String version) {
-        this.version = version;
-    }
-    
-    public CreateNotebookDto(String name, String shape, String version){
-        this.name = name;
-        this.shape = shape;
         this.version = version;
     }
     
