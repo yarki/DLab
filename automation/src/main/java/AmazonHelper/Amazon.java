@@ -41,18 +41,17 @@ public class Amazon {
     public static void checkAmazonStatus(String instanceName, String expAmazonState) throws Exception {
         
         System.out.println("Check status of instance " + instanceName + " on Amazon:");
-        DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(instanceName);
         String instanceState;
         
-        do {
-            instanceState = describeInstanceResult
+        while ((instanceState = Amazon.getInstanceResult(instanceName)
             	.getReservations()
             	.get(0)
             	.getInstances()
             	.get(0)
             	.getState()
-            	.getName();
-        } while (instanceState.equals("shutting-down"));
+            	.getName()).equals("shutting-down")) {
+            Thread.sleep(1000);
+        };
         
         System.out.println("Amazon instance " + instanceName + " state is " + expAmazonState);           
         Assert.assertEquals(instanceState, expAmazonState, "Amazon instance " + instanceName + " state is not correct");

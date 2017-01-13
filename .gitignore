@@ -10,3 +10,4 @@ target
 /automation/bin
 /services/common/bin
 /services/security-service/bin
+/automation/test-output
