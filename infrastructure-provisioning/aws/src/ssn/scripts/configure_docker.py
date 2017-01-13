@@ -29,6 +29,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
+parser.add_argument('--os_family', type=str, default='')
 args = parser.parse_args()
 
 
@@ -40,11 +41,10 @@ def build_docker_images(image_list):
             name = image['name']
             tag = image['tag']
             if name == 'base':
-                dir_name = ''
-            else:
-                dir_name = name
-            sudo("cd /project_images/{0}; docker build "
-                 "-t docker.epmc-bdcc.projects.epam.com/dlab-aws-{1}:{2} .".format(dir_name, name, tag))
+                sudo("cd /project_images/; docker build --build-arg OS=" + args.os_family + " --file {0}/Dockerfile"
+                 "-t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} .".format(name, tag))
+            sudo("cd /project_images/{0}; docker build --build-arg OS=" + args.os_family +
+                 " -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} .".format(name, tag))
         return True
     except:
         return False

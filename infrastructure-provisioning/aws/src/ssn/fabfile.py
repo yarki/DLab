@@ -346,8 +346,8 @@ def run():
                              {"name": "edge", "tag": "latest"},
                              {"name": "emr", "tag": "latest"},
                              {"name": "zeppelin", "tag": "latest"}, ]
-        params = "--hostname {} --keyfile {} --additional_config '{}'". \
-                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), json.dumps(additional_config))
+        params = "--hostname {} --keyfile {} --additional_config '{}' --os_family {}". \
+                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), json.dumps(additional_config), os.environ['general_os_family'])
 
         try:
             local("~/scripts/{}.py {}".format('configure_docker', params))
