@@ -82,7 +82,8 @@ def ensure_nginx():
         if not exists(os.environ['ssn_dlab_path'] + 'tmp/nginx_ensured'):
             sudo('apt-get -y install nginx')
             sudo('service nginx restart')
-            sudo('sysv-rc-conf nginx on')
+            sudo('update-rc.d nginx defaults')
+            sudo('update-rc.d nginx enable')
             sudo('touch ' + os.environ['ssn_dlab_path'] + 'tmp/nginx_ensured')
         return True
     except:
