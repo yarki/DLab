@@ -224,10 +224,11 @@ public class TestServices {
         System.out.println("   SSN computational resources URL is " + ssnCompResURL);
         
         DeployEMRDto deployEMR = new DeployEMRDto();
+        final String emrVersion="emr-5.2.0";
         deployEMR.setEmr_instance_count("3");
         deployEMR.setEmr_master_instance_type("m4.large");
         deployEMR.setEmr_slave_instance_type("m4.large");
-        deployEMR.setEmr_version("emr-4.3.0");
+        deployEMR.setEmr_version(emrVersion);
         deployEMR.setName(emrName);
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
@@ -290,7 +291,7 @@ public class TestServices {
         deployEMR.setEmr_instance_count("1");
         deployEMR.setEmr_master_instance_type("m4.large");
         deployEMR.setEmr_slave_instance_type("m4.large");
-        deployEMR.setEmr_version("emr-4.3.0");
+        deployEMR.setEmr_version(emrVersion);
         deployEMR.setName(emrNewName);
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMRNew = new HttpRequest().webApiPut(ssnCompResURL,
@@ -331,7 +332,7 @@ public class TestServices {
         deployEMR.setEmr_instance_count("1");
         deployEMR.setEmr_master_instance_type("m4.large");
         deployEMR.setEmr_slave_instance_type("m4.large");
-        deployEMR.setEmr_version("emr-4.3.0");
+        deployEMR.setEmr_version(emrVersion);
         deployEMR.setName(emrNewName2);
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMRAnotherNew = new HttpRequest().webApiPut(ssnCompResURL,
