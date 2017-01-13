@@ -273,9 +273,8 @@ def run():
 
             logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
             print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
-            params = "--hostname %s --keyfile %s " \
-                     "--pip_packages 'boto3 argparse fabric jupyter awscli pymongo'" % \
-                     (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
+            params = "--hostname {} --keyfile {} --pip_packages 'boto3 argparse fabric jupyter awscli pymongo' --user {}".\
+                format(instance_hostname, "/root/keys/" + os.environ['creds_key_name'] + ".pem", os.environ['general_os_user'])
 
             if local("~/scripts/%s.py %s" % ('install_prerequisites', params)).failed:
                 with open("/root/result.json", 'w') as result:
