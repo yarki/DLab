@@ -17,3 +17,19 @@
 # limitations under the License.
 #
 # ******************************************************************************
+
+from fabric.api import *
+from fabric.contrib.files import exists
+
+def ensure_pkg(requisites, user):
+    try:
+        if not exists('/home/{}/.ensure_dir/pkg_upgraded'.format(user)):
+            sudo('apt-get update')
+            sudo('apt-get -y install ' + requisites)
+            sudo('unattended-upgrades -v')
+            sudo('export LC_ALL=C')
+            sudo('mkdir /home/{}/.ensure_dir'.format(user))
+            sudo('touch /home/{}/.ensure_dir/pkg_upgraded'.format(user))
+        return True
+    except:
+        return False

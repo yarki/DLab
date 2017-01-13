@@ -22,20 +22,6 @@ import logging
 import os
 
 
-def ensure_apt(requisites):
-    try:
-        if not exists('/home/ubuntu/.ensure_dir/apt_upgraded'):
-            sudo('apt-get update')
-            sudo('apt-get -y install ' + requisites)
-            sudo('unattended-upgrades -v')
-            sudo('export LC_ALL=C')
-            sudo('mkdir /home/ubuntu/.ensure_dir')
-            sudo('touch /home/ubuntu/.ensure_dir/apt_upgraded')
-        return True
-    except:
-        return False
-
-
 def ensure_pip(requisites):
     try:
         if not exists('/home/ubuntu/.ensure_dir/pip_path_added'):

@@ -22,6 +22,7 @@ from fabric.api import *
 import argparse
 import json
 from dlab.fab import *
+from dlab.common_lib import ensure_pkg
 import sys
 
 
@@ -31,6 +32,7 @@ parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--apt_packages', type=str, default='linux-headers-generic python-pip python-dev groff vim less git wget sysv-rc-conf libssl-dev unattended-upgrades')
 parser.add_argument('--pip_packages', type=str, default='boto3 argparse fabric jupyter awscli')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
+parser.add_argument('--user', type=str, default='')
 args = parser.parse_args()
 
 
@@ -38,11 +40,11 @@ if __name__ == "__main__":
     print "Configure connections"
     env['connection_attempts'] = 100
     env.key_filename = [args.keyfile]
-    env.host_string = 'ubuntu@' + args.hostname
+    env.host_string = '{}@{}'.format(args.user, args.hostname)
     deeper_config = json.loads(args.additional_config)
 
     print "Updating repositories and installing requested tools: " + args.apt_packages
-    if not ensure_apt(args.apt_packages):
+    if not ensure_pkg(args.apt_packages, args.user):
         sys.exit(1)
 
     print "Installing python packages: " + args.pip_packages
