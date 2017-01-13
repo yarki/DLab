@@ -400,27 +400,6 @@ def run():
         remove_s3('edge', os.environ['edge_user_name'])
         sys.exit(1)
 
-#    try:
-#        print '[INSTALLING SOCKS PROXY]'
-#        logging.info('[INSTALLING SOCKS PROXY]')
-#        additional_config = {"exploratory_subnet": edge_conf['private_subnet_cidr'],
-#                             "template_file": "/root/templates/danted.conf"}
-#        params = "--hostname %s --keyfile %s --additional_config '%s'" % \
-#                 (instance_hostname, keyfile_name, json.dumps(additional_config))
-#        local("~/scripts/%s.py %s" % ('configure_socks_proxy', params))
-#        with open("/root/result.json", 'w') as result:
-#            res = {"error": "Failed installing socks proxy", "conf": edge_conf}
-#            print json.dumps(res)
-#            result.write(json.dumps(res))
-#    except:
-#        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
-#        remove_all_iam_resources('edge', os.environ['edge_user_name'])
-#        remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
-#        remove_sgroups(edge_conf['notebook_instance_name'])
-#        remove_sgroups(edge_conf['instance_name'])
-#        remove_s3('edge', os.environ['edge_user_name'])
-#        sys.exit(1)
-
 
     try:
         print '[INSTALLING USERs KEY]'
