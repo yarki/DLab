@@ -77,6 +77,7 @@ def run():
                             res = {"error": "Failed to create VPC"}
                             print json.dumps(res)
                             result.write(json.dumps(res))
+                            raise Exception
                     os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
                     enable_vpc_dns(os.environ['creds_vpc_id'])
                     rt_id = create_rt(os.environ['creds_vpc_id'], tag_name, service_base_name)
@@ -94,6 +95,7 @@ def run():
                             res = {"error": "Failed to create Subnet"}
                             print json.dumps(res)
                             result.write(json.dumps(res))
+                            raise Exception
                     with open('/tmp/ssn_subnet_id', 'r') as f:
                         os.environ['creds_subnet_id'] = f.read()
                     enable_auto_assign_ip(os.environ['creds_subnet_id'])
@@ -161,6 +163,7 @@ def run():
                             res = {"error": "Failed creating security group for SSN"}
                             print json.dumps(res)
                             result.write(json.dumps(res))
+                            raise Exception
                     with open('/tmp/ssn_sg_id', 'r') as f:
                         os.environ['creds_security_groups_ids'] = f.read()
                 except:
@@ -180,6 +183,7 @@ def run():
                     res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
+                    raise Exception
         except:
             if pre_defined_sg:
                 remove_sgroups(tag_name)
@@ -200,6 +204,7 @@ def run():
                     res = {"error": "Unable to create an endpoint", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
+                    raise Exception
         except:
             remove_all_iam_resources(instance)
             if pre_defined_sg:
@@ -222,6 +227,7 @@ def run():
                     res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
+                    raise Exception
         except:
             remove_all_iam_resources(instance)
             if pre_defined_sg:
@@ -248,6 +254,7 @@ def run():
                     res = {"error": "Unable to create ssn instance", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
+                    raise Exception
         except:
             remove_all_iam_resources(instance)
             remove_s3(instance)
@@ -275,6 +282,7 @@ def run():
                     res = {"error": "Failed installing software: pip, apt", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
+                    raise Exception
         except:
             remove_ec2(tag_name, instance_name)
             remove_all_iam_resources(instance)
@@ -301,6 +309,7 @@ def run():
                     res = {"error": "Failed configuring ssn", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
+                    raise Exception
         except:
             remove_ec2(tag_name, instance_name)
             remove_all_iam_resources(instance)
@@ -332,6 +341,7 @@ def run():
                     res = {"error": "Unable to configure docker", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
+                    raise Exception
         except:
             remove_ec2(tag_name, instance_name)
             remove_all_iam_resources(instance)
@@ -355,9 +365,10 @@ def run():
 
             if local("~/scripts/%s.py %s" % ('install_prerequisites', params)).failed:
                 with open("/root/result.json", 'w') as result:
-                     res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
-                     print json.dumps(res)
-                     result.write(json.dumps(res))
+                    res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
+                    print json.dumps(res)
+                    result.write(json.dumps(res))
+                raise Exception
         except:
             remove_ec2(tag_name, instance_name)
             remove_all_iam_resources(instance)
@@ -381,6 +392,7 @@ def run():
                     res = {"error": "Unable to upload UI", "conf": os.environ.__dict__}
                     print json.dumps(res)
                     result.write(json.dumps(res))
+                    raise Exception
         except:
             remove_ec2(tag_name, instance_name)
             remove_all_iam_resources(instance)
