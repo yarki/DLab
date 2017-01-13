@@ -43,8 +43,9 @@ def build_docker_images(image_list):
             if name == 'base':
                 sudo("cd /project_images/; docker build --build-arg OS={2} --file {0}/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
                      .format(name, tag, args.os_family))
-            sudo("cd /project_images/{0}; docker build --build-arg OS={2} -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
-                 .format(name, tag, args.os_family))
+            else:
+                sudo("cd /project_images/{0}; docker build --build-arg OS={2} -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
+                     .format(name, tag, args.os_family))
         return True
     except:
         return False
