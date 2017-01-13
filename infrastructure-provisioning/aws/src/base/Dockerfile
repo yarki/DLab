@@ -17,6 +17,7 @@
 # ******************************************************************************
 
 FROM ubuntu:16.04
+ARG OS
 
 # Install any .deb dependecies
 RUN	apt-get update && \
@@ -59,6 +60,8 @@ COPY general/scripts/common/* /root/scripts/
 COPY general/templates/common/* /root/templates/
 COPY general/api/*.py /bin/
 COPY general/lib/* /usr/lib/python2.7/dlab/
+COPY general/scripts/${OS}/common_lib.py /usr/lib/python2.7/dlab/common_lib.py
+
 RUN chmod a+x /root/*.py
 RUN chmod a+x /bin/*.py
 
