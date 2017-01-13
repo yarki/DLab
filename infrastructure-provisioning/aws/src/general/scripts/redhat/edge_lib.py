@@ -39,4 +39,3 @@ def configure_http_proxy_server(config):
         return True
     except:
         return False
-    return True

@@ -57,7 +57,7 @@ if __name__ == "__main__":
     try:
         passed_as_json = json.loads(stdin_contents)
     except:
-        with open("/response/%s.json" % request_id, 'w') as response_file:
+        with open("/response/{}.json".format(request_id), 'w') as response_file:
             reply = dict()
             reply['request_id'] = os.environ['request_id']
             reply['status'] = 'err'
@@ -77,7 +77,7 @@ if __name__ == "__main__":
             config.read(os.path.join('/root/conf', filename))
             for section in config.sections():
                 for option in config.options(section):
-                    varname = "%s_%s" % (section, option)
+                    varname = "{0}_{1}".format(section, option)
                     if varname not in os.environ:
                         os.environ[varname] = config.get(section, option)
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
             config.read(os.path.join('/root/conf', filename))
             for section in config.sections():
                 for option in config.options(section):
-                    varname = "%s_%s" % (section, option)
+                    varname = "{0}_{1}".format(section, option)
                     os.environ[varname] = config.get(section, option)
 
     # Pre-execution steps: checking for dry running
@@ -103,7 +103,7 @@ if __name__ == "__main__":
         local('chmod 600 /root/keys/*.pem')
 
     if dry_run:
-        with open("/response/%s.json" % request_id, 'w') as response_file:
+        with open("/response/{}.json".format(request_id), 'w') as response_file:
             response = {"request_id": request_id, "action": args.action, "dry_run": "true"}
             response_file.write(json.dumps(response))
 
@@ -120,7 +120,7 @@ if __name__ == "__main__":
         with open('/root/description.json') as json_file:
             description = json.load(json_file)
             description['request_id'] = request_id
-            with open("/response/%s.json" % request_id, 'w') as response_file:
+            with open("/response/{}.json".format(request_id), 'w') as response_file:
                 response_file.write(json.dumps(description))
 
     elif args.action == 'stop':

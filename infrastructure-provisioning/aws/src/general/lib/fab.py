@@ -45,13 +45,13 @@ def create_aws_config_files(generate_full_config=False):
 
         with open(aws_user_dir + '/config', 'w') as aws_file:
             aws_file.write("[default]\n")
-            aws_file.write("region = %s\n" % os.environ['creds_region'])
+            aws_file.write("region = {}\n".format(os.environ['creds_region']))
 
         if generate_full_config:
             with open(aws_user_dir + '/credentials', 'w') as aws_file:
                 aws_file.write("[default]\n")
-                aws_file.write("aws_access_key_id = %s\n" % os.environ['creds_access_key'])
-                aws_file.write("aws_secret_access_key = %s\n" % os.environ['creds_secret_access_key'])
+                aws_file.write("aws_access_key_id = {}\n".format(os.environ['creds_access_key']))
+                aws_file.write("aws_secret_access_key = {}\n".format(os.environ['creds_secret_access_key']))
 
         logging.info(local("chmod 600 " + aws_user_dir + "/*"+" 2>&1", capture=True))
         logging.info(local("chmod 550 " + aws_user_dir+" 2>&1", capture=True))

@@ -35,14 +35,12 @@ args = parser.parse_args()
 def build_docker_images(image_list):
     try:
         sudo('mkdir /project_images; chown ' + os.environ['general_os_user'] + ' /project_images')
-        print "KEYFILE: " + args.keyfile
-        print "HOST_STRING: " + args.host_string
-        local('scp -r -i %s /project_tree/* %s:/project_images/' % (args.keyfile, env.host_string))
+        local('scp -r -i {} /project_tree/* {}:/project_images/'.format(args.keyfile, env.host_string))
         for image in image_list:
             name = image['name']
             tag = image['tag']
-            sudo("cd /project_images/%s; docker build "
-                 "-t docker.epmc-bdcc.projects.epam.com/dlab-aws-%s:%s ." % (name, name, tag))
+            sudo("cd /project_images/{0}; docker build "
+                 "-t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} .".format(name, tag))
         return True
     except:
         return False

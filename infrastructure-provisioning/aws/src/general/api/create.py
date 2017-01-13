@@ -47,9 +47,9 @@ if __name__ == "__main__":
         reply['response']['result'] = {"error": "Failed to open result.json"}
 
     if os.environ['general_resource'] == 'ssn':
-        reply['response']['log'] = "/response/%s.log" % os.environ['request_id']
+        reply['response']['log'] = "/response/{}.log".format(os.environ['request_id'])
 
-        with open("/response/%s.json" % os.environ['request_id'], 'w') as response_file:
+        with open("/response/{}.json".format(os.environ['request_id']), 'w') as response_file:
             response_file.write(json.dumps(reply))
     else:
         reply['response']['log'] = "/var/log/dlab/notebook/notebook_{}_{}.log".format(os.environ['notebook_user_name'], os.environ['request_id'])

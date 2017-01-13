@@ -21,6 +21,7 @@
 from fabric.api import *
 from fabric.contrib.files import exists
 
+
 def configure_http_proxy_server(config):
     try:
         if not exists('/tmp/http_proxy_ensured'):
@@ -39,4 +40,4 @@ def configure_http_proxy_server(config):
         return True
     except:
         return False
-    return True
+
