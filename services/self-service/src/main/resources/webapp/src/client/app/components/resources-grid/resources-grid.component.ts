@@ -37,7 +37,7 @@ export class ResourcesGrid implements OnInit {
   environments: Array<ResourcesGridRowModel>;
   filteredEnvironments: Array<ResourcesGridRowModel> = [];
   filterConfiguration: FilterConfigurationModel;
-  filterForm: FilterConfigurationModel = new FilterConfigurationModel('', [], [], []);
+  filterForm: FilterConfigurationModel = new FilterConfigurationModel('', [], [], [], '');
   model = new CreateEmrModel('', '');
   notebookName: string;
   isOutscreenDropdown: boolean;
@@ -88,7 +88,7 @@ export class ResourcesGrid implements OnInit {
       });
     });
 
-    this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, resources);
+    this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, resources, '');
   }
 
   applyFilter_btnClick(config: FilterConfigurationModel) {
@@ -102,25 +102,27 @@ export class ResourcesGrid implements OnInit {
 
     filteredData = filteredData.filter((item: any) => {
       let isName = item.name.toLowerCase().indexOf(config.name.toLowerCase()) !== -1;
-      let isStatus = config.statuses.length > 0 ? (config.statuses.indexOf(item.status) !== -1) : true;
+      let isStatus = config.statuses.length > 0 ? (config.statuses.indexOf(item.status) !== -1) : (config.type !== 'active');
       let isShape = config.shapes.length > 0 ? (config.shapes.indexOf(item.shape) !== -1) : true;
 
       let modifiedResources = containsStatus(item.resources, config.resources);
-      let isResources = config.resources.length > 0 ? (modifiedResources.length >= 0) : true;
+      let isResources = config.resources.length > 0 ? (modifiedResources.length > 0) : true;
 
-      if (config.resources.length > 0 && modifiedResources.length >= 0) {
-        item.resources = modifiedResources;
-      }
+      if (config.resources.length > 0 && modifiedResources.length > 0) { item.resources = modifiedResources; }
+      if (config.resources.length === 0 && config.type === 'active') { item.resources = []; }
 
       return isName && isStatus && isShape && isResources;
     });
 
     this.updateUserPreferences(config);
+    config.type = '';
+    
     this.filteredEnvironments = filteredData;
   }
 
   showActiveInstances(): void {
     let filteredData = (<any>Object).assign({}, this.filterConfiguration);
+    filteredData.type = 'active';
 
     for (let index in filteredData) {
       if (filteredData[index] instanceof Array)
@@ -196,7 +198,7 @@ export class ResourcesGrid implements OnInit {
   }
 
   loadUserPreferences(config): FilterConfigurationModel {
-    return new FilterConfigurationModel(config.name, config.statuses, config.shapes, config.resources);
+    return new FilterConfigurationModel(config.name, config.statuses, config.shapes, config.resources, config.type);
   }
 
   updateUserPreferences(filterConfiguration: FilterConfigurationModel): void {
