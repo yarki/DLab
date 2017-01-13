@@ -26,7 +26,6 @@ import subprocess
 import time
 import argparse
 import os
-from dlab.ssn_lib import *
 
 path = "/etc/mongod.conf"
 outfile = "/etc/mongo_params.yml"
@@ -40,8 +39,26 @@ parser.add_argument('--sg', type=str, default='')
 args = parser.parse_args()
 
 
-def id_generator(size=10, chars=string.digits + string.ascii_letters):
-    return ''.join(random.choice(chars) for _ in range(size))
+def add_2_yml_config(path, section, param, value):
+    try:
+        try:
+            with open(path, 'r') as config_yml_r:
+                config_orig = yaml.load(config_yml_r)
+        except:
+            config_orig = {}
+        sections = []
+        for i in config_orig:
+            sections.append(i)
+        if section in sections:
+            config_orig[section].update({param:value})
+        else:
+            config_orig.update({section:{param:value}})
+        with open(path, 'w') as outfile_yml_w:
+            yaml.dump(config_orig, outfile_yml_w, default_flow_style=False)
+        return True
+    except:
+        print "Could not write the target file"
+        return False
 
 
 def read_yml_conf(path, section, param):
@@ -93,9 +110,9 @@ if __name__ == "__main__":
         pass_upd = False
 
     # Generating output config
-    add_2_yml_config(outfile,'network','ip',mongo_ip)
-    add_2_yml_config(outfile,'network','port',mongo_port)
-    add_2_yml_config(outfile,'account','user','admin')
+    add_2_yml_config(outfile, 'network', 'ip', mongo_ip)
+    add_2_yml_config(outfile, 'network', 'port', mongo_port)
+    add_2_yml_config(outfile, 'account', 'user', 'admin')
     if pass_upd:
-        add_2_yml_config(outfile,'account','pass',mongo_passwd)
+        add_2_yml_config(outfile, 'account', 'pass', mongo_passwd)
 

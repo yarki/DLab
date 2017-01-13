@@ -37,7 +37,8 @@ def ensure_docker_daemon():
             sudo('apt-cache policy docker-engine')
             sudo('apt-get install -y docker-engine')
             sudo('usermod -a -G docker ubuntu')
-            sudo('sysv-rc-conf docker on')
+            sudo('update-rc.d docker defaults')
+            sudo('update-rc.d docker enable')
             sudo('touch ' + os.environ['ssn_dlab_path'] + 'tmp/docker_daemon_ensured')
         return True
     except:
@@ -188,7 +189,6 @@ def ensure_supervisor():
     try:
         if not exists(os.environ['ssn_dlab_path'] + 'tmp/superv_ensured'):
             sudo('apt-get -y install supervisor')
-            #sudo('sysv-rc-conf supervisor on')
             sudo('update-rc.d supervisor defaults')
             sudo('update-rc.d supervisor enable')
             sudo('touch ' + os.environ['ssn_dlab_path'] + 'tmp/superv_ensured')
@@ -210,7 +210,7 @@ def ensure_mongo():
         return False
 
 
-def start_ss(keyfile, host_string):
+def start_ss(keyfile, host_string, dlab_conf_dir, web_path):
     try:
         if not exists(os.environ['ssn_dlab_path'] + 'tmp/ss_started'):
             supervisor_conf = '/etc/supervisor/conf.d/supervisor_svc.conf'
