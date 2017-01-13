@@ -39,8 +39,12 @@ def build_docker_images(image_list):
         for image in image_list:
             name = image['name']
             tag = image['tag']
+            if name == 'base':
+                dir_name = ''
+            else:
+                dir_name = name
             sudo("cd /project_images/{0}; docker build "
-                 "-t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} .".format(name, tag))
+                 "-t docker.epmc-bdcc.projects.epam.com/dlab-aws-{1}:{2} .".format(dir_name, name, tag))
         return True
     except:
         return False
