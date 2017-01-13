@@ -131,6 +131,9 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 
     public UpdateResult updateExploratoryFields(ExploratoryStatusDTO dto) {
         Document values = new Document(STATUS, dto.getStatus()).append(UPTIME, dto.getUptime());
+        if (dto.getErrorMessage() != null) {
+            values.append(ERROR_MESSAGE, dto.getErrorMessage());
+        }
         if (dto.getExploratoryId() != null) {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());
         }

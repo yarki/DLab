@@ -55,6 +55,7 @@ class BaseDAO implements MongoCollections {
     public static final String ID = "_id";
     public static final String USER = "user";
     public static final String STATUS = "status";
+    public static final String ERROR_MESSAGE = "error_message";
     public static final String TIMESTAMP = "timestamp";
 
     @Inject
