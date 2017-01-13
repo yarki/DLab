@@ -20,6 +20,8 @@ from fabric.api import *
 from fabric.contrib.files import exists
 import logging
 import os
+import random
+import string
 
 
 def ensure_pip(requisites):
@@ -57,3 +59,7 @@ def create_aws_config_files(generate_full_config=False):
         return True
     except:
         return False
+
+
+def id_generator(size=10, chars=string.digits + string.ascii_letters):
+    return ''.join(random.choice(chars) for _ in range(size))

@@ -21,8 +21,6 @@
 from fabric.api import *
 import argparse
 import json
-import random
-import string
 import sys
 from dlab.ssn_lib import *
 
@@ -31,10 +29,6 @@ parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
-
-
-def id_generator(size=10, chars=string.digits + string.ascii_letters):
-    return ''.join(random.choice(chars) for _ in range(size))
 
 
 ##############
