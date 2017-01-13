@@ -83,10 +83,10 @@ export class ComputationalResourceCreateDialog {
   public onUpdate($event): void {
     if ($event.model.type === 'template') {
       this.model.setSelectedTemplate($event.model.index);
-      this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-        this.model.selectedItem.shapes.Memory_optimized[0].description, 'master_shape', 'description', 'json');
-      this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-        this.model.selectedItem.shapes.Memory_optimized[0].description, 'slave_shape', 'description', 'json');
+      this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
+        this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'master_shape', 'description', 'json');
+      this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
+        this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'slave_shape', 'description', 'json');
     }
 
     if (this.shapes[$event.model.type])
@@ -158,6 +158,10 @@ export class ComputationalResourceCreateDialog {
     });
   }
 
+  private shapePlaceholder(resourceShapes, byField: string): string {
+    for (var index in resourceShapes) return resourceShapes[index][0][byField];
+  }
+
   private getComputationalResourceLimits(): void {
     this.userResourceService.getComputationalResourcesLimits()
       .subscribe((limits) => {
@@ -174,15 +178,15 @@ export class ComputationalResourceCreateDialog {
 
   private setDefaultParams(): void {
     this.shapes = {
-      master_shape: this.model.selectedItem.shapes.Memory_optimized[0].type,
-      slave_shape: this.model.selectedItem.shapes.Memory_optimized[0].type
+      master_shape: this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'type'),
+      slave_shape: this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'type')
     };
     this.templates_list.setDefaultOptions(this.model.computationalResourceApplicationTemplates,
       this.model.selectedItem.version, 'template', 'version', 'array');
-    this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-      this.model.selectedItem.shapes.Memory_optimized[0].description, 'master_shape', 'description', 'json');
-    this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-      this.model.selectedItem.shapes.Memory_optimized[0].description, 'slave_shape', 'description', 'json');
+    this.master_shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
+      this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'master_shape', 'description', 'json');
+    this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
+      this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'slave_shape', 'description', 'json');
   }
 
   private resetDialog(): void {
