@@ -52,7 +52,6 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     private String originalUuid;
     private DockerAction action;
     private Class<T> resultType;
-    private String errorMessage;
 
     @SuppressWarnings("unchecked")
     public ResourceCallbackHandler(RESTService selfService, String user, String accessToken, String originalUuid, DockerAction action) {
@@ -71,7 +70,6 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
         LOGGER.debug("Got file {} while waiting for {}", fileName, originalUuid);
-        errorMessage = null;
         JsonNode document = MAPPER.readTree(content);
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
@@ -81,13 +79,12 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
             LOGGER.debug("Did {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
         } else {
             LOGGER.error("Could not {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
-            errorMessage = getTextValue(resultNode.get(ERROR_NODE));
+            result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
             resultNode = resultNode.get(CONF_NODE);
-            if (resultNode == null) {
-            	return false;
-            }
         }
-        result = parseOutResponse(resultNode, result);
+        if (resultNode != null) {
+            result = parseOutResponse(resultNode, result);
+        }
         selfService.post(getCallbackURI(), result, resultType);
         return !UserInstanceStatus.FAILED.equals(status);
     }
@@ -111,7 +108,6 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
             return (T) resultType.newInstance()
             		.withUser(user)
             		.withStatus(status)
-            		.withErrorMessage(errorMessage)
             		.withUptime(getUptime(status));
         } catch (Throwable t) {
             throw new DlabException("Something went wrong", t);
