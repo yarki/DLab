@@ -187,7 +187,7 @@ def run():
         params = "--hostname %s --keyfile %s" % (instance_hostname, keyfile_name)
         try:
             local("~/scripts/%s.py %s" % ('install_jupyter_additions', params))
-        except
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to install python libs", "conf": notebook_config}
                 print json.dumps(res)
