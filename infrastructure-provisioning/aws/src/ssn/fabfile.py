@@ -158,9 +158,9 @@ def run():
                         format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), service_base_name, tag_name, False, True)
                     if local("~/scripts/%s.py %s" % ('create_security_group', params)).failed:
                         with open("/root/result.json", 'w') as result:
-                             res = {"error": "Failed creating security group for SSN"}
-                             print json.dumps(res)
-                             result.write(json.dumps(res))
+                            res = {"error": "Failed creating security group for SSN"}
+                            print json.dumps(res)
+                            result.write(json.dumps(res))
                     with open('/tmp/ssn_sg_id', 'r') as f:
                         os.environ['creds_security_groups_ids'] = f.read()
                 except:
