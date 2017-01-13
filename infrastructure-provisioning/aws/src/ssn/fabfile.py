@@ -477,40 +477,42 @@ def run():
 
 
 def terminate():
-    local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
-    local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
-    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                        level=logging.DEBUG,
-                        filename=local_log_filepath)
+    with settings(warn_only=True):
+        local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
+        local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
+        logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                            level=logging.DEBUG,
+                            filename=local_log_filepath)
 
-    # generating variables dictionary
-    create_aws_config_files(generate_full_config=True)
-    print 'Generating infrastructure names and tags'
-    ssn_conf = dict()
-    ssn_conf['service_base_name'] = os.environ['conf_service_base_name']
-    ssn_conf['tag_name'] = ssn_conf['service_base_name'] + '-Tag'
-    ssn_conf['edge_sg'] = ssn_conf['service_base_name'] + "*" + '-edge'
-    ssn_conf['nb_sg'] = ssn_conf['service_base_name'] + "*" + '-nb'
+        # generating variables dictionary
+        create_aws_config_files(generate_full_config=True)
+        print 'Generating infrastructure names and tags'
+        ssn_conf = dict()
+        ssn_conf['service_base_name'] = os.environ['conf_service_base_name']
+        ssn_conf['tag_name'] = ssn_conf['service_base_name'] + '-Tag'
+        ssn_conf['edge_sg'] = ssn_conf['service_base_name'] + "*" + '-edge'
+        ssn_conf['nb_sg'] = ssn_conf['service_base_name'] + "*" + '-nb'
 
-    try:
-        logging.info('[TERMINATE SSN]')
-        print '[TERMINATE SSN]'
-        params = "--tag_name %s --edge_sg %s --nb_sg %s" % \
-                 (ssn_conf['tag_name'], ssn_conf['edge_sg'], ssn_conf['nb_sg'])
-        if not local("~/scripts/%s.py %s" % ('terminate_aws_resources', params)):
+        try:
+            logging.info('[TERMINATE SSN]')
+            print '[TERMINATE SSN]'
+            params = "--tag_name %s --edge_sg %s --nb_sg %s" % \
+                     (ssn_conf['tag_name'], ssn_conf['edge_sg'], ssn_conf['nb_sg'])
+            if local("~/scripts/%s.py %s" % ('terminate_aws_resources', params)).failed:
+                with open("/root/result.json", 'w') as result:
+                    res = {"error": "Failed to terminate ssn", "conf": ssn_conf}
+                    print json.dumps(res)
+                    result.write(json.dumps(res))
+                    raise Exception
+        except:
+            sys.exit(1)
+
+        try:
             with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to terminate ssn", "conf": ssn_conf}
+                res = {"service_base_name": ssn_conf['service_base_name'],
+                       "Action": "Terminate ssn with all service_base_name environment"}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-    except:
-        sys.exit(1)
-
-    try:
-        with open("/root/result.json", 'w') as result:
-            res = {"service_base_name": ssn_conf['service_base_name'],
-                   "Action": "Terminate ssn with all service_base_name environment"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-    except:
-        print "Failed writing results."
-        sys.exit(0)
+        except:
+            print "Failed writing results."
+            sys.exit(0)
