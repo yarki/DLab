@@ -35,6 +35,8 @@ args = parser.parse_args()
 def build_docker_images(image_list):
     try:
         sudo('mkdir /project_images; chown ' + os.environ['general_os_user'] + ' /project_images')
+        print "KEYFILE: " + args.keyfile
+        print "HOST_STRING: " + args.host_string
         local('scp -r -i %s /project_tree/* %s:/project_images/' % (args.keyfile, args.host_string))
         for image in image_list:
             name = image['name']
