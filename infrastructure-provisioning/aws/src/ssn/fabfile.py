@@ -70,7 +70,7 @@ def run():
                 print '[CREATE VPC AND ROUTE TABLE]'
                 params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, service_base_name)
                 try:
-                    local("~/scripts/%s.py %s" % ('create_vpc', params))
+                    local("~/scripts/{}.py {}".format('create_vpc', params))
                 except:
                     with open("/root/result.json", 'w') as result:
                         res = {"error": "Failed to create VPC"}
@@ -90,7 +90,7 @@ def run():
                 print '[CREATE SUBNET]'
                 params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {} --prefix {} --ssn {}".format(os.environ['creds_vpc_id'], 'ssn', tag_name, service_base_name, '20', True)
                 try:
-                    local("~/scripts/%s.py %s" % ('create_subnet', params))
+                    local("~/scripts/{}.py {}".format('create_subnet', params))
                 except:
                     with open("/root/result.json", 'w') as result:
                         res = {"error": "Failed to create Subnet"}
@@ -160,7 +160,7 @@ def run():
                 params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {} --ssn {}". \
                     format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), service_base_name, tag_name, False, True)
                 try:
-                    local("~/scripts/%s.py %s" % ('create_security_group', params))
+                    local("~/scripts/{}.py {}".format('create_security_group', params))
                 except:
                     with open("/root/result.json", 'w') as result:
                         res = {"error": "Failed creating security group for SSN"}
@@ -178,10 +178,10 @@ def run():
                 sys.exit(1)
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
-        params = "--role_name %s --role_profile_name %s --policy_name %s --policy_file_name %s" % \
-                 (role_name, role_profile_name, policy_name, policy_path)
+        params = "--role_name {} --role_profile_name {} --policy_name {} --policy_file_name {}". \
+                format(role_name, role_profile_name, policy_name, policy_path)
         try:
-            local("~/scripts/%s.py %s" % ('create_role_policy', params))
+            local("~/scripts/{}.py {}".format('create_role_policy', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
@@ -204,7 +204,7 @@ def run():
         params = "--vpc_id {} --region {} --infra_tag_name {} --infra_tag_value {}".format(
             os.environ['creds_vpc_id'], os.environ['creds_region'], tag_name, service_base_name)
         try:
-            local("~/scripts/%s.py %s" % ('create_endpoint', params))
+            local("~/scripts/{}.py {}".format('create_endpoint', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to create an endpoint", "conf": os.environ.__dict__}
@@ -225,11 +225,11 @@ def run():
     try:
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
-        params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s --region %s" % \
-                 (user_bucket_name, tag_name, user_bucket_name, region)
+        params = "--bucket_name {} --infra_tag_name {} --infra_tag_value {} --region {}". \
+                 format(user_bucket_name, tag_name, user_bucket_name, region)
 
         try:
-            local("~/scripts/%s.py %s" % ('create_bucket', params))
+            local("~/scripts/{}.py {}".format('create_bucket', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
@@ -251,14 +251,14 @@ def run():
     try:
         logging.info('[CREATE SSN INSTANCE]')
         print('[CREATE SSN INSTANCE]')
-        params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
-                 "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s" % \
-                 (instance_name, ssn_ami_id, os.environ['ssn_instance_size'],
+        params = "--node_name {} --ami_id {} --instance_type {} --key_name {} --security_group_ids {} " \
+                 "--subnet_id {} --iam_profile {} --infra_tag_name {} --infra_tag_value {}". \
+                 format(instance_name, ssn_ami_id, os.environ['ssn_instance_size'],
                   os.environ['creds_key_name'], os.environ['creds_security_groups_ids'],
                   os.environ['creds_subnet_id'], role_profile_name, tag_name, instance_name)
 
         try:
-            local("~/scripts/%s.py %s" % ('create_instance', params))
+            local("~/scripts/{}.py {}".format('create_instance', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to create ssn instance", "conf": os.environ.__dict__}
@@ -287,7 +287,7 @@ def run():
             format(instance_hostname, "/root/keys/" + os.environ['creds_key_name'] + ".pem", os.environ['general_os_user'])
 
         try:
-            local("~/scripts/%s.py %s" % ('install_prerequisites', params))
+            local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing software: pip, apt", "conf": os.environ.__dict__}
@@ -312,11 +312,11 @@ def run():
         logging.info('[CONFIGURE SSN INSTANCE]')
         print('[CONFIGURE SSN INSTANCE]')
         additional_config = {"nginx_template_dir": "/root/templates/"}
-        params = "--hostname %s --keyfile %s --additional_config '%s'" % \
-                 (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
+        params = "--hostname {} --keyfile {} --additional_config '{}'". \
+                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), json.dumps(additional_config))
 
         try:
-            local("~/scripts/%s.py %s" % ('configure_ssn', params))
+            local("~/scripts/{}.py {}".format('configure_ssn', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed configuring ssn", "conf": os.environ.__dict__}
@@ -346,11 +346,11 @@ def run():
                              {"name": "edge", "tag": "latest"},
                              {"name": "emr", "tag": "latest"},
                              {"name": "zeppelin", "tag": "latest"}, ]
-        params = "--hostname %s --keyfile %s --additional_config '%s'" % \
-                 (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
+        params = "--hostname {} --keyfile {} --additional_config '{}'". \
+                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), json.dumps(additional_config))
 
         try:
-            local("~/scripts/%s.py %s" % ('configure_docker', params))
+            local("~/scripts/{}.py {}".format('configure_docker', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to configure docker", "conf": os.environ.__dict__}
@@ -374,12 +374,12 @@ def run():
     try:
         logging.info('[CONFIGURE SSN INSTANCE UI]')
         print('[CONFIGURE SSN INSTANCE UI]')
-        params = "--hostname %s --keyfile %s " \
-                 "--pip_packages 'pymongo pyyaml'" % \
-                 (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
+        params = "--hostname {} --keyfile {} " \
+                 "--pip_packages 'pymongo pyyaml'". \
+                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']))
 
         try:
-            local("~/scripts/%s.py %s" % ('install_prerequisites', params))
+            local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
@@ -401,11 +401,11 @@ def run():
         sys.exit(1)
 
     try:
-        params = "--hostname %s --keyfile %s" % \
-                 (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
+        params = "--hostname {} --keyfile {}". \
+                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']))
 
         try:
-            local("~/scripts/%s.py %s" % ('configure_ui', params))
+            local("~/scripts/{}.py {}".format('configure_ui', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to upload UI", "conf": os.environ.__dict__}
@@ -444,7 +444,7 @@ def run():
         print "SSN AMI name: " + os.environ['ssn_ami_name']
         print "SSN bucket name: " + user_bucket_name
         print "Region: " + region
-        jenkins_url = "http://%s/jenkins" % get_instance_hostname(instance_name)
+        jenkins_url = "http://{}/jenkins".format(get_instance_hostname(instance_name))
         print "Jenkins URL: " + jenkins_url
         try:
             with open('jenkins_crids.txt') as f:
@@ -472,14 +472,14 @@ def run():
 
         print 'Upload response file'
         params = "--instance_name {} --local_log_filepath {}".format(instance_name, local_log_filepath)
-        local("~/scripts/%s.py %s" % ('upload_response_file', params))
+        local("~/scripts/{}.py {}".format('upload_response_file', params))
 
         logging.info('[FINALIZE]')
         print('[FINALIZE]')
         params = ""
         if os.environ['ops_lifecycle_stage'] == 'prod':
-            params += "--key_id %s" % os.environ['creds_access_key']
-            local("~/scripts/%s.py %s" % ('finalize', params))
+            params += "--key_id {}".format(os.environ['creds_access_key'])
+            local("~/scripts/{}.py {}".format('finalize', params))
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
@@ -514,10 +514,10 @@ def terminate():
     try:
         logging.info('[TERMINATE SSN]')
         print '[TERMINATE SSN]'
-        params = "--tag_name %s --edge_sg %s --nb_sg %s" % \
-                 (ssn_conf['tag_name'], ssn_conf['edge_sg'], ssn_conf['nb_sg'])
+        params = "--tag_name {} --edge_sg {} --nb_sg {}". \
+                 format(ssn_conf['tag_name'], ssn_conf['edge_sg'], ssn_conf['nb_sg'])
         try:
-            local("~/scripts/%s.py %s" % ('terminate_aws_resources', params))
+            local("~/scripts/{}.py {}".format('terminate_aws_resources', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to terminate ssn", "conf": ssn_conf}
