@@ -35,25 +35,31 @@ RUN mkdir -p /root/.ssh; echo "Host *" > /root/.ssh/config; \
     echo "GlobalKnownHostsFile=/dev/null" >> /root/.ssh/config; \
     echo "ConnectTimeout=30" >> /root/.ssh/config
 
+# Configuring log directories
 RUN mkdir -p /response; chmod a+rwx /response
 RUN mkdir -p /logs/ssn; chmod a+rwx /logs/ssn
 RUN mkdir -p /logs/edge; chmod a+rwx /logs/edge
 RUN mkdir -p /logs/notebook; chmod a+rwx /logs/notebook
 RUN mkdir -p /logs/emr; chmod a+rwx /logs/emr
 
-# Configuring entrypoint script
+# Copying all base scripts to docker
 ENV PROVISION_CONFIG_DIR /root/conf/
 ENV KEYFILE_DIR /root/keys/
 ENV AWS_DIR /root/.aws
-RUN mkdir -p /root/conf
-RUN mkdir -p /root/templates
-RUN mkdir -p /root/keys/.ssh
-COPY . /root
-COPY ../root/api /root/api
-COPY ../root/conf /root/conf
-COPY ../root/scripts/general /root/scripts
-COPY ../root/lib /usr/lib/python2.7/dlab
-RUN chmod a+x /root/*.py
 
-# Entrypoint
+RUN mkdir -p /root/conf
+RUN mkdir -p /root/scripts
+RUN mkdir -p /root/templates
+RUN mkdir -p /usr/lib/python2.7/dlab
+RUN mkdir -p /root/keys/.ssh
+
+COPY base/ /root
+COPY general/conf/* /root/conf/
+COPY general/scripts/common/* /root/scripts/
+COPY general/templates/common/* /root/templates/
+COPY general/api/*.py /bin/
+COPY general/lib/* /usr/lib/python2.7/dlab/
+RUN chmod a+x /root/*.py
+RUN chmod a+x /bin/*.py
+
 ENTRYPOINT ["/root/entrypoint.py"]

@@ -24,6 +24,7 @@ from dlab.aws_meta import *
 from dlab.aws_actions import *
 import sys, os
 from fabric.api import *
+from dlab.ssn_lib import *
 
 
 def run():

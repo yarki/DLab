@@ -18,12 +18,14 @@
 
 FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
+ARG OS
 COPY ssn/ /root/
+COPY general/scripts/${OS}/ssn_lib.py /usr/lib/python2.7/dlab/ssn_lib.py
+COPY general/templates/${OS}/* /root/templates/
+
 RUN chmod 755 /root/fabfile.py; \
     chmod 755 /root/scripts/*; \
-    chmod a+x /root/entrypoint.py; \
-    chmod a+x /root/api/*; \
-    mv /root/api/*.py /bin/
+    chmod a+x /root/entrypoint.py;
 
 RUN mkdir /project_tree
 COPY . /project_tree

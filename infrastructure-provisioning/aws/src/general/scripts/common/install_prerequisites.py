@@ -22,6 +22,7 @@ from fabric.api import *
 import argparse
 import json
 from dlab.fab import *
+from dlab.common_lib import ensure_pkg
 import sys
 
 
