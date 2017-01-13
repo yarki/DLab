@@ -40,7 +40,7 @@ public class Amazon {
     
     public static void checkAmazonStatus(String instanceName, String expAmazonState) throws Exception {
         
-        System.out.println("Check status of SSN node " + instanceName + " on Amazon:");
+        System.out.println("Check status of instance " + instanceName + " on Amazon:");
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(instanceName);
         String instanceState;
         
@@ -54,7 +54,7 @@ public class Amazon {
             	.getName();
         } while (instanceState.equals("shutting-down"));
         
-        Assert.assertEquals(instanceState, expAmazonState, "Amazon instance state is not correct");
-        System.out.println("Amazon instance state is " + expAmazonState);           
+        System.out.println("Amazon instance " + instanceName + " state is " + expAmazonState);           
+        Assert.assertEquals(instanceState, expAmazonState, "Amazon instance " + instanceName + " state is not correct");
     }
 }

@@ -1,5 +1,25 @@
 package AutomationTest;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.InstanceState;
+import com.amazonaws.services.ec2.model.Tag;
+import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.response.Response;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+
 import AmazonHelper.Amazon;
 import AmazonHelper.AmazonInstanceState;
 import DataModel.CreateNotebookDto;
@@ -13,25 +33,6 @@ import Repository.ContentType;
 import Repository.HttpStatusCode;
 import Repository.Path;
 import ServiceCall.JenkinsCall;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.InstanceState;
-import com.amazonaws.services.ec2.model.Tag;
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Response;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.nio.file.Paths;
 
 @Test(singleThreaded=true)
 public class TestServices {
@@ -214,9 +215,11 @@ public class TestServices {
         
         //get notebook IP
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(noteBookName);
-        InstanceState instanceState = describeInstanceResult.getReservations().get(0).getInstances().get(0)
-            .getState();
-        String notebookIp = describeInstanceResult.getReservations().get(0).getInstances().get(0).getPrivateIpAddress();
+        String notebookIp = describeInstanceResult.getReservations()
+        		.get(0)
+        		.getInstances()
+        		.get(0)
+        		.getPrivateIpAddress();
         
 
         System.out.println("8. EMR will be deployed ...");
@@ -318,15 +321,14 @@ public class TestServices {
             throw new Exception("New EMR " + emrNewName + " has not been terminated");
         System.out.println("    New EMR " + emrNewName + " has been terminated");
 
-        Amazon.checkAmazonStatus("NewEMRAutoTest", AmazonInstanceState.TERMINATED);
+        Amazon.checkAmazonStatus(emrNewName, AmazonInstanceState.TERMINATED);
 
         Docker.checkDockerStatus(nodePrefix + "_terminate_computational_NewEMRAutoTest", publicIp);
 
-        System.out.println("12. Notebook will be terminated ...");
+        System.out.println("12. New EMR will be deployed for notebook termination ...");
         final String emrNewName2 = "AnotherNew" + emrName;
         final String ssnTerminateNotebookURL = getSnnURL(Path.getTerminateNotebookUrl(noteBookName));
         System.out.println("    SSN terminate EMR URL is " + ssnTerminateEMRURL);
-        
         
         System.out.println("    New EMR will be deployed ...");
         deployEMR.setEmr_instance_count("1");
@@ -346,7 +348,7 @@ public class TestServices {
             throw new Exception("New emr " + emrNewName2 + " has not been deployed");
         System.out.println("    New emr " + emrNewName2 + " has been deployed");
 
-        // terminate notebook
+        System.out.println("13. Notebook will be terminated ...");
         Response respTerminateNotebook = new HttpRequest().webApiDelete(ssnTerminateNotebookURL, ContentType.JSON, token);
         System.out.println("    respTerminateNotebook.getBody() is " + respTerminateNotebook.getBody().asString());
         Assert.assertEquals(respTerminateNotebook.statusCode(), HttpStatusCode.OK);
@@ -362,10 +364,11 @@ public class TestServices {
         System.out.println("    EMR has been terminated for Notebook " + noteBookName);
 
         Amazon.checkAmazonStatus(nodePrefix + "-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED);
+        Amazon.checkAmazonStatus(emrNewName2, AmazonInstanceState.TERMINATED);
 
         Docker.checkDockerStatus(nodePrefix + "_terminate_exploratory_NotebookAutoTestt", publicIp);
     }
-
+    
     private static String getEmrClusterName(String emrName) throws Exception {
         Instance instance = Amazon.getInstanceResult(emrName)
         		.getReservations()
@@ -378,8 +381,8 @@ public class TestServices {
 			}
 		}
         throw new Exception("Could not detect cluster name for EMR " + emrName);
-    }    	
-    	
+    }
+
     private static void copyFileToSSN(String filename, String ip) throws IOException, InterruptedException {
         String sourceDir = "/var/lib/jenkins/AutoTestData";
         String copyToSSNCommand = "scp -i %s -o 'StrictHostKeyChecking no' %s ubuntu@%s:~/";
