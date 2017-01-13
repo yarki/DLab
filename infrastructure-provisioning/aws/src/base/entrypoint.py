@@ -109,7 +109,8 @@ if __name__ == "__main__":
 
     # Run execution routines
     elif args.action == 'create':
-        local("/bin/create.py")
+        with hide('running'):
+            local("/bin/create.py")
 
     elif args.action == 'status':
         with hide('running'):
