@@ -26,6 +26,7 @@ from fabric.api import *
 from fabric.contrib.files import exists
 import os
 from dlab.fab import *
+from dlab.aws_meta import *
 
 
 def ensure_docker_daemon():
