@@ -39,21 +39,6 @@ parser.add_argument('--ssn', type=bool, default=False)
 args = parser.parse_args()
 
 
-def create_security_group(security_group_name, vpc_id, security_group_rules, egress, tag):
-    ec2 = boto3.resource('ec2')
-    group = ec2.create_security_group(GroupName=security_group_name, Description='security_group_name', VpcId=vpc_id)
-    time.sleep(10)
-    group.create_tags(Tags=[tag])
-    try:
-        group.revoke_egress(IpPermissions=[{"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}])
-    except:
-        print "Mentioned rule does not exist"
-    for rule in security_group_rules:
-        group.authorize_ingress(IpPermissions=[rule])
-    for rule in egress:
-        group.authorize_egress(IpPermissions=[rule])
-    return group.id
-
 if __name__ == "__main__":
     success = False
     try:
