@@ -24,12 +24,12 @@ import os
 
 def ensure_pip(requisites):
     try:
-        if not exists('/home/ubuntu/.ensure_dir/pip_path_added'):
+        if not exists('/home/{}/.ensure_dir/pip_path_added'.format(os.environ['general_os_user'])):
             sudo('echo PATH=$PATH:/usr/local/bin/:/opt/spark/bin/ >> /etc/profile')
             sudo('echo export PATH >> /etc/profile')
             sudo('pip install -U pip --no-cache-dir')
             sudo('pip install -U ' + requisites + ' --no-cache-dir')
-            sudo('touch /home/ubuntu/.ensure_dir/pip_path_added')
+            sudo('touch /home/{}/.ensure_dir/pip_path_added'.format(os.environ['general_os_user']))
         return True
     except:
         return False
