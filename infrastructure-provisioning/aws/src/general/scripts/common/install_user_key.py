@@ -22,6 +22,7 @@ from fabric.api import *
 import argparse
 import json
 import sys
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
@@ -32,7 +33,7 @@ args = parser.parse_args()
 
 def copy_key(config):
     key = open('{}/{}.pub'.format(config['user_keydir'], config['user_keyname'])).read()
-    if sudo('echo "{}" >> /home/ubuntu/.ssh/authorized_keys'.format(key)).succeeded:
+    if sudo('echo "{0}" >> /home/{1}/.ssh/authorized_keys'.format(key, os.environ['general_os_user'])).succeeded:
         return True
     else:
         return False
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     try:
         env['connection_attempts'] = 100
         env.key_filename = [args.keyfile]
-        env.host_string = 'ubuntu@' + args.hostname
+        env.host_string = '{}@'.format(os.environ['general_os_user']) + args.hostname
         deeper_config = json.loads(args.additional_config)
     except:
         sys.exit(2)

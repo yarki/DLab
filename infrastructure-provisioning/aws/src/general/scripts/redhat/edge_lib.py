@@ -17,28 +17,3 @@
 # limitations under the License.
 #
 # ******************************************************************************
-
-from fabric.api import *
-from fabric.contrib.files import exists
-
-def configure_http_proxy_server(config):
-    try:
-        if not exists('/tmp/http_proxy_ensured'):
-            sudo('yum -y install squid')
-            template_file = config['template_file']
-            proxy_subnet = config['exploratory_subnet']
-            with open("/tmp/tmpsquid.conf", 'w') as out:
-                with open(template_file) as tpl:
-                    for line in tpl:
-                        out.write(line.replace('PROXY_SUBNET', proxy_subnet))
-            put('/tmp/tmpsquid.conf', '/tmp/squid.conf')
-            sudo('\cp /tmp/squid.conf /etc/squid/squid.conf')
-            sudo('systemctl restart squid')
-            sudo('chkconfig squid on')
-            sudo('touch /tmp/http_proxy_ensured')
-        return True
-    except:
-        return False
-    return True
-
-
