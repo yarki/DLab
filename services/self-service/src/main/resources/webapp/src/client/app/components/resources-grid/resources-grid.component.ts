@@ -109,7 +109,11 @@ export class ResourcesGrid implements OnInit {
       let isResources = config.resources.length > 0 ? (modifiedResources.length > 0) : true;
 
       if (config.resources.length > 0 && modifiedResources.length > 0) { item.resources = modifiedResources; }
-      if (config.resources.length === 0 && config.type === 'active') { item.resources = []; }
+      if (config.resources.length === 0 && config.type === 'active' ||
+        modifiedResources.length >= 0 && config.resources.length > 0 && config.type === 'active') {
+        item.resources = modifiedResources;
+        isResources = true;
+      }
 
       return isName && isStatus && isShape && isResources;
     });
