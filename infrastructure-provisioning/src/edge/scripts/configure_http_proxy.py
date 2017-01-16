@@ -28,6 +28,7 @@ import sys, os
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
+parser.add_argument('--user', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
@@ -39,7 +40,7 @@ if __name__ == "__main__":
     try:
         env['connection_attempts'] = 100
         env.key_filename = [args.keyfile]
-        env.host_string = '{}@{}'.format(os.environ['general_os_user'], args.hostname)
+        env.host_string = '{}@{}'.format(args.user, args.hostname)
         deeper_config = json.loads(args.additional_config)
     except:
         sys.exit(2)
