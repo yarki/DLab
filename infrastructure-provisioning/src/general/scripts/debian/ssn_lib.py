@@ -273,6 +273,7 @@ def upload_response_file(instance_name, local_log_filepath):
         sudo('mv /home/ubuntu/' + os.environ['request_id'] + '.json ' + os.environ['ssn_dlab_path'] + 'tmp/result/')
         put(local_log_filepath, '/home/ubuntu/ssn.log')
         sudo('mv /home/ubuntu/ssn.log /var/opt/dlab/log/ssn/')
+        return True
     except:
         print 'Failed to upload response file'
-        sys.exit(1)
+        return False

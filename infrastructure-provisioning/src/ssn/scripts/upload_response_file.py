@@ -18,11 +18,7 @@
 #
 # ******************************************************************************
 
-from dlab.fab import *
-from dlab.aws_meta import *
-from dlab.aws_actions import *
-import sys, os
-from fabric.api import *
+import sys
 import argparse
 import logging
 from dlab.ssn_lib import *
