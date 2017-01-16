@@ -1,6 +1,7 @@
 {
     "resource": "edge",
     "request_id":"RID",
+    "general_os_user":"GOS",
     "conf_service_base_name":"SBN",
     "edge_user_name":"UN",
     "creds_security_groups_ids":"SGI",
