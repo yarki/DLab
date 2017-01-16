@@ -87,7 +87,8 @@ public class ExploratoryResource implements ExploratoryAPI {
         			.withStatus(CREATING.toString())
         			.withImageName(formDTO.getImage())
         			.withImageVersion(formDTO.getVersion())
-        			.withShape(formDTO.getShape()));
+        			.withTemplateName(formDTO.getTemplateName())
+                    .withShape(formDTO.getShape()));
         	if (isAdded) {
                 ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())

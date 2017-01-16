@@ -151,6 +151,7 @@ export class ResourcesGrid implements OnInit {
     if (exploratoryList) {
       return exploratoryList.map((value) => {
         return new ResourcesGridRowModel(value.exploratory_name,
+          value.template_name,
           value.status,
           value.shape,
           value.computational_resources,

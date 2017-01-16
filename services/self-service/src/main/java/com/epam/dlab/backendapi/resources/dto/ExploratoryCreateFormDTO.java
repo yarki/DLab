@@ -30,6 +30,10 @@ public class ExploratoryCreateFormDTO {
 
     @NotBlank
     @JsonProperty
+    private String templateName;
+
+    @NotBlank
+    @JsonProperty
     private String name;
 
     @NotBlank
@@ -48,6 +52,16 @@ public class ExploratoryCreateFormDTO {
     /** Sets the image name of notebook. */
     public void setImage(String image) {
     	this.image = image;
+    }
+
+    /** Returns name of template. */
+    public String getTemplateName() {
+    	return templateName;
+    }
+
+    /** Sets name of template. */
+    public void setTemplateName(String templateName) {
+    	this.templateName = templateName;
     }
 
     /** Returns name of notebook. */
