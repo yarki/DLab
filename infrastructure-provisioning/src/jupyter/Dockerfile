@@ -22,7 +22,8 @@ FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 ARG OS
 
 COPY jupyter/ /root/
-COPY general/scripts/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
+COPY general/lib/os/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
+COPY general/templates/common/* /root/templates/
 COPY general/templates/${OS}/* /root/templates/
 
 RUN chmod 755 /root/fabfile.py; \
