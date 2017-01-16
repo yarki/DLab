@@ -19,10 +19,12 @@
 
 FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
-COPY . /root/
+ARG OS
+
+COPY zeppelin/ /root/
+COPY general/scripts/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
+COPY general/templates/${OS}/* /root/templates/
+
 RUN chmod 755 /root/fabfile.py; \
-    chmod 755 /root/scripts/*; \
-    chmod a+x /root/entrypoint.py; \
-    chmod a+x /root/api/*; \
-    mv /root/api/*.py /bin/
+    chmod 755 /root/scripts/*
 

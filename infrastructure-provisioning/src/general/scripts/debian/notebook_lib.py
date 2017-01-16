@@ -162,6 +162,29 @@ def ensure_libraries_py2(os_user):
             sys.exit(1)
 
 
+def ensure_jre_jdk(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/jre_jdk_ensured'):
+        try:
+            sudo('apt-get install -y default-jre')
+            sudo('apt-get install -y default-jdk')
+            sudo('touch /home/' + os_user + '/.ensure_dir/jre_jdk_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_python3_kernel_zeppelin(python3_version):
+    if not exists('/home/ubuntu/.ensure_dir/python3_kernel_ensured'):
+        try:
+            sudo('apt-get install python3-setuptools')
+            sudo('apt install -y python3-pip')
+            sudo('add-apt-repository -y ppa:fkrull/deadsnakes')
+            sudo('apt update')
+            sudo('apt install -y python' + python3_version + ' python' + python3_version +'-dev')
+            sudo('touch /home/ubuntu/.ensure_dir/python3_kernel_ensured')
+        except:
+            sys.exit(1)
+
+
 def ensure_libraries_py(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed'):
         try:

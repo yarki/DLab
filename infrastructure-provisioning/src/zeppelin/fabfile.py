@@ -52,7 +52,7 @@ def run():
     logging.getLogger('boto3').setLevel(logging.DEBUG)
 
     instance_class = 'notebook'
-    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filename = "{}.log".format(os.environ['request_id'])
     local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -96,13 +96,12 @@ def run():
     try:
         logging.info('[CREATE INSTANCE]')
         print '[CREATE ZEPPELIN NOTEBOOK INSTANCE]'
-        params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
-                 "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s --instance_class %s --instance_disk_size %s" % \
-                 (notebook_config['instance_name'], notebook_config['ami_id'], notebook_config['instance_type'],
-                  notebook_config['key_name'], get_security_group_by_name(notebook_config['security_group_name']),
-                  get_subnet_by_cidr(notebook_config['subnet_cidr']), notebook_config['role_profile_name'],
-                  notebook_config['tag_name'], notebook_config['instance_name'], instance_class, os.environ['notebook_disk_size'])
-        local("~/scripts/%s.py %s" % ('create_instance', params))
+        params = "--node_name {} --ami_id {} --instance_type {} --key_name {} --security_group_ids {} --subnet_id {} --iam_profile {} --infra_tag_name {} --infra_tag_value {} --instance_class {} --instance_disk_size {}"\
+            .format(notebook_config['instance_name'], notebook_config['ami_id'], notebook_config['instance_type'],
+                    notebook_config['key_name'], get_security_group_by_name(notebook_config['security_group_name']),
+                    get_subnet_by_cidr(notebook_config['subnet_cidr']), notebook_config['role_profile_name'],
+                    notebook_config['tag_name'], notebook_config['instance_name'], instance_class, os.environ['notebook_disk_size'])
+        local("~/scripts/{}.py {}".format('create_instance', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to create instance", "conf": notebook_config}
             print json.dumps(res)
@@ -114,16 +113,16 @@ def run():
     instance_hostname = get_instance_hostname(notebook_config['instance_name'])
     edge_instance_name = os.environ['conf_service_base_name'] + "-" + os.environ['notebook_user_name'] + '-edge'
     edge_instance_hostname = get_instance_hostname(edge_instance_name)
-    keyfile_name = "/root/keys/%s.pem" % os.environ['creds_key_name']
+    keyfile_name = "/root/keys/{}.pem".format(os.environ['creds_key_name'])
 
     # configuring proxy on Notebook instance
     try:
         logging.info('[CONFIGURE PROXY ON ZEPPELIN INSTANCE]')
         print '[CONFIGURE PROXY ON ZEPPELIN INSTANCE]'
         additional_config = {"proxy_host": edge_instance_hostname, "proxy_port": "3128"}
-        params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" % \
-                 (instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
-        local("~/scripts/%s.py %s" % ('configure_proxy', params))
+        params = "--hostname {} --instance_name {} --keyfile {} --additional_config '{}'"\
+            .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
+        local("~/scripts/{}.py {}".format('configure_proxy', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to configure proxy", "conf": notebook_config}
             print json.dumps(res)
@@ -136,8 +135,9 @@ def run():
     try:
         logging.info('[INSTALLING PREREQUISITES TO ZEPPELIN NOTEBOOK INSTANCE]')
         print('[INSTALLING PREREQUISITES TO ZEPPELIN NOTEBOOK INSTANCE]')
-        params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
-        local("~/scripts/%s.py %s" % ('install_prerequisites', params))
+        params = "--hostname {} --keyfile {} --user {}"\
+            .format(instance_hostname, keyfile_name, os.environ['general_os_user'])
+        local("~/scripts/{}.py {}".format('install_prerequisites', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed installing apps: apt & pip", "conf": notebook_config}
             print json.dumps(res)
@@ -154,9 +154,10 @@ def run():
                              "backend_hostname": get_instance_hostname(notebook_config['instance_name']),
                              "backend_port": "8080",
                              "nginx_template_dir": "/root/templates/"}
-        params = "--hostname %s --instance_name %s --keyfile %s --region %s --additional_config '%s'" % \
-                 (instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['creds_region'], json.dumps(additional_config))
-        local("~/scripts/%s.py %s" % ('configure_zeppelin_node', params))
+        params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --os_user {}"\
+            .format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['creds_region'],
+                    json.dumps(additional_config), os.environ['general_os_user'])
+        local("~/scripts/{}.py {}".format('configure_zeppelin_node', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to configure zeppelin", "conf": notebook_config}
             print json.dumps(res)
@@ -169,8 +170,9 @@ def run():
     try:
         logging.info('[CONFIGURE ZEPPELIN ADDITIONS]')
         print '[CONFIGURE ZEPPELIN ADDITIONS]'
-        params = "--hostname %s --keyfile %s" % (instance_hostname, keyfile_name)
-        local("~/scripts/%s.py %s" % ('install_zeppelin_additions', params))
+        params = "--hostname {} --keyfile {} --os_user {}"\
+            .format(instance_hostname, keyfile_name, os.environ['general_os_user'])
+        local("~/scripts/{}.py {}".format('install_zeppelin_additions', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to install python libs", "conf": notebook_config}
             print json.dumps(res)
@@ -186,7 +188,7 @@ def run():
                              "user_keydir": "/root/keys/"}
         params = "--hostname {} --keyfile {} --additional_config '{}'".format(
             instance_hostname, keyfile_name, json.dumps(additional_config))
-        local("~/scripts/%s.py %s" % ('install_user_key', params))
+        local("~/scripts/{}.py {}".format('install_user_key', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed installing users key", "conf": params}
             print json.dumps(res)
@@ -237,7 +239,7 @@ def run():
 
 # Main function for terminating exploratory environment
 def terminate():
-    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filename = "{}.log".format(os.environ['request_id'])
     local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -255,9 +257,9 @@ def terminate():
     try:
         logging.info('[TERMINATE NOTEBOOK]')
         print '[TERMINATE NOTEBOOK]'
-        params = "--bucket_name %s --tag_name %s --nb_tag_value %s" % \
-                 (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'])
-        local("~/scripts/%s.py %s" % ('terminate_notebook', params))
+        params = "--bucket_name {} --tag_name {} --nb_tag_value {}"\
+            .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'])
+        local("~/scripts/{}.py {}".format('terminate_notebook', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to terminate notebook", "conf": notebook_config}
             print json.dumps(res)
@@ -280,7 +282,7 @@ def terminate():
 
 # Main function for stopping notebook server
 def stop():
-    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filename = "{}.log".format(os.environ['request_id'])
     local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -300,9 +302,10 @@ def stop():
     try:
         logging.info('[STOP NOTEBOOK]')
         print '[STOP NOTEBOOK]'
-        params = "--bucket_name %s --tag_name %s --nb_tag_value %s --ssh_user %s --key_path %s" % \
-                 (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], notebook_config['ssh_user'], notebook_config['key_path'])
-        local("~/scripts/%s.py %s" % ('stop_notebook', params))
+        params = "--bucket_name {} --tag_name {} --nb_tag_value {} --ssh_user {} --key_path {}"\
+            .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'],
+                    notebook_config['ssh_user'], notebook_config['key_path'])
+        local("~/scripts/{}.py {}".format('stop_notebook', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to stop notebook", "conf": notebook_config}
             print json.dumps(res)
@@ -325,7 +328,7 @@ def stop():
 
 # Main function for starting notebook server
 def start():
-    local_log_filename = "%s.log" % os.environ['request_id']
+    local_log_filename = "{}.log".format(os.environ['request_id'])
     local_log_filepath = "/response/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -342,9 +345,9 @@ def start():
     try:
         logging.info('[START NOTEBOOK]')
         print '[START NOTEBOOK]'
-        params = "--tag_name %s --nb_tag_value %s" % \
-                 (notebook_config['tag_name'], notebook_config['notebook_name'])
-        local("~/scripts/%s.py %s" % ('start_notebook', params))
+        params = "--tag_name {} --nb_tag_value {}"\
+            .format(notebook_config['tag_name'], notebook_config['notebook_name'])
+        local("~/scripts/{}.py {}".format('start_notebook', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to start notebook", "conf": notebook_config}
             print json.dumps(res)
