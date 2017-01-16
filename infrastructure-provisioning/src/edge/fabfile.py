@@ -45,7 +45,7 @@ def status():
         print '[COLLECTING DATA]'
         params = "--service_base_name '{}' --user_name '{}'".format(edge_conf['service_base_name'], edge_conf['user_name'])
         try:
-            local("~/scripts/%s.py %s" % ('collect_data', params))
+            local("~/scripts/{}.py {}".format('collect_data', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to collect necessary information", "conf": edge_conf}
@@ -115,10 +115,10 @@ def run():
     try:
         logging.info('[CREATE SUBNET]')
         print '[CREATE SUBNET]'
-        params = "--vpc_id '%s' --infra_tag_name %s --infra_tag_value %s --username %s" % \
-                 (edge_conf['vpc_id'], edge_conf['tag_name'], edge_conf['service_base_name'], os.environ['edge_user_name'])
+        params = "--vpc_id '{}' --infra_tag_name {} --infra_tag_value {} --username {}" \
+                 .format(edge_conf['vpc_id'], edge_conf['tag_name'], edge_conf['service_base_name'], os.environ['edge_user_name'])
         try:
-            local("~/scripts/%s.py %s" % ('create_subnet', params))
+            local("~/scripts/{}.py {}".format('create_subnet', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to create subnet", "conf": edge_conf}
@@ -135,11 +135,11 @@ def run():
     try:
         logging.info('[CREATE EDGE ROLES]')
         print '[CREATE EDGE ROLES]'
-        params = "--role_name %s --role_profile_name %s --policy_name %s" % \
-                 (edge_conf['role_name'], edge_conf['role_profile_name'],
+        params = "--role_name {} --role_profile_name {} --policy_name {}" \
+                 .format(edge_conf['role_name'], edge_conf['role_profile_name'],
                   edge_conf['policy_name'])
         try:
-            local("~/scripts/%s.py %s" % ('create_role_policy', params))
+            local("~/scripts/{}.py {}".format('create_role_policy', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to creating roles", "conf": edge_conf}
@@ -152,11 +152,11 @@ def run():
     try:
         logging.info('[CREATE BACKEND (NOTEBOOK) ROLES]')
         print '[CREATE BACKEND (NOTEBOOK) ROLES]'
-        params = "--role_name %s --role_profile_name %s --policy_name %s" % \
-                 (edge_conf['notebook_role_name'], edge_conf['notebook_role_profile_name'],
+        params = "--role_name {} --role_profile_name {} --policy_name {}" \
+                 .format(edge_conf['notebook_role_name'], edge_conf['notebook_role_profile_name'],
                   edge_conf['notebook_policy_name'])
         try:
-            local("~/scripts/%s.py %s" % ('create_role_policy', params))
+            local("~/scripts/{}.py {}".format('create_role_policy', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to creating roles", "conf": edge_conf}
@@ -255,7 +255,7 @@ def run():
             format(edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),edge_conf['service_base_name'],
                    edge_conf['instance_name'], json.dumps(sg_rules_template_egress), True, edge_conf['notebook_instance_name'], 'edge')
         try:
-            local("~/scripts/%s.py %s" % ('create_security_group', params))
+            local("~/scripts/{}.py {}".format('create_security_group', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed creating security group for edge node", "conf": edge_conf}
@@ -293,7 +293,7 @@ def run():
             format(edge_conf['notebook_security_group_name'], edge_conf['vpc_id'], json.dumps(ingress_sg_rules_template),
                    json.dumps(egress_sg_rules_template), edge_conf['service_base_name'], edge_conf['notebook_instance_name'], True)
         try:
-            local("~/scripts/%s.py %s" % ('create_security_group', params))
+            local("~/scripts/{}.py {}".format('create_security_group', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed creating security group for private subnet", "conf": edge_conf}
@@ -314,11 +314,11 @@ def run():
     try:
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
-        params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s --region %s" % \
-                 (edge_conf['bucket_name'], edge_conf['tag_name'], edge_conf['bucket_name'],
+        params = "--bucket_name {} --infra_tag_name {} --infra_tag_value {} --region {}" \
+                 .format(edge_conf['bucket_name'], edge_conf['tag_name'], edge_conf['bucket_name'],
                   edge_conf['region'])
         try:
-            local("~/scripts/%s.py %s" % ('create_bucket', params))
+            local("~/scripts/{}.py {}".format('create_bucket', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to create bucket", "conf": edge_conf}
@@ -338,7 +338,7 @@ def run():
         params = '--bucket_name {} --ssn_bucket_name {} --username {} --edge_role_name {} --notebook_role_name {} --service_base_name {}'.format(
             edge_conf['bucket_name'], edge_conf['ssn_bucket_name'], os.environ['edge_user_name'], edge_conf['role_name'], edge_conf['notebook_role_name'],  edge_conf['service_base_name'])
         try:
-            local("~/scripts/%s.py %s" % ('create_policy', params))
+            local("~/scripts/{}.py {}".format('create_policy', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to create bucket policy", "conf": edge_conf}
@@ -355,13 +355,13 @@ def run():
     try:
         logging.info('[CREATE EDGE INSTANCE]')
         print '[CREATE EDGE INSTANCE]'
-        params = "--node_name %s --ami_id %s --instance_type %s --key_name %s --security_group_ids %s " \
-                 "--subnet_id %s --iam_profile %s --infra_tag_name %s --infra_tag_value %s" % \
-                 (edge_conf['instance_name'], edge_conf['ami_id'], edge_conf['instance_size'], edge_conf['key_name'],
+        params = "--node_name {} --ami_id {} --instance_type {} --key_name {} --security_group_ids {} " \
+                 "--subnet_id {} --iam_profile {} --infra_tag_name {} --infra_tag_value {}" \
+                 .format(edge_conf['instance_name'], edge_conf['ami_id'], edge_conf['instance_size'], edge_conf['key_name'],
                   edge_group_id, edge_conf['public_subnet_id'], edge_conf['role_profile_name'],
                   edge_conf['tag_name'], edge_conf['instance_name'])
         try:
-            local("~/scripts/%s.py %s" % ('create_instance', params))
+            local("~/scripts/{}.py {}".format('create_instance', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to create instance", "conf": edge_conf}
@@ -373,7 +373,7 @@ def run():
         addresses = get_instance_ip_address(edge_conf['instance_name'])
         ip_address = addresses.get('Private')
         public_ip_address = addresses.get('Public')
-        keyfile_name = "/root/keys/%s.pem" % edge_conf['key_name']
+        keyfile_name = "/root/keys/{}.pem".format(edge_conf['key_name'])
     except:
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
@@ -387,7 +387,7 @@ def run():
         logging.info('[INSTALLING PREREQUISITES]')
         params = "--hostname {} --keyfile {} --user {}".format(instance_hostname, keyfile_name, os.environ['general_os_user'])
         try:
-            local("~/scripts/%s.py %s" % ('install_prerequisites', params))
+            local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing apps: apt & pip", "conf": edge_conf}
@@ -408,10 +408,10 @@ def run():
         logging.info('[INSTALLING HTTP PROXY]')
         additional_config = {"exploratory_subnet": edge_conf['private_subnet_cidr'],
                              "template_file": "/root/templates/squid.conf"}
-        params = "--hostname %s --keyfile %s --additional_config '%s' --user %s" % \
-                 (instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['general_os_user'])
+        params = "--hostname {} --keyfile {} --additional_config '{}' --user {}" \
+                 .format(instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['general_os_user'])
         try:
-            local("~/scripts/%s.py %s" % ('configure_http_proxy', params))
+            local("~/scripts/{}.py {}".format('configure_http_proxy', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing http proxy", "conf": edge_conf}
@@ -436,7 +436,7 @@ def run():
         params = "--hostname {} --keyfile {} --additional_config '{}' --user {}".format(
             instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['general_os_user'])
         try:
-            local("~/scripts/%s.py %s" % ('install_user_key', params))
+            local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing users key", "conf": edge_conf}
@@ -510,10 +510,10 @@ def terminate():
     try:
         logging.info('[TERMINATE EDGE]')
         print '[TERMINATE EDGE]'
-        params = "--user_name %s --tag_name %s --tag_value %s --edge_sg %s --nb_sg %s" % \
-                 (edge_conf['user_name'], edge_conf['tag_name'], edge_conf['tag_value'], edge_conf['edge_sg'], edge_conf['nb_sg'])
+        params = "--user_name {} --tag_name {} --tag_value {} --edge_sg {} --nb_sg {}" \
+                 .format(edge_conf['user_name'], edge_conf['tag_name'], edge_conf['tag_value'], edge_conf['edge_sg'], edge_conf['nb_sg'])
         try:
-            local("~/scripts/%s.py %s" % ('terminate_edge', params))
+            local("~/scripts/{}.py {}".format('terminate_edge', params))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to terminate edge", "conf": edge_conf}
