@@ -34,7 +34,7 @@ args = parser.parse_args()
 
 def copy_key(config):
     key = open('{}/{}.pub'.format(config['user_keydir'], config['user_keyname'])).read()
-    if sudo('echo "{0}" >> /home/{1}/.ssh/authorized_keys'.format(key, os.environ['general_os_user'])).succeeded:
+    if sudo('echo "{0}" >> /home/{1}/.ssh/authorized_keys'.format(key, args.user)).succeeded:
         return True
     else:
         return False
