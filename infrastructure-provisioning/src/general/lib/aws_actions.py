@@ -782,3 +782,21 @@ def remove_vpc_endpoints(vpc_id):
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
+
+
+def create_image_from_instance(instance_name='', image_name=''):
+    ec2 = boto3.resource('ec2')
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'tag:Name', 'Values': [instance_name]},
+                 {'Name': 'instance-state-name', 'Values': ['running']}])
+    for instance in instances:
+        image = instance.create_image(Name=image_name,
+                                      Description='Automatically created image for notebook server',
+                                      NoReboot=False)
+        image.load()
+        while image.state != 'available':
+            local("echo Waiting for image creation; sleep 20")
+            image.load()
+        image.create_tags(Tags=[{'Key': 'Name', 'Value': os.environ['conf_service_base_name']}])
+        return image.id
+    return ''
