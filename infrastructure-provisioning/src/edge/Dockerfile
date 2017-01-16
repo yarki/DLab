@@ -26,3 +26,4 @@ COPY general/scripts/${OS}/edge_lib.py /usr/lib/python2.7/dlab/edge_lib.py
 
 RUN chmod 755 /root/fabfile.py; \
     chmod 755 /root/scripts/*
+
