@@ -23,6 +23,7 @@ import argparse
 import json
 import sys
 from dlab.ssn_lib import *
+from dlab.fab import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
@@ -31,6 +32,30 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 parser.add_argument('--os_user', type=str, default='')
 parser.add_argument('--dlab_path', type=str, default='')
 args = parser.parse_args()
+
+
+def creating_service_directories(dlab_path, os_user):
+    try:
+        if not exists(dlab_path):
+            sudo('mkdir -p ' + dlab_path)
+            sudo('mkdir -p ' + dlab_path + 'conf')
+            sudo('mkdir -p ' + dlab_path + 'webapp/lib')
+            sudo('mkdir -p ' + dlab_path + 'webapp/static')
+            sudo('mkdir -p ' + dlab_path + 'template')
+            sudo('mkdir -p ' + dlab_path + 'tmp')
+            sudo('mkdir -p ' + dlab_path + 'tmp/result')
+            sudo('mkdir -p /var/opt/dlab/log/ssn')
+            sudo('mkdir -p /var/opt/dlab/log/edge')
+            sudo('mkdir -p /var/opt/dlab/log/notebook')
+            sudo('mkdir -p /var/opt/dlab/log/emr')
+            sudo('ln -s ' + dlab_path + 'conf /etc/opt/dlab')
+            sudo('ln -s /var/opt/dlab/log /var/log/dlab')
+            sudo('chown -R ' + os_user + ':' + os_user + ' /var/opt/dlab/log')
+            sudo('chown -R ' + os_user + ':' + os_user + ' ' + dlab_path)
+
+        return True
+    except:
+        return False
 
 
 ##############
