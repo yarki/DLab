@@ -59,6 +59,10 @@ def run():
         logging.info('ERROR: Edge node is unavailable! Aborting...')
         print 'ERROR: Edge node is unavailable! Aborting...'
         put_resource_status('edge', 'Unavailable', 'emr')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Edge node is unavailable"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
         sys.exit(1)
     #index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag', '{}-{}-emr'.format(os.environ['conf_service_base_name'], os.environ['edge_user_name']))
     #time_stamp = int(time.time())
