@@ -30,6 +30,18 @@ from dlab.fab import *
 import os
 
 
+def enable_proxy(proxy_host, proxy_port):
+    if not exists('/tmp/proxy_enabled'):
+        try:
+            proxy_string = "http://%s:%s" % (proxy_host, proxy_port)
+            sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
+            sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
+            sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
+            sudo('touch /tmp/proxy_enabled ')
+        except:
+            sys.exit(1)
+
+
 def ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, pyspark_local_path_dir, py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/spark_scala_ensured'):
         try:
@@ -146,17 +158,5 @@ def ensure_libraries_py2(os_user):
             sudo('pip2 install boto boto3 --no-cache-dir')
             sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn fabvenv fabric-virtualenv --no-cache-dir')
             sudo('touch /home/' + os_user + '/.ensure_dir/ensure_libraries_py2_installed')
-        except:
-            sys.exit(1)
-
-
-def enable_proxy(proxy_host, proxy_port):
-    if not exists('/tmp/proxy_enabled'):
-        try:
-            proxy_string = "http://{}:{}".format(proxy_host, proxy_port)
-            sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
-            sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
-            sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
-            sudo('touch /tmp/proxy_enabled ')
         except:
             sys.exit(1)
