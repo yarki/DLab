@@ -26,5 +26,5 @@ COPY general/scripts/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.
 COPY general/templates/${OS}/* /root/templates/
 
 RUN chmod 755 /root/fabfile.py; \
-    chmod 755 /root/scripts/*; \
+    chmod 755 /root/scripts/*
 
