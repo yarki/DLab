@@ -19,6 +19,9 @@
 # ******************************************************************************
 
 from dlab.aws_actions import *
+from dlab.common_lib import *
+from dlab.notebook_lib import *
+from dlab.fab import *
 from fabric.api import *
 from fabric.contrib.files import exists
 import argparse
@@ -42,73 +45,6 @@ s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 
 
-def ensure_libraries_py():
-    if not exists('/home/' + args.os_user + '/.ensure_dir/ensure_libraries_py_installed'):
-        try:
-            sudo('export LC_ALL=C')
-            sudo('apt-get install python3-setuptools')
-            sudo('apt install -y python3-pip')
-            sudo('apt-get install -y python-virtualenv')
-            sudo('pip2 install -U pip --no-cache-dir')
-            sudo('pip2 install boto boto3 --no-cache-dir')
-            sudo('pip2 install fabvenv fabric-virtualenv --no-cache-dir')
-            sudo('pip3 install -U pip --no-cache-dir')
-            sudo('pip3 install boto boto3 --no-cache-dir')
-            sudo('pip3 install fabvenv fabric-virtualenv --no-cache-dir')
-            sudo('touch /home/' + args.os_user + '/.ensure_dir/ensure_libraries_py_installed')
-        except:
-            sys.exit(1)
-
-
-def install_rstudio():
-    if not exists('/home/' + args.os_user + '/.ensure_dir/rstudio_ensured'):
-        try:
-            sudo('apt-get install -y default-jre')
-            sudo('apt-get install -y default-jdk')
-            sudo('apt-get install -y r-base')
-            sudo('apt-get install -y gdebi-core')
-            sudo('apt-get install -y r-cran-rjava r-cran-evaluate r-cran-formatr r-cran-yaml r-cran-rcpp r-cran-catools r-cran-jsonlite r-cran-ggplot2')
-            sudo('R CMD javareconf')
-            sudo('R -e \'install.packages("rmarkdown", repos = "https://cran.revolutionanalytics.com")\'')
-            sudo('R -e \'install.packages("base64enc", repos = "https://cran.revolutionanalytics.com")\'')
-            sudo('R -e \'install.packages("tibble", repos = "https://cran.revolutionanalytics.com")\'')
-            sudo('wget https://download2.rstudio.org/rstudio-server-1.0.44-amd64.deb')
-            sudo('gdebi -n rstudio-server-1.0.44-amd64.deb')
-            sudo('mkdir /mnt/var')
-            sudo('chown ' + args.os_user + ':' + args.os_user + ' /mnt/var')
-            sudo('touch /home/' + args.os_user + '/.Renviron')
-            sudo('chown ' + args.os_user + ':' + args.os_user + ' /home/' + args.os_user + '/.Renviron')
-            sudo('''echo 'SPARK_HOME="''' + local_spark_path + '''"' >> /home/''' + args.os_user + '''/.Renviron''')
-            sudo('touch /home/' + args.os_user + '/.Rprofile')
-            sudo('chown ' + args.os_user + ':' + args.os_user + ' /home/' + args.os_user + '/.Rprofile')
-            sudo('''echo 'library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))' >> /home/''' + args.os_user + '''/.Rprofile''')
-            sudo('rstudio-server start')
-            sudo('echo "' + args.os_user + ':' + args.rstudio_pass + '" | chpasswd')
-            sudo("sed -i '/exit 0/d' /etc/rc.local")
-            sudo('''bash -c "echo \'sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/''' + args.os_user + '''/.Renviron\' >> /etc/rc.local"''')
-            sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
-            sudo('touch /home/' + args.os_user + '/.ensure_dir/rstudio_ensured')
-        except:
-            sys.exit(1)
-    else:
-        try:
-            sudo('echo "' + args.os_user + ':' + args.rstudio_pass + '" | chpasswd')
-        except:
-            sys.exit(1)
-
-
-def ensure_local_spark():
-    if not exists('/home/' + args.os_user + '/.ensure_dir/local_spark_ensured'):
-        try:
-            sudo('wget ' + spark_link + ' -O /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
-            sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
-            sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' ' + local_spark_path)
-            sudo('chown -R ' + args.os_user + ':' + args.os_user + ' ' + local_spark_path)
-            sudo('touch /home/' + args.os_user + '/.ensure_dir/local_spark_ensured')
-        except:
-            sys.exit(1)
-
-
 ##############
 # Run script #
 ##############
@@ -129,13 +65,13 @@ if __name__ == "__main__":
     prepare_disk(args.os_user)
 
     print "Install python libraries"
-    ensure_libraries_py()
+    ensure_libraries_py(args.os_user)
 
     print "Install RStudio"
-    install_rstudio()
+    install_rstudio(args.os_user, local_spark_path, args.rstudio_pass)
 
     print "Install local Spark"
-    ensure_local_spark()
+    ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path )
 
     print "Install local S3 kernels"
     ensure_s3_kernel(args.os_user, s3_jars_dir, templates_dir, args.region)
