@@ -19,10 +19,9 @@
 # ******************************************************************************
 
 import argparse
-import json
 from dlab.aws_actions import *
 from dlab.aws_meta import *
-import sys, os
+import sys
 import boto3, botocore
 from dlab.ssn_lib import *
 

@@ -18,9 +18,7 @@
 #
 # ******************************************************************************
 
-import sys
 import argparse
-import json
 from dlab.aws_actions import *
 from dlab.aws_meta import *
 

@@ -22,7 +22,6 @@ from fabric.api import *
 import argparse
 import json
 import sys
-import os
 from dlab.ssn_lib import *
 
 parser = argparse.ArgumentParser()
@@ -30,12 +29,14 @@ parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 parser.add_argument('--os_family', type=str, default='')
+parser.add_argument('--os_user', type=str, default='')
+parser.add_argument('--dlab_path', type=str, default='')
 args = parser.parse_args()
 
 
 def build_docker_images(image_list):
     try:
-        sudo('mkdir /project_images; chown ' + os.environ['general_os_user'] + ' /project_images')
+        sudo('mkdir /project_images; chown ' + args.os_user + ' /project_images')
         local('scp -r -i {} /project_tree/* {}:/project_images/'.format(args.keyfile, env.host_string))
         for image in image_list:
             name = image['name']
@@ -59,13 +60,13 @@ if __name__ == "__main__":
     try:
         env['connection_attempts'] = 100
         env.key_filename = [args.keyfile]
-        env.host_string = os.environ['general_os_user'] + '@' + args.hostname
+        env.host_string = args.os_user + '@' + args.hostname
         deeper_config = json.loads(args.additional_config)
     except:
         sys.exit(2)
 
     print "Installing docker daemon"
-    if not ensure_docker_daemon():
+    if not ensure_docker_daemon(args.dlab_path):
         sys.exit(1)
 
     print "Building dlab images"

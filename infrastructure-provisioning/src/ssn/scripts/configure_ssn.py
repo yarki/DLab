@@ -28,6 +28,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
+parser.add_argument('--os_user', type=str, default='')
+parser.add_argument('--dlab_path', type=str, default='')
 args = parser.parse_args()
 
 
@@ -39,33 +41,33 @@ if __name__ == "__main__":
     try:
         env['connection_attempts'] = 100
         env.key_filename = [args.keyfile]
-        env.host_string = os.environ['general_os_user'] + '@' + args.hostname
+        env.host_string = args.os_user + '@' + args.hostname
         deeper_config = json.loads(args.additional_config)
     except:
         sys.exit(2)
 
     print "Creating service directories."
-    if not creating_service_directories():
+    if not creating_service_directories(args.dlab_path, args.os_user):
         sys.exit(1)
 
     print "Installing nginx as frontend."
-    if not ensure_nginx():
+    if not ensure_nginx(args.dlab_path):
         sys.exit(1)
 
     print "Configuring nginx."
-    if not configure_nginx(deeper_config):
+    if not configure_nginx(deeper_config, args.dlab_path):
         sys.exit(1)
 
     print "Installing jenkins."
-    if not ensure_jenkins():
+    if not ensure_jenkins(args.dlab_path):
         sys.exit(1)
 
     print "Configuring jenkins."
-    if not configure_jenkins():
+    if not configure_jenkins(args.dlab_path, args.os_user):
         sys.exit(1)
 
     print "Copying key"
-    if not cp_key(args.keyfile, env.host_string):
+    if not cp_key(args.keyfile, env.host_string, args.os_user):
         sys.exit(1)
 
     sys.exit(0)

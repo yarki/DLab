@@ -29,9 +29,9 @@ from dlab.fab import *
 from dlab.aws_meta import *
 
 
-def ensure_docker_daemon():
+def ensure_docker_daemon(dlab_path):
     try:
-        if not exists(os.environ['ssn_dlab_path'] + 'tmp/docker_daemon_ensured'):
+        if not exists(dlab_path + 'tmp/docker_daemon_ensured'):
             sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D')
             sudo('echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" | sudo tee /etc/apt/sources.list.d/docker.list')
             sudo('apt-get update')
@@ -40,7 +40,7 @@ def ensure_docker_daemon():
             sudo('usermod -a -G docker ubuntu')
             sudo('update-rc.d docker defaults')
             sudo('update-rc.d docker enable')
-            sudo('touch ' + os.environ['ssn_dlab_path'] + 'tmp/docker_daemon_ensured')
+            sudo('touch ' + dlab_path + 'tmp/docker_daemon_ensured')
         return True
     except:
         return False
@@ -68,11 +68,11 @@ def add_2_yml_config(path,section,param,value):
         return False
 
 
-def cp_key(keyfile, host_string):
+def cp_key(keyfile, host_string, os_user):
     try:
         key_name=keyfile.split("/")
         sudo('mkdir -p /home/ubuntu/keys')
-        sudo('chown -R ubuntu:ubuntu /home/ubuntu/keys')
+        sudo('chown -R ' + os_user + ':' + os_user + ' /home/ubuntu/keys')
         local('scp -r -q -i {0} {0} {1}:/home/ubuntu/keys/{2}'.format(keyfile, host_string, key_name[-1]))
         sudo('chmod 600 /home/ubuntu/keys/*.pem')
         return True
@@ -80,83 +80,83 @@ def cp_key(keyfile, host_string):
         return False
 
 
-def ensure_nginx():
+def ensure_nginx(dlab_path):
     try:
-        if not exists(os.environ['ssn_dlab_path'] + 'tmp/nginx_ensured'):
+        if not exists(dlab_path + 'tmp/nginx_ensured'):
             sudo('apt-get -y install nginx')
             sudo('service nginx restart')
             sudo('update-rc.d nginx defaults')
             sudo('update-rc.d nginx enable')
-            sudo('touch ' + os.environ['ssn_dlab_path'] + 'tmp/nginx_ensured')
+            sudo('touch ' + dlab_path + 'tmp/nginx_ensured')
         return True
     except:
         return False
 
 
-def ensure_jenkins():
+def ensure_jenkins(dlab_path):
     try:
-        if not exists(os.environ['ssn_dlab_path'] + 'tmp/jenkins_ensured'):
+        if not exists(dlab_path + 'tmp/jenkins_ensured'):
             sudo('wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | apt-key add -')
             sudo('echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list')
             sudo('apt-get -y update')
             sudo('apt-get -y install jenkins')
-            sudo('touch ' + os.environ['ssn_dlab_path'] + 'tmp/jenkins_ensured')
+            sudo('touch ' + dlab_path + 'tmp/jenkins_ensured')
         return True
     except:
         return False
 
 
-def configure_jenkins():
+def configure_jenkins(dlab_path, os_user):
     try:
-        if not exists(os.environ['ssn_dlab_path'] + 'tmp/jenkins_configured'):
+        if not exists(dlab_path + 'tmp/jenkins_configured'):
             sudo('echo \'JENKINS_ARGS="--prefix=/jenkins --httpPort=8070"\' >> /etc/default/jenkins')
             sudo('rm -rf /var/lib/jenkins/*')
             sudo('mkdir -p /var/lib/jenkins/jobs/')
-            sudo('chown -R ubuntu:ubuntu /var/lib/jenkins/')
+            sudo('chown -R ' + os_user + ':' + os_user + ' /var/lib/jenkins/')
             put('/root/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
             sudo('chown -R jenkins:jenkins /var/lib/jenkins')
             sudo('/etc/init.d/jenkins stop; sleep 5')
             sudo('sysv-rc-conf jenkins on')
             sudo('service jenkins start')
-            sudo('touch ' + os.environ['ssn_dlab_path'] + '/tmp/jenkins_configured')
+            sudo('touch ' + dlab_path + '/tmp/jenkins_configured')
             sudo('echo "jenkins ALL = NOPASSWD:ALL" >> /etc/sudoers')
         return True
     except:
         return False
 
 
-def creating_service_directories():
+def creating_service_directories(dlab_path, os_user):
     try:
-        if not exists(os.environ['ssn_dlab_path']):
-            sudo('mkdir -p ' + os.environ['ssn_dlab_path'])
-            sudo('mkdir -p ' + os.environ['ssn_dlab_path'] + 'conf')
-            sudo('mkdir -p ' + os.environ['ssn_dlab_path'] + 'webapp/lib')
-            sudo('mkdir -p ' + os.environ['ssn_dlab_path'] + 'webapp/static')
-            sudo('mkdir -p ' + os.environ['ssn_dlab_path'] + 'template')
-            sudo('mkdir -p ' + os.environ['ssn_dlab_path'] + 'tmp')
-            sudo('mkdir -p ' + os.environ['ssn_dlab_path'] + 'tmp/result')
+        if not exists(dlab_path):
+            sudo('mkdir -p ' + dlab_path)
+            sudo('mkdir -p ' + dlab_path + 'conf')
+            sudo('mkdir -p ' + dlab_path + 'webapp/lib')
+            sudo('mkdir -p ' + dlab_path + 'webapp/static')
+            sudo('mkdir -p ' + dlab_path + 'template')
+            sudo('mkdir -p ' + dlab_path + 'tmp')
+            sudo('mkdir -p ' + dlab_path + 'tmp/result')
             sudo('mkdir -p /var/opt/dlab/log/ssn')
             sudo('mkdir -p /var/opt/dlab/log/edge')
             sudo('mkdir -p /var/opt/dlab/log/notebook')
             sudo('mkdir -p /var/opt/dlab/log/emr')
-            sudo('ln -s ' + os.environ['ssn_dlab_path'] + 'conf /etc/opt/dlab')
+            sudo('ln -s ' + dlab_path + 'conf /etc/opt/dlab')
             sudo('ln -s /var/opt/dlab/log /var/log/dlab')
-            sudo('chown -R ubuntu:ubuntu /var/opt/dlab/log')
-            sudo('chown -R ubuntu:ubuntu ' + os.environ['ssn_dlab_path'])
+            sudo('chown -R ' + os_user + ':' + os_user + ' /var/opt/dlab/log')
+            sudo('chown -R ' + os_user + ':' + os_user + ' ' + dlab_path)
 
         return True
     except:
         return False
 
 
-def configure_nginx(config):
+def configure_nginx(config, dlab_path):
     try:
         random_file_part = id_generator(size=20)
         if not exists("/etc/nginx/conf.d/nginx_proxy.conf"):
             sudo('rm -f /etc/nginx/conf.d/*')
             put(config['nginx_template_dir'] + 'nginx_proxy.conf', '/tmp/nginx_proxy.conf')
-            sudo('mv /tmp/nginx_proxy.conf ' + os.environ['ssn_dlab_path'] + 'tmp/')
-            sudo('\cp ' + os.environ['ssn_dlab_path'] + 'tmp/nginx_proxy.conf /etc/nginx/conf.d/')
+            sudo('mv /tmp/nginx_proxy.conf ' + dlab_path + 'tmp/')
+            sudo('\cp ' + dlab_path + 'tmp/nginx_proxy.conf /etc/nginx/conf.d/')
             sudo('mkdir -p /etc/nginx/locations')
             sudo('rm -f /etc/nginx/sites-enabled/default')
     except:

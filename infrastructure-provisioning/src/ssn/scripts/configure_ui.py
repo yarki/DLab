@@ -31,12 +31,21 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
+parser.add_argument('--dlab_path', type=str, default='')
+parser.add_argument('--os_user', type=str, default='')
+parser.add_argument('--request_id', type=str, default='')
+parser.add_argument('--resource', type=str, default='')
+parser.add_argument('--region', type=str, default='')
+parser.add_argument('--service_base_name', type=str, default='')
+parser.add_argument('--security_groups_ids', type=str, default='')
+parser.add_argument('--vpc_id', type=str, default='')
+parser.add_argument('--subnet_id', type=str, default='')
 args = parser.parse_args()
 
-dlab_conf_dir=os.environ['ssn_dlab_path'] + 'conf/'
-web_path = os.environ['ssn_dlab_path'] + 'webapp/lib/'
-local_log_filename = "{}_UI.log".format(os.environ['request_id'])
-local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
+dlab_conf_dir = args.dlab_path + 'conf/'
+web_path = args.dlab_path + 'webapp/lib/'
+local_log_filename = "{}_UI.log".format(args.request_id)
+local_log_filepath = "/logs/" + args.resource + "/" + local_log_filename
 logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                     level=logging.INFO,
                     filename=local_log_filepath)
@@ -48,10 +57,10 @@ def configure_mongo():
             local('scp -i {} /root/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
             sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
         local('scp -i {} /root/templates/instance_shapes.lst {}:/tmp/instance_shapes.lst'.format(args.keyfile, env.host_string))
-        sudo('mv /tmp/instance_shapes.lst ' + os.environ['ssn_dlab_path'] + 'tmp/')
+        sudo('mv /tmp/instance_shapes.lst ' + args.dlab_path + 'tmp/')
         local('scp -i {} /root/scripts/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
-        sudo('mv /tmp/configure_mongo.py ' + os.environ['ssn_dlab_path'] + 'tmp/')
-        sudo('python ' + os.environ['ssn_dlab_path'] + 'tmp/configure_mongo.py --region {} --base_name {} --sg "{}" --vpc {} --subnet {}'.format(os.environ['creds_region'], os.environ['conf_service_base_name'], os.environ['creds_security_groups_ids'].replace(" ", ""), os.environ['creds_vpc_id'], os.environ['creds_subnet_id']))
+        sudo('mv /tmp/configure_mongo.py ' + args.dlab_path + 'tmp/')
+        sudo('python ' + args.dlab_path + 'tmp/configure_mongo.py --region {} --base_name {} --sg "{}" --vpc {} --subnet {} --dlab_path {} --os_user {}'.format(args.region, args.service_base_name, args.security_groups_ids.replace(" ", ""), args.vpc_id, args.subnet_id, args.dlab_path, args.os_user))
         return True
     except:
         return False
@@ -65,7 +74,7 @@ if __name__ == "__main__":
     try:
         env['connection_attempts'] = 100
         env.key_filename = [args.keyfile]
-        env.host_string = os.environ['general_os_user'] + '@' + args.hostname
+        env.host_string = args.os_user + '@' + args.hostname
         deeper_config = json.loads(args.additional_config)
     except:
         sys.exit(2)

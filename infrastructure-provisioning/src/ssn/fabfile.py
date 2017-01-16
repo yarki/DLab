@@ -312,8 +312,8 @@ def run():
         logging.info('[CONFIGURE SSN INSTANCE]')
         print('[CONFIGURE SSN INSTANCE]')
         additional_config = {"nginx_template_dir": "/root/templates/"}
-        params = "--hostname {} --keyfile {} --additional_config '{}'". \
-                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), json.dumps(additional_config))
+        params = "--hostname {} --keyfile {} --additional_config '{}' --os_user {} --dlab_path {}". \
+                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), json.dumps(additional_config), os.environ['general_os_user'], os.environ['ssn_dlab_path'])
 
         try:
             local("~/scripts/{}.py {}".format('configure_ssn', params))
@@ -346,8 +346,8 @@ def run():
                              #{"name": "edge", "tag": "latest"}]
                              #{"name": "emr", "tag": "latest"},
                              #{"name": "zeppelin", "tag": "latest"}, ]
-        params = "--hostname {} --keyfile {} --additional_config '{}' --os_family {}". \
-                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), json.dumps(additional_config), os.environ['general_os_family'])
+        params = "--hostname {} --keyfile {} --additional_config '{}' --os_family {} --os_user {} --dlab_path {}". \
+                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), json.dumps(additional_config), os.environ['general_os_family'], os.environ['general_os_user'], os.environ['ssn_dlab_path'])
 
         try:
             local("~/scripts/{}.py {}".format('configure_docker', params))
@@ -401,8 +401,8 @@ def run():
         sys.exit(1)
 
     try:
-        params = "--hostname {} --keyfile {}". \
-                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']))
+        params = "--hostname {} --keyfile {} --dlab_path {} --os_user {} --request_id {} --resource {} --region {} --service_base_name {} --security_groups_ids {} --vpc_id {} --subnet_id {}". \
+                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), os.environ['ssn_dlab_path'], os.environ['general_os_user'], os.environ['request_id'], os.environ['resource'], os.environ['creds_region'], os.environ['conf_service_base_name'], os.environ['creds_security_groups_ids'], os.environ['creds_vpc_id'], os.environ['creds_subnet_id'])
 
         try:
             local("~/scripts/{}.py {}".format('configure_ui', params))
