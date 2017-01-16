@@ -27,24 +27,6 @@ import os
 import uuid
 
 
-# Function for creating AMI from already provisioned notebook
-def create_image_from_instance(instance_name='', image_name=''):
-    ec2 = boto3.resource('ec2')
-    instances = ec2.instances.filter(
-        Filters=[{'Name': 'tag:Name', 'Values': [instance_name]},
-                 {'Name': 'instance-state-name', 'Values': ['running']}])
-    for instance in instances:
-        image = instance.create_image(Name=image_name,
-                                      Description='Automatically created image for notebook server',
-                                      NoReboot=True)
-        image.load()
-        while image.state != 'available':
-            local("echo Waiting for image creation; sleep 20")
-            image.load()
-        return image.id
-    return ''
-
-
 # Main function for provisioning notebook server
 def run():
     # enable debug level for boto3

@@ -119,7 +119,7 @@ def run():
     try:
         logging.info('[INSTALLING PREREQUISITES TO R_STUDIO NOTEBOOK INSTANCE]')
         print('[INSTALLING PREREQUISITES TO R_STUDIO NOTEBOOK INSTANCE]')
-        params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
+        params = "--hostname %s --keyfile %s --user %s" % (instance_hostname, keyfile_name, os.environ['general_os_user'])
         local("~/scripts/%s.py %s" % ('install_prerequisites', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed installing apps: apt & pip", "conf": notebook_config}
