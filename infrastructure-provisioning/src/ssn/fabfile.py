@@ -342,12 +342,12 @@ def run():
         print('[CONFIGURING DOCKER AT SSN INSTANCE]')
         additional_config = [{"name": "base", "tag": "latest"},
                              {"name": "edge", "tag": "latest"},
-                             {"name": "jupyter", "tag": "latest"}]
-                             #{"name": "rstudio", "tag": "latest"},
-                             #{"name": "zeppelin", "tag": "latest"},
+                             {"name": "jupyter", "tag": "latest"},
+                             {"name": "rstudio", "tag": "latest"},
+                             {"name": "zeppelin", "tag": "latest"}]
                              #{"name": "emr", "tag": "latest"} ]
-        params = "--hostname {} --keyfile {} --additional_config '{}' --os_family {} --os_user {} --dlab_path {}". \
-                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), json.dumps(additional_config), os.environ['general_os_family'], os.environ['general_os_user'], os.environ['ssn_dlab_path'])
+        params = "--hostname {} --keyfile {} --additional_config '{}' --os_family {} --os_user {} --dlab_path {} --cloud_provider {}". \
+                 format(instance_hostname, "/root/keys/{}.pem".format(os.environ['creds_key_name']), json.dumps(additional_config), os.environ['general_os_family'], os.environ['general_os_user'], os.environ['ssn_dlab_path'], os.environ['general_cloud_provider'])
 
         try:
             local("~/scripts/{}.py {}".format('configure_docker', params))

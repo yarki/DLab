@@ -31,6 +31,7 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 parser.add_argument('--os_family', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
 parser.add_argument('--dlab_path', type=str, default='')
+parser.add_argument('--cloud_provider', type=str, default='')
 args = parser.parse_args()
 
 
@@ -41,8 +42,13 @@ def build_docker_images(image_list):
         for image in image_list:
             name = image['name']
             tag = image['tag']
-            sudo("cd /project_images/; docker build --build-arg OS={2} --file {0}/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
-                 .format(name, tag, args.os_family))
+            if name == 'base':
+                sudo("cd /project_images/; docker build --build-arg OS={2} --build-arg CLOUD={3} --file {0}/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
+                     .format(name, tag, args.os_family, args.cloud_provider))
+            else:
+                sudo(
+                    "cd /project_images/; docker build --build-arg OS={2} --file {0}/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
+                    .format(name, tag, args.os_family))
         return True
     except:
         return False
