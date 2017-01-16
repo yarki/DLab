@@ -241,7 +241,7 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         dao.insertOne(USER_INSTANCES, instance1);
         dao.insertOne(USER_INSTANCES, instance2);
 
-        StatusBaseDTO newStatus = new StatusBaseDTO();
+        StatusBaseDTO<?> newStatus = new StatusBaseDTO<>();
         newStatus.setUser("user1");
         newStatus.setExploratoryName("exp_name_1");
         newStatus.setStatus("running");
@@ -480,7 +480,7 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         boolean inserted3 = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp3);
         assertTrue(inserted3);
 
-        UpdateResult testResult = dao.updateComputationalStatusesForExploratory(new StatusBaseDTO()
+        UpdateResult testResult = dao.updateComputationalStatusesForExploratory(new StatusBaseDTO<>()
                 .withUser("user1")
                 .withExploratoryName("exp_name_1")
                 .withStatus(UserInstanceStatus.STOPPED));

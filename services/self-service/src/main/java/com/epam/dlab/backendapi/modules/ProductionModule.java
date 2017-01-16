@@ -27,7 +27,14 @@ import io.dropwizard.setup.Environment;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
 
+/** Production class for an application configuration of SelfService.
+ */
 public class ProductionModule extends BaseModule {
+	
+	/** Instantiates an application configuration of SelfService for production environment.
+     * @param configuration application configuration of SelfService.
+     * @param environment environment of SelfService.
+     */
     public ProductionModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
         super(configuration, environment);
     }
