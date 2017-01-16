@@ -103,7 +103,8 @@ public class SSHConnect {
     }
 
     public static AckStatus checkAck(ChannelExec channel) throws IOException, InterruptedException {
-        InputStream in = channel.getInputStream();
+        channel.setOutputStream(System.out, true);
+    	channel.setErrStream(System.err, true);
 
         int status;
         while(channel.getExitStatus() == -1) {
@@ -111,33 +112,7 @@ public class SSHConnect {
         }
         status = channel.getExitStatus();
 
-        String message = "";
-
-        // b may be 0 for success,
-        //          1 for error,
-        //          2 for fatal error,
-        //          -1
-        if(status > 0){
-            StringBuffer sb=new StringBuffer();
-            int c;
-            int charCount = 0;
-
-            do {
-                c=in.read();
-                sb.append((char)c);
-                if (++charCount >= 4096) {
-                	message = sb.toString();
-                	System.out.print(message);
-                	sb.setLength(0);
-                	charCount = 0;
-                }
-            }
-            while(c!='\n');
-
-            System.out.println(sb.toString());
-            message += sb.toString();
-        }
-        return new AckStatus(status, message);
+        return new AckStatus(status, "");
     }
 
 }

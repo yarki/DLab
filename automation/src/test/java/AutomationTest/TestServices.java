@@ -2,7 +2,6 @@ package AutomationTest;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.testng.Assert;
@@ -19,7 +18,6 @@ import com.jayway.restassured.response.Response;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-
 import AmazonHelper.Amazon;
 import AmazonHelper.AmazonInstanceState;
 import DataModel.CreateNotebookDto;
@@ -542,4 +540,5 @@ public class TestServices {
         }
         return actualStatus;
     }
+
 }
