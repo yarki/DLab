@@ -21,6 +21,7 @@ from fabric.contrib.files import exists
 import logging
 import os
 import random
+import sys
 import string
 
 
@@ -63,3 +64,29 @@ def create_aws_config_files(generate_full_config=False):
 
 def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+def prepare_disk(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/disk_ensured'):
+        try:
+            sudo('''bash -c 'echo -e "o\nn\np\n1\n\n\nw" | fdisk /dev/xvdb' ''')
+            sudo('mkfs.ext4 /dev/xvdb1')
+            sudo('mount /dev/xvdb1 /opt/')
+            sudo(''' bash -c "echo '/dev/xvdb1 /opt/ ext4 errors=remount-ro 0 1' >> /etc/fstab" ''')
+            sudo('touch /home/' + os_user + '/.ensure_dir/disk_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_s3_kernel(os_user, s3_jars_dir, templates_dir, region):
+    if not exists('/home/' + os_user + '/.ensure_dir/s3_kernel_ensured'):
+        try:
+            sudo('mkdir -p ' + s3_jars_dir)
+            put(templates_dir + 'jars/local_jars.tar.gz', '/tmp/local_jars.tar.gz')
+            sudo('tar -xzf /tmp/local_jars.tar.gz -C ' + s3_jars_dir)
+            put(templates_dir + 'spark-defaults_local.conf', '/tmp/spark-defaults_local.conf')
+            sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/spark-defaults_local.conf".format(region))
+            sudo('\cp /tmp/spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
+            sudo('touch /home/' + os_user + '/.ensure_dir/s3_kernel_ensured')
+        except:
+            sys.exit(1)
