@@ -47,9 +47,12 @@ if __name__ == "__main__":
         reply['response']['result'] = {"error": "Failed to open result.json"}
         pass
 
-    reply['response']['log'] = "/var/log/dlab/notebook/notebook_{}_{}.log".format(os.environ['notebook_user_name'], os.environ['request_id'])
+    reply['response']['log'] = "/var/log/dlab/{0}/{0}_{1}_{2}.log".format(os.environ['resource'],
+                                                                          os.environ['edge_user_name'],
+                                                                          os.environ['request_id'])
 
-    with open("/response/notebook_{0}_{1}.json".format(os.environ['notebook_user_name'], os.environ['request_id']), 'w') as response_file:
+    with open("/response/{}_{}_{}.json".format(os.environ['resource'], os.environ['edge_user_name'],
+                                               os.environ['request_id']), 'w') as response_file:
         response_file.write(json.dumps(reply))
 
     try:
