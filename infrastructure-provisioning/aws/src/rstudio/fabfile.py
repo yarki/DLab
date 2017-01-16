@@ -75,7 +75,7 @@ def run():
         'notebook_user_name'] + "-nb-" + notebook_config['exploratory_name'] + notebook_config['uuid']
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-rstudio-notebook-image'
-    notebook_config['role_profile_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
+    notebook_config['role_profile_name'] = os.environ['conf_service_base_name'].lower().replace('-', '_') + "-" + os.environ[
         'notebook_user_name'] + "-nb-Profile"
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + "-nb-SG"
@@ -104,13 +104,14 @@ def run():
                   notebook_config['key_name'], get_security_group_by_name(notebook_config['security_group_name']),
                   get_subnet_by_cidr(notebook_config['subnet_cidr']), notebook_config['role_profile_name'],
                   notebook_config['tag_name'], notebook_config['instance_name'], instance_class, os.environ['notebook_disk_size'])
-        if not run_routine('create_instance', params):
-            logging.info('Failed to create instance')
+        try:
+            local("~/scripts/%s.py %s" % ('create_instance', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to create instance", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         sys.exit(1)
 
@@ -127,13 +128,14 @@ def run():
         additional_config = {"proxy_host": edge_instance_hostname, "proxy_port": "3128"}
         params = "--hostname %s --instance_name %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
-        if not run_routine('configure_proxy', params):
-            logging.info('Failed to configure proxy')
+        try:
+            local("~/scripts/%s.py %s" % ('configure_proxy', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to configure proxy", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -143,13 +145,14 @@ def run():
         logging.info('[INSTALLING PREREQUISITES TO R_STUDIO NOTEBOOK INSTANCE]')
         print('[INSTALLING PREREQUISITES TO R_STUDIO NOTEBOOK INSTANCE]')
         params = "--hostname %s --keyfile %s " % (instance_hostname, keyfile_name)
-        if not run_routine('install_prerequisites', params):
-            logging.info('Failed installing apps: apt & pip')
+        try:
+            local("~/scripts/%s.py %s" % ('install_prerequisites', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing apps: apt & pip", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -160,13 +163,14 @@ def run():
         print '[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]'
         params = "--hostname %s  --keyfile %s --region %s --rstudio_pass %s" % \
                  (instance_hostname,  keyfile_name, os.environ['creds_region'], notebook_config['rstudio_pass'])
-        if not run_routine('configure_rstudio', params):
-            logging.info('Failed to configure rstudio')
+        try:
+            local("~/scripts/%s.py %s" % ('configure_rstudio', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to configure rstudio", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -179,13 +183,14 @@ def run():
                              "user_keydir": "/root/keys/"}
         params = "--hostname {} --keyfile {} --additional_config '{}'".format(
             instance_hostname, keyfile_name, json.dumps(additional_config))
-        if not run_routine('install_user_key', params):
-            logging.info('Failed installing user key')
+        try:
+            local("~/scripts/%s.py %s" % ('install_user_key', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing users key", "conf": params}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         sys.exit(1)
 
@@ -256,13 +261,14 @@ def terminate():
         print '[TERMINATE NOTEBOOK]'
         params = "--bucket_name %s --tag_name %s --nb_tag_value %s" % \
                  (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'])
-        if not run_routine('terminate_notebook', params):
-            logging.info('Failed to terminate notebook')
+        try:
+            local("~/scripts/%s.py %s" % ('terminate_notebook', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to terminate notebook", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         sys.exit(1)
 
@@ -303,13 +309,14 @@ def stop():
         print '[STOP NOTEBOOK]'
         params = "--bucket_name %s --tag_name %s --nb_tag_value %s --ssh_user %s --key_path %s" % \
                  (notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], notebook_config['ssh_user'], notebook_config['key_path'])
-        if not run_routine('stop_notebook', params):
-            logging.info('Failed to stop notebook')
+        try:
+            local("~/scripts/%s.py %s" % ('stop_notebook', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to stop notebook", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         sys.exit(1)
 
@@ -347,13 +354,14 @@ def start():
         print '[START NOTEBOOK]'
         params = "--tag_name %s --nb_tag_value %s" % \
                  (notebook_config['tag_name'], notebook_config['notebook_name'])
-        if not run_routine('start_notebook', params):
-            logging.info('Failed to start notebook')
+        try:
+            local("~/scripts/%s.py %s" % ('start_notebook', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to start notebook", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         sys.exit(1)
 

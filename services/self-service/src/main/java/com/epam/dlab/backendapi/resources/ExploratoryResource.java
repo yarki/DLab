@@ -76,6 +76,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                 .withStatus(CREATING.toString())
                 .withImageName(formDTO.getImage())
                 .withImageVersion(formDTO.getVersion())
+                .withTemplateName(formDTO.getTemplateName())
                 .withShape(formDTO.getShape()));
         if (isAdded) {
             try {

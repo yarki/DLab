@@ -59,20 +59,145 @@ def run():
         region = os.environ['creds_region']
         ssn_ami_id = get_ami_id(os.environ['ssn_ami_name'])
         policy_path = '/root/templates/policy.json'
+        vpc_cidr = '172.31.0.0/16'
+        sg_name = instance_name + '-SG'
+        pre_defined_vpc = False
+        pre_defined_sg = False
 
+        if os.environ['creds_vpc_id'] == '' or os.environ['creds_vpc_id'] == 'PUT_YOUR_VALUE_HERE':
+            try:
+                pre_defined_vpc = True
+                logging.info('[CREATE VPC AND ROUTE TABLE]')
+                print '[CREATE VPC AND ROUTE TABLE]'
+                params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, service_base_name)
+                try:
+                    local("~/scripts/%s.py %s" % ('create_vpc', params))
+                except:
+                    with open("/root/result.json", 'w') as result:
+                        res = {"error": "Failed to create VPC"}
+                        print json.dumps(res)
+                        result.write(json.dumps(res))
+                    raise Exception
+                os.environ['creds_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
+                enable_vpc_dns(os.environ['creds_vpc_id'])
+                rt_id = create_rt(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            except:
+                sys.exit(1)
+
+        if os.environ['creds_subnet_id'] == '' or os.environ['creds_subnet_id'] == 'PUT_YOUR_VALUE_HERE':
+            try:
+                pre_defined_vpc = True
+                logging.info('[CREATE SUBNET]')
+                print '[CREATE SUBNET]'
+                params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {} --prefix {} --ssn {}".format(os.environ['creds_vpc_id'], 'ssn', tag_name, service_base_name, '20', True)
+                try:
+                    local("~/scripts/%s.py %s" % ('create_subnet', params))
+                except:
+                    with open("/root/result.json", 'w') as result:
+                        res = {"error": "Failed to create Subnet"}
+                        print json.dumps(res)
+                        result.write(json.dumps(res))
+                    raise Exception
+                with open('/tmp/ssn_subnet_id', 'r') as f:
+                    os.environ['creds_subnet_id'] = f.read()
+                enable_auto_assign_ip(os.environ['creds_subnet_id'])
+            except:
+                if pre_defined_vpc:
+                    remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+                    remove_route_tables(tag_name, True)
+                    try:
+                        remove_subnets(service_base_name + "-subnet")
+                    except:
+                        print "Subnet hasn't been created."
+                    remove_vpc(os.environ['creds_vpc_id'])
+                sys.exit(1)
+
+        if os.environ['creds_security_groups_ids'] == '' or os.environ['creds_security_groups_ids'] == 'PUT_YOUR_VALUE_HERE':
+            try:
+                pre_defined_sg = True
+                logging.info('[CREATE SG FOR SSN]')
+                print '[CREATE SG FOR SSN]'
+                ingress_sg_rules_template = [
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 80,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 80, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 8080,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 8080, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 22,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 22, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 3128,
+                        "IpRanges": [{"CidrIp": vpc_cidr}],
+                        "ToPort": 3128, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": 443,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": 443, "IpProtocol": "tcp", "UserIdGroupPairs": []
+                    },
+                    {
+                        "PrefixListIds": [],
+                        "FromPort": -1,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        "ToPort": -1, "IpProtocol": "icmp", "UserIdGroupPairs": []
+                    }
+                ]
+                egress_sg_rules_template = [
+                    {"IpProtocol": "-1", "IpRanges": [{"CidrIp": "0.0.0.0/0"}], "UserIdGroupPairs": [], "PrefixListIds": []}
+                ]
+                params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {} --ssn {}". \
+                    format(sg_name, os.environ['creds_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), service_base_name, tag_name, False, True)
+                try:
+                    local("~/scripts/%s.py %s" % ('create_security_group', params))
+                except:
+                    with open("/root/result.json", 'w') as result:
+                        res = {"error": "Failed creating security group for SSN"}
+                        print json.dumps(res)
+                        result.write(json.dumps(res))
+                    raise Exception
+                with open('/tmp/ssn_sg_id', 'r') as f:
+                    os.environ['creds_security_groups_ids'] = f.read()
+            except:
+                if pre_defined_vpc:
+                    remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+                    remove_subnets(service_base_name + "-subnet")
+                    remove_route_tables(tag_name, True)
+                    remove_vpc(os.environ['creds_vpc_id'])
+                sys.exit(1)
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
         params = "--role_name %s --role_profile_name %s --policy_name %s --policy_file_name %s" % \
                  (role_name, role_profile_name, policy_name, policy_path)
 
-        if not run_routine('create_role_policy', params):
-            logging.info('Unable to create roles')
+        try:
+            local("~/scripts/%s.py %s" % ('create_role_policy', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -80,15 +205,23 @@ def run():
         print('[CREATE ENDPOINT AND ROUTE-TABLE]')
         params = "--vpc_id {} --region {} --infra_tag_name {} --infra_tag_value {}".format(
             os.environ['creds_vpc_id'], os.environ['creds_region'], tag_name, service_base_name)
-        if not run_routine('create_endpoint', params):
-            logging.info('Unable to create Endpoint')
+        try:
+            local("~/scripts/%s.py %s" % ('create_endpoint', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to create an endpoint", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_all_iam_resources(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -97,15 +230,24 @@ def run():
         params = "--bucket_name %s --infra_tag_name %s --infra_tag_value %s --region %s" % \
                  (user_bucket_name, tag_name, user_bucket_name, region)
 
-        if not run_routine('create_bucket', params):
-            logging.info('Unable to create bucket')
+        try:
+            local("~/scripts/%s.py %s" % ('create_bucket', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_all_iam_resources(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -117,16 +259,25 @@ def run():
                   os.environ['creds_key_name'], os.environ['creds_security_groups_ids'],
                   os.environ['creds_subnet_id'], role_profile_name, tag_name, instance_name)
 
-        if not run_routine('create_instance', params):
-            logging.info('Unable to create ssn instance')
+        try:
+            local("~/scripts/%s.py %s" % ('create_instance', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to create ssn instance", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -135,20 +286,29 @@ def run():
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         params = "--hostname %s --keyfile %s " \
-                 "--pip_packages 'boto3 argparse fabric jupyter awscli'" % \
+                 "--pip_packages 'boto3 argparse fabric jupyter awscli pymongo'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
-        if not run_routine('install_prerequisites', params):
-            logging.info('Failed installing software: pip, apt')
+        try:
+            local("~/scripts/%s.py %s" % ('install_prerequisites', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing software: pip, apt", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -158,17 +318,26 @@ def run():
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
 
-        if not run_routine('configure_ssn', params):
-            logging.info('Failed configuring ssn')
+        try:
+            local("~/scripts/%s.py %s" % ('configure_ssn', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed configuring ssn", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -178,21 +347,31 @@ def run():
                              {"name": "jupyter", "tag": "latest"},
                              {"name": "rstudio", "tag": "latest"},
                              {"name": "edge", "tag": "latest"},
-                             {"name": "emr", "tag": "latest"}, ]
+                             {"name": "emr", "tag": "latest"},
+                             {"name": "zeppelin", "tag": "latest"}, ]
         params = "--hostname %s --keyfile %s --additional_config '%s'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'], json.dumps(additional_config))
 
-        if not run_routine('configure_docker', params):
-            logging.info('Unable to configure docker')
+        try:
+            local("~/scripts/%s.py %s" % ('configure_docker', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to configure docker", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -202,34 +381,52 @@ def run():
                  "--pip_packages 'pymongo pyyaml'" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
-        if not run_routine('install_prerequisites', params):
-            logging.info('Unable to preconfigure ui')
+        try:
+            local("~/scripts/%s.py %s" % ('install_prerequisites', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
         params = "--hostname %s --keyfile %s" % \
                  (instance_hostname, "/root/keys/%s.pem" % os.environ['creds_key_name'])
 
-        if not run_routine('configure_ui', params):
-            logging.info('Unable to upload UI')
+        try:
+            local("~/scripts/%s.py %s" % ('configure_ui', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Unable to upload UI", "conf": os.environ.__dict__}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
 
     try:
@@ -296,12 +493,24 @@ def run():
         params = ""
         if os.environ['ops_lifecycle_stage'] == 'prod':
             params += "--key_id %s" % os.environ['creds_access_key']
-            run_routine('finalize', params)
+            try:
+                local("~/scripts/%s.py %s" % ('finalize', params))
+            except:
+                raise Exception
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
+        if pre_defined_sg:
+            remove_sgroups(tag_name)
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['creds_vpc_id'])
+            remove_internet_gateways(os.environ['creds_vpc_id'], tag_name, service_base_name)
+            remove_subnets(service_base_name + "-subnet")
+            remove_route_tables(tag_name, True)
+            remove_vpc(os.environ['creds_vpc_id'])
         sys.exit(1)
+
 
 def terminate():
     local_log_filename = "{}_{}.log".format(os.environ['resource'], os.environ['request_id'])
@@ -324,13 +533,14 @@ def terminate():
         print '[TERMINATE SSN]'
         params = "--tag_name %s --edge_sg %s --nb_sg %s" % \
                  (ssn_conf['tag_name'], ssn_conf['edge_sg'], ssn_conf['nb_sg'])
-        if not run_routine('terminate_aws_resources', params):
-            logging.info('Failed to terminate ssn')
+        try:
+            local("~/scripts/%s.py %s" % ('terminate_aws_resources', params))
+        except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to terminate ssn", "conf": ssn_conf}
                 print json.dumps(res)
                 result.write(json.dumps(res))
-            sys.exit(1)
+            raise Exception
     except:
         sys.exit(1)
 

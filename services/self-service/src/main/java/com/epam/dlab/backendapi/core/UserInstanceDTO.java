@@ -39,6 +39,8 @@ public class UserInstanceDTO {
     private String imageName;
     @JsonProperty("version")
     private String imageVersion;
+    @JsonProperty("template_name")
+    private String templateName;
     @JsonProperty
     private String status;
     @JsonProperty
@@ -108,6 +110,15 @@ public class UserInstanceDTO {
 
     public UserInstanceDTO withImageVersion(String imageVersion) {
         setImageVersion(imageVersion);
+        return this;
+    }
+
+    public String getTemplateName() { return templateName; }
+
+    public void setTemplateName(String templateName) { this.templateName = templateName; }
+
+    public UserInstanceDTO withTemplateName(String templateName) {
+        setTemplateName(templateName);
         return this;
     }
 

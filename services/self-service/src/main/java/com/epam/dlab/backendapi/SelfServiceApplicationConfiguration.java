@@ -28,10 +28,28 @@ public class SelfServiceApplicationConfiguration extends ServiceConfiguration {
     @Valid
     @JsonProperty
     private boolean mocked;
+    
+    @Valid
+    @JsonProperty
+    private int minEmrInstanceCount;
+
+    @Valid
+    @JsonProperty
+    private int maxEmrInstanceCount;
 
 
     public boolean isMocked() {
         return mocked;
+    }
+    
+    /** Returns the minimum number of slave EMR instances than could be created. */
+    public int getMinEmrInstanceCount() {
+    	return minEmrInstanceCount;
+    }
+
+    /** Returns the maximum number of slave EMR instances than could be created. */
+    public int getMaxEmrInstanceCount() {
+    	return maxEmrInstanceCount;
     }
     
 }

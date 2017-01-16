@@ -79,6 +79,34 @@ def create_vpc(vpc_cidr, tag):
         traceback.print_exc(file=sys.stdout)
 
 
+def enable_vpc_dns(vpc_id):
+    try:
+        client = boto3.client('ec2')
+        client.modify_vpc_attribute(VpcId=vpc_id,
+                                    EnableDnsHostnames={'Value': True})
+    except Exception as err:
+        logging.info("Unable to modify VPC attributes: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to modify VPC attributes", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def remove_vpc(vpc_id):
+    try:
+        client = boto3.client('ec2')
+        client.delete_vpc(VpcId=vpc_id)
+        print "VPC " + vpc_id + " has been removed"
+    except Exception as err:
+        logging.info("Unable to remove VPC: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove VPC", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
 def create_tag(resource, tag):
     try:
         ec2 = boto3.client('ec2')
@@ -97,6 +125,33 @@ def create_tag(resource, tag):
         traceback.print_exc(file=sys.stdout)
 
 
+def create_rt(vpc_id, infra_tag_name, infra_tag_value):
+    try:
+        tag = {"Key": infra_tag_name, "Value": infra_tag_value}
+        route_table = []
+        ec2 = boto3.client('ec2')
+        rt = ec2.create_route_table(VpcId=vpc_id)
+        rt_id = rt.get('RouteTable').get('RouteTableId')
+        route_table.append(rt_id)
+        print 'Created Route-Table with ID: {}'.format(rt_id)
+        create_tag(route_table, json.dumps(tag))
+        ig = ec2.create_internet_gateway()
+        ig_id = ig.get('InternetGateway').get('InternetGatewayId')
+        route_table = []
+        route_table.append(ig_id)
+        create_tag(route_table, json.dumps(tag))
+        ec2.attach_internet_gateway(InternetGatewayId=ig_id, VpcId=vpc_id)
+        ec2.create_route(DestinationCidrBlock='0.0.0.0/0', RouteTableId=rt_id, GatewayId=ig_id)
+        return rt_id
+    except Exception as err:
+        logging.info("Unable to create Route Table: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to create Route Table", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
 def create_subnet(vpc_id, subnet, tag):
     try:
         ec2 = boto3.resource('ec2')
@@ -108,6 +163,20 @@ def create_subnet(vpc_id, subnet, tag):
         logging.info("Unable to create Subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to create Subnet", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def enable_auto_assign_ip(subnet_id):
+    try:
+        client = boto3.client('ec2')
+        client.modify_subnet_attribute(MapPublicIpOnLaunch={'Value': True}, SubnetId=subnet_id)
+    except Exception as err:
+        logging.info("Unable to create Subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to create Subnet",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
@@ -610,6 +679,10 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                 env.host_string = env.user + "@" + env.hosts
                 sudo('rm -rf  /opt/' + emr_version + '/' + emr_name + '/')
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
+                if exists('/home/ubuntu/.ensure_dir/emr_interpreter_ensured'):
+                    sudo('sed -i \"s/^export SPARK_HOME.*/#export SPARK_HOME=/\" /opt/zeppelin/conf/zeppelin-env.sh')
+                    sudo("rm -rf /home/ubuntu/.ensure_dir/emr_interpreter_ensure")
+                    sudo("service zeppelin-notebook restart")
                 if exists('/home/ubuntu/.ensure_dir/rstudio_emr_ensured'):
                     sudo("sed -i '/" + emr_name + "/d' /home/ubuntu/.Renviron")
                     sudo("sed -i 's|/opt/" + emr_version + '/' + emr_name + "/spark//R/lib:||g' /home/ubuntu/.bashrc")
@@ -625,13 +698,18 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
         traceback.print_exc(file=sys.stdout)
 
 
-def remove_route_tables(tag_name):
+def remove_route_tables(tag_name, ssn=False):
     try:
         client = boto3.client('ec2')
         rtables = client.describe_route_tables(Filters=[{'Name': 'tag-key', 'Values': [tag_name]}]).get('RouteTables')
         for rtable in rtables:
             if rtable:
+                rtable_associations = rtable.get('Associations')
                 rtable = rtable.get('RouteTableId')
+                if ssn:
+                    for association in rtable_associations:
+                        client.disassociate_route_table(AssociationId=association.get('RouteTableAssociationId'))
+                        print "Association " + association.get('RouteTableAssociationId') + " has been removed"
                 client.delete_route_table(RouteTableId=rtable)
                 print "Route table " + rtable + " has been removed"
             else:
@@ -641,6 +719,49 @@ def remove_route_tables(tag_name):
             file=sys.stdout))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Unable to remove route table",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def remove_internet_gateways(vpc_id, tag_name, tag_value):
+    try:
+        ig_id = ''
+        client = boto3.client('ec2')
+        response = client.describe_internet_gateways(
+            Filters=[
+                {'Name': 'tag-key', 'Values': [tag_name]},
+                {'Name': 'tag-value', 'Values': [tag_value]}]).get('InternetGateways')
+        for i in response:
+            ig_id = i.get('InternetGatewayId')
+        client.detach_internet_gateway(InternetGatewayId=ig_id,VpcId=vpc_id)
+        print "Internet gateway " + ig_id + " has been detached from VPC " + vpc_id
+        client.delete_internet_gateway(InternetGatewayId=ig_id)
+        print "Internet gateway " + ig_id + " has been deleted successfully"
+    except Exception as err:
+        logging.info("Unable to remove internet gateway: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove internet gateway",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+def remove_vpc_endpoints(vpc_id):
+    try:
+        client = boto3.client('ec2')
+        response = client.describe_vpc_endpoints(Filters=[{'Name': 'vpc-id', 'Values': [vpc_id]}]).get('VpcEndpoints')
+        for i in response:
+            client.delete_vpc_endpoints(VpcEndpointIds=[i.get('VpcEndpointId')])
+            print "VPC Endpoint " + i.get('VpcEndpointId') + " has been removed successfully"
+    except Exception as err:
+        logging.info("Unable to remove VPC Endpoint: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove VPC Endpoint",
                    "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
             print json.dumps(res)
             result.write(json.dumps(res))
