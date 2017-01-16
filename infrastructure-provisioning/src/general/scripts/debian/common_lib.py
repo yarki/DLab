@@ -20,6 +20,7 @@
 
 from fabric.api import *
 from fabric.contrib.files import exists
+import sys
 
 def ensure_pkg(requisites, user):
     try:
@@ -33,3 +34,11 @@ def ensure_pkg(requisites, user):
         return True
     except:
         return False
+
+
+def renew_gpg_key():
+    try:
+        sudo('mv /etc/apt/trusted.gpg /etc/apt/trusted.bkp')
+        sudo('apt-key update')
+    except:
+        sys.exit(1)

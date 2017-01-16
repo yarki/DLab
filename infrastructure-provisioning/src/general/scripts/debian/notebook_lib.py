@@ -148,3 +148,15 @@ def ensure_libraries_py2(os_user):
             sudo('touch /home/' + os_user + '/.ensure_dir/ensure_libraries_py2_installed')
         except:
             sys.exit(1)
+
+
+def enable_proxy(proxy_host, proxy_port):
+    if not exists('/tmp/proxy_enabled'):
+        try:
+            proxy_string = "http://{}:{}".format(proxy_host, proxy_port)
+            sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
+            sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
+            sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
+            sudo('touch /tmp/proxy_enabled ')
+        except:
+            sys.exit(1)

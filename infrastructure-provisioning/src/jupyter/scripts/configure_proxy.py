@@ -33,26 +33,6 @@ parser.add_argument('--os_user', type=str, default='')
 args = parser.parse_args()
 
 
-def enable_proxy(proxy_host, proxy_port):
-    if not exists('/tmp/proxy_enabled'):
-        try:
-            proxy_string = "http://{}:{}".format(proxy_host, proxy_port)
-            sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
-            sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
-            sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
-            sudo('touch /tmp/proxy_enabled ')
-        except:
-            sys.exit(1)
-
-
-def renew_gpg_key():
-    try:
-        sudo('mv /etc/apt/trusted.gpg /etc/apt/trusted.bkp')
-        sudo('apt-key update')
-    except:
-        sys.exit(1)
-
-
 ##############
 # Run script #
 ##############
