@@ -104,11 +104,14 @@ def run():
                     notebook_config['key_name'], get_security_group_by_name(notebook_config['security_group_name']),
                     get_subnet_by_cidr(notebook_config['subnet_cidr']), notebook_config['role_profile_name'],
                     notebook_config['tag_name'], notebook_config['instance_name'], instance_class, os.environ['notebook_disk_size'])
-        local("~/scripts/{}.py {}".format('create_instance', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to create instance", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('create_instance', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to create instance", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -125,11 +128,14 @@ def run():
         additional_config = {"proxy_host": edge_instance_hostname, "proxy_port": "3128"}
         params = "--hostname {} --instance_name {} --keyfile {} --additional_config '{}' --os_user {}"\
             .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config), os.environ['general_os_user'])
-        local("~/scripts/{}.py {}".format('configure_proxy', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to configure proxy", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('configure_proxy', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to configure proxy", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -139,11 +145,14 @@ def run():
         logging.info('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
         print('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
         params = "--hostname {} --keyfile {} ".format(instance_hostname, keyfile_name)
-        local("~/scripts/{}.py {}".format('install_prerequisites', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed installing apps: apt & pip", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('install_prerequisites', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed installing apps: apt & pip", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -154,11 +163,14 @@ def run():
         print '[CONFIGURE JUPYTER NOTEBOOK INSTANCE]'
         params = "--hostname {} --instance_name {} --keyfile {} --region {} --spark_version {} --hadoop_version {} --os_user {}".\
             format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['creds_region'], os.environ['notebook_spark_version'], os.environ['notebook_hadoop_version'], os.environ['general_os_user'])
-        local("~/scripts/{}.py {}".format('configure_jupyter_node', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to configure jupyter", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('configure_jupyter_node', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to configure jupyter", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -169,11 +181,14 @@ def run():
         print '[CONFIGURE JUPYTER ADDITIONS]'
         params = "--hostname {} --keyfile {} --os_user {}"\
             .format(instance_hostname, keyfile_name, os.environ['general_os_user'])
-        local("~/scripts/{}.py {}".format('install_jupyter_additions', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to install python libs", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('install_jupyter_additions', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to install python libs", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -185,11 +200,14 @@ def run():
                              "user_keydir": "/root/keys/"}
         params = "--hostname {} --keyfile {} --additional_config '{}'".format(
             instance_hostname, keyfile_name, json.dumps(additional_config))
-        local("~/scripts/{}.py {}".format('install_user_key', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed installing users key", "conf": params}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('install_user_key', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed installing users key", "conf": params}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -256,11 +274,14 @@ def terminate():
         print '[TERMINATE NOTEBOOK]'
         params = "--bucket_name {} --tag_name {} --nb_tag_value {} --edge_user_name {}"\
             .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], os.environ['edge_user_name'])
-        local("~/scripts/{}.py {}".format('terminate_notebook', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to terminate notebook", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('terminate_notebook', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to terminate notebook", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -300,11 +321,14 @@ def stop():
         print '[STOP NOTEBOOK]'
         params = "--bucket_name {} --tag_name {} --nb_tag_value {} --ssh_user {} --key_path {} --edge_user_name {}"\
             .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], os.environ['general_os_user'], notebook_config['key_path'], os.environ['edge_user_name'])
-        local("~/scripts/{}.py {}".format('stop_notebook', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to stop notebook", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('stop_notebook', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to stop notebook", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -341,11 +365,14 @@ def start():
         logging.info('[START NOTEBOOK]')
         print '[START NOTEBOOK]'
         params = "--tag_name {} --nb_tag_value {}".format(notebook_config['tag_name'], notebook_config['notebook_name'])
-        local("~/scripts/{}.py {}".format('start_notebook', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to start notebook", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('start_notebook', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to start notebook", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
