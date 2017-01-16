@@ -1,6 +1,9 @@
 package DockerHelper;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,7 +13,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -115,18 +117,25 @@ public class SSHConnect {
         //          1 for error,
         //          2 for fatal error,
         //          -1
-        if(status == 1 || status == 2){
+        if(status > 0){
             StringBuffer sb=new StringBuffer();
             int c;
+            int charCount = 0;
 
             do {
                 c=in.read();
                 sb.append((char)c);
+                if (++charCount >= 4096) {
+                	message = sb.toString();
+                	System.out.print(message);
+                	sb.setLength(0);
+                	charCount = 0;
+                }
             }
             while(c!='\n');
 
-            message = sb.toString();
-            System.out.println(message);
+            System.out.println(sb.toString());
+            message += sb.toString();
         }
         return new AckStatus(status, message);
     }
