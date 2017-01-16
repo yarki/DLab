@@ -23,7 +23,6 @@ ARG OS
 
 COPY jupyter/ /root/
 COPY general/scripts/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
-COPY general/scripts/${OS}/fab.py /usr/lib/python2.7/dlab/fab.py
 COPY general/templates/${OS}/* /root/templates/
 
 RUN chmod 755 /root/fabfile.py; \
