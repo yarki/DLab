@@ -23,7 +23,7 @@ from fabric.contrib.files import exists
 from dlab.edge_lib import configure_http_proxy_server
 import argparse
 import json
-import sys, os
+import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')

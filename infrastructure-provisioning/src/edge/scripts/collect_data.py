@@ -29,9 +29,6 @@ from dlab.aws_meta import *
 parser = argparse.ArgumentParser()
 parser.add_argument('--service_base_name', type=str, default='')
 parser.add_argument('--user_name', type=str, default='')
-#parser.add_argument('--hostname', type=str, default='')
-#parser.add_argument('--keyfile', type=str, default='')
-#parser.add_argument('--request_id', type=str, default='')
 args = parser.parse_args()
 
 
@@ -84,8 +81,3 @@ if __name__ == "__main__":
     with open('/root/' + filename, 'w') as outfile:
         json.dump(data, outfile)
 
-    #env['connection_attempts'] = 100
-    #env.key_filename = [args.keyfile]
-    #env.host_string = 'ubuntu@' + args.hostname
-    #put('/root/' + filename, '/tmp/' + filename, mode=0644)
-    #sudo('mv /tmp/' + filename + ' /home/ubuntu/' + filename)
