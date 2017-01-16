@@ -34,13 +34,13 @@ args = parser.parse_args()
 
 
 def enable_proxy(proxy_host, proxy_port):
-    if not exists('/home/' + args.os_user + '/.ensure_dir/proxy_enabled'):
+    if not exists('/tmp/proxy_enabled'):
         try:
             proxy_string = "http://{}:{}".format(proxy_host, proxy_port)
             sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
             sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
             sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
-            sudo('touch  /home/' + args.os_user + '/.ensure_dir/proxy_enabled')
+            sudo('touch /tmp/proxy_enabled ')
         except:
             sys.exit(1)
 
@@ -62,12 +62,6 @@ if __name__ == "__main__":
     env.key_filename = [args.keyfile]
     env.host_string = args.os_user + '@' + args.hostname
     deeper_config = json.loads(args.additional_config)
-
-    try:
-        if not exists('/home/' + args.os_user + '/.ensure_dir'):
-            sudo('mkdir /home/' + args.os_user + '/.ensure_dir')
-    except:
-        sys.exit(1)
 
     print "Enabling proxy for notebook server for repositories access."
     enable_proxy(deeper_config['proxy_host'], deeper_config['proxy_port'])
