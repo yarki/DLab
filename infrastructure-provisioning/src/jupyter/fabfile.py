@@ -144,7 +144,7 @@ def run():
     try:
         logging.info('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
         print('[INSTALLING PREREQUISITES TO JUPYTER NOTEBOOK INSTANCE]')
-        params = "--hostname {} --keyfile {} ".format(instance_hostname, keyfile_name)
+        params = "--hostname {} --keyfile {} --user {}".format(instance_hostname, keyfile_name, os.environ['general_os_user'])
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
