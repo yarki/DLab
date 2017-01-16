@@ -19,6 +19,12 @@
 
 FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
+ARG OS
+COPY ssn/ /root/
+COPY general/scripts/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
+COPY general/scripts/${OS}/fab.py /usr/lib/python2.7/dlab/fab.py
+COPY general/templates/${OS}/* /root/templates/
+
 COPY . /root/
 RUN chmod 755 /root/fabfile.py; \
     chmod 755 /root/scripts/*; \

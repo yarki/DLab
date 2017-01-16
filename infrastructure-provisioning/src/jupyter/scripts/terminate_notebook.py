@@ -29,6 +29,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--bucket_name', type=str)
 parser.add_argument('--tag_name', type=str)
 parser.add_argument('--nb_tag_value', type=str)
+parser.add_argument('--edge_user_name', type=str)
 args = parser.parse_args()
 
 
@@ -47,7 +48,7 @@ if __name__ == "__main__":
                 cluster = cluster.get("Cluster")
                 emr_name = cluster.get('Name')
                 print 'Cleaning bucket from configs for cluster {}'.format(emr_name)
-                s3_cleanup(args.bucket_name, emr_name, os.environ['notebook_user_name'])
+                s3_cleanup(args.bucket_name, emr_name, args.edge_user_name)
                 print "The bucket " + args.bucket_name + " has been cleaned successfully"
                 print 'Terminating cluster {}'.format(emr_name)
                 terminate_emr(cluster_id)
