@@ -63,6 +63,12 @@ if __name__ == "__main__":
     env.host_string = args.os_user + '@' + args.hostname
     deeper_config = json.loads(args.additional_config)
 
+    try:
+        if not exists('/home/' + args.os_user + '/.ensure_dir'):
+            sudo('mkdir /home/' + args.os_user + '/.ensure_dir')
+    except:
+        sys.exit(1)
+
     print "Enabling proxy for notebook server for repositories access."
     enable_proxy(deeper_config['proxy_host'], deeper_config['proxy_port'])
 
