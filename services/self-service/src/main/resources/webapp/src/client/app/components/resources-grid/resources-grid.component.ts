@@ -37,12 +37,13 @@ export class ResourcesGrid implements OnInit {
   environments: Array<ResourcesGridRowModel>;
   filteredEnvironments: Array<ResourcesGridRowModel> = [];
   filterConfiguration: FilterConfigurationModel;
-  filterForm: FilterConfigurationModel = new FilterConfigurationModel('', [], [], []);
+  filterForm: FilterConfigurationModel = new FilterConfigurationModel('', [], [], [], '');
   model = new CreateEmrModel('', '');
   notebookName: string;
   isOutscreenDropdown: boolean;
   collapseFilterRow: boolean = false;
   filtering: boolean = false;
+  activeFiltering: boolean = false;
 
   @ViewChild('computationalResourceModal') computationalResourceModal;
   @ViewChild('confirmationDialog') confirmationDialog;
@@ -87,7 +88,7 @@ export class ResourcesGrid implements OnInit {
       });
     });
 
-    this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, resources);
+    this.filterConfiguration = new FilterConfigurationModel('', statuses, shapes, resources, '');
   }
 
   applyFilter_btnClick(config: FilterConfigurationModel) {
@@ -101,22 +102,45 @@ export class ResourcesGrid implements OnInit {
 
     filteredData = filteredData.filter((item: any) => {
       let isName = item.name.toLowerCase().indexOf(config.name.toLowerCase()) !== -1;
-      let isStatus = config.statuses.length > 0 ? (config.statuses.indexOf(item.status) !== -1) : true;
+      let isStatus = config.statuses.length > 0 ? (config.statuses.indexOf(item.status) !== -1) : (config.type !== 'active');
       let isShape = config.shapes.length > 0 ? (config.shapes.indexOf(item.shape) !== -1) : true;
 
       let modifiedResources = containsStatus(item.resources, config.resources);
-      let isResources = config.resources.length > 0 ? modifiedResources.length : true;
+      let isResources = config.resources.length > 0 ? (modifiedResources.length > 0) : true;
 
-      if (config.resources.length > 0 && modifiedResources.length) {
+      if (config.resources.length > 0 && modifiedResources.length > 0) { item.resources = modifiedResources; }
+      if (config.resources.length === 0 && config.type === 'active' ||
+        modifiedResources.length >= 0 && config.resources.length > 0 && config.type === 'active') {
         item.resources = modifiedResources;
+        isResources = true;
       }
 
       return isName && isStatus && isShape && isResources;
     });
 
     this.updateUserPreferences(config);
+    config.type = '';
+    
     this.filteredEnvironments = filteredData;
   }
+
+  showActiveInstances(): void {
+    let filteredData = (<any>Object).assign({}, this.filterConfiguration);
+    filteredData.type = 'active';
+
+    for (let index in filteredData) {
+      if (filteredData[index] instanceof Array)
+        filteredData[index] = filteredData[index].filter((item: string) => {
+          return (item !== 'failed' && item !== 'terminated' && item !== 'terminating');
+        });
+      if (index === 'shapes') { filteredData[index] = []; }
+    }
+
+    this.filterForm = this.loadUserPreferences(filteredData);
+    this.applyFilter_btnClick(this.filterForm);
+    this.buildGrid();
+  }
+
 
   onUpdate($event) {
     this.filterForm[$event.type] = $event.model;
@@ -171,6 +195,7 @@ export class ResourcesGrid implements OnInit {
       .subscribe((result) => {
         this.filterForm = this.loadUserPreferences(result);
         this.applyFilter_btnClick(this.filterForm);
+        this.isActiveFilter();
       }, (error) => {
         // FIXME: to avoid SyntaxError: in case of empty database
         this.applyFilter_btnClick(this.filterForm);
@@ -179,7 +204,7 @@ export class ResourcesGrid implements OnInit {
   }
 
   loadUserPreferences(config): FilterConfigurationModel {
-    return new FilterConfigurationModel(config.name, config.statuses, config.shapes, config.resources);
+    return new FilterConfigurationModel(config.name, config.statuses, config.shapes, config.resources, config.type);
   }
 
   updateUserPreferences(filterConfiguration: FilterConfigurationModel): void {
@@ -188,6 +213,14 @@ export class ResourcesGrid implements OnInit {
       (error) => {
         console.log('UPDATE USER PREFERENCES ERROR ', error);
       });
+  }
+
+  isActiveFilter(): void {
+    this.activeFiltering = false;
+
+    for (let index in this.filterForm)
+      if (this.filterForm[index].length)
+        this.activeFiltering = true;
   }
 
   printDetailEnvironmentModal(data): void {
