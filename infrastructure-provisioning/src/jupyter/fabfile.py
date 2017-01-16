@@ -152,12 +152,8 @@ def run():
     try:
         logging.info('[CONFIGURE JUPYTER NOTEBOOK INSTANCE]')
         print '[CONFIGURE JUPYTER NOTEBOOK INSTANCE]'
-        additional_config = {"frontend_hostname": edge_instance_hostname,
-                             "backend_hostname": get_instance_hostname(notebook_config['instance_name']),
-                             "backend_port": "8888",
-                             "nginx_template_dir": "/root/templates/"}
-        params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --spark_version {} --hadoop_version {} --os_user {}".\
-            format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['creds_region'], json.dumps(additional_config), os.environ['notebook_spark_version'], os.environ['notebook_hadoop_version'], os.environ['general_os_user'])
+        params = "--hostname {} --instance_name {} --keyfile {} --region {} --spark_version {} --hadoop_version {} --os_user {}".\
+            format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['creds_region'], os.environ['notebook_spark_version'], os.environ['notebook_hadoop_version'], os.environ['general_os_user'])
         local("~/scripts/{}.py {}".format('configure_jupyter_node', params))
         with open("/root/result.json", 'w') as result:
             res = {"error": "Failed to configure jupyter", "conf": notebook_config}
