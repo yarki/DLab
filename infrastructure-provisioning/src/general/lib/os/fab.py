@@ -82,7 +82,7 @@ def ensure_s3_kernel(os_user, s3_jars_dir, templates_dir, region):
     if not exists('/home/' + os_user + '/.ensure_dir/s3_kernel_ensured'):
         try:
             sudo('mkdir -p ' + s3_jars_dir)
-            put(templates_dir + 'jars/local_jars.tar.gz', '/tmp/local_jars.tar.gz')
+            put(templates_dir + 'local_jars.tar.gz', '/tmp/local_jars.tar.gz')
             sudo('tar -xzf /tmp/local_jars.tar.gz -C ' + s3_jars_dir)
             put(templates_dir + 'spark-defaults_local.conf', '/tmp/spark-defaults_local.conf')
             sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/spark-defaults_local.conf".format(region))
