@@ -85,3 +85,66 @@ def configure_jenkins(dlab_path, os_user):
         return False
 
 
+def configure_nginx(config, dlab_path):
+    try:
+        random_file_part = id_generator(size=20)
+        if not exists("/etc/nginx/conf.d/nginx_proxy.conf"):
+            sudo('rm -f /etc/nginx/conf.d/*')
+            put(config['nginx_template_dir'] + 'nginx_proxy.conf', '/tmp/nginx_proxy.conf')
+            put(config['nginx_template_dir'] + 'nginx_redhat.conf', '/tmp/nginx.conf')
+            sudo('cat /tmp/nginx.conf > /etc/nginx/nginx.conf')
+            sudo('mv /tmp/nginx_proxy.conf ' + dlab_path + 'tmp/')
+            sudo('\cp ' + dlab_path + 'tmp/nginx_proxy.conf /etc/nginx/conf.d/')
+            sudo('mkdir -p /etc/nginx/locations')
+            sudo('rm -f /etc/nginx/sites-enabled/default')
+    except:
+        return False
+
+    try:
+        if not exists("/etc/nginx/locations/proxy_location_jenkins.conf"):
+            nginx_password = id_generator()
+            template_file = config['nginx_template_dir'] + 'proxy_location_jenkins_template.conf'
+            with open("/tmp/%s-tmpproxy_location_jenkins_template.conf" % random_file_part, 'w') as out:
+                with open(template_file) as tpl:
+                    for line in tpl:
+                        out.write(line)
+            put("/tmp/%s-tmpproxy_location_jenkins_template.conf" % random_file_part, '/tmp/proxy_location_jenkins.conf')
+            sudo('\cp /tmp/proxy_location_jenkins.conf /etc/nginx/locations/')
+            sudo("echo 'engineer:" + crypt.crypt(nginx_password, id_generator()) + "' > /etc/nginx/htpasswd")
+            with open('jenkins_crids.txt', 'w+') as f:
+                f.write("Jenkins credentials: engineer  / " + nginx_password)
+    except:
+        return False
+
+    try:
+        sudo('service nginx reload')
+        return True
+    except:
+        return False
+
+
+def ensure_supervisor():
+    try:
+        if not exists('{}tmp/superv_ensured'.format(os.environ['ssn_dlab_path'])):
+            sudo('yum install -y supervisor')
+            #sudo('pip install supervisor')
+            sudo('chkconfig supervisord on')
+            sudo('systemctl start supervisord.service')
+            sudo('touch {}tmp/superv_ensured'.format(os.environ['ssn_dlab_path']))
+        return True
+    except:
+        return False
+
+
+def ensure_mongo():
+    try:
+        if not exists('{}tmp/mongo_ensured'.format(os.environ['ssn_dlab_path'])):
+            sudo('echo -e "[MongoDB]\nname=MongoDB Repository\nbaseurl=http://repo.mongodb.org/yum/redhat/7/mongodb-org/3.2/x86_64/\ngpgcheck=0\nenabled=1\n" > /etc/yum.repos.d/mongodb.repo')
+            sudo('yum install -y mongodb-org')
+            sudo('semanage port -a -t mongod_port_t -p tcp 27017')
+            sudo('chkconfig mongod on')
+            sudo('systemctl start mongod.service')
+            sudo('touch {}tmp/mongo_ensured'.format(os.environ['ssn_dlab_path']))
+        return True
+    except:
+        return False
