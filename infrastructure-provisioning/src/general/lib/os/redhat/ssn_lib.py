@@ -150,7 +150,7 @@ def ensure_mongo():
         return False
 
 
-def start_ss(keyfile, host_string, dlab_conf_dir, web_path):
+def start_ss(keyfile, host_string, dlab_conf_dir, web_path, os_user):
     try:
         if not exists('{}tmp/ss_started'.format(os.environ['ssn_dlab_path'])):
             supervisor_conf = '/etc/supervisord.d/supervisor_svc.ini'
@@ -175,7 +175,7 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path):
             sudo('mkdir -p ' + web_path + 'provisioning-service/')
             sudo('mkdir -p ' + web_path + 'security-service/')
             sudo('mkdir -p ' + web_path + 'self-service/')
-            sudo('chown -R ec2-user:ec2-user ' + web_path)
+            sudo('chown -R {0}:{0} {1}'.format(os_user, web_path))
             try:
                 local('scp -r -i {} /root/web_app/self-service/*.jar {}:'.format(keyfile, host_string) + web_path + 'self-service/')
                 local('scp -r -i {} /root/web_app/security-service/*.jar {}:'.format(keyfile, host_string) + web_path + 'security-service/')
@@ -199,3 +199,5 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path):
         return True
     except:
         return False
+
+

@@ -149,7 +149,7 @@ def ensure_mongo():
         return False
 
 
-def start_ss(keyfile, host_string, dlab_conf_dir, web_path):
+def start_ss(keyfile, host_string, dlab_conf_dir, web_path, os_user):
     try:
         if not exists(os.environ['ssn_dlab_path'] + 'tmp/ss_started'):
             supervisor_conf = '/etc/supervisor/conf.d/supervisor_svc.conf'
@@ -174,7 +174,7 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path):
             sudo('mkdir -p ' + web_path + 'provisioning-service/')
             sudo('mkdir -p ' + web_path + 'security-service/')
             sudo('mkdir -p ' + web_path + 'self-service/')
-            sudo('chown -R ubuntu:ubuntu ' + web_path)
+            sudo('chown -R {0}:{0} {1}'.format(os_user, web_path))
             try:
                 local('scp -r -i {} /root/web_app/self-service/*.jar {}:'.format(keyfile, host_string) + web_path + 'self-service/')
                 local('scp -r -i {} /root/web_app/security-service/*.jar {}:'.format(keyfile, host_string) + web_path + 'security-service/')
@@ -200,18 +200,3 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path):
         return False
 
 
-def upload_response_file(instance_name, local_log_filepath):
-    instance_hostname = get_instance_hostname(instance_name)
-    print 'Connect to SSN instance with hostname: ' + instance_hostname + 'and name: ' + instance_name
-    env['connection_attempts'] = 100
-    env.key_filename = "/root/keys/%s.pem" % os.environ['creds_key_name']
-    env.host_string = 'ubuntu@' + instance_hostname
-    try:
-        put('/root/result.json', '/home/ubuntu/%s.json' % os.environ['request_id'])
-        sudo('mv /home/ubuntu/' + os.environ['request_id'] + '.json ' + os.environ['ssn_dlab_path'] + 'tmp/result/')
-        put(local_log_filepath, '/home/ubuntu/ssn.log')
-        sudo('mv /home/ubuntu/ssn.log /var/opt/dlab/log/ssn/')
-        return True
-    except:
-        print 'Failed to upload response file'
-        return False
