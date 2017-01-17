@@ -92,6 +92,7 @@ def run():
                 res = {"error": "Failed to create instance", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -115,6 +116,7 @@ def run():
                 res = {"error": "Failed to configure proxy", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+                raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -131,6 +133,7 @@ def run():
                 res = {"error": "Failed installing apps: apt & pip", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+                raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -148,6 +151,7 @@ def run():
                 res = {"error": "Failed to configure rstudio", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+                raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -167,6 +171,7 @@ def run():
                 res = {"error": "Failed installing users key", "conf": params}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -243,7 +248,8 @@ def terminate():
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed to terminate notebook", "conf": notebook_config}
                 print json.dumps(res)
-            result.write(json.dumps(res))
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -291,6 +297,7 @@ def stop():
                 res = {"error": "Failed to stop notebook", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -335,6 +342,7 @@ def start():
                 res = {"error": "Failed to start notebook", "conf": notebook_config}
                 print json.dumps(res)
                 result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
