@@ -388,6 +388,8 @@ def configure():
     notebook_config['cluster_name'] = get_not_configured_emr(notebook_config['tag_name'], True)
     notebook_config['notebook_ip'] = get_instance_ip_address(notebook_config['notebook_name']).get('Private')
     notebook_config['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
+    notebook_config['cluster_id'] = get_emr_id_by_name(notebook_config['cluster_name'])
+    notebook_config['not_configured_tag'] = {"Key": 'State', "Value": 'not-configured'}
 
     try:
         logging.info('[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]')
@@ -399,6 +401,7 @@ def configure():
                     os.environ['general_os_user'])
         try:
             local("~/scripts/{}.py {}".format('install_emr_kernels', params))
+            remove_emr_tag(notebook_config['cluster_id'], json.dumps(notebook_config['not_configured_tag']))
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing EMR kernels", "conf": notebook_config}
