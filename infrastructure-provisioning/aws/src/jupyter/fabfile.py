@@ -61,6 +61,17 @@ def run():
 
     # generating variables dictionary
     create_aws_config_files()
+    edge_status = get_instance_status(
+        os.environ['conf_service_base_name'] + '-' + os.environ['notebook_user_name'] + '-edge')
+    if edge_status != 'running':
+        logging.info('ERROR: Edge node is unavailable! Aborting...')
+        print 'ERROR: Edge node is unavailable! Aborting...'
+        put_resource_status('edge', 'Unavailable', 'notebook')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Edge node is unavailable"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
     print 'Generating infrastructure names and tags'
     notebook_config = dict()
     notebook_config['uuid'] = str(uuid.uuid4())[:5]

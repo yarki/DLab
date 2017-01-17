@@ -24,6 +24,7 @@ from dlab.fab import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import uuid
+import os
 
 
 # Function for creating AMI from already provisioned notebook
@@ -52,14 +53,26 @@ def run():
     logging.getLogger('boto3').setLevel(logging.DEBUG)
 
     instance_class = 'notebook'
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'],
+                                               os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
     # generating variables dictionary
     create_aws_config_files()
+    edge_status = get_instance_status(
+        os.environ['conf_service_base_name'] + '-' + os.environ['notebook_user_name'] + '-edge')
+    if edge_status != 'running':
+        logging.info('ERROR: Edge node is unavailable! Aborting...')
+        print 'ERROR: Edge node is unavailable! Aborting...'
+        put_resource_status('edge', 'Unavailable', 'notebook')
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Edge node is unavailable"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
     print 'Generating infrastructure names and tags'
     notebook_config = dict()
     notebook_config['uuid'] = str(uuid.uuid4())[:5]
@@ -241,8 +254,9 @@ def run():
 
 # Main function for terminating exploratory environment
 def terminate():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'],
+                                               os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -287,8 +301,9 @@ def terminate():
 
 # Main function for stopping notebook server
 def stop():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'],
+                                               os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -335,8 +350,9 @@ def stop():
 
 # Main function for starting notebook server
 def start():
-    local_log_filename = "%s.log" % os.environ['request_id']
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'],
+                                               os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)

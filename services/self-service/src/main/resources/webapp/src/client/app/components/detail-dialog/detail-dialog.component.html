@@ -37,7 +37,7 @@ limitations under the License.
         </table>
       </div>
       <div class="row">
-        <div class="col-xs-12 detail-info">
+        <div class="col-xs-12 detail-info" *ngIf="!notebook.error_message">
           <p>Edge Node IP Address {{notebook.ip}}</p>
           <p>Up time {{upTimeInHours}} hour(s) since {{upTimeSince || "not specified."}}</p>
           <p>Open in your browser  <a href="{{notebook.url}}" target="_blank">{{notebook.url}}</a> to access this box after creating a tunnel.</p>
@@ -50,6 +50,9 @@ limitations under the License.
               <small class="helper_instruction">Read instruction how to create the tunnel</small>
             </a>
           </p>
+        </div>
+        <div class="col-xs-12 detail-info" *ngIf="notebook.error_message">
+          <p class="failed">{{notebook.error_message}}</p>
         </div>
       </div>
     </div>
