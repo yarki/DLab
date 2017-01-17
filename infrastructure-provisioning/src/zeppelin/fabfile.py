@@ -34,8 +34,8 @@ def run():
     logging.getLogger('boto3').setLevel(logging.DEBUG)
 
     instance_class = 'notebook'
-    local_log_filename = "{}.log".format(os.environ['request_id'])
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -104,11 +104,14 @@ def run():
         additional_config = {"proxy_host": edge_instance_hostname, "proxy_port": "3128"}
         params = "--hostname {} --instance_name {} --keyfile {} --additional_config '{}'"\
             .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
-        local("~/scripts/{}.py {}".format('configure_proxy', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to configure proxy", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('configure_proxy', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to configure proxy", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -119,11 +122,14 @@ def run():
         print('[INSTALLING PREREQUISITES TO ZEPPELIN NOTEBOOK INSTANCE]')
         params = "--hostname {} --keyfile {} --user {}"\
             .format(instance_hostname, keyfile_name, os.environ['general_os_user'])
-        local("~/scripts/{}.py {}".format('install_prerequisites', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed installing apps: apt & pip", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('install_prerequisites', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed installing apps: apt & pip", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -139,11 +145,13 @@ def run():
         params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --os_user {}"\
             .format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['creds_region'],
                     json.dumps(additional_config), os.environ['general_os_user'])
-        local("~/scripts/{}.py {}".format('configure_zeppelin_node', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to configure zeppelin", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('configure_zeppelin_node', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to configure zeppelin", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -154,11 +162,14 @@ def run():
         print '[CONFIGURE ZEPPELIN ADDITIONS]'
         params = "--hostname {} --keyfile {} --os_user {}"\
             .format(instance_hostname, keyfile_name, os.environ['general_os_user'])
-        local("~/scripts/{}.py {}".format('install_zeppelin_additions', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to install python libs", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('install_zeppelin_additions', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to install python libs", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -170,11 +181,14 @@ def run():
                              "user_keydir": "/root/keys/"}
         params = "--hostname {} --keyfile {} --additional_config '{}'".format(
             instance_hostname, keyfile_name, json.dumps(additional_config))
-        local("~/scripts/{}.py {}".format('install_user_key', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed installing users key", "conf": params}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('install_user_key', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed installing users key", "conf": params}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -221,8 +235,8 @@ def run():
 
 # Main function for terminating exploratory environment
 def terminate():
-    local_log_filename = "{}.log".format(os.environ['request_id'])
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -241,11 +255,14 @@ def terminate():
         print '[TERMINATE NOTEBOOK]'
         params = "--bucket_name {} --tag_name {} --nb_tag_value {}"\
             .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'])
-        local("~/scripts/{}.py {}".format('terminate_notebook', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to terminate notebook", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('terminate_notebook', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to terminate notebook", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -264,8 +281,8 @@ def terminate():
 
 # Main function for stopping notebook server
 def stop():
-    local_log_filename = "{}.log".format(os.environ['request_id'])
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -287,11 +304,14 @@ def stop():
         params = "--bucket_name {} --tag_name {} --nb_tag_value {} --ssh_user {} --key_path {}"\
             .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'],
                     notebook_config['ssh_user'], notebook_config['key_path'])
-        local("~/scripts/{}.py {}".format('stop_notebook', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to stop notebook", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('stop_notebook', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to stop notebook", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
@@ -310,8 +330,8 @@ def stop():
 
 # Main function for starting notebook server
 def start():
-    local_log_filename = "{}.log".format(os.environ['request_id'])
-    local_log_filepath = "/response/" + local_log_filename
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
@@ -329,11 +349,14 @@ def start():
         print '[START NOTEBOOK]'
         params = "--tag_name {} --nb_tag_value {}"\
             .format(notebook_config['tag_name'], notebook_config['notebook_name'])
-        local("~/scripts/{}.py {}".format('start_notebook', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to start notebook", "conf": notebook_config}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        try:
+            local("~/scripts/{}.py {}".format('start_notebook', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to start notebook", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 

@@ -23,6 +23,7 @@ import sys
 from dlab.fab import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
+import os
 import uuid
 
 
