@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.Valid;
 
+/** Configuration for Self Service.
+ */
 public class SelfServiceApplicationConfiguration extends ServiceConfiguration {
 
     @Valid
@@ -38,6 +40,7 @@ public class SelfServiceApplicationConfiguration extends ServiceConfiguration {
     private int maxEmrInstanceCount;
 
 
+    /** Returns <b>true</b> if service is a mock. */
     public boolean isMocked() {
         return mocked;
     }

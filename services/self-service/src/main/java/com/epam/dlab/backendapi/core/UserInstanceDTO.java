@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/** Stores info about the user notebook.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInstanceDTO {
     @JsonProperty("_id")
@@ -52,136 +54,182 @@ public class UserInstanceDTO {
     @JsonProperty("computational_resources")
     private List<UserComputationalResourceDTO> resources = new ArrayList<>();
 
+    /** Returns the unique id for the notebook. */
     public String getId() {
         return id;
     }
 
+    /** Returns the user login name. */
     public String getUser() {
         return user;
     }
 
+    /** Sets the user login name. */
     public void setUser(String user) {
         this.user = user;
     }
 
+    /** Sets the user login name. */
     public UserInstanceDTO withUser(String user) {
         setUser(user);
         return this;
     }
 
+    /** Returns the name of exploratory. */
     public String getExploratoryName() {
         return exploratoryName;
     }
 
+    /** Sets the name of exploratory. */
     public void setExploratoryName(String exploratoryName) {
         this.exploratoryName = exploratoryName;
     }
 
+    /** Sets the name of exploratory. */
     public UserInstanceDTO withExploratoryName(String exploratoryName) {
         setExploratoryName(exploratoryName);
         return this;
     }
 
+    /** Returns the exploratory id. */
     public String getExploratoryId() {
         return exploratoryId;
     }
 
+    /** Sets the exploratory id. */
     public void setExploratoryId(String exploratoryId) {
         this.exploratoryId = exploratoryId;
     }
 
+    /** Sets the exploratory id. */
     public UserInstanceDTO withExploratoryId(String exploratoryId) {
         setExploratoryId(exploratoryId);
         return this;
     }
 
-    public String getImageName() { return imageName; }
+    /** Returns the image name. */
+    public String getImageName() {
+    	return imageName;
+    }
 
-    public void setImageName(String imageName) { this.imageName = imageName; }
+    /** Sets the image name. */
+    public void setImageName(String imageName) {
+    	this.imageName = imageName;
+    }
 
+    /** Sets the image name. */
     public UserInstanceDTO withImageName(String imageName) {
         setImageName(imageName);
         return this;
     }
 
-    public String getImageVersion() { return imageVersion; }
+    /** Returns the image version. */
+    public String getImageVersion() {
+    	return imageVersion;
+    }
 
-    public void setImageVersion(String imageVersion) { this.imageVersion = imageVersion; }
+    /** Sets the image version. */
+    public void setImageVersion(String imageVersion) {
+    	this.imageVersion = imageVersion;
+    }
 
+    /** Sets the image version. */
     public UserInstanceDTO withImageVersion(String imageVersion) {
         setImageVersion(imageVersion);
         return this;
     }
 
-    public String getTemplateName() { return templateName; }
+    /** Returns the name of template. */
+    public String getTemplateName() {
+    	return templateName;
+    }
 
-    public void setTemplateName(String templateName) { this.templateName = templateName; }
+    /** Sets the name of template. */
+    public void setTemplateName(String templateName) {
+    	this.templateName = templateName;
+    }
 
+    /** Sets the name of template. */
     public UserInstanceDTO withTemplateName(String templateName) {
         setTemplateName(templateName);
         return this;
     }
 
+    /** Returns the status of notebook. */
     public String getStatus() {
         return status;
     }
 
+    /** Sets the status of notebook. */
     public void setStatus(String status) {
         this.status = status;
     }
 
+    /** Sets the status of notebook. */
     public UserInstanceDTO withStatus(String status) {
         setStatus(status);
         return this;
     }
 
+    /** Returns the name of notebook shape. */
     public String getShape() {
         return shape;
     }
 
+    /** Sets the name of notebook shape. */
     public void setShape(String shape) {
         this.shape = shape;
     }
 
+    /** Sets the name of notebook shape. */
     public UserInstanceDTO withShape(String shape) {
         setShape(shape);
         return this;
     }
 
+    /** Returns the URL of notebook. */
     public String getUrl() {
         return url;
     }
 
+    /** Sets the URL of notebook. */
     public void setUrl(String url) {
         this.url = url;
     }
 
+    /** Sets the URL of notebook. */
     public UserInstanceDTO withUrl(String url) {
         setUrl(url);
         return this;
     }
 
+    /** Returns the date and time when the notebook has created. */
     public Date getUptime() {
         return uptime;
     }
 
+    /** Sets the date and time when the notebook has created. */
     public void setUptime(Date uptime) {
         this.uptime = uptime;
     }
 
+    /** Sets the date and time when the notebook has created. */
     public UserInstanceDTO withUptime(Date uptime) {
         setUptime(uptime);
         return this;
     }
 
+    /** Returns a list of user's computational resources for notebook. */
     public List<UserComputationalResourceDTO> getResources() {
         return resources;
     }
 
+    /** Sets a list of user's computational resources for notebook. */
     public void setResources(List<UserComputationalResourceDTO> resources) {
         this.resources = resources;
     }
 
+    /** Sets a list of user's computational resources for notebook. */
     public UserInstanceDTO withResources(List<UserComputationalResourceDTO> resources) {
         setResources(resources);
         return this;
