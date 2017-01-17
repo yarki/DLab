@@ -98,7 +98,7 @@ if __name__ == "__main__":
     sudo('echo export DLAB_CONF_DIR >> /etc/profile')
 
     print "Starting Self-Service(UI)"
-    if not start_ss(args.keyfile, env.host_string, dlab_conf_dir, web_path):
+    if not start_ss(args.keyfile, env.host_string, dlab_conf_dir, web_path, args.os_user):
         logging.error('Failed to start UI')
         sys.exit(1)
 

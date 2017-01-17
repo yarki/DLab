@@ -471,7 +471,7 @@ def run():
             f.write(json.dumps(res))
 
         print 'Upload response file'
-        params = "--instance_name {} --local_log_filepath {}".format(instance_name, local_log_filepath)
+        params = "--instance_name {} --local_log_filepath {} --os_user {}".format(instance_name, local_log_filepath, os.environ['general_os_user'])
         local("~/scripts/{}.py {}".format('upload_response_file', params))
 
         logging.info('[FINALIZE]')
