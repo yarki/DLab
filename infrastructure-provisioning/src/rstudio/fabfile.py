@@ -54,7 +54,7 @@ def run():
     notebook_config['key_name'] = os.environ['creds_key_name']
     notebook_config['user_keyname'] = os.environ['notebook_user_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
-        'notebook_user_name'] + "-nb-" + notebook_config['exploratory_name'] + notebook_config['uuid']
+        'notebook_user_name'] + "-nb-" + notebook_config['exploratory_name'] + "-" + notebook_config['uuid']
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'notebook_user_name'] + '-rstudio-notebook-image'
     notebook_config['role_profile_name'] = os.environ['conf_service_base_name'].lower().replace('-', '_') + "-" + os.environ[
@@ -82,9 +82,9 @@ def run():
         print '[CREATE R_STUDIO NOTEBOOK INSTANCE]'
         params = "--node_name {} --ami_id {} --instance_type {} --key_name {} --security_group_ids {} --subnet_id {} --iam_profile {} --infra_tag_name {} --infra_tag_value {} --instance_class {} --instance_disk_size {}"\
             .format(notebook_config['instance_name'], notebook_config['ami_id'], notebook_config['instance_type'],
-                         notebook_config['key_name'], get_security_group_by_name(notebook_config['security_group_name']),
-                         get_subnet_by_cidr(notebook_config['subnet_cidr']), notebook_config['role_profile_name'],
-                         notebook_config['tag_name'], notebook_config['instance_name'], instance_class, os.environ['notebook_disk_size'])
+                    notebook_config['key_name'], get_security_group_by_name(notebook_config['security_group_name']),
+                    get_subnet_by_cidr(notebook_config['subnet_cidr']), notebook_config['role_profile_name'],
+                    notebook_config['tag_name'], notebook_config['instance_name'], instance_class, os.environ['notebook_disk_size'])
         try:
             local("~/scripts/{}.py {}".format('create_instance', params))
         except:
