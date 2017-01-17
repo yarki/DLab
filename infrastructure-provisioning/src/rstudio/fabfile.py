@@ -107,8 +107,8 @@ def run():
         logging.info('[CONFIGURE PROXY ON R_STUDIO INSTANCE]')
         print '[CONFIGURE PROXY ON R_STUDIO INSTANCE]'
         additional_config = {"proxy_host": edge_instance_hostname, "proxy_port": "3128"}
-        params = "--hostname {} --instance_name {} --keyfile {} --additional_config '{}'"\
-            .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
+        params = "--hostname {} --instance_name {} --keyfile {} --additional_config '{}' --os_user {}"\
+            .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config), os.environ['general_os_user'])
         try:
             local("~/scripts/{}.py {}".format('configure_proxy', params))
         except:
@@ -142,8 +142,8 @@ def run():
     try:
         logging.info('[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]')
         print '[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]'
-        params = "--hostname {}  --keyfile {} --region {} --rstudio_pass {}"\
-            .format(instance_hostname,  keyfile_name, os.environ['creds_region'], notebook_config['rstudio_pass'])
+        params = "--hostname {}  --keyfile {} --region {} --rstudio_pass {} --os_user {}"\
+            .format(instance_hostname,  keyfile_name, os.environ['creds_region'], notebook_config['rstudio_pass'], os.environ['general_os_user'])
         try:
             local("~/scripts/{}.py {}".format('configure_rstudio', params))
         except:
