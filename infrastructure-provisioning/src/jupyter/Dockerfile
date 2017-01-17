@@ -23,9 +23,8 @@ ARG OS
 
 COPY jupyter/ /root/
 COPY general/lib/os/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
-COPY general/templates/common/* /root/templates/
-COPY general/templates/${OS}/* /root/templates/
+COPY general/templates/${OS}/jupyter-notebook.service /root/templates/jupyter-notebook.service
 
-RUN chmod 755 /root/fabfile.py; \
-    chmod 755 /root/scripts/*
+RUN chmod a+x /root/fabfile.py; \
+    chmod a+x /root/scripts/*
 

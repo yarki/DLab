@@ -22,11 +22,10 @@ ARG OS
 
 COPY ssn/ /root/
 COPY general/lib/os/${OS}/ssn_lib.py /usr/lib/python2.7/dlab/ssn_lib.py
-COPY general/templates/${OS}/* /root/templates/
+COPY general/templates/${OS}/supervisor_svc.conf /root/templates/supervisor_svc.conf
 
-RUN chmod 755 /root/fabfile.py; \
-    chmod 755 /root/scripts/*; \
-    chmod a+x /root/entrypoint.py;
+RUN chmod a+x /root/fabfile.py; \
+    chmod a+x /root/scripts/*
 
 RUN mkdir /project_tree
 COPY . /project_tree

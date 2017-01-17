@@ -65,6 +65,7 @@ COPY general/lib/os/${OS}/common_lib.py /usr/lib/python2.7/dlab/common_lib.py
 COPY general/lib/os/fab.py /usr/lib/python2.7/dlab/fab.py
 
 RUN chmod a+x /root/*.py
+RUN chmod a+x /root/scripts/*
 RUN chmod a+x /bin/*.py
 
 ENTRYPOINT ["/root/entrypoint.py"]
