@@ -17,3 +17,16 @@
 # limitations under the License.
 #
 # ******************************************************************************
+
+from fabric.api import *
+from fabric.contrib.files import exists
+import argparse
+import json
+import random
+import string
+import sys
+from dlab.notebook_lib import *
+from dlab.fab import *
+import os
+
+
