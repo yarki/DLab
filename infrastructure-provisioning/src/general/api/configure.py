@@ -27,7 +27,7 @@ from fabric.api import local
 if __name__ == "__main__":
     success = True
     try:
-        local('cd /root; fab start')
+        local('cd /root; fab configure')
     except:
         success = False
 
