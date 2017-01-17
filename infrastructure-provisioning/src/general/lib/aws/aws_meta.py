@@ -25,6 +25,8 @@ import traceback
 import sys
 import random
 import string
+from dlab.fab import *
+
 
 def get_instance_hostname(instance_name):
     try:
@@ -382,6 +384,34 @@ def get_emr_list(tag_name, type='Key', emr_count=False, emr_active=False):
         traceback.print_exc(file=sys.stdout)
 
 
+def get_not_configured_emr(tag_name, return_name=False):
+    try:
+        emr = boto3.client('emr')
+        clusters_list = get_emr_list(tag_name, 'Key')
+        if clusters_list:
+            for cluster_id in clusters_list:
+                response = emr.describe_cluster(ClusterId=cluster_id)
+                tag = response.get('Cluster').get('Tags')
+                for j in tag:
+                    if j.get('Value') == 'not-configured':
+                        if return_name:
+                            return response.get('Cluster').get('Name')
+                        else:
+                            return True
+            return False
+        else:
+            return False
+    except Exception as err:
+        logging.error("Error with getting not configured EMR list: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Error with getting not configured EMR list",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
 def get_emr_id_by_name(name):
     try:
         cluster_id = ''
@@ -575,6 +605,3 @@ def check_security_group(security_group_name, count=0):
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
 
-
-def id_generator(size=10, chars=string.digits + string.ascii_letters):
-    return ''.join(random.choice(chars) for _ in range(size))

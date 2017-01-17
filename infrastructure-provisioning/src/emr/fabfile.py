@@ -31,7 +31,7 @@ import logging
 
 
 def emr_waiter(tag_name):
-    if len(get_emr_list(tag_name, 'Value', False, True)) > 0 or os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
+    if len(get_emr_list(tag_name, 'Value', False, True)) > 0 or os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name'] or get_not_configured_emr(tag_name)):
         with hide('stderr', 'running', 'warnings'):
             local("echo 'Some EMR cluster is still being created, waiting..'")
         time.sleep(60)
@@ -78,7 +78,7 @@ def run():
     emr_conf['role_ec2_name'] = os.environ['emr_ec2_role']
     emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid'] + ', ' \
                        + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']\
-                       + ', Notebook=' + os.environ['notebook_name']
+                       + ', Notebook=' + os.environ['notebook_name'] + ', State=not-configured'
     emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
 
@@ -139,27 +139,6 @@ def run():
         local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
     except:
         local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
-        sys.exit(1)
-
-    try:
-        logging.info('[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]')
-        print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
-        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {} --region {}"\
-            .format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'],
-                    keyfile_name, emr_conf['notebook_ip'], emr_conf['region'])
-        try:
-            local("~/scripts/{}.py {}".format('install_emr_kernels', params))
-        except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing EMR kernels", "conf": emr_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
-    except:
-        emr_id = get_emr_id_by_name(emr_conf['cluster_name'])
-        terminate_emr(emr_id)
-        remove_kernels(emr_conf['cluster_name'], emr_conf['tag_name'], os.environ['notebook_name'],
-                       'ubuntu', emr_conf['key_path'], emr_conf['release_label'])
         sys.exit(1)
 
     try:

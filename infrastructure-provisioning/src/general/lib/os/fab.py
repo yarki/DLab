@@ -102,3 +102,40 @@ def ensure_local_spark(os_user, spark_link, spark_version, hadoop_version, local
             sudo('touch /home/' + os_user + '/.ensure_dir/local_spark_ensured')
         except:
             sys.exit(1)
+
+
+def checksum_check(file):
+    result = local('md5sum -c ' + file, capture=True)
+    return result
+
+
+def prepare(emr_dir, yarn_dir):
+    local('mkdir -p ' + emr_dir)
+    local('mkdir -p ' + yarn_dir)
+    local('sudo mkdir -p /opt/python/')
+    result = os.path.exists(emr_dir + 'usr/')
+    return result
+
+
+def spark_defaults(args):
+    spark_def_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/conf/spark-defaults.conf'
+    for i in eval(args.excluded_lines):
+        local(""" sudo bash -c " sed -i '/""" + i + """/d' """ + spark_def_path + """ " """)
+    local(""" sudo bash -c " sed -i '/#/d' """ + spark_def_path + """ " """)
+    local(""" sudo bash -c " sed -i '/^\s*$/d' """ + spark_def_path + """ " """)
+    local(""" sudo bash -c "sed -i '/spark.driver.extraClassPath/,/spark.driver.extraLibraryPath/s|/usr|/opt/EMRVERSION/jars/usr|g' """ + spark_def_path + """ " """)
+    local(""" sudo bash -c "sed -i '/spark.yarn.dist.files/s/\/etc\/spark\/conf/\/opt\/EMRVERSION\/CLUSTER\/conf/g' """ + spark_def_path + """ " """)
+    template_file = spark_def_path
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('EMRVERSION', args.emr_version)
+    text = text.replace('CLUSTER', args.cluster_name)
+    with open(spark_def_path, 'w') as f:
+        f.write(text)
+    endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
+    local("""bash -c 'echo "spark.hadoop.fs.s3a.endpoint    """ + endpoint_url + """" >> """ + spark_def_path + """'""")
+
+
+def configuring_notebook(args):
+    jars_path = '/opt/' + args.emr_version + '/jars/'
+    local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
