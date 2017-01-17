@@ -13,5 +13,5 @@
     "emr_timeout":"ETIM",
     "creds_key_name":"KN",
     "creds_region":"CREG",
-    "notebook_name":"NNM"
+    "notebook_instance_name":"NNM"
 }
