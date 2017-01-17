@@ -78,7 +78,7 @@ def run():
     emr_conf['role_ec2_name'] = os.environ['emr_ec2_role']
     emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid'] + ', ' \
                        + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']\
-                       + ', Notebook=' + os.environ['notebook_name'] + ', State=not-configured'
+                       + ', Notebook=' + os.environ['notebook_instance_name'] + ', State=not-configured'
     emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
 
@@ -103,7 +103,7 @@ def run():
     logging.info(json.dumps(emr_conf))
 
     try:
-        emr_waiter(os.environ['notebook_name'])
+        emr_waiter(os.environ['notebook_instance_name'])
         local('touch /response/.emr_creating_' + os.environ['exploratory_name'])
     except:
         with open("/root/result.json", 'w') as result:
