@@ -34,6 +34,18 @@ parser.add_argument('--dlab_path', type=str, default='')
 args = parser.parse_args()
 
 
+def cp_key(keyfile, host_string, os_user):
+    try:
+        key_name=keyfile.split("/")
+        sudo('mkdir -p /home/' + os_user + '/keys')
+        sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/keys')
+        local('scp -r -q -i {0} {0} {1}:/home/' + os_user + '/keys/{2}'.format(keyfile, host_string, key_name[-1]))
+        sudo('chmod 600 /home/' + os_user + '/keys/*.pem')
+        return True
+    except:
+        return False
+
+
 def creating_service_directories(dlab_path, os_user):
     try:
         if not exists(dlab_path):

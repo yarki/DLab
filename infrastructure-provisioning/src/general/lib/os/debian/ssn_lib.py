@@ -22,6 +22,7 @@ import crypt
 import yaml
 from dlab.fab import *
 from dlab.aws_meta import *
+import os
 
 
 def ensure_docker_daemon(dlab_path):
@@ -36,40 +37,6 @@ def ensure_docker_daemon(dlab_path):
             sudo('update-rc.d docker defaults')
             sudo('update-rc.d docker enable')
             sudo('touch ' + dlab_path + 'tmp/docker_daemon_ensured')
-        return True
-    except:
-        return False
-
-
-def add_2_yml_config(path,section,param,value):
-    try:
-        try:
-            with open(path, 'r') as config_yml_r:
-                config_orig = yaml.load(config_yml_r)
-        except:
-            config_orig = {}
-        sections = []
-        for i in config_orig:
-            sections.append(i)
-        if section in sections:
-            config_orig[section].update({param:value})
-        else:
-            config_orig.update({section:{param:value}})
-        with open(path, 'w') as outfile_yml_w:
-            yaml.dump(config_orig, outfile_yml_w, default_flow_style=True)
-        return True
-    except:
-        print "Could not write the target file"
-        return False
-
-
-def cp_key(keyfile, host_string, os_user):
-    try:
-        key_name=keyfile.split("/")
-        sudo('mkdir -p /home/ubuntu/keys')
-        sudo('chown -R ' + os_user + ':' + os_user + ' /home/ubuntu/keys')
-        local('scp -r -q -i {0} {0} {1}:/home/ubuntu/keys/{2}'.format(keyfile, host_string, key_name[-1]))
-        sudo('chmod 600 /home/ubuntu/keys/*.pem')
         return True
     except:
         return False
