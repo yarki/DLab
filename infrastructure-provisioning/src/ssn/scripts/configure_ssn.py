@@ -39,7 +39,7 @@ def cp_key(keyfile, host_string, os_user):
         key_name=keyfile.split("/")
         sudo('mkdir -p /home/' + os_user + '/keys')
         sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/keys')
-        local('scp -r -q -i {0} {0} {1}:/home/' + os_user + '/keys/{2}'.format(keyfile, host_string, key_name[-1]))
+        local('scp -r -q -i {0} {0} {1}:/home/{3}/keys/{2}'.format(keyfile, host_string, key_name[-1], os_user))
         sudo('chmod 600 /home/' + os_user + '/keys/*.pem')
         return True
     except:
