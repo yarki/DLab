@@ -23,6 +23,8 @@ from fabric.contrib.files import exists
 import argparse
 import json
 import sys
+from dlab.notebook_lib import *
+from dlab.common_lib import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
