@@ -148,3 +148,54 @@ def ensure_mongo():
         return True
     except:
         return False
+
+
+def start_ss(keyfile, host_string, dlab_conf_dir, web_path):
+    try:
+        if not exists('{}tmp/ss_started'.format(os.environ['ssn_dlab_path'])):
+            supervisor_conf = '/etc/supervisord.d/supervisor_svc.ini'
+            put('/root/templates/ssn.yml', '/tmp/ssn.yml')
+            sudo('mv /tmp/ssn.yml ' + os.environ['ssn_dlab_path'] + 'conf/')
+            put('/root/templates/proxy_location_webapp_template.conf', '/tmp/proxy_location_webapp_template.conf')
+            sudo('mv /tmp/proxy_location_webapp_template.conf ' + os.environ['ssn_dlab_path'] + 'tmp/')
+            with open('/root/templates/supervisor_svc.conf', 'r') as f:
+                text = f.read()
+            text = text.replace('WEB_CONF', dlab_conf_dir)
+            with open('/root/templates/supervisor_svc.conf', 'w') as f:
+                f.write(text)
+            put('/root/templates/supervisor_svc.conf', '/tmp/supervisor_svc.conf')
+            sudo('mv /tmp/supervisor_svc.conf ' + os.environ['ssn_dlab_path'] + 'tmp/')
+            sudo('cp ' + os.environ['ssn_dlab_path'] + 'tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
+            sudo('cp ' + os.environ['ssn_dlab_path'] + 'tmp/supervisor_svc.conf {}'.format(supervisor_conf))
+
+            sudo('sed -i \'s=WEB_APP_DIR={}=\' {}'.format(web_path, supervisor_conf))
+
+            sudo('mkdir -p /var/log/application')
+            sudo('mkdir -p ' + web_path)
+            sudo('mkdir -p ' + web_path + 'provisioning-service/')
+            sudo('mkdir -p ' + web_path + 'security-service/')
+            sudo('mkdir -p ' + web_path + 'self-service/')
+            sudo('chown -R ec2-user:ec2-user ' + web_path)
+            try:
+                local('scp -r -i {} /root/web_app/self-service/*.jar {}:'.format(keyfile, host_string) + web_path + 'self-service/')
+                local('scp -r -i {} /root/web_app/security-service/*.jar {}:'.format(keyfile, host_string) + web_path + 'security-service/')
+                local('scp -r -i {} /root/web_app/provisioning-service/*.jar {}:'.format(keyfile, host_string) + web_path + 'provisioning-service/')
+                run('mkdir -p /tmp/yml_tmp/')
+                local('scp -r -i {} /root/web_app/self-service/*.yml {}:'.format(keyfile, host_string) + '/tmp/yml_tmp/')
+                local('scp -r -i {} /root/web_app/security-service/*.yml {}:'.format(keyfile, host_string) + '/tmp/yml_tmp/')
+                local('scp -r -i {} /root/web_app/provisioning-service/*.yml {}:'.format(keyfile, host_string) + '/tmp/yml_tmp/')
+                sudo('mv /tmp/yml_tmp/* ' + os.environ['ssn_dlab_path'] + 'conf/')
+                sudo('rmdir /tmp/yml_tmp/')
+            except:
+                with open("/root/result.json", 'w') as result:
+                    res = {"error": "Unable to upload webapp jars", "conf": os.environ.__dict__}
+                    print json.dumps(res)
+                    result.write(json.dumps(res))
+                sys.exit(1)
+
+            sudo('service supervisord start')
+            sudo('service nginx restart')
+            sudo('touch ' + os.environ['ssn_dlab_path'] + 'tmp/ss_started')
+        return True
+    except:
+        return False
