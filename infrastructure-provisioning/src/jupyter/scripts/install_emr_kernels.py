@@ -32,10 +32,13 @@ parser.add_argument('--emr_version', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--notebook_ip', type=str, default='')
+parser.add_argument('--emr_excluded_spark_properties', type=str, default='')
+parser.add_argument('--edge_user_name', type=str, default='')
+parser.add_argument('--os_user', type=str, default='')
 args = parser.parse_args()
 
 
-def configure_notebook():
+def configure_notebook(args):
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
     put(templates_dir + 'pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
@@ -49,6 +52,11 @@ def configure_notebook():
     put(templates_dir + 'run_template.sh', '/tmp/run_template.sh')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
     sudo('chmod 755 /usr/local/bin/create_configs.py')
+    sudo('mkdir -p /usr/lib/python2.7/dlab/')
+    run('mkdir -p /tmp/dlab_libs/')
+    local('scp -i {} /usr/lib/python2.7/dlab/* {}:/tmp/dlab_libs/'.format(args.keyfile, env.host_string))
+    run('chmod a+x /tmp/dlab_libs/*')
+    sudo('mv /tmp/dlab_libs/* /usr/lib/python2.7/dlab/')
 
 
 def get_spark_version():
@@ -83,10 +91,13 @@ def get_hadoop_version():
 
 if __name__ == "__main__":
     env.hosts = "{}".format(args.notebook_ip)
-    env.user = "ubuntu"
+    env.user = args.os_user
     env.key_filename = "{}".format(args.keyfile)
     env.host_string = env.user + "@" + env.hosts
-    configure_notebook()
+    configure_notebook(args)
     spark_version = get_spark_version()
     hadoop_version = get_hadoop_version()
-    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version + ' --hadoop_version ' + hadoop_version + ' --region ' + args.region + ' --excluded_lines ' + os.environ['emr_excluded_spark_properties'] + ' --user_name ' + os.environ['edge_user_name'])
+    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name '
+         + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version
+         + ' --hadoop_version ' + hadoop_version + ' --region ' + args.region + ' --excluded_lines '
+         + args.emr_excluded_spark_properties + ' --user_name ' + args.edge_user_name + ' --os_user ' + args.os_user)

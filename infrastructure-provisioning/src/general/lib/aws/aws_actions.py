@@ -125,6 +125,20 @@ def create_tag(resource, tag):
         traceback.print_exc(file=sys.stdout)
 
 
+def remove_emr_tag(emr_id, tag):
+    try:
+        emr = boto3.client('emr')
+        emr.remove_tags(ResourceId=emr_id, TagKeys=tag)
+    except Exception as err:
+        logging.info("Unable to remove Tag: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Unable to remove Tag", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        traceback.print_exc(file=sys.stdout)
+
+
+
 def create_rt(vpc_id, infra_tag_name, infra_tag_value):
     try:
         tag = {"Key": infra_tag_name, "Value": infra_tag_value}
@@ -800,3 +814,74 @@ def create_image_from_instance(instance_name='', image_name=''):
         image.create_tags(Tags=[{'Key': 'Name', 'Value': os.environ['conf_service_base_name']}])
         return image.id
     return ''
+
+
+def install_emr_spark(args):
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
+    s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/spark.tar.gz', '/tmp/spark.tar.gz')
+    s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/spark-checksum.chk', '/tmp/spark-checksum.chk')
+    if 'WARNING' in checksum_check('/tmp/spark-checksum.chk'):
+        local('rm -f /tmp/spark.tar.gz')
+        s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/spark.tar.gz', '/tmp/spark.tar.gz')
+        if 'WARNING' in checksum_check('/tmp/spark-checksum.chk'):
+            print "The checksum of spark.tar.gz is mismatched. It could be caused by aws network issue."
+            sys.exit(1)
+    local('sudo tar -zhxvf /tmp/spark.tar.gz -C /opt/' + args.emr_version + '/' + args.cluster_name + '/')
+
+
+def jars(args, emr_dir):
+    print "Downloading jars..."
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
+    s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
+    s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars-checksum.chk', '/tmp/jars-checksum.chk')
+    if 'WARNING' in checksum_check('/tmp/jars-checksum.chk'):
+        local('rm -f /tmp/jars.tar.gz')
+        s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
+        if 'WARNING' in checksum_check('/tmp/jars-checksum.chk'):
+            print "The checksum of jars.tar.gz is mismatched. It could be caused by aws network issue."
+            sys.exit(1)
+    local('tar -zhxvf /tmp/jars.tar.gz -C ' + emr_dir)
+
+
+def yarn(args, yarn_dir):
+    print "Downloading yarn configuration..."
+    s3client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
+    s3resource = boto3.resource('s3', config=Config(signature_version='s3v4'))
+    get_files(s3client, s3resource, args.user_name + '/' + args.cluster_name + '/config/', args.bucket, yarn_dir)
+    local('sudo mv ' + yarn_dir + args.user_name + '/' + args.cluster_name + '/config/* ' + yarn_dir)
+    local('sudo rm -rf ' + yarn_dir + args.user_name + '/')
+
+
+def get_files(s3client, s3resource, dist, bucket, local):
+    s3list = s3client.get_paginator('list_objects')
+    for result in s3list.paginate(Bucket=bucket, Delimiter='/', Prefix=dist):
+        if result.get('CommonPrefixes') is not None:
+            for subdir in result.get('CommonPrefixes'):
+                get_files(s3client, s3resource, subdir.get('Prefix'), bucket, local)
+        if result.get('Contents') is not None:
+            for file in result.get('Contents'):
+                if not os.path.exists(os.path.dirname(local + os.sep + file.get('Key'))):
+                     os.makedirs(os.path.dirname(local + os.sep + file.get('Key')))
+                s3resource.meta.client.download_file(bucket, file.get('Key'), local + os.sep + file.get('Key'))
+
+
+def installing_python(args):
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
+    s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
+    with file('/tmp/python_version') as f:
+        python_version = f.read()
+    python_version = python_version[0:5]
+    if not os.path.exists('/opt/python/python' + python_version):
+        local('wget https://www.python.org/ftp/python/' + python_version + '/Python-' + python_version + '.tgz -O /tmp/Python-' + python_version + '.tgz' )
+        local('tar zxvf /tmp/Python-' + python_version + '.tgz -C /tmp/')
+        with lcd('/tmp/Python-' + python_version):
+            local('./configure --prefix=/opt/python/python' + python_version + ' --with-zlib-dir=/usr/local/lib/ --with-ensurepip=install')
+            local('sudo make altinstall')
+        with lcd('/tmp/'):
+            local('sudo rm -rf Python-' + python_version + '/')
+        local('sudo -i virtualenv /opt/python/python' + python_version)
+        venv_command = '/bin/bash /opt/python/python' + python_version + '/bin/activate'
+        pip_command = '/opt/python/python' + python_version + '/bin/pip' + python_version[:3]
+        local(venv_command + ' && sudo -i ' + pip_command + ' install -U pip --no-cache-dir')
+        local(venv_command + ' && sudo -i ' + pip_command + ' install ipython ipykernel --no-cache-dir')
+        local(venv_command + ' && sudo -i ' + pip_command + ' install boto boto3 NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
