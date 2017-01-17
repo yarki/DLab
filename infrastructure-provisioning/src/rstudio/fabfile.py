@@ -80,8 +80,8 @@ def run():
     try:
         logging.info('[CREATE R_STUDIO NOTEBOOK INSTANCE]')
         print '[CREATE R_STUDIO NOTEBOOK INSTANCE]'
-        params = "--node_name {} --ami_id {} --instance_type {} --key_name {} --security_group_ids {} --subnet_id {} --iam_profile {} --infra_tag_name {} --infra_tag_value {} --instance_class {} --instance_disk_size {}" \
-                 .format(notebook_config['instance_name'], notebook_config['ami_id'], notebook_config['instance_type'],
+        params = "--node_name {} --ami_id {} --instance_type {} --key_name {} --security_group_ids {} --subnet_id {} --iam_profile {} --infra_tag_name {} --infra_tag_value {} --instance_class {} --instance_disk_size {}"\
+            .format(notebook_config['instance_name'], notebook_config['ami_id'], notebook_config['instance_type'],
                          notebook_config['key_name'], get_security_group_by_name(notebook_config['security_group_name']),
                          get_subnet_by_cidr(notebook_config['subnet_cidr']), notebook_config['role_profile_name'],
                          notebook_config['tag_name'], notebook_config['instance_name'], instance_class, os.environ['notebook_disk_size'])
@@ -106,8 +106,8 @@ def run():
         logging.info('[CONFIGURE PROXY ON R_STUDIO INSTANCE]')
         print '[CONFIGURE PROXY ON R_STUDIO INSTANCE]'
         additional_config = {"proxy_host": edge_instance_hostname, "proxy_port": "3128"}
-        params = "--hostname {} --instance_name {} --keyfile {} --additional_config '{}'" \
-                 .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
+        params = "--hostname {} --instance_name {} --keyfile {} --additional_config '{}'"\
+            .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config))
         try:
             local("~/scripts/{}.py {}".format('configure_proxy', params))
         except:
@@ -139,8 +139,8 @@ def run():
     try:
         logging.info('[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]')
         print '[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]'
-        params = "--hostname {}  --keyfile {} --region {} --rstudio_pass {}" \
-                 .format(instance_hostname,  keyfile_name, os.environ['creds_region'], notebook_config['rstudio_pass'])
+        params = "--hostname {}  --keyfile {} --region {} --rstudio_pass {}"\
+            .format(instance_hostname,  keyfile_name, os.environ['creds_region'], notebook_config['rstudio_pass'])
         try:
             local("~/scripts/{}.py {}".format('configure_rstudio', params))
         except:
