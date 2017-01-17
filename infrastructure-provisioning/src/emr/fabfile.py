@@ -53,8 +53,6 @@ def run():
     if os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
         time.sleep(30)
     create_aws_config_files()
-    #index = provide_index('EMR', os.environ['conf_service_base_name'] + '-Tag', '{}-{}-emr'.format(os.environ['conf_service_base_name'], os.environ['edge_user_name']))
-    #time_stamp = int(time.time())
     print 'Generating infrastructure names and tags'
     emr_conf = dict()
     emr_conf['uuid'] = str(uuid.uuid4())[:5]
@@ -78,14 +76,9 @@ def run():
     emr_conf['notebook_ip'] = get_instance_ip_address(os.environ['notebook_name']).get('Private')
     emr_conf['role_service_name'] = os.environ['emr_service_role']
     emr_conf['role_ec2_name'] = os.environ['emr_ec2_role']
-
-    #emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp) + ', ' \
-    #                   + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)\
-    #                   + ', Notebook=' + os.environ['notebook_name']
     emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid'] + ', ' \
                        + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']\
                        + ', Notebook=' + os.environ['notebook_name']
-    #emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)
     emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
 
@@ -125,18 +118,24 @@ def run():
     try:
         logging.info('[Creating EMR Cluster]')
         print '[Creating EMR Cluster]'
-        params = "--name {} --applications '{}' --master_instance_type {} --slave_instance_type {} --instance_count {} --ssh_key {} --release_label {} --emr_timeout {} " \
-                 "--subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --region {} --tags '{}'".format(
-            emr_conf['cluster_name'], emr_conf['apps'], emr_conf['master_instance_type'], emr_conf['slave_instance_type'], emr_conf['instance_count'], emr_conf['key_name'], emr_conf['release_label'], emr_conf['emr_timeout'],
-            emr_conf['subnet_cidr'], emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], 'ubuntu', emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'])
-        local("~/scripts/%s.py %s" % ('create_cluster', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to create EMR Cluster", "conf": emr_conf}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        params = "--name {} --applications '{}' --master_instance_type {} --slave_instance_type {} --instance_count {} --ssh_key {} --release_label {} --emr_timeout {} --subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --region {} --tags '{}' --key_dir {} --edge_user_name {}"\
+            .format(emr_conf['cluster_name'], emr_conf['apps'], emr_conf['master_instance_type'],
+                    emr_conf['slave_instance_type'], emr_conf['instance_count'], emr_conf['key_name'],
+                    emr_conf['release_label'], emr_conf['emr_timeout'], emr_conf['subnet_cidr'],
+                    emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], 'ubuntu',
+                    emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'], os.environ['creds_key_dir'],
+                    os.environ['edge_user_name'])
+        try:
+            local("~/scripts/{}.py {}".format('create_cluster', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to create EMR Cluster", "conf": emr_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
 
         cluster_name = emr_conf['cluster_name']
-        keyfile_name = "/root/keys/%s.pem" % emr_conf['key_name']
+        keyfile_name = "/root/keys/{}.pem".format(emr_conf['key_name'])
         local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
     except:
         local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
@@ -145,16 +144,22 @@ def run():
     try:
         logging.info('[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]')
         print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
-        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {} --region {}".format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'], keyfile_name, emr_conf['notebook_ip'], emr_conf['region'])
-        local("~/scripts/%s.py %s" % ('install_emr_kernels', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed installing EMR kernels", "conf": emr_conf}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {} --region {}"\
+            .format(emr_conf['bucket_name'], emr_conf['cluster_name'], emr_conf['release_label'],
+                    keyfile_name, emr_conf['notebook_ip'], emr_conf['region'])
+        try:
+            local("~/scripts/{}.py {}".format('install_emr_kernels', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed installing EMR kernels", "conf": emr_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         emr_id = get_emr_id_by_name(emr_conf['cluster_name'])
         terminate_emr(emr_id)
-        remove_kernels(emr_conf['cluster_name'],emr_conf['tag_name'],os.environ['notebook_name'],'ubuntu',emr_conf['key_path'], emr_conf['release_label'])
+        remove_kernels(emr_conf['cluster_name'], emr_conf['tag_name'], os.environ['notebook_name'],
+                       'ubuntu', emr_conf['key_path'], emr_conf['release_label'])
         sys.exit(1)
 
     try:
@@ -206,14 +211,17 @@ def terminate():
     try:
         logging.info('[TERMINATE EMR CLUSTER]')
         print '[TERMINATE EMR CLUSTER]'
-        params = "--emr_name %s --bucket_name %s --key_path %s --ssh_user %s --tag_name %s --nb_tag_value %s" % \
-                 (emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['key_path'], emr_conf['ssh_user'],
-                  emr_conf['tag_name'], emr_conf['notebook_name'])
-        local("~/scripts/%s.py %s" % ('terminate_emr', params))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed to terminate EMR cluster", "conf": emr_conf}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        params = "--emr_name {} --bucket_name {} --key_path {} --ssh_user {} --tag_name {} --nb_tag_value {}"\
+            .format(emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['key_path'], emr_conf['ssh_user'],
+                    emr_conf['tag_name'], emr_conf['notebook_name'])
+        try:
+            local("~/scripts/{}.py {}".format('terminate_emr', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to terminate EMR cluster", "conf": emr_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
         sys.exit(1)
 
