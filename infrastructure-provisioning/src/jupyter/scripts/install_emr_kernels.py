@@ -38,7 +38,7 @@ parser.add_argument('--os_user', type=str, default='')
 args = parser.parse_args()
 
 
-def configure_notebook():
+def configure_notebook(args):
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
     put(templates_dir + 'pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
@@ -52,6 +52,11 @@ def configure_notebook():
     put(templates_dir + 'run_template.sh', '/tmp/run_template.sh')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
     sudo('chmod 755 /usr/local/bin/create_configs.py')
+    sudo('mkdir -p /usr/lib/python2.7/dlab/')
+    run('mkdir -p /tmp/dlab_libs/')
+    local('scp -i {} /usr/lib/python2.7/dlab/* {}:/tmp/dlab_libs/'.format(args.keyfile, env.host_string))
+    run('chmod a+x /tmp/dlab_libs/*')
+    sudo('mv /tmp/dlab_libs/* /usr/lib/python2.7/dlab/')
 
 
 def get_spark_version():
@@ -89,7 +94,7 @@ if __name__ == "__main__":
     env.user = args.os_user
     env.key_filename = "{}".format(args.keyfile)
     env.host_string = env.user + "@" + env.hosts
-    configure_notebook()
+    configure_notebook(args)
     spark_version = get_spark_version()
     hadoop_version = get_hadoop_version()
     sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name '
