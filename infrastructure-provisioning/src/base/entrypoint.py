@@ -134,3 +134,7 @@ if __name__ == "__main__":
     elif args.action == 'terminate':
         with hide('running'):
             local("/bin/terminate.py")
+
+    elif args.action == 'configure':
+        with hide('running'):
+            local("/bin/configure.py")
