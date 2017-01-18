@@ -92,6 +92,7 @@
         {
             "Action": [
                 "elasticmapreduce:AddTags",
+                "elasticmapreduce:RemoveTags",
                 "elasticmapreduce:DescribeCluster",
                 "elasticmapreduce:ListClusters",
                 "elasticmapreduce:RunJobFlow",
