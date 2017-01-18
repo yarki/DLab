@@ -215,7 +215,7 @@ def run():
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",
                "exploratory_url": rstudio_ip_url,
-               "exploratory_user": "ubuntu",
+               "exploratory_user": os.environ['general_os_user'],
                "exploratory_pass": notebook_config['rstudio_pass']}
         result.write(json.dumps(res))
 
