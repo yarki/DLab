@@ -138,7 +138,6 @@ def remove_emr_tag(emr_id, tag):
         traceback.print_exc(file=sys.stdout)
 
 
-
 def create_rt(vpc_id, infra_tag_name, infra_tag_value):
     try:
         tag = {"Key": infra_tag_name, "Value": infra_tag_value}
