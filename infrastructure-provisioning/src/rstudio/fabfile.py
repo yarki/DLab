@@ -282,14 +282,13 @@ def stop():
     notebook_config['notebook_name'] = os.environ['notebook_instance_name']
     notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
-    notebook_config['ssh_user'] = os.environ['notebook_ssh_user']
     notebook_config['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
 
     try:
         logging.info('[STOP NOTEBOOK]')
         print '[STOP NOTEBOOK]'
         params = "--bucket_name {} --tag_name {} --nb_tag_value {} --ssh_user {} --key_path {}" \
-                 .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], notebook_config['ssh_user'], notebook_config['key_path'])
+                 .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], os.environ['general_os_user'], notebook_config['key_path'])
         try:
             local("~/scripts/{}.py {}".format('stop_notebook', params))
         except:
