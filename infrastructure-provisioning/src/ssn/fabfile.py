@@ -460,7 +460,6 @@ def run():
                    "role_profile_name": role_profile_name,
                    "policy_name": policy_name,
                    "master_keyname": os.environ['creds_key_name'],
-                   "policies": os.environ['conf_policy_arn'],
                    "vpc_id": os.environ['creds_vpc_id'],
                    "subnet_id": os.environ['creds_subnet_id'],
                    "security_id": os.environ['creds_security_groups_ids'],
