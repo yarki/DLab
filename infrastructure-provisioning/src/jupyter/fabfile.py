@@ -400,7 +400,7 @@ def configure():
                     os.environ['general_os_user'])
         try:
             local("~/scripts/{}.py {}".format('install_emr_kernels', params))
-            remove_emr_tag(notebook_config['cluster_id'], 'State')
+            remove_emr_tag(notebook_config['cluster_id'], ['State'])
         except:
             with open("/root/result.json", 'w') as result:
                 res = {"error": "Failed installing EMR kernels", "conf": notebook_config}

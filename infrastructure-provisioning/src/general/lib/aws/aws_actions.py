@@ -128,7 +128,7 @@ def create_tag(resource, tag):
 def remove_emr_tag(emr_id, tag):
     try:
         emr = boto3.client('emr')
-        emr.remove_tags(ResourceId=emr_id, TagKeys=[tag])
+        emr.remove_tags(ResourceId=emr_id, TagKeys=tag)
     except Exception as err:
         logging.info("Unable to remove Tag: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         with open("/root/result.json", 'w') as result:
