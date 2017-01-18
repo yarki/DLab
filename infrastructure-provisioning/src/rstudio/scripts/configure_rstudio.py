@@ -64,9 +64,6 @@ if __name__ == "__main__":
     print "Mount additional volume"
     prepare_disk(args.os_user)
 
-    print "Install python libraries"
-    ensure_libraries_py(args.os_user)
-
     print "Install RStudio"
     install_rstudio(args.os_user, local_spark_path, args.rstudio_pass)
 

@@ -356,3 +356,60 @@ def start():
     except:
         print "Failed writing results."
         sys.exit(0)
+
+
+# Main function for configuring notebook server after deploying EMR
+def configure():
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG,
+                        filename=local_log_filepath)
+
+    # generating variables dictionary
+    create_aws_config_files()
+    print 'Generating infrastructure names and tags'
+    notebook_config = dict()
+    notebook_config['service_base_name'] = os.environ['conf_service_base_name']
+    notebook_config['notebook_name'] = os.environ['notebook_instance_name']
+    notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
+    notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
+    notebook_config['cluster_name'] = get_not_configured_emr(notebook_config['tag_name'], True)
+    notebook_config['notebook_ip'] = get_instance_ip_address(notebook_config['notebook_name']).get('Private')
+    notebook_config['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
+    notebook_config['cluster_id'] = get_emr_id_by_name(notebook_config['cluster_name'])
+
+    try:
+        logging.info('[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]')
+        print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
+        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {} --region {} --emr_excluded_spark_properties {} --edge_user_name {} --os_user {}"\
+            .format(notebook_config['bucket_name'], notebook_config['cluster_name'], os.environ['emr_version'],
+                    notebook_config['key_path'], notebook_config['notebook_ip'], os.environ['creds_region'],
+                    os.environ['emr_excluded_spark_properties'], os.environ['edge_user_name'],
+                    os.environ['general_os_user'])
+        try:
+            local("~/scripts/{}.py {}".format('install_emr_kernels', params))
+            remove_emr_tag(notebook_config['cluster_id'], ['State'])
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed installing EMR kernels", "conf": notebook_config}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
+    except:
+        emr_id = get_emr_id_by_name(notebook_config['cluster_name'])
+        terminate_emr(emr_id)
+        remove_kernels(notebook_config['cluster_name'], notebook_config['tag_name'], os.environ['notebook_instance_name'],
+                       os.environ['general_os_user'], notebook_config['key_path'], os.environ['emr_version'])
+        sys.exit(1)
+
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"notebook_name": notebook_config['notebook_name'],
+                   "Tag_name": notebook_config['tag_name'],
+                   "Action": "Configure notebook server"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)
