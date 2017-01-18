@@ -253,8 +253,8 @@ def terminate():
     try:
         logging.info('[TERMINATE NOTEBOOK]')
         print '[TERMINATE NOTEBOOK]'
-        params = "--bucket_name {} --tag_name {} --nb_tag_value {} --edge_user_name {}"\
-            .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], os.environ['edge_user_name'])
+        params = "--bucket_name {} --tag_name {} --nb_tag_value {}"\
+            .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'])
         try:
             local("~/scripts/{}.py {}".format('terminate_notebook', params))
         except:
