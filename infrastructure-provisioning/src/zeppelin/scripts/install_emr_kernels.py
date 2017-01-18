@@ -41,14 +41,9 @@ args = parser.parse_args()
 def configure_notebook(args):
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
-    put(templates_dir + 'pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
-    put(templates_dir + 'r_emr_template.json', '/tmp/r_emr_template.json')
+    put(templates_dir + 'emr_spark_interpreter.json', '/tmp/emr_spark_interpreter.json')
     put(templates_dir + 'spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
-    put(templates_dir + 'toree_emr_template.json','/tmp/toree_emr_template.json')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
-    put(templates_dir + 'toree_kernel.tar.gz', '/tmp/toree_kernel.tar.gz')
-    put(templates_dir + 'toree_emr_templatev2.json', '/tmp/toree_emr_templatev2.json')
-    put(templates_dir + 'run_template.sh', '/tmp/run_template.sh')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
     sudo('chmod 755 /usr/local/bin/create_configs.py')
     sudo('mkdir -p /usr/lib/python2.7/dlab/')
