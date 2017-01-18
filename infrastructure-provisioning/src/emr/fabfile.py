@@ -183,7 +183,6 @@ def terminate():
     emr_conf['emr_name'] = os.environ['emr_cluster_name']
     emr_conf['notebook_name'] = os.environ['notebook_instance_name']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
-    emr_conf['ssh_user'] = os.environ['notebook_ssh_user']
     emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
 
@@ -191,7 +190,7 @@ def terminate():
         logging.info('[TERMINATE EMR CLUSTER]')
         print '[TERMINATE EMR CLUSTER]'
         params = "--emr_name {} --bucket_name {} --key_path {} --ssh_user {} --tag_name {} --nb_tag_value {}"\
-            .format(emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['key_path'], emr_conf['ssh_user'],
+            .format(emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['key_path'], os.environ['general_os_user'],
                     emr_conf['tag_name'], emr_conf['notebook_name'])
         try:
             local("~/scripts/{}.py {}".format('terminate_emr', params))
