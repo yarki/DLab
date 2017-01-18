@@ -1,6 +1,7 @@
 {
     "resource": "notebook",
     "request_id":"RID",
+    "general_os_user":"GOS",
     "conf_service_base_name":"SBN",
     "notebook_user_name":"NUN",
     "creds_region":"CREG",
