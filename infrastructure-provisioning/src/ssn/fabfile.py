@@ -436,7 +436,6 @@ def run():
         print "Role profile name: " + role_profile_name
         print "Policy name: " + policy_name
         print "Key name: " + os.environ['creds_key_name']
-        print "Policies: " + os.environ['conf_policy_arn']
         print "VPC ID: " + os.environ['creds_vpc_id']
         print "Subnet ID: " + os.environ['creds_subnet_id']
         print "Security IDs: " + os.environ['creds_security_groups_ids']
