@@ -25,7 +25,7 @@ from fabric.contrib.files import exists
 def ensure_pkg(requisites, user):
     try:
         if not exists('/home/{}/.ensure_dir/pkg_upgraded'.format(user)):
-            sudo('yum -y update')
+            sudo('yum update-minimal --security -y')
             sudo('yum -y install wget')
             sudo('wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm')
             sudo('rpm -ivh epel-release-latest-7.noarch.rpm')

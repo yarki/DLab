@@ -28,7 +28,7 @@ import os
 def ensure_docker_daemon(dlab_path, os_user):
     try:
         if not exists('{}tmp/docker_daemon_ensured'.format(dlab_path)):
-            sudo('yum update -y')
+            sudo('yum update-minimal --security -y')
             sudo('curl -fsSL https://get.docker.com/ | sh')
             sudo('systemctl enable docker.service')
             sudo('systemctl start docker')
