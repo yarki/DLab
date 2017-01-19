@@ -300,15 +300,18 @@ def configure_zeppelin_emr_interpreter(args):
         try:
             local('echo \"Configuring emr spark interpreter for Zeppelin\"')
             template_file = "/tmp/emr_spark_interpreter.json"
-            fr = open(template_file, 'r+')
-            text = fr.read()
-            text = text.replace('CLUSTERNAME', args.cluster_name)
-            text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
-            text = text.replace('EMRVERSION', args.emr_version)
-            fw = open(template_file, 'w')
-            fw.write(text)
-            fw.close()
-            local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d @/tmp/emr_spark_interpreter.json http://localhost:8080/api/interpreter/setting")
+            p_versions = ["2" , "3"]
+            for p_version on p_versions:
+                fr = open(template_file, 'r+')
+                text = fr.read()
+                text = text.replace('CLUSTERNAME', args.cluster_name)
+                text = text.replace('PYTHONVERSION', p_version)
+                text = text.replace('EMRVERSION', args.emr_version)
+                tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
+                fw = open(tempe_file, 'w')
+                fw.write(text)
+                fw.close()
+                local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d @/tmp/emr_spark_py" + p_version + "_interpreter.json http://localhost:8080/api/interpreter/setting")
             local('touch /home/ubuntu/.ensure_dir/emr_interpreter_ensured')
         except:
             sys.exit(1)
