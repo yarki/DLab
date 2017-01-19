@@ -17,5 +17,5 @@ if (String('<%= BUILD_TYPE %>') === 'prod') { enableProdMode(); }
 // let TP = new TranslationProviders();
 // TP.getTranslationFile().then((providers: any) => {
   // const options: any = { providers };
-  platformBrowserDynamic().bootstrapModule(AppModule/*, options*/);
+  platformBrowserDynamic().bootstrapModule(AppModule);
 // });
