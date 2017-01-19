@@ -415,7 +415,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
         service_base_name = os.environ['conf_service_base_name'].lower().replace('-', '_')
         roles_list = []
         for item in client.list_roles(MaxItems=250).get("Roles"):
-            if service_base_name + '-' in item.get("RoleName"):
+            if item.get("RoleName").startswith(service_base_name + '-'):
                 roles_list.append(item.get('RoleName'))
         if roles_list:
             roles_list.sort(reverse=True)
@@ -484,7 +484,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
             print "There are no IAM roles to delete. Checking instance profiles..."
         profile_list = []
         for item in client.list_instance_profiles(MaxItems=250).get("InstanceProfiles"):
-            if service_base_name + '-' in item.get("InstanceProfileName"):
+            if item.get("InstanceProfileName").startswith(service_base_name + '-'):
                 profile_list.append(item.get('InstanceProfileName'))
         if profile_list:
             for instance_profile in profile_list:
