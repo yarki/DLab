@@ -88,6 +88,12 @@ def ensure_python3_kernel(os_user):
             sudo('yum install -y openssl-devel openssl-libs python-virtualenv python-devel python34-devel libxml2-devel libxslt-devel')
             sudo('pip3 install ipython ipykernel --no-cache-dir')
             sudo('python3 -m ipykernel install')
+            # Preserve Python 2 kernel
+            sudo('python2 -m pip install --upgrade setuptools pip')
+            sudo('python2 -m pip install backports.shutil_get_terminal_size ipython ipykernel')
+            sudo('echo y | python2 -m pip uninstall backports.shutil_get_terminal_size')
+            sudo('python2 -m pip install backports.shutil_get_terminal_size')
+            sudo('python2 -m ipykernel install')
             sudo('touch /home/{}/.ensure_dir/python3_kernel_ensured'.format(os_user))
         except:
             sys.exit(1)
@@ -125,5 +131,81 @@ def ensure_r_kernel(spark_version, os_user):
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
             sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
             sudo('touch /home/{}/.ensure_dir/r_kernel_ensured'.format(os_user))
+        except:
+            sys.exit(1)
+
+
+def ensure_matplot(os_user):
+    if not exists('/home/{}/.ensure_dir/matplot_ensured'.format(os_user)):
+        try:
+            sudo('yum install -y python-matplotlib --nogpgcheck')
+            sudo('pip install matplotlib --no-cache-dir')
+            sudo('pip3 install matplotlib --no-cache-dir')
+            sudo('touch /home/{}/.ensure_dir/matplot_ensured'.format(os_user))
+        except:
+            sys.exit(1)
+
+
+def ensure_sbt(os_user):
+    if not exists('/home/{}/.ensure_dir/sbt_ensured'.format(os_user)):
+        try:
+            sudo('curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo')
+            sudo('yum install -y sbt')
+            sudo('touch /home/{}/.ensure_dir/sbt_ensured'.format(os_user))
+        except:
+            sys.exit(1)
+
+
+def ensure_libraries_py2(os_user):
+    if not exists('/home/{}/.ensure_dir/ensure_libraries_py2_installed'.format(os_user)):
+        try:
+            sudo('export LC_ALL=C')
+            sudo('yum clean all')
+            sudo('yum install -y zlib-devel libjpeg-turbo-devel --nogpgcheck')
+            sudo('pip2 install -U pip --no-cache-dir')
+            sudo('pip2 install boto boto3 --no-cache-dir')
+            sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('touch /home/{}/.ensure_dir/ensure_libraries_py2_installed'.format(os_user))
+        except:
+            sys.exit(1)
+
+
+def ensure_jre_jdk(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/jre_jdk_ensured'):
+        try:
+            sudo('yum install -y java-1.8.0-openjdk')
+            sudo('yum install -y java-1.8.0-openjdk-devel')
+            sudo('touch /home/' + os_user + '/.ensure_dir/jre_jdk_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_python3_kernel_zeppelin(python3_version, os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/python3_kernel_ensured'):
+        try:
+            sudo('yum install -y yum-utils python34-pip python34')
+            sudo('pip3 install -U pip setuptools --no-cache-dir')
+            sudo('yum -y groupinstall development')
+            if len(python3_version) < 4:
+                python3_version = python3_version + ".0"
+            sudo('wget https://www.python.org/ftp/python/{0}/Python-{0}.tgz'.format(python3_version))
+            sudo('tar xzf Python-{}.tgz; cd Python-{}; ./configure --prefix=/usr/local; make altinstall')
+            sudo('touch /home/' + os_user + '/.ensure_dir/python3_kernel_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_libraries_py(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed'):
+        try:
+            sudo('export LC_ALL=C')
+            sudo('yum install -y python34-pip python-virtualenv')
+            sudo('pip2 install -U pip setuptools --no-cache-dir')
+            sudo('pip3 install -U pip setuptools --no-cache-dir')
+            sudo('pip2 install boto3 --no-cache-dir')
+            sudo('pip2 install fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('pip3 install boto3 --no-cache-dir')
+            sudo('pip3 install fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('touch /home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed')
         except:
             sys.exit(1)
