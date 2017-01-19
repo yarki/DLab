@@ -55,8 +55,14 @@ public class TestServices {
     public static void Cleanup() throws InterruptedException {
     }
 
+    @Test
+    public void runTests() throws Exception {
+    	testJenkinsJob();
+    	testLogin();
+    	testDLabScenario();
+    }
     
-    @Test(priority=1)
+    //@Test
     public void testJenkinsJob() throws Exception {
 
         /* System.out.println("1. Jenkins Job will be started ...");
@@ -93,7 +99,7 @@ public class TestServices {
         System.out.println("Amazon instance state is running");
     }
     
-    @Test(priority=2)
+    //@Test
     public void testLogin() throws Exception {
     	
     	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
@@ -134,7 +140,7 @@ public class TestServices {
         Assert.assertEquals(responseLogout.statusCode(), HttpStatusCode.Unauthorized/*Replace to HttpStatusCode.OK when EPMCBDCCSS-938 will be fixed and merged*/);
     }
 
-    @Test(priority=3)
+    //@Test
     public void testDLabScenario() throws Exception {
 
     	//ssnURL = "http://ec2-35-164-76-52.us-west-2.compute.amazonaws.com";
