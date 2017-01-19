@@ -122,9 +122,9 @@ def run():
             .format(emr_conf['cluster_name'], emr_conf['apps'], emr_conf['master_instance_type'],
                     emr_conf['slave_instance_type'], emr_conf['instance_count'], emr_conf['key_name'],
                     emr_conf['release_label'], emr_conf['emr_timeout'], emr_conf['subnet_cidr'],
-                    emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'], 'ubuntu',
-                    emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'], os.environ['creds_key_dir'],
-                    os.environ['edge_user_name'])
+                    emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'],
+                    os.environ['general_os_user'], emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'],
+                    os.environ['creds_key_dir'], os.environ['edge_user_name'])
         try:
             local("~/scripts/{}.py {}".format('create_cluster', params))
         except:

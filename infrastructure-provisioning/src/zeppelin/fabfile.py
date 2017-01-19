@@ -221,8 +221,9 @@ def run():
     print "Zeppelin URL: " + zeppelin_ip_url
     print "Zeppelin URL: " + zeppelin_dns_url
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
-        'key_name'] + '.pem ubuntu@' + ip_address
-    print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ubuntu@' + dns_name
+        'key_name'] + '.pem ' + os.environ['general_os_user'] + '@' + ip_address
+    print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ' \
+          + os.environ['general_os_user'] + '@' + dns_name
 
     with open("/root/result.json", 'w') as result:
         res = {"hostname": dns_name,
@@ -236,7 +237,8 @@ def run():
 
 # Main function for terminating exploratory environment
 def terminate():
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'],
+                                               os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -282,7 +284,8 @@ def terminate():
 
 # Main function for stopping notebook server
 def stop():
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'],
+                                               os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -330,7 +333,8 @@ def stop():
 
 # Main function for starting notebook server
 def start():
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'],
+                                               os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -373,7 +377,8 @@ def start():
 
 
 def configure():
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'],
+                                               os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,

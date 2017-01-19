@@ -94,7 +94,7 @@ def configure_notebook_server(notebook_name):
         except:
             sys.exit(1)
 
-        ensure_python3_kernel_zeppelin(python3_version)
+        ensure_python3_kernel_zeppelin(python3_version, args.os_user)
 
 
 ##############
@@ -109,8 +109,8 @@ if __name__ == "__main__":
 
     print "Configuring notebook server."
     try:
-        if not exists('/home/ubuntu/.ensure_dir'):
-            sudo('mkdir /home/ubuntu/.ensure_dir')
+        if not exists('/home/' + args.os_user + '/.ensure_dir'):
+            sudo('mkdir /home/' + args.os_user + '/.ensure_dir')
     except:
         sys.exit(1)
     prepare_disk(args.os_user)

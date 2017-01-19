@@ -24,7 +24,8 @@ from dlab.fab import *
 from dlab.aws_meta import *
 import os
 
-def ensure_docker_daemon(dlab_path):
+
+def ensure_docker_daemon(dlab_path, os_user):
     try:
         if not exists('{}tmp/docker_daemon_ensured'.format(dlab_path)):
             sudo('yum update -y')

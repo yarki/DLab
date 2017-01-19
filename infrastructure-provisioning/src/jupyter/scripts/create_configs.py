@@ -166,6 +166,7 @@ def toree_kernel(args):
         with open(template_sh_file, 'r') as f:
             text = f.read()
         text = text.replace('CLUSTER', args.cluster_name)
+        text = text.replace('OS_USER', args.os_user)
         with open(run_sh_path, 'w') as f:
             f.write(text)
 

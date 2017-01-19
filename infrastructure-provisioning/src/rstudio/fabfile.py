@@ -202,11 +202,12 @@ def run():
     print "SG name: " + notebook_config['security_group_name']
     print "Rstudio URL: " + rstudio_ip_url
     print "Rstudio URL: " + rstudio_dns_url
-    print "Rstudio user: ubuntu"
+    print "Rstudio user: " + os.environ['general_os_user']
     print "Rstudio pass: " + notebook_config['rstudio_pass']
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
-        'key_name'] + '.pem ubuntu@' + ip_address
-    print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ubuntu@' + dns_name
+        'key_name'] + '.pem ' + os.environ['general_os_user'] + '@' + ip_address
+    print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ' + \
+          os.environ['general_os_user'] + '@' + dns_name
 
     with open("/root/result.json", 'w') as result:
         res = {"hostname": dns_name,
