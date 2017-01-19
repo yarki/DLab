@@ -27,7 +27,7 @@ public class ComputationalTerminateDTO extends ComputationalBaseDTO<Computationa
     private String notebookInstanceName;
     @JsonProperty("notebook_ssh_user")
     private String sshUser;
-    @JsonProperty("creds_key_dir")
+    @JsonProperty("conf_key_dir")
     private String keyDir;
 
     public String getClusterName() {

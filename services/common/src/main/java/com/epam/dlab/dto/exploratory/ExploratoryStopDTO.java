@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ExploratoryStopDTO extends ExploratoryActionDTO<ExploratoryStopDTO> {
     @JsonProperty("notebook_ssh_user")
     private String sshUser;
-    @JsonProperty("creds_key_dir")
+    @JsonProperty("conf_key_dir")
     private String keyDir;
 
     public String getSshUser() {

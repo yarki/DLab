@@ -67,8 +67,8 @@ def run():
     emr_conf['apps'] = 'Hadoop Hive Hue Spark'
     emr_conf['service_base_name'] = os.environ['conf_service_base_name']
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
-    emr_conf['key_name'] = os.environ['creds_key_name']
-    emr_conf['region'] = os.environ['creds_region']
+    emr_conf['key_name'] = os.environ['conf_key_name']
+    emr_conf['region'] = os.environ['aws_region']
     emr_conf['release_label'] = os.environ['emr_version']
     emr_conf['master_instance_type'] = os.environ['emr_master_instance_type']
     emr_conf['slave_instance_type'] = os.environ['emr_slave_instance_type']
@@ -84,7 +84,7 @@ def run():
 
     tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
     emr_conf['subnet_cidr'] = get_subnet_by_tag(tag)
-    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
+    emr_conf['key_path'] = os.environ['conf_key_dir'] + '/' + os.environ['conf_key_name'] + '.pem'
 
     try:
         emr_conf['emr_timeout'] = os.environ['emr_timeout']
@@ -123,8 +123,8 @@ def run():
                     emr_conf['slave_instance_type'], emr_conf['instance_count'], emr_conf['key_name'],
                     emr_conf['release_label'], emr_conf['emr_timeout'], emr_conf['subnet_cidr'],
                     emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'],
-                    os.environ['general_os_user'], emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'],
-                    os.environ['creds_key_dir'], os.environ['edge_user_name'])
+                    os.environ['conf_os_user'], emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'],
+                    os.environ['conf_key_dir'], os.environ['edge_user_name'])
         try:
             local("~/scripts/{}.py {}".format('create_cluster', params))
         except:
@@ -183,14 +183,14 @@ def terminate():
     emr_conf['emr_name'] = os.environ['emr_cluster_name']
     emr_conf['notebook_name'] = os.environ['notebook_instance_name']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
-    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
+    emr_conf['key_path'] = os.environ['conf_key_dir'] + '/' + os.environ['conf_key_name'] + '.pem'
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
 
     try:
         logging.info('[TERMINATE EMR CLUSTER]')
         print '[TERMINATE EMR CLUSTER]'
         params = "--emr_name {} --bucket_name {} --key_path {} --ssh_user {} --tag_name {} --nb_tag_value {}"\
-            .format(emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['key_path'], os.environ['general_os_user'],
+            .format(emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['key_path'], os.environ['conf_os_user'],
                     emr_conf['tag_name'], emr_conf['notebook_name'])
         try:
             local("~/scripts/{}.py {}".format('terminate_emr', params))

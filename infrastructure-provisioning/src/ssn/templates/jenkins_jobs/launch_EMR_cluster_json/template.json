@@ -1,7 +1,7 @@
 {
     "resource": "emr",
     "request_id":"RID",
-    "general_os_user":"GOS",
+    "conf_os_user":"GOS",
     "conf_service_base_name":"SBN",
     "edge_user_name":"EUN",
     "emr_service_role":"ESR",
@@ -11,7 +11,7 @@
     "emr_slave_instance_type":"ESMT",
     "emr_instance_count":"EIC",
     "emr_timeout":"ETIM",
-    "creds_key_name":"KN",
-    "creds_region":"CREG",
+    "conf_key_name":"KN",
+    "aws_region":"CREG",
     "notebook_instance_name":"NNM"
 }

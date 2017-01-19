@@ -21,9 +21,9 @@ package com.epam.dlab.dto.exploratory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDTO> {
-    @JsonProperty("notebook_instance_type")
+    @JsonProperty("aws_notebook_instance_type")
     private String notebookInstanceType;
-    @JsonProperty("creds_security_groups_ids")
+    @JsonProperty("aws_security_groups_ids")
     private String securityGroupIds;
 
     public String getNotebookInstanceType() {

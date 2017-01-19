@@ -25,7 +25,7 @@ public class ExploratoryBaseDTO<T extends ExploratoryBaseDTO<?>> extends Resourc
     @JsonProperty("notebook_image")
     private String notebookImage;
 
-    @JsonProperty("notebook_user_name")
+    @JsonProperty("edge_user_name")
     private String notebookUserName;
 
     public String getNotebookImage() { return notebookImage; }

@@ -20,12 +20,12 @@ package com.epam.dlab.backendapi.dao;
 
 public enum MongoSetting {
     SERIVICE_BASE_NAME("service_base_name"),
-    CREDS_REGION("creds_region"),
+    aws_region("aws_region"),
     SECURITY_GROUPS("security_groups_ids"),
     EXPLORATORY_SSH_USER("notebook_ssh_user"),
-    CREDS_KEY_DIRECTORY("creds_key_dir"),
-    CREDS_VPC_ID("creds_vpc_id"),
-    CREDS_SUBNET_ID("creds_subnet_id");
+    conf_key_dirECTORY("conf_key_dir"),
+    aws_vpc_id("aws_vpc_id"),
+    aws_subnet_id("aws_subnet_id");
 
     private String id;
 

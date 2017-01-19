@@ -33,7 +33,7 @@ public class RunDockerCommandTest {
 
     String CREATE_EDGE_METADATA = DOCKER_BASE +
             "-e \"conf_service_base_name=%s\" " +
-            "-e \"creds_key_name=%s\" " +
+            "-e \"conf_key_name=%s\" " +
             "-e \"edge_user_name=%s\" " +
             "%s --action create";
 
@@ -47,36 +47,36 @@ public class RunDockerCommandTest {
             "-e \"notebook_name=%s\" " +
             "-e \"edge_user_name=%s\" " +
             "-e \"edge_subnet_cidr=%s\" " +
-            "-e \"creds_region=%s\" " +
-            "-e \"creds_key_name=%s\" " +
+            "-e \"aws_region=%s\" " +
+            "-e \"conf_key_name=%s\" " +
             "%s --action create";
 
     String TERMINATE_EMR_CLUSTER = DOCKER_BASE +
             "-e \"conf_service_base_name=%s\" " +
             "-e \"edge_user_name=%s\" " +
             "-e \"emr_cluster_name=%s\" " +
-            "-e \"creds_region=%s\" " +
-            "-e \"creds_key_name=%s\" " +
+            "-e \"aws_region=%s\" " +
+            "-e \"conf_key_name=%s\" " +
             "%s --action terminate";
 
     String EXPLORATORY_ENVIRONMENT = DOCKER_BASE +
             "-e \"conf_service_base_name=%s\" " +
-            "-e \"creds_region=%s\" " +
-            "-e \"creds_key_name=%s\" ";
+            "-e \"aws_region=%s\" " +
+            "-e \"conf_key_name=%s\" ";
 
     String CREATE_EXPLORATORY_ENVIRONMENT = EXPLORATORY_ENVIRONMENT +
-            "-e \"notebook_user_name=%s\" " +
+            "-e \"edge_user_name=%s\" " +
             "-e \"notebook_subnet_cidr=%s\" " +
-            "-e \"creds_security_groups_ids=%s\" " +
+            "-e \"aws_security_groups_ids=%s\" " +
             "%s --action create";
 
     String TERMINATE_EXPLORATORY_ENVIRONMENT = EXPLORATORY_ENVIRONMENT +
-            "-e \"notebook_user_name=%s\" " +
+            "-e \"edge_user_name=%s\" " +
             "-e \"notebook_instance_name=%s\" " +
             "%s --action terminate";
 
     String STOP_EXPLORATORY_ENVIRONMENT = EXPLORATORY_ENVIRONMENT +
-            "-e \"notebook_user_name=%s\" " +
+            "-e \"edge_user_name=%s\" " +
             "-e \"notebook_instance_name=%s\" " +
             "%s --action stop";
 

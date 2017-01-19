@@ -30,7 +30,7 @@ public class SettingsDAO extends BaseDAO {
     }
 
     public String getCredsRegion() {
-        return getSetting(CREDS_REGION);
+        return getSetting(aws_region);
     }
 
     public String getSecurityGroups() {
@@ -42,15 +42,15 @@ public class SettingsDAO extends BaseDAO {
     }
 
     public String getCredsKeyDir() {
-        return getSetting(CREDS_KEY_DIRECTORY);
+        return getSetting(conf_key_dirECTORY);
     }
 
     public String getCredsVpcId() {
-        return getSetting(CREDS_VPC_ID);
+        return getSetting(aws_vpc_id);
     }
 
     public String getCredsSubnetId() {
-        return getSetting(CREDS_SUBNET_ID);
+        return getSetting(aws_subnet_id);
     }
 
     private String getSetting(MongoSetting setting) {

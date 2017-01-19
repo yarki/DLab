@@ -34,7 +34,7 @@ def run():
     logging.getLogger('boto3').setLevel(logging.DEBUG)
 
     instance_class = 'notebook'
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -50,17 +50,17 @@ def run():
     except:
         notebook_config['exploratory_name'] = ''
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
-    notebook_config['instance_type'] = os.environ['notebook_instance_type']
-    notebook_config['key_name'] = os.environ['creds_key_name']
-    notebook_config['user_keyname'] = os.environ['notebook_user_name']
+    notebook_config['instance_type'] = os.environ['aws_notebook_instance_type']
+    notebook_config['key_name'] = os.environ['conf_key_name']
+    notebook_config['user_keyname'] = os.environ['edge_user_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
-        'notebook_user_name'] + "-nb-" + notebook_config['exploratory_name'] + "-" + notebook_config['uuid']
+        'edge_user_name'] + "-nb-" + notebook_config['exploratory_name'] + "-" + notebook_config['uuid']
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
-        'notebook_user_name'] + '-rstudio-notebook-image'
+        'edge_user_name'] + '-rstudio-notebook-image'
     notebook_config['role_profile_name'] = os.environ['conf_service_base_name'].lower().replace('-', '_') + "-" + os.environ[
-        'notebook_user_name'] + "-nb-Profile"
+        'edge_user_name'] + "-nb-Profile"
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
-        'notebook_user_name'] + "-nb-SG"
+        'edge_user_name'] + "-nb-SG"
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
     notebook_config['rstudio_pass'] = id_generator()
 
@@ -70,10 +70,10 @@ def run():
         print 'Preconfigured image found. Using: ' + ami_id
         notebook_config['ami_id'] = ami_id
     else:
-        print 'No preconfigured image found. Using default one: ' + get_ami_id(os.environ['notebook_ami_name'])
-        notebook_config['ami_id'] = get_ami_id(os.environ['notebook_ami_name'])
+        print 'No preconfigured image found. Using default one: ' + get_ami_id(os.environ['aws_debian_ami_name'])
+        notebook_config['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
 
-    tag = {"Key": notebook_config['tag_name'], "Value": "{}-{}-subnet".format(notebook_config['service_base_name'], os.environ['notebook_user_name'])}
+    tag = {"Key": notebook_config['tag_name'], "Value": "{}-{}-subnet".format(notebook_config['service_base_name'], os.environ['edge_user_name'])}
     notebook_config['subnet_cidr'] = get_subnet_by_tag(tag)
 
     # launching instance for notebook server
@@ -98,9 +98,9 @@ def run():
 
     # generating variables regarding EDGE proxy on Notebook instance
     instance_hostname = get_instance_hostname(notebook_config['instance_name'])
-    edge_instance_name = os.environ['conf_service_base_name'] + "-" + os.environ['notebook_user_name'] + '-edge'
+    edge_instance_name = os.environ['conf_service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
     edge_instance_hostname = get_instance_hostname(edge_instance_name)
-    keyfile_name = "/root/keys/{}.pem".format(os.environ['creds_key_name'])
+    keyfile_name = "/root/keys/{}.pem".format(os.environ['conf_key_name'])
 
     # configuring proxy on Notebook instance
     try:
@@ -108,7 +108,7 @@ def run():
         print '[CONFIGURE PROXY ON R_STUDIO INSTANCE]'
         additional_config = {"proxy_host": edge_instance_hostname, "proxy_port": "3128"}
         params = "--hostname {} --instance_name {} --keyfile {} --additional_config '{}' --os_user {}"\
-            .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config), os.environ['general_os_user'])
+            .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config), os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('configure_proxy', params))
         except:
@@ -125,7 +125,7 @@ def run():
     try:
         logging.info('[INSTALLING PREREQUISITES TO R_STUDIO NOTEBOOK INSTANCE]')
         print('[INSTALLING PREREQUISITES TO R_STUDIO NOTEBOOK INSTANCE]')
-        params = "--hostname {} --keyfile {} --user {}".format(instance_hostname, keyfile_name, os.environ['general_os_user'])
+        params = "--hostname {} --keyfile {} --user {}".format(instance_hostname, keyfile_name, os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
@@ -143,7 +143,7 @@ def run():
         logging.info('[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]')
         print '[CONFIGURE R_STUDIO NOTEBOOK INSTANCE]'
         params = "--hostname {}  --keyfile {} --region {} --rstudio_pass {} --os_user {}"\
-            .format(instance_hostname,  keyfile_name, os.environ['creds_region'], notebook_config['rstudio_pass'], os.environ['general_os_user'])
+            .format(instance_hostname,  keyfile_name, os.environ['aws_region'], notebook_config['rstudio_pass'], os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('configure_rstudio', params))
         except:
@@ -202,30 +202,30 @@ def run():
     print "SG name: " + notebook_config['security_group_name']
     print "Rstudio URL: " + rstudio_ip_url
     print "Rstudio URL: " + rstudio_dns_url
-    print "Rstudio user: " + os.environ['general_os_user']
+    print "Rstudio user: " + os.environ['conf_os_user']
     print "Rstudio pass: " + notebook_config['rstudio_pass']
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
-        'key_name'] + '.pem ' + os.environ['general_os_user'] + '@' + ip_address
+        'key_name'] + '.pem ' + os.environ['conf_os_user'] + '@' + ip_address
     print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ' + \
-          os.environ['general_os_user'] + '@' + dns_name
+          os.environ['conf_os_user'] + '@' + dns_name
 
     with open("/root/result.json", 'w') as result:
         res = {"hostname": dns_name,
                "ip": ip_address,
-               "master_keyname": os.environ['creds_key_name'],
+               "master_keyname": os.environ['conf_key_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",
                "exploratory_url": [
                    {"description": "Rstudio",
                     "url": rstudio_ip_url}],
-               "exploratory_user": os.environ['general_os_user'],
+               "exploratory_user": os.environ['conf_os_user'],
                "exploratory_pass": notebook_config['rstudio_pass']}
         result.write(json.dumps(res))
 
 
 # Main function for terminating exploratory environment
 def terminate():
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -271,7 +271,7 @@ def terminate():
 
 # Main function for stopping notebook server
 def stop():
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -285,13 +285,13 @@ def stop():
     notebook_config['notebook_name'] = os.environ['notebook_instance_name']
     notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
-    notebook_config['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
+    notebook_config['key_path'] = os.environ['conf_key_dir'] + '/' + os.environ['conf_key_name'] + '.pem'
 
     try:
         logging.info('[STOP NOTEBOOK]')
         print '[STOP NOTEBOOK]'
         params = "--bucket_name {} --tag_name {} --nb_tag_value {} --ssh_user {} --key_path {}" \
-                 .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], os.environ['general_os_user'], notebook_config['key_path'])
+                 .format(notebook_config['bucket_name'], notebook_config['tag_name'], notebook_config['notebook_name'], os.environ['conf_os_user'], notebook_config['key_path'])
         try:
             local("~/scripts/{}.py {}".format('stop_notebook', params))
         except:
@@ -318,7 +318,7 @@ def stop():
 
 # Main function for starting notebook server
 def start():
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -362,7 +362,7 @@ def start():
 
 # Main function for configuring notebook server after deploying EMR
 def configure():
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['notebook_user_name'], os.environ['request_id'])
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
@@ -378,7 +378,7 @@ def configure():
     notebook_config['bucket_name'] = (notebook_config['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     notebook_config['cluster_name'] = get_not_configured_emr(notebook_config['tag_name'], True)
     notebook_config['notebook_ip'] = get_instance_ip_address(notebook_config['notebook_name']).get('Private')
-    notebook_config['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
+    notebook_config['key_path'] = os.environ['conf_key_dir'] + '/' + os.environ['conf_key_name'] + '.pem'
     notebook_config['cluster_id'] = get_emr_id_by_name(notebook_config['cluster_name'])
 
     try:
@@ -386,9 +386,9 @@ def configure():
         print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
         params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {} --region {} --emr_excluded_spark_properties {} --edge_user_name {} --os_user {}"\
             .format(notebook_config['bucket_name'], notebook_config['cluster_name'], os.environ['emr_version'],
-                    notebook_config['key_path'], notebook_config['notebook_ip'], os.environ['creds_region'],
+                    notebook_config['key_path'], notebook_config['notebook_ip'], os.environ['aws_region'],
                     os.environ['emr_excluded_spark_properties'], os.environ['edge_user_name'],
-                    os.environ['general_os_user'])
+                    os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('install_emr_kernels', params))
             remove_emr_tag(notebook_config['cluster_id'], ['State'])
@@ -402,7 +402,7 @@ def configure():
         emr_id = get_emr_id_by_name(notebook_config['cluster_name'])
         terminate_emr(emr_id)
         remove_kernels(notebook_config['cluster_name'], notebook_config['tag_name'], os.environ['notebook_instance_name'],
-                       os.environ['general_os_user'], notebook_config['key_path'], os.environ['emr_version'])
+                       os.environ['conf_os_user'], notebook_config['key_path'], os.environ['emr_version'])
         sys.exit(1)
 
     try:

@@ -46,7 +46,7 @@ if __name__ == "__main__":
     except:
         reply['response']['result'] = {"error": "Failed to open result.json"}
 
-    if os.environ['general_resource'] == 'ssn':
+    if os.environ['conf_resource'] == 'ssn':
         reply['response']['log'] = "/response/{}.log".format(os.environ['request_id'])
 
         with open("/response/{}.json".format(os.environ['request_id']), 'w') as response_file:

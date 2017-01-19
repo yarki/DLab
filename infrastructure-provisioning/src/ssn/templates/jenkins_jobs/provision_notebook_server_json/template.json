@@ -1,11 +1,11 @@
 {
     "resource": "notebook",
-    "general_os_user":"GOS",
+    "conf_os_user":"GOS",
     "request_id":"RID",
     "conf_service_base_name":"SBN",
-    "creds_region":"CREG",
-    "creds_key_name":"CKN",
-    "notebook_instance_type":"NIT",
-    "notebook_user_name":"NUN",
-    "creds_security_groups_ids":"SGI"
+    "aws_region":"CREG",
+    "conf_key_name":"CKN",
+    "aws_notebook_instance_type":"NIT",
+    "edge_user_name":"NUN",
+    "aws_security_groups_ids":"SGI"
 }

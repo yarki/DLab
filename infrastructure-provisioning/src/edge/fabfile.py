@@ -68,14 +68,14 @@ def run():
     edge_conf = dict()
     # Base config
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
-    edge_conf['key_name'] = os.environ['creds_key_name']
+    edge_conf['key_name'] = os.environ['conf_key_name']
     edge_conf['user_keyname'] = os.environ['edge_user_name']
-    edge_conf['public_subnet_id'] = os.environ['creds_subnet_id']
-    edge_conf['vpc_id'] = os.environ['edge_vpc_id']
-    edge_conf['region'] = os.environ['creds_region']
-    edge_conf['ami_id'] = get_ami_id(os.environ['edge_ami_name'])
-    edge_conf['instance_size'] = os.environ['edge_instance_size']
-    edge_conf['sg_ids'] = os.environ['creds_security_groups_ids']
+    edge_conf['public_subnet_id'] = os.environ['aws_subnet_id']
+    edge_conf['vpc_id'] = os.environ['aws_vpc_id']
+    edge_conf['region'] = os.environ['aws_region']
+    edge_conf['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
+    edge_conf['instance_size'] = os.environ['aws_edge_instance_size']
+    edge_conf['sg_ids'] = os.environ['aws_security_groups_ids']
 
     # Edge config
     edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
@@ -385,7 +385,7 @@ def run():
     try:
         print '[INSTALLING PREREQUISITES]'
         logging.info('[INSTALLING PREREQUISITES]')
-        params = "--hostname {} --keyfile {} --user {}".format(instance_hostname, keyfile_name, os.environ['general_os_user'])
+        params = "--hostname {} --keyfile {} --user {}".format(instance_hostname, keyfile_name, os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
@@ -409,7 +409,7 @@ def run():
         additional_config = {"exploratory_subnet": edge_conf['private_subnet_cidr'],
                              "template_file": "/root/templates/squid.conf"}
         params = "--hostname {} --keyfile {} --additional_config '{}' --user {}" \
-                 .format(instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['general_os_user'])
+                 .format(instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('configure_http_proxy', params))
         except:
@@ -434,7 +434,7 @@ def run():
         additional_config = {"user_keyname": edge_conf['user_keyname'],
                              "user_keydir": "/root/keys/"}
         params = "--hostname {} --keyfile {} --additional_config '{}' --user {}".format(
-            instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['general_os_user'])
+            instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
