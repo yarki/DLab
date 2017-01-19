@@ -230,7 +230,9 @@ def run():
                "master_keyname": os.environ['creds_key_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",
-               "exploratory_url": jupyter_ip_url}
+               "exploratory_url": [
+                   {"description": "Jupyter",
+                    "url": jupyter_ip_url}]}
         result.write(json.dumps(res))
 
 

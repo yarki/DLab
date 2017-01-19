@@ -205,8 +205,8 @@ def run():
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')
     dns_name = get_instance_hostname(notebook_config['instance_name'])
-    zeppelin_ip_url = "http://" + ip_address + ":8080/" + notebook_config['instance_name'] + "/"
-    zeppelin_dns_url = "http://" + dns_name + ":8080/" + notebook_config['instance_name'] + "/"
+    zeppelin_ip_url = "http://" + ip_address + ":8080/"
+    zeppelin_dns_url = "http://" + dns_name + ":8080/"
     print '[SUMMARY]'
     logging.info('[SUMMARY]')
     print "Instance name: " + notebook_config['instance_name']
@@ -231,7 +231,9 @@ def run():
                "master_keyname": os.environ['creds_key_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",
-               "exploratory_url": zeppelin_ip_url}
+               "exploratory_url": [
+                   {"description": "Zeppelin",
+                    "url": zeppelin_ip_url}]}
         result.write(json.dumps(res))
 
 

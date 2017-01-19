@@ -215,7 +215,9 @@ def run():
                "master_keyname": os.environ['creds_key_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",
-               "exploratory_url": rstudio_ip_url,
+               "exploratory_url": [
+                   {"description": "Rstudio",
+                    "url": rstudio_ip_url}],
                "exploratory_user": os.environ['general_os_user'],
                "exploratory_pass": notebook_config['rstudio_pass']}
         result.write(json.dumps(res))
