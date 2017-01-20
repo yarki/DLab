@@ -26,8 +26,8 @@ ARG RESOURCE
 COPY tensor/ /root/
 COPY general/scripts/${CLOUD}/${RESOURCE}/* /root/scripts/
 COPY general/lib/os/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
-COPY general/templates/${OS}/tensorboard-python2.service /root/templates/tensorboard-python2.service
-COPY general/templates/${OS}/tensorboard-python3.service /root/templates/tensorboard-python3.service
+COPY general/templates/os/${OS}/tensorboard-python2.service /root/templates/tensorboard-python2.service
+COPY general/templates/os/${OS}/tensorboard-python3.service /root/templates/tensorboard-python3.service
 
 RUN chmod a+x /root/fabfile.py; \
     chmod a+x /root/scripts/*
