@@ -614,3 +614,33 @@ def emr_waiter(tag_name):
         emr_waiter(tag_name)
     else:
         return True
+
+
+def get_spark_version():
+    spark_version = ''
+    emr = boto3.client('emr')
+    clusters = emr.list_clusters(ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING'])
+    clusters = clusters.get('Clusters')
+    for i in clusters:
+        response = emr.describe_cluster(ClusterId=i.get('Id'))
+        if response.get("Cluster").get("Name") == args.cluster_name:
+            response =  response.get("Cluster").get("Applications")
+            for j in response:
+                if j.get("Name") == 'Spark':
+                    spark_version = j.get("Version")
+    return spark_version
+
+
+def get_hadoop_version():
+    hadoop_version = ''
+    emr = boto3.client('emr')
+    clusters = emr.list_clusters(ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING'])
+    clusters = clusters.get('Clusters')
+    for i in clusters:
+        response = emr.describe_cluster(ClusterId=i.get('Id'))
+        if response.get("Cluster").get("Name") == args.cluster_name:
+            response =  response.get("Cluster").get("Applications")
+            for j in response:
+                if j.get("Name") == 'Hadoop':
+                    hadoop_version = j.get("Version")
+    return hadoop_version[0:3]
