@@ -317,8 +317,9 @@ limitations under the License.
 }
 
 .modal-content .danger_color {
-  padding-left: 14px;
+  padding-left: 10px;
   font-size: 12px;
+  display: inline-block;
 }
 
 .modal-content .danger_field {

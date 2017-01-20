@@ -18,6 +18,13 @@
 
 package com.epam.dlab.backendapi.domain;
 
+import static com.epam.dlab.constants.ServiceConsts.PROVISIONING_SERVICE_NAME;
+
+import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
@@ -33,11 +40,11 @@ import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import javax.ws.rs.core.Response;
-
-import static com.epam.dlab.constants.ServiceConsts.PROVISIONING_SERVICE_NAME;
-
+/** Uploads the user key to EDGE notebook.
+ */
 public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
+	private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploader.class);
+	
     @Inject
     private KeyDAO keyDAO;
     @Inject
@@ -48,12 +55,14 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
     private RESTService provisioningService;
 
     @Override
-    public KeyLoadStatus checkKey(UserInfo userInfo) {
-        return keyDAO.findKeyStatus(userInfo);
+    public KeyLoadStatus checkKey(UserInfo userInfo) throws DlabException {
+    	LOGGER.trace("Find the status of the user key for {}", userInfo.getName());
+        return keyDAO.findKeyStatus(userInfo.getName());
     }
 
     @Override
-    public void startKeyUpload(UserInfo userInfo, String content) {
+    public void startKeyUpload(UserInfo userInfo, String content) throws DlabException {
+    	LOGGER.debug("The upload of the user key will be started for user {}", userInfo.getName());
         keyDAO.uploadKey(userInfo.getName(), content);
         try {
             EdgeCreateDTO edge = new EdgeCreateDTO()
@@ -68,22 +77,26 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
                     .withEdge(edge)
                     .withContent(content);
             Response response = provisioningService.post(KEY_LOADER, userInfo.getAccessToken(), dto, Response.class);
+        	LOGGER.debug("The upload of the user key for user {} response status {}", userInfo.getName(), response.getStatus());
+            
             if (Response.Status.ACCEPTED.getStatusCode() != response.getStatus()) {
                 keyDAO.deleteKey(userInfo.getName());
             }
         } catch (Exception e) {
+        	LOGGER.error("The upload of the user key for user {} fails", userInfo.getName(), e);
             keyDAO.deleteKey(userInfo.getName());
             throw new DlabException("Could not upload the key", e);
         }
     }
 
     @Override
-    public void onKeyUploadComplete(UploadFileResultDTO result) {
-        keyDAO.updateKey(result.getUser(), KeyLoadStatus.getStatus(result.isSuccess()));
-        if (result.isSuccess()) {
-            keyDAO.saveCredential(result.getUser(), result.getCredential());
+    public void onKeyUploadComplete(UploadFileResultDTO uploadKeyResult) throws DlabException {
+    	LOGGER.debug("The upload of the user key for user {} has been completed, status is ", uploadKeyResult.getUser(), uploadKeyResult.isSuccess());
+        keyDAO.updateKey(uploadKeyResult.getUser(), KeyLoadStatus.getStatus(uploadKeyResult.isSuccess()));
+        if (uploadKeyResult.isSuccess()) {
+            keyDAO.saveCredential(uploadKeyResult.getUser(), uploadKeyResult.getCredential());
         } else {
-            keyDAO.deleteKey(result.getUser());
+            keyDAO.deleteKey(uploadKeyResult.getUser());
         }
     }
 }
