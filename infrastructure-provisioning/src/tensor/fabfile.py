@@ -43,19 +43,13 @@ def run():
     try:
         local("~/scripts/{}.py".format('prepare_notebook'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed preparing Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed preparing Notebook node")
         sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('configure_tensor'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed configuring Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed configuring Notebook node")
         sys.exit(1)
 
 
