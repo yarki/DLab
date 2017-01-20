@@ -73,7 +73,7 @@ if __name__ == "__main__":
                                                    "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
                                                    "UserIdGroupPairs": [],
                                                    "PrefixListIds": []}]
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'],
+    local_log_filename = "{}_{}_{}.log".format(os.environ['conf_resource'], os.environ['edge_user_name'],
                                                os.environ['request_id'])
     local_log_filepath = "/logs/edge/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
