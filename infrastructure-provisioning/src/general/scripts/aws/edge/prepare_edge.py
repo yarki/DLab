@@ -41,7 +41,7 @@ if __name__ == "__main__":
     edge_conf['public_subnet_id'] = os.environ['aws_subnet_id']
     edge_conf['vpc_id'] = os.environ['aws_vpc_id']
     edge_conf['region'] = os.environ['aws_region']
-    if os.environ['conf_os_family'] == "ubuntu":
+    if os.environ['conf_os_family'] == "debian":
         edge_conf['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
     if os.environ['conf_os_family'] == "redhat":
         edge_conf['ami_id'] = get_ami_id(os.environ['aws_redhat_ami_name'])
