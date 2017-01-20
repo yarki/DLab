@@ -145,7 +145,7 @@ def configuring_notebook(args):
 def append_result(error):
     ts = time.time()
     st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-    with open('/root/result.json', 'a+') as f:
+    with open('/root/result.json', 'A') as f:
         text = f.read()
     if len(text) == 0:
         res = '{}'
