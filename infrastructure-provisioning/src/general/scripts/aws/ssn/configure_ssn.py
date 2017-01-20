@@ -89,7 +89,7 @@ if __name__ == "__main__":
                    json.dumps(additional_config), os.environ['conf_os_user'], os.environ['ssn_dlab_path'])
 
         try:
-            local("~/scripts/{}.py {}".format('configure_ssn', params))
+            local("~/scripts/{}.py {}".format('configure_ssn_node', params))
         except:
             append_result("Failed configuring ssn")
             raise Exception
