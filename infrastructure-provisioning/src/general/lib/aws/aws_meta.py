@@ -616,14 +616,14 @@ def emr_waiter(tag_name):
         return True
 
 
-def get_spark_version():
+def get_spark_version(cluster_name):
     spark_version = ''
     emr = boto3.client('emr')
     clusters = emr.list_clusters(ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING'])
     clusters = clusters.get('Clusters')
     for i in clusters:
         response = emr.describe_cluster(ClusterId=i.get('Id'))
-        if response.get("Cluster").get("Name") == args.cluster_name:
+        if response.get("Cluster").get("Name") == cluster_name:
             response =  response.get("Cluster").get("Applications")
             for j in response:
                 if j.get("Name") == 'Spark':
@@ -631,14 +631,14 @@ def get_spark_version():
     return spark_version
 
 
-def get_hadoop_version():
+def get_hadoop_version(cluster_name):
     hadoop_version = ''
     emr = boto3.client('emr')
     clusters = emr.list_clusters(ClusterStates=['RUNNING', 'WAITING', 'STARTING', 'BOOTSTRAPPING'])
     clusters = clusters.get('Clusters')
     for i in clusters:
         response = emr.describe_cluster(ClusterId=i.get('Id'))
-        if response.get("Cluster").get("Name") == args.cluster_name:
+        if response.get("Cluster").get("Name") == cluster_name:
             response =  response.get("Cluster").get("Applications")
             for j in response:
                 if j.get("Name") == 'Hadoop':
