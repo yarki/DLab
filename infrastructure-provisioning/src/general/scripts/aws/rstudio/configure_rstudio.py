@@ -125,7 +125,7 @@ if __name__ == "__main__":
             .format(instance_hostname, keyfile_name, os.environ['aws_region'], notebook_config['rstudio_pass'],
                     os.environ['conf_os_user'])
         try:
-            local("~/scripts/{}.py {}".format('configure_rstudio', params))
+            local("~/scripts/{}.py {}".format('configure_rstudio_node', params))
         except:
             append_result("Failed to configure rstudio")
             raise Exception
