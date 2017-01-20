@@ -241,7 +241,8 @@ if __name__ == "__main__":
         except Exception as err:
             append_result("Unable to create ssn instance: " + err)
             raise Exception
-    except:
+    except Exception as err:
+        append_result("E: " + err)
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:
