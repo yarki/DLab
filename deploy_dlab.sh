@@ -54,7 +54,7 @@ function deployDlab(){
 
   # Create SSN node and deploy DLab
   sudo docker run -i -v /root/BDCC-DSS-POC.pem:/root/keys/BDCC-DSS-POC.pem \
-    -v "$WORKSPACE"/web_app:/root/web_app -e "resource=ssn" -e "ssn_instance_size=t2.medium" \
+    -v "$WORKSPACE"/web_app:/root/web_app -e "resource=ssn" -e "aws_ssn_instance_size=t2.medium" \
         -e "aws_region=us-west-2" -e "aws_vpc_id=vpc-588a2c3d" -e "aws_subnet_id=subnet-1e6c9347" \
         -e "aws_security_groups_ids=sg-e338c89a" -e "conf_key_name=BDCC-DSS-POC" -e "conf_service_base_name=$Infrastructure_Tag" \
         -e "aws_access_key=$Access_Key_ID" -e "aws_secret_access_key=$Secret_Access_Key" \
