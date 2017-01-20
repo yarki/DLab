@@ -18,44 +18,39 @@
 #
 # ******************************************************************************
 
+
 import json
-import time
-from fabric.api import *
 from dlab.fab import *
 from dlab.aws_meta import *
+import sys, time, os
 from dlab.aws_actions import *
-import sys
-import os
-import uuid
-import logging
 
 
-def run():
+if __name__ == "__main__":
     local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
-    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
-    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
-                        level=logging.INFO,
-                        filename=local_log_filepath)
-    try:
-        local("~/scripts/{}.py".format('prepare_hadoop_cluster'))
-    except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed configuring Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-
-
-def terminate():
-    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
-    local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
+    local_log_filepath = "/logs/edge/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
+    create_aws_config_files()
+    print 'Collecting names and tags'
+    edge_conf = dict()
+    # Base config
+    edge_conf['service_base_name'] = os.environ['conf_service_base_name']
+    edge_conf['user_name'] = os.environ['edge_user_name']
+
     try:
-        local("~/scripts/{}.py".format('terminate_emr'))
+        logging.info('[COLLECT DATA]')
+        print '[COLLECTING DATA]'
+        params = "--service_base_name '{}' --user_name '{}'".format(edge_conf['service_base_name'], edge_conf['user_name'])
+        try:
+            local("~/scripts/{}.py {}".format('collect_data', params))
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to collect necessary information", "conf": edge_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+                raise Exception
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed configuring Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        sys.exit(1)

@@ -19,10 +19,12 @@
 FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
 ARG OS
+ARG CLOUD
+ARG RESOURCE
 
 COPY ssn/ /root/
+COPY general/scripts/${CLOUD}/${RESOURCE}/*
 COPY general/lib/os/${OS}/ssn_lib.py /usr/lib/python2.7/dlab/ssn_lib.py
-COPY general/templates/${OS}/supervisor_svc.conf /root/templates/supervisor_svc.conf
 
 RUN chmod a+x /root/fabfile.py; \
     chmod a+x /root/scripts/*

@@ -605,3 +605,12 @@ def check_security_group(security_group_name, count=0):
             result.write(json.dumps(res))
         traceback.print_exc(file=sys.stdout)
 
+
+def emr_waiter(tag_name):
+    if len(get_emr_list(tag_name, 'Value', False, True)) > 0 or os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name'] or get_not_configured_emr(tag_name)):
+        with hide('stderr', 'running', 'warnings'):
+            local("echo 'Some EMR cluster is still being created, waiting..'")
+        time.sleep(60)
+        emr_waiter(tag_name)
+    else:
+        return True

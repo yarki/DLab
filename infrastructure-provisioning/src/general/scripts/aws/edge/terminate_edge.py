@@ -18,26 +18,14 @@
 #
 # ******************************************************************************
 
+import json
+from dlab.fab import *
 from dlab.aws_meta import *
+import sys, time, os
 from dlab.aws_actions import *
-import boto3
-import argparse
-import sys
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--user_name', type=str)
-parser.add_argument('--tag_name', type=str)
-parser.add_argument('--tag_value', type=str)
-parser.add_argument('--nb_sg', type=str)
-parser.add_argument('--edge_sg', type=str)
-args = parser.parse_args()
 
 
-##############
-# Run script #
-##############
-
-if __name__ == "__main__":
+def terminate_edge_node(tag_name, user_name, tag_value, nb_sg, edge_sg):
     print 'Terminating EMR cluster'
     try:
         clusters_list = get_emr_list(args.tag_name)
@@ -91,3 +79,47 @@ if __name__ == "__main__":
         remove_subnets(args.tag_value)
     except:
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
+    local_log_filepath = "/logs/edge/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG,
+                        filename=local_log_filepath)
+
+    # generating variables dictionary
+    create_aws_config_files()
+    print 'Generating infrastructure names and tags'
+    edge_conf = dict()
+    edge_conf['service_base_name'] = os.environ['conf_service_base_name']
+    edge_conf['user_name'] = os.environ['edge_user_name']
+    edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
+    edge_conf['tag_value'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '*'
+    edge_conf['edge_sg'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
+    edge_conf['nb_sg'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb'
+
+    try:
+        logging.info('[TERMINATE EDGE]')
+        print '[TERMINATE EDGE]'
+        try:
+            terminate_edge_node(edge_conf['tag_name'], edge_conf['user_name'], edge_conf['tag_value'],
+                                edge_conf['nb_sg'], edge_conf['edge_sg'])
+        except:
+            with open("/root/result.json", 'w') as result:
+                res = {"error": "Failed to terminate edge", "conf": edge_conf}
+                print json.dumps(res)
+                result.write(json.dumps(res))
+    except:
+        sys.exit(1)
+
+    try:
+        with open("/root/result.json", 'w') as result:
+            res = {"service_base_name": edge_conf['service_base_name'],
+                   "user_name": edge_conf['user_name'],
+                   "Action": "Terminate edge node"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+    except:
+        print "Failed writing results."
+        sys.exit(0)
