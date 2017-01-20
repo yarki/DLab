@@ -58,10 +58,7 @@ if __name__ == "__main__":
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn'
         region = os.environ['aws_region']
-        if os.environ['conf_os_family'] == "ubuntu":
-            ssn_ami_name = os.environ['aws_debian_ami_name']
-        if os.environ['conf_os_family'] == "redhat":
-            ssn_ami_name = os.environ['aws_redhat_ami_name']
+        ssn_ami_name = os.environ['aws_' + os.environ['conf_os_family'] + '_ami_name']
         ssn_ami_id = get_ami_id(ssn_ami_name)
         policy_path = '/root/templates/policy.json'
         vpc_cidr = '172.31.0.0/16'
