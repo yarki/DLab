@@ -21,6 +21,7 @@
 import json
 import logging
 import os
+import sys
 from fabric.api import *
 
 
@@ -37,6 +38,7 @@ def run():
             res = {"error": "Failed preparing SSN node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('configure_ssn'))
@@ -45,6 +47,7 @@ def run():
             res = {"error": "Failed configuring SSN node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
 
 def terminate():
@@ -61,3 +64,4 @@ def terminate():
             res = {"error": "Failed terminating SSN node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)

@@ -46,6 +46,7 @@ def run():
             res = {"error": "Failed preparing Notebook node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('configure_jupyter'))
@@ -54,6 +55,7 @@ def run():
             res = {"error": "Failed configuring Notebook node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
 
 # Main function for terminating exploratory environment
@@ -70,6 +72,7 @@ def terminate():
             res = {"error": "Failed terminating Notebook node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
 
 # Main function for stopping notebook server
@@ -86,6 +89,7 @@ def stop():
             res = {"error": "Failed stopping Notebook node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
 
 # Main function for starting notebook server
@@ -103,6 +107,7 @@ def start():
             res = {"error": "Failed starting Notebook node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
 
 # Main function for configuring notebook server after deploying EMR
@@ -120,3 +125,4 @@ def configure():
             res = {"error": "Failed configuring analytical tool on Notebook node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)

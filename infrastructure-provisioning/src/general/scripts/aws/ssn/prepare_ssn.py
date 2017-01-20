@@ -32,6 +32,8 @@ if __name__ == "__main__":
                         level=logging.DEBUG,
                         filename=local_log_filepath)
     instance = 'ssn'
+    pre_defined_vpc = False
+    pre_defined_sg = False
     try:
         logging.info('[CREATE AWS CONFIG FILE]')
         print '[CREATE AWS CONFIG FILE]'
@@ -64,8 +66,6 @@ if __name__ == "__main__":
         policy_path = '/root/templates/policy.json'
         vpc_cidr = '172.31.0.0/16'
         sg_name = instance_name + '-SG'
-        pre_defined_vpc = False
-        pre_defined_sg = False
 
         if os.environ['aws_vpc_id'] == '' or os.environ['aws_vpc_id'] == 'PUT_YOUR_VALUE_HERE':
             try:

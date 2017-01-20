@@ -22,6 +22,7 @@
 import json
 from fabric.api import *
 import logging
+import sys
 import os
 
 
@@ -39,6 +40,7 @@ def status():
             res = {"error": "Failed preparing SSN node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
 
 def run():
@@ -56,6 +58,7 @@ def run():
             res = {"error": "Failed preparing Edge node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('configure_edge'))
@@ -64,6 +67,7 @@ def run():
             res = {"error": "Failed configuring Edge node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
 
 # Main function for terminating EDGE node and exploratory environment if exists
@@ -80,3 +84,4 @@ def terminate():
             res = {"error": "Failed terminating Edge node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)

@@ -43,6 +43,7 @@ def run():
             res = {"error": "Failed configuring Notebook node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
 
 
 def terminate():
@@ -59,3 +60,4 @@ def terminate():
             res = {"error": "Failed configuring Notebook node"}
             print json.dumps(res)
             result.write(json.dumps(res))
+        sys.exit(1)
