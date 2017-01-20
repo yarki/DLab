@@ -93,10 +93,7 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_instance', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to create instance", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to create instance")
+            raise Exception
     except:
         sys.exit(1)

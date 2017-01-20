@@ -92,10 +92,7 @@ def run():
         try:
             local("~/scripts/{}.py {}".format('create_instance', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to create instance", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Failed to create instance")
             raise Exception
     except:
         sys.exit(1)
@@ -116,10 +113,7 @@ def run():
         try:
             local("~/scripts/{}.py {}".format('configure_proxy', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to configure proxy", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Failed to configure proxy")
             raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
@@ -133,10 +127,7 @@ def run():
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing apps: apt & pip", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Failed installing apps: apt & pip")
             raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
@@ -151,10 +142,7 @@ def run():
         try:
             local("~/scripts/{}.py {}".format('configure_tensor', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to configure TensorFlow", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Failed to configure TensorFlow")
             raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
@@ -170,10 +158,7 @@ def run():
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing users key", "conf": params}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Failed installing users key")
             raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
@@ -296,10 +281,7 @@ def stop():
         try:
             local("~/scripts/{}.py {}".format('stop_notebook', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to stop notebook", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Failed to stop notebook")
             raise Exception
     except:
         sys.exit(1)
@@ -340,10 +322,7 @@ def start():
         try:
             local("~/scripts/{}.py {}".format('start_notebook', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to start notebook", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Failed to start notebook")
             raise Exception
     except:
         sys.exit(1)
@@ -393,11 +372,8 @@ def configure():
             local("~/scripts/{}.py {}".format('install_emr_kernels', params))
             remove_emr_tag(notebook_config['cluster_id'], ['State'])
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing EMR kernels", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed installing EMR kernels")
+            raise Exception
     except:
         emr_id = get_emr_id_by_name(notebook_config['cluster_name'])
         terminate_emr(emr_id)

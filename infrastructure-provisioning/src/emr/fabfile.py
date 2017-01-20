@@ -39,10 +39,7 @@ def run():
     try:
         local("~/scripts/{}.py".format('prepare_hadoop_cluster'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed configuring Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed configuring Notebook node")
         sys.exit(1)
 
 
@@ -56,8 +53,5 @@ def terminate():
     try:
         local("~/scripts/{}.py".format('terminate_emr'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed configuring Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed configuring Notebook node")
         sys.exit(1)

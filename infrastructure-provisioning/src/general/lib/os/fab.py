@@ -23,6 +23,7 @@ import os
 import random
 import sys
 import string
+import json, uuid, time, datetime
 
 
 def ensure_pip(requisites):
@@ -139,3 +140,21 @@ def spark_defaults(args):
 def configuring_notebook(args):
     jars_path = '/opt/' + args.emr_version + '/jars/'
     local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
+
+
+def append_result(error):
+    ts = time.time()
+    st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+    with open('/root/result.json') as f:
+        text = f.read()
+    if len(text) == 0:
+        res = '{}'
+        with open('/root/result.json', 'w') as f:
+            f.write(res)
+    with open("/root/result.json") as f:
+        res = {"[" + st + "]-" + str(uuid.uuid4())[:4] + " Error": error}
+        data = json.load(f)
+    data.update(res)
+    with open("/root/result.json", 'w') as f:
+        json.dump(data, f)
+    print data

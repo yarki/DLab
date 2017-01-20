@@ -61,11 +61,8 @@ if __name__ == "__main__":
             local("~/scripts/{}.py {}".format('install_emr_kernels', params))
             remove_emr_tag(notebook_config['cluster_id'], ['State'])
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing EMR kernels", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed installing EMR kernels")
+            raise Exception
     except:
         emr_id = get_emr_id_by_name(notebook_config['cluster_name'])
         terminate_emr(emr_id)

@@ -34,19 +34,13 @@ def run():
     try:
         local("~/scripts/{}.py".format('prepare_ssn'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed preparing SSN node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed preparing SSN node")
         sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('configure_ssn'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed configuring SSN node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed configuring SSN node")
         sys.exit(1)
 
 
@@ -60,8 +54,5 @@ def terminate():
     try:
         local("~/scripts/{}.py".format('terminate_ssn'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed terminating SSN node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed terminating SSN node")
         sys.exit(1)

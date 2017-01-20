@@ -64,11 +64,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing software: pip, apt", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed installing software: pip, apt")
+            raise Exception
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
@@ -94,11 +91,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_ssn', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed configuring ssn", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed configuring ssn")
+            raise Exception
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
@@ -130,11 +124,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_docker', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Unable to configure docker", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Unable to configure docker")
+            raise Exception
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
@@ -159,10 +150,7 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Unable to preconfigure ui", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Unable to preconfigure ui")
             raise Exception
     except:
         remove_ec2(tag_name, instance_name)
@@ -188,11 +176,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_ui', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Unable to upload UI", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Unable to upload UI")
+            raise Exception
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)

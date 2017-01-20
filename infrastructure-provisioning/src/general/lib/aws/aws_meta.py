@@ -47,10 +47,7 @@ def get_instance_hostname(instance_name):
             raise Exception("Unable to find instance hostname with instance name: " + instance_name)
     except Exception as err:
         logging.error("Error with finding instance hostname with instance name: " + instance_name + " : " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with finding instance hostname", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with finding instance hostname", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -67,10 +64,7 @@ def get_vpc_endpoints(vpc_id):
         return endpoints
     except Exception as err:
         logging.error("Error with getting VPC Endpoints: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting VPC Endpoints", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting VPC Endpoints", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -92,10 +86,7 @@ def get_route_tables(vpc, tags):
         return rts
     except Exception as err:
         logging.error("Error with getting Route tables: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting Route tables", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting Route tables", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -108,10 +99,7 @@ def get_bucket_by_name(bucket_name):
         return ''
     except Exception as err:
         logging.error("Error with getting bucket by name: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting bucket by name", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting bucket by name", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -131,10 +119,7 @@ def get_instance_ip_address(instance_name):
         return ips
     except Exception as err:
         logging.error("Error with getting bucket by name: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting bucket by name", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting bucket by name", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -145,11 +130,8 @@ def get_ami_id_by_name(ami_name, state="*"):
             return image.id
     except Exception as err:
         logging.error("Error with getting AMI ID by name: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting AMI ID by name",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting AMI ID by name",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
         return ''
     return ''
@@ -163,11 +145,8 @@ def get_security_group_by_name(security_group_name):
     except Exception as err:
         logging.error("Error with getting Security Group ID by name: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting Security Group ID by name",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting Security Group ID by name",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
         return ''
     return ''
@@ -185,11 +164,8 @@ def get_instance_attr(instance_id, attribute_name):
     except Exception as err:
         logging.error("Error with getting instance attribute: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting instance attribute",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting instance attribute",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -205,11 +181,8 @@ def get_instance_by_name(instance_name):
     except Exception as err:
         logging.error("Error with getting instance ID by name: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting instance ID by name",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting instance ID by name",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -223,11 +196,8 @@ def get_role_by_name(role_name):
     except Exception as err:
         logging.error("Error with getting role by name: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting role by name",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting role by name",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -249,11 +219,8 @@ def get_subnet_by_cidr(cidr, vpc_id=''):
     except Exception as err:
         logging.error("Error with getting Subnet ID by CIDR: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting Subnet ID by CIDR",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting Subnet ID by CIDR",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -283,11 +250,8 @@ def get_subnet_by_tag(tag, subnet_id=False, vpc_id=''):
     except Exception as err:
         logging.error("Error with getting Subnet CIDR block by tag: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting Subnet CIDR block by tag",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting Subnet CIDR block by tag",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -300,11 +264,8 @@ def get_vpc_by_cidr(cidr):
     except Exception as err:
         logging.error("Error with getting VPC ID by CIDR: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting VPC ID by CIDR",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting VPC ID by CIDR",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -317,11 +278,8 @@ def get_vpc_by_tag(tag_name, tag_value):
     except Exception as err:
         logging.error("Error with getting VPC ID by tag: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting VPC ID by tag",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting VPC ID by tag",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -341,11 +299,8 @@ def get_emr_info(id, key=''):
     except Exception as err:
         logging.error("Error with getting EMR information: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting EMR information",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting EMR information",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -376,11 +331,8 @@ def get_emr_list(tag_name, type='Key', emr_count=False, emr_active=False):
     except Exception as err:
         logging.error("Error with getting EMR list: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting EMR list",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting EMR list",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -404,11 +356,8 @@ def get_not_configured_emr(tag_name, return_name=False):
     except Exception as err:
         logging.error("Error with getting not configured EMR list: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting not configured EMR list",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting not configured EMR list",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -430,11 +379,8 @@ def get_emr_id_by_name(name):
     except Exception as err:
         logging.error("Error with getting EMR ID by name: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting EMR ID by name",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting EMR ID by name",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -453,11 +399,8 @@ def get_ec2_list(tag_name, value=''):
     except Exception as err:
         logging.error("Error with getting EC2 list: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting EC2 list",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting EC2 list",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -496,11 +439,8 @@ def provide_index(resource_type, tag_name, tag_value=''):
     except Exception as err:
         logging.error("Error with providing index: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with providing index",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with providing index",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -514,11 +454,8 @@ def get_route_table_by_tag(tag_name, tag_value):
     except Exception as err:
         logging.error("Error with getting Route table by tag: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with getting Route table by tag",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with getting Route table by tag",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -556,10 +493,7 @@ def get_ami_id(ami_name):
         return image_id
     except Exception as err:
         logging.error("Failed to find AMI: " + ami_name + " : " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to find AMI", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to find AMI", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -599,10 +533,7 @@ def check_security_group(security_group_name, count=0):
                 return security_group.id
     except Exception as err:
         logging.error("Error with checking Security group by name: " + security_group_name + " : " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Error with checking Security group by name", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Error with checking Security group by name", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 

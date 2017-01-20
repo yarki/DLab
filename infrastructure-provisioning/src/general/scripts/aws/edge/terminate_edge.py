@@ -106,10 +106,7 @@ if __name__ == "__main__":
             terminate_edge_node(edge_conf['tag_name'], edge_conf['user_name'], edge_conf['tag_value'],
                                 edge_conf['nb_sg'], edge_conf['edge_sg'])
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to terminate edge", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Failed to terminate edge")
     except:
         sys.exit(1)
 

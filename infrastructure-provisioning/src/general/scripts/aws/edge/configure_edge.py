@@ -92,11 +92,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing apps: apt & pip", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed installing apps: apt & pip")
+            raise Exception
     except:
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
@@ -116,11 +113,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_http_proxy', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing http proxy", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed installing http proxy")
+            raise Exception
     except:
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
@@ -141,11 +135,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing users key", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed installing users key")
+            raise Exception
     except:
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])

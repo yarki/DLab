@@ -76,11 +76,8 @@ if __name__ == "__main__":
             terminate_emr_cluster(emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['tag_name'],
                                   emr_conf['notebook_name'], os.environ['conf_os_user'], emr_conf['key_path'])
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to terminate EMR cluster", "conf": emr_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to terminate EMR cluster")
+            raise Exception
     except:
         sys.exit(1)
 

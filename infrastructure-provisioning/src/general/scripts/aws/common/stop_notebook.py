@@ -87,11 +87,8 @@ if __name__ == "__main__":
             stop_notebook(notebook_config['notebook_name'], notebook_config['bucket_name'], notebook_config['tag_name'],
                           os.environ['conf_os_user'], notebook_config['key_path'])
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to stop notebook", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to stop notebook")
+            raise Exception
     except:
         sys.exit(1)
 

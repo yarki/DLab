@@ -78,11 +78,8 @@ if __name__ == "__main__":
         try:
             terminate_nb(notebook_config['notebook_name'], notebook_config['bucket_name'], notebook_config['tag_name'])
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to terminate notebook", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to terminate notebook")
+            raise Exception
     except:
         sys.exit(1)
 

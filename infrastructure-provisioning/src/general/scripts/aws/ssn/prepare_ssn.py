@@ -39,10 +39,7 @@ if __name__ == "__main__":
         print '[CREATE AWS CONFIG FILE]'
         if not create_aws_config_files(generate_full_config=True):
             logging.info('Unable to create configuration')
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Unable to create configuration", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Unable to create configuration")
             sys.exit(1)
     except:
         sys.exit(1)
@@ -73,11 +70,8 @@ if __name__ == "__main__":
                 try:
                     local("~/scripts/{}.py {}".format('create_vpc', params))
                 except:
-                    with open("/root/result.json", 'w') as result:
-                        res = {"error": "Failed to create VPC"}
-                        print json.dumps(res)
-                        result.write(json.dumps(res))
-                        raise Exception
+                    append_result("Failed to create VPC")
+                    raise Exception
                 os.environ['aws_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
                 enable_vpc_dns(os.environ['aws_vpc_id'])
                 rt_id = create_rt(os.environ['aws_vpc_id'], tag_name, service_base_name)
@@ -93,11 +87,8 @@ if __name__ == "__main__":
                 try:
                     local("~/scripts/{}.py {}".format('create_subnet', params))
                 except:
-                    with open("/root/result.json", 'w') as result:
-                        res = {"error": "Failed to create Subnet"}
-                        print json.dumps(res)
-                        result.write(json.dumps(res))
-                        raise Exception
+                    append_result("Failed to create Subnet")
+                    raise Exception
                 with open('/tmp/ssn_subnet_id', 'r') as f:
                     os.environ['aws_subnet_id'] = f.read()
                 enable_auto_assign_ip(os.environ['aws_subnet_id'])
@@ -163,11 +154,8 @@ if __name__ == "__main__":
                 try:
                     local("~/scripts/{}.py {}".format('create_security_group', params))
                 except:
-                    with open("/root/result.json", 'w') as result:
-                        res = {"error": "Failed creating security group for SSN"}
-                        print json.dumps(res)
-                        result.write(json.dumps(res))
-                        raise Exception
+                    append_result("Failed creating security group for SSN")
+                    raise Exception
                 with open('/tmp/ssn_sg_id', 'r') as f:
                     os.environ['aws_security_groups_ids'] = f.read()
             except:
@@ -184,11 +172,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_role_policy', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Unable to create roles", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Unable to create roles")
+            raise Exception
     except:
         if pre_defined_sg:
             remove_sgroups(tag_name)
@@ -207,11 +192,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_endpoint', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Unable to create an endpoint", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Unable to create an endpoint")
+            raise Exception
     except:
         remove_all_iam_resources(instance)
         if pre_defined_sg:
@@ -232,11 +214,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_bucket', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Unable to create bucket", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Unable to create bucket")
+            raise Exception
     except:
         remove_all_iam_resources(instance)
         if pre_defined_sg:
@@ -260,11 +239,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_instance', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Unable to create ssn instance", "conf": os.environ.__dict__}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Unable to create ssn instance")
+            raise Exception
     except:
         remove_all_iam_resources(instance)
         remove_s3(instance)

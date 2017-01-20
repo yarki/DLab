@@ -91,11 +91,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_subnet', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to create subnet", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to create subnet")
+            raise Exception
     except:
         sys.exit(1)
 
@@ -112,11 +109,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_role_policy', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to creating roles", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to creating roles")
+            raise Exception
     except:
         sys.exit(1)
 
@@ -129,11 +123,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_role_policy', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to creating roles", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to creating roles")
+            raise Exception
     except:
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         sys.exit(1)
@@ -228,11 +219,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_security_group', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed creating security group for edge node", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed creating security group for edge node")
+            raise Exception
 
         with hide('stderr', 'running', 'warnings'):
             print 'Waiting for changes to propagate'
@@ -266,11 +254,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_security_group', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed creating security group for private subnet", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed creating security group for private subnet")
+            raise Exception
 
         with hide('stderr', 'running', 'warnings'):
             print 'Waiting for changes to propagate'
@@ -291,11 +276,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_bucket', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to create bucket", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to create bucket")
+            raise Exception
     except:
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
@@ -311,10 +293,7 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_policy', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to create bucket policy", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result("Failed to create bucket policy")
     except:
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
@@ -334,10 +313,7 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_instance', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to create instance", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+                append_result("Failed to create instance")
                 raise Exception
 
     except:

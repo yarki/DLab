@@ -47,10 +47,7 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('collect_data', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to collect necessary information", "conf": edge_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to collect necessary information")
+            raise Exception
     except:
         sys.exit(1)

@@ -55,11 +55,8 @@ if __name__ == "__main__":
             print "Starting notebook"
             start_ec2(notebook_config['tag_name'], notebook_config['notebook_name'])
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to start notebook", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to start notebook")
+            raise Exception
     except:
         sys.exit(1)
 

@@ -38,10 +38,7 @@ def put_to_bucket(bucket_name, local_file, destination_file):
         return True
     except Exception as err:
         logging.info("Unable to upload files to S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to upload files to S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to upload files to S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
         return False
 
@@ -57,10 +54,7 @@ def create_s3_bucket(bucket_name, tag, region):
         return bucket.name
     except Exception as err:
         logging.info("Unable to create S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to create S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -72,10 +66,7 @@ def create_vpc(vpc_cidr, tag):
         return vpc.id
     except Exception as err:
         logging.info("Unable to create VPC: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create VPC", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to create VPC", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -86,10 +77,7 @@ def enable_vpc_dns(vpc_id):
                                     EnableDnsHostnames={'Value': True})
     except Exception as err:
         logging.info("Unable to modify VPC attributes: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to modify VPC attributes", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to modify VPC attributes", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -100,10 +88,7 @@ def remove_vpc(vpc_id):
         print "VPC " + vpc_id + " has been removed"
     except Exception as err:
         logging.info("Unable to remove VPC: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove VPC", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove VPC", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -118,10 +103,7 @@ def create_tag(resource, tag):
         )
     except Exception as err:
         logging.info("Unable to create Tag: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create Tag", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to create Tag", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -131,10 +113,7 @@ def remove_emr_tag(emr_id, tag):
         emr.remove_tags(ResourceId=emr_id, TagKeys=tag)
     except Exception as err:
         logging.info("Unable to remove Tag: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove Tag", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove Tag", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -158,10 +137,7 @@ def create_rt(vpc_id, infra_tag_name, infra_tag_value):
         return rt_id
     except Exception as err:
         logging.info("Unable to create Route Table: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create Route Table", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to create Route Table", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -174,10 +150,7 @@ def create_subnet(vpc_id, subnet, tag):
         return subnet.id
     except Exception as err:
         logging.info("Unable to create Subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create Subnet", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to create Subnet", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -203,11 +176,8 @@ def enable_auto_assign_ip(subnet_id):
         client.modify_subnet_attribute(MapPublicIpOnLaunch={'Value': True}, SubnetId=subnet_id)
     except Exception as err:
         logging.info("Unable to create Subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create Subnet",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to create Subnet",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -259,10 +229,7 @@ def create_instance(definitions, instance_tag):
         return ''
     except Exception as err:
         logging.info("Unable to create EC2: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to create EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -278,10 +245,7 @@ def create_iam_role(role_name, role_profile):
             print "Instance profile already exists. Reusing..."
         else:
             logging.info("Unable to create Instance Profile: " + str(e_role.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Unable to create Instance Profile", "error_message": str(e_role.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-                print json.dumps(res)
-                result.write(json.dumps(res))
+            append_result(str({"error": "Unable to create Instance Profile", "error_message": str(e_role.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
             traceback.print_exc(file=sys.stdout)
             return
     try:
@@ -289,10 +253,7 @@ def create_iam_role(role_name, role_profile):
         time.sleep(30)
     except botocore.exceptions.ClientError as err:
         logging.info("Unable to create IAM role: " + str(err.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to create IAM role", "error_message": str(err.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to create IAM role", "error_message": str(err.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -303,10 +264,7 @@ def attach_policy(policy_arn, role_name):
         time.sleep(30)
     except botocore.exceptions.ClientError as err:
         logging.info("Unable to attach Policy: " + str(err.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to attach Policy", "error_message": str(err.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to attach Policy", "error_message": str(err.response['Error']['Message']) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -318,10 +276,7 @@ def create_attach_policy(policy_name, role_name, file_path):
         conn.put_role_policy(RoleName=role_name, PolicyName=policy_name, PolicyDocument=json_file)
     except Exception as err:
         logging.info("Unable to attach Policy: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to attach Policy", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to attach Policy", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -343,10 +298,7 @@ def remove_ec2(tag_name, tag_value):
             print "There are no instances with '" + tag_name + "' tag to terminate"
     except Exception as err:
         logging.info("Unable to remove EC2: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -368,10 +320,7 @@ def stop_ec2(tag_name, tag_value):
             print "There are no instances with " + tag_value + " name to stop"
     except Exception as err:
         logging.info("Unable to stop EC2: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to stop EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to stop EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -393,10 +342,7 @@ def start_ec2(tag_name, tag_value):
             print "There are no instances with " + tag_value + " name to start"
     except Exception as err:
         logging.info("Unable to start EC2: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to start EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to start EC2", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -413,11 +359,8 @@ def remove_detach_iam_policies(role_name, action=''):
                 print "The IAM policy " + policy_arn + " has been deleted successfully"
     except Exception as err:
         logging.info("Unable to remove/detach IAM policy: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove/detach IAM policy",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove/detach IAM policy",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -430,11 +373,8 @@ def remove_roles_and_profiles(role_name, role_profile_name):
         print "The IAM role " + role_name + " and instance profile " + role_profile_name + " have been deleted successfully"
     except Exception as err:
         logging.info("Unable to remove IAM role/profile: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove IAM role/profile",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove IAM role/profile",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -539,10 +479,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
             print "There are no instance profiles to delete"
     except Exception as err:
         logging.info("Unable to remove some of the IAM resources: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove some of the IAM resources", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove some of the IAM resources", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -561,10 +498,7 @@ def s3_cleanup(bucket, cluster_name, user_name):
             s3_res.Object(resource.name, i.key).delete()
     except Exception as err:
         logging.info("Unable to clean S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to clean S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to clean S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -602,10 +536,7 @@ def remove_s3(bucket_type='all', scientist=''):
                 print "There are no buckets to delete"
     except Exception as err:
         logging.info("Unable to remove S3 bucket: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove S3 bucket", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -624,10 +555,7 @@ def remove_subnets(tag_value):
             print "There are no private subnets to delete"
     except Exception as err:
         logging.info("Unable to remove subnet: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove subnet", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove subnet", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -646,10 +574,7 @@ def remove_sgroups(tag_value):
             print "There are no security groups to delete"
     except Exception as err:
         logging.info("Unable to remove SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -668,10 +593,7 @@ def deregister_image(scientist):
             print "There is no notebook ami to deregister"
     except Exception as err:
         logging.info("Unable to de-register image: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to de-register image", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to de-register image", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -685,10 +607,7 @@ def terminate_emr(id):
         waiter.wait(ClusterId=id)
     except Exception as err:
         logging.info("Unable to remove EMR: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove EMR", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove EMR", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -722,10 +641,7 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
             print "There are no notebooks to clean kernels."
     except Exception as err:
         logging.info("Unable to remove kernels on Notebook: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove kernels on Notebook", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove kernels on Notebook", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -748,11 +664,8 @@ def remove_route_tables(tag_name, ssn=False):
     except Exception as err:
         logging.info("Unable to remove route table: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove route table",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove route table",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -773,11 +686,8 @@ def remove_internet_gateways(vpc_id, tag_name, tag_value):
     except Exception as err:
         logging.info("Unable to remove internet gateway: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove internet gateway",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove internet gateway",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
@@ -791,11 +701,8 @@ def remove_vpc_endpoints(vpc_id):
     except Exception as err:
         logging.info("Unable to remove VPC Endpoint: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Unable to remove VPC Endpoint",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result(str({"error": "Unable to remove VPC Endpoint",
+                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 

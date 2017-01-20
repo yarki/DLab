@@ -42,19 +42,13 @@ def run():
     try:
         local("~/scripts/{}.py".format('prepare_notebook'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed preparing Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed preparing Notebook node")
         sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('configure_jupyter'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed configuring Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed configuring Notebook node")
         sys.exit(1)
 
 
@@ -68,10 +62,7 @@ def terminate():
     try:
         local("~/scripts/{}.py".format('terminate_notebook'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed terminating Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed terminating Notebook node")
         sys.exit(1)
 
 
@@ -85,10 +76,7 @@ def stop():
     try:
         local("~/scripts/{}.py".format('stop_notebook'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed stopping Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed stopping Notebook node")
         sys.exit(1)
 
 
@@ -103,10 +91,7 @@ def start():
     try:
         local("~/scripts/{}.py".format('start_notebook'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed starting Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed starting Notebook node")
         sys.exit(1)
 
 
@@ -121,8 +106,5 @@ def configure():
     try:
         local("~/scripts/{}.py".format('configure_analytic_tool'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed configuring analytical tool on Notebook node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed configuring analytical tool on Notebook node")
         sys.exit(1)

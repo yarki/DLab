@@ -36,10 +36,7 @@ def status():
     try:
         local("~/scripts/{}.py".format('status_edge'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed preparing SSN node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed preparing SSN node")
         sys.exit(1)
 
 
@@ -54,19 +51,13 @@ def run():
     try:
         local("~/scripts/{}.py".format('prepare_edge'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed preparing Edge node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed preparing Edge node")
         sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('configure_edge'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed configuring Edge node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed configuring Edge node")
         sys.exit(1)
 
 
@@ -80,8 +71,5 @@ def terminate():
     try:
         local("~/scripts/{}.py".format('terminate_edge'))
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "Failed terminating Edge node"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("Failed terminating Edge node")
         sys.exit(1)

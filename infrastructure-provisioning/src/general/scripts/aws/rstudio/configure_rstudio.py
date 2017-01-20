@@ -96,11 +96,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_proxy', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to configure proxy", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to configure proxy")
+            raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -114,11 +111,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing apps: apt & pip", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed installing apps: apt & pip")
+            raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -133,11 +127,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_rstudio', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to configure rstudio", "conf": notebook_config}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to configure rstudio")
+            raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
@@ -152,11 +143,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed installing users key", "conf": params}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed installing users key")
+            raise Exception
     except:
         sys.exit(1)
 

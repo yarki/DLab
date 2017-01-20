@@ -186,10 +186,7 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path, os_user):
                 sudo('mv /tmp/yml_tmp/* ' + os.environ['ssn_dlab_path'] + 'conf/')
                 sudo('rmdir /tmp/yml_tmp/')
             except:
-                with open("/root/result.json", 'w') as result:
-                    res = {"error": "Unable to upload webapp jars", "conf": os.environ.__dict__}
-                    print json.dumps(res)
-                    result.write(json.dumps(res))
+                append_result("Unable to upload webapp jars")
                 sys.exit(1)
 
             sudo('service supervisor start')

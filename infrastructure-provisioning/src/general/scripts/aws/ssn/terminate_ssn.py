@@ -47,11 +47,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('terminate_aws_resources', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to terminate ssn", "conf": ssn_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to terminate ssn")
+            raise Exception
     except:
         sys.exit(1)
 

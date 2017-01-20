@@ -97,10 +97,7 @@ if __name__ == "__main__":
         emr_waiter(os.environ['notebook_instance_name'])
         local('touch /response/.emr_creating_' + os.environ['exploratory_name'])
     except:
-        with open("/root/result.json", 'w') as result:
-            res = {"error": "EMR waiter fail", "conf": emr_conf}
-            print json.dumps(res)
-            result.write(json.dumps(res))
+        append_result("EMR waiter fail")
         sys.exit(1)
 
     with hide('stderr', 'running', 'warnings'):
@@ -119,11 +116,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_cluster', params))
         except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to create EMR Cluster", "conf": emr_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+            append_result("Failed to create EMR Cluster")
+            raise Exception
 
         cluster_name = emr_conf['cluster_name']
         keyfile_name = "/root/keys/{}.pem".format(emr_conf['key_name'])
