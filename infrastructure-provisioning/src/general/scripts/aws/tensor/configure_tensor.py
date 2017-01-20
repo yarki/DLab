@@ -108,7 +108,7 @@ if __name__ == "__main__":
         params = "--hostname {} --keyfile {} --region {} --os_user {}" \
                  .format(instance_hostname, keyfile_name, os.environ['aws_region'], os.environ['conf_os_user'])
         try:
-            local("~/scripts/{}.py {}".format('configure_tensor', params))
+            local("~/scripts/{}.py {}".format('configure_tensor_node', params))
         except:
             append_result("Failed to configure TensorFlow")
             raise Exception
