@@ -70,19 +70,24 @@ export class ExploratoryEnvironmentCreateDialog {
     });
   }
 
+  shapePlaceholder(resourceShapes, byField: string): string {
+    for (var index in resourceShapes) return resourceShapes[index][0][byField];
+  }
+
   setDefaultParams(): void {
-    this.environment_shape = this.model.selectedItem.shapes.Memory_optimized[0].type;
+    this.environment_shape = this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'type');
+
     this.templates_list.setDefaultOptions(this.model.exploratoryEnvironmentTemplates,
       this.model.selectedItem.template_name, 'template', 'template_name', 'array');
-    this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-      this.model.selectedItem.shapes.Memory_optimized[0].description, 'shape', 'description', 'json');
+    this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
+      this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'shape', 'description', 'json');
   }
 
   onUpdate($event): void {
     if($event.model.type === 'template') {
       this.model.setSelectedTemplate($event.model.index);
-      this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes,
-        this.model.selectedItem.shapes.Memory_optimized[0].description, 'shape', 'description', 'json');
+      this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
+        this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'shape', 'description', 'json');
     }
 
     if($event.model.type === 'shape')

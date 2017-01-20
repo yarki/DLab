@@ -27,6 +27,7 @@ export class ResourcesGridRowModel {
               public ip: string,
               public username: string,
               public password: string,
-              public bucket_name: string
+              public bucket_name: string,
+              public error_message: string
             ) { }
 }

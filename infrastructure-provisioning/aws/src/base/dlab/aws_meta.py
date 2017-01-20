@@ -26,6 +26,7 @@ import sys
 import random
 import string
 
+
 def get_instance_hostname(instance_name):
     try:
         public = ''
@@ -578,3 +579,13 @@ def check_security_group(security_group_name, count=0):
 
 def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+def get_instance_status(instance_name):
+    client = boto3.client('ec2')
+    response = client.describe_instances(Filters=[
+        {'Name': 'tag:Name', 'Values': [instance_name]}]).get('Reservations')
+    for i in response:
+        inst = i.get('Instances')
+        for j in inst:
+            return j.get('State').get('Name')

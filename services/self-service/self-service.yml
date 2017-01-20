@@ -2,6 +2,10 @@
 
 mocked: false
 
+# Minimum and maximum number of slave EMR instances than could be created
+minEmrInstanceCount: 2
+maxEmrInstanceCount: 14
+
 server:
   requestLog:
     appenders:

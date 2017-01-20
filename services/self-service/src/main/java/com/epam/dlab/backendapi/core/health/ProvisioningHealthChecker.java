@@ -25,11 +25,16 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 
+/** Health checker for provisioning service.
+ */
 public class ProvisioningHealthChecker implements HealthChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningHealthChecker.class);
 
     private RESTService provisioningService;
 
+    /** Creates checker instance for provisioning service.
+     * @param provisioningService provisioning service.
+     */
     public ProvisioningHealthChecker(RESTService provisioningService) {
         this.provisioningService = provisioningService;
     }
