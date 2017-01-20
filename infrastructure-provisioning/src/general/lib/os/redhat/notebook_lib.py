@@ -209,3 +209,41 @@ def ensure_libraries_py(os_user):
             sudo('touch /home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed')
         except:
             sys.exit(1)
+
+
+def install_rstudio(os_user, local_spark_path, rstudio_pass):
+    if not exists('/home/' + os_user + '/.ensure_dir/rstudio_ensured'):
+        try:
+            sudo('yum install -y java-1.8.0-openjdk-devel')
+            sudo('yum install -y java-1.8.0-openjdk')
+            sudo('yum install -y cmake')
+            sudo('yum -y install libcur*')
+            sudo('echo -e "[base]\nname=CentOS-7-Base\nbaseurl=http://buildlogs.centos.org/centos/7/os/x86_64-20140704-1/\ngpgcheck=1\ngpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7\npriority=1\nexclude=php mysql" >> /etc/yum.repos.d/CentOS-base.repo')
+            sudo('yum install -y R R-core R-core-devel R-devel --nogpgcheck')
+            sudo('yum install -y --nogpgcheck https://download2.rstudio.org/rstudio-server-rhel-1.0.136-x86_64.rpm')
+
+            sudo('R CMD javareconf')
+            sudo('R -e \'install.packages("rmarkdown", repos = "https://cran.revolutionanalytics.com")\'')
+            sudo('R -e \'install.packages("base64enc", repos = "https://cran.revolutionanalytics.com")\'')
+            sudo('R -e \'install.packages("tibble", repos = "https://cran.revolutionanalytics.com")\'')
+            sudo('mkdir /mnt/var')
+            sudo('chown ' + os_user + ':' + os_user + ' /mnt/var')
+            sudo('touch /home/' + os_user + '/.Renviron')
+            sudo('chown ' + os_user + ':' + os_user + ' /home/' + os_user + '/.Renviron')
+            sudo('''echo 'SPARK_HOME="''' + local_spark_path + '''"' >> /home/''' + os_user + '''/.Renviron''')
+            sudo('touch /home/' + os_user + '/.Rprofile')
+            sudo('chown ' + os_user + ':' + os_user + ' /home/' + os_user + '/.Rprofile')
+            sudo('''echo 'library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))' >> /home/''' + os_user + '''/.Rprofile''')
+            sudo('rstudio-server start')
+            sudo('echo "' + os_user + ':' + rstudio_pass + '" | chpasswd')
+            sudo("sed -i '/exit 0/d' /etc/rc.local")
+            sudo('''bash -c "echo \'sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/''' + os_user + '''/.Renviron\' >> /etc/rc.local"''')
+            sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
+            sudo('touch /home/' + os_user + '/.ensure_dir/rstudio_ensured')
+        except:
+            sys.exit(1)
+    else:
+        try:
+            sudo('echo "' + os_user + ':' + rstudio_pass + '" | chpasswd')
+        except:
+            sys.exit(1)
