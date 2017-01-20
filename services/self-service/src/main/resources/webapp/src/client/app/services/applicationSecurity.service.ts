@@ -18,7 +18,8 @@ limitations under the License.
 
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 import { ApplicationServiceFacade } from './applicationServiceFacade.service';
 import { AppRoutingService } from '../routing/appRouting.service';
 import { LoginModel } from '../login/loginModel';
