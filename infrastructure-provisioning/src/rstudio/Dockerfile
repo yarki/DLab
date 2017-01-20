@@ -25,7 +25,7 @@ ARG RESOURCE
 
 
 COPY rstudio/ /root/
-COPY general/scripts/${CLOUD}/${RESOURCE}/*
+COPY general/scripts/${CLOUD}/${RESOURCE}/* /root/scripts/
 COPY general/lib/os/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
 COPY general/templates/os/${OS}/jupyter-notebook.service /root/templates/jupyter-notebook.service
 

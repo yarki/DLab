@@ -23,7 +23,7 @@ ARG CLOUD
 ARG RESOURCE
 
 COPY emr/ /root/
-COPY general/scripts/${CLOUD}/${RESOURCE}/*
+COPY general/scripts/${CLOUD}/${RESOURCE}/* /root/scripts/
 RUN chmod a+x /root/fabfile.py; \
     chmod a+x /root/scripts/*
 
