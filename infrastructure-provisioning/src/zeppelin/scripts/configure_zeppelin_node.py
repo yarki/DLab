@@ -90,6 +90,7 @@ def configure_notebook_server(notebook_name):
             sudo("systemctl daemon-reload")
             sudo("systemctl enable zeppelin-notebook")
             sudo("systemctl start zeppelin-notebook")
+            sudo('echo \"d /var/run/zeppelin  0755 ' + args.os_user + '\" > /usr/lib/tmpfiles.d/zeppelin.conf')
             sudo('touch /home/' + args.os_user + '/.ensure_dir/zeppelin_ensured')
         except:
             sys.exit(1)
