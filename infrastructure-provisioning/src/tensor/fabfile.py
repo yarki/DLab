@@ -40,6 +40,25 @@ def run():
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
+    try:
+        local("~/scripts/{}.py".format('prepare_notebook'))
+    except:
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed preparing Notebook node"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+    try:
+        local("~/scripts/{}.py".format('configure_jupyter'))
+    except:
+        with open("/root/result.json", 'w') as result:
+            res = {"error": "Failed configuring Notebook node"}
+            print json.dumps(res)
+            result.write(json.dumps(res))
+        sys.exit(1)
+
+
     # generating variables dictionary
     create_aws_config_files()
     print 'Generating infrastructure names and tags'
@@ -70,7 +89,7 @@ def run():
         print 'Preconfigured image found. Using: ' + ami_id
         notebook_config['ami_id'] = ami_id
     else:
-        if os.environ['conf_os_family'] == "ubuntu":
+        if os.environ['conf_os_family'] == "debian":
             notebook_config['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
         if os.environ['conf_os_family'] == "redhat":
             notebook_config['ami_id'] = get_ami_id(os.environ['aws_redhat_ami_name'])
