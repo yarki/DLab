@@ -27,6 +27,7 @@ from fabric.api import *
 from fabric.contrib.files import exists
 import logging
 from dlab.aws_meta import *
+from dlab.fab import *
 import traceback
 
 

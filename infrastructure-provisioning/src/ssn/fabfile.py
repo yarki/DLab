@@ -23,6 +23,7 @@ import logging
 import os
 import sys
 from fabric.api import *
+from dlab.fab import *
 
 
 def run():
