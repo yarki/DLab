@@ -62,8 +62,7 @@ public class TestServices {
     	testDLabScenario();
     }
     
-    //@Test
-    public void testJenkinsJob() throws Exception {
+    private void testJenkinsJob() throws Exception {
 
         /* System.out.println("1. Jenkins Job will be started ...");
        
@@ -99,8 +98,7 @@ public class TestServices {
         System.out.println("Amazon instance state is running");
     }
     
-    //@Test
-    public void testLogin() throws Exception {
+    private void testLogin() throws Exception {
     	
     	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
         
@@ -140,8 +138,7 @@ public class TestServices {
         Assert.assertEquals(responseLogout.statusCode(), HttpStatusCode.Unauthorized/*Replace to HttpStatusCode.OK when EPMCBDCCSS-938 will be fixed and merged*/);
     }
 
-    //@Test
-    public void testDLabScenario() throws Exception {
+    private void testDLabScenario() throws Exception {
 
     	//ssnURL = "http://ec2-35-164-76-52.us-west-2.compute.amazonaws.com";
         //serviceBaseName = "autotest_jan11";
