@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     @JsonProperty("conf_service_base_name")
     private String serviceBaseName;
-    @JsonProperty("creds_region")
+    @JsonProperty("aws_region")
     private String region;
     @JsonProperty("exploratory_name")
     private String exploratoryName;

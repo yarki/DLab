@@ -19,8 +19,11 @@
 FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
 ARG OS
+ARG CLOUD
+ARG RESOURCE
 
 COPY emr/ /root/
+COPY general/scripts/${CLOUD}/${RESOURCE}/* /root/scripts/
 RUN chmod a+x /root/fabfile.py; \
     chmod a+x /root/scripts/*
 

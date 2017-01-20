@@ -27,12 +27,12 @@ import string
 
 def ensure_pip(requisites):
     try:
-        if not exists('/home/{}/.ensure_dir/pip_path_added'.format(os.environ['general_os_user'])):
+        if not exists('/home/{}/.ensure_dir/pip_path_added'.format(os.environ['conf_os_user'])):
             sudo('echo PATH=$PATH:/usr/local/bin/:/opt/spark/bin/ >> /etc/profile')
             sudo('echo export PATH >> /etc/profile')
             sudo('pip install -U pip --no-cache-dir')
             sudo('pip install -U ' + requisites + ' --no-cache-dir')
-            sudo('touch /home/{}/.ensure_dir/pip_path_added'.format(os.environ['general_os_user']))
+            sudo('touch /home/{}/.ensure_dir/pip_path_added'.format(os.environ['conf_os_user']))
         return True
     except:
         return False
@@ -46,13 +46,13 @@ def create_aws_config_files(generate_full_config=False):
 
         with open(aws_user_dir + '/config', 'w') as aws_file:
             aws_file.write("[default]\n")
-            aws_file.write("region = {}\n".format(os.environ['creds_region']))
+            aws_file.write("region = {}\n".format(os.environ['aws_region']))
 
         if generate_full_config:
             with open(aws_user_dir + '/credentials', 'w') as aws_file:
                 aws_file.write("[default]\n")
-                aws_file.write("aws_access_key_id = {}\n".format(os.environ['creds_access_key']))
-                aws_file.write("aws_secret_access_key = {}\n".format(os.environ['creds_secret_access_key']))
+                aws_file.write("aws_access_key_id = {}\n".format(os.environ['aws_access_key']))
+                aws_file.write("aws_secret_access_key = {}\n".format(os.environ['aws_secret_access_key']))
 
         logging.info(local("chmod 600 " + aws_user_dir + "/*"+" 2>&1", capture=True))
         logging.info(local("chmod 550 " + aws_user_dir+" 2>&1", capture=True))

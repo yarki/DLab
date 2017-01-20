@@ -238,3 +238,43 @@ def install_rstudio(os_user, local_spark_path, rstudio_pass):
             sudo('echo "' + os_user + ':' + rstudio_pass + '" | chpasswd')
         except:
             sys.exit(1)
+
+
+def install_tensor(os_user, templates_dir, tensorflow_version):
+    if not exists('/home/' + os_user + '/.ensure_dir/tensor_ensured'):
+        try:
+            # install cuda
+            sudo('curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_8.0.44-1_amd64.deb')
+            sudo('dpkg -i cuda-repo-ubuntu1604_8.0.44-1_amd64.deb')
+            sudo('apt-get update')
+            sudo('apt-get -y install cuda')
+            sudo('mv /usr/local/cuda-8.0 /opt/')
+            sudo('ln -s /opt/cuda-8.0 /usr/local/cuda-8.0')
+            # install cuDNN
+            put(templates_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
+            run('tar xvzf /tmp/cudnn-8.0-linux-x64-v5.1.tgz -C /tmp')
+            sudo('mkdir -p /opt/cudnn/include')
+            sudo('mkdir -p /opt/cudnn/lib64')
+            sudo('mv /tmp/cuda/include/cudnn.h /opt/cudnn/include')
+            sudo('mv /tmp/cuda/lib64/libcudnn* /opt/cudnn/lib64')
+            sudo('chmod a+r /opt/cudnn/include/cudnn.h /opt/cudnn/lib64/libcudnn*')
+            run('echo "export LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH:/opt/cudnn/lib64\"" >> ~/.bash_profile')
+            # install TensorFlow and run TensorBoard
+            sudo('python2.7 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp27-none-linux_x86_64.whl')
+            sudo('python3 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp35-cp35m-linux_x86_64.whl')
+            sudo('mkdir /var/log/tensorboard')
+            put(templates_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
+            put(templates_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
+            sudo("chmod 644 /tmp/tensorboard-python*")
+            sudo('\cp /tmp/tensorboard-python* /etc/systemd/system/')
+            sudo("systemctl daemon-reload")
+            sudo("systemctl enable tensorboard-python2")
+            sudo("systemctl enable tensorboard-python3")
+            sudo("systemctl start tensorboard-python2")
+            sudo("systemctl start tensorboard-python3")
+            # install Theano
+            sudo('python2.7 -m pip install Theano')
+            sudo('python3 -m pip install Theano')
+            sudo('touch /home/' + os_user + '/.ensure_dir/tensor_ensured')
+        except:
+            sys.exit(1)

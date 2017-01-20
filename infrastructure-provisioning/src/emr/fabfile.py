@@ -30,16 +30,6 @@ import uuid
 import logging
 
 
-def emr_waiter(tag_name):
-    if len(get_emr_list(tag_name, 'Value', False, True)) > 0 or os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name'] or get_not_configured_emr(tag_name)):
-        with hide('stderr', 'running', 'warnings'):
-            local("echo 'Some EMR cluster is still being created, waiting..'")
-        time.sleep(60)
-        emr_waiter(tag_name)
-    else:
-        return True
-
-
 def run():
     local_log_filename = "{}_{}_{}.log".format(os.environ['resource'], os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['resource'] +  "/" + local_log_filename
@@ -47,125 +37,13 @@ def run():
                         level=logging.INFO,
                         filename=local_log_filepath)
     try:
-        os.environ['exploratory_name']
-    except:
-        os.environ['exploratory_name'] = ''
-    if os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
-        time.sleep(30)
-    create_aws_config_files()
-    print 'Generating infrastructure names and tags'
-    emr_conf = dict()
-    emr_conf['uuid'] = str(uuid.uuid4())[:5]
-    try:
-        emr_conf['exploratory_name'] = os.environ['exploratory_name']
-    except:
-        emr_conf['exploratory_name'] = ''
-    try:
-        emr_conf['computational_name'] = os.environ['computational_name']
-    except:
-        emr_conf['computational_name'] = ''
-    emr_conf['apps'] = 'Hadoop Hive Hue Spark'
-    emr_conf['service_base_name'] = os.environ['conf_service_base_name']
-    emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
-    emr_conf['key_name'] = os.environ['creds_key_name']
-    emr_conf['region'] = os.environ['creds_region']
-    emr_conf['release_label'] = os.environ['emr_version']
-    emr_conf['master_instance_type'] = os.environ['emr_master_instance_type']
-    emr_conf['slave_instance_type'] = os.environ['emr_slave_instance_type']
-    emr_conf['instance_count'] = os.environ['emr_instance_count']
-    emr_conf['notebook_ip'] = get_instance_ip_address(os.environ['notebook_instance_name']).get('Private')
-    emr_conf['role_service_name'] = os.environ['emr_service_role']
-    emr_conf['role_ec2_name'] = os.environ['emr_ec2_role']
-    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid'] + ', ' \
-                       + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']\
-                       + ', Notebook=' + os.environ['notebook_instance_name'] + ', State=not-configured'
-    emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']
-    emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
-
-    tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
-    emr_conf['subnet_cidr'] = get_subnet_by_tag(tag)
-    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
-
-    try:
-        emr_conf['emr_timeout'] = os.environ['emr_timeout']
-    except:
-        emr_conf['emr_timeout'] = "1200"
-
-    try:
-        emr_conf['exploratory_name'] = os.environ['exploratory_name']
-        emr_conf['computational_name'] = os.environ['computational_name']
-    except:
-        emr_conf['exploratory_name'] = ''
-        emr_conf['computational_name'] = ''
-
-    print "Will create exploratory environment with edge node as access point as following: " + \
-          json.dumps(emr_conf, sort_keys=True, indent=4, separators=(',', ': '))
-    logging.info(json.dumps(emr_conf))
-
-    try:
-        emr_waiter(os.environ['notebook_instance_name'])
-        local('touch /response/.emr_creating_' + os.environ['exploratory_name'])
+        local("~/scripts/{}.py".format('prepare_hadoop_cluster'))
     except:
         with open("/root/result.json", 'w') as result:
-            res = {"error": "EMR waiter fail", "conf": emr_conf}
+            res = {"error": "Failed configuring Notebook node"}
             print json.dumps(res)
             result.write(json.dumps(res))
         sys.exit(1)
-
-    with hide('stderr', 'running', 'warnings'):
-        local("echo Waiting for changes to propagate; sleep 10")
-
-    try:
-        logging.info('[Creating EMR Cluster]')
-        print '[Creating EMR Cluster]'
-        params = "--name {} --applications '{}' --master_instance_type {} --slave_instance_type {} --instance_count {} --ssh_key {} --release_label {} --emr_timeout {} --subnet {} --service_role {} --ec2_role {} --nbs_ip {} --nbs_user {} --s3_bucket {} --region {} --tags '{}' --key_dir {} --edge_user_name {}"\
-            .format(emr_conf['cluster_name'], emr_conf['apps'], emr_conf['master_instance_type'],
-                    emr_conf['slave_instance_type'], emr_conf['instance_count'], emr_conf['key_name'],
-                    emr_conf['release_label'], emr_conf['emr_timeout'], emr_conf['subnet_cidr'],
-                    emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'],
-                    os.environ['general_os_user'], emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'],
-                    os.environ['creds_key_dir'], os.environ['edge_user_name'])
-        try:
-            local("~/scripts/{}.py {}".format('create_cluster', params))
-        except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to create EMR Cluster", "conf": emr_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
-
-        cluster_name = emr_conf['cluster_name']
-        keyfile_name = "/root/keys/{}.pem".format(emr_conf['key_name'])
-        local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
-    except:
-        local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
-        sys.exit(1)
-
-    try:
-        logging.info('[SUMMARY]')
-        print '[SUMMARY]'
-        print "Service base name: " + emr_conf['service_base_name']
-        print "Cluster name: " + emr_conf['cluster_name']
-        print "Key name: " + emr_conf['key_name']
-        print "Region: " + emr_conf['region']
-        print "EMR version: " + emr_conf['release_label']
-        print "EMR master node shape: " + emr_conf['master_instance_type']
-        print "EMR slave node shape: " + emr_conf['slave_instance_type']
-        print "Instance count: " + emr_conf['instance_count']
-        print "Notebook IP address: " + emr_conf['notebook_ip']
-        print "Bucket name: " + emr_conf['bucket_name']
-        with open("/root/result.json", 'w') as result:
-            res = {"hostname": cluster_name,
-                   "key_name": emr_conf['key_name'],
-                   "user_own_bucket_name": emr_conf['bucket_name'],
-                   "Action": "Create new EMR cluster"}
-            print json.dumps(res)
-            result.write(json.dumps(res))
-    except:
-        print "Failed writing results."
-        sys.exit(0)
-
-    sys.exit(0)
 
 
 def terminate():
@@ -175,42 +53,11 @@ def terminate():
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
-    # generating variables dictionary
-    create_aws_config_files()
-    print 'Generating infrastructure names and tags'
-    emr_conf = dict()
-    emr_conf['service_base_name'] = os.environ['conf_service_base_name']
-    emr_conf['emr_name'] = os.environ['emr_cluster_name']
-    emr_conf['notebook_name'] = os.environ['notebook_instance_name']
-    emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
-    emr_conf['key_path'] = os.environ['creds_key_dir'] + '/' + os.environ['creds_key_name'] + '.pem'
-    emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
-
     try:
-        logging.info('[TERMINATE EMR CLUSTER]')
-        print '[TERMINATE EMR CLUSTER]'
-        params = "--emr_name {} --bucket_name {} --key_path {} --ssh_user {} --tag_name {} --nb_tag_value {}"\
-            .format(emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['key_path'], os.environ['general_os_user'],
-                    emr_conf['tag_name'], emr_conf['notebook_name'])
-        try:
-            local("~/scripts/{}.py {}".format('terminate_emr', params))
-        except:
-            with open("/root/result.json", 'w') as result:
-                res = {"error": "Failed to terminate EMR cluster", "conf": emr_conf}
-                print json.dumps(res)
-                result.write(json.dumps(res))
-                raise Exception
+        local("~/scripts/{}.py".format('terminate_emr'))
     except:
-        sys.exit(1)
-
-    try:
         with open("/root/result.json", 'w') as result:
-            res = {"EMR_name": emr_conf['emr_name'],
-                   "notebook_name": emr_conf['notebook_name'],
-                   "user_own_bucket_name": emr_conf['bucket_name'],
-                   "Action": "Terminate EMR cluster"}
+            res = {"error": "Failed configuring Notebook node"}
             print json.dumps(res)
             result.write(json.dumps(res))
-    except:
-        print "Failed writing results."
-        sys.exit(0)
+        sys.exit(1)

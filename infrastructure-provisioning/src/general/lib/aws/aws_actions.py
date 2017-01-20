@@ -32,7 +32,7 @@ import traceback
 
 def put_to_bucket(bucket_name, local_file, destination_file):
     try:
-        s3 = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
+        s3 = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['aws_region'])
         with open(local_file, 'rb') as data:
             s3.upload_fileobj(data, bucket_name, destination_file)
         return True
@@ -444,7 +444,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
         service_base_name = os.environ['conf_service_base_name'].lower().replace('-', '_')
         roles_list = []
         for item in client.list_roles(MaxItems=250).get("Roles"):
-            if service_base_name + '-' in item.get("RoleName"):
+            if item.get("RoleName").startswith(service_base_name + '-'):
                 roles_list.append(item.get('RoleName'))
         if roles_list:
             roles_list.sort(reverse=True)
@@ -513,7 +513,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
             print "There are no IAM roles to delete. Checking instance profiles..."
         profile_list = []
         for item in client.list_instance_profiles(MaxItems=250).get("InstanceProfiles"):
-            if service_base_name + '-' in item.get("InstanceProfileName"):
+            if item.get("InstanceProfileName").startswith(service_base_name + '-'):
                 profile_list.append(item.get('InstanceProfileName'))
         if profile_list:
             for instance_profile in profile_list:
@@ -548,7 +548,7 @@ def remove_all_iam_resources(instance_type, scientist=''):
 
 def s3_cleanup(bucket, cluster_name, user_name):
     s3_res = boto3.resource('s3', config=Config(signature_version='s3v4'))
-    client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
+    client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['aws_region'])
     try:
         client.head_bucket(Bucket=bucket)
     except:
@@ -570,7 +570,7 @@ def s3_cleanup(bucket, cluster_name, user_name):
 
 def remove_s3(bucket_type='all', scientist=''):
     try:
-        client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['creds_region'])
+        client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=os.environ['aws_region'])
         bucket_list = []
         if bucket_type == 'ssn':
             bucket_name = (os.environ['conf_service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
@@ -714,6 +714,8 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                     sudo("service zeppelin-notebook restart")
                 if exists('/home/{}/.ensure_dir/rstudio_emr_ensured'.format(ssh_user)):
                     sudo("sed -i '/" + emr_name + "/d' /home/{}/.Renviron".format(ssh_user))
+                    if not sudo("sed -n '/^SPARK_HOME/p' /home/ubuntu/.Renviron"):
+                        sudo("sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/ubuntu/.Renviron")
                     sudo("sed -i 's|/opt/" + emr_version + '/' + emr_name + "/spark//R/lib:||g' /home/{}/.bashrc".format(ssh_user))
                 print "Notebook's " + env.hosts + " kernels were removed"
         else:

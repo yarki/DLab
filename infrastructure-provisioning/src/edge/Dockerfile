@@ -20,8 +20,11 @@
 FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
 ARG OS
+ARG CLOUD
+ARG RESOURCE
 
 COPY edge/ /root/
+COPY general/scripts/${CLOUD}/${RESOURCE}/* /root/scripts/
 COPY general/lib/os/${OS}/edge_lib.py /usr/lib/python2.7/dlab/edge_lib.py
 
 RUN chmod a+x /root/fabfile.py; \

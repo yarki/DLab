@@ -15,13 +15,13 @@ package com.epam.dlab.dto.edge;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EdgeCreateDTO extends EdgeBaseDTO<EdgeCreateDTO> {
-    @JsonProperty("edge_vpc_id")
+    @JsonProperty("aws_vpc_id")
     private String vpcId;
-    @JsonProperty("creds_subnet_id")
+    @JsonProperty("aws_subnet_id")
     private String subnetId;
-    @JsonProperty("creds_iam_user")
+    @JsonProperty("aws_iam_user")
     private String iamUser;
-    @JsonProperty("creds_security_groups_ids")
+    @JsonProperty("aws_security_groups_ids")
     private String securityGroupIds;
 
     public String getVpcId() {

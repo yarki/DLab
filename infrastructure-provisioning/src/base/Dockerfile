@@ -57,8 +57,11 @@ RUN mkdir -p /root/keys/.ssh
 
 COPY base/ /root
 COPY general/conf/* /root/conf/
-COPY general/scripts/${CLOUD}/* /root/scripts/
-COPY general/templates/common/* /root/templates/
+COPY general/scripts/${CLOUD}/common/* /root/scripts/
+COPY general/scripts/os/* /root/scripts/
+COPY general/templates/${CLOUD}/* /root/templates/
+COPY general/templates/os/common/* /root/templates/
+COPY general/templates/os/${OS}/* /root/templates/
 COPY general/api/*.py /bin/
 COPY general/lib/${CLOUD}/* /usr/lib/python2.7/dlab/
 COPY general/lib/os/${OS}/common_lib.py /usr/lib/python2.7/dlab/common_lib.py

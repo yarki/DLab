@@ -127,7 +127,7 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withCredsKeyName(String keyName) {
-        options.add(String.format("-e \"creds_key_name=%s\"", keyName));
+        options.add(String.format("-e \"conf_key_name=%s\"", keyName));
         return this;
     }
     public RunDockerCommand withConfServiceBaseName(String confServiceBaseName) {
@@ -141,12 +141,12 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withVpcId(String vpcId) {
-        options.add(String.format("-e \"edge_vpc_id=%s\"", vpcId));
+        options.add(String.format("-e \"aws_vpc_id=%s\"", vpcId));
         return this;
     }
 
     public RunDockerCommand withEdgeSubnetId(String subnetId) {
-        options.add(String.format("-e \"creds_subnet_id=%s\"", subnetId));
+        options.add(String.format("-e \"aws_subnet_id=%s\"", subnetId));
         return this;
     }
 
@@ -186,7 +186,7 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withCredsRegion(String credsRegion) {
-        options.add(String.format("-e \"creds_region=%s\"", credsRegion));
+        options.add(String.format("-e \"aws_region=%s\"", credsRegion));
         return this;
     }
 
@@ -201,7 +201,7 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withNotebookUserName(String notebookUserName) {
-        options.add(String.format("-e \"notebook_user_name=%s\"", notebookUserName));
+        options.add(String.format("-e \"edge_user_name=%s\"", notebookUserName));
         return this;
     }
 
@@ -211,7 +211,7 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withCredsSecurityGroupsIds(String credsSecurityGroupsIds) {
-        options.add(String.format("-e \"creds_security_groups_ids=%s\"", credsSecurityGroupsIds));
+        options.add(String.format("-e \"aws_security_groups_ids=%s\"", credsSecurityGroupsIds));
         return this;
     }
 
