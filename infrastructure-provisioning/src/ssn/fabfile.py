@@ -56,7 +56,11 @@ def run():
         tag_name = service_base_name + '-Tag'
         instance_name = service_base_name + '-ssn'
         region = os.environ['aws_region']
-        ssn_ami_id = get_ami_id(os.environ['aws_debian_ami_name'])
+        if os.environ['conf_os_family'] == "ubuntu":
+            ssn_ami_name = os.environ['aws_debian_ami_name']
+        if os.environ['conf_os_family'] == "redhat":
+            ssn_ami_name = os.environ['aws_redhat_ami_name']
+        ssn_ami_id = get_ami_id(ssn_ami_name)
         policy_path = '/root/templates/policy.json'
         vpc_cidr = '172.31.0.0/16'
         sg_name = instance_name + '-SG'
@@ -440,7 +444,7 @@ def run():
         print "Subnet ID: " + os.environ['aws_subnet_id']
         print "Security IDs: " + os.environ['aws_security_groups_ids']
         print "SSN instance shape: " + os.environ['ssn_instance_size']
-        print "SSN AMI name: " + os.environ['aws_debian_ami_name']
+        print "SSN AMI name: " + ssn_ami_name
         print "SSN bucket name: " + user_bucket_name
         print "Region: " + region
         jenkins_url = "http://{}/jenkins".format(get_instance_hostname(instance_name))

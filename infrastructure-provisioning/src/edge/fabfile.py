@@ -73,7 +73,10 @@ def run():
     edge_conf['public_subnet_id'] = os.environ['aws_subnet_id']
     edge_conf['vpc_id'] = os.environ['aws_vpc_id']
     edge_conf['region'] = os.environ['aws_region']
-    edge_conf['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
+    if os.environ['conf_os_family'] == "ubuntu":
+        edge_conf['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
+    if os.environ['conf_os_family'] == "redhat":
+        edge_conf['ami_id'] = get_ami_id(os.environ['aws_redhat_ami_name'])
     edge_conf['instance_size'] = os.environ['aws_edge_instance_size']
     edge_conf['sg_ids'] = os.environ['aws_security_groups_ids']
 

@@ -68,8 +68,11 @@ def run():
         print 'Preconfigured image found. Using: ' + ami_id
         notebook_config['ami_id'] = ami_id
     else:
-        print 'No preconfigured image found. Using default one: ' + get_ami_id(os.environ['aws_debian_ami_name'])
-        notebook_config['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
+        if os.environ['conf_os_family'] == "ubuntu":
+            notebook_config['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
+        if os.environ['conf_os_family'] == "redhat":
+            notebook_config['ami_id'] = get_ami_id(os.environ['aws_redhat_ami_name'])
+        print 'No preconfigured image found. Using default one: ' + notebook_config['ami_id']
 
     tag = {"Key": notebook_config['tag_name'], "Value": "{}-{}-subnet".format(notebook_config['service_base_name'], os.environ['edge_user_name'])}
     notebook_config['subnet_cidr'] = get_subnet_by_tag(tag)
