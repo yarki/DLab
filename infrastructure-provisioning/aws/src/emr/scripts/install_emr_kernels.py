@@ -32,6 +32,7 @@ parser.add_argument('--emr_version', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--notebook_ip', type=str, default='')
+parser.add_argument('--computational_name', type=str, default='')
 args = parser.parse_args()
 
 
@@ -89,4 +90,8 @@ if __name__ == "__main__":
     configure_notebook()
     spark_version = get_spark_version()
     hadoop_version = get_hadoop_version()
-    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' + args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version + ' --hadoop_version ' + hadoop_version + ' --region ' + args.region + ' --excluded_lines ' + os.environ['emr_excluded_spark_properties'] + ' --user_name ' + os.environ['edge_user_name'])
+    sudo('/usr/bin/python /usr/local/bin/create_configs.py --bucket ' + args.bucket + ' --cluster_name ' +
+         args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version +
+         ' --hadoop_version ' + hadoop_version + ' --region ' + args.region + ' --excluded_lines ' +
+         os.environ['emr_excluded_spark_properties'] + ' --user_name ' + os.environ['edge_user_name'] +
+         '--computational_name' + args.computational_name)

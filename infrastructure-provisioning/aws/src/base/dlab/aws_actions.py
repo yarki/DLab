@@ -682,6 +682,19 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                 if exists('/home/ubuntu/.ensure_dir/emr_interpreter_ensured'):
                     sudo('sed -i \"s/^export SPARK_HOME.*/#export SPARK_HOME=/\" /opt/zeppelin/conf/zeppelin-env.sh')
                     sudo("rm -rf /home/ubuntu/.ensure_dir/emr_interpreter_ensure")
+                    zeppelin_url = 'http://localhost:8080/api/interpreter/setting/'
+                    opener = urllib2.build_opener(urllib2.ProxyHandler({}))
+                    req = opener.open(urllib2.Request(zeppelin_url))
+                    r_text = req.read()
+                    json = json.loads(r_text)
+                    for interpreter in json['body']:
+                        if emr_name in interpreter['name']:
+                            print "Interpreter with ID:", interpreter['id'], "and name:", interpreter['name'], \
+                                "will be removed from zeppelin!"
+                            request = urllib2.Request(zeppelin_url + interpreter['id'], data='')
+                            request.get_method = lambda: 'DELETE'
+                            url = opener.open(request)
+                            print url.read()
                     sudo("service zeppelin-notebook restart")
                 if exists('/home/ubuntu/.ensure_dir/rstudio_emr_ensured'):
                     sudo("sed -i '/" + emr_name + "/d' /home/ubuntu/.Renviron")
