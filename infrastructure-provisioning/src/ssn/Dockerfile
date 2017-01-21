@@ -27,7 +27,6 @@ COPY general/scripts/${CLOUD}/${RESOURCE}/* /root/scripts/
 COPY general/lib/os/${OS}/ssn_lib.py /usr/lib/python2.7/dlab/ssn_lib.py
 COPY general/templates/${CLOUD}/instance_shapes.lst /root/templates/
 COPY general/templates/${CLOUD}/policy.json /root/templates/
-COPY general/templates/${CLOUD}/s3_policy.json /root/templates/
 COPY general/templates/os/${OS}/supervisor_svc.conf /root/templates/
 
 RUN chmod a+x /root/fabfile.py; \
