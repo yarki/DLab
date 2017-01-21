@@ -28,6 +28,7 @@ from fabric.contrib.files import exists
 import logging
 from dlab.aws_meta import *
 import traceback
+import urllib2
 
 
 def put_to_bucket(bucket_name, local_file, destination_file):
