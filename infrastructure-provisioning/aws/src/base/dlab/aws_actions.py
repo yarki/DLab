@@ -688,7 +688,7 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                     req = opener.open(urllib2.Request(zeppelin_url))
                     r_text = req.read()
                     interpreter_json = json.loads(r_text)
-                    interpreter_prefix = emr_version + computational_name
+                    interpreter_prefix = emr_version + '_' + computational_name
                     for interpreter in interpreter_json['body']:
                         if interpreter_prefix in interpreter['name']:
                             print "Interpreter with ID:", interpreter['id'], "and name:", interpreter['name'], \
