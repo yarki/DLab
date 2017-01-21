@@ -296,35 +296,31 @@ def configure_zeppelin_emr_interpreter(args):
               '/spark/conf/spark-defaults.conf')
         local('service zeppelin-notebook restart')
         local('sleep 5')
+        local('echo \"Configuring emr spark interpreter for Zeppelin\"')
+        template_file = "/tmp/emr_spark_interpreter.json"
+        p_versions = ["2", "3"]
+        for p_version in p_versions:
+            fr = open(template_file, 'r+')
+            text = fr.read()
+            text = text.replace('CLUSTERNAME', args.cluster_name)
+            text = text.replace('PYTHONVERSION', p_version)
+            text = text.replace('EMRVERSION', args.emr_version + '_' + args.computational_name)
+            tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
+            fw = open(tmp_file, 'w')
+            fw.write(text)
+            fw.close()
+            for _ in range(5):
+                try:
+                    local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d " +
+                          "@/tmp/emr_spark_py" + p_version +
+                          "_interpreter.json http://localhost:8080/api/interpreter/setting")
+                    break
+                except:
+                    local('sleep 5')
+                    pass
+        local('touch /home/ubuntu/.ensure_dir/emr_interpreter_ensured')
     except:
         sys.exit(1)
-    if not os.path.exists('/home/ubuntu/.ensure_dir/emr_interpreter_ensured'):
-        try:
-            local('echo \"Configuring emr spark interpreter for Zeppelin\"')
-            template_file = "/tmp/emr_spark_interpreter.json"
-            p_versions = ["2", "3"]
-            for p_version in p_versions:
-                fr = open(template_file, 'r+')
-                text = fr.read()
-                text = text.replace('CLUSTERNAME', args.cluster_name)
-                text = text.replace('PYTHONVERSION', p_version)
-                text = text.replace('EMRVERSION', args.emr_version + '_' + args.computational_name)
-                tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
-                fw = open(tmp_file, 'w')
-                fw.write(text)
-                fw.close()
-                for _ in range(5):
-                    try:
-                        local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d " +
-                              "@/tmp/emr_spark_py" + p_version +
-                              "_interpreter.json http://localhost:8080/api/interpreter/setting")
-                        break
-                    except:
-                        local('sleep 5')
-                        pass
-            local('touch /home/ubuntu/.ensure_dir/emr_interpreter_ensured')
-        except:
-            sys.exit(1)
 
 
 def installing_python(args):
