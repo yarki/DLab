@@ -28,7 +28,7 @@ from dlab.aws_actions import *
 def terminate_edge_node(tag_name, user_name, tag_value, nb_sg, edge_sg):
     print 'Terminating EMR cluster'
     try:
-        clusters_list = get_emr_list(args.tag_name)
+        clusters_list = get_emr_list(tag_name)
         if clusters_list:
             for cluster_id in clusters_list:
                 client = boto3.client('emr')
@@ -44,39 +44,39 @@ def terminate_edge_node(tag_name, user_name, tag_value, nb_sg, edge_sg):
 
     print "Deregistering notebook's AMI"
     try:
-        deregister_image(args.user_name)
+        deregister_image(user_name)
     except:
         sys.exit(1)
 
     print "Terminating EDGE and notebook instances"
     try:
-        remove_ec2(args.tag_name, args.tag_value)
+        remove_ec2(tag_name, tag_value)
     except:
         sys.exit(1)
 
     print "Removing s3 bucket"
     try:
-        remove_s3('edge', args.user_name)
+        remove_s3('edge', user_name)
     except:
         sys.exit(1)
 
     print "Removing IAM roles and profiles"
     try:
-        remove_all_iam_resources('notebook', args.user_name)
-        remove_all_iam_resources('edge', args.user_name)
+        remove_all_iam_resources('notebook', user_name)
+        remove_all_iam_resources('edge', user_name)
     except:
         sys.exit(1)
 
     print "Removing security groups"
     try:
-        remove_sgroups(args.nb_sg)
-        remove_sgroups(args.edge_sg)
+        remove_sgroups(nb_sg)
+        remove_sgroups(edge_sg)
     except:
         sys.exit(1)
 
     print "Removing private subnet"
     try:
-        remove_subnets(args.tag_value)
+        remove_subnets(tag_value)
     except:
         sys.exit(1)
 

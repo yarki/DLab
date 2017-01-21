@@ -1,6 +1,6 @@
 {
-    "resource": "edge",
     "request_id":"RID",
+    "conf_resource": "edge",
     "conf_service_base_name":"SBN",
     "aws_region":"CREG",
     "edge_user_name":"EUN",

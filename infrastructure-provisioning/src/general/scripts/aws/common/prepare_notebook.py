@@ -49,7 +49,6 @@ if __name__ == "__main__":
     notebook_config['service_base_name'] = os.environ['conf_service_base_name']
     notebook_config['instance_type'] = os.environ['aws_notebook_instance_type']
     notebook_config['key_name'] = os.environ['conf_key_name']
-    notebook_config['user_keyname'] = os.environ['edge_user_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'edge_user_name'] + "-nb-" + notebook_config['exploratory_name'] + "-" + notebook_config['uuid']
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[

@@ -29,7 +29,6 @@ import uuid
 
 
 if __name__ == "__main__":
-    instance_class = 'notebook'
     local_log_filename = "{}_{}_{}.log".format(os.environ['conf_resource'], os.environ['edge_user_name'],
                                                os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['conf_resource'] + "/" + local_log_filename
@@ -57,18 +56,9 @@ if __name__ == "__main__":
         'edge_user_name'] + "-nb-SG"
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
-    print 'Searching preconfigured images'
-    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'], 'available')
-    if ami_id != '':
-        print 'Preconfigured image found. Using: ' + ami_id
-        notebook_config['ami_id'] = ami_id
-    else:
-        notebook_config['ami_id'] = get_ami_id(os.environ['aws_' + os.environ['conf_os_family'] + '_ami_name'])
-        print 'No preconfigured image found. Using default one: ' + notebook_config['ami_id']
-
     tag = {"Key": notebook_config['tag_name'],
            "Value": "{}-{}-subnet".format(notebook_config['service_base_name'], os.environ['edge_user_name'])}
-    notebook_config['subnet_cidr'] = get_subnet_by_tag(tag)
+
     # generating variables regarding EDGE proxy on Notebook instance
     instance_hostname = get_instance_hostname(notebook_config['instance_name'])
     edge_instance_name = os.environ['conf_service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
