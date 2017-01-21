@@ -168,9 +168,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        params = "--hostname {} --keyfile {} --dlab_path {} --os_user {} --request_id {} --resource {} --region {} --service_base_name {} --security_groups_ids {} --vpc_id {} --subnet_id {}". \
+        params = "--hostname {} --keyfile {} --dlab_path {} --os_user {} --os_family {} --request_id {} --resource {} --region {} --service_base_name {} --security_groups_ids {} --vpc_id {} --subnet_id {}". \
             format(instance_hostname, "/root/keys/{}.pem".format(os.environ['conf_key_name']), os.environ['ssn_dlab_path'],
-                   os.environ['conf_os_user'], os.environ['request_id'], os.environ['conf_resource'], os.environ['aws_region'],
+                   os.environ['conf_os_user'], os.environ['conf_os_family'], os.environ['request_id'], os.environ['conf_resource'], os.environ['aws_region'],
                    os.environ['conf_service_base_name'], os.environ['aws_security_groups_ids'], os.environ['aws_vpc_id'],
                    os.environ['aws_subnet_id'])
 
