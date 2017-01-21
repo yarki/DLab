@@ -94,4 +94,4 @@ if __name__ == "__main__":
          args.cluster_name + ' --emr_version ' + args.emr_version + ' --spark_version ' + spark_version +
          ' --hadoop_version ' + hadoop_version + ' --region ' + args.region + ' --excluded_lines ' +
          os.environ['emr_excluded_spark_properties'] + ' --user_name ' + os.environ['edge_user_name'] +
-         '--computational_name ' + args.computational_name)
+         ' --computational_name ' + args.computational_name)
