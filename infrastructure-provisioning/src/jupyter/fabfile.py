@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 # ******************************************************************************
+
 import logging
 import json
 import sys
@@ -29,10 +30,6 @@ import uuid
 
 # Main function for provisioning notebook server
 def run():
-    # enable debug level for boto3
-    logging.getLogger('botocore').setLevel(logging.DEBUG)
-    logging.getLogger('boto3').setLevel(logging.DEBUG)
-
     local_log_filename = "{}_{}_{}.log".format(os.environ['conf_resource'], os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['conf_resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',

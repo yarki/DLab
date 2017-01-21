@@ -29,10 +29,6 @@ import uuid
 
 
 if __name__ == "__main__":
-    # enable debug level for boto3
-    logging.getLogger('botocore').setLevel(logging.DEBUG)
-    logging.getLogger('boto3').setLevel(logging.DEBUG)
-
     instance_class = 'notebook'
     local_log_filename = "{}_{}_{}.log".format(os.environ['conf_resource'], os.environ['edge_user_name'],
                                                os.environ['request_id'])

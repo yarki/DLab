@@ -29,9 +29,14 @@ import uuid
 
 
 if __name__ == "__main__":
-    # generating variables dictionary
-    create_aws_config_files()
-    print 'Generating infrastructure names and tags'
+    instance_class = 'notebook'
+    local_log_filename = "{}_{}_{}.log".format(os.environ['conf_resource'], os.environ['edge_user_name'],
+                                               os.environ['request_id'])
+    local_log_filepath = "/logs/" + os.environ['conf_resource'] + "/" + local_log_filename
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
+                        level=logging.DEBUG,
+                        filename=local_log_filepath)
+
     notebook_config = dict()
     notebook_config['uuid'] = str(uuid.uuid4())[:5]
     try:
