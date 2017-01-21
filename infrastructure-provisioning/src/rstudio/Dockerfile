@@ -23,11 +23,10 @@ ARG OS
 ARG CLOUD
 ARG RESOURCE
 
-
 COPY rstudio/ /root/
 COPY general/scripts/${CLOUD}/${RESOURCE}/* /root/scripts/
+COPY general/scripts/os/configure_proxy.py /root/scripts/
 COPY general/lib/os/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
-COPY general/templates/os/${OS}/jupyter-notebook.service /root/templates/jupyter-notebook.service
 
 RUN chmod a+x /root/fabfile.py; \
     chmod a+x /root/scripts/*
