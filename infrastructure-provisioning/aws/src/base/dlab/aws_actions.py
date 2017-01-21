@@ -664,7 +664,7 @@ def terminate_emr(id):
         traceback.print_exc(file=sys.stdout)
 
 
-def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version):
+def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version, computational_name):
     try:
         ec2 = boto3.resource('ec2')
         inst = ec2.instances.filter(
@@ -687,9 +687,10 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                     opener = urllib2.build_opener(urllib2.ProxyHandler({}))
                     req = opener.open(urllib2.Request(zeppelin_url))
                     r_text = req.read()
-                    json = json.loads(r_text)
-                    for interpreter in json['body']:
-                        if emr_name in interpreter['name']:
+                    interpreter_json = json.loads(r_text)
+                    interpreter_prefix = emr_version + computational_name
+                    for interpreter in interpreter_json['body']:
+                        if interpreter_prefix in interpreter['name']:
                             print "Interpreter with ID:", interpreter['id'], "and name:", interpreter['name'], \
                                 "will be removed from zeppelin!"
                             request = urllib2.Request(zeppelin_url + interpreter['id'], data='')

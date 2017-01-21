@@ -32,6 +32,7 @@ parser.add_argument('--tag_name', type=str)
 parser.add_argument('--nb_tag_value', type=str)
 parser.add_argument('--ssh_user', type=str)
 parser.add_argument('--key_path', type=str)
+parser.add_argument('--computational_name', type=str)
 args = parser.parse_args()
 
 
@@ -55,7 +56,8 @@ if __name__ == "__main__":
                 terminate_emr(cluster_id)
                 print "The EMR cluster " + emr_name + " has been terminated successfully"
                 print "Removing EMR kernels from notebook"
-                remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user, args.key_path, emr_version)
+                remove_kernels(args.emr_name, args.tag_name, args.nb_tag_value, args.ssh_user,
+                               args.key_path, emr_version, args.computational_name)
         else:
             print "There are no EMR clusters to terminate."
     except:
