@@ -318,7 +318,7 @@ def configure_zeppelin_emr_interpreter(args):
                 except:
                     local('sleep 5')
                     pass
-        local('touch /home/ubuntu/.ensure_dir/emr_interpreter_ensured')
+        local('touch /home/ubuntu/.ensure_dir/emr_' + args.computational_name + '_interpreter_ensured')
     except:
         sys.exit(1)
 
