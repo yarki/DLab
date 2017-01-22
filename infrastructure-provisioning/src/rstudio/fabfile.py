@@ -29,25 +29,25 @@ import uuid
 
 # Main function for provisioning notebook server
 def run():
-    # enable debug level for boto3
-    logging.getLogger('botocore').setLevel(logging.DEBUG)
-    logging.getLogger('boto3').setLevel(logging.DEBUG)
-
-    instance_class = 'notebook'
     local_log_filename = "{}_{}_{}.log".format(os.environ['conf_resource'], os.environ['edge_user_name'], os.environ['request_id'])
     local_log_filepath = "/logs/" + os.environ['conf_resource'] + "/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
+    notebook_config = dict()
+    notebook_config['uuid'] = str(uuid.uuid4())[:5]
+
     try:
-        local("~/scripts/{}.py".format('prepare_notebook'))
+        params = "--uuid {}".format(notebook_config['uuid'])
+        local("~/scripts/{}.py {}".format('prepare_notebook', params))
     except:
         append_result("Failed preparing Notebook node")
         sys.exit(1)
 
     try:
-        local("~/scripts/{}.py".format('configure_rstudio'))
+        params = "--uuid {}".format(notebook_config['uuid'])
+        local("~/scripts/{}.py {}".format('configure_rstudio', params))
     except:
         append_result("Failed configuring Notebook node")
         sys.exit(1)

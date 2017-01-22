@@ -25,8 +25,11 @@ from dlab.fab import *
 from dlab.aws_meta import *
 from dlab.aws_actions import *
 import os
-import uuid
+import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--uuid', type=str, default='')
+args = parser.parse_args()
 
 if __name__ == "__main__":
     instance_class = 'notebook'
@@ -41,7 +44,6 @@ if __name__ == "__main__":
     create_aws_config_files()
     print 'Generating infrastructure names and tags'
     notebook_config = dict()
-    notebook_config['uuid'] = str(uuid.uuid4())[:5]
     try:
         notebook_config['exploratory_name'] = os.environ['exploratory_name']
     except:
@@ -50,7 +52,7 @@ if __name__ == "__main__":
     notebook_config['instance_type'] = os.environ['aws_notebook_instance_type']
     notebook_config['key_name'] = os.environ['conf_key_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
-        'edge_user_name'] + "-nb-" + notebook_config['exploratory_name'] + "-" + notebook_config['uuid']
+        'edge_user_name'] + "-nb-" + notebook_config['exploratory_name'] + "-" + args.uuid
     notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'edge_user_name'] + '-' + os.environ['application'] + '-notebook-image'
     notebook_config['role_profile_name'] = os.environ['conf_service_base_name'].lower().replace('-', '_') + "-" + \

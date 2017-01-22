@@ -36,14 +36,19 @@ def run():
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
+    notebook_config = dict()
+    notebook_config['uuid'] = str(uuid.uuid4())[:5]
+
     try:
-        local("~/scripts/{}.py".format('prepare_notebook'))
+        params = "--uuid {}".format(notebook_config['uuid'])
+        local("~/scripts/{}.py {}".format('prepare_notebook', params))
     except:
         append_result("Failed preparing Notebook node")
         sys.exit(1)
 
     try:
-        local("~/scripts/{}.py".format('configure_jupyter'))
+        params = "--uuid {}".format(notebook_config['uuid'])
+        local("~/scripts/{}.py {}".format('configure_jupyter', params))
     except:
         append_result("Failed configuring Notebook node")
         sys.exit(1)
