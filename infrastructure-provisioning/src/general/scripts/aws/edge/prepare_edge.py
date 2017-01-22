@@ -35,7 +35,6 @@ if __name__ == "__main__":
     create_aws_config_files()
     print 'Generating infrastructure names and tags'
     edge_conf = dict()
-    # Base config
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
     edge_conf['key_name'] = os.environ['conf_key_name']
     edge_conf['user_keyname'] = os.environ['edge_user_name']
@@ -48,8 +47,6 @@ if __name__ == "__main__":
         edge_conf['ami_id'] = get_ami_id(os.environ['aws_redhat_ami_name'])
     edge_conf['instance_size'] = os.environ['aws_edge_instance_size']
     edge_conf['sg_ids'] = os.environ['aws_security_groups_ids']
-
-    # Edge config
     edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
     edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
     edge_conf['bucket_name'] = (edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-bucket').lower().replace('_', '-')
@@ -58,21 +55,11 @@ if __name__ == "__main__":
     edge_conf['role_profile_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-edge-Profile'
     edge_conf['policy_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-edge-Policy'
     edge_conf['edge_security_group_name'] = edge_conf['instance_name'] + '-SG'
-    edge_conf['security_group_rules'] = [{"IpProtocol": "-1",
-                                          "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
-                                          "UserIdGroupPairs": [],
-                                          "PrefixListIds": []}]
-
-    # Notebook \ EMR config
     edge_conf['notebook_instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb'
     edge_conf['notebook_role_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-nb-Role'
     edge_conf['notebook_policy_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-nb-Policy'
     edge_conf['notebook_role_profile_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ['edge_user_name'] + '-nb-Profile'
     edge_conf['notebook_security_group_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb-SG'
-    edge_conf['notebook_security_group_rules'] = [{"IpProtocol": "-1",
-                                                   "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
-                                                   "UserIdGroupPairs": [],
-                                                   "PrefixListIds": []}]
 
     # FUSE in case of absence of user's key
     fname = "/root/keys/{}.pub".format(edge_conf['user_keyname'])

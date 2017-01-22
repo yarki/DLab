@@ -25,60 +25,30 @@ import sys, time, os
 from dlab.aws_actions import *
 
 if __name__ == "__main__":
-    print 'Generating infrastructure names and tags'
-    edge_conf = dict()
-    # Base config
-    edge_conf['service_base_name'] = os.environ['conf_service_base_name']
-    edge_conf['key_name'] = os.environ['conf_key_name']
-    edge_conf['user_keyname'] = os.environ['edge_user_name']
-    edge_conf['public_subnet_id'] = os.environ['aws_subnet_id']
-    edge_conf['vpc_id'] = os.environ['aws_vpc_id']
-    edge_conf['region'] = os.environ['aws_region']
-    if os.environ['conf_os_family'] == "debian":
-        edge_conf['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
-    if os.environ['conf_os_family'] == "redhat":
-        edge_conf['ami_id'] = get_ami_id(os.environ['aws_redhat_ami_name'])
-    edge_conf['instance_size'] = os.environ['aws_edge_instance_size']
-    edge_conf['sg_ids'] = os.environ['aws_security_groups_ids']
-
-    # Edge config
-    edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
-    edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
-    edge_conf['bucket_name'] = (
-    edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-bucket').lower().replace('_', '-')
-    edge_conf['ssn_bucket_name'] = (edge_conf['service_base_name'] + "-ssn-bucket").lower().replace('_', '-')
-    edge_conf['role_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ[
-        'edge_user_name'] + '-edge-Role'
-    edge_conf['role_profile_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ[
-        'edge_user_name'] + '-edge-Profile'
-    edge_conf['policy_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ[
-        'edge_user_name'] + '-edge-Policy'
-    edge_conf['edge_security_group_name'] = edge_conf['instance_name'] + '-SG'
-    edge_conf['security_group_rules'] = [{"IpProtocol": "-1",
-                                          "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
-                                          "UserIdGroupPairs": [],
-                                          "PrefixListIds": []}]
-
-    # Notebook \ EMR config
-    edge_conf['notebook_instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb'
-    edge_conf['notebook_role_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ[
-        'edge_user_name'] + '-nb-Role'
-    edge_conf['notebook_policy_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + os.environ[
-        'edge_user_name'] + '-nb-Policy'
-    edge_conf['notebook_role_profile_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + \
-                                              os.environ['edge_user_name'] + '-nb-Profile'
-    edge_conf['notebook_security_group_name'] = edge_conf['service_base_name'] + "-" + os.environ[
-        'edge_user_name'] + '-nb-SG'
-    edge_conf['notebook_security_group_rules'] = [{"IpProtocol": "-1",
-                                                   "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
-                                                   "UserIdGroupPairs": [],
-                                                   "PrefixListIds": []}]
     local_log_filename = "{}_{}_{}.log".format(os.environ['conf_resource'], os.environ['edge_user_name'],
                                                os.environ['request_id'])
     local_log_filepath = "/logs/edge/" + local_log_filename
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG,
                         filename=local_log_filepath)
+
+    print 'Generating infrastructure names and tags'
+    edge_conf = dict()
+    edge_conf['service_base_name'] = os.environ['conf_service_base_name']
+    edge_conf['key_name'] = os.environ['conf_key_name']
+    edge_conf['user_keyname'] = os.environ['edge_user_name']
+    edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
+    edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
+    edge_conf['bucket_name'] = (edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-bucket').lower().replace('_', '-')
+    edge_conf['edge_security_group_name'] = edge_conf['instance_name'] + '-SG'
+    edge_conf['notebook_instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-nb'
+    edge_conf['notebook_role_profile_name'] = edge_conf['service_base_name'].lower().replace('-', '_') + "-" + \
+                                              os.environ['edge_user_name'] + '-nb-Profile'
+    edge_conf['notebook_security_group_name'] = edge_conf['service_base_name'] + "-" + os.environ[
+        'edge_user_name'] + '-nb-SG'
+    tag = {"Key": edge_conf['tag_name'], "Value": "{}-{}-subnet".format(edge_conf['service_base_name'], os.environ['edge_user_name'])}
+    edge_conf['private_subnet_cidr'] = get_subnet_by_tag(tag)
+
     instance_hostname = get_instance_hostname(edge_conf['instance_name'])
     addresses = get_instance_ip_address(edge_conf['instance_name'])
     ip_address = addresses.get('Private')
