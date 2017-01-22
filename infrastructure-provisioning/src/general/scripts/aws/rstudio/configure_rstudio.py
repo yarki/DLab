@@ -59,6 +59,7 @@ if __name__ == "__main__":
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'edge_user_name'] + "-nb-SG"
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
+    notebook_config['rstudio_pass'] = id_generator()
 
     # generating variables regarding EDGE proxy on Notebook instance
     instance_hostname = get_instance_hostname(notebook_config['instance_name'])
