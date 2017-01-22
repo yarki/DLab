@@ -1,5 +1,5 @@
 {
-    "resource": "notebook",
+    "conf_resource": "notebook",
     "request_id":"RID",
     "conf_os_user":"GOS",
     "conf_service_base_name":"SBN",
