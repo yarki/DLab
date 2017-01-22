@@ -34,6 +34,7 @@
               <string>jupyter</string>
               <string>rstudio</string>
               <string>zeppelin</string>
+              <string>tensor</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
