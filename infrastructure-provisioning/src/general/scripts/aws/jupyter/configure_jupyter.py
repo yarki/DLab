@@ -56,9 +56,6 @@ if __name__ == "__main__":
         'edge_user_name'] + "-nb-SG"
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
 
-    tag = {"Key": notebook_config['tag_name'],
-           "Value": "{}-{}-subnet".format(notebook_config['service_base_name'], os.environ['edge_user_name'])}
-
     # generating variables regarding EDGE proxy on Notebook instance
     instance_hostname = get_instance_hostname(notebook_config['instance_name'])
     edge_instance_name = os.environ['conf_service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'

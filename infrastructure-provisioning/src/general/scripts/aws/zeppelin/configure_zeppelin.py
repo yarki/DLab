@@ -37,9 +37,6 @@ if __name__ == "__main__":
                         level=logging.DEBUG,
                         filename=local_log_filepath)
 
-    # generating variables dictionary
-    create_aws_config_files()
-    print 'Generating infrastructure names and tags'
     notebook_config = dict()
     notebook_config['uuid'] = str(uuid.uuid4())[:5]
     try:
@@ -59,22 +56,6 @@ if __name__ == "__main__":
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'edge_user_name'] + "-nb-SG"
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
-
-    print 'Searching preconfigured images'
-    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'], 'available')
-    if ami_id != '':
-        print 'Preconfigured image found. Using: ' + ami_id
-        notebook_config['ami_id'] = ami_id
-    else:
-        if os.environ['conf_os_family'] == "debian":
-            notebook_config['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
-        if os.environ['conf_os_family'] == "redhat":
-            notebook_config['ami_id'] = get_ami_id(os.environ['aws_redhat_ami_name'])
-        print 'No preconfigured image found. Using default one: ' + notebook_config['ami_id']
-
-    tag = {"Key": notebook_config['tag_name'],
-           "Value": "{}-{}-subnet".format(notebook_config['service_base_name'], os.environ['edge_user_name'])}
-    notebook_config['subnet_cidr'] = get_subnet_by_tag(tag)
 
     # generating variables regarding EDGE proxy on Notebook instance
     instance_hostname = get_instance_hostname(notebook_config['instance_name'])
@@ -165,13 +146,13 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # checking the need for image creation
-    # ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
-    # if ami_id == '':
-    #     print "Looks like it's first time we configure notebook server. Creating image."
-    #     image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
-    #                                           image_name=notebook_config['expected_ami_name'])
-    #     if image_id != '':
-    #         print "Image was successfully created. It's ID is " + image_id
+    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
+    if ami_id == '':
+        print "Looks like it's first time we configure notebook server. Creating image."
+        image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
+                                              image_name=notebook_config['expected_ami_name'])
+        if image_id != '':
+            print "Image was successfully created. It's ID is " + image_id
 
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')
