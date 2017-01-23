@@ -58,7 +58,7 @@ def configure_mongo():
             local('scp -i {} /root/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile,
                                                                                                     env.host_string))
             sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
-        local('scp -i {} /root/templates/instance_shapes.lst {}:/tmp/instance_shapes.lst'.format(args.keyfile,
+        local('scp -i {} /root/files/instance_shapes.lst {}:/tmp/instance_shapes.lst'.format(args.keyfile,
                                                                                                  env.host_string))
         sudo('mv /tmp/instance_shapes.lst ' + args.dlab_path + 'tmp/')
         local('scp -i {} /root/scripts/resource_status.py {}:/tmp/resource_status.py'.format(args.keyfile,

@@ -240,7 +240,7 @@ def install_rstudio(os_user, local_spark_path, rstudio_pass):
             sys.exit(1)
 
 
-def install_tensor(os_user, templates_dir, tensorflow_version):
+def install_tensor(os_user, tensorflow_version, files_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/tensor_ensured'):
         try:
             # install cuda
@@ -251,7 +251,7 @@ def install_tensor(os_user, templates_dir, tensorflow_version):
             sudo('mv /usr/local/cuda-8.0 /opt/')
             sudo('ln -s /opt/cuda-8.0 /usr/local/cuda-8.0')
             # install cuDNN
-            put(templates_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
+            put(files_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
             run('tar xvzf /tmp/cudnn-8.0-linux-x64-v5.1.tgz -C /tmp')
             sudo('mkdir -p /opt/cudnn/include')
             sudo('mkdir -p /opt/cudnn/lib64')
@@ -263,8 +263,8 @@ def install_tensor(os_user, templates_dir, tensorflow_version):
             sudo('python2.7 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp27-none-linux_x86_64.whl')
             sudo('python3 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp35-cp35m-linux_x86_64.whl')
             sudo('mkdir /var/log/tensorboard')
-            put(templates_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
-            put(templates_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
+            put(files_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
+            put(files_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
             sudo("chmod 644 /tmp/tensorboard-python*")
             sudo('\cp /tmp/tensorboard-python* /etc/systemd/system/')
             sudo("systemctl daemon-reload")
