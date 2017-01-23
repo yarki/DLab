@@ -18,13 +18,21 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.dao;
 
+/** Name of fields in the Mongo collection {@link MongoCollections#SETTINGS}. */
 public enum MongoSetting {
+	/** Base name of service. */
     SERIVICE_BASE_NAME("service_base_name"),
+	/** Name of AWS region. */
     AWS_REGION("aws_region"),
+	/** Id of security group. */
     SECURITY_GROUPS("security_groups_ids"),
+	/** OS user name. */
     EXPLORATORY_SSH_USER("notebook_ssh_user"),
+	/** Name of directory for user key. */
     CONF_KEY_DIRECTORY("conf_key_dir"),
+	/** Id of virtual private cloud for AWS account. */
     AWS_VPC_ID("aws_vpc_id"),
+	/** Id of virtual private cloud subnet for AWS account. */
     AWS_SUBNET_ID("aws_subnet_id");
 
     private String id;

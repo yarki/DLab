@@ -33,6 +33,8 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     private String exploratoryTemplateName;
     @JsonProperty
     private String status;
+    @JsonProperty("error_message")
+    private String errorMessage;
     @JsonProperty("up_time")
     private Date uptime;
 
@@ -95,6 +97,20 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
 
     public T withStatus(UserInstanceStatus status) {
         return withStatus(status.toString());
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withErrorMessage(String errorMessage) {
+        setErrorMessage(errorMessage);
+        return (T) this;
     }
 
     public Date getUptime() {
