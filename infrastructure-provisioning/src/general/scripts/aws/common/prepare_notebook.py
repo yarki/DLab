@@ -75,10 +75,7 @@ if __name__ == "__main__":
         print 'Preconfigured image found. Using: ' + ami_id
         notebook_config['ami_id'] = ami_id
     else:
-        if os.environ['conf_os_family'] == "debian":
-            notebook_config['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
-        if os.environ['conf_os_family'] == "redhat":
-            notebook_config['ami_id'] = get_ami_id(os.environ['aws_redhat_ami_name'])
+        notebook_config['ami_id'] = get_ami_id(os.environ['aws_' + os.environ['conf_os_family'] + '_ami_name'])
         print 'No preconfigured image found. Using default one: ' + notebook_config['ami_id']
 
     tag = {"Key": notebook_config['tag_name'],
