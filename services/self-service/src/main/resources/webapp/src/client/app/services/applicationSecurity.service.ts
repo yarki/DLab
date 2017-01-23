@@ -55,10 +55,9 @@ export class ApplicationSecurityService {
     if (!!authToken) {
       return this.serviceFacade
         .buildLogoutRequest()
-        .finally(() => {
-          this.clearAuthToken();
-        })
         .map((response: Response) => {
+          this.clearAuthToken();
+
           return response.status === HTTP_STATUS_CODES.OK;
         }, this);
     }
