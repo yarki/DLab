@@ -159,6 +159,7 @@ if __name__ == "__main__":
     print "Instance name: " + notebook_config['instance_name']
     print "Private DNS: " + dns_name
     print "Private IP: " + ip_address
+    print "Instance ID" + get_instance_by_name(notebook_config['instance_name'])
     print "Instance type: " + notebook_config['instance_type']
     print "Key name: " + notebook_config['key_name']
     print "User key name: " + notebook_config['user_keyname']
@@ -175,6 +176,7 @@ if __name__ == "__main__":
     with open("/root/result.json", 'w') as result:
         res = {"hostname": dns_name,
                "ip": ip_address,
+               "id": get_instance_by_name(notebook_config['instance_name']),
                "master_keyname": os.environ['conf_key_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",
