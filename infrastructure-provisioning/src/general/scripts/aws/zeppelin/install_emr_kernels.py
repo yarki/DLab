@@ -42,7 +42,8 @@ args = parser.parse_args()
 def configure_notebook(args):
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
-    put(templates_dir + 'emr_spark_interpreter.json', '/tmp/emr_spark_interpreter.json')
+    files_dir = '/root/files/'
+    put(files_dir + 'emr_spark_interpreter.json', '/tmp/emr_spark_interpreter.json')
     put(templates_dir + 'spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')

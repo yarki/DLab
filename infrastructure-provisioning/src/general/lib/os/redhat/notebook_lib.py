@@ -43,7 +43,7 @@ def enable_proxy(proxy_host, proxy_port):
             sys.exit(1)
 
 
-def ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, pyspark_local_path_dir, py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, os_user):
+def ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, pyspark_local_path_dir, py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, os_user, files_dir):
     if not exists('/home/{}/.ensure_dir/spark_scala_ensured'.format(os_user)):
         try:
             sudo('yum install -y java-1.8.0-openjdk-devel')
@@ -72,7 +72,7 @@ def ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, py
             sudo('ln -s /opt/spark/ /usr/local/spark')
             sudo('jupyter toree install')
             sudo('mv ' + scala_kernel_path + 'lib/* /tmp/')
-            put(templates_dir + 'toree-assembly-0.2.0.jar', '/tmp/toree-assembly-0.2.0.jar')
+            put(files_dir + 'toree-assembly-0.2.0.jar', '/tmp/toree-assembly-0.2.0.jar')
             sudo('mv /tmp/toree-assembly-0.2.0.jar ' + scala_kernel_path + 'lib/')
             sudo('sed -i "s|Apache Toree - Scala|Local Apache Toree - Scala (Scala-' + scala_version + ', Spark-' + spark_version + ')|g" ' + scala_kernel_path + 'kernel.json')
             sudo('touch /home/{}/.ensure_dir/spark_scala_ensured'.format(os_user))
@@ -276,6 +276,7 @@ def install_tensor(os_user, tensorflow_version, files_dir):
             sudo('mkdir /var/log/tensorboard')
             put(files_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
             put(files_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
+            sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/tensorboard-python*")
             sudo("chmod 644 /tmp/tensorboard-python*")
             sudo('\cp /tmp/tensorboard-python* /etc/systemd/system/')
             sudo("systemctl daemon-reload")
