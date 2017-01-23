@@ -26,6 +26,7 @@ from dlab.aws_meta import *
 from dlab.aws_actions import *
 import os
 import argparse
+import traceback
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--uuid', type=str, default='')
@@ -87,9 +88,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_proxy', params))
         except:
-            append_result("Failed to configure proxy")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to configure proxy. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -101,9 +103,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            append_result("Failed installing apps: apt & pip")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing apps: apt & pip. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -116,9 +119,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_tensor_node', params))
         except:
-            append_result("Failed to configure TensorFlow")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to configure TensorFlow. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -132,9 +136,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
-            append_result("Failed installing users key")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing users key. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 

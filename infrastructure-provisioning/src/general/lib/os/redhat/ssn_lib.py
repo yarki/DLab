@@ -187,8 +187,9 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path, os_user):
                 local('scp -r -i {} /root/web_app/provisioning-service/*.yml {}:'.format(keyfile, host_string) + '/tmp/yml_tmp/')
                 sudo('mv /tmp/yml_tmp/* ' + os.environ['ssn_dlab_path'] + 'conf/')
                 sudo('rmdir /tmp/yml_tmp/')
-            except:
-                append_result("Unable to upload webapp jars")
+            except Exception as err:
+                traceback.print_exc()
+                append_result("Unable to upload webapp jars. Exception: " + str(err))
                 sys.exit(1)
 
             sudo('service supervisord start')

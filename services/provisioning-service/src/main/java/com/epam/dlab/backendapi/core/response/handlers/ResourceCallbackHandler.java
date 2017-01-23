@@ -36,11 +36,12 @@ import java.util.Date;
 
 abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implements FileHandlerCallback {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
-    private ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+    protected ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
     private static final String STATUS_FIELD = "status";
     private static final String RESPONSE_NODE = "response";
     private static final String RESULT_NODE = "result";
+    private static final String ERROR_NODE = "error";
     private static final String CONF_NODE = "conf";
 
     private static final String OK_STATUS = "ok";
@@ -73,15 +74,17 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
         T result = getBaseStatusDTO(status);
-        JsonNode resultNode;
+        JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
         if (success) {
-            resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
             LOGGER.debug("Did {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
         } else {
-            resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE).get(CONF_NODE);
             LOGGER.error("Could not {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
+            result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
+            resultNode = resultNode.get(CONF_NODE);
         }
-        result = parseOutResponse(resultNode, result);
+        if (resultNode != null) {
+            result = parseOutResponse(resultNode, result);
+        }
         selfService.post(getCallbackURI(), result, resultType);
         return !UserInstanceStatus.FAILED.equals(status);
     }
@@ -102,7 +105,10 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     @SuppressWarnings("unchecked")
     protected T getBaseStatusDTO(UserInstanceStatus status) {
         try {
-            return (T) resultType.newInstance().withUser(user).withStatus(status).withUptime(getUptime(status));
+            return (T) resultType.newInstance()
+            		.withUser(user)
+            		.withStatus(status)
+            		.withUptime(getUptime(status));
         } catch (Throwable t) {
             throw new DlabException("Something went wrong", t);
         }
