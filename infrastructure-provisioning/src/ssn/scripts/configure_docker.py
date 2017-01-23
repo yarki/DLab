@@ -38,12 +38,12 @@ args = parser.parse_args()
 
 def build_docker_images(image_list):
     try:
-        local('test_scp -r -i {} /project_tree/* {}:{}sources/'.format(args.keyfile, env.host_string, args.dlab_path))
+        local('scp -r -i {} /project_tree/* {}:{}sources/'.format(args.keyfile, env.host_string, args.dlab_path))
         for image in image_list:
             name = image['name']
             tag = image['tag']
             if name == 'base':
-                sudo("cd {4}sources/; docker build --build-arg OS={2} --build-arg CLOUD={3} --file {0}/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
+                sudo("cd {4}sources/; docker build --build-arg OS={2} --build-arg CLOUD={3} --file {0}/Dockerfile_test -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
                      .format(name, tag, args.os_family, args.cloud_provider, args.dlab_path))
             else:
                 sudo(
