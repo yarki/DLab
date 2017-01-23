@@ -22,37 +22,48 @@ import static com.epam.dlab.backendapi.dao.MongoSetting.*;
 import static com.mongodb.client.model.Filters.eq;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+/** Stores the environment settings. */
 public class SettingsDAO extends BaseDAO {
     private static final String VALUE = "value";
 
+    /** Returns the base name of service. */
     public String getServiceBaseName() {
         return getSetting(SERIVICE_BASE_NAME);
     }
 
+    /** Returns the name of AWS region. */
     public String getCredsRegion() {
-        return getSetting(aws_region);
+        return getSetting(AWS_REGION);
     }
 
+    /** Returns the id of security group. */
     public String getSecurityGroups() {
         return getSetting(SECURITY_GROUPS);
     }
 
+    /** Returns the OS user name. */
     public String getExploratorySshUser() {
         return getSetting(EXPLORATORY_SSH_USER);
     }
 
+    /** Returns the name of directory for user key. */
     public String getCredsKeyDir() {
-        return getSetting(conf_key_dirECTORY);
+        return getSetting(CONF_KEY_DIRECTORY);
     }
 
+    /** Returns the id of virtual private cloud for AWS account. */
     public String getCredsVpcId() {
-        return getSetting(aws_vpc_id);
+        return getSetting(AWS_VPC_ID);
     }
 
+    /** Returns the id of virtual private cloud subnet for AWS account. */
     public String getCredsSubnetId() {
-        return getSetting(aws_subnet_id);
+        return getSetting(AWS_SUBNET_ID);
     }
 
+    /** Returns the value of property from Mongo database.
+     * @param setting the name of property.
+     */
     private String getSetting(MongoSetting setting) {
         return mongoService.getCollection(SETTINGS).find(eq(ID, setting.getId())).first().getOrDefault(VALUE, EMPTY).toString();
     }

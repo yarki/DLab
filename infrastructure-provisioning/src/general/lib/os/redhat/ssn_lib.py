@@ -164,7 +164,7 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path, os_user):
             text = text.replace('WEB_CONF', dlab_conf_dir).replace('OS_USR', os_user)
             with open('/root/templates/supervisor_svc.ini', 'w') as f:
                 f.write(text)
-            put('/root/templates/supervisor_svc.ini', '/tmp/supervisor_svc.ini')
+            put('/root/templates/supervisor_svc.conf', '/tmp/supervisor_svc.ini')
             sudo('mv /tmp/supervisor_svc.ini ' + os.environ['ssn_dlab_path'] + 'tmp/')
             sudo('cp ' + os.environ['ssn_dlab_path'] + 'tmp/proxy_location_webapp_template.conf /etc/nginx/locations/proxy_location_webapp.conf')
             sudo('cp ' + os.environ['ssn_dlab_path'] + 'tmp/supervisor_svc.ini {}'.format(supervisor_conf))

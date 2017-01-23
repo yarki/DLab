@@ -126,6 +126,7 @@ if __name__ == "__main__":
         print "Hostname: " + instance_hostname
         print "Public IP: " + public_ip_address
         print "Private IP: " + ip_address
+        print "Instance ID" + get_instance_by_name(edge_conf['instance_name'])
         print "Key name: " + edge_conf['key_name']
         print "Bucket name: " + edge_conf['bucket_name']
         print "Notebook SG: " + edge_conf['notebook_security_group_name']
@@ -136,6 +137,7 @@ if __name__ == "__main__":
             res = {"hostname": instance_hostname,
                    "public_ip": public_ip_address,
                    "ip": ip_address,
+                   "id": get_instance_by_name(edge_conf['instance_name']),
                    "key_name": edge_conf['key_name'],
                    "user_own_bicket_name": edge_conf['bucket_name'],
                    "tunnel_port": "22",

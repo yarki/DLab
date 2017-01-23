@@ -23,10 +23,11 @@ export class ResourcesGridRowModel {
               public shape: string,
               public resources: Array<any>,
               public time: string,
-              public url: string,
+              public url:  Array<any>,
               public ip: string,
               public username: string,
               public password: string,
-              public bucket_name: string
+              public bucket_name: string,
+              public error_message: string
             ) { }
 }

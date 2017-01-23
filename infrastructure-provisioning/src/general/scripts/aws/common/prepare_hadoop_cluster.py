@@ -133,6 +133,7 @@ if __name__ == "__main__":
         print '[SUMMARY]'
         print "Service base name: " + emr_conf['service_base_name']
         print "Cluster name: " + emr_conf['cluster_name']
+        print "Cluster id: " + get_emr_id_by_name(emr_conf['cluster_name'])
         print "Key name: " + emr_conf['key_name']
         print "Region: " + emr_conf['region']
         print "EMR version: " + emr_conf['release_label']
@@ -143,6 +144,7 @@ if __name__ == "__main__":
         print "Bucket name: " + emr_conf['bucket_name']
         with open("/root/result.json", 'w') as result:
             res = {"hostname": cluster_name,
+                   "id": get_emr_id_by_name(emr_conf['cluster_name']),
                    "key_name": emr_conf['key_name'],
                    "user_own_bucket_name": emr_conf['bucket_name'],
                    "Action": "Create new EMR cluster"}
