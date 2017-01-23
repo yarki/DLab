@@ -44,6 +44,14 @@ if __name__ == "__main__":
     if os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
         time.sleep(30)
     create_aws_config_files()
+    edge_status = get_instance_status(
+        os.environ['conf_service_base_name'] + '-' + os.environ['edge_user_name'] + '-edge')
+    if edge_status != 'running':
+        logging.info('ERROR: Edge node is unavailable! Aborting...')
+        print 'ERROR: Edge node is unavailable! Aborting...'
+        put_resource_status('edge', 'Unavailable', 'emr')
+        append_result("Edge node is unavailable")
+        sys.exit(1)
     print 'Generating infrastructure names and tags'
     emr_conf = dict()
     emr_conf['uuid'] = str(uuid.uuid4())[:5]

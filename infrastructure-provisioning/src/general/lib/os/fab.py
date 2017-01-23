@@ -24,6 +24,8 @@ import random
 import sys
 import string
 import json, uuid, time, datetime
+from dlab.aws_meta import *
+from dlab.aws_actions import *
 
 
 def ensure_pip(requisites):
@@ -158,3 +160,12 @@ def append_result(error):
     with open("/root/result.json", 'w') as f:
         json.dump(data, f)
     print data
+
+
+def put_resource_status(resource, status, instance):
+    env['connection_attempts'] = 100
+    keyfile = "/root/keys/" + os.environ['creds_key_name'] + ".pem"
+    hostname = get_instance_hostname(os.environ['conf_service_base_name'] + '-ssn')
+    env.key_filename = [keyfile]
+    env.host_string = 'ubuntu@' + hostname
+    sudo('python ' + os.environ[instance + '_dlab_path'] + 'tmp/resource_status.py --resource {} --status {}'.format(resource, status))
