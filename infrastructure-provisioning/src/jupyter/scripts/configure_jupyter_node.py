@@ -83,7 +83,7 @@ def configure_notebook_server():
 
         ensure_python3_kernel(args.os_user)
 
-        ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region)
+        ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
         ensure_r_kernel(spark_version, args.os_user)
 
