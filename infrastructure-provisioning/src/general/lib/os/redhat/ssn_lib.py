@@ -68,7 +68,7 @@ def configure_jenkins(dlab_path, os_user):
         if not exists('{}tmp/jenkins_configured'.format(dlab_path)):
             sudo('rm -rf /var/lib/jenkins/*')
             sudo('mkdir -p /var/lib/jenkins/jobs/')
-            sudo('chown -R {0}:{0} /var/lib/jenkins/'.format(args.user))
+            sudo('chown -R {0}:{0} /var/lib/jenkins/'.format(os_user))
             put('/root/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
             sudo("find /var/lib/jenkins/jobs/ -type f | xargs sed -i \'s/OS_USR/{}/g\'".format(os_user))
             sudo('chown -R jenkins:jenkins /var/lib/jenkins')
