@@ -664,7 +664,7 @@ def terminate_emr(id):
         traceback.print_exc(file=sys.stdout)
 
 
-def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version, computational_name):
+def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version, computational_name=''):
     try:
         ec2 = boto3.resource('ec2')
         inst = ec2.instances.filter(
