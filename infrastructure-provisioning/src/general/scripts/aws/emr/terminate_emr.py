@@ -26,7 +26,7 @@ import sys
 import os
 
 
-def terminate_emr_cluster(emr_name, bucket_name, tag_name, nb_tag_value, ssh_user, key_path):
+def terminate_emr_cluster(emr_name, bucket_name, tag_name, nb_tag_value, ssh_user, key_path, computational_name):
     print 'Terminating EMR cluster and cleaning EMR config from S3 bucket'
     try:
         clusters_list = get_emr_list(emr_name, 'Value')
@@ -43,7 +43,7 @@ def terminate_emr_cluster(emr_name, bucket_name, tag_name, nb_tag_value, ssh_use
                 print "The EMR cluster " + emr_name + " has been terminated successfully"
                 print "Removing EMR kernels from notebook"
                 remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path,
-                               emr_version)
+                               emr_version, computational_name)
         else:
             print "There are no EMR clusters to terminate."
     except:
@@ -68,13 +68,18 @@ if __name__ == "__main__":
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
     emr_conf['key_path'] = os.environ['conf_key_dir'] + '/' + os.environ['conf_key_name'] + '.pem'
     emr_conf['tag_name'] = emr_conf['service_base_name'] + '-Tag'
+    try:
+        emr_conf['computational_name'] = os.environ['computational_name']
+    except:
+        emr_conf['computational_name'] = ''
 
     try:
         logging.info('[TERMINATE EMR CLUSTER]')
         print '[TERMINATE EMR CLUSTER]'
         try:
             terminate_emr_cluster(emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['tag_name'],
-                                  emr_conf['notebook_name'], os.environ['conf_os_user'], emr_conf['key_path'])
+                                  emr_conf['notebook_name'], os.environ['conf_os_user'], emr_conf['key_path'],
+                                  emr_conf['computational_name'])
         except:
             append_result("Failed to terminate EMR cluster")
             raise Exception

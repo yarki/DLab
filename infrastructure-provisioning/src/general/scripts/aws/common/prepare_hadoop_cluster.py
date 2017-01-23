@@ -82,13 +82,6 @@ if __name__ == "__main__":
     except:
         emr_conf['emr_timeout'] = "1200"
 
-    try:
-        emr_conf['exploratory_name'] = os.environ['exploratory_name']
-        emr_conf['computational_name'] = os.environ['computational_name']
-    except:
-        emr_conf['exploratory_name'] = ''
-        emr_conf['computational_name'] = ''
-
     print "Will create exploratory environment with edge node as access point as following: " + \
           json.dumps(emr_conf, sort_keys=True, indent=4, separators=(',', ': '))
     logging.info(json.dumps(emr_conf))
