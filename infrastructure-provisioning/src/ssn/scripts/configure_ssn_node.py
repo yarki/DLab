@@ -56,6 +56,7 @@ def creating_service_directories(dlab_path, os_user):
             sudo('mkdir -p ' + dlab_path + 'template')
             sudo('mkdir -p ' + dlab_path + 'tmp')
             sudo('mkdir -p ' + dlab_path + 'tmp/result')
+            sudo('mkdir -p ' + dlab_path + 'sources')
             sudo('mkdir -p /var/opt/dlab/log/ssn')
             sudo('mkdir -p /var/opt/dlab/log/edge')
             sudo('mkdir -p /var/opt/dlab/log/notebook')
