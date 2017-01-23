@@ -76,7 +76,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  private checkInfrastructureCreationProgress() {
+  public checkInfrastructureCreationProgress() {
     this.userAccessKeyService.checkUserAccessKey()
       .subscribe(
       response => this.processAccessKeyStatus(response.status, false),
