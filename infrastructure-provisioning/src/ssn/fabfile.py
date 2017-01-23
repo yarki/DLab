@@ -24,6 +24,7 @@ import os
 import sys
 from fabric.api import *
 from dlab.fab import *
+import traceback
 
 
 def run():
@@ -34,14 +35,16 @@ def run():
                         filename=local_log_filepath)
     try:
         local("~/scripts/{}.py".format('prepare_ssn'))
-    except:
-        append_result("Failed preparing SSN node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed preparing SSN node. Exception: " + str(err))
         sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('configure_ssn'))
-    except:
-        append_result("Failed configuring SSN node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed configuring SSN node. Exception: " + str(err))
         sys.exit(1)
 
 
@@ -54,6 +57,7 @@ def terminate():
 
     try:
         local("~/scripts/{}.py".format('terminate_ssn'))
-    except:
-        append_result("Failed terminating SSN node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed terminating SSN node. Exception: " + str(err))
         sys.exit(1)

@@ -46,6 +46,7 @@ jupyter_conf_file = '/home/' + args.os_user + '/.local/share/jupyter/jupyter_not
 scala_kernel_path = '/usr/local/share/jupyter/kernels/apache_toree_scala/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
+files_dir = '/root/files/'
 
 
 def configure_notebook_server(notebook_name):
@@ -83,7 +84,7 @@ def configure_notebook_server(notebook_name):
 
         ensure_python3_kernel(args.os_user)
 
-        ensure_s3_kernel(args.os_user, s3_jars_dir, templates_dir, args.region)
+        ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region)
 
         ensure_r_kernel(spark_version, args.os_user)
     else:

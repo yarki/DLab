@@ -37,6 +37,8 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
+/** Self Service based on Dropwizard application.
+ */
 public class SelfServiceApplication extends Application<SelfServiceApplicationConfiguration> {
     public static void main(String... args) throws Exception {
         new SelfServiceApplication().run(args);

@@ -105,8 +105,9 @@ if __name__ == "__main__":
         try:
             terminate_edge_node(edge_conf['tag_name'], edge_conf['user_name'], edge_conf['tag_value'],
                                 edge_conf['nb_sg'], edge_conf['edge_sg'])
-        except:
-            append_result("Failed to terminate edge")
+        except Exception as err:
+            traceback.print_exc()
+            append_result("Failed to terminate edge. Exception: " + str(err))
     except:
         sys.exit(1)
 

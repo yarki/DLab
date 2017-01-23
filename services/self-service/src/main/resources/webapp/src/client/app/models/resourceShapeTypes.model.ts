@@ -18,27 +18,19 @@ limitations under the License.
 import { ResourceShapeModel } from './resourceShape.model';
 
 export class ResourceShapeTypesModel {
-
-  Memory_optimized: Array<ResourceShapeModel>;
-  GPU_optimized: Array<ResourceShapeModel>;
-  Compute_optimized: Array<ResourceShapeModel>;
+  resourcesShapeTypes: any;
 
   constructor(jsonModel: any) {
-    this.Memory_optimized = [];
-    this.GPU_optimized = [];
-    this.Compute_optimized = [];
+    this.resourcesShapeTypes = {};
 
-    if (jsonModel['Memory optimized'] && jsonModel['Memory optimized'].length > 0)
-      for (let index = 0; index < jsonModel['Memory optimized'].length; index++)
-        this.Memory_optimized.push(new ResourceShapeModel(jsonModel['Memory optimized'][index]));
+    for(let parentIndex in jsonModel) {
+      if (jsonModel[parentIndex] && jsonModel[parentIndex].length > 0) {
+        let tmpl = [];
+        for (let index = 0; index < jsonModel[parentIndex].length; index++)
+          tmpl.push(new ResourceShapeModel(jsonModel[parentIndex][index]));
 
-    if (jsonModel['GPU optimized'] && jsonModel['GPU optimized'].length > 0)
-      for (let index = 0; index < jsonModel['GPU optimized'].length; index++)
-        this.GPU_optimized.push(new ResourceShapeModel(jsonModel['GPU optimized'][index]));
-
-    if (jsonModel['Compute optimized'] && jsonModel['Compute optimized'].length > 0)
-      for (let index = 0; index < jsonModel['Compute optimized'].length; index++)
-        this.Compute_optimized.push(new ResourceShapeModel(jsonModel['Compute optimized'][index]));
-
+        this.resourcesShapeTypes[parentIndex] = tmpl;
+      }
+    }
   }
 }

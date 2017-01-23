@@ -18,6 +18,8 @@ limitations under the License.
 
 package com.epam.dlab.dto.exploratory;
 
+import java.util.List;
+
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -25,7 +27,7 @@ public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
     @JsonProperty("exploratory_id")
     private String exploratoryId;
     @JsonProperty("exploratory_url")
-    private String exploratoryUrl;
+    private List<ExploratoryURL> exploratoryUrl;
     @JsonProperty("exploratory_user")
     private String exploratoryUser;
     @JsonProperty("exploratory_pass")
@@ -44,15 +46,15 @@ public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
         return this;
     }
 
-    public String getExploratoryUrl() {
+    public List<ExploratoryURL> getExploratoryUrl() {
         return exploratoryUrl;
     }
 
-    public void setExploratoryUrl(String exploratoryUrl) {
+    public void setExploratoryUrl(List<ExploratoryURL> exploratoryUrl) {
         this.exploratoryUrl = exploratoryUrl;
     }
 
-    public ExploratoryStatusDTO withExploratoryUrl(String exploratoryUrl) {
+    public ExploratoryStatusDTO withExploratoryUrl(List<ExploratoryURL> exploratoryUrl) {
         setExploratoryUrl(exploratoryUrl);
         return this;
     }

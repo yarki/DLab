@@ -55,11 +55,17 @@ logging.basicConfig(format='%(levelname)-8s [%(asctime)s]  %(message)s',
 def configure_mongo():
     try:
         if not exists("/lib/systemd/system/mongod.service"):
-            local('scp -i {} /root/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile, env.host_string))
+            local('scp -i {} /root/templates/mongod.service_template {}:/tmp/mongod.service'.format(args.keyfile,
+                                                                                                    env.host_string))
             sudo('mv /tmp/mongod.service /lib/systemd/system/mongod.service')
-        local('scp -i {} /root/templates/instance_shapes.lst {}:/tmp/instance_shapes.lst'.format(args.keyfile, env.host_string))
+        local('scp -i {} /root/files/instance_shapes.lst {}:/tmp/instance_shapes.lst'.format(args.keyfile,
+                                                                                                 env.host_string))
         sudo('mv /tmp/instance_shapes.lst ' + args.dlab_path + 'tmp/')
-        local('scp -i {} /root/scripts/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile, env.host_string))
+        local('scp -i {} /root/scripts/resource_status.py {}:/tmp/resource_status.py'.format(args.keyfile,
+                                                                                                      env.host_string))
+        sudo('mv /tmp/resource_status.py ' + os.environ['ssn_dlab_path'] + 'tmp/')
+        local('scp -i {} /root/scripts/configure_mongo.py {}:/tmp/configure_mongo.py'.format(args.keyfile,
+                                                                                             env.host_string))
         sudo('mv /tmp/configure_mongo.py ' + args.dlab_path + 'tmp/')
         sudo('python ' + args.dlab_path + 'tmp/configure_mongo.py --region {} --base_name {} --sg "{}" --vpc {} --subnet {} --dlab_path {} --os_user {} --os_family {}'.format(args.region, args.service_base_name, args.security_groups_ids.replace(" ", ""), args.vpc_id, args.subnet_id, args.dlab_path, args.os_user, args.os_family))
         return True

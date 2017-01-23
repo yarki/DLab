@@ -29,6 +29,7 @@ import logging
 from dlab.aws_meta import *
 from dlab.fab import *
 import traceback
+import urllib2
 
 
 def put_to_bucket(bucket_name, local_file, destination_file):
@@ -612,7 +613,7 @@ def terminate_emr(id):
         traceback.print_exc(file=sys.stdout)
 
 
-def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version):
+def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_version, computational_name=''):
     try:
         ec2 = boto3.resource('ec2')
         inst = ec2.instances.filter(
@@ -628,10 +629,25 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                 env.host_string = env.user + "@" + env.hosts
                 sudo('rm -rf  /opt/' + emr_version + '/' + emr_name + '/')
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
-                if exists('/home/{}/.ensure_dir/emr_interpreter_ensured'.format(ssh_user)):
+                if exists('/home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, computational_name)):
                     sudo('sed -i \"s/^export SPARK_HOME.*/#export SPARK_HOME=/\" /opt/zeppelin/conf/zeppelin-env.sh')
                     sudo("rm -rf /home/{}/.ensure_dir/emr_interpreter_ensure".format(ssh_user))
+                    zeppelin_url = 'http://' + private + ':8080/api/interpreter/setting/'
+                    opener = urllib2.build_opener(urllib2.ProxyHandler({}))
+                    req = opener.open(urllib2.Request(zeppelin_url))
+                    r_text = req.read()
+                    interpreter_json = json.loads(r_text)
+                    interpreter_prefix = emr_version + '_' + computational_name
+                    for interpreter in interpreter_json['body']:
+                        if interpreter_prefix in interpreter['name']:
+                            print "Interpreter with ID:", interpreter['id'], "and name:", interpreter['name'], \
+                                "will be removed from zeppelin!"
+                            request = urllib2.Request(zeppelin_url + interpreter['id'], data='')
+                            request.get_method = lambda: 'DELETE'
+                            url = opener.open(request)
+                            print url.read()
                     sudo("service zeppelin-notebook restart")
+                    sudo('rm -rf /home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, computational_name))
                 if exists('/home/{}/.ensure_dir/rstudio_emr_ensured'.format(ssh_user)):
                     sudo("sed -i '/" + emr_name + "/d' /home/{}/.Renviron".format(ssh_user))
                     if not sudo("sed -n '/^SPARK_HOME/p' /home/ubuntu/.Renviron"):
@@ -770,7 +786,7 @@ def get_files(s3client, s3resource, dist, bucket, local):
         if result.get('Contents') is not None:
             for file in result.get('Contents'):
                 if not os.path.exists(os.path.dirname(local + os.sep + file.get('Key'))):
-                     os.makedirs(os.path.dirname(local + os.sep + file.get('Key')))
+                    os.makedirs(os.path.dirname(local + os.sep + file.get('Key')))
                 s3resource.meta.client.download_file(bucket, file.get('Key'), local + os.sep + file.get('Key'))
 
 

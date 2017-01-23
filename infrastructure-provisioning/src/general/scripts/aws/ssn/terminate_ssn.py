@@ -47,9 +47,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('terminate_aws_resources', params))
         except:
-            append_result("Failed to terminate ssn")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to terminate ssn. Exception: " + str(err))
         sys.exit(1)
 
     try:

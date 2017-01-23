@@ -68,6 +68,14 @@ export class HomeComponent implements OnInit {
     this.resourcesGrid.buildGrid();
   }
 
+  public toggleFiltering(): void {
+    if (this.resourcesGrid.activeFiltering) {
+      this.resourcesGrid.resetFilterConfigurations();
+    } else {
+      this.resourcesGrid.showActiveInstances();
+    }
+  }
+
   private checkInfrastructureCreationProgress() {
     this.userAccessKeyService.checkUserAccessKey()
       .subscribe(

@@ -79,9 +79,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_subnet', params))
         except:
-            append_result("Failed to create subnet")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to create subnet. Exception: " + str(err))
         sys.exit(1)
 
     tag = {"Key": edge_conf['tag_name'], "Value": "{}-{}-subnet".format(edge_conf['service_base_name'], os.environ['edge_user_name'])}

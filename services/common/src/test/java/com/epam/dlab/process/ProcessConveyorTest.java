@@ -142,7 +142,7 @@ public class ProcessConveyorTest {
                 cf.add(DlabProcess.getInstance().start(ping, pingCommand.split(" ")));
             }
         }
-        Thread.sleep(500);
+        Thread.sleep(1000);
         Collection<ProcessId> pIds = DlabProcess.getInstance().getActiveProcesses();
         assertEquals(100,pIds.size());
 
