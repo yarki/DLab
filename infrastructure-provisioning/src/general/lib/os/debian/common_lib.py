@@ -23,9 +23,10 @@ from fabric.contrib.files import exists
 import sys
 
 
-def ensure_pkg(requisites, user):
+def ensure_pkg(user, requisites='linux-headers-generic python-pip python-dev groff gcc vim less git wget sysv-rc-conf libssl-dev unattended-upgrades'):
     try:
         if not exists('/home/{}/.ensure_dir/pkg_upgraded'.format(user)):
+            print "Updating repositories and installing requested tools: " + requisites
             sudo('apt-get update')
             sudo('apt-get -y install ' + requisites)
             sudo('unattended-upgrades -v')
