@@ -38,7 +38,7 @@ args = parser.parse_args()
 
 def build_docker_images(image_list):
     try:
-        local('scp -r -i {} /project_tree/* {}:{}sources/'.format(args.keyfile, env.host_string, args.dlab_path))
+        local('test_scp -r -i {} /project_tree/* {}:{}sources/'.format(args.keyfile, env.host_string, args.dlab_path))
         for image in image_list:
             name = image['name']
             tag = image['tag']
