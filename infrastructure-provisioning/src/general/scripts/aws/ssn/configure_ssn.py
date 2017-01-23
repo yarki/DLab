@@ -59,13 +59,13 @@ if __name__ == "__main__":
 
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
-        params = "--hostname {} --keyfile {} --pip_packages 'boto3 argparse fabric jupyter awscli pymongo' --user {}". \
+        params = "--hostname {} --keyfile {} --pip_packages 'boto3 argparse fabric awscli pymongo' --user {}". \
             format(instance_hostname, "/root/keys/" + os.environ['conf_key_name'] + ".pem", os.environ['conf_os_user'])
 
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            append_result("Failed installing software: pip, apt")
+            append_result("Failed installing software: pip, packages")
             raise Exception
     except:
         remove_ec2(tag_name, instance_name)
