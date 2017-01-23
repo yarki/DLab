@@ -24,10 +24,7 @@ from fabric.api import *
 import argparse
 import os
 import sys
-import time
 from fabric.api import lcd
-from fabric.contrib.files import exists
-from fabvenv import virtualenv
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket', type=str, default='')
@@ -39,17 +36,13 @@ parser.add_argument('--hadoop_version', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--excluded_lines', type=str, default='')
 parser.add_argument('--user_name', type=str, default='')
+parser.add_argument('--computational_name', type=str, default='')
 args = parser.parse_args()
 
 emr_dir = '/opt/' + args.emr_version + '/jars/'
 kernels_dir = '/home/ubuntu/.local/share/jupyter/kernels/'
 spark_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
 yarn_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/conf/'
-# if args.emr_version == 'emr-4.3.0' or args.emr_version == 'emr-4.6.0' or args.emr_version == 'emr-4.8.0':
-#     hadoop_version = '2.6'
-# else:1
-#     hadoop_version = args.hadoop_version
-# spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 
 
 def checksum_check(file):
@@ -123,9 +116,6 @@ def r_kernel(args):
         text = text.replace('SPRK_ACTION', 'session(master = \\\"yarn\\\")')
     with open(kernel_path, 'w') as f:
         f.write(text)
-
-    #local('export HADOOP_CONF_DIR="/opt/{0}/{1}/conf/"; export YARN_CONF_DIR="/opt/{0}/{1}/conf/"; export SPARKR_SUBMIT_ARGS="--master yarn-client sparkr-shell"; export SPARK_HOME="/opt/{0}/{1}/spark/";'.format(args.emr_version, args.cluster_name) + ' export R_LIBS_SITE="${R_LIBS_SITE}:${SPARK_HOME}/R/lib"; R -e "install.packages(\'devtools\',repos=\'http://cran.us.r-project.org\')"; R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"; R CMD javareconf; R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
-    #local('R -e "IRkernel::installspec()"')
 
 
 def pyspark_kernel(args):
@@ -231,7 +221,7 @@ def get_files(s3client, s3resource, dist, bucket, local):
         if result.get('Contents') is not None:
             for file in result.get('Contents'):
                 if not os.path.exists(os.path.dirname(local + os.sep + file.get('Key'))):
-                     os.makedirs(os.path.dirname(local + os.sep + file.get('Key')))
+                    os.makedirs(os.path.dirname(local + os.sep + file.get('Key')))
                 s3resource.meta.client.download_file(bucket, file.get('Key'), local + os.sep + file.get('Key'))
 
 
@@ -282,6 +272,7 @@ def configure_rstudio():
         except:
             sys.exit(1)
 
+
 def configure_zeppelin_emr_interpreter(args):
     try:
         spark_libs = "/opt/" + args.emr_version + "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-core*.jar /opt/" + \
@@ -290,43 +281,46 @@ def configure_zeppelin_emr_interpreter(args):
                      "/jars/usr/lib/hadoop-lzo/lib/hadoop-lzo-*.jar"
         local('echo \"Configuring emr path for Zeppelin\"')
         local('sed -i \"/^# export SPARK_HOME/c\export SPARK_HOME\" /opt/zeppelin/conf/zeppelin-env.sh')
-        local('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/' + args.emr_version + '\/' + \
+        local('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/' + args.emr_version + '\/' +
               args.cluster_name + '\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
-        local('sed -i \"s/^export HADOOP_CONF_DIR.*/export HADOOP_CONF_DIR=\/opt\/' + args.emr_version + '\/' +  \
-              args.cluster_name + '\/conf/\" /opt/' + args.emr_version + '/' + args.cluster_name + \
+        local('sed -i \"s/^export HADOOP_CONF_DIR.*/export HADOOP_CONF_DIR=\/opt\/' + args.emr_version + '\/' +
+              args.cluster_name + '\/conf/\" /opt/' + args.emr_version + '/' + args.cluster_name +
               '/spark/conf/spark-env.sh')
-        local('echo \"spark.jars $(ls ' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/' + args.emr_version + '/' + \
+        local('echo \"spark.jars $(ls ' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/' + args.emr_version + '/' +
               args.cluster_name + '/spark/conf/spark-defaults.conf')
-        local('echo \"spark.executorEnv.PYTHONPATH pyspark.zip:py4j-src.zip\" >> /opt/' + args.emr_version + '/' + \
+        local('echo \"spark.executorEnv.PYTHONPATH pyspark.zip:py4j-src.zip\" >> /opt/' + args.emr_version + '/' +
               args.cluster_name + '/spark/conf/spark-defaults.conf')
-        local('sed -i \'/spark.yarn.dist.files/s/$/,file:\/opt\/' + args.emr_version + '\/' + args.cluster_name + \
-              '\/spark\/python\/lib\/py4j-src.zip,file:\/opt\/' + args.emr_version + '\/' + args.cluster_name + \
-              '\/spark\/python\/lib\/pyspark.zip/\' /opt/' + args.emr_version + '/' + args.cluster_name + \
+        local('sed -i \'/spark.yarn.dist.files/s/$/,file:\/opt\/' + args.emr_version + '\/' + args.cluster_name +
+              '\/spark\/python\/lib\/py4j-src.zip,file:\/opt\/' + args.emr_version + '\/' + args.cluster_name +
+              '\/spark\/python\/lib\/pyspark.zip/\' /opt/' + args.emr_version + '/' + args.cluster_name +
               '/spark/conf/spark-defaults.conf')
         local('service zeppelin-notebook restart')
         local('sleep 5')
+        local('echo \"Configuring emr spark interpreter for Zeppelin\"')
+        template_file = "/tmp/emr_spark_interpreter.json"
+        p_versions = ["2", "3"]
+        for p_version in p_versions:
+            fr = open(template_file, 'r+')
+            text = fr.read()
+            text = text.replace('CLUSTERNAME', args.cluster_name)
+            text = text.replace('PYTHONVERSION', p_version)
+            text = text.replace('EMRVERSION', args.emr_version + '_' + args.computational_name)
+            tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
+            fw = open(tmp_file, 'w')
+            fw.write(text)
+            fw.close()
+            for _ in range(5):
+                try:
+                    local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d " +
+                          "@/tmp/emr_spark_py" + p_version +
+                          "_interpreter.json http://localhost:8080/api/interpreter/setting")
+                    break
+                except:
+                    local('sleep 5')
+                    pass
+        local('touch /home/ubuntu/.ensure_dir/emr_' + args.computational_name + '_interpreter_ensured')
     except:
-            sys.exit(1)
-    if not os.path.exists('/home/ubuntu/.ensure_dir/emr_interpreter_ensured'):
-        try:
-            local('echo \"Configuring emr spark interpreter for Zeppelin\"')
-            template_file = "/tmp/emr_spark_interpreter.json"
-            p_versions = ["2", "3"]
-            for p_version in p_versions:
-                fr = open(template_file, 'r+')
-                text = fr.read()
-                text = text.replace('CLUSTERNAME', args.cluster_name)
-                text = text.replace('PYTHONVERSION', p_version)
-                text = text.replace('EMRVERSION', args.emr_version)
-                tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
-                fw = open(tmp_file, 'w')
-                fw.write(text)
-                fw.close()
-                local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d @/tmp/emr_spark_py" + \
-                      p_version + "_interpreter.json http://localhost:8080/api/interpreter/setting")
-            local('touch /home/ubuntu/.ensure_dir/emr_interpreter_ensured')
-        except:
-            sys.exit(1)
+        sys.exit(1)
 
 
 def installing_python(args):
@@ -343,11 +337,6 @@ def installing_python(args):
             local('sudo make altinstall')
         with lcd('/tmp/'):
             local('sudo rm -rf Python-' + python_version + '/')
-        #local('sudo make distclean')
-        #local('sudo find . -type d -empty -delete')
-        # local('sudo ln -s /opt/python/python' + python_version + '/bin/python' + python_version[0:3] + ' /usr/bin/python' + python_version)
-        # local('sudo cp /usr/bin/pip /usr/bin/pip' + python_version)
-        # local('''sudo sed -i 's|python|python''' + python_version + '''|g' /usr/bin/pip''' + python_version)
         local('sudo -i virtualenv /opt/python/python' + python_version)
         venv_command = '/bin/bash /opt/python/python' + python_version + '/bin/activate'
         pip_command = '/opt/python/python' + python_version + '/bin/pip'+ python_version[:3]
