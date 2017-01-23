@@ -23,6 +23,7 @@ from dlab.aws_actions import *
 import sys, os
 from fabric.api import *
 from dlab.ssn_lib import *
+import traceback
 
 if __name__ == "__main__":
     local_log_filename = "{}_{}.log".format(os.environ['conf_resource'], os.environ['request_id'])
@@ -125,6 +126,7 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_docker', params))
         except:
+            traceback.print_exc()
             raise Exception
     except Exception as err:
         append_result("Unable to configure docker. Exception: " + str(err))
