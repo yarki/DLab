@@ -75,8 +75,9 @@ if __name__ == "__main__":
         try:
             terminate_emr_cluster(emr_conf['emr_name'], emr_conf['bucket_name'], emr_conf['tag_name'],
                                   emr_conf['notebook_name'], os.environ['conf_os_user'], emr_conf['key_path'])
-        except:
-            append_result("Failed to terminate EMR cluster")
+        except Exception as err:
+            traceback.print_exc()
+            append_result("Failed to terminate EMR cluster. Exception: " + str(err))
             raise Exception
     except:
         sys.exit(1)

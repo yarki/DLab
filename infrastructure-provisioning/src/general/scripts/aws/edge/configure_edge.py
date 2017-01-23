@@ -62,9 +62,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            append_result("Failed installing apps: apt & pip")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing apps: apt & pip. Exception: " + str(err))
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
@@ -83,9 +84,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_http_proxy', params))
         except:
-            append_result("Failed installing http proxy")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing http proxy. Exception: " + str(err))
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
@@ -105,9 +107,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
-            append_result("Failed installing users key")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing users key. Excpeption: " + str(err))
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])

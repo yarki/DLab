@@ -40,6 +40,7 @@ if __name__ == "__main__":
         if not create_aws_config_files(generate_full_config=True):
             logging.info('Unable to create configuration')
             append_result("Unable to create configuration")
+            traceback.print_exc()
             sys.exit(1)
     except:
         sys.exit(1)
@@ -69,13 +70,14 @@ if __name__ == "__main__":
                 params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, service_base_name)
                 try:
                     local("~/scripts/{}.py {}".format('create_vpc', params))
-                except Exception as err:
-                    append_result("Failed to create VPC: " + err)
+                except:
+                    traceback.print_exc()
                     raise Exception
                 os.environ['aws_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
                 enable_vpc_dns(os.environ['aws_vpc_id'])
                 rt_id = create_rt(os.environ['aws_vpc_id'], tag_name, service_base_name)
-            except:
+            except Exception as err:
+                append_result("Failed to create VPC. Exception:" + str(err))
                 sys.exit(1)
 
         if os.environ['aws_subnet_id'] == '' or os.environ['aws_subnet_id'] == 'PUT_YOUR_VALUE_HERE':
@@ -86,13 +88,14 @@ if __name__ == "__main__":
                 params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {} --prefix {} --ssn {}".format(os.environ['aws_vpc_id'], 'ssn', tag_name, service_base_name, '20', True)
                 try:
                     local("~/scripts/{}.py {}".format('create_subnet', params))
-                except Exception as err:
-                    append_result("Failed to create Subnet: " + err)
+                except:
+                    traceback.print_exc()
                     raise Exception
                 with open('/tmp/ssn_subnet_id', 'r') as f:
                     os.environ['aws_subnet_id'] = f.read()
                 enable_auto_assign_ip(os.environ['aws_subnet_id'])
-            except:
+            except Exception as err:
+                append_result("Failed to create Subnet. Exception: " + str(err))
                 if pre_defined_vpc:
                     remove_internet_gateways(os.environ['aws_vpc_id'], tag_name, service_base_name)
                     remove_route_tables(tag_name, True)
@@ -153,12 +156,13 @@ if __name__ == "__main__":
                     format(sg_name, os.environ['aws_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), service_base_name, tag_name, False, True)
                 try:
                     local("~/scripts/{}.py {}".format('create_security_group', params))
-                except Exception as err:
-                    append_result("Failed creating security group for SSN: " + err)
+                except:
+                    traceback.print_exc()
                     raise Exception
                 with open('/tmp/ssn_sg_id', 'r') as f:
                     os.environ['aws_security_groups_ids'] = f.read()
-            except:
+            except Exception as err:
+                append_result("Failed creating security group for SSN. Exception: " + str(err))
                 if pre_defined_vpc:
                     remove_internet_gateways(os.environ['aws_vpc_id'], tag_name, service_base_name)
                     remove_subnets(service_base_name + "-subnet")
@@ -171,10 +175,11 @@ if __name__ == "__main__":
                 format(role_name, role_profile_name, policy_name, policy_path)
         try:
             local("~/scripts/{}.py {}".format('create_role_policy', params))
-        except Exception as err:
-            append_result("Unable to create roles: " + err)
+        except:
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Unable to create roles. Exception: " + str(err))
         if pre_defined_sg:
             remove_sgroups(tag_name)
         if pre_defined_vpc:
@@ -191,10 +196,11 @@ if __name__ == "__main__":
             os.environ['aws_vpc_id'], os.environ['aws_region'], tag_name, service_base_name)
         try:
             local("~/scripts/{}.py {}".format('create_endpoint', params))
-        except Exception as err:
-            append_result("Unable to create an endpoint: " + err)
+        except:
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Unable to create an endpoint. Exception: " + str(err))
         remove_all_iam_resources(instance)
         if pre_defined_sg:
             remove_sgroups(tag_name)
@@ -213,10 +219,11 @@ if __name__ == "__main__":
 
         try:
             local("~/scripts/{}.py {}".format('create_bucket', params))
-        except Exception as err:
-            append_result("Unable to create bucket: " + err)
+        except:
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Unable to create bucket. Exception: " + str(err))
         remove_all_iam_resources(instance)
         if pre_defined_sg:
             remove_sgroups(tag_name)
@@ -238,11 +245,11 @@ if __name__ == "__main__":
 
         try:
             local("~/scripts/{}.py {}".format('create_instance', params))
-        except Exception as err:
-            append_result("Unable to create ssn instance: " + err)
+        except:
+            traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("E: " + str(err))
+        append_result("Unable to create ssn instance. Exception: " + str(err))
         remove_all_iam_resources(instance)
         remove_s3(instance)
         if pre_defined_sg:

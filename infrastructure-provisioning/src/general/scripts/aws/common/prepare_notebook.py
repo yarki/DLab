@@ -90,7 +90,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_instance', params))
         except:
-            append_result("Failed to create instance")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to create instance. Exception: " + str(err))
         sys.exit(1)
