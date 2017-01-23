@@ -52,6 +52,7 @@ ENV AWS_DIR /root/.aws
 RUN mkdir -p /root/conf
 RUN mkdir -p /root/scripts
 RUN mkdir -p /root/templates
+RUN mkdir -p /root/files
 RUN mkdir -p /usr/lib/python2.7/dlab
 RUN mkdir -p /root/keys/.ssh
 
