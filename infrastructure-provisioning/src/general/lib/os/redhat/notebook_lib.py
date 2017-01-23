@@ -276,6 +276,7 @@ def install_tensor(os_user, tensorflow_version, files_dir):
             sudo('mkdir /var/log/tensorboard')
             put(files_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
             put(files_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
+            sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/tensorboard-python*")
             sudo("chmod 644 /tmp/tensorboard-python*")
             sudo('\cp /tmp/tensorboard-python* /etc/systemd/system/')
             sudo("systemctl daemon-reload")
