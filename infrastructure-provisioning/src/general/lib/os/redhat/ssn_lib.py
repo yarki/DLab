@@ -92,7 +92,7 @@ def configure_nginx(config, dlab_path):
         if not exists("/etc/nginx/conf.d/nginx_proxy.conf"):
             sudo('rm -f /etc/nginx/conf.d/*')
             put(config['nginx_template_dir'] + 'nginx_proxy.conf', '/tmp/nginx_proxy.conf')
-            put(config['nginx_template_dir'] + 'nginx_redhat.conf', '/tmp/nginx.conf')
+            #put(config['nginx_template_dir'] + 'nginx_redhat.conf', '/tmp/nginx.conf')
             sudo('cat /tmp/nginx.conf > /etc/nginx/nginx.conf')
             sudo('mv /tmp/nginx_proxy.conf ' + dlab_path + 'tmp/')
             sudo('\cp ' + dlab_path + 'tmp/nginx_proxy.conf /etc/nginx/conf.d/')
