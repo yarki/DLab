@@ -45,6 +45,7 @@ pyspark_local_path_dir = '/home/' + args.os_user + '/.local/share/zeppelin/inter
 py3spark_local_path_dir = '/home/' + args.os_user + '/.local/share/zeppelin/interpreters/py3spark_local/'
 zeppelin_conf_file = '/home/' + args.os_user + '/.local/share/zeppelin/zeppelin_notebook_config.py'
 templates_dir = '/root/templates/'
+files_dir = '/root/files'
 
 
 def ensure_s3_libs():
@@ -70,7 +71,7 @@ def configure_notebook_server(notebook_name):
             sudo('cp /opt/zeppelin/conf/zeppelin-site.xml.template /opt/zeppelin/conf/zeppelin-site.xml')
             sudo('sed -i \"/# export ZEPPELIN_PID_DIR/c\export ZEPPELIN_PID_DIR=/var/run/zeppelin\" /opt/zeppelin/conf/zeppelin-env.sh')
             sudo('sed -i \"/# export ZEPPELIN_IDENT_STRING/c\export ZEPPELIN_IDENT_STRING=notebook\" /opt/zeppelin/conf/zeppelin-env.sh')
-            put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
+            put(files_dir + 'interpreter.json', '/tmp/interpreter.json')
             sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
             sudo('mkdir /var/log/zeppelin')
             sudo('mkdir /var/run/zeppelin')
