@@ -125,9 +125,9 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_docker', params))
         except:
-            append_result("Unable to configure docker")
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Unable to configure docker. Exception: " + str(err))
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)

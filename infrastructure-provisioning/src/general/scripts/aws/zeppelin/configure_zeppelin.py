@@ -76,8 +76,8 @@ if __name__ == "__main__":
                     os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('configure_proxy', params))
-        except:
-            append_result("Failed to configure proxy")
+        except Exception as err:
+            append_result("Failed to configure proxy. Exception: " + str(err))
             raise Exception
     except:
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
