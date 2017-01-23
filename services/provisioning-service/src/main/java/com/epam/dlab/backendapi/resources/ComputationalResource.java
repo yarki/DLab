@@ -44,6 +44,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
 import static com.epam.dlab.backendapi.core.commands.DockerAction.CREATE;
+import static com.epam.dlab.backendapi.core.commands.DockerAction.CONFIGURE;
 import static com.epam.dlab.backendapi.core.commands.DockerAction.TERMINATE;
 
 @Path("/computational")
@@ -70,7 +71,7 @@ public class ComputationalResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(CREATE, uuid, dto,ui.getAccessToken()));
+                getFileHandlerCallback(CREATE, uuid, dto, ui.getAccessToken()));
         try {
             long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
             commandExecuter.executeAsync(
@@ -95,6 +96,40 @@ public class ComputationalResource implements DockerCommands {
             );
         } catch (Throwable t) {
             throw new DlabException("Could not create computational resource cluster", t);
+        }
+        return uuid;
+    }
+
+    @Path("/configure")
+    @POST
+    public String configure(@Auth UserInfo ui, ComputationalCreateDTO dto) throws IOException, InterruptedException {
+        LOGGER.debug("Configure computational resources cluster");
+        String uuid = DockerCommands.generateUUID();
+        folderListenerExecutor.start(configuration.getImagesDirectory(),
+                configuration.getResourceStatusPollTimeout(),
+                getFileHandlerCallback(CONFIGURE, uuid, dto, ui.getAccessToken()));
+        try {
+            //long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
+            commandExecuter.executeAsync(
+            		ui.getName(),
+                    uuid,
+                    commandBuilder.buildCommand(
+                            new RunDockerCommand()
+                                    .withInteractive()
+                                    //.withName(nameContainer(dto.getEdgeUserName(), TERMINATE, dto.getComputationalName()))
+                                    .withVolumeForRootKeys(configuration.getKeyDirectory())
+                                    .withVolumeForResponse(configuration.getImagesDirectory())
+                                    .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+                                    //.withResource(getResourceType())
+                                    .withRequestId(uuid)
+                                    //.withEmrTimeout(Long.toString(timeout))
+                                    .withCredsKeyName(configuration.getAdminKey())
+                                    .withActionConfigure(configuration.getEmrImage()),
+                            dto
+                    )
+            );
+        } catch (Throwable t) {
+            throw new DlabException("Could not configure computational resource cluster", t);
         }
         return uuid;
     }
@@ -131,8 +166,8 @@ public class ComputationalResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO dto,String accessToken) {
-        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName(), dto.getComputationalName(),accessToken);
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto, String accessToken) {
+        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto, accessToken);
     }
 
     private String nameContainer(String user, DockerAction action, String name) {

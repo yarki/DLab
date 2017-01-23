@@ -34,7 +34,7 @@ import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.util.Date;
 
-abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implements FileHandlerCallback {
+abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implements FileHandlerCallback {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
     protected ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
@@ -66,6 +66,10 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     public boolean checkUUID(String uuid) {
         return originalUuid.equals(uuid);
     }
+    
+    public DockerAction getAction() {
+    	return action;
+    }
 
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
@@ -74,6 +78,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
         T result = getBaseStatusDTO(status);
+        
         JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
         if (success) {
             LOGGER.debug("Did {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
@@ -82,11 +87,18 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
             result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
             resultNode = resultNode.get(CONF_NODE);
         }
+        LOGGER.debug("Handle Info: status is {}, resultNode is {}", result, (resultNode == null ? "<NULL>" : resultNode.asText()));
         if (resultNode != null) {
             result = parseOutResponse(resultNode, result);
+            LOGGER.debug("Handle new Info: resultNode is {}", (resultNode == null ? "<NULL>" : resultNode.asText()));
         }
+        
         selfService.post(getCallbackURI(), result, resultType);
-        return !UserInstanceStatus.FAILED.equals(status);
+        if (UserInstanceStatus.FAILED.equals(status)) {
+        	return false;
+        }
+        postHandle(); // If failed then return post to self-service the status failed
+        return true;
     }
 
     @Override
@@ -97,6 +109,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
             throw new DlabException("Could not send status update for request " + originalUuid + ", user " + user, t);
         }
     }
+    
+    abstract protected void postHandle();
 
     abstract protected String getCallbackURI();
 
@@ -123,6 +137,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
             switch (action) {
                 case CREATE:
                     return UserInstanceStatus.RUNNING;
+                case CONFIGURE:
+                	return UserInstanceStatus.RUNNING;
                 case START:
                     return UserInstanceStatus.RUNNING;
                 case STOP:

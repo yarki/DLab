@@ -18,15 +18,38 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
+import static com.epam.dlab.UserInstanceStatus.CREATING;
+import static com.epam.dlab.UserInstanceStatus.FAILED;
+import static com.epam.dlab.UserInstanceStatus.TERMINATING;
+
+import java.util.Optional;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
+import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
-import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.backendapi.resources.dto.ComputationalCreateFormDTO;
 import com.epam.dlab.backendapi.resources.dto.ComputationalLimitsDTO;
+import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
@@ -37,17 +60,8 @@ import com.epam.dlab.rest.contracts.ComputationalAPI;
 import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+
 import io.dropwizard.auth.Auth;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import static com.epam.dlab.UserInstanceStatus.*;
 
 /** Provides the REST API for the computational resource.
  */
@@ -112,6 +126,7 @@ public class ComputationalResource implements ComputationalAPI {
                 ComputationalCreateDTO dto = new ComputationalCreateDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withExploratoryName(formDTO.getNotebookName())
+                        .withNotebookTemplateName(getExploratoryTemplateName(userInfo.getName(), formDTO.getNotebookName()))
                         .withComputationalName(formDTO.getName())
                         .withNotebookName(exploratoryId)
                         .withInstanceCount(formDTO.getInstanceCount())
@@ -210,6 +225,21 @@ public class ComputationalResource implements ComputationalAPI {
                 .withComputationalName(computationalName)
                 .withStatus(status);
         infrastructureProvisionDAO.updateComputationalStatus(computationalStatus);
+    }
+    
+    /** Finds and returns the name of template for exploratory.
+     * @param username name of user.
+     * @param exploratoryName name of exploratory.
+     * @throws DlabException
+     */
+    private String getExploratoryTemplateName(String username, String exploratoryName) throws DlabException {
+    	Optional<UserInstanceDTO> opt = infrastructureProvisionDAO.fetchExploratoryFields(username, exploratoryName);
+        if( opt.isPresent() ) {
+            return opt
+            		.get()
+            		.getTemplateName();
+        }
+        throw new DlabException(String.format("Exploratory instance for user {} with name {} not found.", username, exploratoryName));
     }
 
 }
