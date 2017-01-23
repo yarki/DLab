@@ -65,7 +65,8 @@ def configure_notebook_server(notebook_name):
             sys.exit(1)
 
         ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, pyspark_local_path_dir,
-                           py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, args.os_user)
+                           py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, args.os_user,
+                           files_dir)
 
         try:
             put(templates_dir + 'jupyter-notebook.service', '/tmp/jupyter-notebook.service')
