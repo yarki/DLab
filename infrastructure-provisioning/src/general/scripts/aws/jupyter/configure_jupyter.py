@@ -99,8 +99,8 @@ if __name__ == "__main__":
     try:
         logging.info('[CONFIGURE JUPYTER NOTEBOOK INSTANCE]')
         print '[CONFIGURE JUPYTER NOTEBOOK INSTANCE]'
-        params = "--hostname {} --instance_name {} --keyfile {} --region {} --spark_version {} --hadoop_version {} --os_user {}".\
-            format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['aws_region'], os.environ['notebook_spark_version'], os.environ['notebook_hadoop_version'], os.environ['conf_os_user'])
+        params = "--hostname {} --keyfile {} --region {} --spark_version {} --hadoop_version {} --os_user {}".\
+            format(instance_hostname, keyfile_name, os.environ['aws_region'], os.environ['notebook_spark_version'], os.environ['notebook_hadoop_version'], os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('configure_jupyter_node', params))
         except:
@@ -152,14 +152,14 @@ if __name__ == "__main__":
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')
     dns_name = get_instance_hostname(notebook_config['instance_name'])
-    jupyter_ip_url = "http://" + ip_address + ":8888/" + notebook_config['instance_name'] + "/"
-    jupyter_dns_url = "http://" + dns_name + ":8888/" + notebook_config['instance_name'] + "/"
+    jupyter_ip_url = "http://" + ip_address + ":8888/"
+    jupyter_dns_url = "http://" + dns_name + ":8888/"
     print '[SUMMARY]'
     logging.info('[SUMMARY]')
     print "Instance name: " + notebook_config['instance_name']
     print "Private DNS: " + dns_name
     print "Private IP: " + ip_address
-    print "Instance ID" + get_instance_by_name(notebook_config['instance_name'])
+    print "Instance ID: " + get_instance_by_name(notebook_config['instance_name'])
     print "Instance type: " + notebook_config['instance_type']
     print "Key name: " + notebook_config['key_name']
     print "User key name: " + notebook_config['user_keyname']

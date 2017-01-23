@@ -26,10 +26,8 @@ from dlab.fab import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
-parser.add_argument('--instance_name', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--region', type=str, default='')
-parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 parser.add_argument('--spark_version', type=str, default='')
 parser.add_argument('--hadoop_version', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
@@ -49,7 +47,7 @@ templates_dir = '/root/templates/'
 files_dir = '/root/files/'
 
 
-def configure_notebook_server(notebook_name):
+def configure_notebook_server():
     if not exists('/home/' + args.os_user + '/.ensure_dir/jupyter_ensured'):
         try:
             sudo('pip install jupyter --no-cache-dir')
@@ -57,7 +55,6 @@ def configure_notebook_server(notebook_name):
             sudo('jupyter notebook --generate-config --config ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
             sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
-            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
             sudo('echo \'c.NotebookApp.cookie_secret = b"' + id_generator() + '"\' >> ' + jupyter_conf_file)
             sudo('''echo "c.NotebookApp.token = u''" >> ''' + jupyter_conf_file)
             sudo('echo \'c.KernelSpecManager.ensure_native_kernel = False\' >> ' + jupyter_conf_file)
@@ -87,14 +84,7 @@ def configure_notebook_server(notebook_name):
         ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region)
 
         ensure_r_kernel(spark_version, args.os_user)
-    else:
-        try:
-            sudo("sed -i '/^c.NotebookApp.base_url/d' " + jupyter_conf_file)
-            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
-            sudo("systemctl stop jupyter-notebook; sleep 5")
-            sudo("systemctl start jupyter-notebook")
-        except:
-            sys.exit(1)
+
 
 ##############
 # Run script #
@@ -113,4 +103,4 @@ if __name__ == "__main__":
     except:
         sys.exit(1)
     prepare_disk(args.os_user)
-    configure_notebook_server("_".join(args.instance_name.split()))
+    configure_notebook_server()
