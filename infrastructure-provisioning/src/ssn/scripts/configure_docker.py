@@ -38,18 +38,17 @@ args = parser.parse_args()
 
 def build_docker_images(image_list):
     try:
-        sudo('mkdir /project_images; chown ' + args.os_user + ' /project_images')
-        local('scp -r -i {} /project_tree/* {}:/project_images/'.format(args.keyfile, env.host_string))
+        local('scp -r -i {} /project_tree/* {}:{}sources/'.format(args.keyfile, env.host_string, args.dlab_path))
         for image in image_list:
             name = image['name']
             tag = image['tag']
             if name == 'base':
-                sudo("cd /project_images/; docker build --build-arg OS={2} --build-arg CLOUD={3} --file {0}/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
-                     .format(name, tag, args.os_family, args.cloud_provider))
+                sudo("cd {4}sources/; docker build --build-arg OS={2} --build-arg CLOUD={3} --file {0}/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
+                     .format(name, tag, args.os_family, args.cloud_provider, args.dlab_path))
             else:
                 sudo(
-                    "cd /project_images/; docker build --build-arg OS={2} --build-arg CLOUD={3} --build-arg RESOURCE={4} --file {0}/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
-                    .format(name, tag, args.os_family, args.cloud_provider, name))
+                    "cd {}sources/; docker build --build-arg OS={2} --build-arg CLOUD={3} --build-arg RESOURCE={4} --file {0}/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-{0}:{1} ."
+                    .format(name, tag, args.os_family, args.cloud_provider, name, args.dlab_path))
         return True
     except:
         return False
