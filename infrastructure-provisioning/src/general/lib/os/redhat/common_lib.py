@@ -30,7 +30,7 @@ def ensure_pkg(requisites, user):
             sudo('wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm')
             sudo('rpm -ivh epel-release-latest-7.noarch.rpm')
             sudo('yum repolist')
-            sudo('yum -y install python-pip')
+            sudo('yum -y install python-pip gcc')
             sudo('rm -f epel-release-latest-7.noarch.rpm')
             sudo('export LC_ALL=C')
             sudo('yum -y install ' + requisites)
