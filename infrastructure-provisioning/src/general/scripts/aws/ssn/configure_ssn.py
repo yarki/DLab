@@ -124,7 +124,8 @@ if __name__ == "__main__":
 
         try:
             local("~/scripts/{}.py {}".format('configure_docker', params))
-        except:
+        except Exception as err:
+            append_result("failed executing script for configuring docker. Exception: " + str(err))
             raise Exception
     except Exception as err:
         append_result("Unable to configure docker. Exception: " + str(err))
