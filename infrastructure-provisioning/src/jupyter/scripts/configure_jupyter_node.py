@@ -71,6 +71,7 @@ def configure_notebook_server(notebook_name):
             put(templates_dir + 'jupyter-notebook.service', '/tmp/jupyter-notebook.service')
             sudo("chmod 644 /tmp/jupyter-notebook.service")
             sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
+            sudo("sed -i 's|OS_USR|" + args.os_user + "|' /tmp/jupyter-notebook.service")
             sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
             sudo('chown -R ' + args.os_user + ':' + args.os_user + ' /home/' + args.os_user + '/.local')
             sudo('mkdir /mnt/var')
