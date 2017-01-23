@@ -126,7 +126,7 @@ if __name__ == "__main__":
         print "Hostname: " + instance_hostname
         print "Public IP: " + public_ip_address
         print "Private IP: " + ip_address
-        print "Instance ID" + get_instance_by_name(edge_conf['instance_name'])
+        print "Instance ID: " + get_instance_by_name(edge_conf['instance_name'])
         print "Key name: " + edge_conf['key_name']
         print "Bucket name: " + edge_conf['bucket_name']
         print "Notebook SG: " + edge_conf['notebook_security_group_name']
