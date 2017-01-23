@@ -179,7 +179,6 @@ def configure_notebook_server(notebook_name):
             sudo('jupyter notebook --generate-config --config ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
             sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
-            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
             sudo('echo \'c.NotebookApp.cookie_secret = b"' + id_generator() + '"\' >> ' + jupyter_conf_file)
             sudo('''echo "c.NotebookApp.token = u''" >> ''' + jupyter_conf_file)
             sudo('echo \'c.KernelSpecManager.ensure_native_kernel = False\' >> ' + jupyter_conf_file)
@@ -208,14 +207,7 @@ def configure_notebook_server(notebook_name):
         ensure_s3_kernel()
 
         ensure_r_kernel()
-    else:
-        try:
-            sudo("sed -i '/^c.NotebookApp.base_url/d' " + jupyter_conf_file)
-            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
-            sudo("systemctl stop jupyter-notebook; sleep 5")
-            sudo("systemctl start jupyter-notebook")
-        except:
-            sys.exit(1)
+
 
 ##############
 # Run script #
