@@ -44,7 +44,6 @@ parser.add_argument('--region', type=str, default='')
 parser.add_argument('--excluded_lines', type=str, default='')
 parser.add_argument('--user_name', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
-parser.add_argument('--computational_name', type=str, default='')
 args = parser.parse_args()
 
 emr_dir = '/opt/' + args.emr_version + '/jars/'
@@ -73,7 +72,7 @@ def configure_zeppelin_emr_interpreter(args):
             text = fr.read()
             text = text.replace('CLUSTERNAME', args.cluster_name)
             text = text.replace('PYTHONVERSION', p_version)
-            text = text.replace('EMRVERSION', args.emr_version + '_' + args.computational_name)
+            text = text.replace('EMRVERSION', args.emr_version + '_' + args.cluster_name)
             tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
             fw = open(tmp_file, 'w')
             fw.write(text)
@@ -87,7 +86,7 @@ def configure_zeppelin_emr_interpreter(args):
                 except:
                     local('sleep 5')
                     pass
-        local('touch /home/' + args.os_user + '/.ensure_dir/emr_' + args.computational_name + '_interpreter_ensured')
+        local('touch /home/' + args.os_user + '/.ensure_dir/emr_' + args.cluster_name + '_interpreter_ensured')
     except:
             sys.exit(1)
 
