@@ -41,15 +41,17 @@ def run():
     try:
         params = "--uuid {}".format(notebook_config['uuid'])
         local("~/scripts/{}.py {}".format('prepare_notebook', params))
-    except:
-        append_result("Failed preparing Notebook node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed preparing Notebook node. Exception: " + str(err))
         sys.exit(1)
 
     try:
         params = "--uuid {}".format(notebook_config['uuid'])
         local("~/scripts/{}.py {}".format('configure_tensor', params))
-    except:
-        append_result("Failed configuring Notebook node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed configuring Notebook node. Exception: " + str(err))
         sys.exit(1)
 
 
@@ -62,8 +64,9 @@ def terminate():
                         filename=local_log_filepath)
     try:
         local("~/scripts/{}.py".format('terminate_notebook'))
-    except:
-        append_result("Failed terminating Notebook node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed terminating Notebook node. Exception: " + str(err))
         sys.exit(1)
 
 
@@ -76,8 +79,9 @@ def stop():
                         filename=local_log_filepath)
     try:
         local("~/scripts/{}.py".format('stop_notebook'))
-    except:
-        append_result("Failed stopping Notebook node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed stopping Notebook node. Exception: " + str(err))
         sys.exit(1)
 
 
@@ -91,8 +95,9 @@ def start():
 
     try:
         local("~/scripts/{}.py".format('start_notebook'))
-    except:
-        append_result("Failed starting Notebook node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed starting Notebook node. Exception: " + str(err))
         sys.exit(1)
 
 
@@ -106,6 +111,7 @@ def configure():
 
     try:
         local("~/scripts/{}.py".format('configure_analytic_tool'))
-    except:
-        append_result("Failed configuring analytical tool on Notebook node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed configuring analytical tool on Notebook node. Exception: " + str(err))
         sys.exit(1)

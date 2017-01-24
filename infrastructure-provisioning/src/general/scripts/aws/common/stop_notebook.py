@@ -80,17 +80,15 @@ if __name__ == "__main__":
     notebook_config['tag_name'] = notebook_config['service_base_name'] + '-Tag'
     notebook_config['key_path'] = os.environ['conf_key_dir'] + '/' + os.environ['conf_key_name'] + '.pem'
 
+    logging.info('[STOP NOTEBOOK]')
+    print '[STOP NOTEBOOK]'
     try:
-        logging.info('[STOP NOTEBOOK]')
-        print '[STOP NOTEBOOK]'
-        try:
-            stop_notebook(notebook_config['notebook_name'], notebook_config['bucket_name'], notebook_config['tag_name'],
-                          os.environ['conf_os_user'], notebook_config['key_path'])
-        except Exception as err:
-            append_result("Failed to stop notebook. Exception: " + str(err))
-            raise Exception
-    except:
+        stop_notebook(notebook_config['notebook_name'], notebook_config['bucket_name'], notebook_config['tag_name'],
+                      os.environ['conf_os_user'], notebook_config['key_path'])
+    except Exception as err:
+        append_result("Failed to stop notebook. Exception: " + str(err))
         sys.exit(1)
+
 
     try:
         with open("/root/result.json", 'w') as result:

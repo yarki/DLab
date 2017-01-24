@@ -26,10 +26,8 @@ from dlab.fab import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
-parser.add_argument('--instance_name', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--region', type=str, default='')
-parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 parser.add_argument('--spark_version', type=str, default='')
 parser.add_argument('--hadoop_version', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
@@ -46,9 +44,10 @@ jupyter_conf_file = '/home/' + args.os_user + '/.local/share/jupyter/jupyter_not
 scala_kernel_path = '/usr/local/share/jupyter/kernels/apache_toree_scala/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
+files_dir = '/root/files/'
 
 
-def configure_notebook_server(notebook_name):
+def configure_notebook_server():
     if not exists('/home/' + args.os_user + '/.ensure_dir/jupyter_ensured'):
         try:
             sudo('pip install jupyter --no-cache-dir')
@@ -56,7 +55,6 @@ def configure_notebook_server(notebook_name):
             sudo('jupyter notebook --generate-config --config ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
             sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
-            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
             sudo('echo \'c.NotebookApp.cookie_secret = b"' + id_generator() + '"\' >> ' + jupyter_conf_file)
             sudo('''echo "c.NotebookApp.token = u''" >> ''' + jupyter_conf_file)
             sudo('echo \'c.KernelSpecManager.ensure_native_kernel = False\' >> ' + jupyter_conf_file)
@@ -64,12 +62,14 @@ def configure_notebook_server(notebook_name):
             sys.exit(1)
 
         ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, pyspark_local_path_dir,
-                           py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, args.os_user)
+                           py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, args.os_user,
+                           files_dir)
 
         try:
             put(templates_dir + 'jupyter-notebook.service', '/tmp/jupyter-notebook.service')
             sudo("chmod 644 /tmp/jupyter-notebook.service")
             sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
+            sudo("sed -i 's|OS_USR|" + args.os_user + "|' /tmp/jupyter-notebook.service")
             sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
             sudo('chown -R ' + args.os_user + ':' + args.os_user + ' /home/' + args.os_user + '/.local')
             sudo('mkdir /mnt/var')
@@ -83,17 +83,10 @@ def configure_notebook_server(notebook_name):
 
         ensure_python3_kernel(args.os_user)
 
-        ensure_s3_kernel(args.os_user, s3_jars_dir, templates_dir, args.region)
+        ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
         ensure_r_kernel(spark_version, args.os_user)
-    else:
-        try:
-            sudo("sed -i '/^c.NotebookApp.base_url/d' " + jupyter_conf_file)
-            sudo('echo "c.NotebookApp.base_url = \'/' + notebook_name + '/\'" >> ' + jupyter_conf_file)
-            sudo("systemctl stop jupyter-notebook; sleep 5")
-            sudo("systemctl start jupyter-notebook")
-        except:
-            sys.exit(1)
+
 
 ##############
 # Run script #
@@ -103,7 +96,6 @@ if __name__ == "__main__":
     env['connection_attempts'] = 100
     env.key_filename = [args.keyfile]
     env.host_string = args.os_user + '@' + args.hostname
-    deeper_config = json.loads(args.additional_config)
 
     print "Configuring notebook server."
     try:
@@ -112,4 +104,4 @@ if __name__ == "__main__":
     except:
         sys.exit(1)
     prepare_disk(args.os_user)
-    configure_notebook_server("_".join(args.instance_name.split()))
+    configure_notebook_server()

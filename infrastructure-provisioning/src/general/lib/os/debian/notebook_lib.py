@@ -42,7 +42,7 @@ def enable_proxy(proxy_host, proxy_port):
             sys.exit(1)
 
 
-def ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, pyspark_local_path_dir, py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, os_user):
+def ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, pyspark_local_path_dir, py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, os_user, files_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/spark_scala_ensured'):
         try:
             sudo('apt-get install -y default-jre')
@@ -70,7 +70,7 @@ def ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, py
             sudo('ln -s /opt/spark/ /usr/local/spark')
             sudo('jupyter toree install')
             sudo('mv ' + scala_kernel_path + 'lib/* /tmp/')
-            put(templates_dir + 'toree-assembly-0.2.0.jar', '/tmp/toree-assembly-0.2.0.jar')
+            put(files_dir + 'toree-assembly-0.2.0.jar', '/tmp/toree-assembly-0.2.0.jar')
             sudo('mv /tmp/toree-assembly-0.2.0.jar ' + scala_kernel_path + 'lib/')
             sudo('sed -i "s|Apache Toree - Scala|Local Apache Toree - Scala (Scala-' + scala_version + ', Spark-' + spark_version + ')|g" ' + scala_kernel_path + 'kernel.json')
             sudo('touch /home/' + os_user + '/.ensure_dir/spark_scala_ensured')
@@ -240,7 +240,7 @@ def install_rstudio(os_user, local_spark_path, rstudio_pass):
             sys.exit(1)
 
 
-def install_tensor(os_user, templates_dir, tensorflow_version):
+def install_tensor(os_user, tensorflow_version, files_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/tensor_ensured'):
         try:
             # install cuda
@@ -251,7 +251,7 @@ def install_tensor(os_user, templates_dir, tensorflow_version):
             sudo('mv /usr/local/cuda-8.0 /opt/')
             sudo('ln -s /opt/cuda-8.0 /usr/local/cuda-8.0')
             # install cuDNN
-            put(templates_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
+            put(files_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
             run('tar xvzf /tmp/cudnn-8.0-linux-x64-v5.1.tgz -C /tmp')
             sudo('mkdir -p /opt/cudnn/include')
             sudo('mkdir -p /opt/cudnn/lib64')
@@ -263,8 +263,8 @@ def install_tensor(os_user, templates_dir, tensorflow_version):
             sudo('python2.7 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp27-none-linux_x86_64.whl')
             sudo('python3 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp35-cp35m-linux_x86_64.whl')
             sudo('mkdir /var/log/tensorboard')
-            put(templates_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
-            put(templates_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
+            put(files_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
+            put(files_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
             sudo("chmod 644 /tmp/tensorboard-python*")
             sudo('\cp /tmp/tensorboard-python* /etc/systemd/system/')
             sudo("systemctl daemon-reload")

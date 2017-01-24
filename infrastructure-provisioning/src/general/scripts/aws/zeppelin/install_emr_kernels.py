@@ -35,13 +35,15 @@ parser.add_argument('--notebook_ip', type=str, default='')
 parser.add_argument('--emr_excluded_spark_properties', type=str, default='')
 parser.add_argument('--edge_user_name', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
+parser.add_argument('--computational_name', type=str, default='')
 args = parser.parse_args()
 
 
 def configure_notebook(args):
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
-    put(templates_dir + 'emr_spark_interpreter.json', '/tmp/emr_spark_interpreter.json')
+    files_dir = '/root/files/'
+    put(files_dir + 'emr_spark_interpreter.json', '/tmp/emr_spark_interpreter.json')
     put(templates_dir + 'spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
@@ -64,4 +66,5 @@ if __name__ == "__main__":
     sudo("/usr/bin/python /usr/local/bin/create_configs.py --bucket " + args.bucket + " --cluster_name "
          + args.cluster_name + " --emr_version " + args.emr_version + " --spark_version " + spark_version
          + " --hadoop_version " + hadoop_version + " --region " + args.region + " --excluded_lines '"
-         + args.emr_excluded_spark_properties + "' --user_name " + args.edge_user_name + " --os_user " + args.os_user)
+         + args.emr_excluded_spark_properties + "' --user_name " + args.edge_user_name + " --os_user " + args.os_user
+         + ' --computational_name ' + args.computational_name)

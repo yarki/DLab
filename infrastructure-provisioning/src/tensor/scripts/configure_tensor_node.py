@@ -43,6 +43,7 @@ spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-b
 local_spark_path = '/opt/spark/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
+files_dir = '/root/files/'
 
 
 ##############
@@ -68,13 +69,13 @@ if __name__ == "__main__":
     ensure_libraries_py(args.os_user)
 
     print "Install TensorFlow"
-    install_tensor(args.os_user, templates_dir, tensorflow_version)
+    install_tensor(args.os_user, tensorflow_version, files_dir)
 
     print "Install local Spark"
     ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path )
 
     print "Install local S3 kernels"
-    ensure_s3_kernel(args.os_user, s3_jars_dir, templates_dir, args.region)
+    ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
 
 

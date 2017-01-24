@@ -46,7 +46,7 @@ if __name__ == "__main__":
         region = os.environ['aws_region']
         ssn_ami_name = os.environ['aws_' + os.environ['conf_os_family'] + '_ami_name']
         ssn_ami_id = get_ami_id(ssn_ami_name)
-        policy_path = '/root/templates/policy.json'
+        policy_path = '/root/files/policy.json'
         vpc_cidr = '172.31.0.0/16'
         sg_name = instance_name + '-SG'
         pre_defined_vpc = False
@@ -65,9 +65,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            append_result("Failed installing software: pip, packages")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing software: pip, packages. Exception: " + str(err))
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -92,9 +93,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_ssn_node', params))
         except:
-            append_result("Failed configuring ssn")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed configuring ssn. Exception: " + str(err))
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -153,9 +155,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            append_result("Unable to preconfigure ui")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Unable to preconfigure UI. Exception: " + str(err))
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -179,9 +182,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_ui', params))
         except:
-            append_result("Unable to upload UI")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Unable to upload UI. Exception: " + str(err))
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)

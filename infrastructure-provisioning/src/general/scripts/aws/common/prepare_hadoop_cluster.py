@@ -44,6 +44,14 @@ if __name__ == "__main__":
     if os.path.exists('/response/.emr_creating_' + os.environ['exploratory_name']):
         time.sleep(30)
     create_aws_config_files()
+    edge_status = get_instance_status(
+        os.environ['conf_service_base_name'] + '-' + os.environ['edge_user_name'] + '-edge')
+    if edge_status != 'running':
+        logging.info('ERROR: Edge node is unavailable! Aborting...')
+        print 'ERROR: Edge node is unavailable! Aborting...'
+        put_resource_status('edge', 'Unavailable', 'emr')
+        append_result("Edge node is unavailable")
+        sys.exit(1)
     print 'Generating infrastructure names and tags'
     emr_conf = dict()
     emr_conf['uuid'] = str(uuid.uuid4())[:5]
@@ -82,13 +90,6 @@ if __name__ == "__main__":
     except:
         emr_conf['emr_timeout'] = "1200"
 
-    try:
-        emr_conf['exploratory_name'] = os.environ['exploratory_name']
-        emr_conf['computational_name'] = os.environ['computational_name']
-    except:
-        emr_conf['exploratory_name'] = ''
-        emr_conf['computational_name'] = ''
-
     print "Will create exploratory environment with edge node as access point as following: " + \
           json.dumps(emr_conf, sort_keys=True, indent=4, separators=(',', ': '))
     logging.info(json.dumps(emr_conf))
@@ -96,8 +97,9 @@ if __name__ == "__main__":
     try:
         emr_waiter(os.environ['notebook_instance_name'])
         local('touch /response/.emr_creating_' + os.environ['exploratory_name'])
-    except:
-        append_result("EMR waiter fail")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("EMR waiter fail. Exception: " + str(err))
         sys.exit(1)
 
     with hide('stderr', 'running', 'warnings'):
@@ -116,13 +118,14 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_cluster', params))
         except:
-            append_result("Failed to create EMR Cluster")
+            traceback.print_exc()
             raise Exception
 
         cluster_name = emr_conf['cluster_name']
         keyfile_name = "/root/keys/{}.pem".format(emr_conf['key_name'])
         local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
-    except:
+    except Exception as err:
+        append_result("Failed to create EMR Cluster. Exception: " + str(err))
         local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
         sys.exit(1)
 

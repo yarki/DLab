@@ -24,6 +24,8 @@ import random
 import sys
 import string
 import json, uuid, time, datetime
+from dlab.aws_meta import *
+from dlab.aws_actions import *
 
 
 def ensure_pip(requisites):
@@ -79,11 +81,11 @@ def prepare_disk(os_user):
             sys.exit(1)
 
 
-def ensure_s3_kernel(os_user, s3_jars_dir, templates_dir, region):
+def ensure_s3_kernel(os_user, s3_jars_dir, files_dir, region, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/s3_kernel_ensured'):
         try:
             sudo('mkdir -p ' + s3_jars_dir)
-            put(templates_dir + 'local_jars.tar.gz', '/tmp/local_jars.tar.gz')
+            put(files_dir + 'local_jars.tar.gz', '/tmp/local_jars.tar.gz')
             sudo('tar -xzf /tmp/local_jars.tar.gz -C ' + s3_jars_dir)
             put(templates_dir + 'spark-defaults_local.conf', '/tmp/spark-defaults_local.conf')
             sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/spark-defaults_local.conf".format(region))
@@ -158,3 +160,12 @@ def append_result(error):
     with open("/root/result.json", 'w') as f:
         json.dump(data, f)
     print data
+
+
+def put_resource_status(resource, status, instance):
+    env['connection_attempts'] = 100
+    keyfile = "/root/keys/" + os.environ['creds_key_name'] + ".pem"
+    hostname = get_instance_hostname(os.environ['conf_service_base_name'] + '-ssn')
+    env.key_filename = [keyfile]
+    env.host_string = 'ubuntu@' + hostname
+    sudo('python ' + os.environ[instance + '_dlab_path'] + 'tmp/resource_status.py --resource {} --status {}'.format(resource, status))

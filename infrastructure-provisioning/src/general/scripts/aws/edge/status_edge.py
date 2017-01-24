@@ -47,7 +47,8 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('collect_data', params))
         except:
-            append_result("Failed to collect necessary information")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to collect necessary information. Exception: " + str(err))
         sys.exit(1)

@@ -38,8 +38,9 @@ def run():
                         filename=local_log_filepath)
     try:
         local("~/scripts/{}.py".format('prepare_hadoop_cluster'))
-    except:
-        append_result("Failed configuring Notebook node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed configuring Notebook node. Exception: " + str(err))
         sys.exit(1)
 
 
@@ -52,6 +53,7 @@ def terminate():
 
     try:
         local("~/scripts/{}.py".format('terminate_emr'))
-    except:
-        append_result("Failed configuring Notebook node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed configuring Notebook node. Exception: " + str(err))
         sys.exit(1)

@@ -78,9 +78,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_proxy', params))
         except:
-            append_result("Failed to configure proxy")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to configure proxy. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -93,9 +94,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            append_result("Failed installing apps: apt & pip")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing apps: apt & pip. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -109,9 +111,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_rstudio_node', params))
         except:
-            append_result("Failed to configure rstudio")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to configure rstudio. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -125,9 +128,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
-            append_result("Failed installing users key")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing users key. Exception: " + str(err))
         sys.exit(1)
 
     # checking the need for image creation
@@ -149,7 +153,7 @@ if __name__ == "__main__":
     print "Instance name: " + notebook_config['instance_name']
     print "Private DNS: " + dns_name
     print "Private IP: " + ip_address
-    print "Instance ID" + get_instance_by_name(notebook_config['instance_name'])
+    print "Instance ID: " + get_instance_by_name(notebook_config['instance_name'])
     print "Instance type: " + notebook_config['instance_type']
     print "Key name: " + notebook_config['key_name']
     print "User key name: " + notebook_config['user_keyname']

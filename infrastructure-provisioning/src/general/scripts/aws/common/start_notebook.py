@@ -54,8 +54,9 @@ if __name__ == "__main__":
         try:
             print "Starting notebook"
             start_ec2(notebook_config['tag_name'], notebook_config['notebook_name'])
-        except:
-            append_result("Failed to start notebook")
+        except Exception as err:
+            traceback.print_exc()
+            append_result("Failed to start notebook. Exception: " + str(err))
             raise Exception
     except:
         sys.exit(1)

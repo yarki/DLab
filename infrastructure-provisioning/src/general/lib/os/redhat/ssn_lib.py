@@ -68,7 +68,7 @@ def configure_jenkins(dlab_path, os_user):
         if not exists('{}tmp/jenkins_configured'.format(dlab_path)):
             sudo('rm -rf /var/lib/jenkins/*')
             sudo('mkdir -p /var/lib/jenkins/jobs/')
-            sudo('chown -R {0}:{0} /var/lib/jenkins/'.format(args.user))
+            sudo('chown -R {0}:{0} /var/lib/jenkins/'.format(os_user))
             put('/root/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
             sudo("find /var/lib/jenkins/jobs/ -type f | xargs sed -i \'s/OS_USR/{}/g\'".format(os_user))
             sudo('chown -R jenkins:jenkins /var/lib/jenkins')
@@ -187,8 +187,9 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path, os_user):
                 local('scp -r -i {} /root/web_app/provisioning-service/*.yml {}:'.format(keyfile, host_string) + '/tmp/yml_tmp/')
                 sudo('mv /tmp/yml_tmp/* ' + os.environ['ssn_dlab_path'] + 'conf/')
                 sudo('rmdir /tmp/yml_tmp/')
-            except:
-                append_result("Unable to upload webapp jars")
+            except Exception as err:
+                traceback.print_exc()
+                append_result("Unable to upload webapp jars. Exception: " + str(err))
                 sys.exit(1)
 
             sudo('service supervisord start')

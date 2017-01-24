@@ -75,9 +75,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_proxy', params))
         except:
-            append_result("Failed to configure proxy")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to configure proxy. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -89,9 +90,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            append_result("Failed installing apps: apt & pip")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing apps: apt & pip. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -99,14 +101,15 @@ if __name__ == "__main__":
     try:
         logging.info('[CONFIGURE JUPYTER NOTEBOOK INSTANCE]')
         print '[CONFIGURE JUPYTER NOTEBOOK INSTANCE]'
-        params = "--hostname {} --instance_name {} --keyfile {} --region {} --spark_version {} --hadoop_version {} --os_user {}".\
-            format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['aws_region'], os.environ['notebook_spark_version'], os.environ['notebook_hadoop_version'], os.environ['conf_os_user'])
+        params = "--hostname {} --keyfile {} --region {} --spark_version {} --hadoop_version {} --os_user {}".\
+            format(instance_hostname, keyfile_name, os.environ['aws_region'], os.environ['notebook_spark_version'], os.environ['notebook_hadoop_version'], os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('configure_jupyter_node', params))
         except:
-            append_result("Failed to configure jupyter")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to configure jupyter. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -119,9 +122,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_jupyter_additions', params))
         except:
-            append_result("Failed to install python libs")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to install python libs. Exception: " + str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -137,7 +141,8 @@ if __name__ == "__main__":
         except:
             append_result("Failed installing users key")
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing users key. Exception: " + str(err))
         sys.exit(1)
 
     # checking the need for image creation
@@ -152,14 +157,14 @@ if __name__ == "__main__":
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')
     dns_name = get_instance_hostname(notebook_config['instance_name'])
-    jupyter_ip_url = "http://" + ip_address + ":8888/" + notebook_config['instance_name'] + "/"
-    jupyter_dns_url = "http://" + dns_name + ":8888/" + notebook_config['instance_name'] + "/"
+    jupyter_ip_url = "http://" + ip_address + ":8888/"
+    jupyter_dns_url = "http://" + dns_name + ":8888/"
     print '[SUMMARY]'
     logging.info('[SUMMARY]')
     print "Instance name: " + notebook_config['instance_name']
     print "Private DNS: " + dns_name
     print "Private IP: " + ip_address
-    print "Instance ID" + get_instance_by_name(notebook_config['instance_name'])
+    print "Instance ID: " + get_instance_by_name(notebook_config['instance_name'])
     print "Instance type: " + notebook_config['instance_type']
     print "Key name: " + notebook_config['key_name']
     print "User key name: " + notebook_config['user_keyname']

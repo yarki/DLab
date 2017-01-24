@@ -24,6 +24,7 @@ import logging
 import sys
 import os
 from dlab.fab import *
+import traceback
 
 
 def status():
@@ -35,8 +36,9 @@ def status():
 
     try:
         local("~/scripts/{}.py".format('status_edge'))
-    except:
-        append_result("Failed preparing SSN node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed preparing SSN node. Exception: " + str(err))
         sys.exit(1)
 
 
@@ -50,14 +52,16 @@ def run():
 
     try:
         local("~/scripts/{}.py".format('prepare_edge'))
-    except:
-        append_result("Failed preparing Edge node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed preparing Edge node. Exception: " + str(err))
         sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('configure_edge'))
-    except:
-        append_result("Failed configuring Edge node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed configuring Edge node. Exception: " + str(err))
         sys.exit(1)
 
 
@@ -70,6 +74,7 @@ def terminate():
                         filename=local_log_filepath)
     try:
         local("~/scripts/{}.py".format('terminate_edge'))
-    except:
-        append_result("Failed terminating Edge node")
+    except Exception as err:
+        traceback.print_exc()
+        append_result("Failed terminating Edge node. Exception: " + str(err))
         sys.exit(1)

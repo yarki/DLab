@@ -62,9 +62,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_prerequisites', params))
         except:
-            append_result("Failed installing apps: apt & pip")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing apps: apt & pip. Exception: " + str(err))
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
@@ -83,9 +84,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('configure_http_proxy', params))
         except:
-            append_result("Failed installing http proxy")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing http proxy. Exception: " + str(err))
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
@@ -105,9 +107,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
-            append_result("Failed installing users key")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed installing users key. Excpeption: " + str(err))
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
@@ -123,7 +126,7 @@ if __name__ == "__main__":
         print "Hostname: " + instance_hostname
         print "Public IP: " + public_ip_address
         print "Private IP: " + ip_address
-        print "Instance ID" + get_instance_by_name(edge_conf['instance_name'])
+        print "Instance ID: " + get_instance_by_name(edge_conf['instance_name'])
         print "Key name: " + edge_conf['key_name']
         print "Bucket name: " + edge_conf['bucket_name']
         print "Notebook SG: " + edge_conf['notebook_security_group_name']

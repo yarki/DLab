@@ -79,9 +79,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_subnet', params))
         except:
-            append_result("Failed to create subnet")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to create subnet. Exception: " + str(err))
         sys.exit(1)
 
     tag = {"Key": edge_conf['tag_name'], "Value": "{}-{}-subnet".format(edge_conf['service_base_name'], os.environ['edge_user_name'])}
@@ -97,9 +98,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_role_policy', params))
         except:
-            append_result("Failed to creating roles")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to creating roles. Exception: " + str(err))
         sys.exit(1)
 
     try:
@@ -111,9 +113,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_role_policy', params))
         except:
-            append_result("Failed to creating roles")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to creating roles. Exception: " + str(err))
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         sys.exit(1)
 
@@ -218,8 +221,9 @@ if __name__ == "__main__":
                    edge_conf['instance_name'], json.dumps(sg_rules_template_egress), True, edge_conf['notebook_instance_name'], 'edge')
         try:
             local("~/scripts/{}.py {}".format('create_security_group', params))
-        except:
-            append_result("Failed creating security group for edge node")
+        except Exception as err:
+            traceback.print_exc()
+            append_result("Failed creating security group for edge node. Exception: " + str(err))
             raise Exception
 
         with hide('stderr', 'running', 'warnings'):
@@ -254,13 +258,14 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_security_group', params))
         except:
-            append_result("Failed creating security group for private subnet")
+            traceback.print_exc()
             raise Exception
 
         with hide('stderr', 'running', 'warnings'):
             print 'Waiting for changes to propagate'
             time.sleep(10)
-    except:
+    except Exception as err:
+        append_result("Failed creating security group for private subnet. Exception: " + str(err))
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
@@ -276,9 +281,10 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_bucket', params))
         except:
-            append_result("Failed to create bucket")
+            traceback.print_exc()
             raise Exception
-    except:
+    except Exception as err:
+        append_result("Failed to create bucket. Exception: " + str(err))
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
@@ -293,8 +299,9 @@ if __name__ == "__main__":
         try:
             local("~/scripts/{}.py {}".format('create_policy', params))
         except:
-            append_result("Failed to create bucket policy")
-    except:
+            traceback.print_exc()
+    except Exception as err:
+        append_result("Failed to create bucket policy. Exception: " + str(err))
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])
@@ -307,16 +314,17 @@ if __name__ == "__main__":
         print '[CREATE EDGE INSTANCE]'
         params = "--node_name {} --ami_id {} --instance_type {} --key_name {} --security_group_ids {} " \
                  "--subnet_id {} --iam_profile {} --infra_tag_name {} --infra_tag_value {}" \
-                 .format(edge_conf['instance_name'], edge_conf['ami_id'], edge_conf['instance_size'], edge_conf['key_name'],
-                  edge_group_id, edge_conf['public_subnet_id'], edge_conf['role_profile_name'],
-                  edge_conf['tag_name'], edge_conf['instance_name'])
+            .format(edge_conf['instance_name'], edge_conf['ami_id'], edge_conf['instance_size'], edge_conf['key_name'],
+                    edge_group_id, edge_conf['public_subnet_id'], edge_conf['role_profile_name'],
+                    edge_conf['tag_name'], edge_conf['instance_name'])
         try:
             local("~/scripts/{}.py {}".format('create_instance', params))
         except:
-                append_result("Failed to create instance")
-                raise Exception
+            traceback.print_exc()
+            raise Exception
 
-    except:
+    except Exception as err:
+        append_result("Failed to create instance. Exception: " + str(err))
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])

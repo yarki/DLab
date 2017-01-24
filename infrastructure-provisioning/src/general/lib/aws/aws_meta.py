@@ -575,3 +575,13 @@ def get_hadoop_version(cluster_name):
                 if j.get("Name") == 'Hadoop':
                     hadoop_version = j.get("Version")
     return hadoop_version[0:3]
+
+
+def get_instance_status(instance_name):
+    client = boto3.client('ec2')
+    response = client.describe_instances(Filters=[
+        {'Name': 'tag:Name', 'Values': [instance_name]}]).get('Reservations')
+    for i in response:
+        inst = i.get('Instances')
+        for j in inst:
+            return j.get('State').get('Name')
