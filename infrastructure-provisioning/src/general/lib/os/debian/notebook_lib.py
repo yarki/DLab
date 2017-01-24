@@ -27,6 +27,7 @@ import string
 import sys
 from dlab.notebook_lib import *
 from dlab.fab import *
+from dlab.common_lib import *
 import os
 
 
@@ -38,6 +39,9 @@ def enable_proxy(proxy_host, proxy_port):
             sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
             sudo("echo 'Acquire::http::Proxy \"" + proxy_string + "\";' >> /etc/apt/apt.conf")
             sudo('touch /tmp/proxy_enabled ')
+
+            print "Renewing gpg key"
+            renew_gpg_key()
         except:
             sys.exit(1)
 
