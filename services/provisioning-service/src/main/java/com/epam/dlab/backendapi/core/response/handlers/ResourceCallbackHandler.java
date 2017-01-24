@@ -73,7 +73,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
 
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
-        LOGGER.debug("Got file {} while waiting for {}", fileName, originalUuid);
+        LOGGER.debug("Got file {} while waiting for {}, file content: {}", fileName, originalUuid, new String(content));
         JsonNode document = MAPPER.readTree(content);
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
