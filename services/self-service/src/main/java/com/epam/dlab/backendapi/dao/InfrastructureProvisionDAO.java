@@ -156,6 +156,9 @@ public class InfrastructureProvisionDAO extends BaseDAO {
 	@SuppressWarnings("serial")
     public UpdateResult updateExploratoryFields(ExploratoryStatusDTO dto) throws DlabException {
         Document values = new Document(STATUS, dto.getStatus()).append(UPTIME, dto.getUptime());
+    	if (dto.getInstanceId() != null) {
+    		values.append(INSTANCE_ID, dto.getInstanceId());
+    	}
         if (dto.getErrorMessage() != null) {
             values.append(ERROR_MESSAGE, dto.getErrorMessage());
         }
@@ -228,7 +231,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     public UpdateResult updateComputationalStatus(ComputationalStatusDTO dto) throws DlabException {
         try {
             Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus());
-            return updateOne(USER_INSTANCES,
+        	return updateOne(USER_INSTANCES,
                     and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                             elemMatch(COMPUTATIONAL_RESOURCES,
                             		and(eq(COMPUTATIONAL_NAME, dto.getComputationalName()),
@@ -273,7 +276,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         try {
             Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus())
                     .append(computationalFieldFilter(UPTIME), dto.getUptime());
-            if (dto.getComputationalId() != null) {
+        	if (dto.getInstanceId() != null) {
+        		values.append(INSTANCE_ID, dto.getInstanceId());
+        	}
+        	if (dto.getComputationalId() != null) {
                 values.append(computationalFieldFilter(COMPUTATIONAL_ID), dto.getComputationalId());
             }
             return updateOne(USER_INSTANCES, and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
