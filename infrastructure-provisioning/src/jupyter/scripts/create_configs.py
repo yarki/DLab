@@ -44,7 +44,6 @@ parser.add_argument('--region', type=str, default='')
 parser.add_argument('--excluded_lines', type=str, default='')
 parser.add_argument('--user_name', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
-parser.add_argument('--computational_name', type=str, default='')
 args = parser.parse_args()
 
 emr_dir = '/opt/' + args.emr_version + '/jars/'
@@ -136,6 +135,7 @@ def toree_kernel(args):
         text = text.replace('CLUSTER', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
+        text = text.replace('OS_USER', args.os_user)
         text = text.replace('EMR', args.emr_version)
         text = text.replace('SC_VER', scala_version)
         with open(kernel_path, 'w') as f:

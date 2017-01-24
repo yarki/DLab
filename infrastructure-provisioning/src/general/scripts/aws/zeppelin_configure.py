@@ -190,7 +190,7 @@ if __name__ == "__main__":
     with open("/root/result.json", 'w') as result:
         res = {"hostname": dns_name,
                "ip": ip_address,
-               "id": get_instance_by_name(notebook_config['instance_name']),
+               "instance_id": get_instance_by_name(notebook_config['instance_name']),
                "master_keyname": os.environ['conf_key_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",

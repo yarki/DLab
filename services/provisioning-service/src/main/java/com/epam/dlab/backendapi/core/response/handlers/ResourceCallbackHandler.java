@@ -38,6 +38,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
     protected ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
+    private static final String INSTANCE_ID_FIELD = "instance_id";
     private static final String STATUS_FIELD = "status";
     private static final String RESPONSE_NODE = "response";
     private static final String RESULT_NODE = "result";
@@ -84,6 +85,9 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         T result = getBaseStatusDTO(status);
         
         JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
+        if (action == DockerAction.CREATE) {
+        	result.setInstanceId(getTextValue(resultNode.get(INSTANCE_ID_FIELD)));
+        }
         if (success) {
             LOGGER.debug("Did {} resource for user: {}, request: {}", action, user, originalUuid);
         } else {

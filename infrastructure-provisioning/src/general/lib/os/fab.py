@@ -162,10 +162,10 @@ def append_result(error):
     print data
 
 
-def put_resource_status(resource, status, instance):
+def put_resource_status(resource, status, instance, os_user):
     env['connection_attempts'] = 100
     keyfile = "/root/keys/" + os.environ['creds_key_name'] + ".pem"
     hostname = get_instance_hostname(os.environ['conf_service_base_name'] + '-ssn')
     env.key_filename = [keyfile]
-    env.host_string = 'ubuntu@' + hostname
+    env.host_string = os_user + '@' + hostname
     sudo('python ' + os.environ[instance + '_dlab_path'] + 'tmp/resource_status.py --resource {} --status {}'.format(resource, status))

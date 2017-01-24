@@ -14,7 +14,7 @@
     "YARN_CONF_DIR": "/opt/EMR/CLUSTER/conf/"
   },
   "argv": [
-    "/home/ubuntu/.local/share/jupyter/kernels/toree_CLUSTER/bin/run.sh",
+    "/home/OS_USER/.local/share/jupyter/kernels/toree_CLUSTER/bin/run.sh",
     "--profile",
     "{connection_file}"
   ],

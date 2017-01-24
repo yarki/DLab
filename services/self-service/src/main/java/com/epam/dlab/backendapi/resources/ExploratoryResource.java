@@ -98,7 +98,9 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withNotebookImage(formDTO.getImage())
                         .withNotebookInstanceType(formDTO.getShape())
                         .withAwsRegion(settingsDAO.getAwsRegion())
-                        .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups());
+                        .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups())
+                        .withConfOsUser(settingsDAO.getConfOsUser())
+                        .withConfOsFamily(settingsDAO.getConfOsFamily());
                 LOGGER.debug("Created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
                         .ok(provisioningService.post(EXPLORATORY_CREATE, userInfo.getAccessToken(), dto, String.class))
@@ -279,7 +281,9 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(userInstance.getExploratoryId())
-                    .withAwsRegion(settingsDAO.getAwsRegion());
+                    .withAwsRegion(settingsDAO.getAwsRegion())
+                    .withConfOsUser(settingsDAO.getConfOsUser())
+                    .withConfOsFamily(settingsDAO.getConfOsFamily());
             return provisioningService.post(action, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
         	updateExploratoryStatusSilent(userInfo.getName(), exploratoryName, FAILED);

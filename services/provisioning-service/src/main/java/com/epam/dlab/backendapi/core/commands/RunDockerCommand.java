@@ -136,10 +136,22 @@ public class RunDockerCommand implements DockerCommand {
         options.add(String.format("-e \"conf_key_name=%s\"", confKeyName));
         return this;
     }
+
     public RunDockerCommand withConfServiceBaseName(String confServiceBaseName) {
         options.add(String.format("-e \"conf_service_base_name=%s\"", confServiceBaseName));
         return this;
     }
+
+    public RunDockerCommand withConfOsUser(String confOsUser) {
+        options.add(String.format("-e \"conf_os_user=%s\"", confOsUser));
+        return this;
+    }
+
+    public RunDockerCommand withConfOsFamily(String confOsFamily) {
+        options.add(String.format("-e \"conf_os_family=%s\"", confOsFamily));
+        return this;
+    }
+
 
     public RunDockerCommand withEmrInstanceCount(String emrInstanceCount) {
         options.add(String.format("-e \"emr_instance_count=%s\"", emrInstanceCount));

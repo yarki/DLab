@@ -172,13 +172,14 @@ if __name__ == "__main__":
     print "TensorBoard python2 URL: " + tensorboard_python2_url
     print "TensorBoard python3 URL: " + tensorboard_python3_url
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
-        'key_name'] + '.pem ubuntu@' + ip_address
-    print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ubuntu@' + dns_name
+        'key_name'] + '.pem ' + os.environ['conf_os_user'] + '@' + ip_address
+    print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ' \
+          + os.environ['conf_os_user'] + '@' + dns_name
 
     with open("/root/result.json", 'w') as result:
         res = {"hostname": dns_name,
                "ip": ip_address,
-               "id": get_instance_by_name(notebook_config['instance_name']),
+               "instance_id": get_instance_by_name(notebook_config['instance_name']),
                "master_keyname": os.environ['conf_key_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",

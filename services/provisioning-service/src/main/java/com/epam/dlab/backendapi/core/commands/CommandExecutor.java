@@ -35,14 +35,12 @@ public class CommandExecutor implements ICommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
 
     public List<String> executeSync(final String username, final String uuid, String command) throws Exception {
-    	LOGGER.debug("Execute command sync for user {} with UUID {}: {}", username, uuid, command);
         CompletableFuture<ProcessInfo> f = DlabProcess.getInstance().start(new ProcessId(username,uuid), "bash","-c",command);
         ProcessInfo pi = f.get();
         return Arrays.asList(pi.getStdOut().split("\n"));
     }
 
     public void executeAsync(final String username, final String uuid, final String command) {
-    	LOGGER.debug("Execute command async for user {} with UUID {}: {}", username, uuid, command);
         DlabProcess.getInstance().start(new ProcessId(username,uuid), "bash","-c",command);
     }
 

@@ -42,7 +42,7 @@ def read_yml_conf(path, section, param):
         return ''
 
 
-def put_resource_status(resource, status):
+def update_resource_status(resource, status):
     path = "/etc/mongod.conf"
     mongo_ip = read_yml_conf(path, 'net', 'bindIp')
     mongo_port = read_yml_conf(path, 'net', 'port')
@@ -51,7 +51,7 @@ def put_resource_status(resource, status):
 
 if __name__ == "__main__":
     try:
-        put_resource_status(args.resource, args.status)
+        update_resource_status(args.resource, args.status)
     except:
         print "Unable to update status for the resource" + args.resource
         sys.exit(1)

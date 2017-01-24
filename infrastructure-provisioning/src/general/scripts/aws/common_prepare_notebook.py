@@ -47,7 +47,7 @@ if __name__ == "__main__":
     if edge_status != 'running':
         logging.info('ERROR: Edge node is unavailable! Aborting...')
         print 'ERROR: Edge node is unavailable! Aborting...'
-        put_resource_status('edge', 'Unavailable', 'notebook')
+        put_resource_status('edge', 'Unavailable', 'notebook', os.environ['conf_os_user'])
         append_result("Edge node is unavailable")
         sys.exit(1)
     print 'Generating infrastructure names and tags'

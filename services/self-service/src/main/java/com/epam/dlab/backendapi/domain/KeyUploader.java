@@ -72,7 +72,9 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
                     .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups())
                     .withAwsRegion(settingsDAO.getAwsRegion())
                     .withAwsVpcId(settingsDAO.getAwsVpcId())
-                    .withAwsSubnetId(settingsDAO.getAwsSubnetId());
+                    .withAwsSubnetId(settingsDAO.getAwsSubnetId())
+                    .withConfOsUser(settingsDAO.getConfOsUser())
+                    .withConfOsFamily(settingsDAO.getConfOsFamily());
             UploadFileDTO dto = new UploadFileDTO()
                     .withEdge(edge)
                     .withContent(content);
