@@ -69,7 +69,7 @@ if __name__ == "__main__":
     ensure_libraries_py(args.os_user)
 
     print "Install TensorFlow"
-    install_tensor(args.os_user, tensorflow_version, files_dir)
+    install_tensor(args.os_user, tensorflow_version, files_dir, templates_dir)
 
     print "Install local Spark"
     ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path )
