@@ -199,11 +199,10 @@ public class ComputationalResource implements ComputationalAPI {
                     .withClusterName(computationalId)
                     .withConfKeyDir(settingsDAO.getConfKeyDir())
                     .withConfOsUser(settingsDAO.getConfOsUser())
+                    .withConfOsFamily(settingsDAO.getConfOsFamily())
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
-                    .withAwsRegion(settingsDAO.getAwsRegion())
-                    .withConfOsUser(settingsDAO.getConfOsUser())
-                    .withConfOsFamily(settingsDAO.getConfOsFamily());
+                    .withAwsRegion(settingsDAO.getAwsRegion());
             return provisioningService.post(EMR_TERMINATE, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
         	try {
