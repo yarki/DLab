@@ -45,7 +45,7 @@ if __name__ == "__main__":
         print '[COLLECTING DATA]'
         params = "--service_base_name '{}' --user_name '{}'".format(edge_conf['service_base_name'], edge_conf['user_name'])
         try:
-            local("~/scripts/{}.py {}".format('collect_data', params))
+            local("~/scripts/{}.py {}".format('common_collect_data', params))
         except:
             traceback.print_exc()
             raise Exception

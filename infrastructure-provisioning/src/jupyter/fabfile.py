@@ -41,7 +41,7 @@ def run():
 
     try:
         params = "--uuid {}".format(notebook_config['uuid'])
-        local("~/scripts/{}.py {}".format('prepare_notebook', params))
+        local("~/scripts/{}.py {}".format('common_prepare_notebook', params))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed preparing Notebook node. Exception: " + str(err))
@@ -49,7 +49,7 @@ def run():
 
     try:
         params = "--uuid {}".format(notebook_config['uuid'])
-        local("~/scripts/{}.py {}".format('configure_jupyter', params))
+        local("~/scripts/{}.py {}".format('jupyter_configure', params))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed configuring Notebook node. Exception: " + str(err))
@@ -64,7 +64,7 @@ def terminate():
                         level=logging.DEBUG,
                         filename=local_log_filepath)
     try:
-        local("~/scripts/{}.py".format('terminate_notebook'))
+        local("~/scripts/{}.py".format('common_terminate_notebook'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed terminating Notebook node. Exception: " + str(err))
@@ -79,7 +79,7 @@ def stop():
                         level=logging.DEBUG,
                         filename=local_log_filepath)
     try:
-        local("~/scripts/{}.py".format('stop_notebook'))
+        local("~/scripts/{}.py".format('common_stop_notebook'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed stopping Notebook node. Exception: " + str(err))
@@ -95,7 +95,7 @@ def start():
                         filename=local_log_filepath)
 
     try:
-        local("~/scripts/{}.py".format('start_notebook'))
+        local("~/scripts/{}.py".format('common_start_notebook'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed starting Notebook node. Exception: " + str(err))
@@ -111,7 +111,7 @@ def configure():
                         filename=local_log_filepath)
 
     try:
-        local("~/scripts/{}.py".format('configure_analytic_tool'))
+        local("~/scripts/{}.py".format('common_configure_analytic_tool'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed configuring analytical tool on Notebook node. Exception: " + str(err))

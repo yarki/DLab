@@ -45,7 +45,7 @@ if __name__ == "__main__":
         params = "--tag_name {} --edge_sg {} --nb_sg {}". \
                  format(ssn_conf['tag_name'], ssn_conf['edge_sg'], ssn_conf['nb_sg'])
         try:
-            local("~/scripts/{}.py {}".format('terminate_aws_resources', params))
+            local("~/scripts/{}.py {}".format('ssn_terminate_aws_resources', params))
         except:
             traceback.print_exc()
             raise Exception

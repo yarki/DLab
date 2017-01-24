@@ -116,7 +116,7 @@ if __name__ == "__main__":
                     os.environ['conf_os_user'], emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'],
                     os.environ['conf_key_dir'], os.environ['edge_user_name'])
         try:
-            local("~/scripts/{}.py {}".format('create_cluster', params))
+            local("~/scripts/{}.py {}".format('emr_create', params))
         except:
             traceback.print_exc()
             raise Exception

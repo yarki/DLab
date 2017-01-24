@@ -93,7 +93,7 @@ if __name__ == "__main__":
                     notebook_config['tag_name'], notebook_config['instance_name'], instance_class,
                     os.environ['notebook_disk_size'])
         try:
-            local("~/scripts/{}.py {}".format('create_instance', params))
+            local("~/scripts/{}.py {}".format('common_create_instance', params))
         except:
             traceback.print_exc()
             raise Exception
