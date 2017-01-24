@@ -101,8 +101,6 @@ public class ExploratoryResource implements DockerCommands {
                 .withResource(getResourceType())
                 .withRequestId(uuid)
                 .withConfKeyName(configuration.getAdminKey())
-                .withConfOsUser(dto.getConfOsUser())
-                .withConfOsFamily(dto.getConfOsFamily())
                 .withImage(dto.getNotebookImage())
                 .withAction(action);
 

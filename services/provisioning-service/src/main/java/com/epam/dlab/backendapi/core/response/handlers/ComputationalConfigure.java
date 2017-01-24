@@ -58,8 +58,6 @@ public class ComputationalConfigure  implements DockerCommands {
                                     .withRequestId(uuid)
                                     //.withEmrTimeout(Long.toString(timeout))
                                     .withConfKeyName(configuration.getAdminKey())
-                                    .withConfOsUser(dto.getConfOsUser())
-                                    .withConfOsFamily(dto.getConfOsFamily())
                                     .withActionConfigure(configuration.getEmrImage()),
                             dto
                     )

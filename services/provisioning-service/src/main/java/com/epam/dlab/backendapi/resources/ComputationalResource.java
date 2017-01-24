@@ -96,8 +96,6 @@ public class ComputationalResource implements DockerCommands {
                                     .withEmrTimeout(Long.toString(timeout))
                                     .withServiceRole(configuration.getEmrServiceRoleDefault())
                                     .withConfKeyName(configuration.getAdminKey())
-                                    .withConfOsUser(dto.getConfOsUser())
-                                    .withConfOsFamily(dto.getConfOsFamily())
                                     .withActionCreate(configuration.getEmrImage()),
                             dto
                     )
@@ -137,8 +135,6 @@ public class ComputationalResource implements DockerCommands {
                                     .withResource(getResourceType())
                                     .withRequestId(uuid)
                                     .withConfKeyName(configuration.getAdminKey())
-                                    .withConfOsUser(dto.getConfOsUser())
-                                    .withConfOsFamily(dto.getConfOsFamily())
                                     .withActionTerminate(configuration.getEmrImage()),
                             dto
                     )

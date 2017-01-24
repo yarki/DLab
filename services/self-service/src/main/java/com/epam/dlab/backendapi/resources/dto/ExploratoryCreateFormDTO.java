@@ -94,14 +94,4 @@ public class ExploratoryCreateFormDTO {
         this.version = version;
     }
 
-    /** Returns the name of application for notebook: jupiter, rstudio, etc. */
-    public String getApplicationName() {
-    	if (image != null) {
-    		int pos = image.lastIndexOf('-');
-    		if (pos > 0) {
-    			return image.substring(pos + 1);
-    		}
-    	}
-    	return "";
-    }
 }

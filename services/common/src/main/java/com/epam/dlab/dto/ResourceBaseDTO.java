@@ -130,7 +130,7 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
 
     @SuppressWarnings("unchecked")
     public T withApplicationName(String applicationName) {
-        setConfOsFamily(applicationName);
+        setApplicationName(applicationName);
         return (T) this;
     }
 }
