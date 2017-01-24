@@ -123,6 +123,7 @@ def configure_notebook_server(notebook_name):
             sudo('sed -i \"/# export ZEPPELIN_IDENT_STRING/c\export ZEPPELIN_IDENT_STRING=notebook\" /opt/zeppelin/conf/zeppelin-env.sh')
             sudo('sed -i \"/# export SPARK_HOME/c\export SPARK_HOME=/opt/spark\" /opt/zeppelin/conf/zeppelin-env.sh')
             put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
+            sudo('sed -i "s|AWSREGION|' + args.region + '|g" /tmp/interpreter.json')
             sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
             sudo('mkdir /var/log/zeppelin')
             sudo('mkdir /var/run/zeppelin')
