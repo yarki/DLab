@@ -70,7 +70,7 @@ def ensure_spark():
             sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
             sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
             ensure_s3_libs()
-            sudo('echo \"spark.jars $(ls -1 ' + s3_jars_dir + '/* | tr \'\\n\' \',\')\" >> /opt/spark/conf/spark-defaults.conf')
+            sudo('echo \"spark.jars $(ls -1 ' + s3_jars_dir + '* | tr \'\\n\' \',\')\" >> /opt/spark/conf/spark-defaults.conf')
             sudo('touch /home/ubuntu/.ensure_dir/spark_ensured')
         except:
             sys.exit(1)
