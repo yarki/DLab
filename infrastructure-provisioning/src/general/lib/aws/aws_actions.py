@@ -650,8 +650,8 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                     sudo('rm -rf /home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, emr_name))
                 if exists('/home/{}/.ensure_dir/rstudio_emr_ensured'.format(ssh_user)):
                     sudo("sed -i '/" + emr_name + "/d' /home/{}/.Renviron".format(ssh_user))
-                    if not sudo("sed -n '/^SPARK_HOME/p' /home/ubuntu/.Renviron"):
-                        sudo("sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/ubuntu/.Renviron")
+                    if not sudo("sed -n '/^SPARK_HOME/p' /home/{}/.Renviron".format(ssh_user)):
+                        sudo("sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/{}/.Renviron".format(ssh_user))
                     sudo("sed -i 's|/opt/" + emr_version + '/' + emr_name + "/spark//R/lib:||g' /home/{}/.bashrc".format(ssh_user))
                 print "Notebook's " + env.hosts + " kernels were removed"
         else:
