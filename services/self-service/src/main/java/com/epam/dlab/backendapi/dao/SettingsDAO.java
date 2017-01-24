@@ -70,6 +70,10 @@ public class SettingsDAO extends BaseDAO {
      * @param setting the name of property.
      */
     private String getSetting(MongoSetting setting) {
-        return mongoService.getCollection(SETTINGS).find(eq(ID, setting.getId())).first().getOrDefault(VALUE, EMPTY).toString();
+        return mongoService.getCollection(SETTINGS)
+        		.find(eq(ID, setting.getId()))
+        		.first()
+        		.getOrDefault(VALUE, EMPTY)
+        		.toString();
     }
 }

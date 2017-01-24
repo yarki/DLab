@@ -67,13 +67,17 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         return originalUuid.equals(uuid);
     }
     
+    public String getUser() {
+    	return user;
+    }
+    
     public DockerAction getAction() {
     	return action;
     }
 
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
-        LOGGER.debug("Got file {} while waiting for {}, file content: {}", fileName, originalUuid, new String(content));
+        LOGGER.debug("Got file {} while waiting for {}, docker responce: {}", fileName, originalUuid, new String(content));
         JsonNode document = MAPPER.readTree(content);
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
@@ -81,9 +85,9 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         
         JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
         if (success) {
-            LOGGER.debug("Did {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
+            LOGGER.debug("Did {} resource for user: {}, request: {}", action, user, originalUuid);
         } else {
-            LOGGER.error("Could not {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
+            LOGGER.error("Could not {} resource for user: {}, request: {}", action, user, originalUuid);
             result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
             resultNode = resultNode.get(CONF_NODE);
         }
@@ -97,7 +101,13 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         if (UserInstanceStatus.FAILED.equals(status)) {
         	return false;
         }
-        postHandle(); // If failed then return post to self-service the status failed
+        try {
+        	postHandle();
+        } catch (DlabException e) {
+        	LOGGER.error("Could not {} resource for user: {}, request: {}", action, user, originalUuid, e);
+        	selfService.post(getCallbackURI(), getBaseStatusDTO(UserInstanceStatus.FAILED), resultType);
+        	throw new DlabException("Could not " + action + " resource for user: " + user + ", request: " + originalUuid, e);
+        }
         return true;
     }
 

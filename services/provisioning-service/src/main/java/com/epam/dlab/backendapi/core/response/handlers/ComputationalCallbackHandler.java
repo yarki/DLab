@@ -60,7 +60,8 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     			ComputationalCreateDTO d = (ComputationalCreateDTO) dto;
     	    	new ComputationalConfigure().run(dlabUser, d);
     		} else {
-    			throw new DlabException("Could not configure computational resource cluster");
+    			throw new DlabException("Could not configure computational resource cluster. Expected " + ComputationalCreateDTO.class.getName() +
+    					", gotted " + dto.getClass().getName());
     		}
     	}
     }

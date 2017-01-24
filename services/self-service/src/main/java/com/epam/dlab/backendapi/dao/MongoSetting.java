@@ -21,7 +21,7 @@ package com.epam.dlab.backendapi.dao;
 /** Name of fields in the Mongo collection {@link MongoCollections#SETTINGS}. */
 public enum MongoSetting {
 	/** Base name of service. */
-    SERIVICE_BASE_NAME("service_base_name"),
+    SERIVICE_BASE_NAME("conf_service_base_name"),
 	/** Name of AWS region. */
     AWS_REGION("aws_region"),
 	/** Id of security group. */
