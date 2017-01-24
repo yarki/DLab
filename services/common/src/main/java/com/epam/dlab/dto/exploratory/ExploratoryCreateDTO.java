@@ -47,7 +47,7 @@ public class ExploratoryCreateDTO extends ExploratoryBaseDTO<ExploratoryCreateDT
         this.securityGroupIds = securityGroupIds;
     }
 
-    public ExploratoryCreateDTO withSecurityGroupIds(String securityGroupIds) {
+    public ExploratoryCreateDTO withAwsSecurityGroupIds(String securityGroupIds) {
         setSecurityGroupIds(securityGroupIds);
         return this;
     }

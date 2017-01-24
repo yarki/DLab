@@ -35,16 +35,18 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     
     private final String uuid;
     private final ComputationalBaseDTO<?> dto;
+	private final String dlabUser;
 
     @Override
     public String getUUID() {
     	return uuid;
     }
     
-    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto, String accessToken) {
-        super(selfService, dto.getIamUserName(), accessToken, originalUuid, action);
+    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto, String dlabUser) {
+        super(selfService, dto.getIamUserName(), originalUuid, action);
     	this.uuid = originalUuid;
         this.dto = dto;
+        this.dlabUser = dlabUser;
     }
     
     protected ComputationalBaseDTO<?> getDto() {
@@ -56,8 +58,7 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     	if (getAction() == DockerAction.CREATE) {
     		if (dto instanceof ComputationalCreateDTO) {
     			ComputationalCreateDTO d = (ComputationalCreateDTO) dto;
-    			// Run configure
-    			//selfService.post(getCallbackURI(), d, ComputationalCreateDTO.class);
+    	    	new ComputationalConfigure().run(dlabUser, d);
     		} else {
     			throw new DlabException("Could not configure computational resource cluster");
     		}

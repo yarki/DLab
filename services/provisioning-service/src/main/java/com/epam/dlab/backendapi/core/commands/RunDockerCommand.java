@@ -132,8 +132,8 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withCredsKeyName(String keyName) {
-        options.add(String.format("-e \"conf_key_name=%s\"", keyName));
+    public RunDockerCommand withConfKeyName(String confKeyName) {
+        options.add(String.format("-e \"conf_key_name=%s\"", confKeyName));
         return this;
     }
     public RunDockerCommand withConfServiceBaseName(String confServiceBaseName) {
@@ -146,13 +146,13 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withVpcId(String vpcId) {
-        options.add(String.format("-e \"aws_vpc_id=%s\"", vpcId));
+    public RunDockerCommand withAwsVpcId(String awsVpcId) {
+        options.add(String.format("-e \"aws_vpc_id=%s\"", awsVpcId));
         return this;
     }
 
-    public RunDockerCommand withEdgeSubnetId(String subnetId) {
-        options.add(String.format("-e \"aws_subnet_id=%s\"", subnetId));
+    public RunDockerCommand withAwsSubnetId(String awsSubnetId) {
+        options.add(String.format("-e \"aws_subnet_id=%s\"", awsSubnetId));
         return this;
     }
 
@@ -191,8 +191,8 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withCredsRegion(String credsRegion) {
-        options.add(String.format("-e \"aws_region=%s\"", credsRegion));
+    public RunDockerCommand withAwsRegion(String awsRegion) {
+        options.add(String.format("-e \"aws_region=%s\"", awsRegion));
         return this;
     }
 
@@ -216,8 +216,8 @@ public class RunDockerCommand implements DockerCommand {
         return this;
     }
 
-    public RunDockerCommand withCredsSecurityGroupsIds(String credsSecurityGroupsIds) {
-        options.add(String.format("-e \"aws_security_groups_ids=%s\"", credsSecurityGroupsIds));
+    public RunDockerCommand withAwsSecurityGroupsIds(String awsSecurityGroupsIds) {
+        options.add(String.format("-e \"aws_security_groups_ids=%s\"", awsSecurityGroupsIds));
         return this;
     }
 
@@ -237,7 +237,7 @@ public class RunDockerCommand implements DockerCommand {
     }
 
     public RunDockerCommand withResource(String resourceType) {
-        options.add(String.format("-e \"resource=%s\"", resourceType));
+        options.add(String.format("-e \"conf_resource=%s\"", resourceType));
         return this;
     }
 

@@ -34,17 +34,18 @@ public class ComputationalConfigure  implements DockerCommands {
     @Inject
     private RESTService selfService;
 
-    public void run(String username, String accessToken, ComputationalCreateDTO dto) throws DlabException {
+    public String run(String dlabUser, ComputationalCreateDTO dto) throws DlabException {
         LOGGER.debug("Configure computational resources cluster");
-// ???
+        // New UUID?
+        // Response log files
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(CONFIGURE, uuid, dto, accessToken));
+                getFileHandlerCallback(CONFIGURE, uuid, dto, dlabUser));
         try {
             //long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
             commandExecuter.executeAsync(
-            		username,
+            		dlabUser,
                     uuid,
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
@@ -53,10 +54,10 @@ public class ComputationalConfigure  implements DockerCommands {
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
-                                    //.withResource(getResourceType())
+                                    .withResource(getResourceType())
                                     .withRequestId(uuid)
                                     //.withEmrTimeout(Long.toString(timeout))
-                                    .withCredsKeyName(configuration.getAdminKey())
+                                    .withConfKeyName(configuration.getAdminKey())
                                     .withActionConfigure(configuration.getEmrImage()),
                             dto
                     )
@@ -64,10 +65,11 @@ public class ComputationalConfigure  implements DockerCommands {
         } catch (Throwable t) {
             throw new DlabException("Could not configure computational resource cluster", t);
         }
+        return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto, String accessToken) {
-        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto, accessToken);
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto, String dlabUser) {
+        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto, dlabUser);
     }
 
     @Override

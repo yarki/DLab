@@ -24,7 +24,7 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     @JsonProperty("conf_service_base_name")
     private String serviceBaseName;
     @JsonProperty("aws_region")
-    private String region;
+    private String awsRegion;
     @JsonProperty("exploratory_name")
     private String exploratoryName;
     @JsonProperty("iam_user_name")
@@ -44,17 +44,17 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
         return (T) this;
     }
 
-    public String getRegion() {
-        return region;
+    public String getAwsRegion() {
+        return awsRegion;
     }
 
-    public void setRegion(String region) {
-        this.region = region;
+    public void setAwsRegion(String awsRegion) {
+        this.awsRegion = awsRegion;
     }
 
     @SuppressWarnings("unchecked")
-    public T withRegion(String region) {
-        setRegion(region);
+    public T withAwsRegion(String region) {
+        setAwsRegion(region);
         return (T) this;
     }
 

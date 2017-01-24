@@ -21,34 +21,34 @@ package com.epam.dlab.dto.exploratory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ExploratoryStopDTO extends ExploratoryActionDTO<ExploratoryStopDTO> {
-    @JsonProperty("notebook_ssh_user")
-    private String sshUser;
+    @JsonProperty("conf_os_user")
+    private String ñonfOsUser;
     @JsonProperty("conf_key_dir")
-    private String keyDir;
+    private String confKeyDir;
 
-    public String getSshUser() {
-        return sshUser;
+    public String getConfOsUser() {
+        return ñonfOsUser;
     }
 
-    public void setSshUser(String sshUser) {
-        this.sshUser = sshUser;
+    public void setConfOsUser(String ñonfOsUser) {
+        this.ñonfOsUser = ñonfOsUser;
     }
 
-    public ExploratoryStopDTO withSshUser(String sshUser) {
-        setSshUser(sshUser);
+    public ExploratoryStopDTO withConfOsUser(String ñonfOsUser) {
+        setConfOsUser(ñonfOsUser);
         return this;
     }
 
-    public String getKeyDir() {
-        return keyDir;
+    public String getConfKeyDir() {
+        return confKeyDir;
     }
 
-    public void setKeyDir(String keyDir) {
-        this.keyDir = keyDir;
+    public void setConfKeyDir(String confKeyDir) {
+        this.confKeyDir = confKeyDir;
     }
 
-    public ExploratoryStopDTO withKeyDir(String keyDir) {
-        setKeyDir(keyDir);
+    public ExploratoryStopDTO withConfKeyDir(String confKeyDir) {
+        setConfKeyDir(confKeyDir);
         return this;
     }
 }

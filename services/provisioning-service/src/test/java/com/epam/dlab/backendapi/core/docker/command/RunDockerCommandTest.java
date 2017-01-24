@@ -132,7 +132,7 @@ public class RunDockerCommandTest {
                 .withVolumeForResponse(responseVolume)
                 .withRequestId(requestID)
                 .withConfServiceBaseName(confServiceBaseName)
-                .withCredsKeyName(credsKeyName)
+                .withConfKeyName(credsKeyName)
                 .withEdgeUserName(edgeUserName)
                 .withActionCreate(toCreate);
         assertEquals(String.format(CREATE_EDGE_METADATA, rootKeysVolume, responseVolume,
@@ -166,8 +166,8 @@ public class RunDockerCommandTest {
                 .withNotebookName(notebookName)
                 .withEdgeUserName(edgeUserName)
                 .withEdgeSubnetCidr(edgeSubnetCidr)
-                .withCredsRegion(credsRegion)
-                .withCredsKeyName(credsKeyName)
+                .withAwsRegion(credsRegion)
+                .withConfKeyName(credsKeyName)
                 .withActionCreate(toCreate);
 
         assertEquals(
@@ -202,8 +202,8 @@ public class RunDockerCommandTest {
                 .withConfServiceBaseName(confServiceBaseName)
                 .withEdgeUserName(edgeUserName)
                 .withEmrClusterName(emrClusterName)
-                .withCredsRegion(credsRegion)
-                .withCredsKeyName(credsKeyName)
+                .withAwsRegion(credsRegion)
+                .withConfKeyName(credsKeyName)
                 .withActionTerminate(toTerminate);
 
         assertEquals(
@@ -230,11 +230,11 @@ public class RunDockerCommandTest {
                 .withVolumeForResponse(responseVolume)
                 .withRequestId(requestID)
                 .withConfServiceBaseName(confServiceBaseName)
-                .withCredsRegion(credsRegion)
-                .withCredsKeyName(credsKeyName)
+                .withAwsRegion(credsRegion)
+                .withConfKeyName(credsKeyName)
                 .withNotebookUserName(notebookUserName)
                 .withNotebookSubnetCidr(notebookSubnetCidr)
-                .withCredsSecurityGroupsIds(credsSecurityGroupsIds)
+                .withAwsSecurityGroupsIds(credsSecurityGroupsIds)
                 .withActionCreate(toCreate);
 
         assertEquals(
@@ -262,8 +262,8 @@ public class RunDockerCommandTest {
                 .withVolumeForResponse(responseVolume)
                 .withRequestId(requestID)
                 .withConfServiceBaseName(confServiceBaseName)
-                .withCredsRegion(credsRegion)
-                .withCredsKeyName(credsKeyName)
+                .withAwsRegion(credsRegion)
+                .withConfKeyName(credsKeyName)
                 .withNotebookUserName(notebookUserName)
                 .withNotebookInstanceName(notebookInstanceName)
                 .withActionTerminate(toTerminate);
@@ -292,8 +292,8 @@ public class RunDockerCommandTest {
                 .withVolumeForResponse(responseVolume)
                 .withRequestId(requestID)
                 .withConfServiceBaseName(confServiceBaseName)
-                .withCredsRegion(credsRegion)
-                .withCredsKeyName(credsKeyName)
+                .withAwsRegion(credsRegion)
+                .withConfKeyName(credsKeyName)
                 .withNotebookUserName(notebookUserName)
                 .withNotebookInstanceName(notebookInstanceName)
                 .withActionStop(toStop);

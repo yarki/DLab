@@ -135,7 +135,9 @@ public class ComputationalResource implements ComputationalAPI {
                         .withVersion(formDTO.getVersion())
                         .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
-                        .withRegion(settingsDAO.getCredsRegion());
+                        .withAwsRegion(settingsDAO.getAwsRegion())
+                        .withConfOsUser(settingsDAO.getConfOsUser())
+                        .withConfOsFamily(settingsDAO.getConfOsFamily());
                 return Response
                         .ok(provisioningService.post(EMR_CREATE, userInfo.getAccessToken(), dto, String.class))
                         .build();
@@ -195,11 +197,13 @@ public class ComputationalResource implements ComputationalAPI {
                     .withComputationalName(computationalName)
                     .withNotebookInstanceName(exploratoryId)
                     .withClusterName(computationalId)
-                    .withKeyDir(settingsDAO.getCredsKeyDir())
-                    .withSshUser(settingsDAO.getExploratorySshUser())
+                    .withConfKeyDir(settingsDAO.getConfKeyDir())
+                    .withConfOsUser(settingsDAO.getConfOsUser())
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
-                    .withRegion(settingsDAO.getCredsRegion());
+                    .withAwsRegion(settingsDAO.getAwsRegion())
+                    .withConfOsUser(settingsDAO.getConfOsUser())
+                    .withConfOsFamily(settingsDAO.getConfOsFamily());
             return provisioningService.post(EMR_TERMINATE, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
         	try {
