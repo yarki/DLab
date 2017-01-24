@@ -280,7 +280,6 @@ def configure_zeppelin_emr_interpreter(args):
                      "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-s3-*.jar /opt/" + args.emr_version + \
                      "/jars/usr/lib/hadoop-lzo/lib/hadoop-lzo-*.jar"
         local('echo \"Configuring emr path for Zeppelin\"')
-        local('sed -i \"/^# export SPARK_HOME/c\export SPARK_HOME\" /opt/zeppelin/conf/zeppelin-env.sh')
         local('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/' + args.emr_version + '\/' +
               args.cluster_name + '\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
         local('sed -i \"s/^export HADOOP_CONF_DIR.*/export HADOOP_CONF_DIR=\/opt\/' + args.emr_version + '\/' +
