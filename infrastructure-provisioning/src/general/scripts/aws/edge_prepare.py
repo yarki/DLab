@@ -77,7 +77,7 @@ if __name__ == "__main__":
         params = "--vpc_id '{}' --infra_tag_name {} --infra_tag_value {} --username {}" \
                  .format(edge_conf['vpc_id'], edge_conf['tag_name'], edge_conf['service_base_name'], os.environ['edge_user_name'])
         try:
-            local("~/scripts/{}.py {}".format('create_subnet', params))
+            local("~/scripts/{}.py {}".format('common_create_subnet', params))
         except:
             traceback.print_exc()
             raise Exception
@@ -96,7 +96,7 @@ if __name__ == "__main__":
                  .format(edge_conf['role_name'], edge_conf['role_profile_name'],
                   edge_conf['policy_name'])
         try:
-            local("~/scripts/{}.py {}".format('create_role_policy', params))
+            local("~/scripts/{}.py {}".format('common_create_role_policy', params))
         except:
             traceback.print_exc()
             raise Exception
@@ -111,7 +111,7 @@ if __name__ == "__main__":
                  .format(edge_conf['notebook_role_name'], edge_conf['notebook_role_profile_name'],
                   edge_conf['notebook_policy_name'])
         try:
-            local("~/scripts/{}.py {}".format('create_role_policy', params))
+            local("~/scripts/{}.py {}".format('common_create_role_policy', params))
         except:
             traceback.print_exc()
             raise Exception
@@ -220,7 +220,7 @@ if __name__ == "__main__":
             format(edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),edge_conf['service_base_name'],
                    edge_conf['instance_name'], json.dumps(sg_rules_template_egress), True, edge_conf['notebook_instance_name'], 'edge')
         try:
-            local("~/scripts/{}.py {}".format('create_security_group', params))
+            local("~/scripts/{}.py {}".format('common_create_security_group', params))
         except Exception as err:
             traceback.print_exc()
             append_result("Failed creating security group for edge node. Exception: " + str(err))
@@ -256,7 +256,7 @@ if __name__ == "__main__":
             format(edge_conf['notebook_security_group_name'], edge_conf['vpc_id'], json.dumps(ingress_sg_rules_template),
                    json.dumps(egress_sg_rules_template), edge_conf['service_base_name'], edge_conf['notebook_instance_name'], True)
         try:
-            local("~/scripts/{}.py {}".format('create_security_group', params))
+            local("~/scripts/{}.py {}".format('common_create_security_group', params))
         except:
             traceback.print_exc()
             raise Exception
@@ -279,7 +279,7 @@ if __name__ == "__main__":
                  .format(edge_conf['bucket_name'], edge_conf['tag_name'], edge_conf['bucket_name'],
                   edge_conf['region'])
         try:
-            local("~/scripts/{}.py {}".format('create_bucket', params))
+            local("~/scripts/{}.py {}".format('common_create_bucket', params))
         except:
             traceback.print_exc()
             raise Exception
@@ -297,7 +297,7 @@ if __name__ == "__main__":
         params = '--bucket_name {} --ssn_bucket_name {} --username {} --edge_role_name {} --notebook_role_name {} --service_base_name {}'.format(
             edge_conf['bucket_name'], edge_conf['ssn_bucket_name'], os.environ['edge_user_name'], edge_conf['role_name'], edge_conf['notebook_role_name'],  edge_conf['service_base_name'])
         try:
-            local("~/scripts/{}.py {}".format('create_policy', params))
+            local("~/scripts/{}.py {}".format('common_create_policy', params))
         except:
             traceback.print_exc()
     except Exception as err:
@@ -318,7 +318,7 @@ if __name__ == "__main__":
                     edge_group_id, edge_conf['public_subnet_id'], edge_conf['role_profile_name'],
                     edge_conf['tag_name'], edge_conf['instance_name'])
         try:
-            local("~/scripts/{}.py {}".format('create_instance', params))
+            local("~/scripts/{}.py {}".format('common_create_instance', params))
         except:
             traceback.print_exc()
             raise Exception

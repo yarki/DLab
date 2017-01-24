@@ -21,14 +21,13 @@ FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
 ARG OS
 ARG CLOUD
-ARG RESOURCE
 
 COPY zeppelin/ /root/
-COPY general/scripts/${CLOUD}/${RESOURCE}/* /root/scripts/
+COPY general/scripts/${CLOUD}/zeppelin_* /root/scripts/
 COPY general/scripts/os/configure_proxy.py /root/scripts/
 COPY general/lib/os/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
 COPY general/templates/${CLOUD}/emr_spark_interpreter.json /root/templates/
-COPY general/templates/os/${OS}/zeppelin-notebook.service /root/templates/
+COPY general/templates/os/common/zeppelin-notebook.service /root/templates/
 COPY general/files/os/local_jars.tar.gz /root/files/
 
 RUN chmod a+x /root/fabfile.py; \

@@ -251,7 +251,7 @@ if __name__ == "__main__":
         params = ""
         if os.environ['conf_lifecycle_stage'] == 'prod':
             params += "--key_id {}".format(os.environ['aws_access_key'])
-            local("~/scripts/{}.py {}".format('finalize', params))
+            local("~/scripts/{}.py {}".format('ssn_finalize', params))
     except:
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)

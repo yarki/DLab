@@ -34,14 +34,14 @@ def run():
                         level=logging.DEBUG,
                         filename=local_log_filepath)
     try:
-        local("~/scripts/{}.py".format('prepare_ssn'))
+        local("~/scripts/{}.py".format('ssn_prepare'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed preparing SSN node. Exception: " + str(err))
         sys.exit(1)
 
     try:
-        local("~/scripts/{}.py".format('configure_ssn'))
+        local("~/scripts/{}.py".format('ssn_configure'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed configuring SSN node. Exception: " + str(err))
@@ -56,7 +56,7 @@ def terminate():
                         filename=local_log_filepath)
 
     try:
-        local("~/scripts/{}.py".format('terminate_ssn'))
+        local("~/scripts/{}.py".format('ssn_terminate'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed terminating SSN node. Exception: " + str(err))
