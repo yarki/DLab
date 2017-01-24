@@ -74,7 +74,7 @@ def ensure_spark():
                          args.emr_version + "/jars/usr/lib/hadoop/hadoop-aws*.jar /opt/" + args.emr_version + \
                          "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-s3-*.jar /opt/" + args.emr_version + \
                          "/jars/usr/lib/hadoop-lzo/lib/hadoop-lzo-*.jar"
-            sudo('echo \"spark.jars $(ls ' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/spark/conf/spark-defaults.conf')
+            sudo('echo \"spark.jars $(ls -1' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/spark/conf/spark-defaults.conf')
             sudo('touch /home/ubuntu/.ensure_dir/spark_ensured')
         except:
             sys.exit(1)
@@ -116,6 +116,7 @@ def ensure_python3_kernel():
 def configure_notebook_server(notebook_name):
     if not exists('/home/ubuntu/.ensure_dir/zeppelin_ensured'):
         ensure_jre_jdk()
+        ensure_spark()
         try:
             sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
             sudo('tar -zxvf /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz -C /opt/')
@@ -124,6 +125,7 @@ def configure_notebook_server(notebook_name):
             sudo('cp /opt/zeppelin/conf/zeppelin-site.xml.template /opt/zeppelin/conf/zeppelin-site.xml')
             sudo('sed -i \"/# export ZEPPELIN_PID_DIR/c\export ZEPPELIN_PID_DIR=/var/run/zeppelin\" /opt/zeppelin/conf/zeppelin-env.sh')
             sudo('sed -i \"/# export ZEPPELIN_IDENT_STRING/c\export ZEPPELIN_IDENT_STRING=notebook\" /opt/zeppelin/conf/zeppelin-env.sh')
+            sudo('sed -i \"/# export SPARK_HOME/c\export SPARK_HOME=/opt/spark\" /opt/zeppelin/conf/zeppelin-env.sh')
             put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
             sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
             sudo('mkdir /var/log/zeppelin')
@@ -148,7 +150,6 @@ def configure_notebook_server(notebook_name):
             sudo('touch /home/ubuntu/.ensure_dir/zeppelin_ensured')
         except:
             sys.exit(1)
-
         ensure_python3_kernel()
 
 
