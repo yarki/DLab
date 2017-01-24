@@ -62,7 +62,7 @@ if __name__ == "__main__":
                     os.environ['emr_excluded_spark_properties'], os.environ['edge_user_name'],
                     os.environ['conf_os_user'], notebook_config['computational_name'])
         try:
-            local("~/scripts/{}.py {}".format('install_emr_kernels', params))
+            local("~/scripts/{}_{}.py {}".format(os.environ['application'], 'install_emr_kernels', params))
             remove_emr_tag(notebook_config['cluster_id'], ['State'])
         except:
             traceback.print_exc()

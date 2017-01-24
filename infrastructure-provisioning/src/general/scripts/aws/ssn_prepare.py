@@ -69,7 +69,7 @@ if __name__ == "__main__":
                 print '[CREATE VPC AND ROUTE TABLE]'
                 params = "--vpc {} --region {} --infra_tag_name {} --infra_tag_value {}".format(vpc_cidr, region, tag_name, service_base_name)
                 try:
-                    local("~/scripts/{}.py {}".format('create_vpc', params))
+                    local("~/scripts/{}.py {}".format('ssn_create_vpc', params))
                 except:
                     traceback.print_exc()
                     raise Exception
@@ -87,7 +87,7 @@ if __name__ == "__main__":
                 print '[CREATE SUBNET]'
                 params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {} --prefix {} --ssn {}".format(os.environ['aws_vpc_id'], 'ssn', tag_name, service_base_name, '20', True)
                 try:
-                    local("~/scripts/{}.py {}".format('create_subnet', params))
+                    local("~/scripts/{}.py {}".format('common_create_subnet', params))
                 except:
                     traceback.print_exc()
                     raise Exception
@@ -155,7 +155,7 @@ if __name__ == "__main__":
                 params = "--name {} --vpc_id {} --security_group_rules '{}' --egress '{}' --infra_tag_name {} --infra_tag_value {} --force {} --ssn {}". \
                     format(sg_name, os.environ['aws_vpc_id'], json.dumps(ingress_sg_rules_template), json.dumps(egress_sg_rules_template), service_base_name, tag_name, False, True)
                 try:
-                    local("~/scripts/{}.py {}".format('create_security_group', params))
+                    local("~/scripts/{}.py {}".format('common_create_security_group', params))
                 except:
                     traceback.print_exc()
                     raise Exception
@@ -174,7 +174,7 @@ if __name__ == "__main__":
         params = "--role_name {} --role_profile_name {} --policy_name {} --policy_file_name {}". \
                 format(role_name, role_profile_name, policy_name, policy_path)
         try:
-            local("~/scripts/{}.py {}".format('create_role_policy', params))
+            local("~/scripts/{}.py {}".format('common_create_role_policy', params))
         except:
             traceback.print_exc()
             raise Exception
@@ -195,7 +195,7 @@ if __name__ == "__main__":
         params = "--vpc_id {} --region {} --infra_tag_name {} --infra_tag_value {}".format(
             os.environ['aws_vpc_id'], os.environ['aws_region'], tag_name, service_base_name)
         try:
-            local("~/scripts/{}.py {}".format('create_endpoint', params))
+            local("~/scripts/{}.py {}".format('ssn_create_endpoint', params))
         except:
             traceback.print_exc()
             raise Exception
@@ -218,7 +218,7 @@ if __name__ == "__main__":
                  format(user_bucket_name, tag_name, user_bucket_name, region)
 
         try:
-            local("~/scripts/{}.py {}".format('create_bucket', params))
+            local("~/scripts/{}.py {}".format('common_create_bucket', params))
         except:
             traceback.print_exc()
             raise Exception
@@ -244,7 +244,7 @@ if __name__ == "__main__":
                    role_profile_name, tag_name, instance_name)
 
         try:
-            local("~/scripts/{}.py {}".format('create_instance', params))
+            local("~/scripts/{}.py {}".format('common_create_instance', params))
         except:
             traceback.print_exc()
             raise Exception

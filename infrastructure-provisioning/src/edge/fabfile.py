@@ -35,7 +35,7 @@ def status():
                         filename=local_log_filepath)
 
     try:
-        local("~/scripts/{}.py".format('status_edge'))
+        local("~/scripts/{}.py".format('edge_status'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed preparing SSN node. Exception: " + str(err))
@@ -51,14 +51,14 @@ def run():
                         filename=local_log_filepath)
 
     try:
-        local("~/scripts/{}.py".format('prepare_edge'))
+        local("~/scripts/{}.py".format('edge_prepare'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed preparing Edge node. Exception: " + str(err))
         sys.exit(1)
 
     try:
-        local("~/scripts/{}.py".format('configure_edge'))
+        local("~/scripts/{}.py".format('edge_configure'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed configuring Edge node. Exception: " + str(err))
@@ -73,7 +73,7 @@ def terminate():
                         level=logging.DEBUG,
                         filename=local_log_filepath)
     try:
-        local("~/scripts/{}.py".format('terminate_edge'))
+        local("~/scripts/{}.py".format('edge_terminate'))
     except Exception as err:
         traceback.print_exc()
         append_result("Failed terminating Edge node. Exception: " + str(err))
