@@ -33,6 +33,8 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     private String confOsUser;
     @JsonProperty("conf_os_family")
     private String confOsFamily;
+    @JsonProperty("application")
+    private String applicationName;
 
     public String getServiceBaseName() {
         return serviceBaseName;
@@ -115,6 +117,20 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     @SuppressWarnings("unchecked")
     public T withConfOsFamily(String confOsFamily) {
         setConfOsFamily(confOsFamily);
+        return (T) this;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withApplicationName(String applicationName) {
+        setConfOsFamily(applicationName);
         return (T) this;
     }
 }

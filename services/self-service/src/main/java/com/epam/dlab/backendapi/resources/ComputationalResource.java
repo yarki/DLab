@@ -122,13 +122,14 @@ public class ComputationalResource implements ComputationalAPI {
                         .withSlaveNumber(formDTO.getInstanceCount()));
         if (isAdded) {
             try {
-                String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), formDTO.getNotebookName());
+            	UserInstanceDTO instance = getExploratoryInstance(userInfo.getName(), formDTO.getNotebookName());
                 ComputationalCreateDTO dto = new ComputationalCreateDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withExploratoryName(formDTO.getNotebookName())
-                        .withNotebookTemplateName(getExploratoryTemplateName(userInfo.getName(), formDTO.getNotebookName()))
+                        .withNotebookTemplateName(instance.getTemplateName())
+                        .withApplicationName(instance.getApplicationName())
                         .withComputationalName(formDTO.getName())
-                        .withNotebookName(exploratoryId)
+                        .withNotebookName(instance.getExploratoryId())
                         .withInstanceCount(formDTO.getInstanceCount())
                         .withMasterInstanceType(formDTO.getMasterInstanceType())
                         .withSlaveInstanceType(formDTO.getSlaveInstanceType())
@@ -230,19 +231,17 @@ public class ComputationalResource implements ComputationalAPI {
         infrastructureProvisionDAO.updateComputationalStatus(computationalStatus);
     }
     
-    /** Finds and returns the name of template for exploratory.
+    /** Finds and returns the instance of exploratory.
      * @param username name of user.
      * @param exploratoryName name of exploratory.
      * @throws DlabException
      */
-    private String getExploratoryTemplateName(String username, String exploratoryName) throws DlabException {
+    private UserInstanceDTO getExploratoryInstance(String username, String exploratoryName) throws DlabException {
     	Optional<UserInstanceDTO> opt = infrastructureProvisionDAO.fetchExploratoryFields(username, exploratoryName);
         if( opt.isPresent() ) {
             return opt
-            		.get()
-            		.getTemplateName();
+            		.get();
         }
         throw new DlabException(String.format("Exploratory instance for user {} with name {} not found.", username, exploratoryName));
     }
-
 }
