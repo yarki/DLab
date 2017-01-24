@@ -86,7 +86,7 @@ if __name__ == "__main__":
         params = "--hostname {} --instance_name {} --keyfile {} --additional_config '{}' --os_user {}"\
             .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config), os.environ['conf_os_user'])
         try:
-            local("~/scripts/{}.py {}".format('configure_proxy', params))
+            local("~/scripts/{}.py {}".format('notebook_configure_proxy', params))
         except:
             traceback.print_exc()
             raise Exception
