@@ -159,7 +159,7 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path, os_user):
             sudo('mv /tmp/proxy_location_webapp_template.conf ' + os.environ['ssn_dlab_path'] + 'tmp/')
             with open('/root/templates/supervisor_svc.conf', 'r') as f:
                 text = f.read()
-            text = text.replace('WEB_CONF', dlab_conf_dir)
+            text = text.replace('WEB_CONF', dlab_conf_dir).replace('OS_USR', os_user)
             with open('/root/templates/supervisor_svc.conf', 'w') as f:
                 f.write(text)
             put('/root/templates/supervisor_svc.conf', '/tmp/supervisor_svc.conf')
