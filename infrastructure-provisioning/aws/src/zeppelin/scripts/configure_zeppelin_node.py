@@ -25,6 +25,7 @@ import json
 import random
 import string
 import sys
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
