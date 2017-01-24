@@ -18,7 +18,7 @@
 #
 # ******************************************************************************
 
-from dlab.aws_actions import *
+from dlab.actions_lib import *
 from fabric.api import *
 from fabric.contrib.files import exists
 import argparse

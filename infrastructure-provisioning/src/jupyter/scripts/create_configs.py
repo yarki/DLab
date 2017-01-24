@@ -29,7 +29,7 @@ from fabric.api import lcd
 from fabric.contrib.files import exists
 from fabvenv import virtualenv
 from dlab.notebook_lib import *
-from dlab.aws_actions import *
+from dlab.actions_lib import *
 from dlab.fab import *
 from dlab.common_lib import *
 

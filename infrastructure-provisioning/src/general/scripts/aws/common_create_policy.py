@@ -19,8 +19,8 @@
 # ******************************************************************************
 
 import argparse
-from dlab.aws_actions import *
-from dlab.aws_meta import *
+from dlab.actions_lib import *
+from dlab.meta_lib import *
 import sys
 import boto3, botocore
 

@@ -19,7 +19,7 @@
 # ******************************************************************************
 
 from dlab.fab import *
-from dlab.aws_actions import *
+from dlab.actions_lib import *
 import sys, os
 from fabric.api import *
 from dlab.ssn_lib import *

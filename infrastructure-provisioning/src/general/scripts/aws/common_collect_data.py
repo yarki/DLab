@@ -22,8 +22,8 @@ import argparse
 import json
 import datetime
 from fabric.api import *
-from dlab.aws_actions import *
-from dlab.aws_meta import *
+from dlab.actions_lib import *
+from dlab.meta_lib import *
 
 
 parser = argparse.ArgumentParser()

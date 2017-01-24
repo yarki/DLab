@@ -21,7 +21,7 @@
 import argparse
 from fabric.api import *
 import boto3
-from dlab.aws_meta import *
+from dlab.meta_lib import *
 import os
 
 parser = argparse.ArgumentParser()

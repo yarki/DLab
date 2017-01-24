@@ -20,9 +20,9 @@
 
 import json
 from dlab.fab import *
-from dlab.aws_meta import *
+from dlab.meta_lib import *
 import sys, time, os
-from dlab.aws_actions import *
+from dlab.actions_lib import *
 
 if __name__ == "__main__":
     local_log_filename = "{}_{}_{}.log".format(os.environ['conf_resource'], os.environ['edge_user_name'],

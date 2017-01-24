@@ -26,7 +26,7 @@ import json
 from fabric.api import *
 from fabric.contrib.files import exists
 import logging
-from dlab.aws_meta import *
+from dlab.meta_lib import *
 from dlab.fab import *
 import traceback
 import urllib2

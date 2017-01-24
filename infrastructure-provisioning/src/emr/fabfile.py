@@ -22,8 +22,8 @@ import json
 import time
 from fabric.api import *
 from dlab.fab import *
-from dlab.aws_meta import *
-from dlab.aws_actions import *
+from dlab.meta_lib import *
+from dlab.actions_lib import *
 import sys
 import os
 import uuid

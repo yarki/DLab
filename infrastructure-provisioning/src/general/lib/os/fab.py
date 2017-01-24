@@ -24,8 +24,8 @@ import random
 import sys
 import string
 import json, uuid, time, datetime
-from dlab.aws_meta import *
-from dlab.aws_actions import *
+from dlab.meta_lib import *
+from dlab.actions_lib import *
 
 
 def ensure_pip(requisites):

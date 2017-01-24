@@ -21,7 +21,7 @@
 import crypt
 import yaml
 from dlab.fab import *
-from dlab.aws_meta import *
+from dlab.meta_lib import *
 import os
 
 

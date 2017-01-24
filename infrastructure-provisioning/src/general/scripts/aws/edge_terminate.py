@@ -20,9 +20,9 @@
 
 import json
 from dlab.fab import *
-from dlab.aws_meta import *
+from dlab.meta_lib import *
 import sys, time, os
-from dlab.aws_actions import *
+from dlab.actions_lib import *
 
 
 def terminate_edge_node(tag_name, user_name, tag_value, nb_sg, edge_sg):
