@@ -22,20 +22,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ExploratoryStopDTO extends ExploratoryActionDTO<ExploratoryStopDTO> {
     @JsonProperty("conf_os_user")
-    private String ñonfOsUser;
+    private String confOsUser;
     @JsonProperty("conf_key_dir")
     private String confKeyDir;
 
     public String getConfOsUser() {
-        return ñonfOsUser;
+        return confOsUser;
     }
 
-    public void setConfOsUser(String ñonfOsUser) {
-        this.ñonfOsUser = ñonfOsUser;
+    public void setConfOsUser(String confOsUser) {
+        this.confOsUser = confOsUser;
     }
 
-    public ExploratoryStopDTO withConfOsUser(String ñonfOsUser) {
-        setConfOsUser(ñonfOsUser);
+    public ExploratoryStopDTO withConfOsUser(String confOsUser) {
+        setConfOsUser(confOsUser);
         return this;
     }
 

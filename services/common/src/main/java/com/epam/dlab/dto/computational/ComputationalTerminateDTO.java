@@ -26,7 +26,7 @@ public class ComputationalTerminateDTO extends ComputationalBaseDTO<Computationa
     @JsonProperty("notebook_instance_name")
     private String notebookInstanceName;
     @JsonProperty("conf_os_user")
-    private String ñonfOsUser;
+    private String confOsUser;
     @JsonProperty("conf_key_dir")
     private String confKeyDir;
 
@@ -57,15 +57,15 @@ public class ComputationalTerminateDTO extends ComputationalBaseDTO<Computationa
     }
 
     public String getConfOsUser() {
-        return ñonfOsUser;
+        return confOsUser;
     }
 
-    public void setConfOsUser(String ñonfOsUser) {
-        this.ñonfOsUser = ñonfOsUser;
+    public void setConfOsUser(String confOsUser) {
+        this.confOsUser = confOsUser;
     }
 
-    public ComputationalTerminateDTO withConfOsUser(String ñonfOsUser) {
-        setConfOsUser(ñonfOsUser);
+    public ComputationalTerminateDTO withConfOsUser(String confOsUser) {
+        setConfOsUser(confOsUser);
         return this;
     }
 
