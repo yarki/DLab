@@ -34,14 +34,16 @@ parser.add_argument('--region', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 args = parser.parse_args()
 
+spark_version = os.environ['notebook_spark_version']
+hadoop_version = os.environ['notebook_hadoop_version']
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-netinst.tgz"
 zeppelin_version = "0.6.2"
 zeppelin_interpreters = "md,python"
 python3_version = "3.4"
-pyspark_local_path_dir = '/home/ubuntu/.local/share/zeppelin/interpreters/pyspark_local/'
-py3spark_local_path_dir = '/home/ubuntu/.local/share/zeppelin/interpreters/py3spark_local/'
 zeppelin_conf_file = '/home/ubuntu/.local/share/zeppelin/zeppelin_notebook_config.py'
 templates_dir = '/root/templates/'
+s3_jars_dir = '/opt/jars/'
 
 
 def prepare_disk():
@@ -59,6 +61,24 @@ def prepare_disk():
 def id_generator(size=10, chars=string.digits + string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
+
+def ensure_spark():
+    if not exists('/home/ubuntu/.ensure_dir/spark_ensured'):
+        try:
+            sudo('wget ' + spark_link + ' -O /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
+            sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
+            sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
+            ensure_s3_libs()
+            spark_libs = "/opt/" + args.emr_version + "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-core*.jar /opt/" + \
+                         args.emr_version + "/jars/usr/lib/hadoop/hadoop-aws*.jar /opt/" + args.emr_version + \
+                         "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-s3-*.jar /opt/" + args.emr_version + \
+                         "/jars/usr/lib/hadoop-lzo/lib/hadoop-lzo-*.jar"
+            sudo('echo \"spark.jars $(ls ' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/spark/conf/spark-defaults.conf')
+            sudo('touch /home/ubuntu/.ensure_dir/spark_ensured')
+        except:
+            sys.exit(1)
+
+
 def ensure_jre_jdk():
     if not exists('/home/ubuntu/.ensure_dir/jre_jdk_ensured'):
         try:
@@ -71,10 +91,9 @@ def ensure_jre_jdk():
 def ensure_s3_libs():
     if not exists('/home/ubuntu/.ensure_dir/zp_s3_lib_ensured'):
         try:
-            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-core/1.10.75/aws-java-sdk-core-1.10.75.jar')
-            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.6.0/hadoop-aws-2.6.0.jar')
-            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-s3/1.10.75/aws-java-sdk-s3-1.10.75.jar')
-            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.5/lzo-hadoop-1.0.5.jar')
+            sudo('mkdir -p ' + s3_jars_dir)
+            put(templates_dir + 'jars/local_jars.tar.gz', '/tmp/local_jars.tar.gz')
+            sudo('tar -xzf /tmp/local_jars.tar.gz -C ' + s3_jars_dir)
             sudo('touch /home/ubuntu/.ensure_dir/zp_s3_lib_ensured')
         except:
             sys.exit(1)
