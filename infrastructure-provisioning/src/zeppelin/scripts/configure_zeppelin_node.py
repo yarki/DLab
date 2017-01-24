@@ -48,21 +48,21 @@ templates_dir = '/root/templates/'
 files_dir = '/root/files'
 
 
-def ensure_s3_libs():
-    if not exists('/home/' + args.os_user + '/.ensure_dir/zp_s3_lib_ensured'):
+def ensure_s3_libs(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/zp_s3_lib_ensured'):
         try:
             sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-core/1.10.75/aws-java-sdk-core-1.10.75.jar')
             sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.6.0/hadoop-aws-2.6.0.jar')
             sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-s3/1.10.75/aws-java-sdk-s3-1.10.75.jar')
             sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.5/lzo-hadoop-1.0.5.jar')
-            sudo('touch /home/' + args.os_user + '/.ensure_dir/zp_s3_lib_ensured')
+            sudo('touch /home/' + os_user + '/.ensure_dir/zp_s3_lib_ensured')
         except:
             sys.exit(1)
 
 
-def configure_notebook_server(notebook_name):
-    if not exists('/home/' + args.os_user + '/.ensure_dir/zeppelin_ensured'):
-        ensure_jre_jdk(args.os_user)
+def configure_notebook_server(notebook_name, os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/zeppelin_ensured'):
+        ensure_jre_jdk(os_user)
         try:
             sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
             sudo('tar -zxvf /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz -C /opt/')
@@ -76,27 +76,28 @@ def configure_notebook_server(notebook_name):
             sudo('mkdir /var/log/zeppelin')
             sudo('mkdir /var/run/zeppelin')
             sudo('ln -s /var/log/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/logs')
-            sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /var/log/zeppelin')
+            sudo('chown ' + os_user + ':' + os_user + ' -R /var/log/zeppelin')
             sudo('ln -s /var/run/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/run')
-            sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/zeppelin')
+            sudo('chown ' + os_user + ':' + os_user + ' -R /var/run/zeppelin')
             sudo('/opt/zeppelin/bin/install-interpreter.sh --name ' + zeppelin_interpreters + ' --proxy-url $http_proxy')
-            ensure_s3_libs()
-            sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /opt/zeppelin-' + zeppelin_version + '-bin-netinst')
+            ensure_s3_libs(os_user)
+            sudo('chown ' + os_user + ':' + os_user + ' -R /opt/zeppelin-' + zeppelin_version + '-bin-netinst')
         except:
             sys.exit(1)
         try:
             put(templates_dir + 'zeppelin-notebook.service', '/tmp/zeppelin-notebook.service')
+            sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/zeppelin-notebook.service")
             sudo("chmod 644 /tmp/zeppelin-notebook.service")
             sudo('cp /tmp/zeppelin-notebook.service /etc/systemd/system/zeppelin-notebook.service')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable zeppelin-notebook")
             sudo("systemctl start zeppelin-notebook")
-            sudo('echo \"d /var/run/zeppelin  0755 ' + args.os_user + '\" > /usr/lib/tmpfiles.d/zeppelin.conf')
-            sudo('touch /home/' + args.os_user + '/.ensure_dir/zeppelin_ensured')
+            sudo('echo \"d /var/run/zeppelin  0755 ' + os_user + '\" > /usr/lib/tmpfiles.d/zeppelin.conf')
+            sudo('touch /home/' + os_user + '/.ensure_dir/zeppelin_ensured')
         except:
             sys.exit(1)
 
-        ensure_python3_kernel_zeppelin(python3_version, args.os_user)
+        ensure_python3_kernel_zeppelin(python3_version, os_user)
 
 
 ##############
@@ -116,4 +117,4 @@ if __name__ == "__main__":
     except:
         sys.exit(1)
     prepare_disk(args.os_user)
-    configure_notebook_server("_".join(args.instance_name.split()))
+    configure_notebook_server("_".join(args.instance_name.split()), args.os_user)
