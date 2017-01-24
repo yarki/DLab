@@ -93,9 +93,13 @@ def run():
     #emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp) + ', ' \
     #                   + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)\
     #                   + ', Notebook=' + os.environ['notebook_name']
-    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid'] + ', ' \
-                       + emr_conf['service_base_name'] + '-Tag=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']\
-                       + ', Notebook=' + os.environ['notebook_name']
+    emr_conf['tags'] = 'Name=' + emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + \
+                       '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + \
+                       '-' + emr_conf['uuid'] + ', ' + emr_conf['service_base_name'] + '-Tag=' + \
+                       emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + \
+                       emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + \
+                       emr_conf['uuid'] + ', Notebook=' + os.environ['notebook_name'] + ', EMRName=' + \
+                       emr_conf['computational_name']
     #emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + str(time_stamp)
     emr_conf['cluster_name'] = emr_conf['service_base_name'] + '-' + os.environ['edge_user_name'] + '-emr-' + emr_conf['exploratory_name'] + '-' + emr_conf['computational_name'] + '-' + emr_conf['uuid']
     emr_conf['bucket_name'] = (emr_conf['service_base_name'] + '-ssn-bucket').lower().replace('_', '-')
