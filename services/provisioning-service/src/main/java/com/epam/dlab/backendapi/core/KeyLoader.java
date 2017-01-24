@@ -80,7 +80,8 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
                                 .withResource(getResourceType())
                                 .withRequestId(uuid)
                                 .withConfKeyName(configuration.getAdminKey())
-                                .withActionCreate(configuration.getEdgeImage()),
+                                .withActionCreate(configuration.getEdgeImage())
+                                .withUserKeyName(edgeDto.getEdgeUserName()),
                                 edgeDto
                 )
         );
