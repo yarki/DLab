@@ -70,11 +70,7 @@ def ensure_spark():
             sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
             sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
             ensure_s3_libs()
-            spark_libs = "/opt/" + args.emr_version + "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-core*.jar /opt/" + \
-                         args.emr_version + "/jars/usr/lib/hadoop/hadoop-aws*.jar /opt/" + args.emr_version + \
-                         "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-s3-*.jar /opt/" + args.emr_version + \
-                         "/jars/usr/lib/hadoop-lzo/lib/hadoop-lzo-*.jar"
-            sudo('echo \"spark.jars $(ls -1' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/spark/conf/spark-defaults.conf')
+            sudo('echo \"spark.jars $(ls -1 ' + s3_jars_dir + '/* | tr \'\\n\' \',\')\" >> /opt/spark/conf/spark-defaults.conf')
             sudo('touch /home/ubuntu/.ensure_dir/spark_ensured')
         except:
             sys.exit(1)
@@ -135,7 +131,6 @@ def configure_notebook_server(notebook_name):
             sudo('ln -s /var/run/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/run')
             sudo('chown ubuntu:ubuntu -R /var/run/zeppelin')
             sudo('/opt/zeppelin/bin/install-interpreter.sh --name ' + zeppelin_interpreters + ' --proxy-url $http_proxy')
-            ensure_s3_libs()
             sudo('chown ubuntu:ubuntu -R /opt/zeppelin-' + zeppelin_version + '-bin-netinst')
         except:
             sys.exit(1)
@@ -146,7 +141,7 @@ def configure_notebook_server(notebook_name):
             sudo("systemctl daemon-reload")
             sudo("systemctl enable zeppelin-notebook")
             sudo("systemctl start zeppelin-notebook")
-            sudo('echo \"d /var/run/zeppelin  0755 ubuntu\" > /usr/lib/tmpfiles.d/zeppelin.conf')
+            sudo('echo \"d /var/run/zeppelin 0755 ubuntu\" > /usr/lib/tmpfiles.d/zeppelin.conf')
             sudo('touch /home/ubuntu/.ensure_dir/zeppelin_ensured')
         except:
             sys.exit(1)
