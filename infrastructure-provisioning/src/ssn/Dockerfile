@@ -20,10 +20,9 @@ FROM docker.epmc-bdcc.projects.epam.com/dlab-aws-base:latest
 
 ARG OS
 ARG CLOUD
-ARG RESOURCE
 
 COPY ssn/ /root/
-COPY general/scripts/${CLOUD}/${RESOURCE}/* /root/scripts/
+COPY general/scripts/${CLOUD}/ssn_* /root/scripts/
 COPY general/lib/os/${OS}/ssn_lib.py /usr/lib/python2.7/dlab/ssn_lib.py
 COPY general/files/${CLOUD}/instance_shapes.lst /root/files/
 COPY general/templates/os/${OS}/supervisor_svc.conf /root/templates/
