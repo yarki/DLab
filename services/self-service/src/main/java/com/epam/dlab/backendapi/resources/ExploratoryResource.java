@@ -96,6 +96,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
                         .withNotebookImage(formDTO.getImage())
+                        .withApplicationName(formDTO.getApplicationName())
                         .withNotebookInstanceType(formDTO.getShape())
                         .withAwsRegion(settingsDAO.getAwsRegion())
                         .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups())
