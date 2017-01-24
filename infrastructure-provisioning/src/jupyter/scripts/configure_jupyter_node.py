@@ -83,7 +83,7 @@ def configure_notebook_server():
 
         ensure_python3_kernel(args.os_user)
 
-        ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region)
+        ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
         ensure_r_kernel(spark_version, args.os_user)
 
@@ -96,7 +96,6 @@ if __name__ == "__main__":
     env['connection_attempts'] = 100
     env.key_filename = [args.keyfile]
     env.host_string = args.os_user + '@' + args.hostname
-    deeper_config = json.loads(args.additional_config)
 
     print "Configuring notebook server."
     try:

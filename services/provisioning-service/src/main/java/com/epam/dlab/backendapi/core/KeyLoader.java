@@ -79,13 +79,13 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
                                 .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
                                 .withResource(getResourceType())
                                 .withRequestId(uuid)
-                                .withCredsKeyName(configuration.getAdminKey())
+                                .withConfKeyName(configuration.getAdminKey())
                                 .withActionCreate(configuration.getEdgeImage())
                                 .withConfServiceBaseName(edgeDto.getServiceBaseName())
-                                .withCredsRegion(edgeDto.getRegion())
-                                .withCredsSecurityGroupsIds(edgeDto.getSecurityGroupIds())
-                                .withVpcId(edgeDto.getVpcId())
-                                .withEdgeSubnetId(edgeDto.getSubnetId())
+                                .withAwsRegion(edgeDto.getAwsRegion())
+                                .withAwsSecurityGroupsIds(edgeDto.getAwsSecurityGroupIds())
+                                .withAwsVpcId(edgeDto.getAwsVpcId())
+                                .withAwsSubnetId(edgeDto.getAwsSubnetId())
                                 .withUserKeyName(edgeDto.getEdgeUserName()), edgeDto
                 )
         );

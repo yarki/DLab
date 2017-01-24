@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
-        params = "--hostname {} --keyfile {} --apt_packages 'git vim gcc python-devel openssl-devel' --pip_packages 'boto3 argparse fabric awscli pymongo' --user {}". \
+        params = "--hostname {} --keyfile {} --pip_packages 'boto3 argparse fabric awscli pymongo' --user {}". \
             format(instance_hostname, "/root/keys/" + os.environ['conf_key_name'] + ".pem", os.environ['conf_os_user'])
 
         try:

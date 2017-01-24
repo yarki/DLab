@@ -97,8 +97,8 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withIamUserName(userInfo.getName())
                         .withNotebookImage(formDTO.getImage())
                         .withNotebookInstanceType(formDTO.getShape())
-                        .withRegion(settingsDAO.getCredsRegion())
-                        .withSecurityGroupIds(settingsDAO.getSecurityGroups());
+                        .withAwsRegion(settingsDAO.getAwsRegion())
+                        .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups());
                 LOGGER.debug("Created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
                         .ok(provisioningService.post(EXPLORATORY_CREATE, userInfo.getAccessToken(), dto, String.class))
@@ -213,9 +213,9 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(userInstance.getExploratoryId())
-                    .withKeyDir(settingsDAO.getCredsKeyDir())
-                    .withSshUser(settingsDAO.getExploratorySshUser())
-                    .withRegion(settingsDAO.getCredsRegion());
+                    .withConfKeyDir(settingsDAO.getConfKeyDir())
+                    .withConfOsUser(settingsDAO.getConfOsUser())
+                    .withAwsRegion(settingsDAO.getAwsRegion());
             return provisioningService.post(EXPLORATORY_STOP, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
         	LOGGER.warn("Could not stop exploratory environment {} for user {}: {}",
@@ -279,7 +279,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(userInstance.getExploratoryId())
-                    .withRegion(settingsDAO.getCredsRegion());
+                    .withAwsRegion(settingsDAO.getAwsRegion());
             return provisioningService.post(action, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
         	updateExploratoryStatusSilent(userInfo.getName(), exploratoryName, FAILED);

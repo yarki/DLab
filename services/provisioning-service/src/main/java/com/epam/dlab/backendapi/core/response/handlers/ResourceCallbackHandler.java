@@ -34,7 +34,7 @@ import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.util.Date;
 
-abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implements FileHandlerCallback {
+abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implements FileHandlerCallback {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
     protected ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
@@ -54,7 +54,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     private Class<T> resultType;
 
     @SuppressWarnings("unchecked")
-    public ResourceCallbackHandler(RESTService selfService, String user, String accessToken, String originalUuid, DockerAction action) {
+    public ResourceCallbackHandler(RESTService selfService, String user, String originalUuid, DockerAction action) {
         this.selfService = selfService;
         this.user = user;
         this.originalUuid = originalUuid;
@@ -66,27 +66,49 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
     public boolean checkUUID(String uuid) {
         return originalUuid.equals(uuid);
     }
+    
+    public String getUser() {
+    	return user;
+    }
+    
+    public DockerAction getAction() {
+    	return action;
+    }
 
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
-        LOGGER.debug("Got file {} while waiting for {}", fileName, originalUuid);
+        LOGGER.debug("Got file {} while waiting for {}, docker responce: {}", fileName, originalUuid, new String(content));
         JsonNode document = MAPPER.readTree(content);
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
         T result = getBaseStatusDTO(status);
+        
         JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
         if (success) {
-            LOGGER.debug("Did {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
+            LOGGER.debug("Did {} resource for user: {}, request: {}", action, user, originalUuid);
         } else {
-            LOGGER.error("Could not {} resource for user: {}, request: {}, docker response: {}", action, user, originalUuid, new String(content));
+            LOGGER.error("Could not {} resource for user: {}, request: {}", action, user, originalUuid);
             result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
             resultNode = resultNode.get(CONF_NODE);
         }
+        LOGGER.debug("Handle Info: status is {}, resultNode is {}", result, (resultNode == null ? "<NULL>" : resultNode.asText()));
         if (resultNode != null) {
             result = parseOutResponse(resultNode, result);
+            LOGGER.debug("Handle new Info: resultNode is {}", (resultNode == null ? "<NULL>" : resultNode.asText()));
         }
+        
         selfService.post(getCallbackURI(), result, resultType);
-        return !UserInstanceStatus.FAILED.equals(status);
+        if (UserInstanceStatus.FAILED.equals(status)) {
+        	return false;
+        }
+        try {
+        	postHandle();
+        } catch (DlabException e) {
+        	LOGGER.error("Could not {} resource for user: {}, request: {}", action, user, originalUuid, e);
+        	selfService.post(getCallbackURI(), getBaseStatusDTO(UserInstanceStatus.FAILED), resultType);
+        	throw new DlabException("Could not " + action + " resource for user: " + user + ", request: " + originalUuid, e);
+        }
+        return true;
     }
 
     @Override
@@ -97,6 +119,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
             throw new DlabException("Could not send status update for request " + originalUuid + ", user " + user, t);
         }
     }
+    
+    abstract protected void postHandle();
 
     abstract protected String getCallbackURI();
 
@@ -123,6 +147,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO> implement
             switch (action) {
                 case CREATE:
                     return UserInstanceStatus.RUNNING;
+                case CONFIGURE:
+                	return UserInstanceStatus.RUNNING;
                 case START:
                     return UserInstanceStatus.RUNNING;
                 case STOP:

@@ -21,13 +21,15 @@ package com.epam.dlab.backendapi.dao;
 /** Name of fields in the Mongo collection {@link MongoCollections#SETTINGS}. */
 public enum MongoSetting {
 	/** Base name of service. */
-    SERIVICE_BASE_NAME("service_base_name"),
+    SERIVICE_BASE_NAME("conf_service_base_name"),
 	/** Name of AWS region. */
     AWS_REGION("aws_region"),
 	/** Id of security group. */
-    SECURITY_GROUPS("security_groups_ids"),
+    AWS_SECURITY_GROUPS("aws_security_groups_ids"),
 	/** OS user name. */
-    EXPLORATORY_SSH_USER("notebook_ssh_user"),
+    CONF_OS_USER("conf_os_user"),
+	/** Name of OS family. */
+    CONF_OS_FAMILY("conf_os_family"),
 	/** Name of directory for user key. */
     CONF_KEY_DIRECTORY("conf_key_dir"),
 	/** Id of virtual private cloud for AWS account. */
