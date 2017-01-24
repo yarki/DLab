@@ -85,11 +85,11 @@ def ensure_s3_kernel(os_user, s3_jars_dir, files_dir, region, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/s3_kernel_ensured'):
         try:
             sudo('mkdir -p ' + s3_jars_dir)
-            put(files_dir + 'local_jars.tar.gz', '/tmp/local_jars.tar.gz')
-            sudo('tar -xzf /tmp/local_jars.tar.gz -C ' + s3_jars_dir)
-            put(templates_dir + 'spark-defaults_local.conf', '/tmp/spark-defaults_local.conf')
-            sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/spark-defaults_local.conf".format(region))
-            sudo('\cp /tmp/spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
+            put(files_dir + 'notebook_local_jars.tar.gz', '/tmp/notebook_local_jars.tar.gz')
+            sudo('tar -xzf /tmp/notebook_local_jars.tar.gz -C ' + s3_jars_dir)
+            put(templates_dir + 'notebook_spark-defaults_local.conf', '/tmp/notebook_spark-defaults_local.conf')
+            sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/notebook_spark-defaults_local.conf".format(region))
+            sudo('\cp /tmp/notebook_spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
             sudo('touch /home/' + os_user + '/.ensure_dir/s3_kernel_ensured')
         except:
             sys.exit(1)

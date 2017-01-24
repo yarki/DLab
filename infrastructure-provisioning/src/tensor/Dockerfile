@@ -26,10 +26,10 @@ COPY tensor/ /root/
 COPY general/scripts/${CLOUD}/tensor_* /root/scripts/
 COPY general/scripts/os/configure_proxy.py /root/scripts/
 COPY general/lib/os/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
-COPY general/files/os/${OS}/tensorboard-python2.service /root/files/tensorboard-python2.service
-COPY general/files/os/${OS}/tensorboard-python3.service /root/files/tensorboard-python3.service
-COPY general/templates/os/common/spark-defaults_local.conf /root/templates/
-COPY general/files/os/local_jars.tar.gz /root/files/
+COPY general/files/os/${OS}/tensor_tensorboard-python2.service /root/files/tensor_tensorboard-python2.service
+COPY general/files/os/${OS}/tensor_tensorboard-python3.service /root/files/tensor_tensorboard-python3.service
+COPY general/templates/os/common/notebook_spark-defaults_local.conf /root/templates/
+COPY general/files/os/notebook_local_jars.tar.gz /root/files/
 
 RUN chmod a+x /root/fabfile.py; \
     chmod a+x /root/scripts/*
