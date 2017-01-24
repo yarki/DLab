@@ -130,7 +130,7 @@ def ensure_supervisor():
             sudo('yum install -y supervisor')
             #sudo('pip install supervisor')
             sudo('chkconfig supervisord on')
-            sudo('systemctl start supervisord.service')
+            sudo('systemctl start supervisord')
             sudo('touch {}tmp/superv_ensured'.format(os.environ['ssn_dlab_path']))
         return True
     except:
@@ -192,7 +192,7 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path, os_user):
                 append_result("Unable to upload webapp jars. Exception: " + str(err))
                 sys.exit(1)
 
-            sudo('service supervisord start')
+            sudo('systemctl restart supervisord')
             sudo('service nginx restart')
             sudo('touch ' + os.environ['ssn_dlab_path'] + 'tmp/ss_started')
         return True
