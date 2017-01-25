@@ -222,7 +222,7 @@ public class TestServices {
         		.get(0)
         		.getPrivateIpAddress();
         
-
+/*
         System.out.println("8. EMR will be deployed ...");
         final String ssnCompResURL = getSnnURL(Path.COMPUTATIONAL_RES);
         System.out.println("   SSN computational resources URL is " + ssnCompResURL);
@@ -251,7 +251,7 @@ public class TestServices {
         
         //run python script
         testPython(publicIp, notebookIp, serviceBaseName, emrName, getEmrClusterName(emrName));
-
+*/
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
         System.out.println("   SSN stop notebook URL is " + ssnStopNotebookURL);
@@ -289,7 +289,7 @@ public class TestServices {
         Amazon.checkAmazonStatus(nodePrefix + "-nb-" + noteBookName, AmazonInstanceState.RUNNING);
 
         Docker.checkDockerStatus(nodePrefix + "_start_exploratory_NotebookAutoTest", publicIp);
-
+/*
         System.out.println("11. New EMR will be deployed for termination ...");
         final String emrNewName = "New" + emrName; 
         deployEMR.setEmr_instance_count("1");
@@ -328,10 +328,9 @@ public class TestServices {
 
         System.out.println("12. New EMR will be deployed for notebook termination ...");
         final String emrNewName2 = "AnotherNew" + emrName;
-        final String ssnTerminateNotebookURL = getSnnURL(Path.getTerminateNotebookUrl(noteBookName));
-        System.out.println("    SSN terminate EMR URL is " + ssnTerminateEMRURL);
         
-        System.out.println("    New EMR will be deployed ...");
+        System.out.println("    SSN terminate EMR URL is " + ssnTerminateEMRURL);
+		System.out.println("    New EMR will be deployed ...");
         deployEMR.setEmr_instance_count("1");
         deployEMR.setEmr_master_instance_type("m4.large");
         deployEMR.setEmr_slave_instance_type("m4.large");
@@ -348,8 +347,9 @@ public class TestServices {
         if (!gettingStatus.contains("running"))
             throw new Exception("New emr " + emrNewName2 + " has not been deployed");
         System.out.println("    New emr " + emrNewName2 + " has been deployed");
-
+*/
         System.out.println("13. Notebook will be terminated ...");
+        final String ssnTerminateNotebookURL = getSnnURL(Path.getTerminateNotebookUrl(noteBookName));
         Response respTerminateNotebook = new HttpRequest().webApiDelete(ssnTerminateNotebookURL, ContentType.JSON, token);
         System.out.println("    respTerminateNotebook.getBody() is " + respTerminateNotebook.getBody().asString());
         Assert.assertEquals(respTerminateNotebook.statusCode(), HttpStatusCode.OK);
@@ -365,7 +365,9 @@ public class TestServices {
         System.out.println("    EMR has been terminated for Notebook " + noteBookName);
 
         Amazon.checkAmazonStatus(nodePrefix + "-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED);
+/*
         Amazon.checkAmazonStatus(emrNewName2, AmazonInstanceState.TERMINATED);
+*/
 
         Docker.checkDockerStatus(nodePrefix + "_terminate_exploratory_NotebookAutoTestt", publicIp);
     }
