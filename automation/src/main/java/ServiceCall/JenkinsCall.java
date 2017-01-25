@@ -65,7 +65,7 @@ public class JenkinsCall {
         
         if (actualStatus.endsWith("true")) {
             System.out.println("ERROR: Timeout has been expired for Jenkins");
-            System.out.println("  timeout is " + 0);
+            System.out.println("  timeout is " + duration);
             return false;
         }
         return true;

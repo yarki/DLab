@@ -491,7 +491,7 @@ public class TestServices {
 
         if (actualStatus != HttpStatusCode.OK) {
             System.out.println("ERROR: Timeout has been expired for SSN available.");
-            System.out.println("  timeout is " + 0);
+            System.out.println("  timeout is " + duration);
             return false;
         }
         return true;
@@ -517,7 +517,7 @@ public class TestServices {
             System.out.println("  URL is " + url);
             System.out.println("  token is " + token);
             System.out.println("  status is " + status);
-            System.out.println("  timeout is " + timeout);
+            System.out.println("  timeout is " + duration);
         }
         return actualStatus;
     }
@@ -543,7 +543,7 @@ public class TestServices {
             System.out.println("  token is " + token);
             System.out.println("  statusPath is " + statusPath);
             System.out.println("  status is " + status);
-            System.out.println("  timeout is " + timeout);
+            System.out.println("  timeout is " + duration);
         }
         return actualStatus;
     }
