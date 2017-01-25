@@ -35,7 +35,8 @@ public class ComputationalConfigure  implements DockerCommands {
     private RESTService selfService;
 
     public String run(String dlabUser, ComputationalCreateDTO dto) throws DlabException {
-        LOGGER.debug("Configure computational resources cluster");
+        LOGGER.debug("Configure computational resources {} for user {}", dto.getComputationalName(), dlabUser);
+        LOGGER.debug("configuration injected as " + configuration);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(
         		configuration.getImagesDirectory(),
