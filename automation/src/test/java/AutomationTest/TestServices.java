@@ -266,12 +266,13 @@ public class TestServices {
             throw new Exception("Notebook " + noteBookName + " has not been stopped");
         System.out.println("   Notebook " + noteBookName + " has been stopped");
         gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath().getString("computational_resources.status");
+/*
         if (!gettingStatus.contains("terminated"))
             throw new Exception("Computational resources has not been terminated for Notebook " + noteBookName);
         System.out.println("   Computational resources has been terminated for Notebook " + noteBookName);
 
         Amazon.checkAmazonStatus(nodePrefix + "-emr-" + noteBookName, AmazonInstanceState.TERMINATED);
-
+*/
         Docker.checkDockerStatus(nodePrefix + "_stop_exploratory_NotebookAutoTest", publicIp);
 
         System.out.println("10. Notebook will be started ...");
