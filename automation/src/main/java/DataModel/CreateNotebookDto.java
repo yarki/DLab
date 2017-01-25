@@ -1,9 +1,12 @@
 package DataModel;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CreateNotebookDto {
     
 	private String image;
     private String name;
+    @JsonProperty("template_name")
     private String templateName;
     private String shape;
     private String version;
