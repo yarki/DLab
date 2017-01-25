@@ -42,7 +42,6 @@ zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-
 zeppelin_version = "0.6.2"
 zeppelin_interpreters = "md,python"
 python3_version = "3.4"
-zeppelin_conf_file = '/home/ubuntu/.local/share/zeppelin/zeppelin_notebook_config.py'
 templates_dir = '/root/templates/'
 s3_jars_dir = '/opt/jars/'
 
