@@ -25,7 +25,6 @@ public class PropertyValue {
     private static final String ACCESS_KEY_PRIV_FILE_NAME_SSN="ACCESS_KEY_PRIV_FILE_NAME_SSN";
     
 	public static final String TIMEOUT_JENKINS_AUTOTEST="TIMEOUT_JENKINS_AUTOTEST";
-	public static final String TIMEOUT_SSN_CREATE="TIMEOUT_SSN_CREATE";
 	public static final String TIMEOUT_UPLOAD_KEY="TIMEOUT_UPLOAD_KEY";
 	public static final String TIMEOUT_NOTEBOOK_CREATE="TIMEOUT_NOTEBOOK_CREATE";
 	public static final String TIMEOUT_NOTEBOOK_STARTUP="TIMEOUT_NOTEBOOK_STARTUP";
@@ -90,7 +89,6 @@ public class PropertyValue {
         printProperty(ACCESS_KEY_PRIV_FILE_NAME_SSN);
         
         printProperty(TIMEOUT_JENKINS_AUTOTEST);
-        printProperty(TIMEOUT_SSN_CREATE);
         printProperty(TIMEOUT_UPLOAD_KEY);
         printProperty(TIMEOUT_NOTEBOOK_CREATE);
         printProperty(TIMEOUT_NOTEBOOK_STARTUP);
@@ -170,10 +168,6 @@ public class PropertyValue {
 
     public static final int getTimeoutJenkinsAutotest() {
     	return get(TIMEOUT_JENKINS_AUTOTEST, 0);
-    }
-
-    public static final int getTimeoutSSNCreate() {
-    	return get(TIMEOUT_SSN_CREATE, 0);
     }
 
     public static final int getTimeoutUploadKey() {

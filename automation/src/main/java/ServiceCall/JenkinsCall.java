@@ -20,7 +20,7 @@ public class JenkinsCall {
     private String buildNumber;
     private String ssnURL;
     private String serviceBaseName;
-    private String buildResult; 
+    private String buildResult;
     
     FormAuthConfig config = new FormAuthConfig("/Auto_tests/search/", "username", "password");
     
