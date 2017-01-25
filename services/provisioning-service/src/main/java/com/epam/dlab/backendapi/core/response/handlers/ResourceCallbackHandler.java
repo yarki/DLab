@@ -95,10 +95,10 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
             result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
             resultNode = resultNode.get(CONF_NODE);
         }
-        LOGGER.debug("Handle Info: status is {}, resultNode is {}", result, (resultNode == null ? "<NULL>" : resultNode.asText()));
+        LOGGER.debug("Handle Info: status is {}, resultNode is {}", result, (resultNode == null ? "<NULL>" : resultNode.toString()));
         if (resultNode != null) {
             result = parseOutResponse(resultNode, result);
-            LOGGER.debug("Handle new Info: resultNode is {}", (resultNode == null ? "<NULL>" : resultNode.asText()));
+            LOGGER.debug("Handle new Info: resultNode is {}", (resultNode == null ? "<NULL>" : resultNode.toString()));
         }
         
         selfService.post(getCallbackURI(), result, resultType);

@@ -130,6 +130,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withApplicationName(getApplicationName(instance.getImageName()))
                         .withComputationalName(formDTO.getName())
                         .withNotebookName(instance.getExploratoryId())
+                        .withNotebookInstanceName(instance.getExploratoryName())
                         .withInstanceCount(formDTO.getInstanceCount())
                         .withMasterInstanceType(formDTO.getMasterInstanceType())
                         .withSlaveInstanceType(formDTO.getSlaveInstanceType())
