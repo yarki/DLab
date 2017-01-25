@@ -64,7 +64,7 @@ def r_kernel(args):
     text = text.replace('CLUSTER_NAME', args.cluster_name)
     text = text.replace('SPARK_PATH', spark_path)
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('R_VERSION', 'R-{}'.format(str(r_version)))
+    text = text.replace('R_KERNEL_VERSION', 'R-{}'.format(str(r_version)))
     text = text.replace('EMR_VERSION', args.emr_version)
     if 'emr-4.' in args.emr_version:
         text = text.replace('YARN_CLI_TYPE', 'yarn-client')
@@ -135,7 +135,6 @@ def toree_kernel(args):
         text = text.replace('CLUSTER_NAME', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
-        text = text.replace('OS_USER', args.os_user)
         text = text.replace('EMR_VERSION', args.emr_version)
         text = text.replace('SCALA_VERSION', scala_version)
         with open(kernel_path, 'w') as f:
@@ -154,6 +153,7 @@ def toree_kernel(args):
         text = text.replace('CLUSTER_NAME', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
+        text = text.replace('OS_USER', args.os_user)
         text = text.replace('EMR_VERSION', args.emr_version)
         text = text.replace('SCALA_VERSION', scala_version)
         with open(kernel_path, 'w') as f:
