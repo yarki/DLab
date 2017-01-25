@@ -2,6 +2,7 @@ package AutomationTest;
 
 import java.io.File;
 import java.io.FileReader;
+import java.time.Duration;
 import java.util.Properties;
 
 public class PropertyValue {
@@ -38,6 +39,11 @@ public class PropertyValue {
     
     static {
     	loadProperties();
+    }
+    
+    
+    private static Duration getDuration(String duaration) {
+    	return Duration.parse("PT" + duaration);
     }
     
     
@@ -166,24 +172,24 @@ public class PropertyValue {
 
 
 
-    public static final int getTimeoutJenkinsAutotest() {
-    	return get(TIMEOUT_JENKINS_AUTOTEST, 0);
+    public static final Duration getTimeoutJenkinsAutotest() {
+    	return getDuration(get(TIMEOUT_JENKINS_AUTOTEST, "0s"));
     }
 
-    public static final int getTimeoutUploadKey() {
-    	return get(TIMEOUT_UPLOAD_KEY, 0);
+    public static final Duration getTimeoutUploadKey() {
+    	return getDuration(get(TIMEOUT_UPLOAD_KEY, "0s"));
     }
 
-    public static final int getTimeoutNotebookCreate() {
-    	return get(TIMEOUT_NOTEBOOK_CREATE, 0);
+    public static final Duration getTimeoutNotebookCreate() {
+    	return getDuration(get(TIMEOUT_NOTEBOOK_CREATE, "0s"));
     }
 
-    public static final int getTimeoutNotebookStartup() {
-    	return get(TIMEOUT_NOTEBOOK_STARTUP, 0);
+    public static final Duration getTimeoutNotebookStartup() {
+    	return getDuration(get(TIMEOUT_NOTEBOOK_STARTUP, "0s"));
     }
 
-    public static final int getTimeoutNotebookShutdown() {
-    	return get(TIMEOUT_NOTEBOOK_SHUTDOWN, 0);
+    public static final Duration getTimeoutNotebookShutdown() {
+    	return getDuration(get(TIMEOUT_NOTEBOOK_SHUTDOWN, "0s"));
     }
 
     public static final int getTimeoutNotebookTerminate() {
@@ -194,8 +200,8 @@ public class PropertyValue {
     	return get(TIMEOUT_EMR_CREATE, 0);
     }
 
-    public static final int getTimeoutEMRTerminate() {
-    	return get(TIMEOUT_EMR_TERMINATE, 0);
+    public static final Duration getTimeoutEMRTerminate() {
+    	return getDuration(get(TIMEOUT_EMR_TERMINATE, "0s"));
     }
 
 }

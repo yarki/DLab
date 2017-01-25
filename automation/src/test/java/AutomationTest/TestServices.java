@@ -2,6 +2,8 @@ package AutomationTest;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.time.Duration;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.testng.Assert;
@@ -355,8 +357,7 @@ public class TestServices {
         System.out.println("    respTerminateNotebook.getBody() is " + respTerminateNotebook.getBody().asString());
         Assert.assertEquals(respTerminateNotebook.statusCode(), HttpStatusCode.OK);
         
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "terminating",
-        		PropertyValue.getTimeoutNotebookTerminate() + PropertyValue.getTimeoutEMRTerminate());
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "terminating", PropertyValue.getTimeoutEMRTerminate());
         if (!gettingStatus.contains("terminated"))
             throw new Exception("Notebook" + noteBookName + " has not been terminated");
 /*
@@ -479,10 +480,11 @@ public class TestServices {
         return ssnURL + path;
     }
 
-    private boolean waitForSSNService(int timeout) throws InterruptedException {
+    private boolean waitForSSNService(Duration duration) throws InterruptedException {
         HttpRequest request = new HttpRequest();
         int actualStatus;
-        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+        long timeout = duration.toMillis();
+        long expiredTime = System.currentTimeMillis() + timeout;
 
         while ((actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode()) != HttpStatusCode.OK) {
             Thread.sleep(1000);
@@ -500,11 +502,12 @@ public class TestServices {
         return true;
     }
 
-    private static int waitWhileStatus(String url, String token, int status, int timeout)
+    private static int waitWhileStatus(String url, String token, int status, Duration duration)
             throws InterruptedException {
         HttpRequest request = new HttpRequest();
         int actualStatus;
-        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+        long timeout = duration.toMillis();
+        long expiredTime = System.currentTimeMillis() + timeout;
 
         while ((actualStatus = request.webApiGet(url, token).getStatusCode()) == status) {
             Thread.sleep(1000);
@@ -524,11 +527,12 @@ public class TestServices {
         return actualStatus;
     }
 
-    private static String waitWhileStatus(String url, String token, String statusPath, String status, int timeout)
+    private static String waitWhileStatus(String url, String token, String statusPath, String status, Duration duration)
             throws InterruptedException {
         HttpRequest request = new HttpRequest();
         String actualStatus;
-        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+        long timeout = duration.toMillis();
+        long expiredTime = System.currentTimeMillis() + timeout;
 
         while ((actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath)).contains(status)) {
             Thread.sleep(1000);

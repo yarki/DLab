@@ -1,5 +1,6 @@
 package ServiceCall;
 
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,9 +50,10 @@ public class JenkinsCall {
                 get("api/xml").getBody().xmlPath().getString("freeStyleProject.inQueue");
     }
 
-    private boolean waitForJenkinsStartup(int timeout) throws InterruptedException {
+    private boolean waitForJenkinsStartup(Duration duration) throws InterruptedException {
     	String actualStatus;
-        long expiredTime = System.currentTimeMillis() + timeout * 1000;
+    	long timeout = duration.toMillis();
+        long expiredTime = System.currentTimeMillis() + timeout;
         
     	while ((actualStatus = getQueueStatus()).endsWith("true")) {
             Thread.sleep(1000);
