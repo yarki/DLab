@@ -13,6 +13,5 @@
     "emr_timeout":"ETIM",
     "conf_key_name":"KN",
     "aws_region":"CREG",
-    "notebook_instance_name":"NNM",
-    "application":"APP"
+    "notebook_instance_name":"NNM"
 }
