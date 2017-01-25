@@ -107,9 +107,9 @@ def ensure_local_spark(os_user, spark_link, spark_version, hadoop_version, local
             sys.exit(1)
 
 
-def checksum_check(file):
-    result = local('md5sum -c ' + file, capture=True)
-    return result
+#ef checksum_check(file):
+#    result = local('md5sum -c ' + file, capture=True)
+#    return result
 
 
 def prepare(emr_dir, yarn_dir):
