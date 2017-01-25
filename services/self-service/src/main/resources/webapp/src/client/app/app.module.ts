@@ -27,6 +27,7 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { AuthorizationGuard } from './security/authorization.guard';
 import { LoginModule } from './login/login.module';
 import { HomeModule } from './home/home.module';
+import { HealthStatusModule } from './health-status/health-status.module';
 import { AccessNotebookGuideModule } from './help/accessnotebookguide/accessnotebookguide.module';
 import { PublicKeyGuideModule } from './help/publickeyguide/publickeyguide.module';
 import { FormsModule } from '@angular/forms';
@@ -44,6 +45,7 @@ import { ApplicationSecurityService } from './services/applicationSecurity.servi
     RouterModule.forRoot(routes, { useHash: true }),
     LoginModule,
     HomeModule,
+    HealthStatusModule,
     FormsModule,
     AccessNotebookGuideModule,
     PublicKeyGuideModule
