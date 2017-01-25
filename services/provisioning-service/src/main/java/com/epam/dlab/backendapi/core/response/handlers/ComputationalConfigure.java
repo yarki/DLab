@@ -36,10 +36,9 @@ public class ComputationalConfigure  implements DockerCommands {
 
     public String run(String dlabUser, ComputationalCreateDTO dto) throws DlabException {
         LOGGER.debug("Configure computational resources cluster");
-        // New UUID?
-        // Response log files
         String uuid = DockerCommands.generateUUID();
-        folderListenerExecutor.start(configuration.getImagesDirectory(),
+        folderListenerExecutor.start(
+        		configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(CONFIGURE, uuid, dto, dlabUser));
         try {
