@@ -359,12 +359,14 @@ public class TestServices {
         		PropertyValue.getTimeoutNotebookTerminate() + PropertyValue.getTimeoutEMRTerminate());
         if (!gettingStatus.contains("terminated"))
             throw new Exception("Notebook" + noteBookName + " has not been terminated");
+/*
         gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
+
             .getString("computational_resources.status");
         if (!gettingStatus.contains("terminated"))
-            throw new Exception("EMR has been terminated for Notebook " + noteBookName);
+            throw new Exception("EMR has not been terminated for Notebook " + noteBookName);
         System.out.println("    EMR has been terminated for Notebook " + noteBookName);
-
+*/
         Amazon.checkAmazonStatus(nodePrefix + "-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED);
 /*
         Amazon.checkAmazonStatus(emrNewName2, AmazonInstanceState.TERMINATED);
