@@ -196,8 +196,8 @@ public class PropertyValue {
     	return get(TIMEOUT_NOTEBOOK_TERMINATE, 0);
     }
 
-    public static final int getTimeoutEMRCreate() {
-    	return get(TIMEOUT_EMR_CREATE, 0);
+    public static final Duration  getTimeoutEMRCreate() {
+    	return getDuration(get(TIMEOUT_EMR_CREATE, "0s"));
     }
 
     public static final Duration getTimeoutEMRTerminate() {
