@@ -29,7 +29,7 @@ public class ExploratoryCreateFormDTO {
     private String image;
 
     @NotBlank
-    @JsonProperty
+    @JsonProperty("template_name")
     private String templateName;
 
     @NotBlank
@@ -93,4 +93,5 @@ public class ExploratoryCreateFormDTO {
     public void setVersion(String version) {
         this.version = version;
     }
+
 }

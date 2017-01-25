@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core;
 
+import com.epam.dlab.dto.exploratory.ExploratoryURL;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -48,7 +49,7 @@ public class UserInstanceDTO {
     @JsonProperty
     private String shape;
     @JsonProperty("exploratory_url")
-    private String url;
+    private List<ExploratoryURL> exploratoryUrl;
     @JsonProperty("up_time")
     private Date uptime;
     @JsonProperty("computational_resources")
@@ -187,19 +188,19 @@ public class UserInstanceDTO {
         return this;
     }
 
-    /** Returns the URL of notebook. */
-    public String getUrl() {
-        return url;
+    /** Returns the URL of exploratory. */
+    public List<ExploratoryURL> getExploratoryUrl() {
+        return exploratoryUrl;
     }
 
-    /** Sets the URL of notebook. */
-    public void setUrl(String url) {
-        this.url = url;
+    /** Sets the URL of exploratory. */
+    public void setExploratoryUrl(List<ExploratoryURL> exploratoryUrl) {
+        this.exploratoryUrl = exploratoryUrl;
     }
 
-    /** Sets the URL of notebook. */
-    public UserInstanceDTO withUrl(String url) {
-        setUrl(url);
+    /** Sets the URL of exploratory. */
+    public UserInstanceDTO withExploratoryUrl(List<ExploratoryURL> exploratoryUrl) {
+        setExploratoryUrl(exploratoryUrl);
         return this;
     }
 

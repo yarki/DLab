@@ -31,7 +31,10 @@ public class ComputationalCreateDTO extends ComputationalBaseDTO<ComputationalCr
     private String version;
     @JsonProperty("notebook_name")
     private String notebookName;
-
+    @JsonProperty("notebook_instance_name")
+    private String notebookInstanceName;
+    @JsonProperty("notebook_template_name")
+    private String notebookTemplateName;
 
     public String getInstanceCount() {
         return instanceCount;
@@ -97,5 +100,31 @@ public class ComputationalCreateDTO extends ComputationalBaseDTO<ComputationalCr
         setNotebookName(notebookName);
         return this;
     }
+    
+    public String getNotebookInstanceName() {
+        return notebookInstanceName;
+    }
 
+    public void setNotebookInstanceName(String notebookInstanceName) {
+        this.notebookInstanceName = notebookInstanceName;
+    }
+
+    public ComputationalCreateDTO withNotebookInstanceName(String notebookInstanceName) {
+        setNotebookInstanceName(notebookInstanceName);
+        return this;
+    }
+    
+    public String getNotebookTemplateName() {
+        return notebookTemplateName;
+    }
+
+    public void setNotebookTemplateName(String notebookTemplateName) {
+        this.notebookTemplateName = notebookTemplateName;
+    }
+
+    public ComputationalCreateDTO withNotebookTemplateName(String notebookTemplateName) {
+    	setNotebookTemplateName(notebookTemplateName);
+        return this;
+    }
+    
 }

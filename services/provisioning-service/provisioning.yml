@@ -2,7 +2,7 @@
 
 mocked: false
 
-keyDirectory: /home/ubuntu/keys
+keyDirectory: /home/${sys['user.name']}/keys
 responseDirectory: /opt/dlab/tmp
 dockerLogDirectory: ${LOG_ROOT_DIR}
 warmupPollTimeout: 10s

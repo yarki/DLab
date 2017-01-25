@@ -23,10 +23,12 @@ import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryURL;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.client.result.UpdateResult;
 import org.junit.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -283,7 +285,10 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         status.setUser("user1");
         status.setExploratoryName("exp_name_1");
         status.setExploratoryId("exp2");
-        status.setExploratoryUrl("www.exp2.com");
+        List<ExploratoryURL> urls = new ArrayList<ExploratoryURL>();
+        urls.add(new ExploratoryURL().withUrl("www.exp1.com").withDescription("desc1"));
+        urls.add(new ExploratoryURL().withUrl("www.exp2.com").withDescription("desc2"));
+        status.setExploratoryUrl(urls);
         status.setStatus("running");
         status.setUptime(new Date(100));
 
@@ -297,7 +302,9 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
 
         UserInstanceDTO instance = testInstance1.get();
         assertEquals(instance.getExploratoryId(), status.getExploratoryId());
-        assertEquals(instance.getUrl(), status.getExploratoryUrl());
+        assertEquals(instance.getExploratoryUrl().size(), status.getExploratoryUrl().size());
+        assertEquals(instance.getExploratoryUrl().get(0), status.getExploratoryUrl().get(0));
+        assertEquals(instance.getExploratoryUrl().get(1), status.getExploratoryUrl().get(1));
         assertEquals(instance.getStatus(), status.getStatus());
         assertEquals(instance.getUptime(), status.getUptime());
     }

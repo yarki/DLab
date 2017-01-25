@@ -27,10 +27,13 @@ import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.result.UpdateResult;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.epam.dlab.UserInstanceStatus.TERMINATED;
 import static com.mongodb.client.model.Filters.*;
@@ -47,6 +50,8 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     public static final String EXPLORATORY_NAME = "exploratory_name";
     private static final String EXPLORATORY_ID = "exploratory_id";
     private static final String EXPLORATORY_URL = "exploratory_url";
+    private static final String EXPLORATORY_URL_DESC = "description";
+    private static final String EXPLORATORY_URL_URL = "url";
     private static final String EXPLORATORY_USER = "exploratory_user";
     private static final String EXPLORATORY_PASSWORD = "exploratory_pass";
     private static final String UPTIME = "up_time";
@@ -148,8 +153,12 @@ public class InfrastructureProvisionDAO extends BaseDAO {
      * @return The result of an update operation.
      * @exception DlabException
      */
+	@SuppressWarnings("serial")
     public UpdateResult updateExploratoryFields(ExploratoryStatusDTO dto) throws DlabException {
         Document values = new Document(STATUS, dto.getStatus()).append(UPTIME, dto.getUptime());
+    	if (dto.getInstanceId() != null) {
+    		values.append(INSTANCE_ID, dto.getInstanceId());
+    	}
         if (dto.getErrorMessage() != null) {
             values.append(ERROR_MESSAGE, dto.getErrorMessage());
         }
@@ -157,7 +166,12 @@ public class InfrastructureProvisionDAO extends BaseDAO {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());
         }
         if (dto.getExploratoryUrl() != null) {
-            values.append(EXPLORATORY_URL, dto.getExploratoryUrl());
+            values.append(EXPLORATORY_URL, dto.getExploratoryUrl().stream()
+                    .map(url -> new LinkedHashMap<String, String>() {{
+                        put(EXPLORATORY_URL_DESC, url.getDescription());
+                        put(EXPLORATORY_URL_URL, url.getUrl());
+                    }})
+                    .collect(Collectors.toList()));
         }
         if (dto.getExploratoryUser() != null) {
             values.append(EXPLORATORY_USER, dto.getExploratoryUser());
@@ -217,7 +231,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     public UpdateResult updateComputationalStatus(ComputationalStatusDTO dto) throws DlabException {
         try {
             Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus());
-            return updateOne(USER_INSTANCES,
+        	return updateOne(USER_INSTANCES,
                     and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                             elemMatch(COMPUTATIONAL_RESOURCES,
                             		and(eq(COMPUTATIONAL_NAME, dto.getComputationalName()),
@@ -262,7 +276,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         try {
             Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus())
                     .append(computationalFieldFilter(UPTIME), dto.getUptime());
-            if (dto.getComputationalId() != null) {
+        	if (dto.getInstanceId() != null) {
+        		values.append(INSTANCE_ID, dto.getInstanceId());
+        	}
+        	if (dto.getComputationalId() != null) {
                 values.append(computationalFieldFilter(COMPUTATIONAL_ID), dto.getComputationalId());
             }
             return updateOne(USER_INSTANCES, and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),

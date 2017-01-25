@@ -23,12 +23,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     @JsonProperty("conf_service_base_name")
     private String serviceBaseName;
-    @JsonProperty("creds_region")
-    private String region;
+    @JsonProperty("aws_region")
+    private String awsRegion;
     @JsonProperty("exploratory_name")
     private String exploratoryName;
     @JsonProperty("iam_user_name")
     private String iamUserName;
+    @JsonProperty("conf_os_user")
+    private String confOsUser;
+    @JsonProperty("conf_os_family")
+    private String confOsFamily;
+    @JsonProperty("application")
+    private String applicationName;
 
     public String getServiceBaseName() {
         return serviceBaseName;
@@ -44,17 +50,17 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
         return (T) this;
     }
 
-    public String getRegion() {
-        return region;
+    public String getAwsRegion() {
+        return awsRegion;
     }
 
-    public void setRegion(String region) {
-        this.region = region;
+    public void setAwsRegion(String awsRegion) {
+        this.awsRegion = awsRegion;
     }
 
     @SuppressWarnings("unchecked")
-    public T withRegion(String region) {
-        setRegion(region);
+    public T withAwsRegion(String region) {
+        setAwsRegion(region);
         return (T) this;
     }
 
@@ -83,6 +89,48 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     @SuppressWarnings("unchecked")
     public T withIamUserName(String iamUserName) {
         setIamUserName(iamUserName);
+        return (T) this;
+    }
+
+    public String getConfOsUser() {
+        return confOsUser;
+    }
+
+    public void setConfOsUser(String confOsUser) {
+        this.confOsUser = confOsUser;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withConfOsUser(String confOsUser) {
+        setConfOsUser(confOsUser);
+        return (T) this;
+    }
+    
+    public String getConfOsFamily() {
+        return confOsFamily;
+    }
+
+    public void setConfOsFamily(String confOsFamily) {
+        this.confOsFamily = confOsFamily;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withConfOsFamily(String confOsFamily) {
+        setConfOsFamily(confOsFamily);
+        return (T) this;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withApplicationName(String applicationName) {
+        setApplicationName(applicationName);
         return (T) this;
     }
 }
