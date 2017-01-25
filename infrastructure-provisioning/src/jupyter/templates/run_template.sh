@@ -18,7 +18,7 @@
 #
 # ******************************************************************************
 
-PROG_HOME="/home/OS_USER/.local/share/jupyter/kernels/toree_CLUSTER/"
+PROG_HOME="/home/OS_USER/.local/share/jupyter/kernels/toree_CLUSTER_NAME/"
 
 if [ -z "$SPARK_HOME" ]; then
   echo "SPARK_HOME must be set to the location of a Spark distribution!"
