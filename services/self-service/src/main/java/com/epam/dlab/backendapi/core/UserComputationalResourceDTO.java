@@ -39,6 +39,8 @@ public class UserComputationalResourceDTO {
     private String slaveShape;
     @JsonProperty("total_instance_number")
     private String slaveNumber;
+    @JsonProperty("emr_version")
+    private String version;
 
     /** Returns name of computational resource. */
     public String getComputationalName() {
@@ -151,4 +153,21 @@ public class UserComputationalResourceDTO {
         setSlaveNumber(slaveNumber);
         return this;
     }
+
+    /** Returns the EMR version. */
+    public String getVersion() {
+        return version;
+    }
+
+    /** Sets the EMR version. */
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    /** Sets the EMR version. */
+    public UserComputationalResourceDTO withVersion(String version) {
+        setVersion(version);
+        return this;
+    }
+
 }

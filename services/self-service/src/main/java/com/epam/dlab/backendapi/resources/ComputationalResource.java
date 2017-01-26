@@ -119,7 +119,8 @@ public class ComputationalResource implements ComputationalAPI {
                         .withStatus(CREATING.toString())
                         .withMasterShape(formDTO.getMasterInstanceType())
                         .withSlaveShape(formDTO.getSlaveInstanceType())
-                        .withSlaveNumber(formDTO.getInstanceCount()));
+                        .withSlaveNumber(formDTO.getInstanceCount())
+                        .withVersion(formDTO.getVersion()));
         if (isAdded) {
             try {
             	UserInstanceDTO instance = getExploratoryInstance(userInfo.getName(), formDTO.getNotebookName());
@@ -164,7 +165,7 @@ public class ComputationalResource implements ComputationalAPI {
     @POST
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(@Auth UserInfo userInfo, ComputationalStatusDTO dto) throws DlabException {
-        LOGGER.debug("Updating status for computational resource {} for user {}: ", dto.getComputationalName(), dto.getUser(), dto/*.getStatus()*/);
+        LOGGER.debug("Updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto/*.getStatus()*/);
         try {
         	infrastructureProvisionDAO.updateComputationalFields(dto);
         } catch (DlabException e) {
@@ -176,14 +177,25 @@ public class ComputationalResource implements ComputationalAPI {
         if (UserInstanceStatus.CONFIGURING == UserInstanceStatus.of(dto.getStatus())) {
             LOGGER.debug("Send request for configuration of the computational resource {} for user {}", dto.getComputationalName(), dto.getUser());
             try {
+            	UserComputationalResourceDTO computational = infrastructureProvisionDAO
+            			.fetchComputationalFields(userInfo.getName(), dto.getExploratoryName(), dto.getComputationalName());
+            	UserInstanceDTO instance = getExploratoryInstance(userInfo.getName(), dto.getExploratoryName());
+            	ComputationalCreateDTO dtoConf = new ComputationalCreateDTO()
+                        .withServiceBaseName(settingsDAO.getServiceBaseName())
+                        .withNotebookInstanceName(instance.getExploratoryId())
+                        .withVersion(computational.getVersion())
+                        .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                        .withAwsRegion(settingsDAO.getAwsRegion())
+                        .withConfOsUser(settingsDAO.getConfOsUser())
+                        .withConfOsFamily(settingsDAO.getConfOsFamily());
             	return Response
-            			.ok(provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dto, String.class))
+            			.ok(provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dtoConf, String.class))
             			.build();
-            } catch (Throwable t) {
-            	LOGGER.error("Could not send request for configuration of the computational resource {} for user {}",
-            			dto.getComputationalName(), userInfo.getName());
+            } catch (Throwable e) {
+            	LOGGER.error("Could not send request for configuration of the computational resource {} for user {}: ",
+            			dto.getComputationalName(), userInfo.getName(), e);
             	throw new DlabException("Could not send request for configuration of the computational resource " +
-            			dto.getComputationalName() + " for user " + userInfo.getName(), t);
+            			dto.getComputationalName() + " for user " + userInfo.getName(), e);
             }
         }
         return Response.ok().build();
@@ -259,8 +271,7 @@ public class ComputationalResource implements ComputationalAPI {
     private UserInstanceDTO getExploratoryInstance(String username, String exploratoryName) throws DlabException {
     	Optional<UserInstanceDTO> opt = infrastructureProvisionDAO.fetchExploratoryFields(username, exploratoryName);
         if( opt.isPresent() ) {
-            return opt
-            		.get();
+            return opt.get();
         }
         throw new DlabException(String.format("Exploratory instance for user {} with name {} not found.", username, exploratoryName));
     }

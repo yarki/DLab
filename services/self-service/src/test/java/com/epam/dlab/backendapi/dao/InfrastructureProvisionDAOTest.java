@@ -537,7 +537,8 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 .withComputationalName("comp1")
                 .withComputationalId("c1")
                 .withStatus("created")
-                .withUptime(new Date(100));
+                .withUptime(new Date(100))
+                .withVersion("version1");
         boolean inserted = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp1);
         assertTrue(inserted);
 
@@ -545,7 +546,8 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 .withComputationalName("comp2")
                 .withComputationalId("c2")
                 .withStatus("created")
-                .withUptime(new Date(100));
+                .withUptime(new Date(100))
+                .withVersion("version2");
         boolean inserted2 = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp2);
         assertTrue(inserted2);
 
@@ -574,5 +576,16 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         assertEquals(status.getComputationalId(), testComp2.getComputationalId());
         assertEquals(status.getStatus(), testComp2.getStatus());
         assertEquals(status.getUptime(), testComp2.getUptime());
+        
+        testComp2 = dao.fetchComputationalFields(instance1.getUser(), instance1.getExploratoryName(), comp2.getComputationalName());
+        assertNotNull(testComp2);
+        assertEquals(status.getComputationalId(), testComp2.getComputationalId());
+        assertEquals(comp2.getComputationalName(), testComp2.getComputationalName());
+        assertEquals(comp2.getMasterShape(), testComp2.getMasterShape());
+        assertEquals(comp2.getSlaveNumber(), testComp2.getSlaveShape());
+        assertEquals(comp2.getSlaveShape(), testComp2.getSlaveShape());
+        assertEquals(status.getStatus(), testComp2.getStatus());
+        assertEquals(status.getUptime(), testComp2.getUptime());
+        assertEquals(comp2.getVersion(), testComp2.getVersion());
     }
 }
