@@ -63,14 +63,15 @@ def ensure_jenkins(dlab_path):
         return False
 
 
-def configure_jenkins(dlab_path, os_user):
+def configure_jenkins(dlab_path, os_user, config):
     try:
         if not exists('{}tmp/jenkins_configured'.format(dlab_path)):
             sudo('rm -rf /var/lib/jenkins/*')
             sudo('mkdir -p /var/lib/jenkins/jobs/')
             sudo('chown -R {0}:{0} /var/lib/jenkins/'.format(os_user))
             put('/root/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
-            sudo("find /var/lib/jenkins/jobs/ -type f | xargs sed -i \'s/OS_USR/{}/g\'".format(os_user))
+            #sudo("find /var/lib/jenkins/jobs/ -type f | xargs sed -i \'s/OS_USR/{}/g\'".format(os_user))
+            sudo("find /var/lib/jenkins/jobs/ -type f | xargs sed -i \'s/OS_USR/{}/g s/SBN/{}/g\'".format(os_user, config['service_base_name']))
             sudo('chown -R jenkins:jenkins /var/lib/jenkins')
             sudo('/etc/init.d/jenkins stop; sleep 5')
             sudo('sed -i \'/JENKINS_PORT/ s/^/#/\' /etc/sysconfig/jenkins; echo \'JENKINS_PORT="8070"\' >> /etc/sysconfig/jenkins')
@@ -130,7 +131,7 @@ def ensure_supervisor():
             sudo('yum install -y supervisor')
             #sudo('pip install supervisor')
             sudo('chkconfig supervisord on')
-            sudo('systemctl start supervisord.service')
+            sudo('systemctl start supervisord')
             sudo('touch {}tmp/superv_ensured'.format(os.environ['ssn_dlab_path']))
         return True
     except:
@@ -192,7 +193,7 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path, os_user):
                 append_result("Unable to upload webapp jars. Exception: " + str(err))
                 sys.exit(1)
 
-            sudo('service supervisord start')
+            sudo('systemctl restart supervisord')
             sudo('service nginx restart')
             sudo('touch ' + os.environ['ssn_dlab_path'] + 'tmp/ss_started')
         return True

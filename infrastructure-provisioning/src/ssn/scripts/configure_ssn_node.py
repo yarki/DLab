@@ -101,7 +101,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print "Configuring jenkins."
-    if not configure_jenkins(args.dlab_path, args.os_user):
+    if not configure_jenkins(args.dlab_path, args.os_user, deeper_config):
         sys.exit(1)
 
     print "Copying key"
