@@ -101,4 +101,10 @@ export class UserResourceService {
       .buildUpdateUserPreferences(body)
       .map((response: Response) => response);
   }
+
+  public getEnvironmentStatuses(): Observable<Response> {
+    return this.applicationServiceFacade
+    .buildGetEnvironmentStatuses()
+    .map((response: Response) => response.json());
+  }
 }

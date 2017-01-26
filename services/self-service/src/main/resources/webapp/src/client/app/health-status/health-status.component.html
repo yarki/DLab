@@ -28,39 +28,20 @@ limitations under the License.
     <th class="th_status">Status</th>
     <th class="th_actions">Action</th>
   </tr>
-  <tr>
-    <td>Edge Node</td>
-    <td>Type I</td>
-    <td>// 188.163.232.130</td>
-    <td>Running</td>
+  <tr *ngFor="let env of environmentsHealthStatuses">
+    <td>{{env.type}}</td>
+    <td>{{env.cloud_type}}</td>
+    <td>{{env.ip}} {{env.path}}</td>
+    <td class="status" ngClass="{{env.status || ''}}">{{env.status}}</td>
     <td>
       <div class="dropdown">
         <span data-toggle="dropdown" class="actions"></span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">
-            <li>Action I</li>
-            <li>Action II</li>
-            <li>Action III</li>
-            <li>Action IV</li>
-          </ul>
-        </div>
-      </div>
-    </td>
-  </tr>
-  <tr>
-    <td>Bucket</td>
-    <td>Type II</td>
-    <td>// 188.163.232.130</td>
-    <td>Running</td>
-    <td>
-      <div class="dropdown">
-        <span data-toggle="dropdown" class="actions"></span>
-        <div class="dropdown-menu">
-          <ul class="list-unstyled">
-            <li>Action I</li>
-            <li>Action II</li>
-            <li>Action III</li>
-            <li>Action IV</li>
+            <li *ngIf="env.status.toLowerCase() == 'terminated'">Recreate</li>
+            <li *ngIf="env.status.toLowerCase() == 'stopped'">Start</li>
+            <li *ngIf="env.status.toLowerCase() == 'running'">Stop</li>
+            <li *ngIf="env.status.toLowerCase() == 'running'">Terminate</li>
           </ul>
         </div>
       </div>
