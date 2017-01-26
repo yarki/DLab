@@ -47,7 +47,7 @@ zeppelin_interpreters = "md,python"
 python3_version = "3.4"
 local_spark_path = '/opt/spark/'
 templates_dir = '/root/templates/'
-files_dir = '/root/files'
+files_dir = '/root/files/'
 s3_jars_dir = '/opt/jars/'
 
 
