@@ -73,22 +73,24 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
                 uuid,
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
-                                .withName(nameContainer(edgeDto.getEdgeUserName(), "create", "edge"))
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getKeyLoaderDirectory())
-                                .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
-                                .withResource(getResourceType())
-                                .withRequestId(uuid)
-                                .withConfKeyName(configuration.getAdminKey())
-                                .withConfOsUser(edgeDto.getConfOsUser())
-                                .withConfOsFamily(edgeDto.getConfOsFamily())
-                                .withActionCreate(configuration.getEdgeImage())
-                                .withConfServiceBaseName(edgeDto.getServiceBaseName())
-                                .withAwsRegion(edgeDto.getAwsRegion())
-                                .withAwsSecurityGroupsIds(edgeDto.getAwsSecurityGroupIds())
-                                .withAwsVpcId(edgeDto.getAwsVpcId())
-                                .withAwsSubnetId(edgeDto.getAwsSubnetId())
-                                .withUserKeyName(edgeDto.getEdgeUserName()), edgeDto
+	                        .withInteractive()
+	                        .withName(nameContainer(edgeDto.getEdgeUserName(), "create", "edge"))
+	                        .withVolumeForRootKeys(configuration.getKeyDirectory())
+	                        .withVolumeForResponse(configuration.getKeyLoaderDirectory())
+	                        .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+	                        .withResource(getResourceType())
+	                        .withRequestId(uuid)
+	                        .withConfKeyName(configuration.getAdminKey())
+	                        //.withConfOsUser(edgeDto.getConfOsUser())
+	                        //.withConfOsFamily(edgeDto.getConfOsFamily())
+	                        .withActionCreate(configuration.getEdgeImage()),
+	                        //.withConfServiceBaseName(edgeDto.getServiceBaseName())
+	                        //.withAwsRegion(edgeDto.getAwsRegion())
+	                        //.withAwsSecurityGroupsIds(edgeDto.getAwsSecurityGroupIds())
+	                        //.withAwsVpcId(edgeDto.getAwsVpcId())
+	                        //.withAwsSubnetId(edgeDto.getAwsSubnetId())
+	                        //.withUserKeyName(edgeDto.getEdgeUserName()),
+                        edgeDto
                 )
         );
 

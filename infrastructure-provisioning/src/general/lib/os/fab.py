@@ -107,9 +107,9 @@ def ensure_local_spark(os_user, spark_link, spark_version, hadoop_version, local
             sys.exit(1)
 
 
-def checksum_check(file):
-    result = local('md5sum -c ' + file, capture=True)
-    return result
+#ef checksum_check(file):
+#    result = local('md5sum -c ' + file, capture=True)
+#    return result
 
 
 def prepare(emr_dir, yarn_dir):
@@ -164,7 +164,7 @@ def append_result(error):
 
 def put_resource_status(resource, status, instance, os_user):
     env['connection_attempts'] = 100
-    keyfile = "/root/keys/" + os.environ['creds_key_name'] + ".pem"
+    keyfile = "/root/keys/" + os.environ['conf_key_name'] + ".pem"
     hostname = get_instance_hostname(os.environ['conf_service_base_name'] + '-ssn')
     env.key_filename = [keyfile]
     env.host_string = os_user + '@' + hostname

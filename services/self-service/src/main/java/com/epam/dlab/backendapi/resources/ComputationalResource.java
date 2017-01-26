@@ -127,9 +127,9 @@ public class ComputationalResource implements ComputationalAPI {
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withExploratoryName(formDTO.getNotebookName())
                         .withNotebookTemplateName(instance.getTemplateName())
-                        .withApplicationName(instance.getApplicationName())
+                        .withApplicationName(getApplicationName(instance.getImageName()))
                         .withComputationalName(formDTO.getName())
-                        .withNotebookName(instance.getExploratoryId())
+                        .withNotebookInstanceName(instance.getExploratoryId())
                         .withInstanceCount(formDTO.getInstanceCount())
                         .withMasterInstanceType(formDTO.getMasterInstanceType())
                         .withSlaveInstanceType(formDTO.getSlaveInstanceType())
@@ -163,9 +163,14 @@ public class ComputationalResource implements ComputationalAPI {
      */
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(ComputationalStatusDTO dto) throws DlabException {
+    public Response status(@Auth UserInfo userInfo, ComputationalStatusDTO dto) throws DlabException {
         LOGGER.debug("Updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateComputationalFields(dto);
+        if (UserInstanceStatus.CONFIGURING == UserInstanceStatus.of(dto.getStatus())) {
+        	Response
+            .ok(provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dto, String.class))
+            .build();
+        }
         return Response.ok().build();
     }
 
@@ -244,4 +249,16 @@ public class ComputationalResource implements ComputationalAPI {
         }
         throw new DlabException(String.format("Exploratory instance for user {} with name {} not found.", username, exploratoryName));
     }
+
+    /** Returns the name of application for notebook: jupiter, rstudio, etc. */
+    private String getApplicationName(String imageName) {
+    	if (imageName != null) {
+    		int pos = imageName.lastIndexOf('-');
+    		if (pos > 0) {
+    			return imageName.substring(pos + 1);
+    		}
+    	}
+    	return "";
+    }
+
 }

@@ -96,7 +96,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
                         .withNotebookImage(formDTO.getImage())
-                        .withApplicationName(formDTO.getApplicationName())
+                        .withApplicationName(getApplicationName(formDTO.getImage()))
                         .withNotebookInstanceType(formDTO.getShape())
                         .withAwsRegion(settingsDAO.getAwsRegion())
                         .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups())
@@ -127,9 +127,9 @@ public class ExploratoryResource implements ExploratoryAPI {
      */
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(ExploratoryStatusDTO dto) throws DlabException {
+    public Response status(@Auth UserInfo userInfo, ExploratoryStatusDTO dto) throws DlabException {
         LOGGER.debug("Updating status for exploratory environment {} for user {} to {}",
-        		dto.getExploratoryName(), dto.getUser(), dto.getStatus());
+        		dto.getExploratoryName(), userInfo.getName(), dto.getStatus());
         UserInstanceStatus currentStatus;
         
         try {
@@ -340,4 +340,14 @@ public class ExploratoryResource implements ExploratoryAPI {
             		exploratoryName, user, status, e.getLocalizedMessage(), e);
        	}
     }
-}
+
+    /** Returns the name of application for notebook: jupiter, rstudio, etc. */
+    private String getApplicationName(String imageName) {
+    	if (imageName != null) {
+    		int pos = imageName.lastIndexOf('-');
+    		if (pos > 0) {
+    			return imageName.substring(pos + 1);
+    		}
+    	}
+    	return "";
+    }}

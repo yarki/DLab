@@ -61,17 +61,17 @@ def r_kernel(args):
 
     with open(template_file, 'r') as f:
         text = f.read()
-    text = text.replace('CLUSTERNAME', args.cluster_name)
+    text = text.replace('CLUSTER_NAME', args.cluster_name)
     text = text.replace('SPARK_PATH', spark_path)
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('R_VER', 'R-{}'.format(str(r_version)))
-    text = text.replace('EMR', args.emr_version)
+    text = text.replace('R_KERNEL_VERSION', 'R-{}'.format(str(r_version)))
+    text = text.replace('EMR_VERSION', args.emr_version)
     if 'emr-4.' in args.emr_version:
-        text = text.replace('YRN_CLI_TYPE', 'yarn-client')
-        text = text.replace('SPRK_ACTION', 'init()')
+        text = text.replace('YARN_CLI_TYPE', 'yarn-client')
+        text = text.replace('SPARK_ACTION', 'init()')
     else:
-        text = text.replace('YRN_CLI_TYPE', 'yarn')
-        text = text.replace('SPRK_ACTION', 'session(master = \\\"yarn\\\")')
+        text = text.replace('YARN_CLI_TYPE', 'yarn')
+        text = text.replace('SPARK_ACTION', 'session(master = \\\"yarn\\\")')
     with open(kernel_path, 'w') as f:
         f.write(text)
 
@@ -83,13 +83,13 @@ def pyspark_kernel(args):
     template_file = "/tmp/pyspark_emr_template.json"
     with open(template_file, 'r') as f:
         text = f.read()
-    text = text.replace('CLUSTER', args.cluster_name)
+    text = text.replace('CLUSTER_NAME', args.cluster_name)
     text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
     text = text.replace('SPARK_PATH', spark_path)
-    text = text.replace('PY_VER', '2.7')
-    text = text.replace('PY_FULL', '2.7')
+    text = text.replace('PYTHON_SHORT_VERSION', '2.7')
+    text = text.replace('PYTHON_FULL_VERSION', '2.7')
     text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
-    text = text.replace('EMR', args.emr_version)
+    text = text.replace('EMR_VERSION', args.emr_version)
     with open(kernel_path, 'w') as f:
         f.write(text)
     local('touch /tmp/kernel_var.json')
@@ -108,13 +108,13 @@ def pyspark_kernel(args):
         template_file = "/tmp/pyspark_emr_template.json"
         with open(template_file, 'r') as f:
             text = f.read()
-        text = text.replace('CLUSTER', args.cluster_name)
+        text = text.replace('CLUSTER_NAME', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
-        text = text.replace('PY_VER', python_version[0:3])
-        text = text.replace('PY_FULL', python_version[0:5])
+        text = text.replace('PYTHON_SHORT_VERSION', python_version[0:3])
+        text = text.replace('PYTHON_FULL_VERSION', python_version[0:5])
         text = text.replace('PYTHON_PATH', '/opt/python/python' + python_version[:5] + '/bin/python' + python_version[:3])
-        text = text.replace('EMR', args.emr_version)
+        text = text.replace('EMR_VERSION', args.emr_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
@@ -132,12 +132,11 @@ def toree_kernel(args):
         template_file = "/tmp/toree_emr_template.json"
         with open(template_file, 'r') as f:
             text = f.read()
-        text = text.replace('CLUSTER', args.cluster_name)
+        text = text.replace('CLUSTER_NAME', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
-        text = text.replace('OS_USER', args.os_user)
-        text = text.replace('EMR', args.emr_version)
-        text = text.replace('SC_VER', scala_version)
+        text = text.replace('EMR_VERSION', args.emr_version)
+        text = text.replace('SCALA_VERSION', scala_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
@@ -151,11 +150,12 @@ def toree_kernel(args):
         template_file = "/tmp/toree_emr_templatev2.json"
         with open(template_file, 'r') as f:
             text = f.read()
-        text = text.replace('CLUSTER', args.cluster_name)
+        text = text.replace('CLUSTER_NAME', args.cluster_name)
         text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
         text = text.replace('SPARK_PATH', spark_path)
-        text = text.replace('EMR', args.emr_version)
-        text = text.replace('SC_VER', scala_version)
+        text = text.replace('OS_USER', args.os_user)
+        text = text.replace('EMR_VERSION', args.emr_version)
+        text = text.replace('SCALA_VERSION', scala_version)
         with open(kernel_path, 'w') as f:
             f.write(text)
         local('touch /tmp/kernel_var.json')
@@ -166,7 +166,7 @@ def toree_kernel(args):
         template_sh_file = '/tmp/run_template.sh'
         with open(template_sh_file, 'r') as f:
             text = f.read()
-        text = text.replace('CLUSTER', args.cluster_name)
+        text = text.replace('CLUSTER_NAME', args.cluster_name)
         text = text.replace('OS_USER', args.os_user)
         with open(run_sh_path, 'w') as f:
             f.write(text)

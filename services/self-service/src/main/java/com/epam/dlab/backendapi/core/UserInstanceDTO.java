@@ -235,16 +235,4 @@ public class UserInstanceDTO {
         setResources(resources);
         return this;
     }
-    
-    /** Returns the name of application for notebook: jupiter, rstudio, etc. */
-    public String getApplicationName() {
-    	if (imageName != null) {
-    		int pos = imageName.lastIndexOf('-');
-    		if (pos > 0) {
-    			return imageName.substring(pos + 1);
-    		}
-    	}
-    	return "";
-    }
-
 }
