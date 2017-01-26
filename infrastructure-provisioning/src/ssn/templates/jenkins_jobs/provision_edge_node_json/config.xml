@@ -29,17 +29,17 @@
         <hudson.model.StringParameterDefinition>
           <name>SSN_SG_ids</name>
           <description>The ID of the SSN Security Group to be accessible</description>
-          <defaultValue></defaultValue>
+          <defaultValue>SGI</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>vpc_id</name>
           <description>id of VPC where infrastructure is being deployed </description>
-          <defaultValue></defaultValue>
+          <defaultValue>VPC</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>subnet_id</name>
           <description>id of the public subnet where EDGE will be deployed</description>
-          <defaultValue></defaultValue>
+          <defaultValue>SNI</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>os_user</name>

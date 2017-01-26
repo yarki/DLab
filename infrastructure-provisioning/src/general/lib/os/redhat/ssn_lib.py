@@ -71,7 +71,7 @@ def configure_jenkins(dlab_path, os_user, config):
             sudo('chown -R {0}:{0} /var/lib/jenkins/'.format(os_user))
             put('/root/templates/jenkins_jobs/*', '/var/lib/jenkins/jobs/')
             #sudo("find /var/lib/jenkins/jobs/ -type f | xargs sed -i \'s/OS_USR/{}/g\'".format(os_user))
-            sudo("find /var/lib/jenkins/jobs/ -type f | xargs sed -i \'s/OS_USR/{}/g; s/SBN/{}/g\'".format(os_user, config['service_base_name']))
+            sudo("find /var/lib/jenkins/jobs/ -type f | xargs sed -i \'s/OS_USR/{}/g; s/SBN/{}/g; s/SGI/{}/g; s/VPC/{}/g; s/SNI/{}/g\'".format(os_user, config['service_base_name'], config['security_group_id'], config['vpc_id'], config['subnet_id']))
             sudo('chown -R jenkins:jenkins /var/lib/jenkins')
             sudo('/etc/init.d/jenkins stop; sleep 5')
             sudo('sed -i \'/JENKINS_PORT/ s/^/#/\' /etc/sysconfig/jenkins; echo \'JENKINS_PORT="8070"\' >> /etc/sysconfig/jenkins')
