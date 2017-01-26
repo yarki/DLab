@@ -241,7 +241,7 @@ public class TestServices {
         System.out.println("   responseDeployingEMR.getBody() is " + responseDeployingEMR.getBody().asString());
         Assert.assertEquals(responseDeployingEMR.statusCode(), HttpStatusCode.OK);
 
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "configuring", PropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("configuring"))
             throw new Exception("EMR " + emrName + " has not been deployed");
         System.out.println("   EMR " + emrName + " has been deployed");
@@ -249,7 +249,7 @@ public class TestServices {
         Amazon.checkAmazonStatus(nodePrefix + "-emr-" + noteBookName, AmazonInstanceState.RUNNING);
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
         
-        System.out.println("   EMR will be configured ...");
+        System.out.println("   Waiting until EMR has been configured ...");
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "running", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("EMR " + emrName + " has not been configured");
