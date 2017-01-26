@@ -146,12 +146,12 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     
     public ToStringHelper toStringHelper(Object self) {
     	return MoreObjects.toStringHelper(self)
-    	        .add("instance_id", instanceId)
-    	        .add("exploratory_name", exploratoryName)
-    	        .add("exploratory_template_name", exploratoryTemplateName)
+    	        .add("instanceId", instanceId)
+    	        .add("exploratoryName", exploratoryName)
+    	        .add("exploratoryTemplateName", exploratoryTemplateName)
     	        .add("status", status)
-    	        .add("error_message", errorMessage)
-    	        .add("up_time", uptime);
+    	        .add("errorMessage", errorMessage)
+    	        .add("uptime", uptime);
     }
     
     @Override

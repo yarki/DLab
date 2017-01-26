@@ -152,7 +152,7 @@ public class ExploratoryResource implements ExploratoryAPI {
             }
         } catch (DlabException e) {
         	LOGGER.warn("Could not update status for exploratory environment {} for user {} to {}: {}",
-        			dto.getExploratoryName(), dto.getUser(), dto.getStatus(), e.getLocalizedMessage(), e);
+        			dto.getExploratoryName(), dto.getUser(), dto.getStatus(), e);
         	throw new DlabException("Could not update status for exploratory environment " + dto.getExploratoryName() +
         			" for user " + dto.getUser() + " to " + dto.getStatus(), e);
         }
