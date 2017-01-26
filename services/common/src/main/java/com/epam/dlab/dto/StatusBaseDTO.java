@@ -21,6 +21,8 @@ package com.epam.dlab.dto;
 
 import com.epam.dlab.UserInstanceStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 
 import java.util.Date;
 
@@ -140,5 +142,20 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     public T withUptime(Date uptime) {
         setUptime(uptime);
         return (T) this;
+    }
+    
+    public ToStringHelper toStringHelper(Object self) {
+    	return MoreObjects.toStringHelper(self)
+    	        .add("instance_id", instanceId)
+    	        .add("exploratory_name", exploratoryName)
+    	        .add("exploratory_template_name", exploratoryTemplateName)
+    	        .add("status", status)
+    	        .add("error_message", errorMessage)
+    	        .add("up_time", uptime);
+    }
+    
+    @Override
+    public String toString() {
+    	return toStringHelper(this).toString();
     }
 }

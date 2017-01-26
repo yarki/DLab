@@ -167,9 +167,8 @@ public class ComputationalResource implements ComputationalAPI {
         LOGGER.debug("Updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateComputationalFields(dto);
         if (UserInstanceStatus.CONFIGURING == UserInstanceStatus.of(dto.getStatus())) {
-        	Response
-            .ok(provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dto, String.class))
-            .build();
+            LOGGER.debug("Send request for configuration of computational resource {} for user {}", dto.getComputationalName(), dto.getUser());
+        	provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dto, String.class);
         }
         return Response.ok().build();
     }
