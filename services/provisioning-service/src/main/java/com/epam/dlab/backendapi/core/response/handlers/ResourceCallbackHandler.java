@@ -95,24 +95,13 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
             result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
             resultNode = resultNode.get(CONF_NODE);
         }
-        LOGGER.debug("Handle Info: status is {}, resultNode is {}", result, (resultNode == null ? "<NULL>" : resultNode.toString()));
         if (resultNode != null) {
             result = parseOutResponse(resultNode, result);
             LOGGER.debug("Handle new Info: resultNode is {}", (resultNode == null ? "<NULL>" : resultNode.toString()));
         }
         
         selfService.post(getCallbackURI(), result, resultType);
-        if (UserInstanceStatus.FAILED.equals(status)) {
-        	return false;
-        }
-        try {
-        	postHandle();
-        } catch (DlabException e) {
-        	LOGGER.error("Could not {} resource for user: {}, request: {}", action, user, originalUuid, e);
-        	selfService.post(getCallbackURI(), getBaseStatusDTO(UserInstanceStatus.FAILED), resultType);
-        	throw new DlabException("Could not " + action + " resource for user: " + user + ", request: " + originalUuid, e);
-        }
-        return true;
+        return !UserInstanceStatus.FAILED.equals(status);
     }
 
     @Override
@@ -124,8 +113,6 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         }
     }
     
-    abstract protected void postHandle();
-
     abstract protected String getCallbackURI();
 
     abstract protected T parseOutResponse(JsonNode document, T baseStatus);

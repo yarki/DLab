@@ -57,12 +57,6 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
         this.exploratoryName = exploratoryName;
     }
 
-
-	@Override
-	protected void postHandle() {
-		// Nothing to do
-	}
-
 	@Override
     protected String getCallbackURI() {
         return EXPLORATORY + STATUS_URI;
