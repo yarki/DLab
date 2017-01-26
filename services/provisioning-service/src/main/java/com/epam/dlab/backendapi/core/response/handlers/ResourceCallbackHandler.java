@@ -103,8 +103,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         }
         if (resultNode != null) {
             result = parseOutResponse(resultNode, result);
-            LOGGER.debug("Handle new Info: resultNode is {}", (resultNode == null ? "<NULL>" : resultNode.toString()));
         }
+        LOGGER.debug("Handler result for {} is {}", originalUuid, result);
         
         selfServicePost(result);
         return !UserInstanceStatus.FAILED.equals(status);

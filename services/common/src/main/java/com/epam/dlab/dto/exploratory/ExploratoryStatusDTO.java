@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects.ToStringHelper;
 
 public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
     @JsonProperty("exploratory_id")
@@ -75,5 +76,19 @@ public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
     public ExploratoryStatusDTO withExploratoryPassword(String exploratoryPassword) {
         setExploratoryPassword(exploratoryPassword);
         return this;
+    }
+    
+    @Override
+    public ToStringHelper toStringHelper(Object self) {
+    	return super.toStringHelper(self)
+    	        .add("exploratoryId", exploratoryId)
+    	        .add("exploratoryUrl", exploratoryUrl)
+    	        .add("exploratoryUser", exploratoryUser)
+    	        .add("exploratoryPassword", exploratoryPassword);
+    }
+    
+    @Override
+    public String toString() {
+    	return toStringHelper(this).toString();
     }
 }
