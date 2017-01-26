@@ -20,7 +20,6 @@
 
 from dlab.fab import *
 from dlab.actions_lib import *
-#from dlab.meta_lib import get_security_group_by_name, get_subnet_by_cidr, get_vpc_by_cidr
 import sys, os
 from fabric.api import *
 from dlab.ssn_lib import *
@@ -86,7 +85,7 @@ if __name__ == "__main__":
     try:
         logging.info('[CONFIGURE SSN INSTANCE]')
         print('[CONFIGURE SSN INSTANCE]')
-        additional_config = {"nginx_template_dir": "/root/templates/", "service_base_name": service_base_name, "security_group_id": get_security_group_by_name(sg_name), "vpc_id": get_vpc_by_cidr(vpc_cidr), "subnet_id": get_subnet_by_cidr(vpc_cidr, get_vpc_by_cidr(vpc_cidr))}
+        additional_config = {"nginx_template_dir": "/root/templates/", "service_base_name": service_base_name, "security_group_id": os.environ['aws_security_groups_ids'], "vpc_id": os.environ['aws_vpc_id'], "subnet_id": os.environ['aws_subnet_id'], "admin_key": os.environ['conf_key_name']}
         #additional_config = {"nginx_template_dir": "/root/templates/", "service_base_name": service_base_name}
         params = "--hostname {} --keyfile {} --additional_config '{}' --os_user {} --dlab_path {}". \
             format(instance_hostname, "/root/keys/{}.pem".format(os.environ['conf_key_name']),

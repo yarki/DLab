@@ -9,7 +9,7 @@
         <hudson.model.StringParameterDefinition>
           <name>Service_base_name</name>
           <description>unique infrastructure value that previously was used when ssn being provisioned</description>
-          <defaultValue></defaultValue>
+          <defaultValue>SBN</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>Username</name>
@@ -19,7 +19,7 @@
         <hudson.model.StringParameterDefinition>
           <name>SSH_Key_Name</name>
           <description>name of the uploaded ssh key file (without &quot;.pem&quot;)</description>
-          <defaultValue></defaultValue>
+          <defaultValue>AKEY</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>os_user</name>
