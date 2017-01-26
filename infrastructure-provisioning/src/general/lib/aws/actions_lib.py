@@ -26,7 +26,7 @@ import json
 from fabric.api import *
 from fabric.contrib.files import exists
 import logging
-from dlab.aws_meta import *
+from dlab.meta_lib import *
 from dlab.fab import *
 import traceback
 import urllib2
@@ -630,14 +630,14 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                 sudo('rm -rf  /opt/' + emr_version + '/' + emr_name + '/')
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
                 if exists('/home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, emr_name)):
-                    sudo('sed -i \"s/^export SPARK_HOME.*/#export SPARK_HOME=/\" /opt/zeppelin/conf/zeppelin-env.sh')
+                    sudo('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
                     sudo("rm -rf /home/{}/.ensure_dir/emr_interpreter_ensure".format(ssh_user))
                     zeppelin_url = 'http://' + private + ':8080/api/interpreter/setting/'
                     opener = urllib2.build_opener(urllib2.ProxyHandler({}))
                     req = opener.open(urllib2.Request(zeppelin_url))
                     r_text = req.read()
                     interpreter_json = json.loads(r_text)
-                    interpreter_prefix = emr_version + '_' + emr_name
+                    interpreter_prefix = emr_name
                     for interpreter in interpreter_json['body']:
                         if interpreter_prefix in interpreter['name']:
                             print "Interpreter with ID:", interpreter['id'], "and name:", interpreter['name'], \
@@ -650,8 +650,8 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                     sudo('rm -rf /home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, emr_name))
                 if exists('/home/{}/.ensure_dir/rstudio_emr_ensured'.format(ssh_user)):
                     sudo("sed -i '/" + emr_name + "/d' /home/{}/.Renviron".format(ssh_user))
-                    if not sudo("sed -n '/^SPARK_HOME/p' /home/ubuntu/.Renviron"):
-                        sudo("sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/ubuntu/.Renviron")
+                    if not sudo("sed -n '/^SPARK_HOME/p' /home/{}/.Renviron".format(ssh_user)):
+                        sudo("sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/{}/.Renviron".format(ssh_user))
                     sudo("sed -i 's|/opt/" + emr_version + '/' + emr_name + "/spark//R/lib:||g' /home/{}/.bashrc".format(ssh_user))
                 print "Notebook's " + env.hosts + " kernels were removed"
         else:
@@ -745,10 +745,10 @@ def install_emr_spark(args):
     s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/spark.tar.gz', '/tmp/spark.tar.gz')
     s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/spark-checksum.chk', '/tmp/spark-checksum.chk')
-    if 'WARNING' in checksum_check('/tmp/spark-checksum.chk'):
+    if 'WARNING' in local('md5sum -c /tmp/spark-checksum.chk', capture=True):
         local('rm -f /tmp/spark.tar.gz')
         s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/spark.tar.gz', '/tmp/spark.tar.gz')
-        if 'WARNING' in checksum_check('/tmp/spark-checksum.chk'):
+        if 'WARNING' in local('md5sum -c /tmp/spark-checksum.chk', capture=True):
             print "The checksum of spark.tar.gz is mismatched. It could be caused by aws network issue."
             sys.exit(1)
     local('sudo tar -zhxvf /tmp/spark.tar.gz -C /opt/' + args.emr_version + '/' + args.cluster_name + '/')
@@ -759,10 +759,10 @@ def jars(args, emr_dir):
     s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
     s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
     s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars-checksum.chk', '/tmp/jars-checksum.chk')
-    if 'WARNING' in checksum_check('/tmp/jars-checksum.chk'):
+    if 'WARNING' in local('md5sum -c /tmp/jars-checksum.chk', capture=True):
         local('rm -f /tmp/jars.tar.gz')
         s3_client.download_file(args.bucket, 'jars/' + args.emr_version + '/jars.tar.gz', '/tmp/jars.tar.gz')
-        if 'WARNING' in checksum_check('/tmp/jars-checksum.chk'):
+        if 'WARNING' in local('md5sum -c /tmp/jars-checksum.chk', capture=True):
             print "The checksum of jars.tar.gz is mismatched. It could be caused by aws network issue."
             sys.exit(1)
     local('tar -zhxvf /tmp/jars.tar.gz -C ' + emr_dir)

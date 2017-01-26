@@ -1,5 +1,5 @@
 {
-  "name": "EMRVERSION_spark",
+  "name": "EMRVERSION_spark_pyPYTHONVERSION",
   "group": "spark",
   "properties": {
     "args": "",
@@ -11,7 +11,7 @@
     "zeppelin.spark.concurrentSQL": "false",
     "zeppelin.spark.sql.stacktrace": "false",
     "zeppelin.spark.importImplicit": "true",
-    "zeppelin.pyspark.python": "python",
+    "zeppelin.pyspark.python": "pythonPYTHONVERSION",
     "zeppelin.dep.localrepo": "local-repo",
     "zeppelin.dep.additionalRemoteRepository": "spark-packages,http://dl.bintray.com/spark-packages/maven,false;",
     "spark.home": "/opt/EMRVERSION/CLUSTERNAME/spark",

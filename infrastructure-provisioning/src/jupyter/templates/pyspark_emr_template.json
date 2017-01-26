@@ -7,11 +7,11 @@
   "{connection_file}"
  ],
  "language": "python",
- "display_name": "PySpark (Python-PY_FULL / SPARK_VERSION ) [CLUSTER]",
+ "display_name": "PySpark (Python-PYTHON_FULL_VERSION / SPARK_VERSION ) [CLUSTER_NAME]",
  "env": {
-  "HADOOP_CONF_DIR" : "/opt/EMR/CLUSTER/conf/",
-  "YARN_CONF_DIR": "/opt/EMR/CLUSTER/conf/",
-  "PYSPARK_PYTHON": "pythonPY_VER",
+  "HADOOP_CONF_DIR" : "/opt/EMR_VERSION/CLUSTER_NAME/conf/",
+  "YARN_CONF_DIR": "/opt/EMR_VERSION/CLUSTER_NAME/conf/",
+  "PYSPARK_PYTHON": "pythonPYTHON_SHORT_VERSION",
   "SPARK_HOME": "SPARK_PATH",
   "PYTHONPATH": "PY4J:SPARK_PATHpython/:",
   "PYTHONSTARTUP": "SPARK_PATHpython/pyspark/shell.py",

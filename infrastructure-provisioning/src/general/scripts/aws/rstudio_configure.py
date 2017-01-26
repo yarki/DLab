@@ -22,8 +22,8 @@ import logging
 import json
 import sys
 from dlab.fab import *
-from dlab.aws_meta import *
-from dlab.aws_actions import *
+from dlab.meta_lib import *
+from dlab.actions_lib import *
 import os
 import argparse
 
@@ -76,7 +76,7 @@ if __name__ == "__main__":
             .format(instance_hostname, notebook_config['instance_name'], keyfile_name, json.dumps(additional_config),
                     os.environ['conf_os_user'])
         try:
-            local("~/scripts/{}.py {}".format('configure_proxy', params))
+            local("~/scripts/{}.py {}".format('notebook_configure_proxy', params))
         except:
             traceback.print_exc()
             raise Exception
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     with open("/root/result.json", 'w') as result:
         res = {"hostname": dns_name,
                "ip": ip_address,
-               "id": get_instance_by_name(notebook_config['instance_name']),
+               "instance_id": get_instance_by_name(notebook_config['instance_name']),
                "master_keyname": os.environ['conf_key_name'],
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",

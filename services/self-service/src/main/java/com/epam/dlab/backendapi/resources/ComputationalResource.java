@@ -122,13 +122,14 @@ public class ComputationalResource implements ComputationalAPI {
                         .withSlaveNumber(formDTO.getInstanceCount()));
         if (isAdded) {
             try {
-                String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), formDTO.getNotebookName());
+            	UserInstanceDTO instance = getExploratoryInstance(userInfo.getName(), formDTO.getNotebookName());
                 ComputationalCreateDTO dto = new ComputationalCreateDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withExploratoryName(formDTO.getNotebookName())
-                        .withNotebookTemplateName(getExploratoryTemplateName(userInfo.getName(), formDTO.getNotebookName()))
+                        .withNotebookTemplateName(instance.getTemplateName())
+                        .withApplicationName(getApplicationName(instance.getImageName()))
                         .withComputationalName(formDTO.getName())
-                        .withNotebookName(exploratoryId)
+                        .withNotebookInstanceName(instance.getExploratoryId())
                         .withInstanceCount(formDTO.getInstanceCount())
                         .withMasterInstanceType(formDTO.getMasterInstanceType())
                         .withSlaveInstanceType(formDTO.getSlaveInstanceType())
@@ -162,9 +163,14 @@ public class ComputationalResource implements ComputationalAPI {
      */
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(ComputationalStatusDTO dto) throws DlabException {
+    public Response status(@Auth UserInfo userInfo, ComputationalStatusDTO dto) throws DlabException {
         LOGGER.debug("Updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
         infrastructureProvisionDAO.updateComputationalFields(dto);
+        if (UserInstanceStatus.CONFIGURING == UserInstanceStatus.of(dto.getStatus())) {
+        	Response
+            .ok(provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dto, String.class))
+            .build();
+        }
         return Response.ok().build();
     }
 
@@ -230,19 +236,29 @@ public class ComputationalResource implements ComputationalAPI {
         infrastructureProvisionDAO.updateComputationalStatus(computationalStatus);
     }
     
-    /** Finds and returns the name of template for exploratory.
+    /** Finds and returns the instance of exploratory.
      * @param username name of user.
      * @param exploratoryName name of exploratory.
      * @throws DlabException
      */
-    private String getExploratoryTemplateName(String username, String exploratoryName) throws DlabException {
+    private UserInstanceDTO getExploratoryInstance(String username, String exploratoryName) throws DlabException {
     	Optional<UserInstanceDTO> opt = infrastructureProvisionDAO.fetchExploratoryFields(username, exploratoryName);
         if( opt.isPresent() ) {
             return opt
-            		.get()
-            		.getTemplateName();
+            		.get();
         }
         throw new DlabException(String.format("Exploratory instance for user {} with name {} not found.", username, exploratoryName));
+    }
+
+    /** Returns the name of application for notebook: jupiter, rstudio, etc. */
+    private String getApplicationName(String imageName) {
+    	if (imageName != null) {
+    		int pos = imageName.lastIndexOf('-');
+    		if (pos > 0) {
+    			return imageName.substring(pos + 1);
+    		}
+    	}
+    	return "";
     }
 
 }

@@ -25,6 +25,7 @@ import json
 import random
 import string
 import sys
+import os
 from dlab.notebook_lib import *
 from dlab.fab import *
 
@@ -37,32 +38,21 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 parser.add_argument('--os_user', type=str, default='')
 args = parser.parse_args()
 
+spark_version = os.environ['notebook_spark_version']
+hadoop_version = os.environ['notebook_hadoop_version']
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-netinst.tgz"
 zeppelin_version = "0.6.2"
 zeppelin_interpreters = "md,python"
 python3_version = "3.4"
-pyspark_local_path_dir = '/home/' + args.os_user + '/.local/share/zeppelin/interpreters/pyspark_local/'
-py3spark_local_path_dir = '/home/' + args.os_user + '/.local/share/zeppelin/interpreters/py3spark_local/'
-zeppelin_conf_file = '/home/' + args.os_user + '/.local/share/zeppelin/zeppelin_notebook_config.py'
+local_spark_path = '/opt/spark/'
 templates_dir = '/root/templates/'
 files_dir = '/root/files'
+s3_jars_dir = '/opt/jars/'
 
 
-def ensure_s3_libs(os_user):
-    if not exists('/home/' + os_user + '/.ensure_dir/zp_s3_lib_ensured'):
-        try:
-            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-core/1.10.75/aws-java-sdk-core-1.10.75.jar')
-            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.6.0/hadoop-aws-2.6.0.jar')
-            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/com/amazonaws/aws-java-sdk-s3/1.10.75/aws-java-sdk-s3-1.10.75.jar')
-            sudo('wget -P /opt/zeppelin/interpreter/spark/dep http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.5/lzo-hadoop-1.0.5.jar')
-            sudo('touch /home/' + os_user + '/.ensure_dir/zp_s3_lib_ensured')
-        except:
-            sys.exit(1)
-
-
-def configure_notebook_server(notebook_name, os_user):
+def configure_notebook_server(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/zeppelin_ensured'):
-        ensure_jre_jdk(os_user)
         try:
             sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
             sudo('tar -zxvf /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz -C /opt/')
@@ -71,7 +61,10 @@ def configure_notebook_server(notebook_name, os_user):
             sudo('cp /opt/zeppelin/conf/zeppelin-site.xml.template /opt/zeppelin/conf/zeppelin-site.xml')
             sudo('sed -i \"/# export ZEPPELIN_PID_DIR/c\export ZEPPELIN_PID_DIR=/var/run/zeppelin\" /opt/zeppelin/conf/zeppelin-env.sh')
             sudo('sed -i \"/# export ZEPPELIN_IDENT_STRING/c\export ZEPPELIN_IDENT_STRING=notebook\" /opt/zeppelin/conf/zeppelin-env.sh')
-            put(files_dir + 'interpreter.json', '/tmp/interpreter.json')
+            sudo('sed -i \"/# export SPARK_HOME/c\export SPARK_HOME=\/opt\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
+            put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
+            sudo('sed -i "s|AWSREGION|' + args.region + '|g" /tmp/interpreter.json')
+            sudo('sed -i "s|OS_USER|' + args.region + '|g" /tmp/interpreter.json')
             sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
             sudo('mkdir /var/log/zeppelin')
             sudo('mkdir /var/run/zeppelin')
@@ -80,7 +73,6 @@ def configure_notebook_server(notebook_name, os_user):
             sudo('ln -s /var/run/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/run')
             sudo('chown ' + os_user + ':' + os_user + ' -R /var/run/zeppelin')
             sudo('/opt/zeppelin/bin/install-interpreter.sh --name ' + zeppelin_interpreters + ' --proxy-url $http_proxy')
-            ensure_s3_libs(os_user)
             sudo('chown ' + os_user + ':' + os_user + ' -R /opt/zeppelin-' + zeppelin_version + '-bin-netinst')
         except:
             sys.exit(1)
@@ -92,12 +84,10 @@ def configure_notebook_server(notebook_name, os_user):
             sudo("systemctl daemon-reload")
             sudo("systemctl enable zeppelin-notebook")
             sudo("systemctl start zeppelin-notebook")
-            sudo('echo \"d /var/run/zeppelin  0755 ' + os_user + '\" > /usr/lib/tmpfiles.d/zeppelin.conf')
+            sudo('echo \"d /var/run/zeppelin 0755 ' + os_user + '\" > /usr/lib/tmpfiles.d/zeppelin.conf')
             sudo('touch /home/' + os_user + '/.ensure_dir/zeppelin_ensured')
         except:
             sys.exit(1)
-
-        ensure_python3_kernel_zeppelin(python3_version, os_user)
 
 
 ##############
@@ -116,5 +106,19 @@ if __name__ == "__main__":
             sudo('mkdir /home/' + args.os_user + '/.ensure_dir')
     except:
         sys.exit(1)
+
+    print "Mount additional volume"
     prepare_disk(args.os_user)
-    configure_notebook_server("_".join(args.instance_name.split()), args.os_user)
+
+    print "Install local Spark"
+    ensure_jre_jdk(args.os_user)
+    ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path)
+
+    print "Install Zeppelin"
+    configure_notebook_server(args.os_user)
+
+    print "Install python3 kernels"
+    ensure_python3_kernel_zeppelin(python3_version, args.os_user)
+
+    print "Install local S3 kernels"
+    ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)

@@ -21,9 +21,7 @@ package com.epam.dlab.backendapi.core.response.handlers;
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.backendapi.core.commands.DockerAction;
 import com.epam.dlab.dto.computational.ComputationalBaseDTO;
-import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
-import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -35,37 +33,22 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     
     private final String uuid;
     private final ComputationalBaseDTO<?> dto;
-	private final String dlabUser;
 
     @Override
     public String getUUID() {
     	return uuid;
     }
     
-    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto, String dlabUser) {
-        super(selfService, dto.getIamUserName(), originalUuid, action);
+    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto, String accessToken) {
+        super(selfService, dto.getIamUserName(), originalUuid, action, accessToken);
     	this.uuid = originalUuid;
         this.dto = dto;
-        this.dlabUser = dlabUser;
     }
     
     protected ComputationalBaseDTO<?> getDto() {
     	return dto;
     }
     
-    @Override
-    protected void postHandle() {
-    	if (getAction() == DockerAction.CREATE) {
-    		if (dto instanceof ComputationalCreateDTO) {
-    			ComputationalCreateDTO d = (ComputationalCreateDTO) dto;
-    	    	new ComputationalConfigure().run(dlabUser, d);
-    		} else {
-    			throw new DlabException("Could not configure computational resource cluster. Expected " + ComputationalCreateDTO.class.getName() +
-    					", gotted " + dto.getClass().getName());
-    		}
-    	}
-    }
-
     @Override
     protected String getCallbackURI() {
         return COMPUTATIONAL + STATUS_URI;
@@ -75,7 +58,7 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO baseStatus) {
     	baseStatus.setComputationalId(getTextValue(resultNode.get(COMPUTATIONAL_ID_FIELD)));
     	if (getAction() == DockerAction.CREATE &&
-    			UserInstanceStatus.valueOf(baseStatus.getStatus()) == UserInstanceStatus.RUNNING) {
+    			UserInstanceStatus.of(baseStatus.getStatus()) == UserInstanceStatus.RUNNING) {
     		baseStatus.withStatus(UserInstanceStatus.CONFIGURING);
     	}
         return baseStatus;

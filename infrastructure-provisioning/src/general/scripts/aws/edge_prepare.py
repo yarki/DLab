@@ -20,9 +20,9 @@
 
 import json
 from dlab.fab import *
-from dlab.aws_meta import *
+from dlab.meta_lib import *
 import sys, time, os
-from dlab.aws_actions import *
+from dlab.actions_lib import *
 
 
 if __name__ == "__main__":
@@ -41,10 +41,7 @@ if __name__ == "__main__":
     edge_conf['public_subnet_id'] = os.environ['aws_subnet_id']
     edge_conf['vpc_id'] = os.environ['aws_vpc_id']
     edge_conf['region'] = os.environ['aws_region']
-    if os.environ['conf_os_family'] == "debian":
-        edge_conf['ami_id'] = get_ami_id(os.environ['aws_debian_ami_name'])
-    if os.environ['conf_os_family'] == "redhat":
-        edge_conf['ami_id'] = get_ami_id(os.environ['aws_redhat_ami_name'])
+    edge_conf['ami_id'] = get_ami_id(os.environ['aws_' + os.environ['conf_os_family'] + '_ami_name'])
     edge_conf['instance_size'] = os.environ['aws_edge_instance_size']
     edge_conf['sg_ids'] = os.environ['aws_security_groups_ids']
     edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'

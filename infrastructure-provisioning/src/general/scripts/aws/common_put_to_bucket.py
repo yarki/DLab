@@ -19,7 +19,7 @@
 # ******************************************************************************
 
 import argparse
-from dlab.aws_actions import *
+from dlab.actions_lib import *
 import sys
 
 parser = argparse.ArgumentParser()

@@ -18,7 +18,7 @@
 #
 # ******************************************************************************
 
-from dlab.aws_actions import *
+from dlab.actions_lib import *
 from dlab.common_lib import *
 from dlab.notebook_lib import *
 from dlab.fab import *

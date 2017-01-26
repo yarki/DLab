@@ -29,7 +29,7 @@ from fabric.api import lcd
 from fabric.contrib.files import exists
 from fabvenv import virtualenv
 from dlab.notebook_lib import *
-from dlab.aws_actions import *
+from dlab.actions_lib import *
 from dlab.fab import *
 from dlab.common_lib import *
 
@@ -56,7 +56,6 @@ def configure_zeppelin_emr_interpreter(args):
     try:
         spark_libs = "/opt/" + args.emr_version + "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-core*.jar /opt/" + args.emr_version + "/jars/usr/lib/hadoop/hadoop-aws*.jar /opt/" + args.emr_version + "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-s3-*.jar /opt/" + args.emr_version + "/jars/usr/lib/hadoop-lzo/lib/hadoop-lzo-*.jar"
         local('echo \"Configuring emr path for Zeppelin\"')
-        local('sed -i \"/^# export SPARK_HOME/c\export SPARK_HOME\" /opt/zeppelin/conf/zeppelin-env.sh')
         local('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/' + args.emr_version + '\/' + args.cluster_name + '\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
         local('sed -i \"s/^export HADOOP_CONF_DIR.*/export HADOOP_CONF_DIR=\/opt\/' + args.emr_version + '\/' + args.cluster_name + '\/conf/\" /opt/' + args.emr_version + '/' + args.cluster_name + '/spark/conf/spark-env.sh')
         local('echo \"spark.jars $(ls ' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/' + args.emr_version + '/' + args.cluster_name + '/spark/conf/spark-defaults.conf')
@@ -72,7 +71,7 @@ def configure_zeppelin_emr_interpreter(args):
             text = fr.read()
             text = text.replace('CLUSTERNAME', args.cluster_name)
             text = text.replace('PYTHONVERSION', p_version)
-            text = text.replace('EMRVERSION', args.emr_version + '_' + args.cluster_name)
+            text = text.replace('EMRVERSION', args.cluster_name)
             tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
             fw = open(tmp_file, 'w')
             fw.write(text)

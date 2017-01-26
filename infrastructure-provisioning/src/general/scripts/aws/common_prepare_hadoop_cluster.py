@@ -22,8 +22,8 @@ import json
 import time
 from fabric.api import *
 from dlab.fab import *
-from dlab.aws_meta import *
-from dlab.aws_actions import *
+from dlab.meta_lib import *
+from dlab.actions_lib import *
 import sys
 import os
 import uuid
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     if edge_status != 'running':
         logging.info('ERROR: Edge node is unavailable! Aborting...')
         print 'ERROR: Edge node is unavailable! Aborting...'
-        put_resource_status('edge', 'Unavailable', 'emr')
+        put_resource_status('edge', 'Unavailable', 'emr', os.environ['conf_os_user'])
         append_result("Edge node is unavailable")
         sys.exit(1)
     print 'Generating infrastructure names and tags'
@@ -145,7 +145,7 @@ if __name__ == "__main__":
         print "Bucket name: " + emr_conf['bucket_name']
         with open("/root/result.json", 'w') as result:
             res = {"hostname": cluster_name,
-                   "id": get_emr_id_by_name(emr_conf['cluster_name']),
+                   "instance_id": get_emr_id_by_name(emr_conf['cluster_name']),
                    "key_name": emr_conf['key_name'],
                    "user_own_bucket_name": emr_conf['bucket_name'],
                    "Action": "Create new EMR cluster"}

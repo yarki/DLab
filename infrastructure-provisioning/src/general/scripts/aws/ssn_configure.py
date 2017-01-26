@@ -19,8 +19,8 @@
 # ******************************************************************************
 
 from dlab.fab import *
-from dlab.aws_actions import *
-from dlab.aws_meta import get_security_group_by_name, get_subnet_by_cidr, get_vpc_by_cidr
+from dlab.actions_lib import *
+#from dlab.meta_lib import get_security_group_by_name, get_subnet_by_cidr, get_vpc_by_cidr
 import sys, os
 from fabric.api import *
 from dlab.ssn_lib import *
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         region = os.environ['aws_region']
         ssn_ami_name = os.environ['aws_' + os.environ['conf_os_family'] + '_ami_name']
         ssn_ami_id = get_ami_id(ssn_ami_name)
-        policy_path = '/root/files/policy.json'
+        policy_path = '/root/files/ssn_policy.json'
         vpc_cidr = '172.31.0.0/16'
         sg_name = instance_name + '-SG'
         pre_defined_vpc = False

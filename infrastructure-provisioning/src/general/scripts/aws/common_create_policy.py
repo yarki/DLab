@@ -19,8 +19,8 @@
 # ******************************************************************************
 
 import argparse
-from dlab.aws_actions import *
-from dlab.aws_meta import *
+from dlab.actions_lib import *
+from dlab.meta_lib import *
 import sys
 import boto3, botocore
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     success = False
     if args.bucket_name:
         try:
-            handler = open('/root/templates/s3_policy.json', 'r')
+            handler = open('/root/templates/edge_s3_policy.json', 'r')
             policy = handler.read()
             policy = policy.replace('BUCKET_NAME', args.bucket_name)
             policy = policy.replace('SSN_BUCK', args.ssn_bucket_name)

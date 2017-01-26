@@ -20,9 +20,9 @@
 
 import json
 from dlab.fab import *
-from dlab.aws_meta import *
+from dlab.meta_lib import *
 import sys, time, os
-from dlab.aws_actions import *
+from dlab.actions_lib import *
 
 if __name__ == "__main__":
     local_log_filename = "{}_{}_{}.log".format(os.environ['conf_resource'], os.environ['edge_user_name'],
@@ -137,7 +137,7 @@ if __name__ == "__main__":
             res = {"hostname": instance_hostname,
                    "public_ip": public_ip_address,
                    "ip": ip_address,
-                   "id": get_instance_by_name(edge_conf['instance_name']),
+                   "instance_id": get_instance_by_name(edge_conf['instance_name']),
                    "key_name": edge_conf['key_name'],
                    "user_own_bicket_name": edge_conf['bucket_name'],
                    "tunnel_port": "22",

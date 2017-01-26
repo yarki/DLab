@@ -24,10 +24,8 @@ ARG CLOUD
 COPY ssn/ /root/
 COPY general/scripts/${CLOUD}/ssn_* /root/scripts/
 COPY general/lib/os/${OS}/ssn_lib.py /usr/lib/python2.7/dlab/ssn_lib.py
-COPY general/files/${CLOUD}/instance_shapes.lst /root/files/
-COPY general/templates/os/${OS}/supervisor_svc.conf /root/templates/
-COPY general/templates/os/${OS}/* /root/templates/
-COPY general/files/${CLOUD}/policy.json /root/files/
+COPY general/files/${CLOUD}/ssn_instance_shapes.lst /root/files/
+COPY general/files/${CLOUD}/ssn_policy.json /root/files/
 
 RUN chmod a+x /root/fabfile.py; \
     chmod a+x /root/scripts/*

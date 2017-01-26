@@ -249,7 +249,7 @@ def install_rstudio(os_user, local_spark_path, rstudio_pass):
             sys.exit(1)
 
 
-def install_tensor(os_user, tensorflow_version, files_dir):
+def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/tensor_ensured'):
         try:
             sudo('yum -y install gcc kernel-devel-$(uname -r) kernel-headers-$(uname -r)')
@@ -274,8 +274,8 @@ def install_tensor(os_user, tensorflow_version, files_dir):
             sudo('python2.7 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp27-none-linux_x86_64.whl')
             sudo('python3 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp35-cp35m-linux_x86_64.whl')
             sudo('mkdir /var/log/tensorboard')
-            put(files_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
-            put(files_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
+            put(templates_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
+            put(templates_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
             sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/tensorboard-python*")
             sudo("chmod 644 /tmp/tensorboard-python*")
             sudo('\cp /tmp/tensorboard-python* /etc/systemd/system/')

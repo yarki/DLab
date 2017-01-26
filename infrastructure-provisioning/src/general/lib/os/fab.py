@@ -24,8 +24,8 @@ import random
 import sys
 import string
 import json, uuid, time, datetime
-from dlab.aws_meta import *
-from dlab.aws_actions import *
+from dlab.meta_lib import *
+from dlab.actions_lib import *
 
 
 def ensure_pip(requisites):
@@ -85,11 +85,11 @@ def ensure_s3_kernel(os_user, s3_jars_dir, files_dir, region, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/s3_kernel_ensured'):
         try:
             sudo('mkdir -p ' + s3_jars_dir)
-            put(files_dir + 'local_jars.tar.gz', '/tmp/local_jars.tar.gz')
-            sudo('tar -xzf /tmp/local_jars.tar.gz -C ' + s3_jars_dir)
-            put(templates_dir + 'spark-defaults_local.conf', '/tmp/spark-defaults_local.conf')
-            sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/spark-defaults_local.conf".format(region))
-            sudo('\cp /tmp/spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
+            put(files_dir + 'notebook_local_jars.tar.gz', '/tmp/notebook_local_jars.tar.gz')
+            sudo('tar -xzf /tmp/notebook_local_jars.tar.gz -C ' + s3_jars_dir)
+            put(templates_dir + 'notebook_spark-defaults_local.conf', '/tmp/notebook_spark-defaults_local.conf')
+            sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/notebook_spark-defaults_local.conf".format(region))
+            sudo('\cp /tmp/notebook_spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
             sudo('touch /home/' + os_user + '/.ensure_dir/s3_kernel_ensured')
         except:
             sys.exit(1)
@@ -107,9 +107,9 @@ def ensure_local_spark(os_user, spark_link, spark_version, hadoop_version, local
             sys.exit(1)
 
 
-def checksum_check(file):
-    result = local('md5sum -c ' + file, capture=True)
-    return result
+#ef checksum_check(file):
+#    result = local('md5sum -c ' + file, capture=True)
+#    return result
 
 
 def prepare(emr_dir, yarn_dir):
@@ -162,10 +162,10 @@ def append_result(error):
     print data
 
 
-def put_resource_status(resource, status, instance):
+def put_resource_status(resource, status, instance, os_user):
     env['connection_attempts'] = 100
-    keyfile = "/root/keys/" + os.environ['creds_key_name'] + ".pem"
+    keyfile = "/root/keys/" + os.environ['conf_key_name'] + ".pem"
     hostname = get_instance_hostname(os.environ['conf_service_base_name'] + '-ssn')
     env.key_filename = [keyfile]
-    env.host_string = 'ubuntu@' + hostname
+    env.host_string = os_user + '@' + hostname
     sudo('python ' + os.environ[instance + '_dlab_path'] + 'tmp/resource_status.py --resource {} --status {}'.format(resource, status))
