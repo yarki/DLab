@@ -18,6 +18,7 @@ limitations under the License.
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { HomeComponent } from './home.component';
 import { ModalModule } from './../components/modal/index';
 import { ResourcesGridModule } from './../components/resources-grid/index';
@@ -28,6 +29,7 @@ import { ExploratoryEnvironmentCreateDialogModule } from './../components/explor
 
 import { NavbarModule } from './../shared/navbar/index';
 import { ApplicationSecurityService } from '../services/applicationSecurity.service';
+import { routing } from './home.routes';
 
 @NgModule({
   imports: [
@@ -37,7 +39,9 @@ import { ApplicationSecurityService } from '../services/applicationSecurity.serv
     ProgressDialogModule,
     UploadKeyDialogModule,
     ExploratoryEnvironmentCreateDialogModule,
-    NavbarModule
+    NavbarModule,
+    RouterModule,
+    routing
   ],
   declarations: [HomeComponent],
   exports: [HomeComponent],

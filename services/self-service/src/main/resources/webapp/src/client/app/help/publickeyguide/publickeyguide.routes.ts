@@ -16,17 +16,13 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { NgModule, ModuleWithProviders } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
 import { PublicKeyGuide } from './publickeyguide.component';
-import { NavbarModule } from './../../shared/navbar/index';
 
-import { routing  } from './publickeyguide.routes';
+const routes: Routes = [{
+  path: '',
+  component: PublicKeyGuide,
+}];
 
-@NgModule({
-  imports: [CommonModule, NavbarModule, RouterModule, routing],
-  declarations: [PublicKeyGuide],
-  exports: [PublicKeyGuide]
-})
-export class PublicKeyGuideModule { }
+export const routing: ModuleWithProviders = RouterModule.forChild(routes);
