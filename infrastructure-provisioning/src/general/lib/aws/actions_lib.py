@@ -630,7 +630,7 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                 sudo('rm -rf  /opt/' + emr_version + '/' + emr_name + '/')
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
                 if exists('/home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, emr_name)):
-                    sudo('sed -i \"s/^export SPARK_HOME.*/#export SPARK_HOME=/\" /opt/zeppelin/conf/zeppelin-env.sh')
+                    sudo('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
                     sudo("rm -rf /home/{}/.ensure_dir/emr_interpreter_ensure".format(ssh_user))
                     zeppelin_url = 'http://' + private + ':8080/api/interpreter/setting/'
                     opener = urllib2.build_opener(urllib2.ProxyHandler({}))
