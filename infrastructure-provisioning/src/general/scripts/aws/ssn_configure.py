@@ -86,8 +86,8 @@ if __name__ == "__main__":
     try:
         logging.info('[CONFIGURE SSN INSTANCE]')
         print('[CONFIGURE SSN INSTANCE]')
-        #additional_config = {"nginx_template_dir": "/root/templates/", "service_base_name": service_base_name, "security_group_id": get_security_group_by_name(sg_name), "vpc_id": get_vpc_by_cidr(vpc_cidr), "subnet_id": get_subnet_by_cidr(vpc_cidr, get_vpc_by_cidr(vpc_cidr))}
-        additional_config = {"nginx_template_dir": "/root/templates/", "service_base_name": service_base_name}
+        additional_config = {"nginx_template_dir": "/root/templates/", "service_base_name": service_base_name, "security_group_id": get_security_group_by_name(sg_name), "vpc_id": get_vpc_by_cidr(vpc_cidr), "subnet_id": get_subnet_by_cidr(vpc_cidr, get_vpc_by_cidr(vpc_cidr))}
+        #additional_config = {"nginx_template_dir": "/root/templates/", "service_base_name": service_base_name}
         params = "--hostname {} --keyfile {} --additional_config '{}' --os_user {} --dlab_path {}". \
             format(instance_hostname, "/root/keys/{}.pem".format(os.environ['conf_key_name']),
                    json.dumps(additional_config), os.environ['conf_os_user'], os.environ['ssn_dlab_path'])
