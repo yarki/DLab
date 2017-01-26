@@ -164,11 +164,27 @@ public class ComputationalResource implements ComputationalAPI {
     @POST
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(@Auth UserInfo userInfo, ComputationalStatusDTO dto) throws DlabException {
-        LOGGER.debug("Updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto.getStatus());
-        infrastructureProvisionDAO.updateComputationalFields(dto);
+        LOGGER.debug("Updating status for computational resource {} for user {}: ", dto.getComputationalName(), dto.getUser(), dto/*.getStatus()*/);
+        try {
+        	infrastructureProvisionDAO.updateComputationalFields(dto);
+        } catch (DlabException e) {
+        	LOGGER.error("Could not update status for computational resource {} for user {} to {}: {}",
+        			dto.getComputationalName(), dto.getUser(), dto.getStatus(), e.getLocalizedMessage(), e);
+        	throw new DlabException("Could not update status for computational resource " + dto.getComputationalName() +
+        			" for user " + dto.getUser() + " to " + dto.getStatus(), e);
+        }
         if (UserInstanceStatus.CONFIGURING == UserInstanceStatus.of(dto.getStatus())) {
-            LOGGER.debug("Send request for configuration of computational resource {} for user {}", dto.getComputationalName(), dto.getUser());
-        	provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dto, String.class);
+            LOGGER.debug("Send request for configuration of the computational resource {} for user {}", dto.getComputationalName(), dto.getUser());
+            try {
+            	return Response
+            			.ok(provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dto, String.class))
+            			.build();
+            } catch (Throwable t) {
+            	LOGGER.error("Could not send request for configuration of the computational resource {} for user {}",
+            			dto.getComputationalName(), userInfo.getName());
+            	throw new DlabException("Could not send request for configuration of the computational resource " +
+            			dto.getComputationalName() + " for user " + userInfo.getName(), t);
+            }
         }
         return Response.ok().build();
     }

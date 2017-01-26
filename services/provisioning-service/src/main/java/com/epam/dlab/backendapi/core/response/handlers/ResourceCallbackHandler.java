@@ -79,6 +79,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     }
     
     private void selfServicePost(T object) {
+        LOGGER.debug("Send post request to self service for request {}, object {}", originalUuid, object);
    		selfService.post(getCallbackURI(), accessToken, object, resultType);
     }
 
@@ -104,7 +105,6 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         if (resultNode != null) {
             result = parseOutResponse(resultNode, result);
         }
-        LOGGER.debug("Handler result for {} is {}", originalUuid, result);
         
         selfServicePost(result);
         return !UserInstanceStatus.FAILED.equals(status);
