@@ -51,8 +51,8 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     	return uuid;
     }
 
-    public ExploratoryCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String exploratoryName) {
-        super(selfService, user, originalUuid, action);
+    public ExploratoryCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String exploratoryName, String accessToken) {
+        super(selfService, user, originalUuid, action, accessToken);
         this.uuid = originalUuid;
         this.exploratoryName = exploratoryName;
     }

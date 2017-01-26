@@ -46,21 +46,23 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     private static final String CONF_NODE = "conf";
 
     private static final String OK_STATUS = "ok";
-    private static final String ERROR_STATUR = "err";
+    private static final String ERROR_STATUS = "err";
 
-    private RESTService selfService;
-    private String user;
-    private String originalUuid;
-    private DockerAction action;
-    private Class<T> resultType;
+    private final RESTService selfService;
+    private final String user;
+    private final String originalUuid;
+    private final DockerAction action;
+    private final Class<T> resultType;
+    private final String accessToken;
 
     @SuppressWarnings("unchecked")
-    public ResourceCallbackHandler(RESTService selfService, String user, String originalUuid, DockerAction action) {
+    public ResourceCallbackHandler(RESTService selfService, String user, String originalUuid, DockerAction action, String accessToken) {
         this.selfService = selfService;
         this.user = user;
         this.originalUuid = originalUuid;
         this.action = action;
         this.resultType = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        this.accessToken = accessToken;
     }
 
     @Override
@@ -74,6 +76,10 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     
     public DockerAction getAction() {
     	return action;
+    }
+    
+    private void selfServicePost(T object) {
+   		selfService.post(getCallbackURI(), accessToken, object, resultType);
     }
 
     @Override
@@ -100,14 +106,14 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
             LOGGER.debug("Handle new Info: resultNode is {}", (resultNode == null ? "<NULL>" : resultNode.toString()));
         }
         
-        selfService.post(getCallbackURI(), result, resultType);
+        selfServicePost(result);
         return !UserInstanceStatus.FAILED.equals(status);
     }
 
     @Override
     public void handleError() {
         try {
-            selfService.post(getCallbackURI(), getBaseStatusDTO(UserInstanceStatus.FAILED), resultType);
+        	selfServicePost(getBaseStatusDTO(UserInstanceStatus.FAILED));
         } catch (Throwable t) {
             throw new DlabException("Could not send status update for request " + originalUuid + ", user " + user, t);
         }

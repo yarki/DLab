@@ -127,9 +127,9 @@ public class ExploratoryResource implements ExploratoryAPI {
      */
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(ExploratoryStatusDTO dto) throws DlabException {
+    public Response status(@Auth UserInfo userInfo, ExploratoryStatusDTO dto) throws DlabException {
         LOGGER.debug("Updating status for exploratory environment {} for user {} to {}",
-        		dto.getExploratoryName(), dto.getUser(), dto.getStatus());
+        		dto.getExploratoryName(), userInfo.getName(), dto.getStatus());
         UserInstanceStatus currentStatus;
         
         try {

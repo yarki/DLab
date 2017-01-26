@@ -39,8 +39,8 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     	return uuid;
     }
     
-    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto) {
-        super(selfService, dto.getIamUserName(), originalUuid, action);
+    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto, String accessToken) {
+        super(selfService, dto.getIamUserName(), originalUuid, action, accessToken);
     	this.uuid = originalUuid;
         this.dto = dto;
     }
