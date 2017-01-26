@@ -90,7 +90,7 @@ public class ExploratoryResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
-                getFileHandlerCallback(action, uuid, dto));
+                getFileHandlerCallback(action, uuid, dto, accessToken));
 
         RunDockerCommand runDockerCommand = new RunDockerCommand()
                 .withInteractive()
@@ -108,8 +108,8 @@ public class ExploratoryResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ExploratoryBaseDTO dto) {
-        return new ExploratoryCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName());
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ExploratoryBaseDTO dto, String accessToken) {
+        return new ExploratoryCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName(), accessToken);
     }
 
     private String nameContainer(String user, DockerAction action, String name) {

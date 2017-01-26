@@ -21,7 +21,6 @@ package com.epam.dlab.backendapi;
 import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.core.*;
 import com.epam.dlab.backendapi.core.commands.CommandExecutor;
-import com.epam.dlab.backendapi.core.response.handlers.ComputationalConfigure;
 import com.epam.dlab.backendapi.resources.*;
 import com.epam.dlab.process.DlabProcess;
 import com.epam.dlab.rest.client.RESTService;
@@ -71,7 +70,6 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         jersey.register(injector.getInstance(KeyLoaderResource.class));
         jersey.register(injector.getInstance(ExploratoryResource.class));
         jersey.register(injector.getInstance(ComputationalResource.class));
-        jersey.register(injector.getInstance(ComputationalConfigure.class));
         jersey.register(injector.getInstance(InfrastructureResource.class));
     }
 
