@@ -51,7 +51,8 @@ def ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, py
         try:
             sudo('apt-get install -y default-jre')
             sudo('apt-get install -y default-jdk')
-            sudo('wget ' + scala_link + ' -O /tmp/scala.deb')
+            #sudo('wget ' + scala_link + ' -O /tmp/scala.deb')
+            sudo('wget {}scala-{}.deb -O /tmp/scala.deb'.format(scala_link, scala_version))
             sudo('dpkg -i /tmp/scala.deb')
             sudo('wget ' + spark_link + ' -O /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
             sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
