@@ -89,6 +89,8 @@ def ensure_s3_kernel(os_user, s3_jars_dir, files_dir, region, templates_dir):
             sudo('tar -xzf /tmp/notebook_local_jars.tar.gz -C ' + s3_jars_dir)
             put(templates_dir + 'notebook_spark-defaults_local.conf', '/tmp/notebook_spark-defaults_local.conf')
             sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/notebook_spark-defaults_local.conf".format(region))
+            if os.environ['application'] == 'zeppelin':
+                sudo('echo \"spark.jars $(ls -1 ' + s3_jars_dir + '* | tr \'\\n\' \',\')\" >> /tmp/notebook_spark-defaults_local.conf')
             sudo('\cp /tmp/notebook_spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
             sudo('touch /home/' + os_user + '/.ensure_dir/s3_kernel_ensured')
         except:
