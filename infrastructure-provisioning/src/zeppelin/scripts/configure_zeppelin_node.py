@@ -113,11 +113,11 @@ if __name__ == "__main__":
     print "Install ava"
     ensure_jre_jdk(args.os_user)
 
-    print "Install local S3 kernels"
-    ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
-
     print "Install local Spark"
     ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path)
+
+    print "Install local S3 kernels"
+    ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
     print "Install Zeppelin"
     configure_notebook_server(args.os_user)
