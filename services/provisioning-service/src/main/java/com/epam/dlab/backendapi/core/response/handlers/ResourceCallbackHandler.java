@@ -46,7 +46,6 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     private static final String CONF_NODE = "conf";
 
     private static final String OK_STATUS = "ok";
-    private static final String ERROR_STATUS = "err";
 
     private final RESTService selfService;
     private final String user;
@@ -78,13 +77,19 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     	return action;
     }
     
-    private void selfServicePost(T object) {
-   		selfService.post(getCallbackURI(), accessToken, object, resultType);
+    private void selfServicePost(T object) throws DlabException {
+        LOGGER.debug("Send post request to self service for UUID {}, object {}", originalUuid, object);
+        try {
+        	selfService.post(getCallbackURI(), accessToken, object, resultType);
+        } catch (Exception e) {
+        	LOGGER.error("Send request or responce error for UUID {}: {}", e.getLocalizedMessage(), originalUuid, e);
+        	throw new DlabException("Send request or responce error for UUID " + originalUuid + ": " + e.getLocalizedMessage(), e);
+        }
     }
 
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
-        LOGGER.debug("Got file {} while waiting for {}, docker responce: {}", fileName, originalUuid, new String(content));
+        LOGGER.debug("Got file {} while waiting for UUID {}, docker responce: {}", fileName, originalUuid, new String(content));
         JsonNode document = MAPPER.readTree(content);
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
@@ -94,28 +99,28 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         if (action == DockerAction.CREATE) {
         	result.setInstanceId(getTextValue(resultNode.get(INSTANCE_ID_FIELD)));
         }
+
         if (success) {
-            LOGGER.debug("Did {} resource for user: {}, request: {}", action, user, originalUuid);
+            LOGGER.debug("Did {} resource for user: {}, UUID: {}", action, user, originalUuid);
         } else {
-            LOGGER.error("Could not {} resource for user: {}, request: {}", action, user, originalUuid);
+            LOGGER.error("Could not {} resource for user: {}, UUID: {}", action, user, originalUuid);
             result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
             resultNode = resultNode.get(CONF_NODE);
         }
-        if (resultNode != null) {
-            result = parseOutResponse(resultNode, result);
-        }
-        LOGGER.debug("Handler result for {} is {}", originalUuid, result);
+        result = parseOutResponse(resultNode, result);
         
         selfServicePost(result);
         return !UserInstanceStatus.FAILED.equals(status);
     }
 
-    @Override
-    public void handleError() {
+    @SuppressWarnings("unchecked")
+	@Override
+    public void handleError(String errorMessage) {
         try {
-        	selfServicePost(getBaseStatusDTO(UserInstanceStatus.FAILED));
+        	selfServicePost((T) getBaseStatusDTO(UserInstanceStatus.FAILED)
+        			.withErrorMessage(errorMessage));
         } catch (Throwable t) {
-            throw new DlabException("Could not send status update for request " + originalUuid + ", user " + user, t);
+            throw new DlabException("Could not send status update for UUID " + originalUuid + ", user " + user, t);
         }
     }
     
@@ -152,6 +157,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
                     return UserInstanceStatus.STOPPED;
                 case TERMINATE:
                     return UserInstanceStatus.TERMINATED;
+			default:
+				break;
             }
         }
         return UserInstanceStatus.FAILED;

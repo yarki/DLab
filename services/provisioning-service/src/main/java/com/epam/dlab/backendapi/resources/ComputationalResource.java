@@ -45,6 +45,7 @@ import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.core.response.handlers.ComputationalCallbackHandler;
 import com.epam.dlab.dto.computational.ComputationalBaseDTO;
+import com.epam.dlab.dto.computational.ComputationalConfigDTO;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.exceptions.DlabException;
@@ -108,7 +109,7 @@ public class ComputationalResource implements DockerCommands {
 
     @Path("/configure")
     @POST
-    public String configure(@Auth UserInfo ui, ComputationalCreateDTO dto) throws IOException, InterruptedException {
+    public String configure(@Auth UserInfo ui, ComputationalConfigDTO dto) throws IOException, InterruptedException {
     	LOGGER.debug("Configure computational resources {} for user {}", dto.getComputationalName(), ui.getName());
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(
@@ -116,22 +117,19 @@ public class ComputationalResource implements DockerCommands {
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(CONFIGURE, uuid, dto, ui.getAccessToken()));
         try {
-            //long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
             commandExecuter.executeAsync(
             		ui.getName(),
                     uuid,
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
                                     .withInteractive()
-                                    //.withName(nameContainer(dto.getEdgeUserName(), TERMINATE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
                                     .withResource(getResourceType())
                                     .withRequestId(uuid)
-                                    //.withEmrTimeout(Long.toString(timeout))
                                     .withConfKeyName(configuration.getAdminKey())
-                                    .withActionConfigure(configuration.getEmrImage()),
+                                    .withActionConfigure(getImageConfigure(dto.getApplicationName())),
                             dto
                     )
             );
@@ -183,5 +181,14 @@ public class ComputationalResource implements DockerCommands {
 
     public String getResourceType() {
         return Directories.EMR_LOG_DIRECTORY;
+    }
+    
+    private String getImageConfigure(String application) throws DlabException {
+    	String imageName = configuration.getEmrImage();
+    	int pos = imageName.lastIndexOf('-');
+    	if (pos > 0) {
+    		return imageName.substring(0, pos + 1) + application;
+    	}
+        throw new DlabException("Could not describe the image name for computational resources from image " + imageName + " and application " + application);
     }
 }

@@ -60,8 +60,8 @@ public class UserSettingsResource implements SelfServiceAPI {
         try {
         	userSettingsDAO.setUISettings(userInfo, settings);
         } catch (Exception e) {
-        	LOGGER.debug("Save settings for user {} fail", userInfo.getName(), e);
-        	throw new DlabException("Save settings for user " + userInfo.getName() + " fail", e);
+        	LOGGER.error("Save settings for user {} fail", userInfo.getName(), e);
+        	throw new DlabException("Save settings for user " + userInfo.getName() + " fail: " + e.getLocalizedMessage(), e);
         }
         return Response.ok().build();
     }

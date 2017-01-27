@@ -20,6 +20,7 @@ package com.epam.dlab.dto.exploratory;
 
 import com.epam.dlab.dto.ResourceBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects.ToStringHelper;
 
 public class ExploratoryBaseDTO<T extends ExploratoryBaseDTO<?>> extends ResourceBaseDTO<T> {
     @JsonProperty("notebook_image")
@@ -50,5 +51,17 @@ public class ExploratoryBaseDTO<T extends ExploratoryBaseDTO<?>> extends Resourc
     public T withNotebookUserName(String notebookUserName) {
         setNotebookUserName(notebookUserName);
         return (T) this;
+    }
+
+    @Override
+    public ToStringHelper toStringHelper(Object self) {
+    	return super.toStringHelper(self)
+    	        .add("notebookImage", notebookImage)
+    	        .add("notebookUserName", notebookUserName);
+    }
+    
+    @Override
+    public String toString() {
+    	return toStringHelper(this).toString();
     }
 }

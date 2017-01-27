@@ -109,8 +109,8 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
         }
 
         @Override
-        public void handleError() {
-            LOGGER.warn("docker warmupper returned no result");
+        public void handleError(String errorMessage) {
+            LOGGER.warn("docker warmupper returned no result: " + errorMessage);
         }
     }
     

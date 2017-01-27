@@ -18,49 +18,46 @@ limitations under the License.
 
 package com.epam.dlab.dto.computational;
 
-import com.epam.dlab.dto.ResourceBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
-abstract public class ComputationalBaseDTO<T extends ComputationalBaseDTO<?>> extends ResourceBaseDTO<T> {
-    @JsonProperty("edge_user_name")
-    private String edgeUserName;
-    @JsonProperty("computational_name")
-    private String computationalName;
-
-    public String getEdgeUserName() {
-        return edgeUserName;
+public class ComputationalConfigDTO extends ComputationalBaseDTO<ComputationalConfigDTO> {
+    @JsonProperty("emr_version")
+    private String version;
+    @JsonProperty("notebook_instance_name")
+    private String notebookInstanceName;
+    
+    public String getVersion() {
+        return version;
     }
 
-    public void setEdgeUserName(String edgeUserName) {
-        this.edgeUserName = edgeUserName;
+    public void setVersion(String version) {
+        this.version = version;
     }
 
-    @SuppressWarnings("unchecked")
-    public T withEdgeUserName(String edgeUserName) {
-        setEdgeUserName(edgeUserName);
-        return (T) this;
+    public ComputationalConfigDTO withVersion(String version) {
+        setVersion(version);
+        return this;
     }
 
-    public String getComputationalName() {
-        return computationalName;
+    public String getNotebookInstanceName() {
+        return notebookInstanceName;
     }
 
-    public void setComputationalName(String computationalName) {
-        this.computationalName = computationalName;
+    public void setNotebookInstanceName(String notebookInstanceName) {
+        this.notebookInstanceName = notebookInstanceName;
     }
 
-    @SuppressWarnings("unchecked")
-    public T withComputationalName(String computationalName) {
-        setComputationalName(computationalName);
-        return (T) this;
+    public ComputationalConfigDTO withNotebookInstanceName(String notebookInstanceName) {
+        setNotebookInstanceName(notebookInstanceName);
+        return this;
     }
-
+    
     @Override
     public ToStringHelper toStringHelper(Object self) {
     	return super.toStringHelper(self)
-    	        .add("edgeUserName", edgeUserName)
-    	        .add("computationalName", computationalName);
+    	        .add("version", version)
+    	        .add("notebookInstanceName", notebookInstanceName);
     }
     
     @Override

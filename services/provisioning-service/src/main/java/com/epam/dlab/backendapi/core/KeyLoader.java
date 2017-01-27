@@ -81,15 +81,7 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
 	                        .withResource(getResourceType())
 	                        .withRequestId(uuid)
 	                        .withConfKeyName(configuration.getAdminKey())
-	                        //.withConfOsUser(edgeDto.getConfOsUser())
-	                        //.withConfOsFamily(edgeDto.getConfOsFamily())
 	                        .withActionCreate(configuration.getEdgeImage()),
-	                        //.withConfServiceBaseName(edgeDto.getServiceBaseName())
-	                        //.withAwsRegion(edgeDto.getAwsRegion())
-	                        //.withAwsSecurityGroupsIds(edgeDto.getAwsSecurityGroupIds())
-	                        //.withAwsVpcId(edgeDto.getAwsVpcId())
-	                        //.withAwsSubnetId(edgeDto.getAwsSubnetId())
-	                        //.withUserKeyName(edgeDto.getEdgeUserName()),
                         edgeDto
                 )
         );
@@ -131,7 +123,8 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
             }
 
             @Override
-            public void handleError() {
+            public void handleError(String errorMessage) {
+            	LOGGER.error("Could not upload the user key:" , errorMessage);
                 selfService.post(KEY_LOADER, accessToken, new UploadFileResultDTO(user), UploadFileResultDTO.class);
             }
         };
