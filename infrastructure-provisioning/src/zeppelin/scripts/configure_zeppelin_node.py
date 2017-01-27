@@ -64,7 +64,7 @@ def configure_notebook_server(os_user):
             sudo('sed -i \"/# export SPARK_HOME/c\export SPARK_HOME=\/opt\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
             put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
             sudo('sed -i "s|AWSREGION|' + args.region + '|g" /tmp/interpreter.json')
-            sudo('sed -i "s|OS_USER|' + args.region + '|g" /tmp/interpreter.json')
+            sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
             sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
             sudo('mkdir /var/log/zeppelin')
             sudo('mkdir /var/run/zeppelin')
@@ -110,15 +110,17 @@ if __name__ == "__main__":
     print "Mount additional volume"
     prepare_disk(args.os_user)
 
-    print "Install local Spark"
+    print "Install Java"
     ensure_jre_jdk(args.os_user)
+
+    print "Install local Spark"
     ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path)
+
+    print "Install local S3 kernels"
+    ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
     print "Install Zeppelin"
     configure_notebook_server(args.os_user)
 
     print "Install python3 kernels"
     ensure_python3_kernel_zeppelin(python3_version, args.os_user)
-
-    print "Install local S3 kernels"
-    ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
