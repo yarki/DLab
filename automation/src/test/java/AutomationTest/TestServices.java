@@ -230,7 +230,7 @@ public class TestServices {
         
         DeployEMRDto deployEMR = new DeployEMRDto();
         final String emrVersion="emr-5.2.0";
-        deployEMR.setEmr_instance_count("3");
+        deployEMR.setEmr_instance_count("2"); // TODO: Set to 3
         deployEMR.setEmr_master_instance_type("m4.large");
         deployEMR.setEmr_slave_instance_type("m4.large");
         deployEMR.setEmr_version(emrVersion);
