@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 
 import java.util.Date;
 
@@ -169,5 +170,18 @@ public class UserComputationalResourceDTO {
         setVersion(version);
         return this;
     }
-
+    
+    @Override
+    public String toString() {
+    	return MoreObjects.toStringHelper(this)
+    			.add("computationalId", computationalId)
+    			.add("computationalName", computationalName)
+    			.add("version", version)
+    	        .add("masterShape", masterShape)
+    			.add("slaveShape", slaveShape)
+    			.add("slaveNumber", slaveNumber)
+    			.add("uptime", uptime)
+    	        .add("status", status)
+    	        .toString();
+    }
 }

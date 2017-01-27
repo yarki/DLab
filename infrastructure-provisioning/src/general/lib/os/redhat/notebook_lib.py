@@ -48,7 +48,7 @@ def ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, py
         try:
             sudo('yum install -y java-1.8.0-openjdk-devel')
             sudo('yum install -y java-1.8.0-openjdk')
-            sudo('wget ' + scala_link + ' -O /tmp/scala.rpm')
+            sudo('wget {}scala-{}.rpm -O /tmp/scala.rpm'.format(scala_link, scala_version))
             sudo('rpm -i /tmp/scala.rpm')
 
             sudo('wget ' + spark_link + ' -O /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz')

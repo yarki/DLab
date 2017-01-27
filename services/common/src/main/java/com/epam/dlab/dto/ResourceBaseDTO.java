@@ -19,6 +19,8 @@ limitations under the License.
 package com.epam.dlab.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 
 abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     @JsonProperty("conf_service_base_name")
@@ -132,5 +134,21 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     public T withApplicationName(String applicationName) {
         setApplicationName(applicationName);
         return (T) this;
+    }
+    
+    public ToStringHelper toStringHelper(Object self) {
+    	return MoreObjects.toStringHelper(self)
+    	        .add("serviceBaseName", serviceBaseName)
+    	        .add("applicationName", applicationName)
+    	        .add("exploratoryName", exploratoryName)
+    	        .add("iamUserName", iamUserName)
+    	        .add("awsRegion", awsRegion)
+    	        .add("confOsUser", confOsUser)
+    	        .add("confOsFamily", confOsFamily);
+    }
+    
+    @Override
+    public String toString() {
+    	return toStringHelper(this).toString();
     }
 }

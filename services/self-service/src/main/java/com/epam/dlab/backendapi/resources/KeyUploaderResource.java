@@ -74,7 +74,7 @@ public class KeyUploaderResource {
     		status = keyUploader.checkKey(userInfo);
         	LOGGER.debug("The status of the user key for {} is {}", userInfo.getName(), status.name());
     	} catch (DlabException e) {
-    		LOGGER.warn("Check the status of the user key for {} fails: ", userInfo.getName(), e.getLocalizedMessage(), e);
+    		LOGGER.error("Check the status of the user key for {} fails", userInfo.getName(), e);
     		status = KeyLoadStatus.ERROR;
     	}
 		return Response.status(status.getHttpStatus()).build();
@@ -101,8 +101,8 @@ public class KeyUploaderResource {
             content = buffer.lines().collect(Collectors.joining("\n"));
             keyUploader.startKeyUpload(userInfo, content);
         } catch (IOException|DlabException e) {
-    		LOGGER.warn("Could not upload the key for user {}: {}", userInfo.getName(), e.getLocalizedMessage(), e);
-    		throw new DlabException("Could not upload the key for user " + userInfo.getName(), e);
+    		LOGGER.error("Could not upload the key for user {}", userInfo.getName(), e);
+    		throw new DlabException("Could not upload the key for user " + userInfo.getName() + ": " + e.getLocalizedMessage(), e);
     	}
         return Response.ok().build();
     }
@@ -118,8 +118,8 @@ public class KeyUploaderResource {
         try {
         	keyUploader.onKeyUploadComplete(uploadKeyResult);
         } catch (DlabException e) {
-    		LOGGER.warn("Could not upload the key result for user {}: {}", uploadKeyResult.getUser(), e.getLocalizedMessage(), e);
-    		throw new DlabException("Could not upload the key result for user " + uploadKeyResult.getUser(), e);
+    		LOGGER.error("Could not upload the key result for user {}", uploadKeyResult.getUser(), e);
+    		throw new DlabException("Could not upload the key result for user " + uploadKeyResult.getUser() + ": " + e.getLocalizedMessage(), e);
     	}
         return Response.ok().build();
     }

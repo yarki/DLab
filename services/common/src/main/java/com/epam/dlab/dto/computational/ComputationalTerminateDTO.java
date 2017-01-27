@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.dto.computational;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects.ToStringHelper;
 
 public class ComputationalTerminateDTO extends ComputationalBaseDTO<ComputationalTerminateDTO> {
     @JsonProperty("emr_cluster_name")
@@ -80,5 +81,19 @@ public class ComputationalTerminateDTO extends ComputationalBaseDTO<Computationa
     public ComputationalTerminateDTO withConfKeyDir(String confKeyDir) {
         setConfKeyDir(confKeyDir);
         return this;
+    }
+
+    @Override
+    public ToStringHelper toStringHelper(Object self) {
+    	return super.toStringHelper(self)
+    	        .add("clusterName", clusterName)
+    	        .add("notebookInstanceName", notebookInstanceName)
+    	        .add("confOsUser", confOsUser)
+    	        .add("confKeyDir", confKeyDir);
+    }
+    
+    @Override
+    public String toString() {
+    	return toStringHelper(this).toString();
     }
 }
