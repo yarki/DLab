@@ -19,6 +19,8 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 /** Stores info about new exploratory.
@@ -29,7 +31,7 @@ public class ExploratoryCreateFormDTO {
     private String image;
 
     @NotBlank
-    @JsonProperty
+    @JsonProperty("template_name")
     private String templateName;
 
     @NotBlank
@@ -92,5 +94,16 @@ public class ExploratoryCreateFormDTO {
     /** Sets version. */
     public void setVersion(String version) {
         this.version = version;
+    }
+    
+    @Override
+    public String toString() {
+    	return MoreObjects.toStringHelper(this)
+    			.add("name", name)
+    			.add("templateName", templateName)
+    			.add("shape", shape)
+    	        .add("version", version)
+    			.add("image", image)
+    			.toString();
     }
 }

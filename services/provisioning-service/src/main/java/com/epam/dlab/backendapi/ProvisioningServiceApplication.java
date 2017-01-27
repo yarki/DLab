@@ -22,7 +22,6 @@ import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.core.*;
 import com.epam.dlab.backendapi.core.commands.CommandExecutor;
 import com.epam.dlab.backendapi.resources.*;
-import com.epam.dlab.mongo.MongoService;
 import com.epam.dlab.process.DlabProcess;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.mappers.JsonProcessingExceptionMapper;

@@ -122,7 +122,7 @@ export class ExploratoryEnvironmentCreateModel {
   private createExploratoryEnvironment(): Observable<Response> {
     return this.userResourceService.createExploratoryEnvironment({
       image: this.environment_image,
-      templateName: this.environment_template_name,
+      template_name: this.environment_template_name,
       name: this.environment_name,
       shape: this.environment_shape,
       version: this.environment_version
