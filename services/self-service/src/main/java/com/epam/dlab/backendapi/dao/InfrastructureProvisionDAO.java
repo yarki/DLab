@@ -32,6 +32,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -223,6 +224,32 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                 computationalFieldFilter(COMPUTATIONAL_ID), EMPTY).toString();
     }
 
+    /** Finds and returns the of computational resource.
+     * @param user user name.
+     * @param exploratoryName the name of exploratory.
+     * @param computationalName name of computational resource.
+     * @exception DlabException
+     */
+    public UserComputationalResourceDTO fetchComputationalFields(String user, String exploratoryName, String computationalName) throws DlabException {
+    	Optional<UserInstanceDTO> opt = findOne(USER_INSTANCES,
+                and(exploratoryCondition(user, exploratoryName),
+                		elemMatch(COMPUTATIONAL_RESOURCES, eq(COMPUTATIONAL_NAME, computationalName))),
+                fields(include(COMPUTATIONAL_RESOURCES), excludeId()),
+                UserInstanceDTO.class);
+        if( opt.isPresent() ) {
+        	List<UserComputationalResourceDTO> list = opt.get().getResources();
+        	UserComputationalResourceDTO comp = list.stream()
+        			.filter(r -> r.getComputationalName().equals(computationalName))
+        			.findFirst()
+        			.orElse(null);
+        	if (comp != null) {
+        		return comp;
+        	}
+        }
+        throw new DlabException("Computational resource " + computationalName + " for user " + user + " with exploratory name " +
+        		exploratoryName + " not found.");
+    }
+
     /** Updates the status of computational resource in Mongo database.
      * @param dto object of computational resource status.
      * @return The result of an update operation.
@@ -274,8 +301,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
      */
     public UpdateResult updateComputationalFields(ComputationalStatusDTO dto) throws DlabException {
         try {
-            Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus())
-                    .append(computationalFieldFilter(UPTIME), dto.getUptime());
+            Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus());
+        	if (dto.getUptime() != null) {
+        		values.append(UPTIME, dto.getUptime());
+        	}
         	if (dto.getInstanceId() != null) {
         		values.append(INSTANCE_ID, dto.getInstanceId());
         	}

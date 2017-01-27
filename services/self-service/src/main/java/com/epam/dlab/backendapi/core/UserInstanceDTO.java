@@ -21,6 +21,7 @@ package com.epam.dlab.backendapi.core;
 import com.epam.dlab.dto.exploratory.ExploratoryURL;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -234,5 +235,23 @@ public class UserInstanceDTO {
     public UserInstanceDTO withResources(List<UserComputationalResourceDTO> resources) {
         setResources(resources);
         return this;
+    }
+    
+    @Override
+    public String toString() {
+    	return MoreObjects.toStringHelper(this)
+    			.add("id", id)
+    			.add("user", user)
+    			.add("exploratoryId", exploratoryId)
+    	        .add("exploratoryName", exploratoryName)
+    			.add("templateName", templateName)
+    			.add("imageName", imageName)
+    			.add("imageVersion", imageVersion)
+    	        .add("shape", shape)
+    	        .add("status", status)
+    	        .add("uptime", uptime)
+    	        .add("exploratoryUrl", exploratoryUrl)
+    	        .add("resources", resources)
+    	        .toString();
     }
 }
