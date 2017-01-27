@@ -182,6 +182,7 @@ public class ComputationalResource implements ComputationalAPI {
             	UserInstanceDTO instance = getExploratoryInstance(userInfo.getName(), dto.getExploratoryName());
             	ComputationalCreateDTO dtoConf = new ComputationalCreateDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
+                        .withApplicationName(getApplicationName(instance.getImageName()))
                         .withNotebookInstanceName(instance.getExploratoryId())
                         .withVersion(computational.getVersion())
                         .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))

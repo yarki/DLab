@@ -116,22 +116,19 @@ public class ComputationalResource implements DockerCommands {
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(CONFIGURE, uuid, dto, ui.getAccessToken()));
         try {
-            //long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
             commandExecuter.executeAsync(
             		ui.getName(),
                     uuid,
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
                                     .withInteractive()
-                                    //.withName(nameContainer(dto.getEdgeUserName(), TERMINATE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
                                     .withResource(getResourceType())
                                     .withRequestId(uuid)
-                                    //.withEmrTimeout(Long.toString(timeout))
                                     .withConfKeyName(configuration.getAdminKey())
-                                    .withActionConfigure(configuration.getEmrImage()),
+                                    .withActionConfigure(getImageConfigure(dto.getApplicationName())),
                             dto
                     )
             );
@@ -183,5 +180,14 @@ public class ComputationalResource implements DockerCommands {
 
     public String getResourceType() {
         return Directories.EMR_LOG_DIRECTORY;
+    }
+    
+    private String getImageConfigure(String application) throws DlabException {
+    	String imageName = configuration.getEmrImage();
+    	int pos = imageName.lastIndexOf('-');
+    	if (pos > 0) {
+    		return imageName.substring(pos) + application;
+    	}
+        throw new DlabException("Could not describe the image name for computational resources from image " + imageName + " and application " + application);
     }
 }
