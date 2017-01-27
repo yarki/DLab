@@ -21,6 +21,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Router } from '@angular/router';
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { AppComponent } from './app.component';
+import { NavbarModule } from './shared/navbar/index';
 import { routes } from './app.routes';
 
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
@@ -38,7 +39,8 @@ import { ApplicationSecurityService } from './services/applicationSecurity.servi
     BrowserModule,
     HttpModule,
     RouterModule.forRoot(routes, { useHash: true }),
-    FormsModule
+    FormsModule,
+    NavbarModule
   ],
   declarations: [AppComponent],
   providers: [{

@@ -20,12 +20,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AccessNotebookGuide } from './accessnotebookguide.component';
-import { NavbarModule } from './../../shared/navbar/index';
-
 import { routing  } from './accessnotebookguide.routes';
 
 @NgModule({
-  imports: [CommonModule, NavbarModule, RouterModule, routing],
+  imports: [CommonModule, RouterModule, routing],
   declarations: [AccessNotebookGuide],
   exports: [AccessNotebookGuide]
 })
