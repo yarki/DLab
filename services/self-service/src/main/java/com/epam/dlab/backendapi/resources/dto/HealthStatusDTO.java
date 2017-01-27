@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 
 /** Stores the health statuses for services.
  */
@@ -58,5 +59,13 @@ public class HealthStatusDTO {
     public HealthStatusDTO withProvisioningAlive(boolean provisioningAlive) {
         setProvisioningAlive(provisioningAlive);
         return this;
+    }
+    
+    @Override
+    public String toString() {
+    	return MoreObjects.toStringHelper(this)
+    			.add("mongoAlive", mongoAlive)
+    			.add("provisioningAlive", provisioningAlive)
+    	        .toString();
     }
 }

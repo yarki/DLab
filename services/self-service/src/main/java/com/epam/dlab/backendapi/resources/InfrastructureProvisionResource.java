@@ -80,8 +80,8 @@ public class InfrastructureProvisionResource implements DockerAPI {
         		});
     		return documents;
         } catch (Throwable t) {
-        	LOGGER.warn("Could not load list of provisioned resources for user: {}", userInfo.getName(), t.getLocalizedMessage(), t);
-            throw new DlabException("Could not load list of provisioned resources for user " + userInfo.getName(), t);
+        	LOGGER.error("Could not load list of provisioned resources for user: {}", userInfo.getName(), t);
+            throw new DlabException("Could not load list of provisioned resources for user " + userInfo.getName() + ": " + t.getLocalizedMessage(), t);
         }
     }
 
@@ -104,8 +104,8 @@ public class InfrastructureProvisionResource implements DockerAPI {
         try {
         	return dao.findShapes();
         } catch (Throwable t) {
-        	LOGGER.warn("Could not load list of shapes for user: {}", userInfo.getName(), t.getLocalizedMessage(), t);
-            throw new DlabException("Could not load list of shapes for user " + userInfo.getName(), t);
+        	LOGGER.error("Could not load list of shapes for user: {}", userInfo.getName(), t);
+            throw new DlabException("Could not load list of shapes for user " + userInfo.getName() + ": " + t.getLocalizedMessage(), t);
         }
     }
 
@@ -120,8 +120,8 @@ public class InfrastructureProvisionResource implements DockerAPI {
         	return Stream.of(provisioningService.get(DOCKER_COMPUTATIONAL, userInfo.getAccessToken(), ComputationalMetadataDTO[].class))
                 .collect(Collectors.toSet());
         } catch (Throwable t) {
-        	LOGGER.warn("Could not load list of computational templates for user: {}", userInfo.getName(), t.getLocalizedMessage(), t);
-            throw new DlabException("Could not load list of computational templates for user " + userInfo.getName(), t);
+        	LOGGER.error("Could not load list of computational templates for user: {}", userInfo.getName(), t);
+            throw new DlabException("Could not load list of computational templates for user " + userInfo.getName() + ": " + t.getLocalizedMessage(), t);
         }
     }
 
@@ -143,8 +143,8 @@ public class InfrastructureProvisionResource implements DockerAPI {
 	        });
 	        return list;
         } catch (Throwable t) {
-        	LOGGER.warn("Could not load list of exploratory templates for user: {}", userInfo.getName(), t.getLocalizedMessage(), t);
-            throw new DlabException("Could not load list of exploratory templates for user " + userInfo.getName(), t);
+        	LOGGER.error("Could not load list of exploratory templates for user: {}", userInfo.getName(), t);
+            throw new DlabException("Could not load list of exploratory templates for user " + userInfo.getName() + ": " + t.getLocalizedMessage(), t);
         }
     }
 }

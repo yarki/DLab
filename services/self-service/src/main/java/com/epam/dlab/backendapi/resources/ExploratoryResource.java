@@ -96,9 +96,12 @@ public class ExploratoryResource implements ExploratoryAPI {
                         .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
                         .withNotebookImage(formDTO.getImage())
+                        .withApplicationName(getApplicationName(formDTO.getImage()))
                         .withNotebookInstanceType(formDTO.getShape())
-                        .withRegion(settingsDAO.getCredsRegion())
-                        .withSecurityGroupIds(settingsDAO.getSecurityGroups());
+                        .withAwsRegion(settingsDAO.getAwsRegion())
+                        .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups())
+                        .withConfOsUser(settingsDAO.getConfOsUser())
+                        .withConfOsFamily(settingsDAO.getConfOsFamily());
                 LOGGER.debug("Created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
                 return Response
                         .ok(provisioningService.post(EXPLORATORY_CREATE, userInfo.getAccessToken(), dto, String.class))
@@ -108,12 +111,12 @@ public class ExploratoryResource implements ExploratoryAPI {
                 return Response.status(Response.Status.FOUND).build();
             }
         } catch (Throwable t) {
-        	LOGGER.warn("Could not update the status of exploratory environment {} with name {} for user {}: {}",
-                    formDTO.getImage(), formDTO.getName(), userInfo.getName(), t.getLocalizedMessage(), t);
+        	LOGGER.error("Could not update the status of exploratory environment {} with name {} for user {}",
+                    formDTO.getImage(), formDTO.getName(), userInfo.getName(), t);
         	if (isAdded) {
         		updateExploratoryStatusSilent(userInfo.getName(), formDTO.getName(), FAILED);
         	}
-            throw new DlabException("Could not create exploratory environment " + formDTO.getName() + " for user " + userInfo.getName(), t);
+            throw new DlabException("Could not create exploratory environment " + formDTO.getName() + " for user " + userInfo.getName() + ": " + t.getLocalizedMessage(), t);
         }
     }
 
@@ -124,18 +127,18 @@ public class ExploratoryResource implements ExploratoryAPI {
      */
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(ExploratoryStatusDTO dto) throws DlabException {
+    public Response status(@Auth UserInfo userInfo, ExploratoryStatusDTO dto) throws DlabException {
         LOGGER.debug("Updating status for exploratory environment {} for user {} to {}",
-        		dto.getExploratoryName(), dto.getUser(), dto.getStatus());
+        		dto.getExploratoryName(), userInfo.getName(), dto.getStatus());
         UserInstanceStatus currentStatus;
         
         try {
         	currentStatus = infrastructureProvisionDAO.fetchExploratoryStatus(dto.getUser(), dto.getExploratoryName());
         } catch (DlabException e) {
-        	LOGGER.warn("Could not get current status for exploratory environment {} for user {}: {}",
-        			dto.getExploratoryName(), dto.getUser(), e.getLocalizedMessage(), e);
+        	LOGGER.error("Could not get current status for exploratory environment {} for user {}",
+        			dto.getExploratoryName(), dto.getUser(), e);
             throw new DlabException("Could not get current status for exploratory environment " + dto.getExploratoryName() +
-            		" for user " + dto.getUser(), e);
+            		" for user " + dto.getUser() + ": " + e.getLocalizedMessage(), e);
         }
         LOGGER.debug("Current status for exploratory environment {} for user {} is {}",
         		dto.getExploratoryName(), dto.getUser(), currentStatus);
@@ -148,10 +151,10 @@ public class ExploratoryResource implements ExploratoryAPI {
             	updateComputationalStatuses(dto.getUser(), dto.getExploratoryName(), TERMINATED);
             }
         } catch (DlabException e) {
-        	LOGGER.warn("Could not update status for exploratory environment {} for user {} to {}: {}",
-        			dto.getExploratoryName(), dto.getUser(), dto.getStatus(), e.getLocalizedMessage(), e);
+        	LOGGER.error("Could not update status for exploratory environment {} for user {} to {}",
+        			dto.getExploratoryName(), dto.getUser(), dto.getStatus(), e);
         	throw new DlabException("Could not update status for exploratory environment " + dto.getExploratoryName() +
-        			" for user " + dto.getUser() + " to " + dto.getStatus(), e);
+        			" for user " + dto.getUser() + " to " + dto.getStatus() + ": " + e.getLocalizedMessage(), e);
         }
 
     	return Response.ok().build();
@@ -169,10 +172,10 @@ public class ExploratoryResource implements ExploratoryAPI {
         try {
         	return action(userInfo, formDTO.getNotebookInstanceName(), EXPLORATORY_START, STARTING);
         } catch (DlabException e) {
-        	LOGGER.warn("Could not start exploratory environment {} for user {}: {}",
-        			formDTO.getNotebookInstanceName(), userInfo.getName(), e.getLocalizedMessage(), e);
+        	LOGGER.error("Could not start exploratory environment {} for user {}",
+        			formDTO.getNotebookInstanceName(), userInfo.getName(), e);
         	throw new DlabException("Could not start exploratory environment " + formDTO.getNotebookInstanceName() +
-        			" for user " + userInfo.getName(), e);
+        			" for user " + userInfo.getName() + ": " + e.getLocalizedMessage(), e);
         }
     }
 
@@ -192,8 +195,8 @@ public class ExploratoryResource implements ExploratoryAPI {
         	updateExploratoryStatus(userInfo.getName(), name, STOPPING);
         	updateComputationalStatuses(userInfo.getName(), name, TERMINATING);
         } catch (DlabException e) {
-        	LOGGER.warn("Could not update status for exploratory environment {} for user {}: {}",
-        			name, userInfo.getName(), e.getLocalizedMessage(), e);
+        	LOGGER.error("Could not update status for exploratory environment {} for user {}:",
+        			name, userInfo.getName(), e);
             throw new DlabException("Could not update status for exploratory environment " + name +
             		" for user " + userInfo.getName() + ": " + e.getLocalizedMessage(), e);
         }
@@ -213,15 +216,15 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(userInstance.getExploratoryId())
-                    .withKeyDir(settingsDAO.getCredsKeyDir())
-                    .withSshUser(settingsDAO.getExploratorySshUser())
-                    .withRegion(settingsDAO.getCredsRegion());
+                    .withConfKeyDir(settingsDAO.getConfKeyDir())
+                    .withConfOsUser(settingsDAO.getConfOsUser())
+                    .withAwsRegion(settingsDAO.getAwsRegion());
             return provisioningService.post(EXPLORATORY_STOP, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
-        	LOGGER.warn("Could not stop exploratory environment {} for user {}: {}",
-                    name, userInfo.getName(), t.getLocalizedMessage(), t);
+        	LOGGER.error("Could not stop exploratory environment {} for user {}",
+                    name, userInfo.getName(), t);
         	updateExploratoryStatusSilent(userInfo.getName(), name, FAILED);
-            throw new DlabException("Could not stop exploratory environment " + name + " for user " + userInfo.getName(), t);
+            throw new DlabException("Could not stop exploratory environment " + name + " for user " + userInfo.getName() + ": " + t.getLocalizedMessage(), t);
         }
     }
 
@@ -240,8 +243,8 @@ public class ExploratoryResource implements ExploratoryAPI {
             updateExploratoryStatus(userInfo.getName(), name, status);
             updateComputationalStatuses(userInfo.getName(), name, status);
         } catch (DlabException e) {
-        	LOGGER.warn("Could not update status for exploratory environment {} for user {}: {}",
-        			name, userInfo.getName(), e.getLocalizedMessage(), e);
+        	LOGGER.error("Could not update status for exploratory environment {} for user {}",
+        			name, userInfo.getName(), e);
             throw new DlabException("Could not update status for exploratory environment " + name +
             		" for user " + userInfo.getName() + ": " + e.getLocalizedMessage(), e);
         }
@@ -249,9 +252,9 @@ public class ExploratoryResource implements ExploratoryAPI {
         try {
         	return action(userInfo, name, EXPLORATORY_TERMINATE, status);
         } catch (DlabException e) {
-        	LOGGER.warn("Could not terminate exploratory environment {} for user {}: {}",
-                    name, userInfo.getName(), e.getLocalizedMessage(), e);
-           	throw new DlabException("Could not terminate exploratory environment " + name + " for user " + userInfo.getName(), e);
+        	LOGGER.error("Could not terminate exploratory environment {} for user {}",
+                    name, userInfo.getName(), e);
+           	throw new DlabException("Could not terminate exploratory environment " + name + " for user " + userInfo.getName() + ": " + e.getLocalizedMessage(), e);
         }
     }
 
@@ -279,11 +282,13 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(userInstance.getExploratoryId())
-                    .withRegion(settingsDAO.getCredsRegion());
+                    .withAwsRegion(settingsDAO.getAwsRegion())
+                    .withConfOsUser(settingsDAO.getConfOsUser())
+                    .withConfOsFamily(settingsDAO.getConfOsFamily());
             return provisioningService.post(action, userInfo.getAccessToken(), dto, String.class);
         } catch (Throwable t) {
         	updateExploratoryStatusSilent(userInfo.getName(), exploratoryName, FAILED);
-            throw new DlabException("Could not " + action + " exploratory environment " + exploratoryName, t);
+            throw new DlabException("Could not " + action + " exploratory environment " + exploratoryName + ": " + t.getLocalizedMessage(), t);
         }
     }
 
@@ -331,8 +336,18 @@ public class ExploratoryResource implements ExploratoryAPI {
     	try {
        		updateExploratoryStatus(user, exploratoryName, status);
        	} catch (DlabException e) {
-            LOGGER.warn("Could not update the status of exploratory environment {} for user {} to {}: {}",
-            		exploratoryName, user, status, e.getLocalizedMessage(), e);
+            LOGGER.error("Could not update the status of exploratory environment {} for user {} to {}",
+            		exploratoryName, user, status, e);
        	}
     }
-}
+
+    /** Returns the name of application for notebook: jupiter, rstudio, etc. */
+    private String getApplicationName(String imageName) {
+    	if (imageName != null) {
+    		int pos = imageName.lastIndexOf('-');
+    		if (pos > 0) {
+    			return imageName.substring(pos + 1);
+    		}
+    	}
+    	return "";
+    }}
