@@ -38,7 +38,7 @@ limitations under the License.
     <span class="user-name">{{currentUserName}}</span>
   </button>
   <a [routerLink]="['/environment_health_status']" class="statusbar">
-    <span class="glyphicon glyphicon-bell"></span>
-    <span class="status ok"></span>
+    <span class="glyphicon glyphicon-record" ngClass="{{healthStatus || ''}}"></span>
+    <!-- <span class="status ok"></span> -->
   </a>
 </nav>

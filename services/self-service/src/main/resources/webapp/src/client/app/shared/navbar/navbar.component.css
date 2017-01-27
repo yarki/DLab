@@ -98,15 +98,16 @@ limitations under the License.
   display: block;
   position: relative;
   float: right;
-  width: 60px;
+  width: 56px;
   text-align: center;
   line-height: 46px;
   color: #f9fafb;
-  font-size: 20px;
+  font-size: 15px;
 }
 
 .navbar .statusbar .glyphicon {
   z-index: 2;
+  top: 3px;
 }
 
 .navbar .statusbar .status {
@@ -120,13 +121,13 @@ limitations under the License.
   z-index: 1;
 }
 .navbar .statusbar .ok {
-  background: #81b44a;
+  color: #81b44a;
 }
 .navbar .statusbar .warning {
-  background: #f7b500;
+  color: #f7b500;
 }
 .navbar .statusbar .critical {
-  background: #ef5c4b;
+  color: #ef5c4b;
 }
 
 .navbar .btn-logout {
