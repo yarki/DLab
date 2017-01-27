@@ -48,6 +48,22 @@ templates_dir = '/root/templates/'
 files_dir = '/root/files/'
 
 
+def add_breeze_library_local():
+    breeze_tmp_dir = '/tmp/breeze_tmp_local/'
+    sudo('mkdir -p ' + breeze_tmp_dir)
+    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze_2.11/0.12/breeze_2.11-0.12.jar -O ' +
+          breeze_tmp_dir + 'breeze_2.11-0.12.jar')
+    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-natives_2.11/0.12/breeze-natives_2.11-0.12.jar -O ' +
+         breeze_tmp_dir + 'breeze-natives_2.11-0.12.jar')
+    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-viz_2.11/0.12/breeze-viz_2.11-0.12.jar -O ' +
+          breeze_tmp_dir + 'breeze-viz_2.11-0.12.jar')
+    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-macros_2.11/0.12/breeze-macros_2.11-0.12.jar -O ' +
+          breeze_tmp_dir + 'breeze-macros_2.11-0.12.jar')
+    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-parent_2.11/0.12/breeze-parent_2.11-0.12.jar -O ' +
+          breeze_tmp_dir + 'breeze-parent_2.11-0.12.jar')
+    sudo('mv ' + breeze_tmp_dir + '* ' + s3_jars_dir)
+
+
 def configure_notebook_server():
     if not exists('/home/' + args.os_user + '/.ensure_dir/jupyter_ensured'):
         try:
@@ -87,6 +103,8 @@ def configure_notebook_server():
         ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
         ensure_r_kernel(spark_version, args.os_user)
+
+        add_breeze_library_local()
 
 
 ##############

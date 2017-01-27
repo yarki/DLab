@@ -160,7 +160,9 @@ def toree_kernel(args):
             f.write(text)
         local('touch /tmp/kernel_var.json')
         local(
-            "PYJ=`find /opt/" + args.emr_version + "/" + args.cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+            "PYJ=`find /opt/" + args.emr_version + "/" + args.cluster_name +
+            "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path +
+            " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
         run_sh_path = kernels_dir + "toree_" + args.cluster_name + "/bin/run.sh"
         template_sh_file = '/tmp/run_template.sh'
@@ -170,6 +172,27 @@ def toree_kernel(args):
         text = text.replace('OS_USER', args.os_user)
         with open(run_sh_path, 'w') as f:
             f.write(text)
+
+
+def add_breeze_library_emr(args):
+    spark_defaults_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/conf/spark-defaults.conf'
+    new_jars_directory_path = '/opt/' + args.emr_version + '/jars/usr/other/'
+    breeze_tmp_dir = '/tmp/breeze_tmp_emr/'
+    local('sudo mkdir -p ' + new_jars_directory_path)
+    local('mkdir -p ' + breeze_tmp_dir)
+    local('wget http://central.maven.org/maven2/org/scalanlp/breeze_2.11/0.12/breeze_2.11-0.12.jar -O ' +
+          breeze_tmp_dir + 'breeze_2.11-0.12.jar')
+    local('wget http://central.maven.org/maven2/org/scalanlp/breeze-natives_2.11/0.12/breeze-natives_2.11-0.12.jar -O '
+          + breeze_tmp_dir + 'breeze-natives_2.11-0.12.jar')
+    local('wget http://central.maven.org/maven2/org/scalanlp/breeze-viz_2.11/0.12/breeze-viz_2.11-0.12.jar -O ' +
+          breeze_tmp_dir + 'breeze-viz_2.11-0.12.jar')
+    local('wget http://central.maven.org/maven2/org/scalanlp/breeze-macros_2.11/0.12/breeze-macros_2.11-0.12.jar -O ' +
+          breeze_tmp_dir + 'breeze-macros_2.11-0.12.jar')
+    local('wget http://central.maven.org/maven2/org/scalanlp/breeze-parent_2.11/0.12/breeze-parent_2.11-0.12.jar -O ' +
+          breeze_tmp_dir + 'breeze-parent_2.11-0.12.jar')
+    local('sudo mv ' + breeze_tmp_dir + '* ' + new_jars_directory_path)
+    local(""" sudo bash -c "sed -i '/spark.driver.extraClassPath/s/$/:\/opt\/""" + args.emr_version +
+          """\/jars\/usr\/other\/*/' """ + spark_defaults_path + """" """)
 
 
 if __name__ == "__main__":
@@ -186,3 +209,4 @@ if __name__ == "__main__":
         spark_defaults(args)
         r_kernel(args)
         configuring_notebook(args)
+        add_breeze_library_emr(args)
