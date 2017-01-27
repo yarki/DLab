@@ -63,6 +63,9 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     }
 
     protected ExploratoryStatusDTO parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO baseStatus) {
+    	if (resultNode == null) {
+    		return baseStatus;
+    	}
     	final JsonNode nodeUrl = resultNode.get(EXPLORATORY_URL_FIELD);
     	List<ExploratoryURL> url = null;
     	if (nodeUrl != null) {
