@@ -301,8 +301,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
      */
     public UpdateResult updateComputationalFields(ComputationalStatusDTO dto) throws DlabException {
         try {
-            Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus())
-                    .append(computationalFieldFilter(UPTIME), dto.getUptime());
+            Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus());
+        	if (dto.getUptime() != null) {
+        		values.append(UPTIME, dto.getUptime());
+        	}
         	if (dto.getInstanceId() != null) {
         		values.append(INSTANCE_ID, dto.getInstanceId());
         	}
