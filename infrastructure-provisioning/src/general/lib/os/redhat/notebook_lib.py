@@ -199,7 +199,7 @@ def ensure_libraries_py(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed'):
         try:
             sudo('export LC_ALL=C')
-            sudo('yum install -y python34-pip python-virtualenv openssl-devel python-devel')
+            sudo('yum install -y python34-pip python-virtualenv openssl-devel python-devel python34-devel')
             sudo('pip2 install -U pip setuptools --no-cache-dir')
             sudo('pip3 install -U pip setuptools --no-cache-dir')
             sudo('pip2 install boto3 --no-cache-dir')
