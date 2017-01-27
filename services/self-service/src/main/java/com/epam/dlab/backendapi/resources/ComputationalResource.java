@@ -188,6 +188,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withNotebookInstanceName(instance.getExploratoryId())
                         .withVersion(computational.getVersion())
                         .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                        .withIamUserName(userInfo.getName())
                         .withAwsRegion(settingsDAO.getAwsRegion())
                         .withConfOsUser(settingsDAO.getConfOsUser())
                         .withConfOsFamily(settingsDAO.getConfOsFamily()) //TODO: Remove and check it

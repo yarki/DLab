@@ -56,9 +56,17 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
 
     @Override
     protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO baseStatus) {
+    	if (getAction() == DockerAction.CONFIGURE) {
+    		baseStatus.withExploratoryName(getDto().getExploratoryName())
+    			.withComputationalName(getDto().getComputationalName());
+    	}
+    	if (resultNode == null) {
+    		return baseStatus;
+    	}
+
     	switch (getAction()) {
     	case CREATE:
-    		baseStatus.setComputationalId(getTextValue(resultNode.get(COMPUTATIONAL_ID_FIELD)));
+    		baseStatus.withComputationalId(getTextValue(resultNode.get(COMPUTATIONAL_ID_FIELD)));
     		if (UserInstanceStatus.of(baseStatus.getStatus()) == UserInstanceStatus.RUNNING) {
     			baseStatus.withStatus(UserInstanceStatus.CONFIGURING);
     		}

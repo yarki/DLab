@@ -99,6 +99,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         if (action == DockerAction.CREATE) {
         	result.setInstanceId(getTextValue(resultNode.get(INSTANCE_ID_FIELD)));
         }
+
         if (success) {
             LOGGER.debug("Did {} resource for user: {}, UUID: {}", action, user, originalUuid);
         } else {
@@ -106,9 +107,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
             result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
             resultNode = resultNode.get(CONF_NODE);
         }
-        if (resultNode != null) {
-            result = parseOutResponse(resultNode, result);
-        }
+        result = parseOutResponse(resultNode, result);
         
         selfServicePost(result);
         return !UserInstanceStatus.FAILED.equals(status);
