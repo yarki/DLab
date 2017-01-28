@@ -1,5 +1,6 @@
 package AmazonHelper;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import com.amazonaws.auth.AWSCredentials;
@@ -13,6 +14,8 @@ import com.amazonaws.services.ec2.model.Filter;
 import org.testng.Assert;
 
 public class Amazon {
+	
+	private static final Duration CHECK_TIMEOUT = Duration.parse("PT10m");
     
     public static DescribeInstancesResult getInstanceResult(String instanceName) throws Exception {
 
@@ -39,10 +42,12 @@ public class Amazon {
     }
     
     public static void checkAmazonStatus(String instanceName, String expAmazonState) throws Exception {
-        
         System.out.println("Check status of instance " + instanceName + " on Amazon:");
         String instanceState;
-        
+        long timeout = CHECK_TIMEOUT.toMillis();
+        long expiredTime = System.currentTimeMillis() + timeout;
+
+        // TODOD: Add timeout
         while ((instanceState = Amazon.getInstanceResult(instanceName)
             	.getReservations()
             	.get(0)
@@ -50,10 +55,14 @@ public class Amazon {
             	.get(0)
             	.getState()
             	.getName()).equals("shutting-down")) {
+        	if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
+                System.out.println("Amazon instance " + instanceName + " state is " + instanceState);           
+        		throw new Exception("Timeout has been expired for check amazon instance " + instanceState);
+            }
             Thread.sleep(1000);
         };
         
-        System.out.println("Amazon instance " + instanceName + " state is " + expAmazonState);           
+        System.out.println("Amazon instance " + instanceName + " state is " + instanceState);           
         Assert.assertEquals(instanceState, expAmazonState, "Amazon instance " + instanceName + " state is not correct");
     }
 }

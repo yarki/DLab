@@ -250,7 +250,7 @@ public class TestServices {
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
         
         System.out.println("   Waiting until EMR has been configured ...");
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "running", PropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "configuring", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("EMR " + emrName + " has not been configured");
         System.out.println("   EMR " + emrName + " has been configured");
@@ -490,18 +490,21 @@ public class TestServices {
         long expiredTime = System.currentTimeMillis() + timeout;
 
         while ((actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode()) != HttpStatusCode.OK) {
-            Thread.sleep(1000);
             if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
                 actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode();
                 break;
             }
+            Thread.sleep(1000);
         }
 
         if (actualStatus != HttpStatusCode.OK) {
             System.out.println("ERROR: Timeout has been expired for SSN available.");
             System.out.println("  timeout is " + duration);
             return false;
-        }
+        } else {
+    		System.out.println("Current status code for SSN is " + actualStatus);
+    	}
+        
         return true;
     }
 
@@ -513,11 +516,11 @@ public class TestServices {
         long expiredTime = System.currentTimeMillis() + timeout;
 
         while ((actualStatus = request.webApiGet(url, token).getStatusCode()) == status) {
-            Thread.sleep(1000);
             if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
                 actualStatus = request.webApiGet(url, token).getStatusCode();
                 break;
             }
+            Thread.sleep(1000);
         }
 
         if (actualStatus == status) {
@@ -526,7 +529,10 @@ public class TestServices {
             System.out.println("  token is " + token);
             System.out.println("  status is " + status);
             System.out.println("  timeout is " + duration);
-        }
+    	} else {
+    		System.out.println("Current status code for " + url + " is " + actualStatus);
+    	}
+
         return actualStatus;
     }
 
@@ -538,11 +544,11 @@ public class TestServices {
         long expiredTime = System.currentTimeMillis() + timeout;
 
         while ((actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath)).contains(status)) {
-            Thread.sleep(1000);
             if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
                 actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath);
                 break;
             }
+            Thread.sleep(1000);
         }
 
         if (actualStatus.contains(status)) {
@@ -552,7 +558,10 @@ public class TestServices {
             System.out.println("  statusPath is " + statusPath);
             System.out.println("  status is " + status);
             System.out.println("  timeout is " + duration);
+        } else {
+        	System.out.println("Current state for " + url + ":" + statusPath + " is " + actualStatus);
         }
+        
         return actualStatus;
     }
 

@@ -122,13 +122,23 @@ public class JenkinsCall {
     }
     
     public String getBuildResult() throws Exception {
-        //wait until job return build result     
-        do{
+    	long timeout = PropertyValue.getTimeoutJenkinsAutotest().toMillis();
+    	long expiredTime = System.currentTimeMillis() + timeout;
+        
+    	//wait until job return build result     
+        do {
             buildResult = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config).
                 contentType(ContentType.JSON).
                 when(). 
                 get(buildNumber + "/api/json?pretty=true").getBody().jsonPath().getString("result");
-        }while(buildResult == null);
+            if (buildResult == null) {
+            	if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
+            		throw new Exception("Timeout has been expired for Jenkins build. Timeout is " + PropertyValue.getTimeoutJenkinsAutotest());
+            	}
+            	Thread.sleep(1000);
+            }
+        } while (buildResult == null);
+        
         return buildResult;
     }
 
