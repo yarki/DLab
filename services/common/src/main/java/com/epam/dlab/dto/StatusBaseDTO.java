@@ -66,7 +66,7 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
 
     @SuppressWarnings("unchecked")
     public T withInstanceId(String instanceId) {
-        setUser(instanceId);
+    	setInstanceId(instanceId);
         return (T) this;
     }
 
