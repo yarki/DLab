@@ -28,9 +28,6 @@ export const routes: Routes = [{
     loadChildren: 'app/home/home.module#HomeModule',
     canActivate: [AuthorizationGuard]
   }, {
-    path: 'environment_health_status',
-    loadChildren: 'app/health-status/health-status.module#HealthStatusModule'
-  }, {
     path: 'login',
     loadChildren: 'app/login/login.module#LoginModule'
   }, {
@@ -40,3 +37,8 @@ export const routes: Routes = [{
     path: 'help/publickeyguide',
     loadChildren: 'app/help/publickeyguide/publickeyguide.module#PublicKeyGuideModule'
   }];
+
+// {
+//     path: 'environment_health_status',
+//     loadChildren: 'app/health-status/health-status.module#HealthStatusModule'
+//   },
