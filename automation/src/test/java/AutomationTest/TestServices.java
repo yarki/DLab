@@ -40,6 +40,7 @@ public class TestServices {
     private String serviceBaseName;
     private String ssnURL;
     private String publicIp;
+    private String privateIp;
 
     private final static Logger logger = Logger.getLogger(TestServices.class.getName());
 
@@ -87,14 +88,16 @@ public class TestServices {
 
         System.out.println("Check status of SSN node on Amazon:");
         DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(serviceBaseName + "-ssn");
-        InstanceState instanceState = describeInstanceResult
-        	.getReservations()
-        	.get(0)
-        	.getInstances()
-        	.get(0)
-            .getState();
-        publicIp = describeInstanceResult.getReservations().get(0).getInstances().get(0).getPublicIpAddress();
+        Instance ssnInstance = describeInstanceResult
+            	.getReservations()
+            	.get(0)
+            	.getInstances()
+            	.get(0);
+        InstanceState instanceState = ssnInstance.getState();
+        publicIp = ssnInstance.getPublicIpAddress();
         System.out.println("Public Ip is: " + publicIp);
+        privateIp = ssnInstance.getPrivateIpAddress();
+        System.out.println("Private Ip is: " + privateIp);
         Assert.assertEquals(instanceState.getName(), AmazonInstanceState.RUNNING,
                             "Amazon instance state is not running");
         System.out.println("Amazon instance state is running");
@@ -263,7 +266,7 @@ emrName = "eimrAutoTest201701301310";
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
 
         //run python script
-        testPython(publicIp, notebookIp, serviceBaseName, emrName, getEmrClusterName(emrName));
+        testPython(privateIp/*publicIp*/, notebookIp, serviceBaseName, emrName, getEmrClusterName(emrName));
 Assert.assertEquals(true, false, "TESTS HAS BEEN INTERRUPTED!");
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
@@ -418,7 +421,8 @@ Assert.assertEquals(true, false, "TESTS HAS BEEN INTERRUPTED!");
                 filename,
                 ip);
         
-        System.out.println(String.format("Copying %s...", filename));
+    	System.out.println(String.format("Copying %s...", filename));
+    	System.out.println(String.format("  Run command: %s", command));
         ChannelExec copyResult = SSHConnect.setCommand(session, command);
         AckStatus status = SSHConnect.checkAck(copyResult);
         System.out.println(String.format("Copied %s: %s", filename, status.toString()));
