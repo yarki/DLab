@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit {
   @ViewChild('createAnalyticalModal') createAnalyticalModal;
   @ViewChild(ResourcesGrid) resourcesGrid: ResourcesGrid;
 
-  private readonly CHECK_ACCESS_KEY_TIMEOUT : number = 10000;
+  private readonly CHECK_ACCESS_KEY_TIMEOUT : number = 20000;
 
   constructor(
     private userAccessKeyService: UserAccessKeyService,
