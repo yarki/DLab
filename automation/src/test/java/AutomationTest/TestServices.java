@@ -148,9 +148,10 @@ public class TestServices {
 
         String gettingStatus;
         String noteBookName = "Notebook" + HelperMethods.generateRandomValue();
+        String emrName = "eimr" + HelperMethods.generateRandomValue();
 // TODO: Remove it
 noteBookName = "NotebookAutoTest201701301310";
-        String emrName = "eimr" + HelperMethods.generateRandomValue();
+emrName = "eimrAutoTest201701301310";
         final String nodePrefix = PropertyValue.getUsernameSimple();
 
         RestAssured.baseURI = ssnURL;
