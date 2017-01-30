@@ -42,8 +42,7 @@ def configure_notebook(args):
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
     files_dir = '/root/files/'
-    put(files_dir + 'emr_spark_interpreter.json', '/tmp/emr_spark_interpreter.json')
-    put(templates_dir + 'spark-defaults_template.conf', '/tmp/spark-defaults_template.conf')
+    put(templates_dir + 'emr_spark_interpreter.json', '/tmp/emr_spark_interpreter.json')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
     sudo('chmod 755 /usr/local/bin/create_configs.py')
