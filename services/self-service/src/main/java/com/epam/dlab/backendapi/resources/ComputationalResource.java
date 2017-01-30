@@ -184,6 +184,7 @@ public class ComputationalResource implements ComputationalAPI {
             	ComputationalConfigDTO dtoConf = new ComputationalConfigDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withApplicationName(getApplicationName(instance.getImageName()))
+                        .withExploratoryName(dto.getExploratoryName())
                         .withComputationalName(computational.getComputationalName())
                         .withNotebookInstanceName(instance.getExploratoryId())
                         .withVersion(computational.getVersion())

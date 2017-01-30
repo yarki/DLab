@@ -30,6 +30,8 @@ public class UserComputationalResourceDTO {
     private String computationalName;
     @JsonProperty("computational_id")
     private String computationalId;
+    @JsonProperty("instance_id")
+    private String instanceId;
     @JsonProperty
     private String status;
     @JsonProperty("up_time")
@@ -72,6 +74,22 @@ public class UserComputationalResourceDTO {
     /** Sets a unique id of computational resource. */
     public UserComputationalResourceDTO withComputationalId(String computationalId) {
         setComputationalId(computationalId);
+        return this;
+    }
+
+    /** Returns the id of instance in Amazon. */
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    /** Sets the id of instance in Amazon. */
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    /** Sets the id of instance in Amazon. */
+    public UserComputationalResourceDTO withInstanceId(String instanceId) {
+    	setInstanceId(instanceId);
         return this;
     }
 

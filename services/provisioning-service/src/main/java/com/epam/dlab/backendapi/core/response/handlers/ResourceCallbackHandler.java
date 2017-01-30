@@ -89,7 +89,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
 
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
-        LOGGER.debug("Got file {} while waiting for UUID {}, docker responce: {}", fileName, originalUuid, new String(content));
+        LOGGER.debug("Got file {} while waiting for UUID {}, for action {}, docker responce: {}", fileName, originalUuid, action.name(), new String(content));
         JsonNode document = MAPPER.readTree(content);
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);
