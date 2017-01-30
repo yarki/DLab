@@ -220,7 +220,7 @@ emrName = "eimrAutoTest201701301310";
         Docker.checkDockerStatus(nodePrefix + "_create_exploratory_NotebookAutoTest", publicIp);
         
         //get notebook IP
-        DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(noteBookName);
+        DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(amazonNodePrefix + "-nb-" + noteBookName);
         String notebookIp = describeInstanceResult.getReservations()
         		.get(0)
         		.getInstances()
@@ -263,7 +263,7 @@ emrName = "eimrAutoTest201701301310";
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
 
         //run python script
-        testPython(publicIp, notebookIp, serviceBaseName, emrName, getEmrClusterName(emrName));
+        testPython(publicIp, notebookIp, serviceBaseName, emrName, getEmrClusterName(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName));
 Assert.assertEquals(true, false, "TESTS HAS BEEN INTERRUPTED!");
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
