@@ -32,13 +32,16 @@ export const routes: Routes = [{
     loadChildren: 'app/login/login.module#LoginModule'
   }, {
     path: 'help/accessnotebookguide',
-    loadChildren: 'app/help/accessnotebookguide/accessnotebookguide.module#AccessNotebookGuideModule'
+    loadChildren: 'app/help/accessnotebookguide/accessnotebookguide.module#AccessNotebookGuideModule',
+    canActivate: [AuthorizationGuard]
   }, {
     path: 'help/publickeyguide',
-    loadChildren: 'app/help/publickeyguide/publickeyguide.module#PublicKeyGuideModule'
+    loadChildren: 'app/help/publickeyguide/publickeyguide.module#PublicKeyGuideModule',
+    canActivate: [AuthorizationGuard]
   }];
 
 // {
 //     path: 'environment_health_status',
-//     loadChildren: 'app/health-status/health-status.module#HealthStatusModule'
+//     loadChildren: 'app/health-status/health-status.module#HealthStatusModule',
+//     canActivate: [AuthorizationGuard]
 //   },
