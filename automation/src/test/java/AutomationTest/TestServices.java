@@ -148,6 +148,8 @@ public class TestServices {
 
         String gettingStatus;
         String noteBookName = "Notebook" + HelperMethods.generateRandomValue();
+// TODO: Remove it
+noteBookName = "NotebookAutoTest201701301310";
         String emrName = "eimr" + HelperMethods.generateRandomValue();
         final String nodePrefix = PropertyValue.getUsernameSimple();
 
