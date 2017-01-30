@@ -254,8 +254,8 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
         try:
             sudo('yum -y install gcc kernel-devel-$(uname -r) kernel-headers-$(uname -r)')
             # install cuda
-            sudo('curl -O http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-8.0.44-1.x86_64.rpm')
-            sudo('rpm -i cuda-repo-rhel7-8.0.44-1.x86_64.rpm')
+            sudo('wget https://developer.nvidia.com/compute/cuda/8.0/prod/local_installers/cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64-rpm')
+            sudo('mv cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64-rpm cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64.rpm; rpm -i cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64.rpm')
             sudo('yum clean all')
             sudo('yum -y install cuda')
 
