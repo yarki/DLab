@@ -18,9 +18,16 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.commands.CommandBuilder;
-import com.epam.dlab.backendapi.core.commands.CommandExecutor;
 import com.epam.dlab.backendapi.core.commands.DockerCommands;
 import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
@@ -34,13 +41,6 @@ import com.epam.dlab.rest.contracts.SelfServiceAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Singleton
 public class KeyLoader implements DockerCommands, SelfServiceAPI {
@@ -73,20 +73,16 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
                 uuid,
                 commandBuilder.buildCommand(
                         new RunDockerCommand()
-                                .withName(nameContainer(edgeDto.getEdgeUserName(), "create", "edge"))
-                                .withVolumeForRootKeys(configuration.getKeyDirectory())
-                                .withVolumeForResponse(configuration.getKeyLoaderDirectory())
-                                .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
-                                .withResource(getResourceType())
-                                .withRequestId(uuid)
-                                .withCredsKeyName(configuration.getAdminKey())
-                                .withActionCreate(configuration.getEdgeImage())
-                                .withConfServiceBaseName(edgeDto.getServiceBaseName())
-                                .withCredsRegion(edgeDto.getRegion())
-                                .withCredsSecurityGroupsIds(edgeDto.getSecurityGroupIds())
-                                .withVpcId(edgeDto.getVpcId())
-                                .withEdgeSubnetId(edgeDto.getSubnetId())
-                                .withUserKeyName(edgeDto.getEdgeUserName()), edgeDto
+	                        .withInteractive()
+	                        .withName(nameContainer(edgeDto.getEdgeUserName(), "create", "edge"))
+	                        .withVolumeForRootKeys(configuration.getKeyDirectory())
+	                        .withVolumeForResponse(configuration.getKeyLoaderDirectory())
+	                        .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+	                        .withResource(getResourceType())
+	                        .withRequestId(uuid)
+	                        .withConfKeyName(configuration.getAdminKey())
+	                        .withActionCreate(configuration.getEdgeImage()),
+                        edgeDto
                 )
         );
 
@@ -127,7 +123,8 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
             }
 
             @Override
-            public void handleError() {
+            public void handleError(String errorMessage) {
+            	LOGGER.error("Could not upload the user key:" , errorMessage);
                 selfService.post(KEY_LOADER, accessToken, new UploadFileResultDTO(user), UploadFileResultDTO.class);
             }
         };
