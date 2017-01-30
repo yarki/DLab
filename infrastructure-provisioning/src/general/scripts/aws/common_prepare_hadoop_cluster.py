@@ -127,6 +127,8 @@ if __name__ == "__main__":
     except Exception as err:
         append_result("Failed to create EMR Cluster. Exception: " + str(err))
         local('rm /response/.emr_creating_' + os.environ['exploratory_name'])
+        emr_id = get_emr_id_by_name(emr_conf['cluster_name'])
+        terminate_emr(emr_id)
         sys.exit(1)
 
     try:
