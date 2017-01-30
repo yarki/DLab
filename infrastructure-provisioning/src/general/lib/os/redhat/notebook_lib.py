@@ -189,7 +189,7 @@ def ensure_python3_kernel_zeppelin(python3_version, os_user):
             if len(python3_version) < 4:
                 python3_version = python3_version + ".0"
             sudo('wget https://www.python.org/ftp/python/{0}/Python-{0}.tgz'.format(python3_version))
-            sudo('tar xzf Python-{}.tgz; cd Python-{}; ./configure --prefix=/usr/local; make altinstall')
+            sudo('tar xzf Python-{0}.tgz; cd Python-{0}; ./configure --prefix=/usr/local; make altinstall'.format(python3_version))
             sudo('touch /home/' + os_user + '/.ensure_dir/python3_kernel_ensured')
         except:
             sys.exit(1)
