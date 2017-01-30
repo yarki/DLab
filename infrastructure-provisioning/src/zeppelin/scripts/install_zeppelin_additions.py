@@ -40,7 +40,9 @@ def ensure_libraries_py3():
         try:
             sudo('pip3 install -U pip --no-cache-dir')
             sudo('pip3 install boto boto3 --no-cache-dir')
-            sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('pip3 install NumPy SciPy Sympy --no-cache-dir')
+            sudo('pip3 install Matplotlib Pillow --no-cache-dir')
+            sudo('pip3 install pandas sklearn fabvenv fabric-virtualenv --no-cache-dir')
             sudo('touch /home/' + args.os_user + '/.ensure_dir/ensure_libraries_py3_installed')
         except:
             sys.exit(1)

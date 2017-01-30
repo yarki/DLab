@@ -183,7 +183,7 @@ def ensure_jre_jdk(os_user):
 def ensure_python3_kernel_zeppelin(python3_version, os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/python3_kernel_ensured'):
         try:
-            sudo('yum install -y yum-utils python34-pip python34')
+            sudo('yum install -y yum-utils python34-pip python34 openssl-devel python34-devel')
             sudo('pip3 install -U pip setuptools --no-cache-dir')
             sudo('yum -y groupinstall development')
             if len(python3_version) < 4:
