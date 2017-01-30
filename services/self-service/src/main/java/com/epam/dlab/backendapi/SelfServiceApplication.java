@@ -65,7 +65,6 @@ public class SelfServiceApplication extends Application<SelfServiceApplicationCo
         jersey.register(new JsonProcessingExceptionMapper());
         jersey.register(MultiPartFeature.class);
         jersey.register(injector.getInstance(SecurityResource.class));
-        jersey.register(injector.getInstance(DockerResource.class));
         jersey.register(injector.getInstance(KeyUploaderResource.class));
         jersey.register(injector.getInstance(InfrastructureProvisionResource.class));
         jersey.register(injector.getInstance(ComputationalResource.class));

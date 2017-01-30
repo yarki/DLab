@@ -190,9 +190,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
                         .withAwsRegion(settingsDAO.getAwsRegion())
-                        .withConfOsUser(settingsDAO.getConfOsUser())
-                        .withConfOsFamily(settingsDAO.getConfOsFamily()) //TODO: Remove and check it
-                        ;
+                        .withConfOsUser(settingsDAO.getConfOsUser());
             	provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dtoConf, String.class);
             } catch (Throwable e) {
             	LOGGER.error("Could not send request for configuration of the computational resource {} for user {}: ",
@@ -235,7 +233,6 @@ public class ComputationalResource implements ComputationalAPI {
                     .withClusterName(computationalId)
                     .withConfKeyDir(settingsDAO.getConfKeyDir())
                     .withConfOsUser(settingsDAO.getConfOsUser())
-                    .withConfOsFamily(settingsDAO.getConfOsFamily()) //TODO: Remove and check it
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withAwsRegion(settingsDAO.getAwsRegion());
