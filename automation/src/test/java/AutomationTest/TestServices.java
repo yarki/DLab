@@ -149,9 +149,6 @@ public class TestServices {
         String gettingStatus;
         String noteBookName = "Notebook" + HelperMethods.generateRandomValue();
         String emrName = "eimr" + HelperMethods.generateRandomValue();
-// TODO: Remove it
-noteBookName = "NotebookAutoTest201701301310";
-emrName = "eimrAutoTest201701301310";
         final String nodePrefix = PropertyValue.getUsernameSimple();
         final String amazonNodePrefix = serviceBaseName + "-" + nodePrefix;
 
@@ -206,11 +203,11 @@ emrName = "eimrAutoTest201701301310";
         createNoteBookRequest.setName(noteBookName);
         createNoteBookRequest.setShape("r3.xlarge");
         createNoteBookRequest.setVersion("jupyter-1.6");
-/*        Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
+        Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
                                                                       createNoteBookRequest, token);
         System.out.println("   responseCreateNotebook.getBody() is " + responseCreateNotebook.getBody().asString());
         Assert.assertEquals(responseCreateNotebook.statusCode(), HttpStatusCode.OK);
-*/
+
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "creating", PropertyValue.getTimeoutNotebookCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("Notebook " + noteBookName + " has not been created");
@@ -239,7 +236,7 @@ emrName = "eimrAutoTest201701301310";
         deployEMR.setEmr_version(emrVersion);
         deployEMR.setName(emrName);
         deployEMR.setNotebook_name(noteBookName);
-/*        Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
+        Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
                                                                     deployEMR, token);
         System.out.println("   responseDeployingEMR.getBody() is " + responseDeployingEMR.getBody().asString());
         Assert.assertEquals(responseDeployingEMR.statusCode(), HttpStatusCode.OK);
@@ -253,7 +250,7 @@ emrName = "eimrAutoTest201701301310";
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
         
         System.out.println("   Waiting until EMR has been configured ...");
-*/
+
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "configuring", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("EMR " + emrName + " has not been configured");
@@ -264,7 +261,7 @@ emrName = "eimrAutoTest201701301310";
 
         //run python script
         testPython(publicIp, notebookIp, serviceBaseName, emrName, getEmrClusterName(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName));
-Assert.assertEquals(true, false, "TESTS HAS BEEN INTERRUPTED!");
+
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
         System.out.println("   SSN stop notebook URL is " + ssnStopNotebookURL);
