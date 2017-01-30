@@ -24,7 +24,7 @@ public class Amazon {
             _ec2.setRegion(com.amazonaws.regions.Region.getRegion(Regions.US_WEST_2));
      
             List<String> valuesT1 = new ArrayList<String>();
-            valuesT1.add("*" + instanceName + "*");
+            valuesT1.add(instanceName + "*");
             
             Filter filter = new Filter("tag:Name", valuesT1);
             

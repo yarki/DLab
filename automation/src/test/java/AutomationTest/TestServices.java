@@ -40,7 +40,6 @@ public class TestServices {
     private String serviceBaseName;
     private String ssnURL;
     private String publicIp;
-    private String privateIp;
 
     private final static Logger logger = Logger.getLogger(TestServices.class.getName());
 
@@ -96,8 +95,6 @@ public class TestServices {
         InstanceState instanceState = ssnInstance.getState();
         publicIp = ssnInstance.getPublicIpAddress();
         System.out.println("Public Ip is: " + publicIp);
-        privateIp = ssnInstance.getPrivateIpAddress();
-        System.out.println("Private Ip is: " + privateIp);
         Assert.assertEquals(instanceState.getName(), AmazonInstanceState.RUNNING,
                             "Amazon instance state is not running");
         System.out.println("Amazon instance state is running");
@@ -156,6 +153,7 @@ public class TestServices {
 noteBookName = "NotebookAutoTest201701301310";
 emrName = "eimrAutoTest201701301310";
         final String nodePrefix = PropertyValue.getUsernameSimple();
+        final String amazonNodePrefix = serviceBaseName + "-" + nodePrefix;
 
         RestAssured.baseURI = ssnURL;
         LoginDto testUserRequestBody = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
@@ -194,7 +192,7 @@ emrName = "eimrAutoTest201701301310";
         }
 
         Docker.checkDockerStatus(nodePrefix + "_create_edge_", publicIp);
-        Amazon.checkAmazonStatus(serviceBaseName + "-" + nodePrefix + "-edge", AmazonInstanceState.RUNNING);
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-edge", AmazonInstanceState.RUNNING);
 
         System.out.println("7. Notebook will be created ...");
         final String ssnExpEnvURL = getSnnURL(Path.EXP_ENVIRONMENT);
@@ -218,8 +216,7 @@ emrName = "eimrAutoTest201701301310";
             throw new Exception("Notebook " + noteBookName + " has not been created");
         System.out.println("   Notebook " + noteBookName + " has been created");
 
-        Amazon.checkAmazonStatus(nodePrefix + "-nb-" + noteBookName, AmazonInstanceState.RUNNING);
-
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-nb-" + noteBookName, AmazonInstanceState.RUNNING);
         Docker.checkDockerStatus(nodePrefix + "_create_exploratory_NotebookAutoTest", publicIp);
         
         //get notebook IP
@@ -252,7 +249,7 @@ emrName = "eimrAutoTest201701301310";
             throw new Exception("EMR " + emrName + " has not been deployed");
         System.out.println("   EMR " + emrName + " has been deployed");
 
-        Amazon.checkAmazonStatus(nodePrefix + "-emr-" + noteBookName, AmazonInstanceState.RUNNING);
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.RUNNING);
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
         
         System.out.println("   Waiting until EMR has been configured ...");
@@ -262,11 +259,11 @@ emrName = "eimrAutoTest201701301310";
             throw new Exception("EMR " + emrName + " has not been configured");
         System.out.println("   EMR " + emrName + " has been configured");
 
-        Amazon.checkAmazonStatus(nodePrefix + "-emr-" + noteBookName, AmazonInstanceState.RUNNING);
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.RUNNING);
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
 
         //run python script
-        testPython(privateIp/*publicIp*/, notebookIp, serviceBaseName, emrName, getEmrClusterName(emrName));
+        testPython(publicIp, notebookIp, serviceBaseName, emrName, getEmrClusterName(emrName));
 Assert.assertEquals(true, false, "TESTS HAS BEEN INTERRUPTED!");
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
@@ -287,7 +284,7 @@ Assert.assertEquals(true, false, "TESTS HAS BEEN INTERRUPTED!");
             throw new Exception("Computational resources has not been terminated for Notebook " + noteBookName);
         System.out.println("   Computational resources has been terminated for Notebook " + noteBookName);
 
-        Amazon.checkAmazonStatus(nodePrefix + "-emr-" + noteBookName, AmazonInstanceState.TERMINATED);
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.TERMINATED);
         Docker.checkDockerStatus(nodePrefix + "_stop_exploratory_NotebookAutoTest", publicIp);
 
         System.out.println("10. Notebook will be started ...");
@@ -302,7 +299,7 @@ Assert.assertEquals(true, false, "TESTS HAS BEEN INTERRUPTED!");
             throw new Exception("Notebook " + noteBookName + " has not been started");
         System.out.println("    Notebook " + noteBookName + " has been started");
 
-        Amazon.checkAmazonStatus(nodePrefix + "-nb-" + noteBookName, AmazonInstanceState.RUNNING);
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-nb-" + noteBookName, AmazonInstanceState.RUNNING);
         Docker.checkDockerStatus(nodePrefix + "_start_exploratory_NotebookAutoTest", publicIp);
 
         System.out.println("11. New EMR will be deployed for termination ...");
@@ -337,8 +334,7 @@ Assert.assertEquals(true, false, "TESTS HAS BEEN INTERRUPTED!");
             throw new Exception("New EMR " + emrNewName + " has not been terminated");
         System.out.println("    New EMR " + emrNewName + " has been terminated");
 
-        Amazon.checkAmazonStatus(emrNewName, AmazonInstanceState.TERMINATED);
-
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName, AmazonInstanceState.TERMINATED);
         Docker.checkDockerStatus(nodePrefix + "_terminate_computational_NewEMRAutoTest", publicIp);
 
         System.out.println("12. New EMR will be deployed for notebook termination ...");
@@ -380,8 +376,8 @@ Assert.assertEquals(true, false, "TESTS HAS BEEN INTERRUPTED!");
             throw new Exception("EMR has not been terminated for Notebook " + noteBookName);
         System.out.println("    EMR has been terminated for Notebook " + noteBookName);
 
-        Amazon.checkAmazonStatus(nodePrefix + "-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED);
-        Amazon.checkAmazonStatus(emrNewName2, AmazonInstanceState.TERMINATED);
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED);
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName2, AmazonInstanceState.TERMINATED);
 
         Docker.checkDockerStatus(nodePrefix + "_terminate_exploratory_NotebookAutoTestt", publicIp);
     }
