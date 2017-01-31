@@ -17,7 +17,7 @@ limitations under the License.
 ****************************************************************************/
 
 
-import { Component, ViewEncapsulation, OnInit} from '@angular/core';
+import { Component, ViewEncapsulation, OnInit } from '@angular/core';
 import { ApplicationSecurityService } from '../../services/applicationSecurity.service';
 import { AppRoutingService } from '../../routing/appRouting.service';
 
