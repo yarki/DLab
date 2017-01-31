@@ -37,16 +37,16 @@ args = parser.parse_args()
 if __name__ == "__main__":
     data = json.loads(args.list_resources)
     statuses = []
-    list_ec2_ids = []
+    list_instances_ids = []
     list_cluster_ids = []
     try:
         for i in data:
             if i.get('resource_type') == 'host':
-                list_ec2_ids.append(i.get('id'))
+                list_instances_ids.append(i.get('id'))
             elif i.get('resource_type') == 'cluster':
                 list_cluster_ids.append(i.get('id'))
-        data_ec2 = get_instance_status(list_ec2_ids)
-        statuses = get_cluster_status(list_cluster_ids, data_ec2)
+        data_ec2 = get_list_instance_statuses(list_instances_ids)
+        statuses = get_list_cluster_statuses(list_cluster_ids, data_ec2)
         with open('/root/result.json', 'w') as outfile:
             json.dump(statuses, outfile)
     except Exception as err:
