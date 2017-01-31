@@ -116,26 +116,25 @@ public class InfrastructureProvisionDAO extends BaseDAO {
      * @param exploratoryName the name of exploratory.
      * @exception DlabException
      */
-    public Optional<UserInstanceDTO> fetchExploratoryFields(String user, String exploratoryName) throws DlabException {
-        return findOne(USER_INSTANCES,
+    public UserInstanceDTO fetchExploratoryFields(String user, String exploratoryName) throws DlabException {
+
+        Optional<UserInstanceDTO> opt = findOne(USER_INSTANCES,
                 exploratoryCondition(user, exploratoryName),
                 fields(exclude(COMPUTATIONAL_RESOURCES)),
                 UserInstanceDTO.class);
+
+        if( opt.isPresent() ) {
+            return opt.get();
+        }
+        throw new DlabException(String.format("Exploratory instance for user {} with name {} not found.", user, exploratoryName));
     }
 
     /** Inserts the info about notebook into Mongo database.
      * @param dto the info about notebook 
-     * @return <b>true</b> if operation was successful, otherwise <b>false</b>.
      * @exception DlabException
      */
-    public boolean insertExploratory(UserInstanceDTO dto) throws DlabException {
-        try {
-            insertOne(USER_INSTANCES, dto);
-            return true;
-        } catch (MongoWriteException e) {
-        	// TODO: Lost error message
-            return false;
-        }
+    public void insertExploratory(UserInstanceDTO dto) throws DlabException {
+        insertOne(USER_INSTANCES, dto);
     }
 
     /** Updates the status of exploratory in Mongo database.

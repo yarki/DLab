@@ -178,8 +178,7 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 .withImageName("jupyter")
                 .withImageVersion("jupyter-2");
 
-        Boolean isInserted = dao.insertExploratory(instance1);
-        assertTrue(isInserted);
+        dao.insertExploratory(instance1);
 
         UserInstanceDTO instance2 = new UserInstanceDTO()
                 .withUser("user1")
@@ -189,15 +188,14 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 .withImageName("rstudio")
                 .withImageVersion("r-3");
 
-        Boolean isInserted2 = dao.insertExploratory(instance2);
-        assertTrue(isInserted2);
+        dao.insertExploratory(instance2);
 
-        Optional<UserInstanceDTO> testInstance = dao.fetchExploratoryFields("user1", "exp_name_2");
-        assertTrue(testInstance.isPresent());
-        assertEquals(instance2.getExploratoryId(), testInstance.get().getExploratoryId());
-        assertEquals(instance2.getStatus(), testInstance.get().getStatus());
-        assertEquals(instance2.getImageName(), testInstance.get().getImageName());
-        assertEquals(instance2.getImageVersion(), testInstance.get().getImageVersion());
+        UserInstanceDTO testInstance = dao.fetchExploratoryFields("user1", "exp_name_2");
+
+        assertEquals(instance2.getExploratoryId(), testInstance.getExploratoryId());
+        assertEquals(instance2.getStatus(), testInstance.getStatus());
+        assertEquals(instance2.getImageName(), testInstance.getImageName());
+        assertEquals(instance2.getImageVersion(), testInstance.getImageVersion());
     }
 
     @Test
@@ -210,8 +208,7 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 .withImageName("jupyter")
                 .withImageVersion("jupyter-2");
 
-        Boolean isInserted = dao.insertExploratory(instance1);
-        assertTrue(isInserted);
+        dao.insertExploratory(instance1);
 
         long insertedCount = mongoService.getCollection(USER_INSTANCES).count();
         assertEquals(insertedCount, 1L);
