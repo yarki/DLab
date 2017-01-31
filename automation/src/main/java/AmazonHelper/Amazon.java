@@ -46,7 +46,6 @@ public class Amazon {
             }
             
             return instances.get(0);
-  
     }
     
     public static void checkAmazonStatus(String instanceName, String expAmazonState) throws Exception {
