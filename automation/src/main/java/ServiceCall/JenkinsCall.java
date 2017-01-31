@@ -93,7 +93,7 @@ public class JenkinsCall {
         return buildNumber;
     }
 
-    public String getLastJenkinsJob(String jenkinsJobURL) throws Exception {
+    public String getJenkinsJob(String jenkinsJobURL) throws Exception {
         RestAssured.baseURI = jenkinsJobURL;
 
         getBuildNumber();
@@ -104,6 +104,12 @@ public class JenkinsCall {
     }
 
     public String getBuildNumber() throws Exception {
+    	buildNumber = PropertyValue.getJenkinsBuildNumber();
+        if (buildNumber != null) {
+            System.out.println("Jenkins build number is " + buildNumber);
+        	return buildNumber;
+    	}
+        
         String buildName = given()
                 .header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==")
                 .auth()
@@ -116,8 +122,10 @@ public class JenkinsCall {
         Matcher matcher = pattern.matcher(buildName);
         if(matcher.find()) {
             buildNumber = matcher.group().substring(2).trim();         
+        } else {
+        	throw new Exception("Jenkins job was failed. There is no buildNumber");
         }
-        else throw new Exception("Jenkins job was failed. There is no buildNumber");
+		PropertyValue.setJenkinsBuildNumber(buildNumber);
         System.out.println("Jenkins build number is " + buildNumber);
         return buildNumber;
     }
@@ -128,7 +136,7 @@ public class JenkinsCall {
         
     	//wait until job return build result     
         do {
-            buildResult = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config).
+        	buildResult = given().header("Authorization", "Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==").auth().form(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword(), config).
                 contentType(ContentType.JSON).
                 when(). 
                 get(buildNumber + "/api/json?pretty=true").getBody().jsonPath().getString("result");

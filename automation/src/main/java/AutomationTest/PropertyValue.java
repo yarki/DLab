@@ -34,6 +34,7 @@ public class PropertyValue {
 	public static final String TIMEOUT_EMR_CREATE="TIMEOUT_EMR_CREATE";
 	public static final String TIMEOUT_EMR_TERMINATE="TIMEOUT_EMR_TERMINATE";
 	
+	private static String jenkinsBuildNumber; 
 
     private static final Properties props = new Properties();
     
@@ -105,15 +106,15 @@ public class PropertyValue {
     }
     
     
-    public static final String getJenkinsUsername() {
+    public static String getJenkinsUsername() {
     	return get(JENKINS_USERNAME);
     }
     
-    public static final String getJenkinsPassword() {
+    public static String getJenkinsPassword() {
     	return get(JENKINS_PASSWORD);
     }
 
-    public static final String getUsername() {
+    public static String getUsername() {
     	return get(USERNAME);
     }
     
@@ -123,87 +124,98 @@ public class PropertyValue {
 		return (i == -1 ? s : s.substring(0, i));
 	}
 
-    public static final String getPassword() {
+    public static String getPassword() {
     	return get(PASSWORD);
     }
 
-    public static final String getNotIAMUsername() {
+    public static String getNotIAMUsername() {
     	return get(NOT_IAM_USERNAME);
     }
 
-    public static final String getNotIAMPassword() {
+    public static String getNotIAMPassword() {
     	return get(NOT_IAM_PASSWORD);
     }
 
-    public static final String getNotDLabUsername() {
+    public static String getNotDLabUsername() {
     	return get(NOT_DLAB_USERNAME);
     }
 
-    public static final String getNotDLabPassword() {
+    public static String getNotDLabPassword() {
     	return get(NOT_DLAB_PASSWORD);
     }
 
-    public static final String getJenkinsJobURL() {
+    public static String getJenkinsJobURL() {
     	return get(JENKINS_JOB_URL);
     }
 
-    public static final String getUserForActivateKey() {
+    public static String getUserForActivateKey() {
     	return get(USER_FOR_ACTIVATE_KEY);
     }
 
-    public static final String getPasswordForActivateKey() {
+    public static String getPasswordForActivateKey() {
     	return get(PASSWORD_FOR_ACTIVATE_KEY);
     }
 
-    public static final String getAccessKeyPrivFileName() {
+    public static String getAccessKeyPrivFileName() {
     	File file = new File(get(ACCESS_KEY_PRIV_FILE_NAME));
         return file.getAbsolutePath();
     }
 
-    public static final String getAccessKeyPubFileName() {
+    public static String getAccessKeyPubFileName() {
     	File file = new File(get(ACCESS_KEY_PUB_FILE_NAME));
         return file.getAbsolutePath();
     }
 
-    public static final String getAccessKeyPrivFileNameSSN() {
+    public static String getAccessKeyPrivFileNameSSN() {
         File file = new File(get(ACCESS_KEY_PRIV_FILE_NAME_SSN));
         return file.getAbsolutePath();
     }
 
 
 
-    public static final Duration getTimeoutJenkinsAutotest() {
+    public static Duration getTimeoutJenkinsAutotest() {
     	return getDuration(get(TIMEOUT_JENKINS_AUTOTEST, "0s"));
     }
 
-    public static final Duration getTimeoutUploadKey() {
+    public static Duration getTimeoutUploadKey() {
     	return getDuration(get(TIMEOUT_UPLOAD_KEY, "0s"));
     }
 
-    public static final Duration getTimeoutNotebookCreate() {
+    public static Duration getTimeoutNotebookCreate() {
     	return getDuration(get(TIMEOUT_NOTEBOOK_CREATE, "0s"));
     }
 
-    public static final Duration getTimeoutNotebookStartup() {
+    public static Duration getTimeoutNotebookStartup() {
     	return getDuration(get(TIMEOUT_NOTEBOOK_STARTUP, "0s"));
     }
 
-    public static final Duration getTimeoutNotebookShutdown() {
+    public static Duration getTimeoutNotebookShutdown() {
     	return getDuration(get(TIMEOUT_NOTEBOOK_SHUTDOWN, "0s"));
     }
 
-    public static final int getTimeoutNotebookTerminate() {
+    public static int getTimeoutNotebookTerminate() {
     	return get(TIMEOUT_NOTEBOOK_TERMINATE, 0);
     }
 
-    public static final Duration  getTimeoutEMRCreate() {
+    public static Duration  getTimeoutEMRCreate() {
     	return getDuration(get(TIMEOUT_EMR_CREATE, "0s"));
     }
 
-    public static final Duration getTimeoutEMRTerminate() {
+    public static Duration getTimeoutEMRTerminate() {
     	return getDuration(get(TIMEOUT_EMR_TERMINATE, "0s"));
     }
+    
+    public static String getJenkinsBuildNumber() {
+    	if (jenkinsBuildNumber == null || jenkinsBuildNumber.isEmpty()) {
+    		jenkinsBuildNumber = System.getProperty("jenkins.buildNumber");
+    		if (jenkinsBuildNumber != null && jenkinsBuildNumber.isEmpty()) {
+    			jenkinsBuildNumber = null;
+    		}
+    	}
+    	return jenkinsBuildNumber;
+    }
 
+    public static void setJenkinsBuildNumber(String jenkinsBuildNumber) {
+    	PropertyValue.jenkinsBuildNumber = jenkinsBuildNumber;
+    }
 }
-
-

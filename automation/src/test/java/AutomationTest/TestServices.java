@@ -73,14 +73,14 @@ public class TestServices {
 
         System.out.println("1. Looking for last Jenkins Job ...");
         JenkinsCall jenkins = new JenkinsCall(PropertyValue.getJenkinsUsername(), PropertyValue.getJenkinsPassword());
-        String buildNumber = jenkins.getLastJenkinsJob(PropertyValue.getJenkinsJobURL());
+        String buildNumber = jenkins.getJenkinsJob(PropertyValue.getJenkinsJobURL());
         System.out.println("   Jenkins Job found:");
+        System.out.println("Build number is: " + buildNumber);
         
         ssnURL = jenkins.getSsnURL().replaceAll(" ", "");
         serviceBaseName = jenkins.getServiceBaseName().replaceAll(" ", "");
         Assert.assertNotNull(ssnURL, "Jenkins URL was not generated");
         Assert.assertNotNull(serviceBaseName, "Service BaseName was not generated");
-        System.out.println("Build number is: " + buildNumber);
         System.out.println("JenkinsURL is: " + ssnURL);
         System.out.println("ServiceBaseName is: " + serviceBaseName);
 
