@@ -70,6 +70,7 @@ public class DlabProcess {
     }
 
     public CompletableFuture<ProcessInfo> start(ProcessId id, String... command){
+    	LOG.debug("Run OS command for user {} with UUID {}: {}", id.getUser(), id.getCommand(), command);
         CompletableFuture<ProcessInfo> future = processConveyor.createBuildFuture( id, ()-> new ProcessInfoBuilder(id,expirationTime) );
         processConveyor.add(id, future, ProcessStep.FUTURE);
         processConveyor.add(id, command, ProcessStep.START);

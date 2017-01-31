@@ -38,15 +38,11 @@ public class Amazon {
             
             if (reservations.size() == 0) {
             	throw new Exception("Instance "+ instanceName + " in Amazon not found");
-            } else if (reservations.size() > 1) {
-            	throw new Exception("Found many instances in Amazon for instance filter "+ instanceName);
             }
             
             List<Instance> instances = reservations.get(0).getInstances();
             if (instances.size() == 0) {
             	throw new Exception("Instance "+ instanceName + " in Amazon not found");
-            } else if (instances.size() > 1) {
-            	throw new Exception("Found many instances in Amazon for instance filter "+ instanceName);
             }
             
             return instances.get(0);

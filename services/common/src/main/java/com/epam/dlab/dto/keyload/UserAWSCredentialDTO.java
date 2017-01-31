@@ -25,6 +25,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserAWSCredentialDTO {
 	public static final String USER_OWN_BUCKET_NAME = "user_own_bicket_name";
 	
+    @JsonProperty("instance_id")
+    private String instanceId;
     @JsonProperty
     private String hostname;
     @JsonProperty("public_ip")
@@ -48,6 +50,10 @@ public class UserAWSCredentialDTO {
     @JsonProperty("edge_sg")
     private String edgeSG;
 
+    public String getInstanceId() {
+    	return instanceId;
+    }
+    
     public String getPublicIp() {
         return publicIp;
     }

@@ -32,39 +32,48 @@ public class SettingsDAO extends BaseDAO {
     }
 
     /** Returns the name of AWS region. */
-    public String getCredsRegion() {
-        return getSetting(CREDS_REGION);
+    public String getAwsRegion() {
+        return getSetting(AWS_REGION);
     }
 
     /** Returns the id of security group. */
-    public String getSecurityGroups() {
-        return getSetting(SECURITY_GROUPS);
+    public String getAwsSecurityGroups() {
+        return getSetting(AWS_SECURITY_GROUPS);
     }
 
     /** Returns the OS user name. */
-    public String getExploratorySshUser() {
-        return getSetting(EXPLORATORY_SSH_USER);
+    public String getConfOsUser() {
+        return getSetting(CONF_OS_USER);
+    }
+
+    /** Returns the name of OS family. */
+    public String getConfOsFamily() {
+        return getSetting(CONF_OS_FAMILY);
     }
 
     /** Returns the name of directory for user key. */
-    public String getCredsKeyDir() {
-        return getSetting(CREDS_KEY_DIRECTORY);
+    public String getConfKeyDir() {
+        return getSetting(CONF_KEY_DIRECTORY);
     }
 
     /** Returns the id of virtual private cloud for AWS account. */
-    public String getCredsVpcId() {
-        return getSetting(CREDS_VPC_ID);
+    public String getAwsVpcId() {
+        return getSetting(AWS_VPC_ID);
     }
 
     /** Returns the id of virtual private cloud subnet for AWS account. */
-    public String getCredsSubnetId() {
-        return getSetting(CREDS_SUBNET_ID);
+    public String getAwsSubnetId() {
+        return getSetting(AWS_SUBNET_ID);
     }
 
     /** Returns the value of property from Mongo database.
      * @param setting the name of property.
      */
     private String getSetting(MongoSetting setting) {
-        return mongoService.getCollection(SETTINGS).find(eq(ID, setting.getId())).first().getOrDefault(VALUE, EMPTY).toString();
+        return mongoService.getCollection(SETTINGS)
+        		.find(eq(ID, setting.getId()))
+        		.first()
+        		.getOrDefault(VALUE, EMPTY)
+        		.toString();
     }
 }

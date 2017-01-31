@@ -16,7 +16,7 @@ limitations under the License.
 
 ****************************************************************************/
 
-import {Pipe, PipeTransform} from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({ name: 'keys' })
 
