@@ -36,21 +36,32 @@ if __name__ == "__main__":
     print 'Generating infrastructure names and tags'
     edge_conf = dict()
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
-    edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
+    edge_conf['notebook_name'] = os.environ['notebook_instance_name']
     edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
 
-    logging.info('[STOP EDGE]')
-    print '[STOP EDGE]'
     try:
-        stop_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
-    except Exception as err:
-        append_result("Failed to stop edge. Exception: " + str(err))
+        logging.info('[START EDGE]')
+        print '[START EDGE]'
+        params = "--tag_name {} --nb_tag_value {}".format(edge_conf['tag_name'], edge_conf['notebook_name'])
+        try:
+            print "Starting notebook"
+            start_ec2(edge_conf['tag_name'], edge_conf['notebook_name'])
+        except Exception as err:
+            traceback.print_exc()
+            append_result("Failed to start notebook. Exception: " + str(err))
+            raise Exception
+    except:
         sys.exit(1)
 
     try:
+        addresses = get_instance_ip_address(edge_conf['instance_name'])
+        ip_address = addresses.get('Private')
+        public_ip_address = addresses.get('Public')
         with open("/root/result.json", 'w') as result:
-            res = {"Edge_name": edge_conf['instance_name'],
-                   "Action": "Stop edge server"}
+            res = {"Edge_name": edge_conf['notebook_name'],
+                   "public_ip": public_ip_address,
+                   "ip": ip_address,
+                   "Action": "Start up notebook server"}
             print json.dumps(res)
             result.write(json.dumps(res))
     except:
