@@ -15,6 +15,7 @@ import org.testng.Assert;
 import static com.jayway.restassured.RestAssured.given;
 
 public class JenkinsCall {
+	private static final long JENKINS_REQUEST_TIMEOUT = 5000;
     
     private String jenkinsUserName;
     private String jenkinsPassword;
@@ -56,7 +57,7 @@ public class JenkinsCall {
         long expiredTime = System.currentTimeMillis() + timeout;
         
     	while ((actualStatus = getQueueStatus()).endsWith("true")) {
-            Thread.sleep(1000);
+            Thread.sleep(JENKINS_REQUEST_TIMEOUT);
             if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
             	actualStatus = getQueueStatus();
             	break;
@@ -135,7 +136,7 @@ public class JenkinsCall {
             	if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
             		throw new Exception("Timeout has been expired for Jenkins build. Timeout is " + PropertyValue.getTimeoutJenkinsAutotest());
             	}
-            	Thread.sleep(1000);
+            	Thread.sleep(JENKINS_REQUEST_TIMEOUT);
             }
         } while (buildResult == null);
         

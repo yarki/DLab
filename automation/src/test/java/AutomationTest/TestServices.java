@@ -36,13 +36,12 @@ import ServiceCall.JenkinsCall;
 
 @Test(singleThreaded=true)
 public class TestServices {
+    private final static Logger logger = Logger.getLogger(TestServices.class.getName());
+    private final static long SSN_REQUEST_TIMEOUT = 10000; 
 
-    private String serviceBaseName;
+	private String serviceBaseName;
     private String ssnURL;
     private String publicIp;
-
-    private final static Logger logger = Logger.getLogger(TestServices.class.getName());
-
 
     @BeforeClass
     public static void Setup() throws InterruptedException {
@@ -86,12 +85,7 @@ public class TestServices {
         System.out.println("ServiceBaseName is: " + serviceBaseName);
 
         System.out.println("Check status of SSN node on Amazon:");
-        DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(serviceBaseName + "-ssn");
-        Instance ssnInstance = describeInstanceResult
-            	.getReservations()
-            	.get(0)
-            	.getInstances()
-            	.get(0);
+        Instance ssnInstance = Amazon.getInstance(serviceBaseName + "-ssn");
         InstanceState instanceState = ssnInstance.getState();
         publicIp = ssnInstance.getPublicIpAddress();
         System.out.println("Public Ip is: " + publicIp);
@@ -217,11 +211,7 @@ public class TestServices {
         Docker.checkDockerStatus(nodePrefix + "_create_exploratory_NotebookAutoTest", publicIp);
         
         //get notebook IP
-        DescribeInstancesResult describeInstanceResult = Amazon.getInstanceResult(amazonNodePrefix + "-nb-" + noteBookName);
-        String notebookIp = describeInstanceResult.getReservations()
-        		.get(0)
-        		.getInstances()
-        		.get(0)
+        String notebookIp = Amazon.getInstance(amazonNodePrefix + "-nb-" + noteBookName)
         		.getPrivateIpAddress();
         
         System.out.println("8. EMR will be deployed ...");
@@ -301,7 +291,7 @@ public class TestServices {
 
         System.out.println("11. New EMR will be deployed for termination ...");
         final String emrNewName = "New" + emrName; 
-        deployEMR.setEmr_instance_count("1");
+        deployEMR.setEmr_instance_count("2");
         deployEMR.setEmr_master_instance_type("m4.large");
         deployEMR.setEmr_slave_instance_type("m4.large");
         deployEMR.setEmr_version(emrVersion);
@@ -313,9 +303,18 @@ public class TestServices {
         Assert.assertEquals(responseDeployingEMRNew.statusCode(), HttpStatusCode.OK);
         
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
-        if (!gettingStatus.contains("running"))
+        if (!gettingStatus.contains("configuring"))
             throw new Exception("New EMR " + emrNewName + " has not been deployed");
         System.out.println("    New EMR " + emrNewName + " has been deployed");
+        
+        System.out.println("   Waiting until EMR has been configured ...");
+        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "configuring", PropertyValue.getTimeoutEMRCreate());
+        if (!gettingStatus.contains("running"))
+            throw new Exception("EMR " + emrNewName + " has not been configured");
+        System.out.println("   EMR " + emrNewName + " has been configured");
+
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName, AmazonInstanceState.RUNNING);
+        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
 
         System.out.println("    New EMR will be terminated ...");
         final String ssnTerminateEMRURL = getSnnURL(Path.getTerminateEMRUrl(noteBookName, emrNewName));
@@ -380,11 +379,7 @@ public class TestServices {
     }
     
     private static String getEmrClusterName(String emrName) throws Exception {
-        Instance instance = Amazon.getInstanceResult(emrName)
-        		.getReservations()
-        		.get(0)
-        		.getInstances()
-        		.get(0);
+        Instance instance = Amazon.getInstance(emrName);
         for (Tag tag : instance.getTags()) {
 			if (tag.getKey().equals("Name")) {
 		        return tag.getValue();
@@ -495,7 +490,7 @@ public class TestServices {
                 actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode();
                 break;
             }
-            Thread.sleep(1000);
+            Thread.sleep(SSN_REQUEST_TIMEOUT);
         }
 
         if (actualStatus != HttpStatusCode.OK) {
@@ -521,7 +516,7 @@ public class TestServices {
                 actualStatus = request.webApiGet(url, token).getStatusCode();
                 break;
             }
-            Thread.sleep(1000);
+            Thread.sleep(SSN_REQUEST_TIMEOUT);
         }
 
         if (actualStatus == status) {
@@ -549,7 +544,7 @@ public class TestServices {
                 actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath);
                 break;
             }
-            Thread.sleep(1000);
+            Thread.sleep(SSN_REQUEST_TIMEOUT);
         }
 
         if (actualStatus.contains(status)) {
