@@ -44,4 +44,4 @@ export const routes: Routes = [{
 //     path: 'environment_health_status',
 //     loadChildren: 'app/health-status/health-status.module#HealthStatusModule',
 //     canActivate: [AuthorizationGuard]
-//   },
+//  }
