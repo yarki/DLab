@@ -27,6 +27,4 @@ import './operators';
 
 })
 
-export class AppComponent {
-
-}
+export class AppComponent { }

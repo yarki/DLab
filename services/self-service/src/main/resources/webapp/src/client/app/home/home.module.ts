@@ -20,6 +20,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HomeComponent } from './home.component';
+import { NavbarModule } from './../shared/navbar/index';
 import { ModalModule } from './../components/modal/index';
 import { ResourcesGridModule } from './../components/resources-grid/index';
 import { ProgressDialogModule } from './../components/progress-dialog/index';
@@ -37,6 +38,7 @@ import { routing } from './home.routes';
     UploadKeyDialogModule,
     ExploratoryEnvironmentCreateDialogModule,
     RouterModule,
+    NavbarModule,
     routing
   ],
   declarations: [HomeComponent],
