@@ -19,7 +19,7 @@ limitations under the License.
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { ApplicationServiceFacade } from './applicationServiceFacade.service';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class UserResourceService {
