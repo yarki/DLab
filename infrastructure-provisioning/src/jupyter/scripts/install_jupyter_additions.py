@@ -33,6 +33,24 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 parser.add_argument('--os_user', type=str, default='')
 args = parser.parse_args()
 
+s3_jars_dir = '/opt/jars/'
+
+
+def add_breeze_library_local():
+    breeze_tmp_dir = '/tmp/breeze_tmp_local/'
+    sudo('mkdir -p ' + breeze_tmp_dir)
+    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze_2.11/0.12/breeze_2.11-0.12.jar -O ' +
+         breeze_tmp_dir + 'breeze_2.11-0.12.jar')
+    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-natives_2.11/0.12/breeze-natives_2.11-0.12.jar -O ' +
+         breeze_tmp_dir + 'breeze-natives_2.11-0.12.jar')
+    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-viz_2.11/0.12/breeze-viz_2.11-0.12.jar -O ' +
+         breeze_tmp_dir + 'breeze-viz_2.11-0.12.jar')
+    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-macros_2.11/0.12/breeze-macros_2.11-0.12.jar -O ' +
+         breeze_tmp_dir + 'breeze-macros_2.11-0.12.jar')
+    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-parent_2.11/0.12/breeze-parent_2.11-0.12.jar -O ' +
+         breeze_tmp_dir + 'breeze-parent_2.11-0.12.jar')
+    sudo('mv ' + breeze_tmp_dir + '* ' + s3_jars_dir)
+
 
 def ensure_libraries_py3(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/ensure_libraries_py3_installed'):
@@ -44,6 +62,7 @@ def ensure_libraries_py3(os_user):
             sudo('touch /home/' + os_user + '/.ensure_dir/ensure_libraries_py3_installed')
         except:
             sys.exit(1)
+
 
 ##############
 # Run script #
@@ -66,3 +85,6 @@ if __name__ == "__main__":
 
     print "Installing notebook additions: sbt."
     ensure_sbt(args.os_user)
+
+    print "Installing Breeze library"
+    add_breeze_library_local()
