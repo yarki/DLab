@@ -302,10 +302,10 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         try {
             Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus());
         	if (dto.getUptime() != null) {
-        		values.append(UPTIME, dto.getUptime());
+        		values.append(computationalFieldFilter(UPTIME), dto.getUptime());
         	}
         	if (dto.getInstanceId() != null) {
-        		values.append(INSTANCE_ID, dto.getInstanceId());
+        		values.append(computationalFieldFilter(INSTANCE_ID), dto.getInstanceId());
         	}
         	if (dto.getComputationalId() != null) {
                 values.append(computationalFieldFilter(COMPUTATIONAL_ID), dto.getComputationalId());

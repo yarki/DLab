@@ -18,7 +18,7 @@ limitations under the License.
 
 import { Injectable } from '@angular/core';
 import { Http, Response, RequestOptions, RequestMethod, Headers } from '@angular/http';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import { Dictionary } from '../util/collections/dictionary/dictionary';
 
 @Injectable()

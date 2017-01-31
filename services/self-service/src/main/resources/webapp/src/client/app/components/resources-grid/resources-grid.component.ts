@@ -120,7 +120,7 @@ export class ResourcesGrid implements OnInit {
 
     this.updateUserPreferences(config);
     config.type = '';
-    
+
     this.filteredEnvironments = filteredData;
   }
 

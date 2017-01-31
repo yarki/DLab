@@ -74,7 +74,7 @@ public class ComputationalResource implements DockerCommands {
     @Path("/create")
     @POST
     public String create(@Auth UserInfo ui, ComputationalCreateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("create computational resources cluster");
+    	LOGGER.debug("Create computational resources {} for user {}: {}", dto.getComputationalName(), ui.getName(), dto);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
@@ -110,7 +110,7 @@ public class ComputationalResource implements DockerCommands {
     @Path("/configure")
     @POST
     public String configure(@Auth UserInfo ui, ComputationalConfigDTO dto) throws IOException, InterruptedException {
-    	LOGGER.debug("Configure computational resources {} for user {}", dto.getComputationalName(), ui.getName());
+    	LOGGER.debug("Configure computational resources {} for user {}: {}", dto.getComputationalName(), ui.getName(), dto);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(
         		configuration.getImagesDirectory(),
@@ -142,7 +142,7 @@ public class ComputationalResource implements DockerCommands {
     @Path("/terminate")
     @POST
     public String terminate(@Auth UserInfo ui, ComputationalTerminateDTO dto) throws IOException, InterruptedException {
-        LOGGER.debug("terminate computational resources cluster");
+    	LOGGER.debug("Terminate computational resources {} for user {}: {}", dto.getComputationalName(), ui.getName(), dto);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
