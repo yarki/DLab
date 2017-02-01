@@ -36,29 +36,28 @@ if __name__ == "__main__":
     print 'Generating infrastructure names and tags'
     edge_conf = dict()
     edge_conf['service_base_name'] = os.environ['conf_service_base_name']
-    edge_conf['notebook_name'] = os.environ['notebook_instance_name']
+    edge_conf['instance_name'] = edge_conf['service_base_name'] + "-" + os.environ['edge_user_name'] + '-edge'
     edge_conf['tag_name'] = edge_conf['service_base_name'] + '-Tag'
 
+    logging.info('[START EDGE]')
+    print '[START EDGE]'
     try:
-        logging.info('[START EDGE]')
-        print '[START EDGE]'
-        params = "--tag_name {} --nb_tag_value {}".format(edge_conf['tag_name'], edge_conf['notebook_name'])
-        try:
-            print "Starting notebook"
-            start_ec2(edge_conf['tag_name'], edge_conf['notebook_name'])
-        except Exception as err:
-            traceback.print_exc()
-            append_result("Failed to start notebook. Exception: " + str(err))
-            raise Exception
+        start_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
+    except Exception as err:
+        append_result("Failed to start edge. Exception: " + str(err))
+        sys.exit(1)
+
     except:
         sys.exit(1)
 
     try:
+        instance_hostname = get_instance_hostname(edge_conf['instance_name'])
         addresses = get_instance_ip_address(edge_conf['instance_name'])
         ip_address = addresses.get('Private')
         public_ip_address = addresses.get('Public')
         with open("/root/result.json", 'w') as result:
-            res = {"Edge_name": edge_conf['notebook_name'],
+            res = {"edge_name": edge_conf['notebook_name'],
+                   "hostname": instance_hostname,
                    "public_ip": public_ip_address,
                    "ip": ip_address,
                    "Action": "Start up notebook server"}

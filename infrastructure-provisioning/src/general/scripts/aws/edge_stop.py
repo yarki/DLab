@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     try:
         with open("/root/result.json", 'w') as result:
-            res = {"Edge_name": edge_conf['instance_name'],
+            res = {"edge_name": edge_conf['instance_name'],
                    "Action": "Stop edge server"}
             print json.dumps(res)
             result.write(json.dumps(res))
