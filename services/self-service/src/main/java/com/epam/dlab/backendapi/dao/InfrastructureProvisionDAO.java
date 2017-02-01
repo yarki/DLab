@@ -130,7 +130,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     }
 
     /** Inserts the info about notebook into Mongo database.
-     * @param dto the info about notebook 
+     * @param dto the info about notebook
      * @exception DlabException
      */
     public void insertExploratory(UserInstanceDTO dto) throws DlabException {

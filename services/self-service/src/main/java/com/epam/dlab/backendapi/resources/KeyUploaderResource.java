@@ -91,10 +91,9 @@ public class KeyUploaderResource {
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response post(@Auth UserInfo userInfo,
+    public Response uploadKey(@Auth UserInfo userInfo,
                          @FormDataParam("file") InputStream uploadedInputStream,
                          @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException, DlabException {
-    	// TODO: Check for not user parameter fileDetail. Handle exceptions.
         LOGGER.debug("Upload the key for user {}", userInfo.getName());
         String content;
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {

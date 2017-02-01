@@ -25,10 +25,10 @@ import { AuthorizationGuard } from './security/authorization.guard';
 
 export const routes: Routes = [{
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'resources_list',
     pathMatch: 'full'
   }, {
-    path: 'dashboard',
+    path: 'resources_list',
     component: HomeComponent,
     canActivate: [AuthorizationGuard]
   }, {
@@ -36,8 +36,16 @@ export const routes: Routes = [{
     component: LoginComponent
   }, {
     path: 'help/accessnotebookguide',
-    component: AccessNotebookGuide
+    component: AccessNotebookGuide,
+    canActivate: [AuthorizationGuard]
   }, {
     path: 'help/publickeyguide',
-    component: PublicKeyGuide
+    component: PublicKeyGuide,
+    canActivate: [AuthorizationGuard]
   }];
+
+// {
+//     path: 'environment_health_status',
+//     loadChildren: 'app/health-status/health-status.module#HealthStatusModule',
+//     canActivate: [AuthorizationGuard]
+//  }

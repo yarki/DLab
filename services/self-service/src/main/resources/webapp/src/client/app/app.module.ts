@@ -23,12 +23,13 @@ import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
 
-import { LocationStrategy, HashLocationStrategy } from '@angular/common';
-import { AuthorizationGuard } from './security/authorization.guard';
-import { LoginModule } from './login/login.module';
 import { HomeModule } from './home/home.module';
+import { LoginModule } from './login/login.module';
 import { AccessNotebookGuideModule } from './help/accessnotebookguide/accessnotebookguide.module';
 import { PublicKeyGuideModule } from './help/publickeyguide/publickeyguide.module';
+
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { AuthorizationGuard } from './security/authorization.guard';
 import { FormsModule } from '@angular/forms';
 import { UserAccessKeyService } from './services/userAccessKey.service';
 import { AppRoutingService } from './routing/appRouting.service';
@@ -42,9 +43,9 @@ import { ApplicationSecurityService } from './services/applicationSecurity.servi
     BrowserModule,
     HttpModule,
     RouterModule.forRoot(routes, { useHash: true }),
-    LoginModule,
-    HomeModule,
     FormsModule,
+    HomeModule,
+    LoginModule,
     AccessNotebookGuideModule,
     PublicKeyGuideModule
   ],
@@ -69,5 +70,4 @@ import { ApplicationSecurityService } from './services/applicationSecurity.servi
   ],
   bootstrap: [AppComponent]
 })
-
 export class AppModule { }

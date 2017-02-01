@@ -35,6 +35,8 @@ export class ApplicationServiceFacade {
   private static readonly COMPUTATIONAL_RESOURCES = 'computational_resources';
   private static readonly COMPUTATIONAL_RESOURCES_LIMITS = 'computational_resources_limits';
   private static readonly USER_PREFERENCES = 'user_preferences';
+  private static readonly HEALTH_STATUS_STATE = 'health_status_state';
+  private static readonly ENVIRONMENT_HEALTH_STATUSES = 'environment_health_statuses';
   private accessTokenKey: string = 'access_token';
   private requestRegistry: Dictionary<string>;
 
@@ -154,6 +156,19 @@ export class ApplicationServiceFacade {
       this.getRequestOptions(true, true));
   }
 
+  public buildGetEnvironmentHealthStatus(): Observable<Response> {
+    return this.buildRequest(RequestMethod.Get,
+      this.requestRegistry.Item(ApplicationServiceFacade.HEALTH_STATUS_STATE),
+      null,
+      this.getRequestOptions(true, true));
+  }
+
+  public buildGetEnvironmentStatuses(): Observable<Response> {
+    return this.buildRequest(RequestMethod.Get,
+      this.requestRegistry.Item(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUSES),
+      null,
+      this.getRequestOptions(true, true));
+  }
 
   private setupRegistry(): void {
     this.requestRegistry = new Dictionary<string>();
@@ -183,6 +198,10 @@ export class ApplicationServiceFacade {
 
     // Filtering Configuration
     this.requestRegistry.Add(ApplicationServiceFacade.USER_PREFERENCES, '/api/user/settings');
+
+    // Environment Health Status
+    this.requestRegistry.Add(ApplicationServiceFacade.HEALTH_STATUS_STATE, 'app/health-status/data_status.json');
+    this.requestRegistry.Add(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUSES, 'app/health-status/data.json');
   }
 
   private buildRequest(method: RequestMethod, url: string, body: any, opt: RequestOptions): Observable<Response> {
