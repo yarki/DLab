@@ -25,6 +25,8 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryURL;
 import com.epam.dlab.exceptions.DlabException;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.result.UpdateResult;
 import org.junit.*;
 
@@ -34,6 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static com.epam.dlab.backendapi.dao.BaseDAO.USER;
+import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.EXPLORATORY_NAME;
 import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.exploratoryCondition;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static junit.framework.TestCase.*;
@@ -50,8 +54,15 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
     @Before
     public void setup() {
         cleanup();
+
+        mongoService.createCollection(USER_INSTANCES);
+        mongoService.getCollection(USER_INSTANCES).createIndex(new BasicDBObject(USER, 1).append(EXPLORATORY_NAME, 2),
+                new IndexOptions().unique(true));
+
+
         dao = new InfrastructureProvisionDAO();
         testInjector.injectMembers(dao);
+
     }
 
     @BeforeClass
@@ -211,7 +222,7 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         dao.insertExploratory(instance1);
 
         long insertedCount = mongoService.getCollection(USER_INSTANCES).count();
-        assertEquals(insertedCount, 1L);
+        assertEquals(1,insertedCount);
 
         Optional<UserInstanceDTO> testInstance = dao.findOne(USER_INSTANCES,
                 exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
