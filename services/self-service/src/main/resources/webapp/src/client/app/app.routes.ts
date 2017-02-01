@@ -17,27 +17,31 @@ limitations under the License.
 ****************************************************************************/
 
 import { Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-import { LoginComponent } from './login/login.component';
-import { AccessNotebookGuide } from './help/accessnotebookguide/accessnotebookguide.component';
-import { PublicKeyGuide } from './help/publickeyguide/publickeyguide.component';
 import { AuthorizationGuard } from './security/authorization.guard';
 
 export const routes: Routes = [{
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'resources_list',
     pathMatch: 'full'
   }, {
-    path: 'dashboard',
-    component: HomeComponent,
+    path: 'resources_list',
+    loadChildren: 'app/home/home.module#HomeModule',
     canActivate: [AuthorizationGuard]
   }, {
     path: 'login',
-    component: LoginComponent
+    loadChildren: 'app/login/login.module#LoginModule'
   }, {
     path: 'help/accessnotebookguide',
-    component: AccessNotebookGuide
+    loadChildren: 'app/help/accessnotebookguide/accessnotebookguide.module#AccessNotebookGuideModule',
+    canActivate: [AuthorizationGuard]
   }, {
     path: 'help/publickeyguide',
-    component: PublicKeyGuide
+    loadChildren: 'app/help/publickeyguide/publickeyguide.module#PublicKeyGuideModule',
+    canActivate: [AuthorizationGuard]
   }];
+
+// {
+//     path: 'environment_health_status',
+//     loadChildren: 'app/health-status/health-status.module#HealthStatusModule',
+//     canActivate: [AuthorizationGuard]
+//  }

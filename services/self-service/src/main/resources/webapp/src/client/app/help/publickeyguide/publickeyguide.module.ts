@@ -18,13 +18,14 @@ limitations under the License.
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { PublicKeyGuide } from './publickeyguide.component';
 import { NavbarModule } from './../../shared/navbar/index';
+import { routing  } from './publickeyguide.routes';
 
 @NgModule({
-  imports: [CommonModule, NavbarModule],
+  imports: [CommonModule, RouterModule, NavbarModule, routing],
   declarations: [PublicKeyGuide],
   exports: [PublicKeyGuide]
 })
-
 export class PublicKeyGuideModule { }

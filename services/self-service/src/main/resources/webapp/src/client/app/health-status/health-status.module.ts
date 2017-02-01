@@ -16,15 +16,16 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component } from '@angular/core';
-import { Config } from './shared/config/env.config';
-import './operators';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { routing  } from './health-status.routes';
 
-@Component({
-  moduleId: module.id,
-  selector: 'sd-app',
-  templateUrl: 'app.component.html',
+import { HealthStatusComponent } from './health-status.component';
 
+@NgModule({
+    imports: [CommonModule, RouterModule, routing],
+    declarations: [HealthStatusComponent],
+    exports: [HealthStatusComponent]
 })
-
-export class AppComponent { }
+export class HealthStatusModule { }

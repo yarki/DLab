@@ -591,3 +591,43 @@ def get_instance_status(instance_name):
         inst = i.get('Instances')
         for j in inst:
             return j.get('State').get('Name')
+
+
+def get_list_instance_statuses(instance_ids):
+    data = []
+    client = boto3.client('ec2')
+    for h in instance_ids:
+        host = {}
+        try:
+            response = client.describe_instances(InstanceIds=[h]).get('Reservations')
+            for i in response:
+                inst = i.get('Instances')
+                for j in inst:
+                    host['resource_type'] = 'host'
+                    host['id'] = j.get('InstanceId')
+                    host['state'] = j.get('State').get('Name')
+                    data.append(host)
+        except:
+            host['resource_type'] = 'host'
+            host['id'] = h
+            host['state'] = 'unavailable'
+            data.append(host)
+    return data
+
+
+def get_list_cluster_statuses(cluster_ids, data=[]):
+    client = boto3.client('emr')
+    for i in cluster_ids:
+        host = {}
+        try:
+            response = client.describe_cluster(ClusterId=i).get('Cluster')
+            host['resource_type'] = 'cluster'
+            host['id'] = i
+            host['state'] = response.get('Status').get('State').lower()
+            data.append(host)
+        except:
+            host['resource_type'] = 'cluster'
+            host['id'] = i
+            host['state'] = 'unavailable'
+            data.append(host)
+    return data
