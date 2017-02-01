@@ -55,6 +55,12 @@ if __name__ == "__main__":
         addresses = get_instance_ip_address(edge_conf['instance_name'])
         ip_address = addresses.get('Private')
         public_ip_address = addresses.get('Public')
+        print '[SUMMARY]'
+        logging.info('[SUMMARY]')
+        print "Instance name: " + edge_conf['instance_name']
+        print "Hostname: " + instance_hostname
+        print "Public IP: " + public_ip_address
+        print "Private IP: " + ip_address
         with open("/root/result.json", 'w') as result:
             res = {"edge_name": edge_conf['notebook_name'],
                    "hostname": instance_hostname,
