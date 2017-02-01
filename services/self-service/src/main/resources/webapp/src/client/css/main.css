@@ -126,7 +126,8 @@ body {
   color: #f7b500;
 }
 
-.creating {
+.creating,
+.configuring {
   color: #35afd5;
 }
 

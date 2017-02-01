@@ -74,10 +74,10 @@ public class InfrastructureProvisionResource implements DockerAPI {
         LOGGER.debug("Loading list of provisioned resources for user {}", userInfo.getName());
         try {
         	Iterable<Document> documents = appendEdgeInfo(dao.find(userInfo.getName()), userInfo.getName());
-        	documents.forEach(d -> {
-        		int i = 0;
-        		LOGGER.debug("Notebook[{}]: {}", ++i, d);
-        		});
+    		int i = 0;
+    		for (Document d : documents) {
+    			LOGGER.debug("Notebook[{}]: {}", ++i, d);
+			}
     		return documents;
         } catch (Throwable t) {
         	LOGGER.error("Could not load list of provisioned resources for user: {}", userInfo.getName(), t);
@@ -92,21 +92,6 @@ public class InfrastructureProvisionResource implements DockerAPI {
                 		.append(EDGE_IP, cred.getPublicIp())
                 		.append(UserAWSCredentialDTO.USER_OWN_BUCKET_NAME, cred.getUserOwnBucketName()))
                 .collect(Collectors.toList());
-    }
-
-    /** Returns the list of the shapes for user.
-     * @param userInfo user info.
-     */
-    @GET
-    @Path("/computational_resources_shapes")
-    public Iterable<Document> getShapes(@Auth UserInfo userInfo) {
-        LOGGER.debug("Loading list of shapes for user {}", userInfo.getName());
-        try {
-        	return dao.findShapes();
-        } catch (Throwable t) {
-        	LOGGER.error("Could not load list of shapes for user: {}", userInfo.getName(), t);
-            throw new DlabException("Could not load list of shapes for user " + userInfo.getName() + ": " + t.getLocalizedMessage(), t);
-        }
     }
 
     /** Returns the list of the computational resources templates for user.

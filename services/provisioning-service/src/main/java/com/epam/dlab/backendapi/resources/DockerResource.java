@@ -22,7 +22,6 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.ICommandExecutor;
 import com.epam.dlab.backendapi.core.MetadataHolder;
-import com.epam.dlab.backendapi.core.commands.CommandBuilder;
 import com.epam.dlab.backendapi.core.commands.DockerCommands;
 import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
@@ -50,9 +49,6 @@ public class DockerResource implements DockerCommands {
     private MetadataHolder metadataHolder;
     @Inject
     private ICommandExecutor commandExecuter;
-
-    @Inject
-    private CommandBuilder commandBuilder;
 
     @GET
     @Path("{type}")
