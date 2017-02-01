@@ -599,18 +599,17 @@ def get_list_instance_statuses(instance_ids):
     for h in instance_ids:
         host = {}
         try:
-            response = client.describe_instances(InstanceIds=[h]).get('Reservations')
+            response = client.describe_instances(InstanceIds=[h.get('id')]).get('Reservations')
             for i in response:
                 inst = i.get('Instances')
                 for j in inst:
-                    host['resource_type'] = 'host'
                     host['id'] = j.get('InstanceId')
                     host['state'] = j.get('State').get('Name')
                     data.append(host)
         except:
             host['resource_type'] = 'host'
-            host['id'] = h
-            host['state'] = 'unavailable'
+            host['id'] = h.get('id')
+            host['state'] = 'terminated'
             data.append(host)
     return data
 
@@ -620,14 +619,17 @@ def get_list_cluster_statuses(cluster_ids, data=[]):
     for i in cluster_ids:
         host = {}
         try:
-            response = client.describe_cluster(ClusterId=i).get('Cluster')
-            host['resource_type'] = 'cluster'
-            host['id'] = i
-            host['state'] = response.get('Status').get('State').lower()
+            response = client.describe_cluster(ClusterId=i.get('id')).get('Cluster')
+            host['id'] = i.get('id')
+            if response.get('Status').get('State').lower() == 'waiting':
+                host['state'] = 'running'
+            elif response.get('Status').get('State').lower() == 'running':
+                host['state'] = 'configuring'
+            else:
+                host['state'] = response.get('Status').get('State').lower()
             data.append(host)
         except:
-            host['resource_type'] = 'cluster'
-            host['id'] = i
-            host['state'] = 'unavailable'
+            host['id'] = i.get('id')
+            host['state'] = 'terminated'
             data.append(host)
     return data
