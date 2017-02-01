@@ -3,6 +3,8 @@ package AutomationTest;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -15,6 +17,7 @@ import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Tag;
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
@@ -202,7 +205,7 @@ public class TestServices {
         System.out.println("   responseCreateNotebook.getBody() is " + responseCreateNotebook.getBody().asString());
         Assert.assertEquals(responseCreateNotebook.statusCode(), HttpStatusCode.OK);
 
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "creating", PropertyValue.getTimeoutNotebookCreate());
+        gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, noteBookName, "creating", PropertyValue.getTimeoutNotebookCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("Notebook " + noteBookName + " has not been created");
         System.out.println("   Notebook " + noteBookName + " has been created");
@@ -231,7 +234,7 @@ public class TestServices {
         System.out.println("   responseDeployingEMR.getBody() is " + responseDeployingEMR.getBody().asString());
         Assert.assertEquals(responseDeployingEMR.statusCode(), HttpStatusCode.OK);
 
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "creating", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("configuring"))
             throw new Exception("EMR " + emrName + " has not been deployed");
         System.out.println("   EMR " + emrName + " has been deployed");
@@ -241,7 +244,7 @@ public class TestServices {
         
         System.out.println("   Waiting until EMR has been configured ...");
 
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "configuring", PropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "configuring", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("EMR " + emrName + " has not been configured");
         System.out.println("   EMR " + emrName + " has been configured");
@@ -264,11 +267,16 @@ public class TestServices {
         System.out.println("   responseStopNotebook.getBody() is " + responseStopNotebook.getBody().asString());
         Assert.assertEquals(responseStopNotebook.statusCode(), HttpStatusCode.OK);
         
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "stopping", PropertyValue.getTimeoutNotebookShutdown());
+        gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, noteBookName, "stopping", PropertyValue.getTimeoutNotebookShutdown());
         if (!gettingStatus.contains("stopped"))
             throw new Exception("Notebook " + noteBookName + " has not been stopped");
         System.out.println("   Notebook " + noteBookName + " has been stopped");
-        gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath().getString("computational_resources.status");
+        gettingStatus = getEmrStatus(
+        					new HttpRequest()
+        						.webApiGet(ssnProUserResURL, token)
+        						.getBody()
+        						.jsonPath(),
+        					noteBookName, emrName);
 
         if (!gettingStatus.contains("terminated"))
             throw new Exception("Computational resources has not been terminated for Notebook " + noteBookName);
@@ -284,7 +292,7 @@ public class TestServices {
         System.out.println("    respStartNotebook.getBody() is " + respStartNotebook.getBody().asString());
         Assert.assertEquals(respStartNotebook.statusCode(), HttpStatusCode.OK);
         
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "starting", PropertyValue.getTimeoutNotebookStartup());
+        gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, noteBookName, "starting", PropertyValue.getTimeoutNotebookStartup());
         if (!gettingStatus.contains("running"))
             throw new Exception("Notebook " + noteBookName + " has not been started");
         System.out.println("    Notebook " + noteBookName + " has been started");
@@ -305,13 +313,13 @@ public class TestServices {
         System.out.println("    responseDeployingEMRNew.getBody() is " + responseDeployingEMRNew.getBody().asString());
         Assert.assertEquals(responseDeployingEMRNew.statusCode(), HttpStatusCode.OK);
         
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "creating", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("configuring"))
             throw new Exception("New EMR " + emrNewName + " has not been deployed");
         System.out.println("    New EMR " + emrNewName + " has been deployed");
         
         System.out.println("   Waiting until EMR has been configured ...");
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "configuring", PropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "configuring", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("EMR " + emrNewName + " has not been configured");
         System.out.println("   EMR " + emrNewName + " has been configured");
@@ -328,7 +336,7 @@ public class TestServices {
         System.out.println("    respTerminateEMR.getBody() is " + respTerminateEMR.getBody().asString());
         Assert.assertEquals(respTerminateEMR.statusCode(), HttpStatusCode.OK);
         
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "terminating", PropertyValue.getTimeoutEMRTerminate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "terminating", PropertyValue.getTimeoutEMRTerminate());
         if (!gettingStatus.contains("terminated"))
             throw new Exception("New EMR " + emrNewName + " has not been terminated");
         System.out.println("    New EMR " + emrNewName + " has been terminated");
@@ -353,7 +361,7 @@ public class TestServices {
         System.out.println("    responseDeployingEMRAnotherNew.getBody() is " + responseDeployingEMRAnotherNew.getBody().asString());
         Assert.assertEquals(responseDeployingEMRAnotherNew.statusCode(), HttpStatusCode.OK);
         
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "creating", PropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "creating", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("New emr " + emrNewName2 + " has not been deployed");
         System.out.println("    New emr " + emrNewName2 + " has been deployed");
@@ -364,13 +372,16 @@ public class TestServices {
         System.out.println("    respTerminateNotebook.getBody() is " + respTerminateNotebook.getBody().asString());
         Assert.assertEquals(respTerminateNotebook.statusCode(), HttpStatusCode.OK);
         
-        gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "terminating", PropertyValue.getTimeoutEMRTerminate());
+        gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, noteBookName, "terminating", PropertyValue.getTimeoutEMRTerminate());
         if (!gettingStatus.contains("terminated"))
             throw new Exception("Notebook" + noteBookName + " has not been terminated");
 
-        gettingStatus = new HttpRequest().webApiGet(ssnProUserResURL, token).getBody().jsonPath()
-
-            .getString("computational_resources.status");
+        gettingStatus = getEmrStatus(
+				new HttpRequest()
+					.webApiGet(ssnProUserResURL, token)
+					.getBody()
+					.jsonPath(),
+				noteBookName, emrNewName2);
         if (!gettingStatus.contains("terminated"))
             throw new Exception("EMR has not been terminated for Notebook " + noteBookName);
         System.out.println("    EMR has been terminated for Notebook " + noteBookName);
@@ -491,7 +502,6 @@ public class TestServices {
 
         while ((actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode()) != HttpStatusCode.OK) {
             if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
-                actualStatus = request.webApiGet(ssnURL, ContentType.TEXT).statusCode();
                 break;
             }
             Thread.sleep(SSN_REQUEST_TIMEOUT);
@@ -517,7 +527,6 @@ public class TestServices {
 
         while ((actualStatus = request.webApiGet(url, token).getStatusCode()) == status) {
             if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
-                actualStatus = request.webApiGet(url, token).getStatusCode();
                 break;
             }
             Thread.sleep(SSN_REQUEST_TIMEOUT);
@@ -536,16 +545,28 @@ public class TestServices {
         return actualStatus;
     }
 
-    private String waitWhileStatus(String url, String token, String statusPath, String status, Duration duration)
+    private static String getNotebookStatus(JsonPath json, String notebookName) {
+		List<Map<String, String>> notebooks = json
+				.param("name", notebookName)
+				.getList("findAll { notebook -> notebook.exploratory_name == name }");
+        if (notebooks == null || notebooks.size() != 1) {
+        	return null;
+        }
+        Map<String, String> notebook = notebooks.get(0);
+        return notebook.get("status");
+    }
+
+    private String waitWhileNotebookStatus(String url, String token, String notebookName, String status, Duration duration)
             throws InterruptedException {
         HttpRequest request = new HttpRequest();
         String actualStatus;
         long timeout = duration.toMillis();
         long expiredTime = System.currentTimeMillis() + timeout;
 
-        while ((actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath)).contains(status)) {
+        while ((actualStatus = getNotebookStatus(request.webApiGet(url, token)
+        											.getBody()
+        											.jsonPath(), notebookName)).equals(status)) {
             if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
-                actualStatus = request.webApiGet(url, token).getBody().jsonPath().getString(statusPath);
                 break;
             }
             Thread.sleep(SSN_REQUEST_TIMEOUT);
@@ -555,14 +576,79 @@ public class TestServices {
             System.out.println("ERROR: Timeout has been expired for request.");
             System.out.println("  URL is " + url);
             System.out.println("  token is " + token);
-            System.out.println("  statusPath is " + statusPath);
             System.out.println("  status is " + status);
             System.out.println("  timeout is " + duration);
         } else {
-        	System.out.println("Current state for " + url + ":" + statusPath + " is " + actualStatus);
+        	System.out.println("Current state for Notebook " + notebookName + " is " + actualStatus);
         }
         
         return actualStatus;
     }
+    
+    private static String getEmrStatus(JsonPath json, String notebookName, String computationalName) {
+		List<Map<String, List<Map<String, String>>>> notebooks = json
+				.param("name", notebookName)
+				.getList("findAll { notebook -> notebook.exploratory_name == name }");
+        if (notebooks == null || notebooks.size() != 1) {
+        	return null;
+        }
+        List<Map<String, String>> resources = notebooks.get(0)
+        		.get("computational_resources");
+        for (Map<String, String> resource : resources) {
+            String comp = resource.get("computational_name");
+            if (comp != null && comp.equals(computationalName)) {
+            	return resource.get("status");
+            }
+		}
+		return null;
+    }
+    
+    private String waitWhileEmrStatus(String url, String token, String notebookName, String computationalName, String status, Duration duration)
+            throws InterruptedException {
+        HttpRequest request = new HttpRequest();
+        String actualStatus;
+        long timeout = duration.toMillis();
+        long expiredTime = System.currentTimeMillis() + timeout;
 
+        while ((actualStatus = getEmrStatus(request.webApiGet(url, token)
+        											.getBody()
+        											.jsonPath(), notebookName, computationalName)).equals(status)) {
+            if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
+                break;
+            }
+            Thread.sleep(SSN_REQUEST_TIMEOUT);
+        }
+
+        if (actualStatus.contains(status)) {
+            System.out.println("ERROR: Timeout has been expired for request.");
+            System.out.println("  URL is " + url);
+            System.out.println("  token is " + token);
+            System.out.println("  status is " + status);
+            System.out.println("  timeout is " + duration);
+        } else {
+        	System.out.println("Current state for EMR " + computationalName + " on notebook " + notebookName + " is " + actualStatus);
+        }
+        
+        return actualStatus;
+    }
+    
+    public static void main(String [] args) {
+    	HttpRequest request = new HttpRequest();
+    	String hostName = "ec2-35-165-7-108.us-west-2.compute.amazonaws.com";
+    	String ssnLoginURL = "http://" + hostName + "/api/user/login";
+    	LoginDto testUserRequestBody = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
+        Response responseTestUser = request.webApiPost(ssnLoginURL, ContentType.JSON, testUserRequestBody);
+        Assert.assertEquals(HttpStatusCode.OK, responseTestUser.getStatusCode(), "Failed to login");
+        String token = responseTestUser.getBody().asString();
+        String compUrl = " http://" + hostName + "/api/infrastructure_provision/provisioned_user_resources";
+    	
+        Response r = request.webApiGet(compUrl, token);
+        System.out.println("Responce body is " + r.getBody().asString());
+        JsonPath j = r
+        		.getBody()
+        		.jsonPath();
+		
+        System.out.println("Notebook status is " + getNotebookStatus(j, "useinj1"));
+		System.out.println("EMR status is " + getEmrStatus(j, "useinj1", "useinemr1"));
+    }
 }

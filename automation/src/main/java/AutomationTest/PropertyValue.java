@@ -7,8 +7,8 @@ import java.util.Properties;
 
 public class PropertyValue {
 
-	public static final String CONFIG_FILE_NAME="/var/lib/jenkins/AutoTestData/config.properties";
-//	private static final String CONFIG_FILE_NAME="config.properties";
+	private static final boolean DEV_MODE;
+	public static final String CONFIG_FILE_NAME;
 	
 	private static final String JENKINS_USERNAME="JENKINS_USERNAME";
 	private static final String JENKINS_PASSWORD="JENKINS_PASSWORD";
@@ -34,11 +34,13 @@ public class PropertyValue {
 	public static final String TIMEOUT_EMR_CREATE="TIMEOUT_EMR_CREATE";
 	public static final String TIMEOUT_EMR_TERMINATE="TIMEOUT_EMR_TERMINATE";
 	
-	private static String jenkinsBuildNumber; 
+	private static String jenkinsBuildNumber;
 
     private static final Properties props = new Properties();
     
     static {
+    	DEV_MODE = System.getProperty("run.mode", "remote").equalsIgnoreCase("dev");
+    	CONFIG_FILE_NAME = (DEV_MODE ? "config.properties" : "/var/lib/jenkins/AutoTestData/config.properties");
     	loadProperties();
     }
     
