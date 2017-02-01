@@ -34,16 +34,13 @@ if __name__ == "__main__":
                         filename=local_log_filepath)
 
     create_aws_config_files()
-    print 'Collecting names and tags'
-    edge_conf = dict()
+    print 'Getting statuses of DLAB resources'
     # Base config
-    edge_conf['service_base_name'] = os.environ['conf_service_base_name']
-    edge_conf['user_name'] = os.environ['edge_user_name']
 
     try:
         logging.info('[COLLECT DATA]')
         print '[COLLECTING DATA]'
-        params = "--service_base_name '{}' --user_name '{}'".format(edge_conf['service_base_name'], edge_conf['user_name'])
+        params = "--list_resources '{}'".format(os.environ['edge_list_resources'])
         try:
             local("~/scripts/{}.py {}".format('common_collect_data', params))
         except:

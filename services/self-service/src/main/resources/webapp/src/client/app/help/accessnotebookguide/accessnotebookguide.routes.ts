@@ -16,15 +16,13 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component } from '@angular/core';
-import { Config } from './shared/config/env.config';
-import './operators';
+import { NgModule, ModuleWithProviders } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { AccessNotebookGuide } from './accessnotebookguide.component';
 
-@Component({
-  moduleId: module.id,
-  selector: 'sd-app',
-  templateUrl: 'app.component.html',
+const routes: Routes = [{
+  path: '',
+  component: AccessNotebookGuide,
+}];
 
-})
-
-export class AppComponent { }
+export const routing: ModuleWithProviders = RouterModule.forChild(routes);
