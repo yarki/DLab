@@ -194,8 +194,8 @@ export class ResourcesGrid implements OnInit {
     this.userResourceService.getUserPreferences()
       .subscribe((result) => {
         this.filterForm = this.loadUserPreferences(result);
+        this.isActiveFilter(result);
         this.applyFilter_btnClick(this.filterForm);
-        this.isActiveFilter();
       }, (error) => {
         // FIXME: to avoid SyntaxError: in case of empty database
         this.applyFilter_btnClick(this.filterForm);
@@ -215,11 +215,11 @@ export class ResourcesGrid implements OnInit {
       });
   }
 
-  isActiveFilter(): void {
+  isActiveFilter(filterConfig): void {
     this.activeFiltering = false;
 
-    for (let index in this.filterForm)
-      if (this.filterForm[index].length)
+    for (let index in filterConfig)
+      if (filterConfig[index].length)
         this.activeFiltering = true;
   }
 
