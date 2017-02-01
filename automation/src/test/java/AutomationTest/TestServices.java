@@ -338,7 +338,7 @@ public class TestServices {
         
         System.out.println("    SSN terminate EMR URL is " + ssnTerminateEMRURL);
 		System.out.println("    New EMR will be deployed ...");
-        deployEMR.setEmr_instance_count("1");
+        deployEMR.setEmr_instance_count("2");
         deployEMR.setEmr_master_instance_type("m4.large");
         deployEMR.setEmr_slave_instance_type("m4.large");
         deployEMR.setEmr_version(emrVersion);
