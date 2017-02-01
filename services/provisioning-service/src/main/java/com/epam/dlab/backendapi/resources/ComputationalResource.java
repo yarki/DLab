@@ -123,6 +123,7 @@ public class ComputationalResource implements DockerCommands {
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
                                     .withInteractive()
+                                    .withName(nameContainer(dto.getEdgeUserName(), CONFIGURE, dto.getComputationalName()))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
