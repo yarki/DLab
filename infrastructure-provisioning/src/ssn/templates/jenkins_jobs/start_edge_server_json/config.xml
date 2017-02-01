@@ -43,7 +43,7 @@
           <description></description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
-              <string>stop</string>
+              <string>start</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
