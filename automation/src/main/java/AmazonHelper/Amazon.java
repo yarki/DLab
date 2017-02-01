@@ -89,9 +89,4 @@ public class Amazon {
 			System.out.println(grant);
 		}
     }
-    
-    
-    public static void main(String [] args) throws Exception {
-    	printBucketGrants("dev-feb01-auto-epmc-bdcc-test-bucket.s3.amazonaws.com");
-    }
 }
