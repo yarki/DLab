@@ -11,7 +11,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Tag;
@@ -44,7 +43,7 @@ public class TestServices {
     private String publicIp;
 
     @BeforeClass
-    public static void Setup() throws InterruptedException {
+    public void Setup() throws InterruptedException {
         // loading log4j.xml file
         DOMConfigurator.configure("log4j.xml");
 
@@ -53,7 +52,7 @@ public class TestServices {
     }
     
     @AfterClass
-    public static void Cleanup() throws InterruptedException {
+    public void Cleanup() throws InterruptedException {
     }
 
     @Test
@@ -197,11 +196,11 @@ public class TestServices {
         createNoteBookRequest.setName(noteBookName);
         createNoteBookRequest.setShape("r3.xlarge");
         createNoteBookRequest.setVersion("jupyter-1.6");
-        Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
+/*        Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
                                                                       createNoteBookRequest, token);
         System.out.println("   responseCreateNotebook.getBody() is " + responseCreateNotebook.getBody().asString());
         Assert.assertEquals(responseCreateNotebook.statusCode(), HttpStatusCode.OK);
-
+*/
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "status", "creating", PropertyValue.getTimeoutNotebookCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("Notebook " + noteBookName + " has not been created");
@@ -226,7 +225,7 @@ public class TestServices {
         deployEMR.setEmr_version(emrVersion);
         deployEMR.setName(emrName);
         deployEMR.setNotebook_name(noteBookName);
-        Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
+/*        Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
                                                                     deployEMR, token);
         System.out.println("   responseDeployingEMR.getBody() is " + responseDeployingEMR.getBody().asString());
         Assert.assertEquals(responseDeployingEMR.statusCode(), HttpStatusCode.OK);
@@ -238,7 +237,7 @@ public class TestServices {
 
         Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.RUNNING);
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
-        
+*/        
         System.out.println("   Waiting until EMR has been configured ...");
 
         gettingStatus = waitWhileStatus(ssnProUserResURL, token, "computational_resources.status", "configuring", PropertyValue.getTimeoutEMRCreate());
@@ -249,8 +248,11 @@ public class TestServices {
         Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.RUNNING);
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
 
+        System.out.println("   Check bucket " + getBucketName());
+        Amazon.printBucketGrants(getBucketName());
+        
         //run python script
-        testPython(publicIp, notebookIp, serviceBaseName, emrName, getEmrClusterName(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName));
+        testPython(publicIp, notebookIp, emrName, getEmrClusterName(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName));
 
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
@@ -378,7 +380,11 @@ public class TestServices {
         Docker.checkDockerStatus(nodePrefix + "_terminate_exploratory_NotebookAutoTestt", publicIp);
     }
     
-    private static String getEmrClusterName(String emrName) throws Exception {
+    private String getBucketName() {
+    	return String.format("%s-%s-bucket", serviceBaseName, PropertyValue.getUsernameSimple()).replace('_', '-').toLowerCase();
+    }
+    
+    private String getEmrClusterName(String emrName) throws Exception {
         Instance instance = Amazon.getInstance(emrName);
         for (Tag tag : instance.getTags()) {
 			if (tag.getKey().equals("Name")) {
@@ -388,7 +394,7 @@ public class TestServices {
         throw new Exception("Could not detect cluster name for EMR " + emrName);
     }
 
-    private static void copyFileToSSN(String filename, String ip) throws IOException, InterruptedException {
+    private void copyFileToSSN(String filename, String ip) throws IOException, InterruptedException {
         String sourceDir = "/var/lib/jenkins/AutoTestData";
         String copyToSSNCommand = "scp -i %s -o 'StrictHostKeyChecking no' %s ubuntu@%s:~/";
 
@@ -402,7 +408,7 @@ public class TestServices {
         Assert.assertTrue(status.isOk());
     }
     
-    private static void copyFileToNotebook(Session session, String filename, String ip) throws JSchException, IOException, InterruptedException {
+    private void copyFileToNotebook(Session session, String filename, String ip) throws JSchException, IOException, InterruptedException {
     	String copyToNotebookCommand = "scp -i %s -o 'StrictHostKeyChecking no' ~/%s ubuntu@%s:/tmp/";
     	String command = String.format(copyToNotebookCommand,
     			PropertyValue.getAccessKeyPrivFileNameSSN(),
@@ -417,10 +423,8 @@ public class TestServices {
         Assert.assertTrue(status.isOk());
     }
     
-    private static void testPython(String ssnIP, String noteBookIp, String serviceBaseName, String emrName, String cluster_name)
+    private void testPython(String ssnIP, String noteBookIp, String emrName, String cluster_name)
             throws JSchException, IOException, InterruptedException {
-    	final String nodePrefix = PropertyValue.getUsernameSimple();
-
     	String [] files = {
     			"kernels_test.py",
     			"train.csv",
@@ -445,17 +449,16 @@ public class TestServices {
             	copyFileToNotebook(ssnSession, filename, noteBookIp);
     		}
 
-            System.out.println(String.format("Port forwarding to notebook %s...", noteBookIp));
+            System.out.println(String.format("Port forwarding from ssn " + ssnIP + " to notebook %s...", noteBookIp));
             int assignedPort = ssnSession.setPortForwardingL(0, noteBookIp, 22);
             System.out.println(String.format("Port forwarded localhost:%s -> %s:22", assignedPort, noteBookIp));
 
             Session notebookSession = SSHConnect.getForwardedConnect("ubuntu", noteBookIp, assignedPort);
 
             try {
-                String bucketName = String.format("%s-%s-bucket", serviceBaseName, nodePrefix).replace('_', '-').toLowerCase();
                 command = String.format("/usr/bin/python %s --bucket %s --cluster_name %s",
                         Paths.get("/tmp", pyFilename).toString(),
-                        bucketName,
+                        getBucketName(),
                         cluster_name);
                 System.out.println(String.format("Executing command %s...", command));
                 ChannelExec runScript = SSHConnect.setCommand(notebookSession, command);
@@ -504,7 +507,7 @@ public class TestServices {
         return true;
     }
 
-    private static int waitWhileStatus(String url, String token, int status, Duration duration)
+    private int waitWhileStatus(String url, String token, int status, Duration duration)
             throws InterruptedException {
         HttpRequest request = new HttpRequest();
         int actualStatus;
@@ -532,7 +535,7 @@ public class TestServices {
         return actualStatus;
     }
 
-    private static String waitWhileStatus(String url, String token, String statusPath, String status, Duration duration)
+    private String waitWhileStatus(String url, String token, String statusPath, String status, Duration duration)
             throws InterruptedException {
         HttpRequest request = new HttpRequest();
         String actualStatus;
