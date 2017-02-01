@@ -23,6 +23,11 @@ import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
 
+import { HomeModule } from './home/home.module';
+import { LoginModule } from './login/login.module';
+import { AccessNotebookGuideModule } from './help/accessnotebookguide/accessnotebookguide.module';
+import { PublicKeyGuideModule } from './help/publickeyguide/publickeyguide.module';
+
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { AuthorizationGuard } from './security/authorization.guard';
 import { FormsModule } from '@angular/forms';
@@ -38,7 +43,11 @@ import { ApplicationSecurityService } from './services/applicationSecurity.servi
     BrowserModule,
     HttpModule,
     RouterModule.forRoot(routes, { useHash: true }),
-    FormsModule
+    FormsModule,
+    HomeModule,
+    LoginModule,
+    AccessNotebookGuideModule,
+    PublicKeyGuideModule
   ],
   declarations: [AppComponent],
   providers: [{

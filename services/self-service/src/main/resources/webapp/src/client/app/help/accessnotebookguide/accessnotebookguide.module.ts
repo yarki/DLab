@@ -18,13 +18,11 @@ limitations under the License.
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { AccessNotebookGuide } from './accessnotebookguide.component';
 import { NavbarModule } from './../../shared/navbar/index';
-import { routing  } from './accessnotebookguide.routes';
 
 @NgModule({
-  imports: [CommonModule, RouterModule, NavbarModule, routing],
+  imports: [CommonModule, NavbarModule],
   declarations: [AccessNotebookGuide],
   exports: [AccessNotebookGuide]
 })
