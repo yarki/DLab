@@ -23,6 +23,7 @@ from dlab.fab import *
 from dlab.meta_lib import *
 import sys, time, os
 from dlab.actions_lib import *
+import traceback
 
 
 if __name__ == "__main__":
@@ -322,6 +323,37 @@ if __name__ == "__main__":
 
     except Exception as err:
         append_result("Failed to create instance. Exception: " + str(err))
+        remove_all_iam_resources('notebook', os.environ['edge_user_name'])
+        remove_all_iam_resources('edge', os.environ['edge_user_name'])
+        remove_sgroups(edge_conf['notebook_instance_name'])
+        remove_sgroups(edge_conf['instance_name'])
+        remove_s3('edge', os.environ['edge_user_name'])
+        sys.exit(1)
+
+
+    try:
+        logging.info('[ASSOCIATING ELASTIC IP]')
+        print '[ASSOCIATING ELASTIC IP]'
+        edge_conf['edge_id'] = get_instance_by_name(edge_conf['instance_name'])
+        if os.environ['edge_elastic_ip']:
+            params = "--elastic_ip {} --edge_id {}".format(os.environ['edge_elastic_ip'], edge_conf['edge_id'])
+        else:
+            params = "--edge_id {}".format(edge_conf['edge_id'])
+        try:
+            local("~/scripts/{}.py {}".format('edge_associate_elastic_ip', params))
+        except:
+            traceback.print_exc()
+            raise Exception
+    except Exception as err:
+        append_result("Failed to create instance. Exception: " + str(err))
+        try:
+            edge_conf['edge_public_ip'] = get_instance_ip_address(edge_conf['instance_name']).get('Public')
+            edge_conf['allocation_id'] = get_allocation_id_by_elastic_ip(edge_conf['edge_public_ip'])
+            disassociate_elastic_ip(edge_conf['allocation_id'])
+            release_elastic_ip(edge_conf['allocation_id'])
+        except:
+            print "No Elastic IPs to release!"
+        remove_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
         remove_sgroups(edge_conf['notebook_instance_name'])

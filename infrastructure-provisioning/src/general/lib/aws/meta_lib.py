@@ -591,3 +591,15 @@ def get_instance_status(instance_name):
         inst = i.get('Instances')
         for j in inst:
             return j.get('State').get('Name')
+
+
+def get_allocation_id_by_elastic_ip(elastic_ip):
+    try:
+        client = boto3.client('ec2')
+        response = client.describe_addresses(PublicIps=[elastic_ip]).get('Addresses')
+        for i in response:
+            return i.get('AllocationId')
+    except Exception as err:
+        logging.error("Error with getting allocation id by elastic ip: " + elastic_ip + " : " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        append_result(str({"error": "Error with getting allocation id by elastic ip", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
