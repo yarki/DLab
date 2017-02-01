@@ -144,8 +144,8 @@ public class TestServices {
         String emrName = "eimr" + HelperMethods.generateRandomValue();
 
 // TODO: REMOVE IT
-noteBookName = "Notebook201702010715";
-emrName = "eimr201702010715";
+noteBookName = "NotebookAutoTest201702010715";
+emrName = "eimrAutoTest201702010715";
         
         final String nodePrefix = PropertyValue.getUsernameSimple();
         final String amazonNodePrefix = serviceBaseName + "-" + nodePrefix;
