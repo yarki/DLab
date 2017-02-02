@@ -4,6 +4,5 @@
     "conf_service_base_name":"SBN",
     "edge_user_name":"EUN",
     "conf_key_name":"KN",
-    "aws_region":"CREG",
-    "hostname":"SBN-EUN-edge"
+    "aws_region":"CREG"
 }
