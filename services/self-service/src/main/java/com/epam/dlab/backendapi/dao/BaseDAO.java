@@ -199,8 +199,7 @@ class BaseDAO implements MongoCollections {
                 }
             }
         }
-        // TODO: check that the code below is equivalent to return Optional.ofNullable(first)
-        return first == null ? Optional.empty() : Optional.ofNullable(first);
+        return Optional.ofNullable(first);
     }
 
     /** Finds and returns one document from the collection by condition.

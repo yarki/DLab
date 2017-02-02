@@ -25,6 +25,8 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryURL;
 import com.epam.dlab.exceptions.DlabException;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.result.UpdateResult;
 import org.junit.*;
 
@@ -34,6 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static com.epam.dlab.backendapi.dao.BaseDAO.USER;
+import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.EXPLORATORY_NAME;
 import static com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO.exploratoryCondition;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static junit.framework.TestCase.*;
@@ -50,8 +54,15 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
     @Before
     public void setup() {
         cleanup();
+
+        mongoService.createCollection(USER_INSTANCES);
+        mongoService.getCollection(USER_INSTANCES).createIndex(new BasicDBObject(USER, 1).append(EXPLORATORY_NAME, 2),
+                new IndexOptions().unique(true));
+
+
         dao = new InfrastructureProvisionDAO();
         testInjector.injectMembers(dao);
+
     }
 
     @BeforeClass
@@ -178,8 +189,7 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 .withImageName("jupyter")
                 .withImageVersion("jupyter-2");
 
-        Boolean isInserted = dao.insertExploratory(instance1);
-        assertTrue(isInserted);
+        dao.insertExploratory(instance1);
 
         UserInstanceDTO instance2 = new UserInstanceDTO()
                 .withUser("user1")
@@ -189,15 +199,14 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 .withImageName("rstudio")
                 .withImageVersion("r-3");
 
-        Boolean isInserted2 = dao.insertExploratory(instance2);
-        assertTrue(isInserted2);
+        dao.insertExploratory(instance2);
 
-        Optional<UserInstanceDTO> testInstance = dao.fetchExploratoryFields("user1", "exp_name_2");
-        assertTrue(testInstance.isPresent());
-        assertEquals(instance2.getExploratoryId(), testInstance.get().getExploratoryId());
-        assertEquals(instance2.getStatus(), testInstance.get().getStatus());
-        assertEquals(instance2.getImageName(), testInstance.get().getImageName());
-        assertEquals(instance2.getImageVersion(), testInstance.get().getImageVersion());
+        UserInstanceDTO testInstance = dao.fetchExploratoryFields("user1", "exp_name_2");
+
+        assertEquals(instance2.getExploratoryId(), testInstance.getExploratoryId());
+        assertEquals(instance2.getStatus(), testInstance.getStatus());
+        assertEquals(instance2.getImageName(), testInstance.getImageName());
+        assertEquals(instance2.getImageVersion(), testInstance.getImageVersion());
     }
 
     @Test
@@ -210,11 +219,10 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
                 .withImageName("jupyter")
                 .withImageVersion("jupyter-2");
 
-        Boolean isInserted = dao.insertExploratory(instance1);
-        assertTrue(isInserted);
+        dao.insertExploratory(instance1);
 
         long insertedCount = mongoService.getCollection(USER_INSTANCES).count();
-        assertEquals(insertedCount, 1L);
+        assertEquals(1,insertedCount);
 
         Optional<UserInstanceDTO> testInstance = dao.findOne(USER_INSTANCES,
                 exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
