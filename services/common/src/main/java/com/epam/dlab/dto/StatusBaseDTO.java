@@ -21,12 +21,16 @@ package com.epam.dlab.dto;
 
 import com.epam.dlab.UserInstanceStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 
 import java.util.Date;
 
 public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     @JsonProperty
     private String user;
+    @JsonProperty("instance_id")
+    private String instanceId;
     @JsonProperty("exploratory_name")
     private String exploratoryName;
     @JsonProperty("exploratory_template_name")
@@ -52,6 +56,19 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
         return (T) this;
     }
 
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withInstanceId(String instanceId) {
+    	setInstanceId(instanceId);
+        return (T) this;
+    }
 
     public String getExploratoryName() {
         return exploratoryName;
@@ -125,5 +142,20 @@ public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     public T withUptime(Date uptime) {
         setUptime(uptime);
         return (T) this;
+    }
+    
+    public ToStringHelper toStringHelper(Object self) {
+    	return MoreObjects.toStringHelper(self)
+    	        .add("instanceId", instanceId)
+    	        .add("exploratoryName", exploratoryName)
+    	        .add("exploratoryTemplateName", exploratoryTemplateName)
+    	        .add("status", status)
+    	        .add("errorMessage", errorMessage)
+    	        .add("uptime", uptime);
+    }
+    
+    @Override
+    public String toString() {
+    	return toStringHelper(this).toString();
     }
 }

@@ -2,12 +2,13 @@ package AutomationTest;
 
 import java.io.File;
 import java.io.FileReader;
+import java.time.Duration;
 import java.util.Properties;
 
 public class PropertyValue {
 
-	public static final String CONFIG_FILE_NAME="/var/lib/jenkins/AutoTestData/config.properties";
-//	private static final String CONFIG_FILE_NAME="config.properties";
+	private static final boolean DEV_MODE;
+	public static final String CONFIG_FILE_NAME;
 	
 	private static final String JENKINS_USERNAME="JENKINS_USERNAME";
 	private static final String JENKINS_PASSWORD="JENKINS_PASSWORD";
@@ -24,8 +25,12 @@ public class PropertyValue {
 	private static final String ACCESS_KEY_PUB_FILE_NAME="ACCESS_KEY_PUB_FILE_NAME";
     private static final String ACCESS_KEY_PRIV_FILE_NAME_SSN="ACCESS_KEY_PRIV_FILE_NAME_SSN";
     
+    private static final String AWS_ACCESS_KEY_ID="AWS_ACCESS_KEY_ID";
+    private static final String AWS_SECRET_ACCESS_KEY="AWS_SECRET_ACCESS_KEY";
+    private static final String AWS_REGION="AWS_REGION";
+    private static final String AWS_REQUEST_TIMEOUT="AWS_REQUEST_TIMEOUT";
+    
 	public static final String TIMEOUT_JENKINS_AUTOTEST="TIMEOUT_JENKINS_AUTOTEST";
-	public static final String TIMEOUT_SSN_CREATE="TIMEOUT_SSN_CREATE";
 	public static final String TIMEOUT_UPLOAD_KEY="TIMEOUT_UPLOAD_KEY";
 	public static final String TIMEOUT_NOTEBOOK_CREATE="TIMEOUT_NOTEBOOK_CREATE";
 	public static final String TIMEOUT_NOTEBOOK_STARTUP="TIMEOUT_NOTEBOOK_STARTUP";
@@ -34,17 +39,26 @@ public class PropertyValue {
 	public static final String TIMEOUT_EMR_CREATE="TIMEOUT_EMR_CREATE";
 	public static final String TIMEOUT_EMR_TERMINATE="TIMEOUT_EMR_TERMINATE";
 	
+	private static String jenkinsBuildNumber;
 
     private static final Properties props = new Properties();
     
     static {
+    	DEV_MODE = System.getProperty("run.mode", "remote").equalsIgnoreCase("dev");
+    	jenkinsBuildNumber = System.getProperty("jenkins.buildNumber", "");
+    	if (jenkinsBuildNumber.isEmpty()) {
+    		jenkinsBuildNumber = null;
+    	}
+    	CONFIG_FILE_NAME = (DEV_MODE ? "config.properties" : "/var/lib/jenkins/AutoTestData/config.properties");
     	loadProperties();
     }
     
-    
     private PropertyValue() { }
-    
 	
+    private static Duration getDuration(String duaration) {
+    	return Duration.parse("PT" + duaration);
+    }
+    
 	public static String get(String propertyName) {
 		return get(propertyName, "");
 	}
@@ -90,7 +104,6 @@ public class PropertyValue {
         printProperty(ACCESS_KEY_PRIV_FILE_NAME_SSN);
         
         printProperty(TIMEOUT_JENKINS_AUTOTEST);
-        printProperty(TIMEOUT_SSN_CREATE);
         printProperty(TIMEOUT_UPLOAD_KEY);
         printProperty(TIMEOUT_NOTEBOOK_CREATE);
         printProperty(TIMEOUT_NOTEBOOK_STARTUP);
@@ -101,15 +114,23 @@ public class PropertyValue {
     }
     
     
-    public static final String getJenkinsUsername() {
+    public static String getJenkinsBuildNumber() {
+    	return jenkinsBuildNumber;
+    }
+
+    public static void setJenkinsBuildNumber(String jenkinsBuildNumber) {
+    	PropertyValue.jenkinsBuildNumber = jenkinsBuildNumber;
+    }
+
+    public static String getJenkinsUsername() {
     	return get(JENKINS_USERNAME);
     }
     
-    public static final String getJenkinsPassword() {
+    public static String getJenkinsPassword() {
     	return get(JENKINS_PASSWORD);
     }
 
-    public static final String getUsername() {
+    public static String getUsername() {
     	return get(USERNAME);
     }
     
@@ -119,91 +140,100 @@ public class PropertyValue {
 		return (i == -1 ? s : s.substring(0, i));
 	}
 
-    public static final String getPassword() {
+    public static String getPassword() {
     	return get(PASSWORD);
     }
 
-    public static final String getNotIAMUsername() {
+    public static String getNotIAMUsername() {
     	return get(NOT_IAM_USERNAME);
     }
 
-    public static final String getNotIAMPassword() {
+    public static String getNotIAMPassword() {
     	return get(NOT_IAM_PASSWORD);
     }
 
-    public static final String getNotDLabUsername() {
+    public static String getNotDLabUsername() {
     	return get(NOT_DLAB_USERNAME);
     }
 
-    public static final String getNotDLabPassword() {
+    public static String getNotDLabPassword() {
     	return get(NOT_DLAB_PASSWORD);
     }
 
-    public static final String getJenkinsJobURL() {
+    public static String getJenkinsJobURL() {
     	return get(JENKINS_JOB_URL);
     }
 
-    public static final String getUserForActivateKey() {
+    public static String getUserForActivateKey() {
     	return get(USER_FOR_ACTIVATE_KEY);
     }
 
-    public static final String getPasswordForActivateKey() {
+    public static String getPasswordForActivateKey() {
     	return get(PASSWORD_FOR_ACTIVATE_KEY);
     }
 
-    public static final String getAccessKeyPrivFileName() {
+    public static String getAccessKeyPrivFileName() {
     	File file = new File(get(ACCESS_KEY_PRIV_FILE_NAME));
         return file.getAbsolutePath();
     }
 
-    public static final String getAccessKeyPubFileName() {
+    public static String getAccessKeyPubFileName() {
     	File file = new File(get(ACCESS_KEY_PUB_FILE_NAME));
         return file.getAbsolutePath();
     }
 
-    public static final String getAccessKeyPrivFileNameSSN() {
+    public static String getAccessKeyPrivFileNameSSN() {
         File file = new File(get(ACCESS_KEY_PRIV_FILE_NAME_SSN));
         return file.getAbsolutePath();
     }
 
-
-
-    public static final int getTimeoutJenkinsAutotest() {
-    	return get(TIMEOUT_JENKINS_AUTOTEST, 0);
+    public static String getAwsAccessKeyId() {
+        return get(AWS_ACCESS_KEY_ID);
     }
 
-    public static final int getTimeoutSSNCreate() {
-    	return get(TIMEOUT_SSN_CREATE, 0);
+    public static String getAwsSecretAccessKey() {
+        return get(AWS_SECRET_ACCESS_KEY);
     }
 
-    public static final int getTimeoutUploadKey() {
-    	return get(TIMEOUT_UPLOAD_KEY, 0);
+	public static String getAwsRegion() {
+	    return get(AWS_REGION);
+	}
+
+	public static Duration getAwsRequestTimeout() {
+    	return getDuration(get(AWS_REQUEST_TIMEOUT, "10s"));
     }
 
-    public static final int getTimeoutNotebookCreate() {
-    	return get(TIMEOUT_NOTEBOOK_CREATE, 0);
+	
+    public static Duration getTimeoutJenkinsAutotest() {
+    	return getDuration(get(TIMEOUT_JENKINS_AUTOTEST, "0s"));
     }
 
-    public static final int getTimeoutNotebookStartup() {
-    	return get(TIMEOUT_NOTEBOOK_STARTUP, 0);
+    public static Duration getTimeoutUploadKey() {
+    	return getDuration(get(TIMEOUT_UPLOAD_KEY, "0s"));
     }
 
-    public static final int getTimeoutNotebookShutdown() {
-    	return get(TIMEOUT_NOTEBOOK_SHUTDOWN, 0);
+    public static Duration getTimeoutNotebookCreate() {
+    	return getDuration(get(TIMEOUT_NOTEBOOK_CREATE, "0s"));
     }
 
-    public static final int getTimeoutNotebookTerminate() {
+    public static Duration getTimeoutNotebookStartup() {
+    	return getDuration(get(TIMEOUT_NOTEBOOK_STARTUP, "0s"));
+    }
+
+    public static Duration getTimeoutNotebookShutdown() {
+    	return getDuration(get(TIMEOUT_NOTEBOOK_SHUTDOWN, "0s"));
+    }
+
+    public static int getTimeoutNotebookTerminate() {
     	return get(TIMEOUT_NOTEBOOK_TERMINATE, 0);
     }
 
-    public static final int getTimeoutEMRCreate() {
-    	return get(TIMEOUT_EMR_CREATE, 0);
+    public static Duration  getTimeoutEMRCreate() {
+    	return getDuration(get(TIMEOUT_EMR_CREATE, "0s"));
     }
 
-    public static final int getTimeoutEMRTerminate() {
-    	return get(TIMEOUT_EMR_TERMINATE, 0);
+    public static Duration getTimeoutEMRTerminate() {
+    	return getDuration(get(TIMEOUT_EMR_TERMINATE, "0s"));
     }
 
 }
-
-

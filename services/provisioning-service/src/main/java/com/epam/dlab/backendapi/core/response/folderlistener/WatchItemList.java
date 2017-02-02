@@ -63,7 +63,7 @@ public class WatchItemList {
 		}
 
 		@Override
-		public void handleError() { }
+		public void handleError(String errorMessage) { }
 		
 		@Override
 		public boolean handle(String fileName, byte[] content) throws Exception {

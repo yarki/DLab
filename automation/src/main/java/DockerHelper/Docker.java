@@ -15,7 +15,7 @@ public class Docker {
     public static void checkDockerStatus(String dockerImageName, String publicIP)
             throws IOException, JSchException, InterruptedException {
         
-        System.out.println("Check status of instanse on Docker:");
+        System.out.println("Check docker status for instanse " + publicIP + " and image" + dockerImageName);
         
         Session session = SSHConnect.getConnect("ubuntu", publicIP, 22);
         ChannelExec getResult = SSHConnect.setCommand(session, Command.GET_CONTAINERS);
@@ -29,6 +29,6 @@ public class Docker {
         Assert.assertEquals(dockerContainer.getStatus().contains(Status.EXITED_0), true, "Status of container is not  Exited (0)");
         
         System.out.println("Docker image " + dockerImageName + " has status Exited (0)");
-        }
+    }
 
 }

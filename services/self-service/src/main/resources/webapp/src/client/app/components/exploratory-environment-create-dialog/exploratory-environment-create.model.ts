@@ -17,7 +17,7 @@ limitations under the License.
 ****************************************************************************/
 /* tslint:disable:no-empty */
 
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import { Response } from '@angular/http';
 import { UserResourceService } from '../../services/userResource.service';
 import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
@@ -122,7 +122,7 @@ export class ExploratoryEnvironmentCreateModel {
   private createExploratoryEnvironment(): Observable<Response> {
     return this.userResourceService.createExploratoryEnvironment({
       image: this.environment_image,
-      templateName: this.environment_template_name,
+      template_name: this.environment_template_name,
       name: this.environment_name,
       shape: this.environment_shape,
       version: this.environment_version

@@ -19,6 +19,8 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 /** Stores info about creation of the computational resource.
@@ -76,5 +78,17 @@ public class ComputationalCreateFormDTO {
     /** Returns the name of notebook. */
     public String getNotebookName() {
         return notebookName;
+    }
+    
+    @Override
+    public String toString() {
+    	return MoreObjects.toStringHelper(this)
+    			.add("name", name)
+    			.add("notebookName", notebookName)
+    			.add("version", version)
+    			.add("masterInstanceType", masterInstanceType)
+    	        .add("slaveInstanceType", slaveInstanceType)
+    			.add("instanceCount", instanceCount)
+    	        .toString();
     }
 }
