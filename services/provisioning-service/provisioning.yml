@@ -12,7 +12,7 @@ adminKey: BDCC-DSS-POC
 edgeImage: docker.dlab-edge
 fileLengthCheckDelay: 500ms
 
-emrImage: ddocker.dlab-emr
+emrImage: docker.dlab-emr
 emrEC2RoleDefault: EMR_EC2_DefaultRole
 emrServiceRoleDefault: EMR_DefaultRole
 
