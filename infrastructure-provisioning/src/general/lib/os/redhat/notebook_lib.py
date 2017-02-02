@@ -159,7 +159,6 @@ def ensure_sbt(os_user):
 def ensure_libraries_py2(os_user):
     if not exists('/home/{}/.ensure_dir/ensure_libraries_py2_installed'.format(os_user)):
         try:
-            sudo('export LC_ALL=C')
             sudo('yum clean all')
             sudo('yum install -y zlib-devel libjpeg-turbo-devel --nogpgcheck')
             sudo('pip2 install -U pip --no-cache-dir')
@@ -180,33 +179,40 @@ def ensure_jre_jdk(os_user):
             sys.exit(1)
 
 
-def ensure_python3_kernel_zeppelin(python3_version, os_user):
-    if not exists('/home/' + os_user + '/.ensure_dir/python3_kernel_ensured'):
+def ensure_python3_specific_version(python3_version, os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/python3_specific_version_ensured'):
         try:
-            sudo('yum install -y yum-utils python34-pip python34 openssl-devel python34-devel')
-            sudo('pip3 install -U pip setuptools --no-cache-dir')
+            sudo('yum install -y yum-utils python34 openssl-devel')
             sudo('yum -y groupinstall development')
             if len(python3_version) < 4:
                 python3_version = python3_version + ".0"
             sudo('wget https://www.python.org/ftp/python/{0}/Python-{0}.tgz'.format(python3_version))
             sudo('tar xzf Python-{0}.tgz; cd Python-{0}; ./configure --prefix=/usr/local; make altinstall'.format(python3_version))
-            sudo('touch /home/' + os_user + '/.ensure_dir/python3_kernel_ensured')
+            sudo('touch /home/' + os_user + '/.ensure_dir/python3_specific_version_ensured')
         except:
             sys.exit(1)
 
 
-def ensure_libraries_py(os_user):
-    if not exists('/home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed'):
+def ensure_python2_libraries(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/python2_libraries_ensured'):
         try:
-            sudo('export LC_ALL=C')
-            sudo('yum install -y python34-pip python-virtualenv openssl-devel python-devel python34-devel')
+            sudo('yum install -y python-virtualenv openssl-devel python-devel')
             sudo('pip2 install -U pip setuptools --no-cache-dir')
-            sudo('pip3 install -U pip setuptools --no-cache-dir')
             sudo('pip2 install boto3 --no-cache-dir')
             sudo('pip2 install fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('touch /home/' + os_user + '/.ensure_dir/python2_libraries_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_python3_libraries(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/python3_libraries_ensured'):
+        try:
+            sudo('yum install -y python34-pip python34-devel')
+            sudo('pip3 install -U pip setuptools --no-cache-dir')
             sudo('pip3 install boto3 --no-cache-dir')
             sudo('pip3 install fabvenv fabric-virtualenv --no-cache-dir')
-            sudo('touch /home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed')
+            sudo('touch /home/' + os_user + '/.ensure_dir/python3_libraries_ensured')
         except:
             sys.exit(1)
 

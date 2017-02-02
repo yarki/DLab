@@ -36,7 +36,6 @@ args = parser.parse_args()
 spark_version = args.spark_version
 hadoop_version = args.hadoop_version
 scala_version = '2.11.8'
-#scala_link = "http://www.scala-lang.org/files/archive/scala-" + scala_version + ".deb"
 scala_link = "http://www.scala-lang.org/files/archive/"
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 pyspark_local_path_dir = '/home/' + args.os_user + '/.local/share/jupyter/kernels/pyspark_local/'
@@ -48,7 +47,7 @@ templates_dir = '/root/templates/'
 files_dir = '/root/files/'
 
 
-def configure_notebook_server():
+def configure_jupyter():
     if not exists('/home/' + args.os_user + '/.ensure_dir/jupyter_ensured'):
         try:
             sudo('pip install jupyter --no-cache-dir')
@@ -82,12 +81,6 @@ def configure_notebook_server():
         except:
             sys.exit(1)
 
-        ensure_python3_kernel(args.os_user)
-
-        ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
-
-        ensure_r_kernel(spark_version, args.os_user)
-
 
 ##############
 # Run script #
@@ -104,5 +97,18 @@ if __name__ == "__main__":
             sudo('mkdir /home/' + args.os_user + '/.ensure_dir')
     except:
         sys.exit(1)
+
+    print "Mount additional volume"
     prepare_disk(args.os_user)
-    configure_notebook_server()
+
+    print "Install Jupyter"
+    configure_jupyter()
+
+    print "Install python3 libraries"
+    ensure_python3_kernel(args.os_user)
+
+    print "Install local jars"
+    ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
+
+    print "Install R kernel for Jupyter"
+    ensure_r_kernel(spark_version, args.os_user)

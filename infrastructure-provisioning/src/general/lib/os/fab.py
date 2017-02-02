@@ -81,7 +81,7 @@ def prepare_disk(os_user):
             sys.exit(1)
 
 
-def ensure_s3_kernel(os_user, s3_jars_dir, files_dir, region, templates_dir):
+def ensure_local_jars(os_user, s3_jars_dir, files_dir, region, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/s3_kernel_ensured'):
         try:
             sudo('mkdir -p ' + s3_jars_dir)
@@ -107,11 +107,6 @@ def ensure_local_spark(os_user, spark_link, spark_version, hadoop_version, local
             sudo('touch /home/' + os_user + '/.ensure_dir/local_spark_ensured')
         except:
             sys.exit(1)
-
-
-#ef checksum_check(file):
-#    result = local('md5sum -c ' + file, capture=True)
-#    return result
 
 
 def prepare(emr_dir, yarn_dir):

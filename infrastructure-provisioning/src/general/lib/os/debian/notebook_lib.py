@@ -157,7 +157,6 @@ def ensure_sbt(os_user):
 def ensure_libraries_py2(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/ensure_libraries_py2_installed'):
         try:
-            sudo('export LC_ALL=C')
             sudo('apt-get install -y libjpeg8-dev zlib1g-dev')
             sudo('pip2 install -U pip --no-cache-dir')
             sudo('pip2 install boto boto3 --no-cache-dir')
@@ -177,33 +176,38 @@ def ensure_jre_jdk(os_user):
             sys.exit(1)
 
 
-def ensure_python3_kernel_zeppelin(python3_version, os_user):
-    if not exists('/home/' + os_user + '/.ensure_dir/python3_kernel_ensured'):
+def ensure_python3_specific_version(python3_version, os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/python3_specific_version_ensured'):
         try:
-            sudo('apt-get install python3-setuptools')
-            sudo('apt install -y python3-pip')
             sudo('add-apt-repository -y ppa:fkrull/deadsnakes')
             sudo('apt update')
             sudo('apt install -y python' + python3_version + ' python' + python3_version +'-dev')
-            sudo('touch /home/' + os_user + '/.ensure_dir/python3_kernel_ensured')
+            sudo('touch /home/' + os_user + '/.ensure_dir/python3_specific_version_ensured')
         except:
             sys.exit(1)
 
 
-def ensure_libraries_py(os_user):
-    if not exists('/home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed'):
+def ensure_python2_libraries(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/python2_libraries_ensured'):
         try:
-            sudo('export LC_ALL=C')
-            sudo('apt-get install python3-setuptools')
-            sudo('apt install -y python3-pip')
             sudo('apt-get install -y python-virtualenv')
             sudo('pip2 install -U pip --no-cache-dir')
-            sudo('pip2 install boto boto3 --no-cache-dir')
+            sudo('pip2 install boto3 --no-cache-dir')
             sudo('pip2 install fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('touch /home/' + os_user + '/.ensure_dir/python2_libraries_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_python3_libraries(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/python3_libraries_ensured'):
+        try:
+            sudo('apt-get install python3-setuptools')
+            sudo('apt install -y python3-pip')
             sudo('pip3 install -U pip --no-cache-dir')
-            sudo('pip3 install boto boto3 --no-cache-dir')
+            sudo('pip3 install boto3 --no-cache-dir')
             sudo('pip3 install fabvenv fabric-virtualenv --no-cache-dir')
-            sudo('touch /home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed')
+            sudo('touch /home/' + os_user + '/.ensure_dir/python3_libraries_ensured')
         except:
             sys.exit(1)
 
@@ -211,8 +215,6 @@ def ensure_libraries_py(os_user):
 def install_rstudio(os_user, local_spark_path, rstudio_pass):
     if not exists('/home/' + os_user + '/.ensure_dir/rstudio_ensured'):
         try:
-            sudo('apt-get install -y default-jre')
-            sudo('apt-get install -y default-jdk')
             sudo('apt-get install -y r-base')
             sudo('apt-get install -y gdebi-core')
             sudo('apt-get install -y r-cran-rjava r-cran-evaluate r-cran-formatr r-cran-yaml r-cran-rcpp r-cran-catools r-cran-jsonlite r-cran-ggplot2')

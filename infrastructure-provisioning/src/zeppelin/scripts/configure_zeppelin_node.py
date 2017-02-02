@@ -51,7 +51,7 @@ files_dir = '/root/files/'
 s3_jars_dir = '/opt/jars/'
 
 
-def configure_notebook_server(os_user):
+def configure_zeppelin(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/zeppelin_ensured'):
         try:
             sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
@@ -116,11 +116,12 @@ if __name__ == "__main__":
     print "Install local Spark"
     ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path)
 
-    print "Install local S3 kernels"
-    ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
+    print "Install local jars"
+    ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
     print "Install Zeppelin"
-    configure_notebook_server(args.os_user)
+    configure_zeppelin(args.os_user)
 
-    print "Install python3 kernels"
-    ensure_python3_kernel_zeppelin(python3_version, args.os_user)
+    print "Install python3 libraries"
+    ensure_python3_libraries(args.os_user)
+    ensure_python3_specific_version(python3_version, args.os_user)

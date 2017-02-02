@@ -65,11 +65,14 @@ if __name__ == "__main__":
     print "Mount additional volume"
     prepare_disk(args.os_user)
 
-    print "Install python libraries"
-    ensure_libraries_py(args.os_user)
+    print "Install Java"
+    ensure_jre_jdk(args.os_user)
 
-    print "Install python 3.5"
-    ensure_python3_kernel_zeppelin("3.5.2", args.os_user)
+    print "Install python2 libraries"
+    ensure_python2_libraries(args.os_user)
+
+    print "Install python3 libraries"
+    ensure_python3_libraries(args.os_user)
 
     print "Install TensorFlow"
     install_tensor(args.os_user, tensorflow_version, files_dir, templates_dir)
@@ -77,8 +80,8 @@ if __name__ == "__main__":
     print "Install local Spark"
     ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path )
 
-    print "Install local S3 kernels"
-    ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
+    print "Install local jars"
+    ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
 
 
