@@ -75,7 +75,7 @@ public class TestServices {
 
         System.out.println("1. Looking for last Jenkins Job ...");
         JenkinsCall jenkins = new JenkinsCall();
-        String buildNumber = jenkins.getJenkinsJob(PropertyValue.getJenkinsJobURL());
+        String buildNumber = jenkins.getJenkinsJob();
         System.out.println("   Jenkins Job found:");
         System.out.println("Build number is: " + buildNumber);
         

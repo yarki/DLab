@@ -106,8 +106,8 @@ public class JenkinsCall {
         return PropertyValue.getJenkinsBuildNumber();
     }
 
-    public String getJenkinsJob(String jenkinsJobURL) throws Exception {
-        RestAssured.baseURI = jenkinsJobURL;
+    public String getJenkinsJob() throws Exception {
+        RestAssured.baseURI = PropertyValue.getJenkinsJobURL();
 
         setBuildNumber();
         checkBuildResult();
