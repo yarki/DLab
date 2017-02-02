@@ -348,8 +348,6 @@ def remove_ec2(tag_name, tag_value):
                         for h in i.get('Instances'):
                             elastic_ip = h.get('PublicIpAddress')
                             allocation_id = get_allocation_id_by_elastic_ip(elastic_ip)
-                            disassociate_elastic_ip(allocation_id)
-                            print "Disassociating Elastic IP from instance: " + instance.id
                             release_elastic_ip(allocation_id)
                             print "Releasing Elastic IP: " + elastic_ip
                 except:
