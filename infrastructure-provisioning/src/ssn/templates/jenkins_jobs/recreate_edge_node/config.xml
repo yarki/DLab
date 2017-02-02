@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>This job terminates emr cluster, cleans up s3 bucket, removes notebook kernels</description>
+  <description>This job recreates EDGE server</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -17,19 +17,9 @@
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>emr_name</name>
-          <description>name of the EMR cluster to terminate</description>
+          <name>Elastic_ip</name>
+          <description>Elastic IP address for Edge node</description>
           <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>Notebook_Name</name>
-          <description>name of the notebook, EMR cluster is linked to</description>
-          <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>SSH_Key_Name</name>
-          <description>name of the uploaded ssh key file (without ".pem")</description>
-          <defaultValue>AKEY</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>os_user</name>
@@ -58,7 +48,7 @@
           <description></description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
-              <string>terminate</string>
+              <string>recreate</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
@@ -75,7 +65,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>rand=`openssl rand -hex 10`;
-sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/terminate_EMR_cluster_json/template.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/EUN/&apos;${Username}&apos;/g&apos; | sed &apos;s/KN/&apos;${SSH_Key_Name}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sed &apos;s/ECN/&apos;${emr_name}&apos;/g&apos; | sed &apos;s/NIN/&apos;${Notebook_Name}&apos;/g&apos; | sed &apos;s/GOS/&apos;${os_user}&apos;/g&apos; | sudo docker run -i -v /home/${os_user}/keys:/root/keys -v /opt/dlab/tmp/result:/response  docker.epmc-bdcc.projects.epam.com/dlab-aws-emr --action $Action</command>
+sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/recreate_edge_node/template.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/EEI/&apos;${Elastic_ip}&apos;/g&apos; | sed &apos;s/NUN/&apos;${Username}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sudo docker run -i -v /home/${os_user}/keys:/root/keys -v /opt/dlab/tmp/result:/response  docker.epmc-bdcc.projects.epam.com/dlab-aws-edge --action $Action</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
