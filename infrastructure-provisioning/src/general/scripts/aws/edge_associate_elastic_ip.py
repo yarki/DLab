@@ -38,10 +38,10 @@ if __name__ == "__main__":
                         level=logging.DEBUG,
                         filename=local_log_filepath)
     try:
-        if args.elastic_ip:
-            allocation_id = get_allocation_id_by_elastic_ip(args.elastic_ip)
-        else:
+        if args.elastic_ip == 'None':
             allocation_id = allocate_elastic_ip()
+        else:
+            allocation_id = get_allocation_id_by_elastic_ip(args.elastic_ip)
 
         associate_elastic_ip(args.edge_id, allocation_id)
     except:

@@ -62,7 +62,7 @@ if __name__ == "__main__":
         print "Public IP: " + public_ip_address
         print "Private IP: " + ip_address
         with open("/root/result.json", 'w') as result:
-            res = {"edge_name": edge_conf['notebook_name'],
+            res = {"edge_name": edge_conf['instance_name'],
                    "hostname": instance_hostname,
                    "public_ip": public_ip_address,
                    "ip": ip_address,
