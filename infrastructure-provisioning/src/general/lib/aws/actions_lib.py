@@ -320,10 +320,10 @@ def associate_elastic_ip(instance_id, allocation_id):
         traceback.print_exc(file=sys.stdout)
 
 
-def disassociate_elastic_ip(allocation_id):
+def disassociate_elastic_ip(association_id):
     try:
         client = boto3.client('ec2')
-        client.disassociate_address(AssociationId=allocation_id)
+        client.disassociate_address(AssociationId=association_id)
     except Exception as err:
         logging.info("Unable to disassociate Elastic IP: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))

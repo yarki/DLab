@@ -350,7 +350,6 @@ if __name__ == "__main__":
         try:
             edge_conf['edge_public_ip'] = get_instance_ip_address(edge_conf['instance_name']).get('Public')
             edge_conf['allocation_id'] = get_allocation_id_by_elastic_ip(edge_conf['edge_public_ip'])
-            disassociate_elastic_ip(edge_conf['allocation_id'])
             release_elastic_ip(edge_conf['allocation_id'])
         except:
             print "No Elastic IPs to release!"

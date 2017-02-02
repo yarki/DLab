@@ -66,7 +66,6 @@ if __name__ == "__main__":
             raise Exception
     except Exception as err:
         append_result("Failed installing apps: apt & pip. Exception: " + str(err))
-        disassociate_elastic_ip(edge_conf['allocation_id'])
         release_elastic_ip(edge_conf['allocation_id'])
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
@@ -90,7 +89,6 @@ if __name__ == "__main__":
             raise Exception
     except Exception as err:
         append_result("Failed installing http proxy. Exception: " + str(err))
-        disassociate_elastic_ip(edge_conf['allocation_id'])
         release_elastic_ip(edge_conf['allocation_id'])
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
@@ -115,7 +113,6 @@ if __name__ == "__main__":
             raise Exception
     except Exception as err:
         append_result("Failed installing users key. Excpeption: " + str(err))
-        disassociate_elastic_ip(edge_conf['allocation_id'])
         release_elastic_ip(edge_conf['allocation_id'])
         remove_all_iam_resources('notebook', os.environ['edge_user_name'])
         remove_all_iam_resources('edge', os.environ['edge_user_name'])
