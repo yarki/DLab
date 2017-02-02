@@ -104,6 +104,7 @@ public class TestServices {
         Assert.assertEquals(waitForSSNService(PropertyValue.getTimeoutNotebookCreate()), true, "SSN service was not started");
         System.out.println("   SSN service is available");
         
+        
         System.out.println("3. Check login");
         final String ssnLoginURL = getSnnURL(Path.LOGIN);
         System.out.println("   SSN login URL is " + ssnLoginURL);
@@ -127,6 +128,7 @@ public class TestServices {
         Response responseTestUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, testUserLogin);
         Assert.assertEquals(responseTestUser.statusCode(), HttpStatusCode.OK);
  		
+        
         System.out.println("4. Check logout");
         final String ssnlogoutURL = getSnnURL(Path.LOGOUT);
         System.out.println("   SSN logout URL is " + ssnlogoutURL);
@@ -152,6 +154,7 @@ public class TestServices {
         RestAssured.baseURI = ssnURL;
         LoginDto testUserRequestBody = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
 
+        
         System.out.println("5. Logging user in...");
 
         final String ssnLoginURL = getSnnURL(Path.LOGIN);
@@ -165,6 +168,7 @@ public class TestServices {
         String token = responseTestUser.getBody().asString();
         System.out.println("   Logged in. Obtained token: " + token);
 
+        
         System.out.println("5.a Checking for user Key...");
         Response respCheckKey = new HttpRequest().webApiGet(ssnUploadKeyURL, token);
 
@@ -188,6 +192,7 @@ public class TestServices {
         Docker.checkDockerStatus(nodePrefix + "_create_edge_", publicIp);
         Amazon.checkAmazonStatus(amazonNodePrefix + "-edge", AmazonInstanceState.RUNNING);
 
+        
         System.out.println("7. Notebook will be created ...");
         final String ssnExpEnvURL = getSnnURL(Path.EXP_ENVIRONMENT);
         System.out.println("   SSN exploratory environment URL is " + ssnExpEnvURL);
@@ -216,6 +221,7 @@ public class TestServices {
         //get notebook IP
         String notebookIp = Amazon.getInstance(amazonNodePrefix + "-nb-" + noteBookName)
         		.getPrivateIpAddress();
+        
         
         System.out.println("8. EMR will be deployed ...");
         final String ssnCompResURL = getSnnURL(Path.COMPUTATIONAL_RES);
@@ -258,6 +264,7 @@ public class TestServices {
         //run python script
         testPython(publicIp, notebookIp, emrName, getEmrClusterName(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName));
 
+        
         System.out.println("9. Notebook will be stopped ...");
         final String ssnStopNotebookURL = getSnnURL(Path.getStopNotebookUrl(noteBookName));
         System.out.println("   SSN stop notebook URL is " + ssnStopNotebookURL);
@@ -285,6 +292,7 @@ public class TestServices {
         Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.TERMINATED);
         Docker.checkDockerStatus(nodePrefix + "_stop_exploratory_NotebookAutoTest", publicIp);
 
+        
         System.out.println("10. Notebook will be started ...");
         String myJs = "{\"notebook_instance_name\":\"" + noteBookName + "\"}";
         Response respStartNotebook = new HttpRequest().webApiPost(ssnExpEnvURL, ContentType.JSON,
@@ -300,6 +308,7 @@ public class TestServices {
         Amazon.checkAmazonStatus(amazonNodePrefix + "-nb-" + noteBookName, AmazonInstanceState.RUNNING);
         Docker.checkDockerStatus(nodePrefix + "_start_exploratory_NotebookAutoTest", publicIp);
 
+        
         System.out.println("11. New EMR will be deployed for termination ...");
         final String emrNewName = "New" + emrName; 
         deployEMR.setEmr_instance_count("2");
@@ -313,13 +322,13 @@ public class TestServices {
         System.out.println("    responseDeployingEMRNew.getBody() is " + responseDeployingEMRNew.getBody().asString());
         Assert.assertEquals(responseDeployingEMRNew.statusCode(), HttpStatusCode.OK);
         
-        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "creating", PropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrNewName, "creating", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("configuring"))
             throw new Exception("New EMR " + emrNewName + " has not been deployed");
         System.out.println("    New EMR " + emrNewName + " has been deployed");
         
         System.out.println("   Waiting until EMR has been configured ...");
-        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "configuring", PropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrNewName, "configuring", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("EMR " + emrNewName + " has not been configured");
         System.out.println("   EMR " + emrNewName + " has been configured");
@@ -336,7 +345,7 @@ public class TestServices {
         System.out.println("    respTerminateEMR.getBody() is " + respTerminateEMR.getBody().asString());
         Assert.assertEquals(respTerminateEMR.statusCode(), HttpStatusCode.OK);
         
-        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "terminating", PropertyValue.getTimeoutEMRTerminate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrNewName, "terminating", PropertyValue.getTimeoutEMRTerminate());
         if (!gettingStatus.contains("terminated"))
             throw new Exception("New EMR " + emrNewName + " has not been terminated");
         System.out.println("    New EMR " + emrNewName + " has been terminated");
@@ -344,6 +353,7 @@ public class TestServices {
         Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName, AmazonInstanceState.TERMINATED);
         Docker.checkDockerStatus(nodePrefix + "_terminate_computational_NewEMRAutoTest", publicIp);
 
+        
         System.out.println("12. New EMR will be deployed for notebook termination ...");
         final String emrNewName2 = "AnotherNew" + emrName;
         
@@ -360,12 +370,22 @@ public class TestServices {
                                                                               token);
         System.out.println("    responseDeployingEMRAnotherNew.getBody() is " + responseDeployingEMRAnotherNew.getBody().asString());
         Assert.assertEquals(responseDeployingEMRAnotherNew.statusCode(), HttpStatusCode.OK);
-        
-        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "creating", PropertyValue.getTimeoutEMRCreate());
-        if (!gettingStatus.contains("running"))
+
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrNewName2, "creating", PropertyValue.getTimeoutEMRCreate());
+        if (!gettingStatus.contains("configuring"))
             throw new Exception("New emr " + emrNewName2 + " has not been deployed");
         System.out.println("    New emr " + emrNewName2 + " has been deployed");
+        
+        System.out.println("   Waiting until EMR has been configured ...");
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrNewName2, "configuring", PropertyValue.getTimeoutEMRCreate());
+        if (!gettingStatus.contains("running"))
+            throw new Exception("EMR " + emrNewName2 + " has not been configured");
+        System.out.println("   EMR " + emrNewName2 + " has been configured");
 
+        Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName2, AmazonInstanceState.RUNNING);
+        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
+
+        
         System.out.println("13. Notebook will be terminated ...");
         final String ssnTerminateNotebookURL = getSnnURL(Path.getTerminateNotebookUrl(noteBookName));
         Response respTerminateNotebook = new HttpRequest().webApiDelete(ssnTerminateNotebookURL, ContentType.JSON, token);
@@ -547,8 +567,7 @@ public class TestServices {
     }
 
     private String getNotebookStatus(JsonPath json, String notebookName) {
-    	System.out.println("Looking status for notebook " + notebookName + " in " + json.getString(""));
-		List<Map<String, String>> notebooks = json
+    	List<Map<String, String>> notebooks = json
 				.param("name", notebookName)
 				.getList("findAll { notebook -> notebook.exploratory_name == name }");
         if (notebooks == null || notebooks.size() != 1) {
@@ -590,8 +609,7 @@ public class TestServices {
     }
     
     private String getEmrStatus(JsonPath json, String notebookName, String computationalName) {
-    	System.out.println("Looking status for computational " + computationalName + " on notebook " + notebookName + " in " + json);
-		List<Map<String, List<Map<String, String>>>> notebooks = json
+    	List<Map<String, List<Map<String, String>>>> notebooks = json
 				.param("name", notebookName)
 				.getList("findAll { notebook -> notebook.exploratory_name == name }");
         if (notebooks == null || notebooks.size() != 1) {
