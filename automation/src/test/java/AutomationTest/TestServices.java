@@ -200,11 +200,11 @@ public class TestServices {
         createNoteBookRequest.setName(noteBookName);
         createNoteBookRequest.setShape("r3.xlarge");
         createNoteBookRequest.setVersion("jupyter-1.6");
-        Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
+/*        Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
                                                                       createNoteBookRequest, token);
         System.out.println("   responseCreateNotebook.getBody() is " + responseCreateNotebook.getBody().asString());
         Assert.assertEquals(responseCreateNotebook.statusCode(), HttpStatusCode.OK);
-
+*/
         gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, noteBookName, "creating", PropertyValue.getTimeoutNotebookCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("Notebook " + noteBookName + " has not been created");
@@ -229,7 +229,7 @@ public class TestServices {
         deployEMR.setEmr_version(emrVersion);
         deployEMR.setName(emrName);
         deployEMR.setNotebook_name(noteBookName);
-        Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
+/*        Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
                                                                     deployEMR, token);
         System.out.println("   responseDeployingEMR.getBody() is " + responseDeployingEMR.getBody().asString());
         Assert.assertEquals(responseDeployingEMR.statusCode(), HttpStatusCode.OK);
@@ -237,7 +237,7 @@ public class TestServices {
         gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "creating", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("configuring"))
             throw new Exception("EMR " + emrName + " has not been deployed");
-        System.out.println("   EMR " + emrName + " has been deployed");
+*/        System.out.println("   EMR " + emrName + " has been deployed");
 
         Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.RUNNING);
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
@@ -545,7 +545,7 @@ public class TestServices {
         return actualStatus;
     }
 
-    private static String getNotebookStatus(JsonPath json, String notebookName) {
+    private String getNotebookStatus(JsonPath json, String notebookName) {
 		List<Map<String, String>> notebooks = json
 				.param("name", notebookName)
 				.getList("findAll { notebook -> notebook.exploratory_name == name }");
@@ -585,7 +585,7 @@ public class TestServices {
         return actualStatus;
     }
     
-    private static String getEmrStatus(JsonPath json, String notebookName, String computationalName) {
+    private String getEmrStatus(JsonPath json, String notebookName, String computationalName) {
 		List<Map<String, List<Map<String, String>>>> notebooks = json
 				.param("name", notebookName)
 				.getList("findAll { notebook -> notebook.exploratory_name == name }");
@@ -632,23 +632,4 @@ public class TestServices {
         return actualStatus;
     }
     
-    public static void main(String [] args) {
-    	HttpRequest request = new HttpRequest();
-    	String hostName = "ec2-35-165-7-108.us-west-2.compute.amazonaws.com";
-    	String ssnLoginURL = "http://" + hostName + "/api/user/login";
-    	LoginDto testUserRequestBody = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
-        Response responseTestUser = request.webApiPost(ssnLoginURL, ContentType.JSON, testUserRequestBody);
-        Assert.assertEquals(HttpStatusCode.OK, responseTestUser.getStatusCode(), "Failed to login");
-        String token = responseTestUser.getBody().asString();
-        String compUrl = " http://" + hostName + "/api/infrastructure_provision/provisioned_user_resources";
-    	
-        Response r = request.webApiGet(compUrl, token);
-        System.out.println("Responce body is " + r.getBody().asString());
-        JsonPath j = r
-        		.getBody()
-        		.jsonPath();
-		
-        System.out.println("Notebook status is " + getNotebookStatus(j, "useinj1"));
-		System.out.println("EMR status is " + getEmrStatus(j, "useinj1", "useinemr1"));
-    }
 }
