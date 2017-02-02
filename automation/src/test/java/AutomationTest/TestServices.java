@@ -540,7 +540,7 @@ public class TestServices {
 
     private int waitWhileStatus(String url, String token, int status, Duration duration)
             throws InterruptedException {
-    	System.out.println("Wait for status code " + status + " with URL " + url + " with token " + token);
+    	System.out.println("Waiting until status code " + status + " with URL " + url + " with token " + token);
         HttpRequest request = new HttpRequest();
         int actualStatus;
         long timeout = duration.toMillis();
@@ -580,7 +580,7 @@ public class TestServices {
 
     private String waitWhileNotebookStatus(String url, String token, String notebookName, String status, Duration duration)
             throws InterruptedException {
-    	System.out.println("Wait for status " + status + " with URL " + url + " with token " + token + " for notebook " + notebookName);
+    	System.out.println("Waiting until status " + status + " with URL " + url + " with token " + token + " for notebook " + notebookName);
         HttpRequest request = new HttpRequest();
         String actualStatus;
         long timeout = duration.toMillis();
@@ -628,7 +628,7 @@ public class TestServices {
     
     private String waitWhileEmrStatus(String url, String token, String notebookName, String computationalName, String status, Duration duration)
             throws InterruptedException {
-    	System.out.println("Wait for status " + status + " with URL " + url + " with token " + token + " for computational " +
+    	System.out.println("Waiting until status " + status + " with URL " + url + " with token " + token + " for computational " +
             computationalName + " on notebook " + notebookName);
         HttpRequest request = new HttpRequest();
         String actualStatus;
