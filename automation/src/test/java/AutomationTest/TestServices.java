@@ -475,7 +475,6 @@ public class TestServices {
                 System.out.println(String.format("Executing command %s...", command));
                 ChannelExec runScript = SSHConnect.setCommand(notebookSession, command);
                 status = SSHConnect.checkAck(runScript);
-                System.out.println(String.format("Executed command: %s", status.toString()));
                 Assert.assertTrue(status.isOk(), "The python script works not correct");
 
                 System.out.println("Python script was work correct ");
@@ -520,6 +519,7 @@ public class TestServices {
 
     private int waitWhileStatus(String url, String token, int status, Duration duration)
             throws InterruptedException {
+    	System.out.println("Wait for status code " + status + " with URL " + url + " with token " + token);
         HttpRequest request = new HttpRequest();
         int actualStatus;
         long timeout = duration.toMillis();
@@ -546,6 +546,7 @@ public class TestServices {
     }
 
     private String getNotebookStatus(JsonPath json, String notebookName) {
+    	System.out.println("Looking status for notebook " + notebookName + " in " + json);
 		List<Map<String, String>> notebooks = json
 				.param("name", notebookName)
 				.getList("findAll { notebook -> notebook.exploratory_name == name }");
@@ -558,6 +559,7 @@ public class TestServices {
 
     private String waitWhileNotebookStatus(String url, String token, String notebookName, String status, Duration duration)
             throws InterruptedException {
+    	System.out.println("Wait for status " + status + " with URL " + url + " with token " + token + " for notebook " + notebookName);
         HttpRequest request = new HttpRequest();
         String actualStatus;
         long timeout = duration.toMillis();
@@ -586,6 +588,7 @@ public class TestServices {
     }
     
     private String getEmrStatus(JsonPath json, String notebookName, String computationalName) {
+    	System.out.println("Looking status for computational " + computationalName + " on notebook " + notebookName + " in " + json);
 		List<Map<String, List<Map<String, String>>>> notebooks = json
 				.param("name", notebookName)
 				.getList("findAll { notebook -> notebook.exploratory_name == name }");
@@ -605,6 +608,8 @@ public class TestServices {
     
     private String waitWhileEmrStatus(String url, String token, String notebookName, String computationalName, String status, Duration duration)
             throws InterruptedException {
+    	System.out.println("Wait for status " + status + " with URL " + url + " with token " + token + " for computational " +
+            computationalName + " on notebook " + notebookName);
         HttpRequest request = new HttpRequest();
         String actualStatus;
         long timeout = duration.toMillis();
