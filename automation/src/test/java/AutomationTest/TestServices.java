@@ -200,11 +200,11 @@ public class TestServices {
         createNoteBookRequest.setName(noteBookName);
         createNoteBookRequest.setShape("r3.xlarge");
         createNoteBookRequest.setVersion("jupyter-1.6");
-/*        Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
+        Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
                                                                       createNoteBookRequest, token);
         System.out.println("   responseCreateNotebook.getBody() is " + responseCreateNotebook.getBody().asString());
         Assert.assertEquals(responseCreateNotebook.statusCode(), HttpStatusCode.OK);
-*/
+
         gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, noteBookName, "creating", PropertyValue.getTimeoutNotebookCreate());
         if (!gettingStatus.contains("running"))
             throw new Exception("Notebook " + noteBookName + " has not been created");
@@ -229,7 +229,7 @@ public class TestServices {
         deployEMR.setEmr_version(emrVersion);
         deployEMR.setName(emrName);
         deployEMR.setNotebook_name(noteBookName);
-/*        Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
+        Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
                                                                     deployEMR, token);
         System.out.println("   responseDeployingEMR.getBody() is " + responseDeployingEMR.getBody().asString());
         Assert.assertEquals(responseDeployingEMR.statusCode(), HttpStatusCode.OK);
@@ -237,7 +237,7 @@ public class TestServices {
         gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "creating", PropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("configuring"))
             throw new Exception("EMR " + emrName + " has not been deployed");
-*/        System.out.println("   EMR " + emrName + " has been deployed");
+        System.out.println("   EMR " + emrName + " has been deployed");
 
         Amazon.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.RUNNING);
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
@@ -468,8 +468,9 @@ public class TestServices {
             Session notebookSession = SSHConnect.getForwardedConnect("ubuntu", noteBookIp, assignedPort);
 
             try {
-                command = String.format("/usr/bin/python %s --bucket %s --cluster_name %s",
+                command = String.format("/usr/bin/python %s --region %s --bucket %s --cluster_name %s",
                         Paths.get("/tmp", pyFilename).toString(),
+                        PropertyValue.getAwsRegion(),
                         getBucketName(),
                         cluster_name);
                 System.out.println(String.format("Executing command %s...", command));
@@ -546,15 +547,16 @@ public class TestServices {
     }
 
     private String getNotebookStatus(JsonPath json, String notebookName) {
-    	System.out.println("Looking status for notebook " + notebookName + " in " + json);
+    	System.out.println("Looking status for notebook " + notebookName + " in " + json.getString(""));
 		List<Map<String, String>> notebooks = json
 				.param("name", notebookName)
 				.getList("findAll { notebook -> notebook.exploratory_name == name }");
         if (notebooks == null || notebooks.size() != 1) {
-        	return null;
+        	return "";
         }
         Map<String, String> notebook = notebooks.get(0);
-        return notebook.get("status");
+        String status = notebook.get("status");
+        return (status == null ? "" : status);
     }
 
     private String waitWhileNotebookStatus(String url, String token, String notebookName, String status, Duration duration)
@@ -593,7 +595,7 @@ public class TestServices {
 				.param("name", notebookName)
 				.getList("findAll { notebook -> notebook.exploratory_name == name }");
         if (notebooks == null || notebooks.size() != 1) {
-        	return null;
+        	return "";
         }
         List<Map<String, String>> resources = notebooks.get(0)
         		.get("computational_resources");
@@ -603,7 +605,7 @@ public class TestServices {
             	return resource.get("status");
             }
 		}
-		return null;
+		return "";
     }
     
     private String waitWhileEmrStatus(String url, String token, String notebookName, String computationalName, String status, Duration duration)
