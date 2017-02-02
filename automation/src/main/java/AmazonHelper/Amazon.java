@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
@@ -18,17 +19,26 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.AccessControlList;
 import com.amazonaws.services.s3.model.Grant;
 
+import AutomationTest.PropertyValue;
+
 import org.testng.Assert;
 
 public class Amazon {
 	
-	private static final long AWS_REQUEST_TIMEOUT = 10000;
 	private static final Duration CHECK_TIMEOUT = Duration.parse("PT10m");
 	
+	private static AWSCredentials getCredentials() {
+		return new BasicAWSCredentials(PropertyValue.getAwsAccessKeyId(), PropertyValue.getAwsSecretAccessKey());
+	}
+	
+	private static Region getRegion() {
+		return Region.getRegion(Regions.fromName(PropertyValue.getAwsRegion()));
+	}
+	
     public static List<Instance> getInstances(String instanceName) throws Exception {
-            AWSCredentials credentials = new BasicAWSCredentials(AmazonCredentials.ACCESS_KEY, AmazonCredentials.SECRET_KEY);
+            AWSCredentials credentials = getCredentials();
             AmazonEC2 ec2 = new AmazonEC2Client(credentials);
-            ec2.setRegion(com.amazonaws.regions.Region.getRegion(Regions.US_WEST_2));
+            ec2.setRegion(getRegion());
      
             List<String> valuesT1 = new ArrayList<String>();
             valuesT1.add(instanceName + "*");
@@ -58,7 +68,8 @@ public class Amazon {
     public static void checkAmazonStatus(String instanceName, String expAmazonState) throws Exception {
         System.out.println("Check status of instance " + instanceName + " on Amazon:");
         String instanceState;
-        long timeout = CHECK_TIMEOUT.toMillis();
+        long requestTimeout = PropertyValue.getAwsRequestTimeout().toMillis();
+    	long timeout = CHECK_TIMEOUT.toMillis();
         long expiredTime = System.currentTimeMillis() + timeout;
 
         // TODOD: Add timeout
@@ -69,7 +80,7 @@ public class Amazon {
                 System.out.println("Amazon instance " + instanceName + " state is " + instanceState);           
         		throw new Exception("Timeout has been expired for check amazon instance " + instanceState);
             }
-            Thread.sleep(AWS_REQUEST_TIMEOUT);
+            Thread.sleep(requestTimeout);
         };
         
         for (Instance instance : Amazon.getInstances(instanceName)) {
@@ -80,10 +91,10 @@ public class Amazon {
 
     public static void printBucketGrants(String bucketName) throws Exception {
     	System.out.println("Print grants for bucket " + bucketName + " on Amazon:");
-        AWSCredentials credentials = new BasicAWSCredentials(AmazonCredentials.ACCESS_KEY, AmazonCredentials.SECRET_KEY);
+        AWSCredentials credentials = getCredentials();
         AmazonS3 s3 = new AmazonS3Client(credentials);
         
-        s3.setRegion(com.amazonaws.regions.Region.getRegion(Regions.US_WEST_2));
+        s3.setRegion(getRegion());
         AccessControlList acl = s3.getBucketAcl(bucketName);
         for (Grant grant : acl.getGrants()) {
 			System.out.println(grant);
