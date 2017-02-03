@@ -98,7 +98,7 @@ def configure_local_kernels(args):
     sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
     sudo('sed -i "s|SP_VER|' + args.spark_version + '|g" /tmp/interpreter.json')
     while not port_number_found:
-        port_free = sudo('nc -z localhost ' + default_port + '; echo $?')
+        port_free = sudo('nc -z localhost ' + str(default_port) + '; echo $?')
         if port_free == '1':
             livy_port = default_port
             port_number_found = True
