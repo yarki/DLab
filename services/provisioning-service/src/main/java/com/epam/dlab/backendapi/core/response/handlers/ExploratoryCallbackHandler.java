@@ -39,6 +39,7 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryCallbackHandler.class);
 	
     private static final String EXPLORATORY_ID_FIELD = "notebook_name";
+    private static final String EXPLORATORY_PRIVATE_IP_FIELD = "ip";
     private static final String EXPLORATORY_URL_FIELD = "exploratory_url";
     private static final String EXPLORATORY_USER_FIELD = "exploratory_user";
     private static final String EXPLORATORY_PASSWORD_FIELD = "exploratory_pass";
@@ -78,6 +79,7 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
         return baseStatus
                 .withExploratoryId(getTextValue(resultNode.get(EXPLORATORY_ID_FIELD)))
                 .withExploratoryUrl(url)
+                .withExploratoryPrivateIp(getTextValue(resultNode.get(EXPLORATORY_PRIVATE_IP_FIELD)))
                 .withExploratoryUser(getTextValue(resultNode.get(EXPLORATORY_USER_FIELD)))
                 .withExploratoryPassword(getTextValue(resultNode.get(EXPLORATORY_PASSWORD_FIELD)));
     }
