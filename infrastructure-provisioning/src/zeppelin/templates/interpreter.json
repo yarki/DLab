@@ -49,6 +49,10 @@
         {
           "class": "org.apache.zeppelin.livy.LivyPySparkInterpreter",
           "name": "pyspark"
+        },
+        {
+          "class": "org.apache.zeppelin.spark.PySparkInterpreter",
+          "name": "pyspark"
         }
       ],
       "dependencies": [],
@@ -86,6 +90,10 @@
       "interpreterGroup": [
         {
           "class": "org.apache.zeppelin.livy.LivyPySparkInterpreter",
+          "name": "pyspark"
+        },
+        {
+          "class": "org.apache.zeppelin.spark.PySparkInterpreter",
           "name": "pyspark"
         }
       ],

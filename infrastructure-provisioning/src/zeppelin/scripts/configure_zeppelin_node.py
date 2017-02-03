@@ -127,7 +127,7 @@ def install_local_livy(args):
     sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
     sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /opt/livy/')
     put(templates_dir + 'livy-server.service', '/tmp/livy-server.service')
-    sudo("sed -i 's|OS_USR|" + args.os_user + "|' /tmp/livy-server.service")
+    sudo("sed -i 's|OS_USER|" + args.os_user + "|' /tmp/livy-server.service")
     sudo("chmod 644 /tmp/livy-server.service")
     sudo('cp /tmp/livy-server.service /etc/systemd/system/livy-server.service')
     sudo("systemctl daemon-reload")
