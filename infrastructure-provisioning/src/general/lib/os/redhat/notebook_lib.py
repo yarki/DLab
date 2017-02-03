@@ -296,10 +296,14 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
 
 
 def install_maven():
-    sudo('apt-get -y install maven')
+    sudo('yum install -y unzip')
+    with cd('/tmp/'):
+        sudo('wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip')
+        sudo('unzip apache-maven-3.3.9-bin.zip')
+        sudo('mv apache-maven-3.3.9/ /opt/maven')
+        sudo('ln -s /opt/maven/bin/mvn /usr/bin/mvn')
 
 
 def install_livy_dependencies():
-    sudo('apt-get -y install libkrb5-dev')
     sudo('pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
     sudo('pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')
