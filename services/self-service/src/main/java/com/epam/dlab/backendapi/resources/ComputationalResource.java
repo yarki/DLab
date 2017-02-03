@@ -22,8 +22,6 @@ import static com.epam.dlab.UserInstanceStatus.CREATING;
 import static com.epam.dlab.UserInstanceStatus.FAILED;
 import static com.epam.dlab.UserInstanceStatus.TERMINATING;
 
-import java.util.Optional;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;

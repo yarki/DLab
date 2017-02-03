@@ -16,51 +16,55 @@ limitations under the License.
 
 ****************************************************************************/
 
-package com.epam.dlab.dto;
+package com.epam.dlab.dto.status;
 
+import com.epam.dlab.dto.ResourceBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
-abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
+public class EnvResourceDTO extends ResourceBaseDTO<EnvResourceDTO> {
     @JsonProperty("aws_region")
     private String awsRegion;
-    @JsonProperty("iam_user_name")
-    private String iamUserName;
-
-    @SuppressWarnings("unchecked")
-	private final T self = (T)this;
-
+    @JsonProperty("list_resources")
+    private EnvResourceList resourceList;
+    
+    /** Return the name of region in Amazon. */
     public String getAwsRegion() {
         return awsRegion;
     }
 
+    /** Set the name of region in Amazon. */
     public void setAwsRegion(String awsRegion) {
         this.awsRegion = awsRegion;
     }
 
-    public T withAwsRegion(String region) {
+    /** Set the name of region in Amazon. */
+	public EnvResourceDTO withAwsRegion(String region) {
         setAwsRegion(region);
-        return self;
+        return this;
     }
 
-    public String getIamUserName() {
-        return iamUserName;
+    /** Return the list of resources (hosts, clusters, storages). */
+    public EnvResourceList getResourceList() {
+        return resourceList;
     }
 
-    public void setIamUserName(String iamUserName) {
-        this.iamUserName = iamUserName;
+    /** Set the list of resources (hosts, clusters, storages). */
+    public void setResourceList(EnvResourceList resourceList) {
+        this.resourceList = resourceList;
     }
 
-    public T withIamUserName(String iamUserName) {
-        setIamUserName(iamUserName);
-        return self;
+    /** Set the list of resources (hosts, clusters, storages). */
+	public EnvResourceDTO withResourceList(EnvResourceList resourceList) {
+        setResourceList(resourceList);
+        return this;
     }
 
+    @Override
     public ToStringHelper toStringHelper(Object self) {
-    	return MoreObjects.toStringHelper(self)
-    	        .add("iamUserName", iamUserName)
-    	        .add("awsRegion", awsRegion);
+    	return super.toStringHelper(self)
+    	        .add("awsRegion", awsRegion)
+    	        .add("resourceList", resourceList);
     }
     
     @Override

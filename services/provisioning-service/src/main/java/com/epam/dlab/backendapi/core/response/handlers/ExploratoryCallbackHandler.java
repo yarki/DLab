@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 public class ExploratoryCallbackHandler extends ResourceCallbackHandler<ExploratoryStatusDTO> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryCallbackHandler.class);
 	
+    private static final String INSTANCE_ID_FIELD = "instance_id";
     private static final String EXPLORATORY_ID_FIELD = "notebook_name";
     private static final String EXPLORATORY_URL_FIELD = "exploratory_url";
     private static final String EXPLORATORY_USER_FIELD = "exploratory_user";
@@ -76,6 +77,7 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
 			}
     	}
         return baseStatus
+	            .withInstanceId(getTextValue(resultNode.get(INSTANCE_ID_FIELD)))
                 .withExploratoryId(getTextValue(resultNode.get(EXPLORATORY_ID_FIELD)))
                 .withExploratoryUrl(url)
                 .withExploratoryUser(getTextValue(resultNode.get(EXPLORATORY_USER_FIELD)))

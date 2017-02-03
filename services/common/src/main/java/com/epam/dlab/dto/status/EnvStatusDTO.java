@@ -16,51 +16,38 @@ limitations under the License.
 
 ****************************************************************************/
 
-package com.epam.dlab.dto;
+package com.epam.dlab.dto.status;
 
+import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
-abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
-    @JsonProperty("aws_region")
-    private String awsRegion;
-    @JsonProperty("iam_user_name")
-    private String iamUserName;
-
-    @SuppressWarnings("unchecked")
-	private final T self = (T)this;
-
-    public String getAwsRegion() {
-        return awsRegion;
+/** Describe the lists of resources (host, cluster, storage) for check status in Cloud.
+ */
+public class EnvStatusDTO extends StatusBaseDTO<EnvStatusDTO> {
+    @JsonProperty("list_resources")
+    private EnvResourceList resourceList;
+    
+    /** Return the list of resources (hosts, clusters, storages). */
+    public EnvResourceList getResourceList() {
+        return resourceList;
     }
 
-    public void setAwsRegion(String awsRegion) {
-        this.awsRegion = awsRegion;
+    /** Set the list of resources (hosts, clusters, storages). */
+    public void setResourceList(EnvResourceList resourceList) {
+        this.resourceList = resourceList;
     }
 
-    public T withAwsRegion(String region) {
-        setAwsRegion(region);
-        return self;
+    /** Set the list of resources (hosts, clusters, storages). */
+	public EnvStatusDTO withResourceList(EnvResourceList resourceList) {
+        setResourceList(resourceList);
+        return this;
     }
 
-    public String getIamUserName() {
-        return iamUserName;
-    }
-
-    public void setIamUserName(String iamUserName) {
-        this.iamUserName = iamUserName;
-    }
-
-    public T withIamUserName(String iamUserName) {
-        setIamUserName(iamUserName);
-        return self;
-    }
-
+    @Override
     public ToStringHelper toStringHelper(Object self) {
-    	return MoreObjects.toStringHelper(self)
-    	        .add("iamUserName", iamUserName)
-    	        .add("awsRegion", awsRegion);
+    	return super.toStringHelper(self)
+    	        .add("resourceList", resourceList);
     }
     
     @Override

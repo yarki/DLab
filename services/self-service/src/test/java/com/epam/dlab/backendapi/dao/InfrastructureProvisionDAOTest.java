@@ -20,7 +20,6 @@ package com.epam.dlab.backendapi.dao;
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
-import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryURL;
@@ -251,7 +250,7 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         dao.insertOne(USER_INSTANCES, instance1);
         dao.insertOne(USER_INSTANCES, instance2);
 
-        StatusBaseDTO<?> newStatus = new StatusBaseDTO<>();
+        ExploratoryStatusDTO newStatus = new ExploratoryStatusDTO();
         newStatus.setUser("user1");
         newStatus.setExploratoryName("exp_name_1");
         newStatus.setStatus("running");
@@ -495,7 +494,7 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         boolean inserted3 = dao.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp3);
         assertTrue(inserted3);
 
-        UpdateResult testResult = dao.updateComputationalStatusesForExploratory(new StatusBaseDTO<>()
+        UpdateResult testResult = dao.updateComputationalStatusesForExploratory(new ComputationalStatusDTO()
                 .withUser("user1")
                 .withExploratoryName("exp_name_1")
                 .withStatus(UserInstanceStatus.STOPPED));

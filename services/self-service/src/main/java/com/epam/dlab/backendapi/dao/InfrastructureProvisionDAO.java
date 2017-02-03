@@ -21,11 +21,10 @@ package com.epam.dlab.backendapi.dao;
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
-import com.epam.dlab.dto.StatusBaseDTO;
+import com.epam.dlab.dto.StatusEnvBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
-import com.mongodb.MongoWriteException;
 import com.mongodb.client.result.UpdateResult;
 
 import org.bson.Document;
@@ -142,7 +141,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
      * @return The result of an update operation.
      * @exception DlabException
      */
-    public UpdateResult updateExploratoryStatus(StatusBaseDTO<?> dto) throws DlabException {
+    public UpdateResult updateExploratoryStatus(StatusEnvBaseDTO<?> dto) throws DlabException {
         return updateOne(USER_INSTANCES,
                 exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                 set(STATUS, dto.getStatus()));
@@ -273,7 +272,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
      * @return The result of an update operation.
      * @exception DlabException
      */
-    public UpdateResult updateComputationalStatusesForExploratory(StatusBaseDTO<?> dto) throws DlabException {
+    public UpdateResult updateComputationalStatusesForExploratory(StatusEnvBaseDTO<?> dto) throws DlabException {
         Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus());
         values.append(computationalFieldFilter(UPTIME), null);
         long modifiedCount;

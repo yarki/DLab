@@ -16,51 +16,56 @@ limitations under the License.
 
 ****************************************************************************/
 
-package com.epam.dlab.dto;
+package com.epam.dlab.dto.status;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
-abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
-    @JsonProperty("aws_region")
-    private String awsRegion;
-    @JsonProperty("iam_user_name")
-    private String iamUserName;
+/** Describe the resource (host, cluster, storage) for check status in Cloud.
+ */
+public class EnvResource {
+    @JsonProperty
+    private String id;
+    @JsonProperty
+    private String state;
 
-    @SuppressWarnings("unchecked")
-	private final T self = (T)this;
-
-    public String getAwsRegion() {
-        return awsRegion;
+    /** Return the id of resource. instanceId for host, clusterId for cluster, path for storage. */
+    public String getId() {
+        return id;
     }
 
-    public void setAwsRegion(String awsRegion) {
-        this.awsRegion = awsRegion;
+    /** Set the id of resource. instanceId for host, clusterId for cluster, path for storage. */
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public T withAwsRegion(String region) {
-        setAwsRegion(region);
-        return self;
+    /** Set the id of resource. instanceId for host, clusterId for cluster, path for storage. */
+    public EnvResource withId(String id) {
+        setId(id);
+        return this;
     }
 
-    public String getIamUserName() {
-        return iamUserName;
+    /** Return the status of resource. */
+    public String getState() {
+        return state;
     }
 
-    public void setIamUserName(String iamUserName) {
-        this.iamUserName = iamUserName;
+    /** Set the status of resource. */
+    public void setState(String state) {
+        this.state = state;
     }
 
-    public T withIamUserName(String iamUserName) {
-        setIamUserName(iamUserName);
-        return self;
+    /** Set the status of resource. */
+    public EnvResource withState(String state) {
+    	setState(state);
+        return this;
     }
 
     public ToStringHelper toStringHelper(Object self) {
     	return MoreObjects.toStringHelper(self)
-    	        .add("iamUserName", iamUserName)
-    	        .add("awsRegion", awsRegion);
+    	        .add("id", id)
+    	        .add("status", state);
     }
     
     @Override
