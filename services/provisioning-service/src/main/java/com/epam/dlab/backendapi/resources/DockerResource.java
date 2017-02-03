@@ -52,7 +52,7 @@ public class DockerResource implements DockerCommands {
 
     @GET
     @Path("{type}")
-    public Set<ImageMetadataDTO> getDockerImages(@PathParam("type") String type) throws
+    public Set<ImageMetadataDTO> getDockerImages(@Auth UserInfo ui, @PathParam("type") String type) throws
             IOException, InterruptedException {
         LOGGER.debug("docker statuses asked for {}", type);
         return metadataHolder
