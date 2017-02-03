@@ -52,7 +52,7 @@ public class InfrasctructureResource {
     @Path("/status")
     public HealthStatusDTO status(@Auth UserInfo userInfo) {
         return new HealthStatusDTO()
-                .withMongoAlive(mongoHealthChecker.isAlive())
-                .withProvisioningAlive(provisioningHealthChecker.isAlive());
+                .withMongoAlive(mongoHealthChecker.isAlive(userInfo))
+                .withProvisioningAlive(provisioningHealthChecker.isAlive(userInfo));
     }
 }

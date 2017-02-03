@@ -112,7 +112,7 @@ public class KeyUploaderResource {
      */
     @POST
     @Path("/callback")
-    public Response loadKeyResponse(UploadFileResultDTO uploadKeyResult) {
+    public Response loadKeyResponse(@Auth UserInfo ui, UploadFileResultDTO uploadKeyResult) {
         LOGGER.debug("Upload the key result for user {}", uploadKeyResult.getUser(), uploadKeyResult.isSuccess());
         try {
         	keyUploader.onKeyUploadComplete(uploadKeyResult);
