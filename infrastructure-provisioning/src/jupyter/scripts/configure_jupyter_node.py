@@ -42,42 +42,55 @@ pyspark_local_path_dir = '/home/' + args.os_user + '/.local/share/jupyter/kernel
 py3spark_local_path_dir = '/home/' + args.os_user + '/.local/share/jupyter/kernels/py3spark_local/'
 jupyter_conf_file = '/home/' + args.os_user + '/.local/share/jupyter/jupyter_notebook_config.py'
 scala_kernel_path = '/usr/local/share/jupyter/kernels/apache_toree_scala/'
+r_kernels_dir = '/home/' + args.os_user + '/.local/share/jupyter/kernels/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 files_dir = '/root/files/'
+local_spark_path = '/opt/spark/'
 
 
-def configure_jupyter():
-    if not exists('/home/' + args.os_user + '/.ensure_dir/jupyter_ensured'):
+def ensure_pyspark_local_kernel():
+    if not exists('/home/' + args.os_user + '/.ensure_dir/pyspark_local_kernel_ensured'):
         try:
-            sudo('pip install jupyter --no-cache-dir')
-            sudo('rm -rf ' + jupyter_conf_file)
-            sudo('jupyter notebook --generate-config --config ' + jupyter_conf_file)
-            sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
-            sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
-            sudo('echo \'c.NotebookApp.cookie_secret = b"' + id_generator() + '"\' >> ' + jupyter_conf_file)
-            sudo('''echo "c.NotebookApp.token = u''" >> ''' + jupyter_conf_file)
-            sudo('echo \'c.KernelSpecManager.ensure_native_kernel = False\' >> ' + jupyter_conf_file)
+            sudo('mkdir -p ' + pyspark_local_path_dir)
+            sudo('touch ' + pyspark_local_path_dir + 'kernel.json')
+            put(templates_dir + 'pyspark_local_template.json', '/tmp/pyspark_local_template.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/pyspark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/pyspark_local_template.json')
+            sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
+            sudo('touch /home/' + args.os_user + '/.ensure_dir/pyspark_local_kernel_ensured')
         except:
             sys.exit(1)
 
-        ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, pyspark_local_path_dir,
-                           py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, args.os_user,
-                           files_dir)
 
+def ensure_py3spark_local_kernel():
+    if not exists('/home/' + args.os_user + '/.ensure_dir/py3spark_local_kernel_ensured'):
         try:
-            put(templates_dir + 'jupyter-notebook.service', '/tmp/jupyter-notebook.service')
-            sudo("chmod 644 /tmp/jupyter-notebook.service")
-            sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
-            sudo("sed -i 's|OS_USR|" + args.os_user + "|' /tmp/jupyter-notebook.service")
-            sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
-            sudo('chown -R ' + args.os_user + ':' + args.os_user + ' /home/' + args.os_user + '/.local')
-            sudo('mkdir /mnt/var')
-            sudo('chown ' + args.os_user + ':' + args.os_user + ' /mnt/var')
-            sudo("systemctl daemon-reload")
-            sudo("systemctl enable jupyter-notebook")
-            sudo("systemctl start jupyter-notebook")
-            sudo('touch /home/' + args.os_user + '/.ensure_dir/jupyter_ensured')
+            sudo('mkdir -p ' + py3spark_local_path_dir)
+            sudo('touch ' + py3spark_local_path_dir + 'kernel.json')
+            put(templates_dir + 'py3spark_local_template.json', '/tmp/py3spark_local_template.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/py3spark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/py3spark_local_template.json')
+            sudo('\cp /tmp/py3spark_local_template.json ' + py3spark_local_path_dir + 'kernel.json')
+            sudo('touch /home/' + args.os_user + '/.ensure_dir/py3spark_local_kernel_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_toree_local_kernel():
+    if not exists('/home/' + args.os_user + '/.ensure_dir/toree_local_kernel_ensured'):
+        try:
+            sudo('pip install --pre toree --no-cache-dir')
+            sudo('ln -s /opt/spark/ /usr/local/spark')
+            sudo('jupyter toree install')
+            sudo('mv ' + scala_kernel_path + 'lib/* /tmp/')
+            put(files_dir + 'toree-assembly-0.2.0.jar', '/tmp/toree-assembly-0.2.0.jar')
+            sudo('mv /tmp/toree-assembly-0.2.0.jar ' + scala_kernel_path + 'lib/')
+            sudo(
+                'sed -i "s|Apache Toree - Scala|Local Apache Toree - Scala (Scala-' + scala_version + ', Spark-' + spark_version + ')|g" ' + scala_kernel_path + 'kernel.json')
+            sudo('touch /home/' + args.os_user + '/.ensure_dir/toree_local_kernel_ensured')
         except:
             sys.exit(1)
 
@@ -101,14 +114,35 @@ if __name__ == "__main__":
     print "Mount additional volume"
     prepare_disk(args.os_user)
 
-    print "Install Jupyter"
-    configure_jupyter()
+    print "Install Java"
+    ensure_jre_jdk(args.os_user)
+
+    print "Install Scala"
+    ensure_scala(scala_link, scala_version, args.os_user)
+
+    print "Install python2 libraries"
+    ensure_python2_libraries(args.os_user)
 
     print "Install python3 libraries"
-    ensure_python3_kernel(args.os_user)
+    ensure_python3_libraries(args.os_user)
+
+    print "Install Jupyter"
+    configure_jupyter(args.os_user, jupyter_conf_file, templates_dir)
+
+    print "Install local Spark"
+    ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path)
 
     print "Install local jars"
     ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
+    print "Install pyspark local kernel for Jupyter"
+    ensure_pyspark_local_kernel()
+
+    print "Install py3spark local kernel for Jupyter"
+    ensure_py3spark_local_kernel()
+
+    print "Install Toree-Scala kernel for Jupyter"
+    ensure_toree_local_kernel()
+
     print "Install R kernel for Jupyter"
-    ensure_r_kernel(spark_version, args.os_user)
+    ensure_r_local_kernel(spark_version, args.os_user, templates_dir, r_kernels_dir)

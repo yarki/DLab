@@ -78,7 +78,7 @@ if __name__ == "__main__":
     install_rstudio(args.os_user, local_spark_path, args.rstudio_pass)
 
     print "Install local Spark"
-    ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path )
+    ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path)
 
     print "Install local jars"
     ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)

@@ -122,6 +122,9 @@ if __name__ == "__main__":
     print "Install Zeppelin"
     configure_zeppelin(args.os_user)
 
+    print "Install python2 libraries"
+    ensure_python2_libraries(args.os_user)
+
     print "Install python3 libraries"
     ensure_python3_libraries(args.os_user)
     ensure_python3_specific_version(python3_version, args.os_user)

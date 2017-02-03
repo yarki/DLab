@@ -166,3 +166,30 @@ def put_resource_status(resource, status, dlab_path, os_user):
     env.key_filename = [keyfile]
     env.host_string = os_user + '@' + hostname
     sudo('python ' + dlab_path + 'tmp/resource_status.py --resource {} --status {}'.format(resource, status))
+
+
+def configure_jupyter(os_user, jupyter_conf_file, templates_dir):
+    if not exists('/home/' + os_user + '/.ensure_dir/jupyter_ensured'):
+        try:
+            sudo('pip install jupyter --no-cache-dir')
+            sudo('rm -rf ' + jupyter_conf_file)
+            sudo('jupyter notebook --generate-config --config ' + jupyter_conf_file)
+            sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
+            sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
+            sudo('echo \'c.NotebookApp.cookie_secret = b"' + id_generator() + '"\' >> ' + jupyter_conf_file)
+            sudo('''echo "c.NotebookApp.token = u''" >> ''' + jupyter_conf_file)
+            sudo('echo \'c.KernelSpecManager.ensure_native_kernel = False\' >> ' + jupyter_conf_file)
+            put(templates_dir + 'jupyter-notebook.service', '/tmp/jupyter-notebook.service')
+            sudo("chmod 644 /tmp/jupyter-notebook.service")
+            sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
+            sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/jupyter-notebook.service")
+            sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
+            sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
+            sudo('mkdir /mnt/var')
+            sudo('chown ' + os_user + ':' + os_user + ' /mnt/var')
+            sudo("systemctl daemon-reload")
+            sudo("systemctl enable jupyter-notebook")
+            sudo("systemctl start jupyter-notebook")
+            sudo('touch /home/' + os_user + '/.ensure_dir/jupyter_ensured')
+        except:
+            sys.exit(1)
