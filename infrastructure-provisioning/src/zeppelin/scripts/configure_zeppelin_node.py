@@ -36,14 +36,15 @@ parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 parser.add_argument('--os_user', type=str, default='')
+parser.add_argument('--spark_version', type=str, default='')
+parser.add_argument('--hadoop_version', type=str, default='')
 args = parser.parse_args()
 
-spark_version = os.environ['notebook_spark_version']
-hadoop_version = os.environ['notebook_hadoop_version']
-spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
+
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version + "-bin-hadoop" + args.hadoop_version + ".tgz"
 zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-netinst.tgz"
 zeppelin_version = "0.6.2"
-zeppelin_interpreters = "md,python"
+zeppelin_interpreters = "md,python,livy"
 python3_version = "3.4"
 local_spark_path = '/opt/spark/'
 templates_dir = '/root/templates/'
@@ -62,10 +63,6 @@ def configure_notebook_server(os_user):
             sudo('sed -i \"/# export ZEPPELIN_PID_DIR/c\export ZEPPELIN_PID_DIR=/var/run/zeppelin\" /opt/zeppelin/conf/zeppelin-env.sh')
             sudo('sed -i \"/# export ZEPPELIN_IDENT_STRING/c\export ZEPPELIN_IDENT_STRING=notebook\" /opt/zeppelin/conf/zeppelin-env.sh')
             sudo('sed -i \"/# export SPARK_HOME/c\export SPARK_HOME=\/opt\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
-            put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
-            sudo('sed -i "s|AWSREGION|' + args.region + '|g" /tmp/interpreter.json')
-            sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
-            sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
             sudo('mkdir /var/log/zeppelin')
             sudo('mkdir /var/run/zeppelin')
             sudo('ln -s /var/log/zeppelin /opt/zeppelin-' + zeppelin_version + '-bin-netinst/logs')
@@ -88,6 +85,49 @@ def configure_notebook_server(os_user):
             sudo('touch /home/' + os_user + '/.ensure_dir/zeppelin_ensured')
         except:
             sys.exit(1)
+
+
+def configure_local_kernels(args):
+    port_number_found = False
+    default_port = 8998
+    livy_port = ''
+    put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
+    sudo('sed -i "s|AWSREGION|' + args.region + '|g" /tmp/interpreter.json')
+    sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
+    sudo('sed -i "s|SP_VER|' + args.spark_version + '|g" /tmp/interpreter.json')
+    while not port_number_found:
+        port_free = sudo('nc -z localhost ' + default_port + '; echo $?')
+        if port_free == '1':
+            livy_port = default_port
+            port_number_found = True
+        else:
+            default_port += 1
+    sudo('sed -i "s|LIVYPORT|' + livy_port + '|g" /tmp/interpreter.json')
+    sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
+    sudo('echo "livy.server.port = ' + str(livy_port) + '" >> /opt/livy/conf/livy.conf')
+    sudo('''echo "SPARK_HOME='/opt/spark/'" >> /opt/livy/conf/livy-env.sh''')
+    sudo('sed -i "s/^/#/g" /opt/livy/conf/spark-blacklist.conf')
+    sudo("systemctl start livy-server")
+
+
+def install_local_livy(args):
+    install_maven()
+    install_livy_dependencies()
+    with cd('/opt/'):
+        sudo('git init')
+        sudo('git clone https://github.com/cloudera/livy.git')
+    with cd('/opt/livy/'):
+        sudo('mvn package -DskipTests')
+    sudo('mkdir -p /var/run/livy')
+    sudo('mkdir -p /opt/livy/logs')
+    sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
+    sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /opt/livy/')
+    put(templates_dir + 'livy-server.service', '/tmp/livy-server.service')
+    sudo("sed -i 's|OS_USR|" + args.os_user + "|' /tmp/livy-server.service")
+    sudo("chmod 644 /tmp/livy-server.service")
+    sudo('cp /tmp/livy-server.service /etc/systemd/system/livy-server.service')
+    sudo("systemctl daemon-reload")
+    sudo("systemctl enable livy-server")
 
 
 ##############
@@ -114,7 +154,7 @@ if __name__ == "__main__":
     ensure_jre_jdk(args.os_user)
 
     print "Install local Spark"
-    ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path)
+    ensure_local_spark(args.os_user, spark_link, args.spark_version, args.hadoop_version, local_spark_path)
 
     print "Install local S3 kernels"
     ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
@@ -124,3 +164,9 @@ if __name__ == "__main__":
 
     print "Install python3 kernels"
     ensure_python3_kernel_zeppelin(python3_version, args.os_user)
+
+    print "Installing Livy for local kernels"
+    install_local_livy(args)
+
+    print "Configuring local kernels"
+    configure_local_kernels(args)

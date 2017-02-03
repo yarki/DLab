@@ -293,3 +293,13 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo('touch /home/' + os_user + '/.ensure_dir/tensor_ensured')
         except:
             sys.exit(1)
+
+
+def install_maven():
+    sudo('apt-get -y install maven')
+
+
+def install_livy_dependencies():
+    sudo('apt-get -y install libkrb5-dev')
+    sudo('pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
+    sudo('pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')
