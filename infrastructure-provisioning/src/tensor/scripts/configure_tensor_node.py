@@ -44,6 +44,7 @@ local_spark_path = '/opt/spark/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 files_dir = '/root/files/'
+jupyter_conf_file = '/home/' + args.os_user + '/.local/share/jupyter/jupyter_notebook_config.py'
 
 
 ##############
@@ -77,11 +78,11 @@ if __name__ == "__main__":
     print "Install TensorFlow"
     install_tensor(args.os_user, tensorflow_version, files_dir, templates_dir)
 
+    print "Install Jupyter"
+    configure_jupyter(args.os_user, jupyter_conf_file, templates_dir)
+
     print "Install local Spark"
     ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path )
 
     print "Install local jars"
     ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
-
-
-
