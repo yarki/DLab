@@ -193,3 +193,33 @@ def configure_jupyter(os_user, jupyter_conf_file, templates_dir):
             sudo('touch /home/' + os_user + '/.ensure_dir/jupyter_ensured')
         except:
             sys.exit(1)
+
+
+def ensure_pyspark_local_kernel(os_user, pyspark_local_path_dir, templates_dir, spark_version):
+    if not exists('/home/' + os_user + '/.ensure_dir/pyspark_local_kernel_ensured'):
+        try:
+            sudo('mkdir -p ' + pyspark_local_path_dir)
+            sudo('touch ' + pyspark_local_path_dir + 'kernel.json')
+            put(templates_dir + 'pyspark_local_template.json', '/tmp/pyspark_local_template.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/pyspark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/pyspark_local_template.json')
+            sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
+            sudo('touch /home/' + os_user + '/.ensure_dir/pyspark_local_kernel_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_py3spark_local_kernel(os_user, py3spark_local_path_dir, templates_dir, spark_version):
+    if not exists('/home/' + os_user + '/.ensure_dir/py3spark_local_kernel_ensured'):
+        try:
+            sudo('mkdir -p ' + py3spark_local_path_dir)
+            sudo('touch ' + py3spark_local_path_dir + 'kernel.json')
+            put(templates_dir + 'py3spark_local_template.json', '/tmp/py3spark_local_template.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/py3spark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/py3spark_local_template.json')
+            sudo('\cp /tmp/py3spark_local_template.json ' + py3spark_local_path_dir + 'kernel.json')
+            sudo('touch /home/' + os_user + '/.ensure_dir/py3spark_local_kernel_ensured')
+        except:
+            sys.exit(1)
