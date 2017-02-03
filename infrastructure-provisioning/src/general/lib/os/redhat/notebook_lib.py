@@ -85,6 +85,7 @@ def ensure_python3_kernel(os_user):
         try:
             sudo('yum install -y python-setuptools python-wheel')
             sudo('yum install -y python34-setuptools python34-pip')
+            sudo('yum install -y https://forensics.cert.org/centos/cert/7/x86_64/pyparsing-2.0.3-1.el7.noarch.rpm')
             sudo('yum install -y openssl-devel openssl-libs python-virtualenv python-devel python34-devel libxml2-devel libxslt-devel')
             sudo('pip3 install ipython ipykernel --no-cache-dir')
             sudo('python3 -m ipykernel install')
@@ -184,6 +185,7 @@ def ensure_python3_kernel_zeppelin(python3_version, os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/python3_kernel_ensured'):
         try:
             sudo('yum install -y yum-utils python34-pip python34 openssl-devel python34-devel')
+            sudo('yum install -y https://forensics.cert.org/centos/cert/7/x86_64/pyparsing-2.0.3-1.el7.noarch.rpm')
             sudo('pip3 install -U pip setuptools --no-cache-dir')
             sudo('yum -y groupinstall development')
             if len(python3_version) < 4:
@@ -200,6 +202,7 @@ def ensure_libraries_py(os_user):
         try:
             sudo('export LC_ALL=C')
             sudo('yum install -y python34-pip python-virtualenv openssl-devel python-devel python34-devel')
+            sudo('yum install -y https://forensics.cert.org/centos/cert/7/x86_64/pyparsing-2.0.3-1.el7.noarch.rpm')
             sudo('pip2 install -U pip setuptools --no-cache-dir')
             sudo('pip3 install -U pip setuptools --no-cache-dir')
             sudo('pip2 install boto3 --no-cache-dir')

@@ -38,6 +38,8 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 parser.add_argument('--os_user', type=str, default='')
 parser.add_argument('--spark_version', type=str, default='')
 parser.add_argument('--hadoop_version', type=str, default='')
+parser.add_argument('--edge_hostname', type=str, default='')
+parser.add_argument('--proxy_port', type=str, default='')
 args = parser.parse_args()
 
 
@@ -117,7 +119,9 @@ def install_local_livy(args):
         sudo('git init')
         sudo('git clone https://github.com/cloudera/livy.git')
     with cd('/opt/livy/'):
-        sudo('mvn package -DskipTests')
+        sudo('mvn package -DskipTests -Dhttp.proxyHost=' + args.edge_hostname + ' -Dhttp.proxyPort=' +
+             args.proxy_port + ' -Dhttps.proxyHost=' + args.edge_hostname +
+             ' -Dhttps.proxyPort=' + args.proxy_port)
     sudo('mkdir -p /var/run/livy')
     sudo('mkdir -p /opt/livy/logs')
     sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
