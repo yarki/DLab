@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.dao.InfrastructureExploratoryDAO;
+import com.epam.dlab.backendapi.dao.ExploratoryDAO;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
@@ -58,7 +58,7 @@ public class InfrastructureProvisionResource implements DockerAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(InfrastructureProvisionResource.class);
 
     @Inject
-    private InfrastructureExploratoryDAO dao;
+    private ExploratoryDAO dao;
     @Inject
     private KeyDAO keyDAO;
     @Inject

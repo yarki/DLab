@@ -21,8 +21,8 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
-import com.epam.dlab.backendapi.dao.InfrastructureComputationalDAO;
-import com.epam.dlab.backendapi.dao.InfrastructureExploratoryDAO;
+import com.epam.dlab.backendapi.dao.ComputationalDAO;
+import com.epam.dlab.backendapi.dao.ExploratoryDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.backendapi.resources.dto.ExploratoryActionFormDTO;
@@ -62,9 +62,9 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
-    private InfrastructureExploratoryDAO infExpDAO;
+    private ExploratoryDAO infExpDAO;
     @Inject
-    private InfrastructureComputationalDAO infCompDAO;
+    private ComputationalDAO infCompDAO;
     @Inject
     @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;

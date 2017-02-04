@@ -41,7 +41,7 @@ import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.client.result.UpdateResult;
 
-public class InfrastructureExploratoryDAO extends BaseDAO {
+public class ExploratoryDAO extends BaseDAO {
     public static final String EXPLORATORY_NAME = "exploratory_name";
     private static final String EXPLORATORY_ID = "exploratory_id";
     private static final String EXPLORATORY_URL = "exploratory_url";

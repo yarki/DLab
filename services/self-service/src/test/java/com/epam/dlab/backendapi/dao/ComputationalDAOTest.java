@@ -32,17 +32,17 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.epam.dlab.backendapi.dao.BaseDAO.USER;
-import static com.epam.dlab.backendapi.dao.InfrastructureExploratoryDAO.EXPLORATORY_NAME;
-import static com.epam.dlab.backendapi.dao.InfrastructureExploratoryDAO.exploratoryCondition;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.EXPLORATORY_NAME;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static junit.framework.TestCase.*;
 
 @Ignore
-public class InfrastructureComputationalDAOTest extends DAOTestBase {
-    private InfrastructureExploratoryDAO infExpDAO;
-    private InfrastructureComputationalDAO infCompDAO;
+public class ComputationalDAOTest extends DAOTestBase {
+    private ExploratoryDAO infExpDAO;
+    private ComputationalDAO infCompDAO;
     
-    public InfrastructureComputationalDAOTest() {
+    public ComputationalDAOTest() {
         super(Collections.singletonList(USER_INSTANCES));
     }
 
@@ -54,9 +54,9 @@ public class InfrastructureComputationalDAOTest extends DAOTestBase {
         mongoService.getCollection(USER_INSTANCES).createIndex(new BasicDBObject(USER, 1).append(EXPLORATORY_NAME, 2),
                 new IndexOptions().unique(true));
 
-        infExpDAO = new InfrastructureExploratoryDAO();
+        infExpDAO = new ExploratoryDAO();
         testInjector.injectMembers(infExpDAO);
-        infCompDAO = new InfrastructureComputationalDAO();
+        infCompDAO = new ComputationalDAO();
         testInjector.injectMembers(infCompDAO);
     }
 

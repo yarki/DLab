@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.dao.InfrastructureComputationalDAO;
+import com.epam.dlab.backendapi.dao.ComputationalDAO;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.resources.dto.HealthStatusDTO;
@@ -67,7 +67,7 @@ public class InfrasctructureResource {
     @Inject
     private KeyDAO keyDAO;
     @Inject
-    private InfrastructureComputationalDAO ifnCompDao;
+    private ComputationalDAO ifnCompDao;
     
     @Inject
     @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)

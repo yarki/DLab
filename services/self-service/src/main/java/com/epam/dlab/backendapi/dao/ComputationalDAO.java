@@ -18,10 +18,10 @@
 
 package com.epam.dlab.backendapi.dao;
 
-import static com.epam.dlab.backendapi.dao.InfrastructureExploratoryDAO.COMPUTATIONAL_RESOURCES;
-import static com.epam.dlab.backendapi.dao.InfrastructureExploratoryDAO.exploratoryCondition;
-import static com.epam.dlab.backendapi.dao.InfrastructureExploratoryDAO.UPTIME;
 import static com.epam.dlab.UserInstanceStatus.TERMINATED;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.COMPUTATIONAL_RESOURCES;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.UPTIME;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.not;
@@ -44,7 +44,7 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.client.result.UpdateResult;
 
-public class InfrastructureComputationalDAO extends BaseDAO {
+public class ComputationalDAO extends BaseDAO {
     private static final String COMPUTATIONAL_NAME = "computational_name";
     private static final String COMPUTATIONAL_ID = "computational_id";
 

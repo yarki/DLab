@@ -34,17 +34,17 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.epam.dlab.backendapi.dao.BaseDAO.USER;
-import static com.epam.dlab.backendapi.dao.InfrastructureExploratoryDAO.EXPLORATORY_NAME;
-import static com.epam.dlab.backendapi.dao.InfrastructureExploratoryDAO.exploratoryCondition;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.EXPLORATORY_NAME;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static junit.framework.TestCase.*;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 @Ignore
-public class InfrastructureExploratoryDAOTest extends DAOTestBase {
-    private InfrastructureExploratoryDAO infExpDAO;
+public class ExploratoryDAOTest extends DAOTestBase {
+    private ExploratoryDAO infExpDAO;
     
-    public InfrastructureExploratoryDAOTest() {
+    public ExploratoryDAOTest() {
         super(Collections.singletonList(USER_INSTANCES));
     }
 
@@ -57,7 +57,7 @@ public class InfrastructureExploratoryDAOTest extends DAOTestBase {
                 new IndexOptions().unique(true));
 
 
-        infExpDAO = new InfrastructureExploratoryDAO();
+        infExpDAO = new ExploratoryDAO();
         testInjector.injectMembers(infExpDAO);
 
     }
