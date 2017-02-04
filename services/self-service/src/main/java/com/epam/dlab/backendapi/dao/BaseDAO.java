@@ -60,6 +60,7 @@ class BaseDAO implements MongoCollections {
     public static final String FIELD_SET_DELIMETER = ".$.";
     public static final String FIELD_PROJECTION_DELIMITER = "$";
     public static final String ID = "_id";
+    public static final String SET = "$set";
     public static final String USER = "user";
     public static final String INSTANCE_ID = "instance_id";
     public static final String STATUS = "status";

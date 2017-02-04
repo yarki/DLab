@@ -31,8 +31,8 @@ public class UserAWSCredentialDTO {
     private String hostname;
     @JsonProperty("public_ip")
     private String publicIp;
-    @JsonProperty
-    private String ip;
+    @JsonProperty("ip")
+    private String privateIp;
     @JsonProperty("key_name")
     private String keyName;
     @JsonProperty(USER_OWN_BUCKET_NAME)
@@ -56,6 +56,10 @@ public class UserAWSCredentialDTO {
     
     public String getPublicIp() {
         return publicIp;
+    }
+    
+    public String getPrivateIp() {
+        return privateIp;
     }
     
     public String getUserOwnBucketName() {

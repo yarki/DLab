@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.response.handlers;
 
-import static com.epam.dlab.rest.contracts.ApiCallbacks.COMPUTATIONAL;
+import static com.epam.dlab.rest.contracts.ApiCallbacks.INFRASTRUCTURE;
 import static com.epam.dlab.rest.contracts.ApiCallbacks.STATUS_URI;
 
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class ResourcesStatusCallbackHandler extends ResourceCallbackHandler<EnvS
     
     @Override
     protected String getCallbackURI() {
-        return COMPUTATIONAL + STATUS_URI; // TODO: Change it
+        return INFRASTRUCTURE + STATUS_URI;
     }
 
     @Override

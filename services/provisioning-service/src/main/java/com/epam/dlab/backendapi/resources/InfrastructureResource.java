@@ -74,7 +74,7 @@ public class InfrastructureResource implements DockerCommands {
         return Response.status(Response.Status.OK).build();
     }
     
-    @Path("/env_status")
+    @Path("/status")
     @POST
     public String status(@Auth UserInfo ui, EnvResourceDTO dto) throws IOException, InterruptedException {
     	LOGGER.debug("Request the statuses of resources for user {}: {}", ui.getName(), dto);

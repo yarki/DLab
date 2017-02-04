@@ -43,7 +43,8 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
-import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
+import com.epam.dlab.backendapi.dao.InfrastructureComputationalDAO;
+import com.epam.dlab.backendapi.dao.InfrastructureExploratoryDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.resources.dto.ComputationalCreateFormDTO;
 import com.epam.dlab.backendapi.resources.dto.ComputationalLimitsDTO;
@@ -73,7 +74,9 @@ public class ComputationalResource implements ComputationalAPI {
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
-    private InfrastructureProvisionDAO infrastructureProvisionDAO;
+    private InfrastructureExploratoryDAO infExpDAO;
+    @Inject
+    private InfrastructureComputationalDAO infCompDAO;
     @Inject
     @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
@@ -112,7 +115,7 @@ public class ComputationalResource implements ComputationalAPI {
             		", maximum is " + configuration.getMaxEmrInstanceCount() + ".");
         }
 
-        boolean isAdded = infrastructureProvisionDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
+        boolean isAdded = infCompDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
                         .withComputationalName(formDTO.getName())
                         .withStatus(CREATING.toString())
@@ -122,7 +125,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withVersion(formDTO.getVersion()));
         if (isAdded) {
             try {
-            	UserInstanceDTO instance = infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), formDTO.getNotebookName());
+            	UserInstanceDTO instance = infExpDAO.fetchExploratoryFields(userInfo.getName(), formDTO.getNotebookName());
                 ComputationalCreateDTO dto = new ComputationalCreateDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withExploratoryName(formDTO.getNotebookName())
@@ -166,7 +169,7 @@ public class ComputationalResource implements ComputationalAPI {
     public Response status(@Auth UserInfo userInfo, ComputationalStatusDTO dto) throws DlabException {
         LOGGER.debug("Updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto);
         try {
-        	infrastructureProvisionDAO.updateComputationalFields(dto);
+        	infCompDAO.updateComputationalFields(dto);
         } catch (DlabException e) {
         	LOGGER.error("Could not update status for computational resource {} for user {} to {}: {}",
         			dto.getComputationalName(), dto.getUser(), dto.getStatus(), e.getLocalizedMessage(), e);
@@ -176,9 +179,9 @@ public class ComputationalResource implements ComputationalAPI {
         if (UserInstanceStatus.CONFIGURING == UserInstanceStatus.of(dto.getStatus())) {
             LOGGER.debug("Send request for configuration of the computational resource {} for user {}", dto.getComputationalName(), dto.getUser());
             try {
-            	UserComputationalResourceDTO computational = infrastructureProvisionDAO
+            	UserComputationalResourceDTO computational = infCompDAO
             			.fetchComputationalFields(userInfo.getName(), dto.getExploratoryName(), dto.getComputationalName());
-            	UserInstanceDTO instance = infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), dto.getExploratoryName());
+            	UserInstanceDTO instance = infExpDAO.fetchExploratoryFields(userInfo.getName(), dto.getExploratoryName());
             	ComputationalConfigDTO dtoConf = new ComputationalConfigDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withApplicationName(getApplicationName(instance.getImageName()))
@@ -222,8 +225,8 @@ public class ComputationalResource implements ComputationalAPI {
     	}
         
         try {
-            String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), exploratoryName);
-            String computationalId = infrastructureProvisionDAO.fetchComputationalId(userInfo.getName(), exploratoryName, computationalName);
+            String exploratoryId = infExpDAO.fetchExploratoryId(userInfo.getName(), exploratoryName);
+            String computationalId = infCompDAO.fetchComputationalId(userInfo.getName(), exploratoryName, computationalName);
             ComputationalTerminateDTO dto = new ComputationalTerminateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withExploratoryName(exploratoryName)
@@ -259,7 +262,7 @@ public class ComputationalResource implements ComputationalAPI {
                 .withExploratoryName(exploratoryName)
                 .withComputationalName(computationalName)
                 .withStatus(status);
-        infrastructureProvisionDAO.updateComputationalStatus(computationalStatus);
+        infCompDAO.updateComputationalStatus(computationalStatus);
     }
 
 
