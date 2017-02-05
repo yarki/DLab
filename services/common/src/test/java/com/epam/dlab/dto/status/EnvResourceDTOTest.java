@@ -47,9 +47,9 @@ public class EnvResourceDTOTest {
     	List<EnvResource> hosts1 = new ArrayList<EnvResource>();
     	hosts1.add(new EnvResource().withId("1"));
     	hosts1.add(new EnvResource().withId("2"));
-    	hosts1.add(new EnvResource().withId("3").withState("state3"));
+    	hosts1.add(new EnvResource().withId("3").withStatus("state3"));
     	assertEquals(hosts1.get(0).getId(), "1");
-    	assertEquals(hosts1.get(2).getState(), "state3");
+    	assertEquals(hosts1.get(2).getStatus(), "state3");
     	
     	List<EnvResource> clusters1 = new ArrayList<EnvResource>();
     	clusters1.add(new EnvResource().withId("10"));

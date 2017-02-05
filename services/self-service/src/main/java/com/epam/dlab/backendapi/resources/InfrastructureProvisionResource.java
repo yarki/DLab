@@ -70,7 +70,7 @@ public class InfrastructureProvisionResource implements DockerAPI {
      */
     @GET
     @Path("/provisioned_user_resources")
-    public Iterable<Document> getList(@Auth UserInfo userInfo) throws DlabException {
+    public Iterable<Document> getUserResources(@Auth UserInfo userInfo) throws DlabException {
         LOGGER.debug("Loading list of provisioned resources for user {}", userInfo.getName());
         try {
         	Iterable<Document> documents = appendEdgeInfo(dao.findExploratory(userInfo.getName()), userInfo.getName());

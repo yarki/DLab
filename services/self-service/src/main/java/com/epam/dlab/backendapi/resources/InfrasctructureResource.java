@@ -21,9 +21,6 @@ package com.epam.dlab.backendapi.resources;
 import static com.epam.dlab.backendapi.core.health.HealthChecks.MONGO_HEALTH_CHECKER;
 import static com.epam.dlab.backendapi.core.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -36,13 +33,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.dao.ComputationalDAO;
-import com.epam.dlab.backendapi.dao.KeyDAO;
+import com.epam.dlab.backendapi.dao.EnvStatusDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.resources.dto.HealthStatusDTO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.contracts.HealthChecker;
-import com.epam.dlab.dto.status.EnvResource;
 import com.epam.dlab.dto.status.EnvResourceDTO;
 import com.epam.dlab.dto.status.EnvResourceList;
 import com.epam.dlab.dto.status.EnvStatusDTO;
@@ -65,9 +60,7 @@ public class InfrasctructureResource {
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
-    private KeyDAO keyDAO;
-    @Inject
-    private ComputationalDAO ifnCompDao;
+    private EnvStatusDAO envDAO;
     
     @Inject
     @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
@@ -95,20 +88,14 @@ public class InfrasctructureResource {
     @POST
     @Path(ApiCallbacks.STATUS_URI + "_test")
     public Response statusTest(@Auth UserInfo userInfo) {
-    	List<EnvResource> hostList = new ArrayList<EnvResource>();
-    	String edgePrivateIp = keyDAO
-    			.getUserAWSCredential(userInfo.getName())
-    			.getPrivateIp();
-    	hostList.add(new EnvResource().withId(edgePrivateIp));
-    	
-    	//Iterable<Document> documents = ifnCompDao.find(userInfo.getName());
-    	
-		EnvResourceList resourceList = new EnvResourceList()
-    			.withHostList(hostList);
+        LOGGER.debug("Looking ids of resources for user {}", userInfo.getName());
+
+        EnvResourceList resourceList = envDAO.findEnvResources(userInfo.getName(), false);
 		EnvResourceDTO dto = new EnvResourceDTO()
     			.withAwsRegion(settingsDAO.getAwsRegion())
     			.withIamUserName(userInfo.getName())
     			.withResourceList(resourceList);
+        LOGGER.debug("Ask docker for the status of resources for user {}: {}", userInfo.getName(), dto);
     	
 		return Response.ok(
     			provisioningService.post(ApiCallbacks.INFRASTRUCTURE + ApiCallbacks.STATUS_URI, userInfo.getAccessToken(),
@@ -125,10 +112,11 @@ public class InfrasctructureResource {
     public Response status(@Auth UserInfo userInfo, EnvStatusDTO dto) {
         LOGGER.debug("Updating status for resources for user {}: {}", dto.getUser(), dto);
         try {
-        	//infrastructureProvisionDAO.updateComputationalFields(dto);
+        	//envDAO.updateEnvResources(dto);
         } catch (DlabException e) {
-        	LOGGER.error("Could not update status for resources for user {}: {}", dto.getUser(), e.getLocalizedMessage(), e);
+        	LOGGER.warn("Could not update status for resources for user {}: {}", dto.getUser(), e.getLocalizedMessage(), e);
         }
+        // Always necessary send OK
         return Response.ok().build();
     }
 

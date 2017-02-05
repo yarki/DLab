@@ -57,7 +57,11 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
     @Override
     public KeyLoadStatus checkKey(UserInfo userInfo) throws DlabException {
     	LOGGER.trace("Find the status of the user key for {}", userInfo.getName());
-        return keyDAO.findKeyStatus(userInfo.getName());
+    	KeyLoadStatus status = keyDAO.findKeyStatus(userInfo.getName());
+    	if (status == KeyLoadStatus.SUCCESS) {
+    		// TODO: Start the listener for status
+    	}
+        return status;
     }
 
     @Override
@@ -97,6 +101,7 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
         keyDAO.updateKey(uploadKeyResult.getUser(), KeyLoadStatus.getStatus(uploadKeyResult.isSuccess()));
         if (uploadKeyResult.isSuccess()) {
             keyDAO.saveCredential(uploadKeyResult.getUser(), uploadKeyResult.getCredential());
+            // TODO: Start the listener for status
         } else {
             keyDAO.deleteKey(uploadKeyResult.getUser());
         }

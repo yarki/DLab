@@ -28,7 +28,7 @@ public class EnvResource {
     @JsonProperty
     private String id;
     @JsonProperty
-    private String state;
+    private String status;
 
     /** Return the id of resource. instanceId for host, clusterId for cluster, path for storage. */
     public String getId() {
@@ -47,25 +47,25 @@ public class EnvResource {
     }
 
     /** Return the status of resource. */
-    public String getState() {
-        return state;
+    public String getStatus() {
+        return status;
     }
 
     /** Set the status of resource. */
-    public void setState(String state) {
-        this.state = state;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     /** Set the status of resource. */
-    public EnvResource withState(String state) {
-    	setState(state);
+    public EnvResource withStatus(String status) {
+    	setStatus(status);
         return this;
     }
 
     public ToStringHelper toStringHelper(Object self) {
     	return MoreObjects.toStringHelper(self)
     	        .add("id", id)
-    	        .add("status", state);
+    	        .add("status", status);
     }
     
     @Override

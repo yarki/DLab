@@ -49,6 +49,9 @@ public class UserAWSCredentialDTO {
     private String notebookSubnet;
     @JsonProperty("edge_sg")
     private String edgeSG;
+    // TODO: Add by DevOps
+    @JsonProperty
+    private String status;
 
     public String getInstanceId() {
     	return instanceId;
