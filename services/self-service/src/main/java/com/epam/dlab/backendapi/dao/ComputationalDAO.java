@@ -144,7 +144,7 @@ public class ComputationalDAO extends BaseDAO {
     public UpdateResult updateComputationalStatusesForExploratory(StatusEnvBaseDTO<?> dto) throws DlabException {
         Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus());
         values.append(computationalFieldFilter(UPTIME), null);
-        long modifiedCount;
+        /*long modifiedCount;
         UpdateResult result;
         UpdateResult lastUpdate = null;
         do {
@@ -157,8 +157,16 @@ public class ComputationalDAO extends BaseDAO {
                     new Document(SET, values));
             modifiedCount = lastUpdate.getModifiedCount();
         }
-        while (modifiedCount > 0);
-        return result;
+        while (modifiedCount > 0);*/
+        
+        //return result;
+        return updateMany(USER_INSTANCES,
+                    and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
+                        elemMatch(COMPUTATIONAL_RESOURCES,
+                        		and(not(eq(STATUS, TERMINATED.toString())), not(eq(STATUS, dto.getStatus())))
+                        		)
+                        ),
+                    new Document(SET, values));
     }
 
     /** Updates the info of computational resource in Mongo database.

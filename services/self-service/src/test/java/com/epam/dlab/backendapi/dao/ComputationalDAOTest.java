@@ -252,7 +252,7 @@ public class ComputationalDAOTest extends DAOTestBase {
                 .withUser("user1")
                 .withExploratoryName("exp_name_1")
                 .withStatus(UserInstanceStatus.STOPPED));
-        assertEquals(1, testResult.getModifiedCount());
+        assertEquals(3, testResult.getModifiedCount());
 
         Optional<UserInstanceDTO> testInstance = infExpDAO.findOne(USER_INSTANCES,
                 exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
