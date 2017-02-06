@@ -37,7 +37,7 @@ import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static junit.framework.TestCase.*;
 
-//@Ignore
+@Ignore
 public class ComputationalDAOTest extends DAOTestBase {
     private ExploratoryDAO infExpDAO;
     private ComputationalDAO infCompDAO;
