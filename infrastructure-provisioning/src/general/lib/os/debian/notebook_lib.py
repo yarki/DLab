@@ -126,9 +126,13 @@ def ensure_additional_python_libs(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/additional_python_libs_ensured'):
         try:
             sudo('apt-get install -y libjpeg8-dev zlib1g-dev')
-            sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn keras opencv h5py --no-cache-dir')
-            sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn keras opencv h5py --no-cache-dir')
-            sudo('jupyter-kernelspec remove -f python3')
+            sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+            sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+            if os.environ['application'] == 'jupyter':
+                sudo('jupyter-kernelspec remove -f python3')
+            if os.environ['application'] == 'tensor':
+                sudo('pip2 install keras opencv h5py --no-cache-dir')
+                sudo('pip3 install keras opencv h5py --no-cache-dir')
             sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
         except:
             sys.exit(1)

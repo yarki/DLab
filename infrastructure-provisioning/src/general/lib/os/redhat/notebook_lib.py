@@ -125,6 +125,9 @@ def ensure_additional_python_libs(os_user):
             sudo('yum install -y zlib-devel libjpeg-turbo-devel --nogpgcheck')
             sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
             sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+            if os.environ['application'] == 'tensor':
+                sudo('pip2 install keras opencv h5py --no-cache-dir')
+                sudo('pip3 install keras opencv h5py --no-cache-dir')
             sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
         except:
             sys.exit(1)
