@@ -149,7 +149,7 @@ def ensure_python2_libraries(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/python2_libraries_ensured'):
         try:
             sudo('apt-get install -y libssl-dev python-virtualenv')
-            sudo('pip3 install ipython ipykernel --no-cache-dir')
+            sudo('pip2 install ipython ipykernel --no-cache-dir')
             sudo('pip2 install -U pip --no-cache-dir')
             sudo('pip2 install boto3 --no-cache-dir')
             sudo('pip2 install fabvenv fabric-virtualenv --no-cache-dir')
