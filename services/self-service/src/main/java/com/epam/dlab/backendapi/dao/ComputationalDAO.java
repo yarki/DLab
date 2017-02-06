@@ -65,7 +65,6 @@ public class ComputationalDAO extends BaseDAO {
                         elemMatch(COMPUTATIONAL_RESOURCES,
                         		eq(COMPUTATIONAL_NAME, computationalDTO.getComputationalName())))
                 );
-
         if (!optional.isPresent()) {
             updateOne(USER_INSTANCES,
             		exploratoryCondition(user, exploratoryName),
@@ -141,32 +140,23 @@ public class ComputationalDAO extends BaseDAO {
      * @return The result of an update operation.
      * @exception DlabException
      */
-    public UpdateResult updateComputationalStatusesForExploratory(StatusEnvBaseDTO<?> dto) throws DlabException {
+    public int updateComputationalStatusesForExploratory(StatusEnvBaseDTO<?> dto) throws DlabException {
         Document values = new Document(computationalFieldFilter(STATUS), dto.getStatus());
         values.append(computationalFieldFilter(UPTIME), null);
-        /*long modifiedCount;
-        UpdateResult result;
-        UpdateResult lastUpdate = null;
+        int count = 0;
+        UpdateResult result = null;
         do {
-            result = lastUpdate;
-            lastUpdate = updateOne(USER_INSTANCES,
+            result = updateOne(USER_INSTANCES,
                     and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                             elemMatch(COMPUTATIONAL_RESOURCES,
                                     and(not(eq(STATUS, TERMINATED.toString())),
                                             not(eq(STATUS, dto.getStatus()))))),
                     new Document(SET, values));
-            modifiedCount = lastUpdate.getModifiedCount();
+            count += result.getModifiedCount();
         }
-        while (modifiedCount > 0);*/
+        while (result.getModifiedCount() > 0);
         
-        //return result;
-        return updateMany(USER_INSTANCES,
-                    and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
-                        elemMatch(COMPUTATIONAL_RESOURCES,
-                        		and(not(eq(STATUS, TERMINATED.toString())), not(eq(STATUS, dto.getStatus())))
-                        		)
-                        ),
-                    new Document(SET, values));
+        return count;
     }
 
     /** Updates the info of computational resource in Mongo database.

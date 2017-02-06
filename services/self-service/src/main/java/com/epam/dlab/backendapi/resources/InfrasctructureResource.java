@@ -90,7 +90,7 @@ public class InfrasctructureResource {
     public Response statusTest(@Auth UserInfo userInfo) {
         LOGGER.debug("Looking ids of resources for user {}", userInfo.getName());
 
-        EnvResourceList resourceList = envDAO.findEnvResources(userInfo.getName(), false);
+        EnvResourceList resourceList = envDAO.findEnvResources(userInfo.getName());
 		EnvResourceDTO dto = new EnvResourceDTO()
     			.withAwsRegion(settingsDAO.getAwsRegion())
     			.withIamUserName(userInfo.getName())

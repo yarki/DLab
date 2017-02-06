@@ -37,7 +37,7 @@ import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static junit.framework.TestCase.*;
 
-@Ignore
+//@Ignore
 public class ComputationalDAOTest extends DAOTestBase {
     private ExploratoryDAO infExpDAO;
     private ComputationalDAO infCompDAO;
@@ -67,7 +67,7 @@ public class ComputationalDAOTest extends DAOTestBase {
 
     @AfterClass
     public static void teardownAll() {
-        DAOTestBase.teardownAll();
+        //DAOTestBase.teardownAll();
     }
 
     @Test
@@ -248,11 +248,11 @@ public class ComputationalDAOTest extends DAOTestBase {
         boolean inserted3 = infCompDAO.addComputational(instance1.getUser(), instance1.getExploratoryName(), comp3);
         assertTrue(inserted3);
 
-        UpdateResult testResult = infCompDAO.updateComputationalStatusesForExploratory(new ComputationalStatusDTO()
+        int testResult = infCompDAO.updateComputationalStatusesForExploratory(new ComputationalStatusDTO()
                 .withUser("user1")
                 .withExploratoryName("exp_name_1")
                 .withStatus(UserInstanceStatus.STOPPED));
-        assertEquals(3, testResult.getModifiedCount());
+        assertEquals(2, testResult);
 
         Optional<UserInstanceDTO> testInstance = infExpDAO.findOne(USER_INSTANCES,
                 exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),

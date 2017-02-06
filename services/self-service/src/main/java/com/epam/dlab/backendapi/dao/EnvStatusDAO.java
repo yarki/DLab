@@ -19,46 +19,44 @@
 package com.epam.dlab.backendapi.dao;
 
 import static com.epam.dlab.backendapi.dao.ExploratoryDAO.COMPUTATIONAL_RESOURCES;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.EXPLORATORY_NAME;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.dto.status.EnvResource;
 import com.epam.dlab.dto.status.EnvResourceList;
 import com.epam.dlab.exceptions.DlabException;
-import com.mongodb.client.result.UpdateResult;
 
 public class EnvStatusDAO extends BaseDAO {
-	private static final Bson INCLUDE_EDGE_FIELDS = include(INSTANCE_ID, STATUS);
-	private static final Bson INCLUDE_EXP_FIELDS = include(INSTANCE_ID, STATUS, COMPUTATIONAL_RESOURCES + "." + INSTANCE_ID, COMPUTATIONAL_RESOURCES + "." + STATUS);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnvStatusDAO.class);
+
+    private static final Bson INCLUDE_EDGE_FIELDS = include(INSTANCE_ID, STATUS);
+	private static final Bson INCLUDE_EXP_FIELDS = include(INSTANCE_ID, COMPUTATIONAL_RESOURCES + "." + INSTANCE_ID);
+	private static final Bson INCLUDE_EXP_UPDATE_FIELDS = include(EXPLORATORY_NAME, INSTANCE_ID, STATUS,
+								COMPUTATIONAL_RESOURCES + "." + INSTANCE_ID, COMPUTATIONAL_RESOURCES + "." + STATUS);
 
 	/** Add the resource to list if it have instance_id.
 	 * @param list the list to add.
 	 * @param document document with resource.
 	 * @param includeStatus include status or not to the list.
 	 */
-	private void addResource(List<EnvResource> list, Document document, boolean includeStatus) {
+	private void addResource(List<EnvResource> list, Document document) {
 		String instanceId = document.getString(INSTANCE_ID);
-		if (instanceId == null) {
-			return;
+		if (instanceId != null) {
+			EnvResource host = new EnvResource().withId(instanceId);
+			list.add(host);
 		}
-		
-		EnvResource host = new EnvResource().withId(instanceId);
-		if (includeStatus) {
-    		host.withStatus(document.getString(STATUS));
-		}
-		
-		list.add(host);
 	}
 	
 	private Document getEdgeNode(String user) {
@@ -83,14 +81,14 @@ public class EnvStatusDAO extends BaseDAO {
     /** Finds and returns the list of user resources. 
      * @param user name.
      */
-    public EnvResourceList findEnvResources(String user, boolean includeStatus) {
+    public EnvResourceList findEnvResources(String user) {
     	List<EnvResource> hostList = new ArrayList<EnvResource>();
     	List<EnvResource> clusterList = new ArrayList<EnvResource>();
     	
     	// Add EDGE
     	Document edge = getEdgeNode(user);
     	if (edge != null) {
-    		addResource(hostList, edge, includeStatus);
+    		addResource(hostList, edge);
     	}
 
     	// Add exploratory
@@ -99,7 +97,7 @@ public class EnvStatusDAO extends BaseDAO {
     			fields(INCLUDE_EXP_FIELDS, excludeId()));
 
     	for (Document exp : expList) {
-    		addResource(hostList, exp, includeStatus);
+    		addResource(hostList, exp);
     		
     		// Add computational
 			@SuppressWarnings("unchecked")
@@ -108,7 +106,7 @@ public class EnvStatusDAO extends BaseDAO {
 				continue;
 			}
 			for (Document comp : compList) {
-				addResource(clusterList, comp, includeStatus);
+				addResource(clusterList, comp);
 			}
 		}
     	
@@ -123,7 +121,8 @@ public class EnvStatusDAO extends BaseDAO {
      * @param status the status of node.
      * @exception DlabException
      */
-    public void updateEdgeStatus(String user, List<EnvResource> hostList) throws DlabException {
+    private void updateEdgeStatus(String user, List<EnvResource> hostList) throws DlabException {
+    	LOGGER.debug("Update EDGE status for user ", user);
     	Document edge = getEdgeNode(user);
     	String instanceId;
     	if (edge == null ||
@@ -136,6 +135,7 @@ public class EnvStatusDAO extends BaseDAO {
     		return;
     	}
     	
+    	LOGGER.debug("Update EDGE status for user with instance_id {} from {} to {}", user, instanceId, edge.getString(STATUS), r.getStatus());
     	if (!r.getStatus().equals(edge.getString(STATUS))) {
     		Document values = new Document(STATUS, r.getStatus());
     		updateOne(USER_AWS_CREDENTIALS,
@@ -144,7 +144,31 @@ public class EnvStatusDAO extends BaseDAO {
     	}
     }
     
-    /** Updates the status of exploratory and computational for user.
+    /** Update the status of exploratory if it needed.
+     * @param user the user name
+     * @param instanceId the id of instance
+     * @param oldState old state
+     * @param newState new state
+     */
+    private void updateExploratoryStatus(String user, String instanceId, UserInstanceStatus oldState, UserInstanceStatus newState) {
+    	LOGGER.debug("Update exploratory status for user with instance_id {} from {} to {}", user, instanceId, oldState, newState);
+		/*updateOne(USER_INSTANCES,
+        exploratoryCondition(user, exp.get),
+        set(STATUS, r.getStatus()));*/
+    }
+    
+
+    /** Update the status of exploratory if it needed.
+     * @param user the user name
+     * @param instanceId the id of instance
+     * @param oldState old state
+     * @param newState new state
+     */
+	private void updateComputationalStatus(String user, String exploratoryId, String clusterId, UserInstanceStatus oldState, UserInstanceStatus newState) {
+    	LOGGER.debug("Update computational status for user with instance_id {} from {} to {}", user, clusterId, oldState, newState);
+	}
+
+	/** Updates the status of exploratory and computational for user.
      * @param user the name of user.
      * @param status the status of node.
      * @exception DlabException
@@ -154,10 +178,45 @@ public class EnvStatusDAO extends BaseDAO {
     		return;
     	}
     	
+    	// Update EDGE
 		updateEdgeStatus(user, list.getHostList());
     	if (list.getHostList().size() == 0) {
     		return;
     	}
+    	
+    	// Update exploratory
+    	Iterable<Document> expList = find(USER_INSTANCES,
+    			eq(USER, user),
+    			fields(INCLUDE_EXP_UPDATE_FIELDS, excludeId()));
 
+    	EnvResource r;
+    	for (Document exp : expList) {
+    		final String exploratoryName = exp.getString(EXPLORATORY_NAME);
+    		String instanceId = exp.getString(INSTANCE_ID);
+    		if (instanceId != null) {
+    			r = getEnvResourceAndRemove(list.getHostList(), instanceId);
+    			if (r != null) {
+    				updateExploratoryStatus(user, instanceId,
+    						UserInstanceStatus.of(exp.getString(STATUS)), UserInstanceStatus.of(r.getStatus()));
+    			}
+    		}
+    		
+    		// Update computational
+			@SuppressWarnings("unchecked")
+			List<Document> compList = (List<Document>) exp.get(COMPUTATIONAL_RESOURCES);
+			if (compList == null) {
+				continue;
+			}
+			for (Document comp : compList) {
+				instanceId = comp.getString(INSTANCE_ID);
+	    		if (instanceId != null) {
+	    			r = getEnvResourceAndRemove(list.getClusterList(), instanceId);
+	    			if (r != null) {
+	    				updateComputationalStatus(user, exploratoryName, instanceId,
+	    						UserInstanceStatus.of(comp.getString(STATUS)), UserInstanceStatus.of(r.getStatus()));
+	    			}
+	    		}
+			}
+		}
     }
 }
