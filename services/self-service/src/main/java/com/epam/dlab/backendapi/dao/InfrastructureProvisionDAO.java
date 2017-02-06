@@ -182,7 +182,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
             values.append(EXPLORATORY_PASSWORD, dto.getExploratoryPassword());
         }
         if (dto.getExploratoryPrivateIp() != null) {
-            values.append(EXPLORATORY_PASSWORD, dto.getExploratoryPrivateIp());
+            values.append(EXPLORATORY_PRIVATE_IP, dto.getExploratoryPrivateIp());
         }
         return updateOne(USER_INSTANCES,
                 exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
