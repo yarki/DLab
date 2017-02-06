@@ -877,10 +877,10 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
                 except:
                     local('sleep 5')
                     pass
-        sudo('echo "livy.server.port = ' + str(livy_port) + '" >> ' + livy_path + 'conf/livy.conf')
-        sudo('''echo "SPARK_HOME=' ''' + spark_dir + ''' '" >> ''' + livy_path + '''conf/livy-env.sh''')
-        sudo('sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
-        sudo(livy_path + 'bin/livy-server start')
+        local('sudo echo "livy.server.port = ' + str(livy_port) + '" >> ' + livy_path + 'conf/livy.conf')
+        local(''' sudo echo "SPARK_HOME=' ''' + spark_dir + ''' '" >> ''' + livy_path + '''conf/livy-env.sh''')
+        local('sudo sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
+        local('sudo ' + livy_path + 'bin/livy-server start')
         local('touch /home/' + os_user + '/.ensure_dir/emr_' + cluster_name + '_interpreter_ensured')
     except:
             sys.exit(1)
