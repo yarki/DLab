@@ -790,9 +790,9 @@ def get_files(s3client, s3resource, dist, bucket, local):
                 s3resource.meta.client.download_file(bucket, file.get('Key'), local + os.sep + file.get('Key'))
 
 
-def installing_python(args):
-    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
-    s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
+def installing_python(region, bucket, user_name, cluster_name):
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=region)
+    s3_client.download_file(bucket, user_name + '/' + cluster_name + '/python_version', '/tmp/python_version')
     with file('/tmp/python_version') as f:
         python_version = f.read()
     python_version = python_version[0:5]

@@ -1,26 +1,5 @@
 {
   "interpreterSettings": {
-    "2C6578YPS": {
-      "id": "2C6578YPS",
-      "name": "python3",
-      "group": "python",
-      "properties": {
-        "zeppelin.python": "python3"
-      },
-      "interpreterGroup": [
-        {
-          "class": "org.apache.zeppelin.python.PythonInterpreter",
-          "name": "python"
-        }
-      ],
-      "dependencies": [],
-      "option": {
-        "remote": true,
-        "perNoteSession": false,
-        "perNoteProcess": false,
-        "isExistingProcess": false
-      }
-    },
     "2C6RJRBD1": {
       "id": "2C6RJRBD1",
       "name": "Local PySpark (Python-2.7 / Spark-SP_VER)",
@@ -95,28 +74,6 @@
         {
           "class": "org.apache.zeppelin.spark.PySparkInterpreter",
           "name": "pyspark"
-        }
-      ],
-      "dependencies": [],
-      "option": {
-        "remote": true,
-        "perNoteSession": false,
-        "perNoteProcess": false,
-        "isExistingProcess": false
-      }
-    },
-    "2C3B8E6M6": {
-      "id": "2C3B8E6M6",
-      "name": "python",
-      "group": "python",
-      "properties": {
-        "zeppelin.python": "python",
-        "zeppelin.interpreter.localRepo": "/opt/zeppelin/local-repo/2C3B8E6M6"
-      },
-      "interpreterGroup": [
-        {
-          "class": "org.apache.zeppelin.python.PythonInterpreter",
-          "name": "python"
         }
       ],
       "dependencies": [],

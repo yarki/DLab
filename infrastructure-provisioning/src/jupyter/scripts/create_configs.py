@@ -102,7 +102,7 @@ def pyspark_kernel(args):
         python_version = f.read()
     # python_version = python_version[0:3]
     if python_version != '\n':
-        installing_python(args)
+        installing_python(args.region, args.bucket, args.user_name, args.cluster_name)
         local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
         kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
         template_file = "/tmp/pyspark_emr_template.json"
