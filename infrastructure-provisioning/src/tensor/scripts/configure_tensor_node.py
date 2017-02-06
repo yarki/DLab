@@ -83,14 +83,16 @@ if __name__ == "__main__":
     print "Install Jupyter"
     configure_jupyter(args.os_user, jupyter_conf_file, templates_dir)
 
+    print "Install local Spark"
+    ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path )
+
+    print "Install local jars"
+    ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
+
     print "Install pyspark local kernel for Jupyter"
     ensure_pyspark_local_kernel(args.os_user, pyspark_local_path_dir, templates_dir, spark_version)
 
     print "Install py3spark local kernel for Jupyter"
     ensure_py3spark_local_kernel(args.os_user, py3spark_local_path_dir, templates_dir, spark_version)
 
-    print "Install local Spark"
-    ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path )
 
-    print "Install local jars"
-    ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
