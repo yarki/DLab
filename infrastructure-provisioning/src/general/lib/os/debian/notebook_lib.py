@@ -131,8 +131,8 @@ def ensure_additional_python_libs(os_user):
             if os.environ['application'] == 'jupyter':
                 sudo('jupyter-kernelspec remove -f python3')
             if os.environ['application'] == 'tensor':
-                sudo('pip2 install keras opencv h5py --no-cache-dir')
-                sudo('pip3 install keras opencv h5py --no-cache-dir')
+                sudo('pip2 install keras opencv-python h5py --no-cache-dir')
+                sudo('pip3 install keras opencv-python h5py --no-cache-dir')
             sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
         except:
             sys.exit(1)
@@ -222,6 +222,7 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo('apt-get -y install cuda')
             sudo('mv /usr/local/cuda-8.0 /opt/')
             sudo('ln -s /opt/cuda-8.0 /usr/local/cuda-8.0')
+            sudo('rm -f /home/' + os_user + 'cuda-repo-ubuntu1604_8.0.44-1_amd64.deb')
             # install cuDNN
             put(files_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
             run('tar xvzf /tmp/cudnn-8.0-linux-x64-v5.1.tgz -C /tmp')
@@ -240,6 +241,8 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/tensorboard-python*")
             sudo("chmod 644 /tmp/tensorboard-python*")
             sudo('\cp /tmp/tensorboard-python* /etc/systemd/system/')
+            sudo('mkdir -p /var/log/tensorboard_py2; chown ' + os_user + ':' + os_user + ' -R /var/log/tensorboard_py2')
+            sudo('mkdir -p /var/log/tensorboard_py3; chown ' + os_user + ':' + os_user + ' -R /var/log/tensorboard_py3')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable tensorboard-python2")
             sudo("systemctl enable tensorboard-python3")

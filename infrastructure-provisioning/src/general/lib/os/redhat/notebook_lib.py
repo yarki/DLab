@@ -126,8 +126,8 @@ def ensure_additional_python_libs(os_user):
             sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
             sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
             if os.environ['application'] == 'tensor':
-                sudo('pip2 install keras opencv h5py --no-cache-dir')
-                sudo('pip3 install keras opencv h5py --no-cache-dir')
+                sudo('pip2 install keras opencv-python h5py --no-cache-dir')
+                sudo('pip3 install keras opencv-python h5py --no-cache-dir')
             sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
         except:
             sys.exit(1)
@@ -225,9 +225,9 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo('yum clean all')
             sudo('yum -y install cuda')
             sudo('pip3 innstall --upgrade pip wheel numpy')
-
             sudo('mv /usr/local/cuda-8.0 /opt/')
             sudo('ln -s /opt/cuda-8.0 /usr/local/cuda-8.0')
+            sudo('rm -f /home/' + os_user + 'cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64-rpm')
             # install cuDNN
             put(files_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
             run('tar xvzf /tmp/cudnn-8.0-linux-x64-v5.1.tgz -C /tmp')
@@ -248,6 +248,8 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/tensorboard-python*")
             sudo("chmod 644 /tmp/tensorboard-python*")
             sudo('\cp /tmp/tensorboard-python* /etc/systemd/system/')
+            sudo('mkdir -p /var/log/tensorboard_py2; chown ' + os_user + ':' + os_user + ' -R /var/log/tensorboard_py2')
+            sudo('mkdir -p /var/log/tensorboard_py3; chown ' + os_user + ':' + os_user + ' -R /var/log/tensorboard_py3')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable tensorboard-python2")
             sudo("systemctl enable tensorboard-python3")
