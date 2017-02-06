@@ -44,6 +44,7 @@ import com.epam.dlab.dto.status.EnvStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
+import com.epam.dlab.rest.contracts.InfrasctructureAPI;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -54,7 +55,7 @@ import io.dropwizard.auth.Auth;
 @Path(ApiCallbacks.INFRASTRUCTURE)
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class InfrasctructureResource {
+public class InfrasctructureResource implements InfrasctructureAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(InfrasctructureResource.class);
 
     @Inject
@@ -98,7 +99,7 @@ public class InfrasctructureResource {
         LOGGER.debug("Ask docker for the status of resources for user {}: {}", userInfo.getName(), dto);
     	
 		return Response.ok(
-    			provisioningService.post(ApiCallbacks.INFRASTRUCTURE + ApiCallbacks.STATUS_URI, userInfo.getAccessToken(),
+    			provisioningService.post(INFRASTRUCTURE_STATUS, userInfo.getAccessToken(),
     					dto, EnvResourceDTO.class)
     			).build();
     }
