@@ -208,5 +208,5 @@ if __name__ == "__main__":
         toree_kernel(args)
         spark_defaults(args)
         r_kernel(args)
-        configuring_notebook(args)
+        configuring_notebook(args.emr_version)
         add_breeze_library_emr(args)

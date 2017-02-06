@@ -81,7 +81,7 @@ if __name__ == "__main__":
         yarn(args, yarn_dir)
         install_emr_spark(args)
         spark_defaults(args)
-        configuring_notebook(args)
+        configuring_notebook(args.emr_version)
         install_remote_livy(args)
         configure_zeppelin_emr_interpreter(args.emr_version, args.cluster_name, args.region, args.bucket,
                                            args.user_name, args.spark_version, spark_dir, args.os_user)
