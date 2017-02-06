@@ -35,6 +35,7 @@ import org.junit.Test;
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
+import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.dto.status.EnvResourceList;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mongodb.BasicDBObject;
@@ -42,9 +43,10 @@ import com.mongodb.client.model.IndexOptions;
 
 @Ignore
 public class EnvStatusDAOTest extends DAOTestBase {
-    private ExploratoryDAO infExpDAO;
-    private ComputationalDAO infCompDAO;
+    private ExploratoryDAO expDAO;
+    private ComputationalDAO compDAO;
     private EnvStatusDAO envDAO;
+    private KeyDAO keyDAO;
     
     public EnvStatusDAOTest() {
         super(USER_AWS_CREDENTIALS, USER_INSTANCES);
@@ -59,12 +61,14 @@ public class EnvStatusDAOTest extends DAOTestBase {
         		.createIndex(new BasicDBObject(USER, 1).append(EXPLORATORY_NAME, 2),
                 new IndexOptions().unique(true));
 
-        infExpDAO = new ExploratoryDAO();
-        testInjector.injectMembers(infExpDAO);
-        infCompDAO = new ComputationalDAO();
-        testInjector.injectMembers(infCompDAO);
+        expDAO = new ExploratoryDAO();
+        testInjector.injectMembers(expDAO);
+        compDAO = new ComputationalDAO();
+        testInjector.injectMembers(compDAO);
         envDAO = new EnvStatusDAO();
         testInjector.injectMembers(envDAO);
+        keyDAO = new KeyDAO();
+        testInjector.injectMembers(keyDAO);
     }
 
     @BeforeClass
@@ -89,36 +93,37 @@ public class EnvStatusDAOTest extends DAOTestBase {
     @Test
     public void findEnvResources() {
     	final String user = "user1";
+    	final String exploratoryName = "exp1";
+    	final String computationalName = "comp1";
     	
     	// Add EDGE
     	EdgeInfo edge = new EdgeInfo();
     	edge.instanceId = "instance0";
     	edge.privateIp = "privIp";
     	edge.edgeStatus = "stopped";
-    	infExpDAO.insertOne(USER_AWS_CREDENTIALS, edge, user);
+    	expDAO.insertOne(USER_AWS_CREDENTIALS, edge, user);
     	
     	// Add exploratory
         UserInstanceDTO exp1 = new UserInstanceDTO()
                 .withUser(user)
-                .withExploratoryName("exp1")
+                .withExploratoryName(exploratoryName)
                 .withUptime(new Date(100));
-        infExpDAO.insertOne(USER_INSTANCES, exp1);
+        expDAO.insertOne(USER_INSTANCES, exp1);
         // Set status and instance_id for exploratory
         ExploratoryStatusDTO expStatus = new ExploratoryStatusDTO()
         		.withUser(user)
-        		.withExploratoryName("exp1")
+        		.withExploratoryName(exploratoryName)
         		.withInstanceId("instance1")
         		.withStatus("running");
-        infExpDAO.updateExploratoryFields(expStatus);
+        expDAO.updateExploratoryFields(expStatus);
 
         // Add computational
         UserComputationalResourceDTO comp1 = new UserComputationalResourceDTO()
-                .withComputationalName("comp1")
-                .withComputationalId("c1")
+                .withComputationalName(computationalName)
                 .withInstanceId("instance11")
                 .withStatus("creating")
                 .withUptime(new Date(200));
-        boolean inserted = infCompDAO.addComputational(exp1.getUser(), exp1.getExploratoryName(), comp1);
+        boolean inserted = compDAO.addComputational(exp1.getUser(), exploratoryName, comp1);
         assertTrue(inserted);
 
         // Check selected resources
@@ -130,6 +135,20 @@ public class EnvStatusDAOTest extends DAOTestBase {
         assertEquals(edge.instanceId, resList.getHostList().get(0).getId());
         assertEquals(expStatus.getInstanceId(), resList.getHostList().get(1).getId());
         assertEquals(comp1.getInstanceId(), resList.getClusterList().get(0).getId());
+
+        // Change status
+        resList.getHostList().get(0).setStatus("running");
+        resList.getHostList().get(1).setStatus("stopped");
+        resList.getClusterList().get(0).setStatus("terminating");
+        
+        envDAO.updateEnvStatus(user, resList);
+
+        // Check new status
+        UserAWSCredentialDTO userCred = keyDAO.getUserAWSCredential(user);
+        assertEquals("running", userCred.getEdgeStatus());
+        
+        assertEquals("stopped", expDAO.fetchExploratoryStatus(user, exploratoryName).toString());
+        assertEquals("terminating", compDAO.fetchComputationalFields(user, exploratoryName, computationalName).getStatus());
     }
 
 }

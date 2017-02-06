@@ -45,6 +45,7 @@ import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
 import com.epam.dlab.rest.contracts.InfrasctructureAPI;
+import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -94,14 +95,14 @@ public class InfrasctructureResource implements InfrasctructureAPI {
         EnvResourceList resourceList = envDAO.findEnvResources(userInfo.getName());
 		EnvResourceDTO dto = new EnvResourceDTO()
     			.withAwsRegion(settingsDAO.getAwsRegion())
+    			.withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
     			.withIamUserName(userInfo.getName())
     			.withResourceList(resourceList);
         LOGGER.debug("Ask docker for the status of resources for user {}: {}", userInfo.getName(), dto);
     	
-		return Response.ok(
-    			provisioningService.post(INFRASTRUCTURE_STATUS, userInfo.getAccessToken(),
-    					dto, EnvResourceDTO.class)
-    			).build();
+		provisioningService.post(INFRASTRUCTURE_STATUS, userInfo.getAccessToken(), dto, EnvResourceDTO.class);
+    	
+		return Response.ok().build();
     }
     
     /** Updates the status of the resources for user.

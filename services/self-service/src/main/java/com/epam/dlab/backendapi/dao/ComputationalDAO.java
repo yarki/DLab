@@ -44,6 +44,8 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.client.result.UpdateResult;
 
+/** DAO for user computational resources.
+ */
 public class ComputationalDAO extends BaseDAO {
     private static final String COMPUTATIONAL_NAME = "computational_name";
     private static final String COMPUTATIONAL_ID = "computational_id";

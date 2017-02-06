@@ -69,6 +69,10 @@ public class UserAWSCredentialDTO {
     	return userOwnBucketName;
     }
 
+	public String getEdgeStatus() {
+		return edgeStatus;
+	}
+	
 	public UserAWSCredentialDTO withEdgeStatus(UserInstanceStatus status) {
 		edgeStatus = status.toString();
 		return this;

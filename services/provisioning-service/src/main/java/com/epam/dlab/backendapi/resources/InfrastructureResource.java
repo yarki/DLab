@@ -77,7 +77,7 @@ public class InfrastructureResource implements DockerCommands {
     @Path("/status")
     @POST
     public String status(@Auth UserInfo ui, EnvResourceDTO dto) throws IOException, InterruptedException {
-    	LOGGER.debug("Request the statuses of resources for user {}: {}", ui.getName(), dto);
+    	LOGGER.debug("Request the status of resources for user {}: {}", ui.getName(), dto);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
                 configuration.getResourceStatusPollTimeout(),
@@ -89,7 +89,7 @@ public class InfrastructureResource implements DockerCommands {
                     commandBuilder.buildCommand(
                             new RunDockerCommand()
                                     .withInteractive()
-                                    .withName(nameContainer(dto.getIamUserName(), STATUS, "resource"))
+                                    .withName(nameContainer(dto.getEdgeUserName(), STATUS, "resources"))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
                                     .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
@@ -110,7 +110,7 @@ public class InfrastructureResource implements DockerCommands {
     }
 
     private String nameContainer(String user, DockerAction action, String name) {
-        return nameContainer(user, action.toString(), "computational", name);
+        return nameContainer(user, action.toString(), name);
     }
 
     public String getResourceType() {

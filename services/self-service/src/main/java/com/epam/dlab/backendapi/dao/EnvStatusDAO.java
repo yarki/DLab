@@ -21,7 +21,9 @@ package com.epam.dlab.backendapi.dao;
 import static com.epam.dlab.backendapi.dao.ExploratoryDAO.COMPUTATIONAL_RESOURCES;
 import static com.epam.dlab.backendapi.dao.ExploratoryDAO.EXPLORATORY_NAME;
 import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Projections.elemMatch;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
@@ -40,16 +42,20 @@ import com.epam.dlab.dto.status.EnvResourceList;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.client.model.Updates;
 
+/** DAO for updates of the status of environment resources.
+ */
 public class EnvStatusDAO extends BaseDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnvStatusDAO.class);
 
 	private static final String EDGE_STATUS = "edge_status";
+	private static final String COMPUTATIONAL_STATUS = COMPUTATIONAL_RESOURCES + "." + STATUS;
+	private static final String COMPUTATIONAL_STATUS_FILTER = COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS;
 
     private static final Bson INCLUDE_EDGE_FIELDS = include(INSTANCE_ID, EDGE_STATUS);
 	private static final Bson INCLUDE_EXP_FIELDS = include(INSTANCE_ID, STATUS,
-								COMPUTATIONAL_RESOURCES + "." + INSTANCE_ID, COMPUTATIONAL_RESOURCES + "." + STATUS);
+								COMPUTATIONAL_RESOURCES + "." + INSTANCE_ID, COMPUTATIONAL_STATUS);
 	private static final Bson INCLUDE_EXP_UPDATE_FIELDS = include(EXPLORATORY_NAME, INSTANCE_ID, STATUS,
-								COMPUTATIONAL_RESOURCES + "." + INSTANCE_ID, COMPUTATIONAL_RESOURCES + "." + STATUS);
+								COMPUTATIONAL_RESOURCES + "." + INSTANCE_ID, COMPUTATIONAL_STATUS);
 
 	/** Add the resource to list if it have instance_id.
 	 * @param list the list to add.
@@ -84,12 +90,19 @@ public class EnvStatusDAO extends BaseDAO {
 		}
 	}
 	
+	/** Find and return the id of instance for EDGE node.
+	 * @param user the name of user.
+	 */
 	private Document getEdgeNode(String user) {
 		return findOne(USER_AWS_CREDENTIALS,
     			eq(ID, user),
     			fields(INCLUDE_EDGE_FIELDS, excludeId())).orElse(null);
 	}
-	
+
+	/** Find and return the resource item for given id (of instance or cluster) or <b>null<b> otherwise. 
+	 * @param list the list of resources.
+	 * @param id the id of instance or cluster.
+	 */
 	private EnvResource getEnvResourceAndRemove(List<EnvResource> list, String id) {
 		synchronized (list) {
 			for (int i = 0; i < list.size(); i++) {
@@ -141,45 +154,12 @@ public class EnvStatusDAO extends BaseDAO {
     			.withClusterList(clusterList.size() > 0 ? clusterList : null));
     }
 
-    /** Updates the status of EDGE node for user.
-     * @param user the name of user.
-     * @param status the status of node.
-     * @exception DlabException
+    /** Translate the status of instance in Amazon into exploratory's status.
+     * @param oldStatus the current status of exploratory.
+     * @param newStatus the current status of instance in Amazon.
      */
-    private void updateEdgeStatus(String user, List<EnvResource> hostList) throws DlabException {
-    	LOGGER.debug("Update EDGE status for user ", user);
-    	Document edge = getEdgeNode(user);
-    	String instanceId;
-    	if (edge == null ||
-    		(instanceId = edge.getString(INSTANCE_ID)) == null) {
-    		return;
-    	}
-		
-    	EnvResource r = getEnvResourceAndRemove(hostList, instanceId);
-    	if (r == null) {
-    		return;
-    	}
-    	
-    	LOGGER.debug("Update EDGE status for user with instance_id {} from {} to {}", user, instanceId, edge.getString(STATUS), r.getStatus());
-    	if (!r.getStatus().equals(edge.getString(STATUS))) {
-    		Document values = new Document(STATUS, r.getStatus());
-    		updateOne(USER_AWS_CREDENTIALS,
-        		eq(ID, user),
-                new Document(SET, values));
-    	}
-    }
-    
-    
-    private UserInstanceStatus getExploratoryNewStatus(UserInstanceStatus oldStatus, String newStatus) {
-    	/*
-    	pending
-    	running
-    	shutting-down
-    	terminated
-    	stopping
-    	stopped
-    	*/
-    	
+    private UserInstanceStatus getInstanceNewStatus(UserInstanceStatus oldStatus, String newStatus) {
+    	/* AWS statuses: pending, running, shutting-down, terminated, stopping, stopped */
     	UserInstanceStatus status;
     	if ("pending".equalsIgnoreCase(newStatus) || "stopping".equalsIgnoreCase(newStatus)) {
     		return oldStatus;
@@ -190,8 +170,6 @@ public class EnvStatusDAO extends BaseDAO {
     	}
     	
     	switch (oldStatus) {
-			case CONFIGURING:
-			case CREATED:
 			case CREATING:
 				return (status.in(UserInstanceStatus.TERMINATED, UserInstanceStatus.STOPPED) ? status : oldStatus);
 			case RUNNING:
@@ -211,6 +189,40 @@ public class EnvStatusDAO extends BaseDAO {
     	}
     }
     
+    /** Updates the status of EDGE node for user.
+     * @param user the name of user.
+     * @param status the status of node.
+     * @exception DlabException
+     */
+    private void updateEdgeStatus(String user, List<EnvResource> hostList) throws DlabException {
+    	LOGGER.debug("Update EDGE status for user {}", user);
+    	Document edge = getEdgeNode(user);
+    	String instanceId;
+    	if (edge == null ||
+    		(instanceId = edge.getString(INSTANCE_ID)) == null) {
+    		return;
+    	}
+		
+    	EnvResource r = getEnvResourceAndRemove(hostList, instanceId);
+    	if (r == null) {
+    		return;
+    	}
+    	
+    	LOGGER.debug("Update EDGE status for user {} with instance_id {} from {} to {}",
+    			user, instanceId, edge.getString(EDGE_STATUS), r.getStatus());
+    	String oldStatus = edge.getString(EDGE_STATUS);
+    	UserInstanceStatus oStatus = (oldStatus == null ? UserInstanceStatus.CREATING : UserInstanceStatus.of(oldStatus));
+    	UserInstanceStatus status = getInstanceNewStatus(oStatus, r.getStatus());
+    	LOGGER.debug("Translate EDGE status for user {} with instanceId {} from {} to {}",
+    			user, instanceId, r.getStatus(), status);
+    	if (oStatus != status) {
+        	LOGGER.debug("EDGE status will be updated from {} to {}", oldStatus, status);
+    		updateOne(USER_AWS_CREDENTIALS,
+        		eq(ID, user),
+        		Updates.set(EDGE_STATUS, status.toString()));
+    	}
+    }
+    
     /** Update the status of exploratory if it needed.
      * @param user the user name
      * @param instanceId the id of instance
@@ -219,30 +231,73 @@ public class EnvStatusDAO extends BaseDAO {
      */
     private void updateExploratoryStatus(String user, String exploratoryName,
     		String oldStatus, String newStatus) {
-    	LOGGER.debug("Update exploratory status for user with exploratory {} from {} to {}", user, exploratoryName, oldStatus, newStatus);
+    	LOGGER.debug("Update exploratory status for user {} with exploratory {} from {} to {}", user, exploratoryName, oldStatus, newStatus);
     	UserInstanceStatus oStatus = UserInstanceStatus.of(oldStatus);
-    	UserInstanceStatus status = getExploratoryNewStatus(oStatus, newStatus);
-    	LOGGER.debug("Translate exploratory status for user with exploratory {} from {} to {}", user, exploratoryName, newStatus, status);
+    	UserInstanceStatus status = getInstanceNewStatus(oStatus, newStatus);
+    	LOGGER.debug("Translate exploratory status for user {} with exploratory {} from {} to {}", user, exploratoryName, newStatus, status);
 
     	if (oStatus != status) {
         	LOGGER.debug("Exploratory status will be updated from {} to {}", oldStatus, status);
         	updateOne(USER_INSTANCES,
         			exploratoryCondition(user, exploratoryName),
-        			Updates.set(STATUS, status.name()));
+        			Updates.set(STATUS, status.toString()));
     	}
     }
 
+    /** Translate the status of cluster in Amazon into computational's status.
+     * @param oldStatus the current status of computational.
+     * @param newStatus the current status of cluster in Amazon.
+     */
+    private UserInstanceStatus getComputationalNewStatus(UserInstanceStatus oldStatus, String newStatus) {
+    	/* AWS statuses: bootstrapping, running, starting, terminated, terminated_with_errors, terminating, waiting */
+    	UserInstanceStatus status;
+    	if ("terminated".equalsIgnoreCase(newStatus) || "terminated_with_errors".equalsIgnoreCase(newStatus)) {
+    		status = UserInstanceStatus.TERMINATED;
+    	} else if ("terminating".equalsIgnoreCase(newStatus)) {
+    		status = UserInstanceStatus.TERMINATING;
+    	} else {
+    		return oldStatus;
+    	}
+    	
+    	switch (oldStatus) {
+			case CREATING:
+			case CONFIGURING:
+				return (status.in(UserInstanceStatus.TERMINATED, UserInstanceStatus.TERMINATING) ? status : oldStatus);
+			case TERMINATING:
+				return (status.in(UserInstanceStatus.TERMINATED) ? status : oldStatus);
+			case FAILED:
+			case TERMINATED:
+			default:
+				return oldStatus;
+    	}
+    }
+    
     /** Update the status of exploratory if it needed.
      * @param user the user name
      * @param instanceId the id of instance
      * @param oldStatus old status
      * @param newStatus new status
      */
-	private void updateComputationalStatus(String user, String exploratoryId, String clusterId,
+	private void updateComputationalStatus(String user, String exploratoryName, String clusterId,
 			String oldStatus, String newStatus) {
-    	LOGGER.debug("Update computational status for user with instance_id {} from {} to {}", user, clusterId, oldStatus, newStatus);
+    	LOGGER.debug("Update computational status for user {} with exploratory {} and instanceId {} from {} to {}",
+    			user, exploratoryName, clusterId, oldStatus, newStatus);
     	UserInstanceStatus oStatus = UserInstanceStatus.of(oldStatus);
-    	
+    	UserInstanceStatus status = getComputationalNewStatus(oStatus, newStatus);
+    	LOGGER.debug("Translate computational status for user {} with exploratory {} and instanceId {} from {} to {}",
+    			user, exploratoryName, clusterId, newStatus, status);
+
+    	if (oStatus != status) {
+        	LOGGER.debug("Computational status will be updated from {} to {}", oldStatus, status);
+        	Document values = new Document(COMPUTATIONAL_STATUS_FILTER, status.toString());
+        	updateOne(USER_INSTANCES,
+        			and(exploratoryCondition(user, exploratoryName),
+                            elemMatch(COMPUTATIONAL_RESOURCES,
+                            		  and(eq(INSTANCE_ID, clusterId))
+                                     )
+                       ),
+        			new Document(SET, values));
+    	}
 	}
 
 	/** Updates the status of exploratory and computational for user.

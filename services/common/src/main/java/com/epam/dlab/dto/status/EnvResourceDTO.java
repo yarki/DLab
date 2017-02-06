@@ -23,24 +23,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
 public class EnvResourceDTO extends ResourceBaseDTO<EnvResourceDTO> {
-    @JsonProperty("aws_region")
-    private String awsRegion;
-    @JsonProperty("list_resources")
+    @JsonProperty("edge_user_name")
+    private String edgeUserName;
+    @JsonProperty("edge_list_resources")
     private EnvResourceList resourceList;
     
-    /** Return the name of region in Amazon. */
-    public String getAwsRegion() {
-        return awsRegion;
+    /** Return the name of user for EDGE node. */
+    public String getEdgeUserName() {
+        return edgeUserName;
     }
 
-    /** Set the name of region in Amazon. */
-    public void setAwsRegion(String awsRegion) {
-        this.awsRegion = awsRegion;
+    /** Set the name of user for EDGE node. */
+    public void setEdgeUserName(String edgeUserName) {
+        this.edgeUserName = edgeUserName;
     }
 
-    /** Set the name of region in Amazon. */
-	public EnvResourceDTO withAwsRegion(String region) {
-        setAwsRegion(region);
+    /** Set the name of user for EDGE node. */
+    public EnvResourceDTO withEdgeUserName(String edgeUserName) {
+        setEdgeUserName(edgeUserName);
         return this;
     }
 
@@ -63,8 +63,8 @@ public class EnvResourceDTO extends ResourceBaseDTO<EnvResourceDTO> {
     @Override
     public ToStringHelper toStringHelper(Object self) {
     	return super.toStringHelper(self)
-    	        .add("awsRegion", awsRegion)
-    	        .add("resourceList", resourceList);
+    	        .add("edgeUserName", edgeUserName)
+    			.add("resourceList", resourceList);
     }
     
     @Override

@@ -25,7 +25,7 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 /** Describe the lists of resources (host, cluster, storage) for check status in Cloud.
  */
 public class EnvStatusDTO extends StatusBaseDTO<EnvStatusDTO> {
-    @JsonProperty("list_resources")
+    @JsonProperty("edge_list_resources")
     private EnvResourceList resourceList;
     
     /** Return the list of resources (hosts, clusters, storages). */
