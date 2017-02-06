@@ -38,7 +38,7 @@ public class ProcessConveyor extends AssemblingConveyor<ProcessId,ProcessStep,Pr
         this.setDefaultCartConsumer((l,v,b)->{
             LOG.warn("default processor for {} {} {}",l,v,b.get());
             if(v instanceof FutureCart) {
-                FutureCart<?, ?, ?> fc = (FutureCart<?, ?, ?>)v;
+                FutureCart fc = (FutureCart)v;
                 fc.get().cancel(true);
             }
         });

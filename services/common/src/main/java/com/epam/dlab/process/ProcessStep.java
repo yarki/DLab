@@ -31,8 +31,7 @@ public enum ProcessStep implements SmartLabel<ProcessInfoBuilder> {
 ;
     private BiConsumer<ProcessInfoBuilder, Object> consumer;
 
-	@SuppressWarnings("unchecked")
-	<T extends Object> ProcessStep(BiConsumer<ProcessInfoBuilder, T> consumer) {
+    <T> ProcessStep(BiConsumer<ProcessInfoBuilder, T> consumer) {
         this.consumer = (BiConsumer<ProcessInfoBuilder, Object>) consumer;
     }
 

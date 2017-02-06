@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.epam.dlab.process;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
 
-@Ignore
 public class ProcessConveyorTest {
 
     private static String OS = System.getProperty("os.name").toLowerCase();
