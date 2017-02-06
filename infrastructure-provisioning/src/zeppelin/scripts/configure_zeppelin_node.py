@@ -44,8 +44,8 @@ args = parser.parse_args()
 
 
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version + "-bin-hadoop" + args.hadoop_version + ".tgz"
-zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-netinst.tgz"
-zeppelin_version = "0.6.2"
+zeppelin_version = "0.7.0"
+zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-" + zeppelin_version + "-bin-netinst.tgz"
 zeppelin_interpreters = "md,python,livy"
 python3_version = "3.4"
 local_spark_path = '/opt/spark/'
