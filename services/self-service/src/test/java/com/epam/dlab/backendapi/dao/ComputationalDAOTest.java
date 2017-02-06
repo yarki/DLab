@@ -17,6 +17,25 @@
  ****************************************************************************/
 package com.epam.dlab.backendapi.dao;
 
+import static com.epam.dlab.backendapi.dao.BaseDAO.USER;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.EXPLORATORY_NAME;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
+import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
@@ -24,18 +43,6 @@ import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.result.UpdateResult;
-import org.junit.*;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import static com.epam.dlab.backendapi.dao.BaseDAO.USER;
-import static com.epam.dlab.backendapi.dao.ExploratoryDAO.EXPLORATORY_NAME;
-import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
-import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
-import static junit.framework.TestCase.*;
 
 @Ignore
 public class ComputationalDAOTest extends DAOTestBase {
@@ -43,7 +50,7 @@ public class ComputationalDAOTest extends DAOTestBase {
     private ComputationalDAO infCompDAO;
     
     public ComputationalDAOTest() {
-        super(Collections.singletonList(USER_INSTANCES));
+        super(USER_INSTANCES);
     }
 
     @Before

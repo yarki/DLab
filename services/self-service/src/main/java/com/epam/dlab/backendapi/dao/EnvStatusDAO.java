@@ -20,6 +20,7 @@ package com.epam.dlab.backendapi.dao;
 
 import static com.epam.dlab.backendapi.dao.ExploratoryDAO.COMPUTATIONAL_RESOURCES;
 import static com.epam.dlab.backendapi.dao.ExploratoryDAO.EXPLORATORY_NAME;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
@@ -37,11 +38,14 @@ import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.dto.status.EnvResource;
 import com.epam.dlab.dto.status.EnvResourceList;
 import com.epam.dlab.exceptions.DlabException;
+import com.mongodb.client.model.Updates;
 
 public class EnvStatusDAO extends BaseDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnvStatusDAO.class);
 
-    private static final Bson INCLUDE_EDGE_FIELDS = include(INSTANCE_ID, STATUS);
+	private static final String EDGE_STATUS = "edge_status";
+
+    private static final Bson INCLUDE_EDGE_FIELDS = include(INSTANCE_ID, EDGE_STATUS);
 	private static final Bson INCLUDE_EXP_FIELDS = include(INSTANCE_ID, STATUS,
 								COMPUTATIONAL_RESOURCES + "." + INSTANCE_ID, COMPUTATIONAL_RESOURCES + "." + STATUS);
 	private static final Bson INCLUDE_EXP_UPDATE_FIELDS = include(EXPLORATORY_NAME, INSTANCE_ID, STATUS,
@@ -52,10 +56,15 @@ public class EnvStatusDAO extends BaseDAO {
 	 * @param document document with resource.
 	 * @param includeStatus include status or not to the list.
 	 */
-	private void addResource(List<EnvResource> list, Document document) {
+	private void addResource(List<EnvResource> list, Document document, String statusFieldName) {
+		LOGGER.debug("Add resource from {}", document);
 		String instanceId = document.getString(INSTANCE_ID);
 		if (instanceId != null) {
-			UserInstanceStatus status = UserInstanceStatus.of(document.getString(STATUS));
+			UserInstanceStatus status = UserInstanceStatus.of(document.getString(statusFieldName));
+			if (status == null) {
+				LOGGER.error("Unknown status {} from field {}, content is {}", document.getString(statusFieldName), statusFieldName, document);
+				return;
+			}
 			switch (status) {
 			case CONFIGURING:
 			case CREATING:
@@ -104,7 +113,7 @@ public class EnvStatusDAO extends BaseDAO {
     	// Add EDGE
     	Document edge = getEdgeNode(user);
     	if (edge != null) {
-    		addResource(hostList, edge);
+    		addResource(hostList, edge, EDGE_STATUS);
     	}
 
     	// Add exploratory
@@ -113,7 +122,7 @@ public class EnvStatusDAO extends BaseDAO {
     			fields(INCLUDE_EXP_FIELDS, excludeId()));
 
     	for (Document exp : expList) {
-    		addResource(hostList, exp);
+    		addResource(hostList, exp, STATUS);
     		
     		// Add computational
 			@SuppressWarnings("unchecked")
@@ -122,7 +131,7 @@ public class EnvStatusDAO extends BaseDAO {
 				continue;
 			}
 			for (Document comp : compList) {
-				addResource(clusterList, comp);
+				addResource(clusterList, comp, STATUS);
 			}
 		}
     	
@@ -160,69 +169,80 @@ public class EnvStatusDAO extends BaseDAO {
     	}
     }
     
+    
+    private UserInstanceStatus getExploratoryNewStatus(UserInstanceStatus oldStatus, String newStatus) {
+    	/*
+    	pending
+    	running
+    	shutting-down
+    	terminated
+    	stopping
+    	stopped
+    	*/
+    	
+    	UserInstanceStatus status;
+    	if ("pending".equalsIgnoreCase(newStatus) || "stopping".equalsIgnoreCase(newStatus)) {
+    		return oldStatus;
+    	} else if ("shutting-down".equalsIgnoreCase(newStatus)) {
+    		status = UserInstanceStatus.TERMINATING;
+    	} else {
+    		status = UserInstanceStatus.of(newStatus);
+    	}
+    	
+    	switch (oldStatus) {
+			case CONFIGURING:
+			case CREATED:
+			case CREATING:
+				return (status.in(UserInstanceStatus.TERMINATED, UserInstanceStatus.STOPPED) ? status : oldStatus);
+			case RUNNING:
+			case STARTING:
+			case STOPPING:
+				return (status.in(UserInstanceStatus.TERMINATING, UserInstanceStatus.TERMINATED,
+	                              UserInstanceStatus.STOPPING, UserInstanceStatus.STOPPED) ? status : oldStatus);
+			case STOPPED:
+				return (status.in(UserInstanceStatus.TERMINATING, UserInstanceStatus.TERMINATED,
+	                    UserInstanceStatus.RUNNING) ? status : oldStatus);
+			case TERMINATING:
+				return (status.in(UserInstanceStatus.TERMINATED) ? status : oldStatus);
+			case FAILED:
+			case TERMINATED:
+			default:
+				return oldStatus;
+    	}
+    }
+    
     /** Update the status of exploratory if it needed.
      * @param user the user name
      * @param instanceId the id of instance
-     * @param oldState old state
-     * @param newState new state
+     * @param oldStatus old status
+     * @param newStatus new status
      */
-    private void updateExploratoryStatus(String user, String instanceId,
-    		UserInstanceStatus oldState, String newState) {
-    	LOGGER.debug("Update exploratory status for user with instance_id {} from {} to {}", user, instanceId, oldState, newState);
-    	switch (oldState) {
-		case CONFIGURING:
-		case CREATED:
-		case CREATING:
-			if ("terminated".equalsIgnoreCase(newState)) {
-				// terminated
-			} else if ("stopped".equalsIgnoreCase(newState)) {
-				// stopped
-			}
-			break;
-		case RUNNING:
-			if ("terminated".equalsIgnoreCase(newState)) {
-				// terminated
-			} else if ("stopped".equalsIgnoreCase(newState)) {
-				// stopped
-			}
-			break;
-		case STARTING:
-			break;
-		case STOPPED:
-			break;
-		case STOPPING:
-			break;
-		case TERMINATING:
-			break;
-		case FAILED:
-		case TERMINATED:
-		default:
-			break;
-    	
+    private void updateExploratoryStatus(String user, String exploratoryName,
+    		String oldStatus, String newStatus) {
+    	LOGGER.debug("Update exploratory status for user with exploratory {} from {} to {}", user, exploratoryName, oldStatus, newStatus);
+    	UserInstanceStatus oStatus = UserInstanceStatus.of(oldStatus);
+    	UserInstanceStatus status = getExploratoryNewStatus(oStatus, newStatus);
+    	LOGGER.debug("Translate exploratory status for user with exploratory {} from {} to {}", user, exploratoryName, newStatus, status);
+
+    	if (oStatus != status) {
+        	LOGGER.debug("Exploratory status will be updated from {} to {}", oldStatus, status);
+        	updateOne(USER_INSTANCES,
+        			exploratoryCondition(user, exploratoryName),
+        			Updates.set(STATUS, status.name()));
     	}
-/*
-pending
-running
-shutting-down
-terminated
-stopping
-stopped
-*/
-		/*updateOne(USER_INSTANCES,
-        exploratoryCondition(user, exp.get),
-        set(STATUS, r.getStatus()));*/
     }
-    
 
     /** Update the status of exploratory if it needed.
      * @param user the user name
      * @param instanceId the id of instance
-     * @param oldState old state
-     * @param newState new state
+     * @param oldStatus old status
+     * @param newStatus new status
      */
 	private void updateComputationalStatus(String user, String exploratoryId, String clusterId,
-			UserInstanceStatus oldState, String newState) {
-    	LOGGER.debug("Update computational status for user with instance_id {} from {} to {}", user, clusterId, oldState, newState);
+			String oldStatus, String newStatus) {
+    	LOGGER.debug("Update computational status for user with instance_id {} from {} to {}", user, clusterId, oldStatus, newStatus);
+    	UserInstanceStatus oStatus = UserInstanceStatus.of(oldStatus);
+    	
 	}
 
 	/** Updates the status of exploratory and computational for user.
@@ -253,8 +273,7 @@ stopped
     		if (instanceId != null) {
     			r = getEnvResourceAndRemove(list.getHostList(), instanceId);
     			if (r != null) {
-    				updateExploratoryStatus(user, instanceId,
-    						UserInstanceStatus.of(exp.getString(STATUS)), r.getStatus());
+    				updateExploratoryStatus(user, exploratoryName, exp.getString(STATUS), r.getStatus());
     			}
     		}
     		
@@ -270,7 +289,7 @@ stopped
 	    			r = getEnvResourceAndRemove(list.getClusterList(), instanceId);
 	    			if (r != null) {
 	    				updateComputationalStatus(user, exploratoryName, instanceId,
-	    						UserInstanceStatus.of(comp.getString(STATUS)), r.getStatus());
+	    						comp.getString(STATUS), r.getStatus());
 	    			}
 	    		}
 			}

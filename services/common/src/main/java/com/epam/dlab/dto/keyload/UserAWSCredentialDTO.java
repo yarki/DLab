@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.dto.keyload;
 
+import com.epam.dlab.UserInstanceStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -49,9 +50,8 @@ public class UserAWSCredentialDTO {
     private String notebookSubnet;
     @JsonProperty("edge_sg")
     private String edgeSG;
-    // TODO: Add by DevOps
-    @JsonProperty
-    private String status;
+    @JsonProperty("edge_status")
+    private String edgeStatus;
 
     public String getInstanceId() {
     	return instanceId;
@@ -68,4 +68,9 @@ public class UserAWSCredentialDTO {
     public String getUserOwnBucketName() {
     	return userOwnBucketName;
     }
+
+	public UserAWSCredentialDTO withEdgeStatus(UserInstanceStatus status) {
+		edgeStatus = status.toString();
+		return this;
+	}
 }

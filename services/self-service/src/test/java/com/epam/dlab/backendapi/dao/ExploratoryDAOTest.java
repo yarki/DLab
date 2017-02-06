@@ -28,7 +28,6 @@ import com.mongodb.client.result.UpdateResult;
 import org.junit.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +44,7 @@ public class ExploratoryDAOTest extends DAOTestBase {
     private ExploratoryDAO infExpDAO;
     
     public ExploratoryDAOTest() {
-        super(Collections.singletonList(USER_INSTANCES));
+        super(USER_INSTANCES);
     }
 
     @Before

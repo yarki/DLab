@@ -24,7 +24,6 @@ import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
 import java.util.Date;
 
 import org.junit.AfterClass;
@@ -48,7 +47,7 @@ public class EnvStatusDAOTest extends DAOTestBase {
     private EnvStatusDAO envDAO;
     
     public EnvStatusDAOTest() {
-        super(Collections.singletonList(USER_INSTANCES));
+        super(USER_AWS_CREDENTIALS, USER_INSTANCES);
     }
 
     @Before
@@ -75,14 +74,14 @@ public class EnvStatusDAOTest extends DAOTestBase {
 
     @AfterClass
     public static void teardownAll() {
-        //DAOTestBase.teardownAll();
+        DAOTestBase.teardownAll();
     }
     
     private static class EdgeInfo {
         @JsonProperty("instance_id")
         private String instanceId;
-        @JsonProperty
-        private String status;
+        @JsonProperty("edge_status")
+        private String edgeStatus;
         @JsonProperty("ip")
         private String privateIp;
     }
@@ -95,7 +94,7 @@ public class EnvStatusDAOTest extends DAOTestBase {
     	EdgeInfo edge = new EdgeInfo();
     	edge.instanceId = "instance0";
     	edge.privateIp = "privIp";
-    	edge.status = "stopped";
+    	edge.edgeStatus = "stopped";
     	infExpDAO.insertOne(USER_AWS_CREDENTIALS, edge, user);
     	
     	// Add exploratory
@@ -109,7 +108,7 @@ public class EnvStatusDAOTest extends DAOTestBase {
         		.withUser(user)
         		.withExploratoryName("exp1")
         		.withInstanceId("instance1")
-        		.withStatus("runnig");
+        		.withStatus("running");
         infExpDAO.updateExploratoryFields(expStatus);
 
         // Add computational
