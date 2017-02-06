@@ -123,17 +123,14 @@ public class EnvStatusDAOTest extends DAOTestBase {
         assertTrue(inserted);
 
         // Check selected resources
-        EnvResourceList resList = envDAO.findEnvResources(user, true);
+        EnvResourceList resList = envDAO.findEnvResources(user);
 
         assertEquals(2, resList.getHostList().size());
         assertEquals(1, resList.getClusterList().size());
 
         assertEquals(edge.instanceId, resList.getHostList().get(0).getId());
-        assertEquals(edge.status, resList.getHostList().get(0).getStatus());
         assertEquals(expStatus.getInstanceId(), resList.getHostList().get(1).getId());
-        assertEquals(expStatus.getStatus(), resList.getHostList().get(1).getStatus());
         assertEquals(comp1.getInstanceId(), resList.getClusterList().get(0).getId());
-        assertEquals(comp1.getStatus(), resList.getClusterList().get(0).getStatus());
     }
 
 }
