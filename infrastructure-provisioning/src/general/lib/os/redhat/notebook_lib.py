@@ -81,7 +81,7 @@ def ensure_matplot(os_user):
     if not exists('/home/{}/.ensure_dir/matplot_ensured'.format(os_user)):
         try:
             sudo('yum install -y python-matplotlib --nogpgcheck')
-            sudo('pip install matplotlib --no-cache-dir')
+            sudo('pip2 install matplotlib --no-cache-dir')
             sudo('pip3 install matplotlib --no-cache-dir')
             sudo('touch /home/{}/.ensure_dir/matplot_ensured'.format(os_user))
         except:
@@ -123,8 +123,9 @@ def ensure_additional_python_libs(os_user):
         try:
             sudo('yum clean all')
             sudo('yum install -y zlib-devel libjpeg-turbo-devel --nogpgcheck')
-            sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
-            sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+            if os.environ['application'] == 'jupyter' or os.environ['application'] == 'zeppelin':
+                sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+                sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
             if os.environ['application'] == 'tensor':
                 sudo('pip2 install keras opencv-python h5py --no-cache-dir')
                 sudo('pip3 install keras opencv-python h5py --no-cache-dir')

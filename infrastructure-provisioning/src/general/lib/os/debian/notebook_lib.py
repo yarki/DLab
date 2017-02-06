@@ -82,7 +82,7 @@ def ensure_matplot(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/matplot_ensured'):
         try:
             sudo('apt-get build-dep -y python-matplotlib')
-            sudo('pip install matplotlib --no-cache-dir')
+            sudo('pip2 install matplotlib --no-cache-dir')
             sudo('pip3 install matplotlib --no-cache-dir')
             sudo('touch /home/' + os_user + '/.ensure_dir/matplot_ensured')
         except:
@@ -126,9 +126,10 @@ def ensure_additional_python_libs(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/additional_python_libs_ensured'):
         try:
             sudo('apt-get install -y libjpeg8-dev zlib1g-dev')
-            sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
-            sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
-            if os.environ['application'] == 'jupyter':
+            if os.environ['application'] == 'jupyter' or os.environ['application'] == 'zeppelin':
+                sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+                sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+            if os.environ['application'] == 'jupyter' or os.environ['application'] == 'tensor':
                 sudo('jupyter-kernelspec remove -f python3')
             if os.environ['application'] == 'tensor':
                 sudo('pip2 install keras opencv-python h5py --no-cache-dir')
