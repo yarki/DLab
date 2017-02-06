@@ -294,3 +294,13 @@ def install_livy_dependencies():
     sudo('apt-get -y install libkrb5-dev')
     sudo('pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
     sudo('pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')
+
+
+def install_maven_emr():
+    local('sudo apt-get -y install maven')
+
+
+def install_livy_dependencies_emr():
+    local('sudo apt-get -y install libkrb5-dev')
+    local('sudo pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
+    local('sudo pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')

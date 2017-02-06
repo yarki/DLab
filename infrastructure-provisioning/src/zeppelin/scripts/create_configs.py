@@ -55,8 +55,8 @@ yarn_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/conf/'
 
 
 def install_remote_livy(args):
-    install_maven()
-    install_livy_dependencies()
+    install_maven_emr()
+    install_livy_dependencies_emr()
     with cd('/opt/' + args.emr_version + '/' + args.cluster_name + '/'):
         sudo('git init')
         sudo('git clone https://github.com/cloudera/livy.git')
