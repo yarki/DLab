@@ -857,7 +857,7 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
             text = text.replace('SPARK_HOME', spark_dir)
             text = text.replace('AWS_REGION', region)
             while not port_number_found:
-                port_free = local('sudo nc -z localhost ' + str(default_port) + '; echo $?')
+                port_free = local('sudo nc -z localhost ' + str(default_port) + '; echo $?', capture=True)
                 if port_free == '1':
                     livy_port = default_port
                     port_number_found = True
