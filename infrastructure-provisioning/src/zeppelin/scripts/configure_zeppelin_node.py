@@ -170,6 +170,9 @@ if __name__ == "__main__":
     print "Install python3 kernels"
     ensure_python3_kernel_zeppelin(python3_version, args.os_user)
 
+    print "Installing virtualenv"
+    ensure_libraries_py(os_user)
+
     print "Installing Livy for local kernels"
     install_local_livy(args)
 
