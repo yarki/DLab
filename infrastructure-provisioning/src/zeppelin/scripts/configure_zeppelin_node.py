@@ -40,8 +40,9 @@ args = parser.parse_args()
 
 spark_version = os.environ['notebook_spark_version']
 hadoop_version = os.environ['notebook_hadoop_version']
-spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
-zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-netinst.tgz"
+zeppelin_version = "0.7.0"
+zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-" + zeppelin_version + "/zeppelin-" + zeppelin_version\
+                + "-bin-netinst.tgz"
 zeppelin_version = "0.6.2"
 zeppelin_interpreters = "md,python"
 python3_version = "3.4"
