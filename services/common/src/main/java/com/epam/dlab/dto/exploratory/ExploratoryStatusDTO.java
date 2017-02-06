@@ -33,19 +33,19 @@ public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
     private String exploratoryUser;
     @JsonProperty("exploratory_pass")
     private String exploratoryPassword;
-    @JsonProperty("exploratory_private_ip")
-    private String exploratoryPrivateIp;
+    @JsonProperty("private_ip")
+    private String privateIp;
 
-    public String getExploratoryPrivateIp() {
-        return exploratoryPrivateIp;
+    public String getPrivateIp() {
+        return privateIp;
     }
 
-    public void setExploratoryPrivateIp(String exploratoryPrivateIp) {
-        this.exploratoryPrivateIp = exploratoryPrivateIp;
+    public void setPrivateIp(String privateIp) {
+        this.privateIp = privateIp;
     }
 
-    public ExploratoryStatusDTO withExploratoryPrivateIp(String exploratoryPrivateIp) {
-        setExploratoryPrivateIp(exploratoryPrivateIp);
+    public ExploratoryStatusDTO withPrivateIp(String privateIp) {
+        setPrivateIp(privateIp);
         return this;
     }
 

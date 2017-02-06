@@ -76,10 +76,10 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
 				LOGGER.warn("Cannot parse field {} in JSON {}", EXPLORATORY_URL_FIELD, nodeUrl.toString(), e);
 			}
     	}
-        return baseStatus
+    	return baseStatus
                 .withExploratoryId(getTextValue(resultNode.get(EXPLORATORY_ID_FIELD)))
                 .withExploratoryUrl(url)
-                .withExploratoryPrivateIp(getTextValue(resultNode.get(EXPLORATORY_PRIVATE_IP_FIELD)))
+                .withPrivateIp(getTextValue(resultNode.get(EXPLORATORY_PRIVATE_IP_FIELD)))
                 .withExploratoryUser(getTextValue(resultNode.get(EXPLORATORY_USER_FIELD)))
                 .withExploratoryPassword(getTextValue(resultNode.get(EXPLORATORY_PASSWORD_FIELD)));
     }

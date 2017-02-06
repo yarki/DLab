@@ -55,7 +55,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     private static final String EXPLORATORY_URL_URL = "url";
     private static final String EXPLORATORY_USER = "exploratory_user";
     private static final String EXPLORATORY_PASSWORD = "exploratory_pass";
-    private static final String EXPLORATORY_PRIVATE_IP = "exploratory_private_ip";
+    private static final String EXPLORATORY_PRIVATE_IP = "private_ip";
     private static final String UPTIME = "up_time";
     private static final String COMPUTATIONAL_RESOURCES = "computational_resources";
     private static final String COMPUTATIONAL_NAME = "computational_name";
@@ -167,6 +167,12 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         if (dto.getExploratoryId() != null) {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());
         }
+
+
+        if (dto.getPrivateIp() != null) {
+            values.append(EXPLORATORY_PRIVATE_IP, dto.getPrivateIp());
+        }
+
         if (dto.getExploratoryUrl() != null) {
             values.append(EXPLORATORY_URL, dto.getExploratoryUrl().stream()
                     .map(url -> new LinkedHashMap<String, String>() {{
@@ -180,9 +186,6 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         }
         if (dto.getExploratoryPassword() != null) {
             values.append(EXPLORATORY_PASSWORD, dto.getExploratoryPassword());
-        }
-        if (dto.getExploratoryPrivateIp() != null) {
-            values.append(EXPLORATORY_PRIVATE_IP, dto.getExploratoryPrivateIp());
         }
         return updateOne(USER_INSTANCES,
                 exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
