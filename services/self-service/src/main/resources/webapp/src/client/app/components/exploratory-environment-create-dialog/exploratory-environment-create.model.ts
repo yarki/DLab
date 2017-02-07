@@ -22,6 +22,7 @@ import { Response } from '@angular/http';
 import { UserResourceService } from '../../services/userResource.service';
 import { ExploratoryEnvironmentVersionModel } from '../../models/exploratoryEnvironmentVersion.model';
 import { ResourceShapeTypesModel } from '../../models/resourceShapeTypes.model';
+import { SortUtil } from '../../util/sortUtil';
 
 export class ExploratoryEnvironmentCreateModel {
 
@@ -97,7 +98,7 @@ export class ExploratoryEnvironmentCreateModel {
 
             let shapeJson = data[parentIndex].exploratory_environment_shapes;
             let exploratoryJson = data[parentIndex].exploratory_environment_versions;
-            let shapeObj: ResourceShapeTypesModel = new ResourceShapeTypesModel(shapeJson);
+            let shapeObj: ResourceShapeTypesModel = new ResourceShapeTypesModel(SortUtil.shapesSort(shapeJson));
 
             for (let index = 0; index < exploratoryJson.length; index++)
               this.exploratoryEnvironmentTemplates.push(

@@ -19,6 +19,7 @@ limitations under the License.
 import { ComputationalResourceApplicationTemplate } from './computationalResourceApplicationTemplate.model';
 import { ResourceShapeTypesModel } from './resourceShapeTypes.model';
 import { ImageType } from './imageType.enum';
+import { SortUtil } from '../util/sortUtil';
 
 export class ComputationalResourceImage {
   template_name: string;
@@ -33,7 +34,7 @@ export class ComputationalResourceImage {
     this.environment_type = ImageType.СOMPUTATIONAL;
     this.application_templates = [];
 
-    this.shapes = new ResourceShapeTypesModel(jsonModel.computation_resources_shapes);
+    this.shapes = new ResourceShapeTypesModel(SortUtil.shapesSort(jsonModel.computation_resources_shapes));
 
     if (jsonModel.templates && jsonModel.templates.length > 0)
       for (let index = 0; index < jsonModel.templates.length; index++)
