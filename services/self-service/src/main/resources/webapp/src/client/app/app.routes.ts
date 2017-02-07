@@ -22,6 +22,7 @@ import { LoginComponent } from './login/login.component';
 import { AccessNotebookGuide } from './help/accessnotebookguide/accessnotebookguide.component';
 import { PublicKeyGuide } from './help/publickeyguide/publickeyguide.component';
 import { AuthorizationGuard } from './security/authorization.guard';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 export const routes: Routes = [{
     path: '',
@@ -40,4 +41,7 @@ export const routes: Routes = [{
   }, {
     path: 'help/publickeyguide',
     component: PublicKeyGuide
+  }, {
+    path: '**',
+    component: NotFoundComponent
   }];

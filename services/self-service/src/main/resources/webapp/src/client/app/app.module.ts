@@ -23,6 +23,7 @@ import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
 
+import { NotFoundModule } from './not-found/not-found.module';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { AuthorizationGuard } from './security/authorization.guard';
 import { LoginModule } from './login/login.module';
@@ -46,7 +47,8 @@ import { ApplicationSecurityService } from './services/applicationSecurity.servi
     HomeModule,
     FormsModule,
     AccessNotebookGuideModule,
-    PublicKeyGuideModule
+    PublicKeyGuideModule,
+    NotFoundModule
   ],
   declarations: [AppComponent],
   providers: [{
