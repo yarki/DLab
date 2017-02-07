@@ -202,6 +202,13 @@ def create_instance(definitions, instance_tag):
             instances = ec2.create_instances(ImageId=definitions.ami_id, MinCount=1, MaxCount=1,
                                              BlockDeviceMappings=[
                                                  {
+                                                     "DeviceName": "/dev/sda1",
+                                                     "Ebs":
+                                                         {
+                                                             "VolumeSize": 12
+                                                         }
+                                                 },
+                                                 {
                                                      "DeviceName": "/dev/sdb",
                                                      "Ebs":
                                                          {
