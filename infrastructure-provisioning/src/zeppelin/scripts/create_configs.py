@@ -61,7 +61,7 @@ def configure_zeppelin_emr_interpreter(args):
         local('echo \"spark.jars $(ls ' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/' + args.emr_version + '/' + args.cluster_name + '/spark/conf/spark-defaults.conf')
         local('echo \"spark.executorEnv.PYTHONPATH pyspark.zip:py4j-src.zip\" >> /opt/' + args.emr_version + '/' + args.cluster_name + '/spark/conf/spark-defaults.conf')
         local('sed -i \'/spark.yarn.dist.files/s/$/,file:\/opt\/' + args.emr_version + '\/' + args.cluster_name + '\/spark\/python\/lib\/py4j-src.zip,file:\/opt\/' + args.emr_version + '\/' + args.cluster_name + '\/spark\/python\/lib\/pyspark.zip/\' /opt/' + args.emr_version + '/' +  args.cluster_name + '/spark/conf/spark-defaults.conf')
-        local('service zeppelin-notebook restart')
+        local('sudo service zeppelin-notebook restart')
         local('sleep 5')
         local('echo \"Configuring emr spark interpreter for Zeppelin\"')
         template_file = "/tmp/emr_spark_interpreter.json"
