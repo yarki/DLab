@@ -16,24 +16,13 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { DropdownList } from './dropdown-list.component';
-import { ClickOutsideModule } from '../../../directives/click-outside/index';
-import { KeysPipeModule } from '../../../util/pipes/keys-pipe/index';
-import { UnderscorelessPipeModule } from '../../../util/pipes/underscoreless-pipe/index';
+import { NgModule, ModuleWithProviders } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { HomeComponent } from './home.component';
 
-export * from './dropdown-list.component';
+const routes: Routes = [{
+  path: '',
+  component: HomeComponent,
+}];
 
-@NgModule({
-  imports: [
-    CommonModule,
-    ClickOutsideModule,
-    KeysPipeModule,
-    UnderscorelessPipeModule
-  ],
-  declarations: [DropdownList],
-  exports: [DropdownList]
-})
-
-export class DropdownListModule { }
+export const routing: ModuleWithProviders = RouterModule.forChild(routes);

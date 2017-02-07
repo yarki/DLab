@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.health;
 
+import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.contracts.HealthChecker;
 import com.epam.dlab.rest.client.RESTService;
 import org.slf4j.Logger;
@@ -40,9 +41,9 @@ public class ProvisioningHealthChecker implements HealthChecker {
     }
 
     @Override
-    public boolean isAlive() {
+    public boolean isAlive(UserInfo userInfo) {
         try {
-            Response response = provisioningService.get("infrastructure/status", Response.class);
+            Response response = provisioningService.get("infrastructure/status",userInfo.getAccessToken(), Response.class);
             boolean alive = response.getStatusInfo().getStatusCode() == Response.Status.OK.getStatusCode();
             if (!alive) {
                 LOGGER.error("Provisioning service is not available");

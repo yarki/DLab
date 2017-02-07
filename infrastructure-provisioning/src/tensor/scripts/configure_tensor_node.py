@@ -68,6 +68,9 @@ if __name__ == "__main__":
     print "Install python libraries"
     ensure_libraries_py(args.os_user)
 
+    print "Install python 3.5"
+    ensure_python3_kernel_zeppelin("3.5.2", args.os_user)
+
     print "Install TensorFlow"
     install_tensor(args.os_user, tensorflow_version, files_dir, templates_dir)
 

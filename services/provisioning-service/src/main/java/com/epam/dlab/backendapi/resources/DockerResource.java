@@ -22,7 +22,6 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.ICommandExecutor;
 import com.epam.dlab.backendapi.core.MetadataHolder;
-import com.epam.dlab.backendapi.core.commands.CommandBuilder;
 import com.epam.dlab.backendapi.core.commands.DockerCommands;
 import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
@@ -51,12 +50,9 @@ public class DockerResource implements DockerCommands {
     @Inject
     private ICommandExecutor commandExecuter;
 
-    @Inject
-    private CommandBuilder commandBuilder;
-
     @GET
     @Path("{type}")
-    public Set<ImageMetadataDTO> getDockerImages(@PathParam("type") String type) throws
+    public Set<ImageMetadataDTO> getDockerImages(@Auth UserInfo ui, @PathParam("type") String type) throws
             IOException, InterruptedException {
         LOGGER.debug("docker statuses asked for {}", type);
         return metadataHolder

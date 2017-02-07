@@ -26,10 +26,10 @@ import { NotFoundComponent } from './not-found/not-found.component';
 
 export const routes: Routes = [{
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'resources_list',
     pathMatch: 'full'
   }, {
-    path: 'dashboard',
+    path: 'resources_list',
     component: HomeComponent,
     canActivate: [AuthorizationGuard]
   }, {
@@ -37,11 +37,19 @@ export const routes: Routes = [{
     component: LoginComponent
   }, {
     path: 'help/accessnotebookguide',
-    component: AccessNotebookGuide
+    component: AccessNotebookGuide,
+    canActivate: [AuthorizationGuard]
   }, {
     path: 'help/publickeyguide',
-    component: PublicKeyGuide
+    component: PublicKeyGuide,
+    canActivate: [AuthorizationGuard]
   }, {
     path: '**',
     component: NotFoundComponent
   }];
+
+// {
+//     path: 'environment_health_status',
+//     loadChildren: 'app/health-status/health-status.module#HealthStatusModule',
+//     canActivate: [AuthorizationGuard]
+//  }

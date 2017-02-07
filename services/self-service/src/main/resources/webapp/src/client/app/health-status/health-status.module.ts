@@ -18,22 +18,14 @@ limitations under the License.
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DropdownList } from './dropdown-list.component';
-import { ClickOutsideModule } from '../../../directives/click-outside/index';
-import { KeysPipeModule } from '../../../util/pipes/keys-pipe/index';
-import { UnderscorelessPipeModule } from '../../../util/pipes/underscoreless-pipe/index';
+import { RouterModule } from '@angular/router';
+import { routing  } from './health-status.routes';
 
-export * from './dropdown-list.component';
+import { HealthStatusComponent } from './health-status.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    ClickOutsideModule,
-    KeysPipeModule,
-    UnderscorelessPipeModule
-  ],
-  declarations: [DropdownList],
-  exports: [DropdownList]
+    imports: [CommonModule, RouterModule, routing],
+    declarations: [HealthStatusComponent],
+    exports: [HealthStatusComponent]
 })
-
-export class DropdownListModule { }
+export class HealthStatusModule { }
