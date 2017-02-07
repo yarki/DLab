@@ -128,7 +128,9 @@ def ensure_additional_python_libs(os_user):
                 sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
             if os.environ['application'] == 'tensor':
                 sudo('pip2 install keras opencv-python h5py --no-cache-dir')
+                sudo('python2 -m ipykernel install')
                 sudo('pip3 install keras opencv-python h5py --no-cache-dir')
+                sudo('python3 -m ipykernel install')
             sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
         except:
             sys.exit(1)
@@ -172,7 +174,6 @@ def ensure_python3_libraries(os_user):
             sudo('pip3 install boto3 --no-cache-dir')
             sudo('pip3 install fabvenv fabric-virtualenv --no-cache-dir')
             sudo('pip3 install ipython ipykernel --no-cache-dir')
-            sudo('python3 -m ipykernel install')
             sudo('touch /home/' + os_user + '/.ensure_dir/python3_libraries_ensured')
         except:
             sys.exit(1)
