@@ -129,8 +129,6 @@ def ensure_additional_python_libs(os_user):
             if os.environ['application'] == 'jupyter' or os.environ['application'] == 'zeppelin':
                 sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
                 sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
-            if os.environ['application'] == 'jupyter' or os.environ['application'] == 'tensor':
-                sudo('jupyter-kernelspec remove -f python3')
             if os.environ['application'] == 'tensor':
                 sudo('pip2 install keras opencv-python h5py --no-cache-dir')
                 sudo('pip3 install keras opencv-python h5py --no-cache-dir')
@@ -169,7 +167,6 @@ def ensure_python3_libraries(os_user):
             sudo('apt-get install python3-setuptools')
             sudo('apt install -y python3-pip')
             sudo('pip3 install ipython ipykernel --no-cache-dir')
-            sudo('python3 -m ipykernel install')
             sudo('pip3 install -U pip --no-cache-dir')
             sudo('pip3 install boto3 --no-cache-dir')
             sudo('pip3 install fabvenv fabric-virtualenv --no-cache-dir')
