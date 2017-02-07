@@ -82,8 +82,8 @@ public class InfrasctructureResource implements InfrasctructureAPI {
     @Path(ApiCallbacks.STATUS_URI)
     public HealthStatusDTO status(@Auth UserInfo userInfo) {
         return new HealthStatusDTO()
-                .withMongoAlive(mongoHealthChecker.isAlive())
-                .withProvisioningAlive(provisioningHealthChecker.isAlive());
+                .withMongoAlive(mongoHealthChecker.isAlive(userInfo))
+                .withProvisioningAlive(provisioningHealthChecker.isAlive(userInfo));
     }
     
     
