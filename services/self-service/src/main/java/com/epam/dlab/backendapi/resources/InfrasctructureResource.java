@@ -53,7 +53,7 @@ import io.dropwizard.auth.Auth;
 
 /** Provides the REST API for the basic information about infrastructure.
  */
-@Path(ApiCallbacks.INFRASTRUCTURE)
+@Path("/infrastructure")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class InfrasctructureResource implements InfrasctructureAPI {
@@ -102,6 +102,7 @@ public class InfrasctructureResource implements InfrasctructureAPI {
     	
 		provisioningService.post(INFRASTRUCTURE_STATUS, userInfo.getAccessToken(), dto, EnvResourceDTO.class);
     	
+        LOGGER.debug("Request has been send to docker");
 		return Response.ok().build();
     }
     

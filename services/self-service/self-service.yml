@@ -6,6 +6,9 @@ mocked: false
 minEmrInstanceCount: 2
 maxEmrInstanceCount: 14
 
+#Timeout for check the status of environment via provisioning service
+checkEnvStatusTimeout: 1m
+
 server:
   requestLog:
     appenders:

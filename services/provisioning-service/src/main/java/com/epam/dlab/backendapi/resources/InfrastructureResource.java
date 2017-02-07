@@ -46,6 +46,7 @@ import com.epam.dlab.rest.client.RESTService;
 import com.google.inject.Inject;
 
 import io.dropwizard.auth.Auth;
+import io.dropwizard.util.Duration;
 
 import static com.epam.dlab.backendapi.core.commands.DockerAction.STATUS;
 
@@ -56,6 +57,8 @@ import java.io.IOException;
 @Produces(MediaType.APPLICATION_JSON)
 public class InfrastructureResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(InfrastructureResource.class);
+    
+    private static final Duration REQUEST_STATUS_TIMEOUT = Duration.minutes(1);
 
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
@@ -80,7 +83,7 @@ public class InfrastructureResource implements DockerCommands {
     	LOGGER.debug("Request the status of resources for user {}: {}", ui.getName(), dto);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
-                configuration.getResourceStatusPollTimeout(),
+        		REQUEST_STATUS_TIMEOUT,
                 getFileHandlerCallback(STATUS, uuid, dto, ui.getAccessToken()));
         try {
             commandExecuter.executeAsync(

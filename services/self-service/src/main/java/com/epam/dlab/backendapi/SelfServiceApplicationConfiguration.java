@@ -21,7 +21,10 @@ package com.epam.dlab.backendapi;
 import com.epam.dlab.ServiceConfiguration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.dropwizard.util.Duration;
+
 import javax.validation.Valid;
+import javax.ws.rs.DefaultValue;
 
 /** Configuration for Self Service.
  */
@@ -37,7 +40,12 @@ public class SelfServiceApplicationConfiguration extends ServiceConfiguration {
 
     @Valid
     @JsonProperty
+    @DefaultValue("10m")
     private int maxEmrInstanceCount;
+    
+    @Valid
+    @JsonProperty
+    private Duration checkEnvStatusTimeout;
 
 
     /** Returns <b>true</b> if service is a mock. */
@@ -55,4 +63,8 @@ public class SelfServiceApplicationConfiguration extends ServiceConfiguration {
     	return maxEmrInstanceCount;
     }
     
+    /** Returns the timeout for check the status of environment via provisioning service. */
+    public Duration getCheckEnvStatusTimeout() {
+    	return checkEnvStatusTimeout;
+    }
 }
