@@ -210,6 +210,7 @@ if __name__ == "__main__":
                "master_keyname": os.environ['conf_key_name'],
                "tensorboard_python2_log_dir": "/var/log/tensorboard_py2",
                "tensorboard_python3_log_dir": "/var/log/tensorboard_py3",
+               "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",
                "exploratory_url": [
                    {"description": "TensorBoard for python 2.x",
