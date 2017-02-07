@@ -30,6 +30,7 @@ COPY general/templates/os/notebook_spark-defaults_local.conf /root/templates/
 COPY general/templates/os/jupyter-notebook.service /root/templates/
 COPY general/templates/os/pyspark_local_template.json /root/templates/
 COPY general/templates/os/py3spark_local_template.json /root/templates/
+COPY general/templates/os/pyspark_emr_template.json /root/templates/
 COPY general/files/os/notebook_local_jars.tar.gz /root/files/
 
 RUN chmod a+x /root/fabfile.py; \
