@@ -40,12 +40,14 @@ args = parser.parse_args()
 
 spark_version = os.environ['notebook_spark_version']
 hadoop_version = os.environ['notebook_hadoop_version']
-zeppelin_version = "0.7.0"
-zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-" + zeppelin_version + "/zeppelin-" + zeppelin_version\
-                + "-bin-netinst.tgz"
+latest_zeppelin_version = "0.7.0"
+latest_zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-" + latest_zeppelin_version + "/zeppelin-" + \
+                       latest_zeppelin_version + "-bin-netinst.tgz"
 old_zeppelin_version = "0.6.2"
 old_zeppelin_link = "http://archive.apache.org/dist/zeppelin/zeppelin-" + old_zeppelin_version + \
                     "/zeppelin-" + old_zeppelin_version + "-bin-netinst.tgz"
+zeppelin_version = ''
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 zeppelin_interpreters = "md,python"
 python3_version = "3.4"
 local_spark_path = '/opt/spark/'
@@ -58,7 +60,9 @@ def configure_notebook_server(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/zeppelin_ensured'):
         try:
             try:
-                sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
+                sudo('wget ' + latest_zeppelin_link + ' -O /tmp/zeppelin-' + latest_zeppelin_version
+                     + '-bin-netinst.tgz')
+                zeppelin_version = latest_zeppelin_version
             except:
                 sudo('wget ' + old_zeppelin_link + ' -O /tmp/zeppelin-' + old_zeppelin_version + '-bin-netinst.tgz')
                 zeppelin_version = old_zeppelin_version
