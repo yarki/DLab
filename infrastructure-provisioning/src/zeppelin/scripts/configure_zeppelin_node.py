@@ -43,7 +43,9 @@ hadoop_version = os.environ['notebook_hadoop_version']
 zeppelin_version = "0.7.0"
 zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-" + zeppelin_version + "/zeppelin-" + zeppelin_version\
                 + "-bin-netinst.tgz"
-zeppelin_version = "0.6.2"
+old_zeppelin_version = "0.6.2"
+old_zeppelin_link = "http://archive.apache.org/dist/zeppelin/zeppelin-" + old_zeppelin_version + \
+                    "/zeppelin-" + old_zeppelin_version + "-bin-netinst.tgz"
 zeppelin_interpreters = "md,python"
 python3_version = "3.4"
 local_spark_path = '/opt/spark/'
@@ -55,7 +57,11 @@ s3_jars_dir = '/opt/jars/'
 def configure_notebook_server(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/zeppelin_ensured'):
         try:
-            sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
+            try:
+                sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
+            except:
+                sudo('wget ' + old_zeppelin_link + ' -O /tmp/zeppelin-' + old_zeppelin_version + '-bin-netinst.tgz')
+                zeppelin_version = old_zeppelin_version
             sudo('tar -zxvf /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz -C /opt/')
             sudo('ln -s /opt/zeppelin-' + zeppelin_version + '-bin-netinst /opt/zeppelin')
             sudo('cp /opt/zeppelin/conf/zeppelin-env.sh.template /opt/zeppelin/conf/zeppelin-env.sh')
