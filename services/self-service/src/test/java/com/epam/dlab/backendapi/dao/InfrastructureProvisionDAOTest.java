@@ -276,12 +276,19 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
 
     @Test
     public void updateExploratoryFieldsSuccess() {
+
+        List<ExploratoryURL> urls = new ArrayList<ExploratoryURL>();
+        urls.add(new ExploratoryURL().withUrl("www.192.168.100.1.com").withDescription("desc1"));
+        urls.add(new ExploratoryURL().withUrl("www.192.168.100.1.com").withDescription("desc2"));
+
+
         UserInstanceDTO instance1 = new UserInstanceDTO()
                 .withUser("user1")
                 .withExploratoryName("exp_name_1")
                 .withExploratoryId("exp1")
                 .withStatus("created")
-                .withPrivateIp("192.168.100.1");
+                .withPrivateIp("192.168.100.1")
+                .withExploratoryUrl(urls);
 
 
         UserInstanceDTO instance2 = new UserInstanceDTO()
@@ -298,22 +305,11 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         status.setUser("user1");
         status.setExploratoryName("exp_name_1");
         status.setExploratoryId("exp2");
-        List<ExploratoryURL> urls = new ArrayList<ExploratoryURL>();
-        List<ExploratoryURL> urlsReference = new ArrayList<ExploratoryURL>();
 
-        // in fact these urls are useless
-        urls.add(new ExploratoryURL().withUrl("www.192.168.100.1.com").withDescription("desc1"));
-        urls.add(new ExploratoryURL().withUrl("www.192.168.100.1.com").withDescription("desc2"));
-
-        status.setExploratoryUrl(urls);
+        //status.setExploratoryUrl(urls);
         status.setPrivateIp("8.8.8.8");
         status.setStatus("running");
         status.setUptime(new Date(100));
-
-        // in fact these urls will be final, cause they depends from PrivateIp
-        urlsReference.add(new ExploratoryURL().withUrl("www.8.8.8.8.com").withDescription("desc1"));
-        urlsReference.add(new ExploratoryURL().withUrl("www.8.8.8.8.com").withDescription("desc2"));
-
 
         UpdateResult result = dao.updateExploratoryFields(status);
         assertEquals(result.getModifiedCount(), 1);
@@ -324,14 +320,20 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         assertTrue(testInstance1.isPresent());
 
         UserInstanceDTO instance = testInstance1.get();
+
+        // these urls will be final, cause they depends from PrivateIp
+        List<ExploratoryURL> urlsNew = new ArrayList<ExploratoryURL>();
+        urlsNew.add(new ExploratoryURL().withUrl("www.8.8.8.8.com").withDescription("desc1"));
+        urlsNew.add(new ExploratoryURL().withUrl("www.8.8.8.8.com").withDescription("desc2"));
+
+
         assertEquals(instance.getExploratoryId(), status.getExploratoryId());
-        assertEquals(instance.getExploratoryUrl().size(), urlsReference.size());
-        assertEquals(instance.getExploratoryUrl().get(0), urlsReference.get(0));
-        assertEquals(instance.getExploratoryUrl().get(1), urlsReference.get(1));
+        assertEquals(instance.getExploratoryUrl().size(), urlsNew.size());
+        assertEquals(instance.getExploratoryUrl().get(0), urlsNew.get(0));
+        assertEquals(instance.getExploratoryUrl().get(1), urlsNew.get(1));
         assertEquals(instance.getStatus(), status.getStatus());
         assertEquals(instance.getUptime(), status.getUptime());
         assertEquals(instance.getPrivateIp(), status.getPrivateIp());
-
     }
 
     @Test

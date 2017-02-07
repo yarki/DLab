@@ -166,26 +166,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());
         }
 
-        if (dto.getPrivateIp() != null) {
 
-            UserInstanceDTO inst = fetchExploratoryFields(dto.getUser(),dto.getExploratoryName());
-
-            if (!inst.getPrivateIp().equals(dto.getPrivateIp())) { // IP was changed
-
-                if (dto.getExploratoryUrl() != null) {
-                    values.append(EXPLORATORY_URL, dto.getExploratoryUrl().stream()
-                            .map(url -> new LinkedHashMap<String, String>() {{
-                                put(EXPLORATORY_URL_DESC, url.getDescription());
-                                put(EXPLORATORY_URL_URL, url.getUrl().replace(inst.getPrivateIp(),dto.getPrivateIp()));
-                            }})
-                            .collect(Collectors.toList()));
-                }
-
-            }
-
-            values.append(EXPLORATORY_PRIVATE_IP, dto.getPrivateIp());
-        }
-/*
         if (dto.getExploratoryUrl() != null) {
             values.append(EXPLORATORY_URL, dto.getExploratoryUrl().stream()
                     .map(url -> new LinkedHashMap<String, String>() {{
@@ -193,8 +174,26 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                         put(EXPLORATORY_URL_URL, url.getUrl());
                     }})
                     .collect(Collectors.toList()));
+        } else {
+            if (dto.getPrivateIp() != null) {
+                UserInstanceDTO inst = fetchExploratoryFields(dto.getUser(),dto.getExploratoryName());
+                if (!inst.getPrivateIp().equals(dto.getPrivateIp())) { // IP was changed
+                    if (inst.getExploratoryUrl() != null) {
+                        values.append(EXPLORATORY_URL, inst.getExploratoryUrl().stream()
+                                .map(url -> new LinkedHashMap<String, String>() {{
+                                    put(EXPLORATORY_URL_DESC, url.getDescription());
+                                    put(EXPLORATORY_URL_URL, url.getUrl().replace(inst.getPrivateIp(),dto.getPrivateIp()));
+                                }})
+                                .collect(Collectors.toList()));
+                    }
+                }
+            }
         }
-        */
+
+        if (dto.getPrivateIp() != null) {
+            values.append(EXPLORATORY_PRIVATE_IP, dto.getPrivateIp());
+        }
+
         if (dto.getExploratoryUser() != null) {
             values.append(EXPLORATORY_USER, dto.getExploratoryUser());
         }
