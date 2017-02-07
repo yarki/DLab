@@ -276,27 +276,17 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
 
     @Test
     public void updateExploratoryFieldsSuccess() {
-
-        List<ExploratoryURL> urls = new ArrayList<ExploratoryURL>();
-        urls.add(new ExploratoryURL().withUrl("www.192.168.100.1.com").withDescription("desc1"));
-        urls.add(new ExploratoryURL().withUrl("www.192.168.100.1.com").withDescription("desc2"));
-
-
         UserInstanceDTO instance1 = new UserInstanceDTO()
                 .withUser("user1")
                 .withExploratoryName("exp_name_1")
                 .withExploratoryId("exp1")
-                .withStatus("created")
-                .withPrivateIp("192.168.100.1")
-                .withExploratoryUrl(urls);
-
+                .withStatus("created");
 
         UserInstanceDTO instance2 = new UserInstanceDTO()
                 .withUser("user1")
                 .withExploratoryName("exp_name_2")
                 .withExploratoryId("exp2")
-                .withStatus("created")
-                .withPrivateIp("192.168.100.2");
+                .withStatus("created");
 
         dao.insertOne(USER_INSTANCES, instance1);
         dao.insertOne(USER_INSTANCES, instance2);
@@ -305,9 +295,10 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         status.setUser("user1");
         status.setExploratoryName("exp_name_1");
         status.setExploratoryId("exp2");
-
-        //status.setExploratoryUrl(urls);
-        status.setPrivateIp("8.8.8.8");
+        List<ExploratoryURL> urls = new ArrayList<ExploratoryURL>();
+        urls.add(new ExploratoryURL().withUrl("www.exp1.com").withDescription("desc1"));
+        urls.add(new ExploratoryURL().withUrl("www.exp2.com").withDescription("desc2"));
+        status.setExploratoryUrl(urls);
         status.setStatus("running");
         status.setUptime(new Date(100));
 
@@ -320,9 +311,49 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         assertTrue(testInstance1.isPresent());
 
         UserInstanceDTO instance = testInstance1.get();
+        assertEquals(instance.getExploratoryId(), status.getExploratoryId());
+        assertEquals(instance.getExploratoryUrl().size(), status.getExploratoryUrl().size());
+        assertEquals(instance.getExploratoryUrl().get(0), status.getExploratoryUrl().get(0));
+        assertEquals(instance.getExploratoryUrl().get(1), status.getExploratoryUrl().get(1));
+        assertEquals(instance.getStatus(), status.getStatus());
+        assertEquals(instance.getUptime(), status.getUptime());    }
+
+    @Test
+    public void updateExploratoryUrlByIpSuccess() {
+
+        List<ExploratoryURL> urls = new ArrayList<>();
+        urls.add(new ExploratoryURL().withUrl("www.192.168.100.1.com").withDescription("desc1"));
+        urls.add(new ExploratoryURL().withUrl("www.192.168.100.1.com").withDescription("desc2"));
+
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created")
+                .withPrivateIp("192.168.100.1")
+                .withExploratoryUrl(urls);
+
+        dao.insertOne(USER_INSTANCES, instance1);
+
+        ExploratoryStatusDTO status = new ExploratoryStatusDTO();
+        status.setUser("user1");
+        status.setExploratoryName("exp_name_1");
+        status.setExploratoryId("exp2");
+
+        status.setPrivateIp("8.8.8.8");
+
+        UpdateResult result = dao.updateExploratoryFields(status);
+        assertEquals(result.getModifiedCount(), 1);
+
+        Optional<UserInstanceDTO> testInstance1 = dao.findOne(USER_INSTANCES,
+                exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
+                UserInstanceDTO.class);
+        assertTrue(testInstance1.isPresent());
+
+        UserInstanceDTO instance = testInstance1.get();
 
         // these urls will be final, cause they depends from PrivateIp
-        List<ExploratoryURL> urlsNew = new ArrayList<ExploratoryURL>();
+        List<ExploratoryURL> urlsNew = new ArrayList<>();
         urlsNew.add(new ExploratoryURL().withUrl("www.8.8.8.8.com").withDescription("desc1"));
         urlsNew.add(new ExploratoryURL().withUrl("www.8.8.8.8.com").withDescription("desc2"));
 
@@ -331,9 +362,47 @@ public class InfrastructureProvisionDAOTest extends DAOTestBase {
         assertEquals(instance.getExploratoryUrl().size(), urlsNew.size());
         assertEquals(instance.getExploratoryUrl().get(0), urlsNew.get(0));
         assertEquals(instance.getExploratoryUrl().get(1), urlsNew.get(1));
-        assertEquals(instance.getStatus(), status.getStatus());
-        assertEquals(instance.getUptime(), status.getUptime());
         assertEquals(instance.getPrivateIp(), status.getPrivateIp());
+    }
+
+    @Test
+    public void updateExploratoryUrlByUrlSuccess() {
+
+        List<ExploratoryURL> urls = new ArrayList<>();
+        urls.add(new ExploratoryURL().withUrl("www.192.168.100.1.com").withDescription("desc1"));
+        urls.add(new ExploratoryURL().withUrl("www.192.168.100.1.com").withDescription("desc2"));
+
+        UserInstanceDTO instance1 = new UserInstanceDTO()
+                .withUser("user1")
+                .withExploratoryName("exp_name_1")
+                .withExploratoryId("exp1")
+                .withStatus("created")
+                .withPrivateIp("192.168.100.1");
+
+        dao.insertOne(USER_INSTANCES, instance1);
+
+        ExploratoryStatusDTO status = new ExploratoryStatusDTO();
+        status.setUser("user1");
+        status.setExploratoryName("exp_name_1");
+        status.setExploratoryId("exp2");
+
+        status.setExploratoryUrl(urls);
+
+        UpdateResult result = dao.updateExploratoryFields(status);
+        assertEquals(result.getModifiedCount(), 1);
+
+        Optional<UserInstanceDTO> testInstance1 = dao.findOne(USER_INSTANCES,
+                exploratoryCondition(instance1.getUser(), instance1.getExploratoryName()),
+                UserInstanceDTO.class);
+        assertTrue(testInstance1.isPresent());
+
+        UserInstanceDTO instance = testInstance1.get();
+
+        assertEquals(instance.getExploratoryId(), status.getExploratoryId());
+        assertEquals(instance.getExploratoryUrl().size(), urls.size());
+        assertEquals(instance.getExploratoryUrl().get(0), urls.get(0));
+        assertEquals(instance.getExploratoryUrl().get(1), urls.get(1));
+
     }
 
     @Test
