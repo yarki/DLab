@@ -73,11 +73,17 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     		try {
 				url = MAPPER.readValue(nodeUrl.toString(), new TypeReference<List<ExploratoryURL>>() {});
 			} catch (IOException e) {
-				LOGGER.warn("Cannot parse field {} in JSON {}", EXPLORATORY_URL_FIELD, nodeUrl.toString(), e);
+				LOGGER.warn("Cannot parse field {} for UUID () in JSON {}", EXPLORATORY_URL_FIELD, getUUID(), nodeUrl.toString(), e);
 			}
     	}
+
+    	String exploratoryId = getTextValue(resultNode.get(EXPLORATORY_ID_FIELD));
+    	if (exploratoryId.equals("")) {
+            LOGGER.warn("Empty field {} for UUID () in JSON {}", RESPONSE_NODE + "." + RESULT_NODE + "." + EXPLORATORY_ID_FIELD, getUUID(), nodeUrl.toString());
+        }
+
     	return baseStatus
-                .withExploratoryId(getTextValue(resultNode.get(EXPLORATORY_ID_FIELD)))
+                .withExploratoryId(exploratoryId)
                 .withExploratoryUrl(url)
                 .withPrivateIp(getTextValue(resultNode.get(EXPLORATORY_PRIVATE_IP_FIELD)))
                 .withExploratoryUser(getTextValue(resultNode.get(EXPLORATORY_USER_FIELD)))

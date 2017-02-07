@@ -25,7 +25,6 @@ import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
-import com.mongodb.MongoWriteException;
 import com.mongodb.client.result.UpdateResult;
 
 import org.bson.Document;
@@ -167,11 +166,26 @@ public class InfrastructureProvisionDAO extends BaseDAO {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());
         }
 
-
         if (dto.getPrivateIp() != null) {
+
+            UserInstanceDTO inst = fetchExploratoryFields(dto.getUser(),dto.getExploratoryName());
+
+            if (!inst.getPrivateIp().equals(dto.getPrivateIp())) { // IP was changed
+
+                if (dto.getExploratoryUrl() != null) {
+                    values.append(EXPLORATORY_URL, dto.getExploratoryUrl().stream()
+                            .map(url -> new LinkedHashMap<String, String>() {{
+                                put(EXPLORATORY_URL_DESC, url.getDescription());
+                                put(EXPLORATORY_URL_URL, url.getUrl().replace(inst.getPrivateIp(),dto.getPrivateIp()));
+                            }})
+                            .collect(Collectors.toList()));
+                }
+
+            }
+
             values.append(EXPLORATORY_PRIVATE_IP, dto.getPrivateIp());
         }
-
+/*
         if (dto.getExploratoryUrl() != null) {
             values.append(EXPLORATORY_URL, dto.getExploratoryUrl().stream()
                     .map(url -> new LinkedHashMap<String, String>() {{
@@ -180,6 +194,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                     }})
                     .collect(Collectors.toList()));
         }
+        */
         if (dto.getExploratoryUser() != null) {
             values.append(EXPLORATORY_USER, dto.getExploratoryUser());
         }
