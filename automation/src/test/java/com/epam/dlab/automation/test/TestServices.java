@@ -59,15 +59,28 @@ public class TestServices {
     public void Cleanup() throws InterruptedException {
     }
 
-    @Test
-    public void runTests() throws Exception {
+    @Test(priority = 0)
+    public void runJenkins() throws Exception {
         LOGGER.info("Test Started");
     	testJenkinsJob();
-    	testLogin();
-    	testDLabScenario();
         LOGGER.info("Test Finished");
     }
-    
+
+
+    @Test(priority = 1)
+    public void runLogin() throws Exception {
+        LOGGER.info("Test Started");
+        testLogin();
+        LOGGER.info("Test Finished");
+    }
+
+    @Test(priority = 2)
+    public void runDLabScenario() throws Exception {
+        LOGGER.info("Test Started");
+        testDLabScenario();
+        LOGGER.info("Test Finished");
+    }
+
     private void testJenkinsJob() throws Exception {
 
         /* LOGGER.info("1. Jenkins Job will be started ...");
@@ -128,7 +141,7 @@ public class TestServices {
         Assert.assertEquals(responseForActivateAccessKey.getBody().asString(), "Username or password are not valid");
         
         LoginDto testUserLogin = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
-        LOGGER.info("Logging in with credentials {}:{}", PropertyValue.getUsername(), PropertyValue.getPassword());
+        LOGGER.info("Logging in with credentials {}:{}", "Usein_Faradzhev@epam.com", "uf123"/*PropertyValue.getUsername(), PropertyValue.getPassword()*/);
         Response responseTestUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, testUserLogin);
         Assert.assertEquals(responseTestUser.statusCode(), HttpStatusCode.OK);
  		
