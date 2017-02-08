@@ -16,24 +16,17 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { DropdownList } from './dropdown-list.component';
-import { ClickOutsideModule } from '../../../directives/click-outside/index';
-import { KeysPipeModule } from '../../../util/pipes/keys-pipe/index';
-import { UnderscorelessPipeModule } from '../../../util/pipes/underscoreless-pipe/index';
+import { Component } from '@angular/core';
 
-export * from './dropdown-list.component';
-
-@NgModule({
-  imports: [
-    CommonModule,
-    ClickOutsideModule,
-    KeysPipeModule,
-    UnderscorelessPipeModule
-  ],
-  declarations: [DropdownList],
-  exports: [DropdownList]
+@Component({
+    moduleId: module.id,
+    selector: 'not-found',
+    templateUrl: 'not-found.component.html',
+    styleUrls: ['not-found.component.css']
 })
+export class NotFoundComponent {
 
-export class DropdownListModule { }
+    test() { if(true) { console.log(15);
+    }
+}
+ }

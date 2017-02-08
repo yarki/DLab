@@ -38,16 +38,18 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 parser.add_argument('--os_user', type=str, default='')
 parser.add_argument('--spark_version', type=str, default='')
 parser.add_argument('--hadoop_version', type=str, default='')
+parser.add_argument('--zeppelin_version', type=str, default='')
 parser.add_argument('--edge_hostname', type=str, default='')
 parser.add_argument('--proxy_port', type=str, default='')
 args = parser.parse_args()
 
-
-spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + args.spark_version + "-bin-hadoop" + args.hadoop_version + ".tgz"
-zeppelin_version = "0.7.0"
-zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-" + zeppelin_version + "/zeppelin-" + zeppelin_version\
-                + "-bin-netinst.tgz"
-zeppelin_interpreters = "md,python,livy"
+spark_version = args.spark_version
+hadoop_version = args.hadoop_version
+zeppelin_version = args.zeppelin_version
+zeppelin_link = "http://archive.apache.org/dist/zeppelin/zeppelin-" + zeppelin_version + "/zeppelin-" + \
+                zeppelin_version + "-bin-netinst.tgz"
+spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
+zeppelin_interpreters = "md,python"
 python3_version = "3.4"
 local_spark_path = '/opt/spark/'
 templates_dir = '/root/templates/'
@@ -55,7 +57,7 @@ files_dir = '/root/files/'
 s3_jars_dir = '/opt/jars/'
 
 
-def configure_notebook_server(os_user):
+def configure_zeppelin(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/zeppelin_ensured'):
         try:
             sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
@@ -161,14 +163,18 @@ if __name__ == "__main__":
     print "Install local Spark"
     ensure_local_spark(args.os_user, spark_link, args.spark_version, args.hadoop_version, local_spark_path)
 
-    print "Install local S3 kernels"
-    ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
+    print "Install local jars"
+    ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
     print "Install Zeppelin"
-    configure_notebook_server(args.os_user)
+    configure_zeppelin(args.os_user)
 
-    print "Install python3 kernels"
-    ensure_python3_kernel_zeppelin(python3_version, args.os_user)
+    print "Install python2 libraries"
+    ensure_python2_libraries(args.os_user)
+
+    print "Install python3 libraries"
+    ensure_python3_libraries(args.os_user)
+    ensure_python3_specific_version(python3_version, args.os_user)
 
     print "Installing virtualenv"
     ensure_libraries_py(os_user)

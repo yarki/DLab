@@ -126,6 +126,22 @@ if __name__ == "__main__":
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
+    # installing python2 and python3 libs
+    try:
+        logging.info('[CONFIGURE TENSOR ADDITIONS]')
+        print '[CONFIGURE TENSOR ADDITIONS]'
+        params = "--hostname {} --keyfile {} --os_user {}"\
+            .format(instance_hostname, keyfile_name, os.environ['conf_os_user'])
+        try:
+            local("~/scripts/{}.py {}".format('install_tensor_additions', params))
+        except:
+            traceback.print_exc()
+            raise Exception
+    except Exception as err:
+        append_result("Failed to install python libs. Exception: " + str(err))
+        remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
+        sys.exit(1)
+
     try:
         print '[INSTALLING USERs KEY]'
         logging.info('[INSTALLING USERs KEY]')
@@ -163,6 +179,7 @@ if __name__ == "__main__":
     dns_name = get_instance_hostname(notebook_config['instance_name'])
     tensorboard_python2_url = "http://" + ip_address + ":6006/"
     tensorboard_python3_url = "http://" + ip_address + ":6007/"
+    jupyter_ip_url = "http://" + ip_address + ":8888/"
     print '[SUMMARY]'
     logging.info('[SUMMARY]')
     print "Instance name: " + notebook_config['instance_name']
@@ -177,6 +194,10 @@ if __name__ == "__main__":
     print "SG name: " + notebook_config['security_group_name']
     print "TensorBoard python2 URL: " + tensorboard_python2_url
     print "TensorBoard python3 URL: " + tensorboard_python3_url
+    print "TensorBoard python2 log dir: /var/log/tensorboard_py2"
+    print "TensorBoard python3 log dir: /var/log/tensorboard_py3"
+    print "Jupyter URL: " + jupyter_ip_url
+    print "Jupyter URL: " + jupyter_ip_url
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
         'key_name'] + '.pem ' + os.environ['conf_os_user'] + '@' + ip_address
     print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ' \
@@ -187,11 +208,15 @@ if __name__ == "__main__":
                "ip": ip_address,
                "instance_id": get_instance_by_name(notebook_config['instance_name']),
                "master_keyname": os.environ['conf_key_name'],
+               "tensorboard_python2_log_dir": "/var/log/tensorboard_py2",
+               "tensorboard_python3_log_dir": "/var/log/tensorboard_py3",
                "notebook_name": notebook_config['instance_name'],
                "Action": "Create new notebook server",
                "exploratory_url": [
                    {"description": "TensorBoard for python 2.x",
                     "url": tensorboard_python2_url},
                    {"description": "TensorBoard for python 3.x",
-                    "url": tensorboard_python3_url}]}
+                    "url": tensorboard_python3_url},
+                   {"description": "Jupyter",
+                    "url": jupyter_ip_url}]}
         result.write(json.dumps(res))

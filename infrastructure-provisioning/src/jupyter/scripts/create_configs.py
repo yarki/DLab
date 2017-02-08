@@ -76,53 +76,6 @@ def r_kernel(args):
         f.write(text)
 
 
-def pyspark_kernel(args):
-    spark_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
-    local('mkdir -p ' + kernels_dir + 'pyspark_' + args.cluster_name + '/')
-    kernel_path = kernels_dir + "pyspark_" + args.cluster_name + "/kernel.json"
-    template_file = "/tmp/pyspark_emr_template.json"
-    with open(template_file, 'r') as f:
-        text = f.read()
-    text = text.replace('CLUSTER_NAME', args.cluster_name)
-    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('SPARK_PATH', spark_path)
-    text = text.replace('PYTHON_SHORT_VERSION', '2.7')
-    text = text.replace('PYTHON_FULL_VERSION', '2.7')
-    text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
-    text = text.replace('EMR_VERSION', args.emr_version)
-    with open(kernel_path, 'w') as f:
-        f.write(text)
-    local('touch /tmp/kernel_var.json')
-    local(
-        "PYJ=`find /opt/" + args.emr_version + "/" + args.cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
-    local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
-    s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
-    with file('/tmp/python_version') as f:
-        python_version = f.read()
-    # python_version = python_version[0:3]
-    if python_version != '\n':
-        installing_python(args.region, args.bucket, args.user_name, args.cluster_name)
-        local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
-        kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
-        template_file = "/tmp/pyspark_emr_template.json"
-        with open(template_file, 'r') as f:
-            text = f.read()
-        text = text.replace('CLUSTER_NAME', args.cluster_name)
-        text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-        text = text.replace('SPARK_PATH', spark_path)
-        text = text.replace('PYTHON_SHORT_VERSION', python_version[0:3])
-        text = text.replace('PYTHON_FULL_VERSION', python_version[0:5])
-        text = text.replace('PYTHON_PATH', '/opt/python/python' + python_version[:5] + '/bin/python' + python_version[:3])
-        text = text.replace('EMR_VERSION', args.emr_version)
-        with open(kernel_path, 'w') as f:
-            f.write(text)
-        local('touch /tmp/kernel_var.json')
-        local(
-            "PYJ=`find /opt/" + args.emr_version + "/" + args.cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
-        local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-
-
 def toree_kernel(args):
     spark_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
     scala_version = local("dpkg -l scala | grep scala | awk '{print $3}'", capture=True)
@@ -204,7 +157,7 @@ if __name__ == "__main__":
             jars(args, emr_dir)
         yarn(args, yarn_dir)
         install_emr_spark(args)
-        pyspark_kernel(args)
+        pyspark_kernel(kernels_dir, args.emr_version, args.cluster_name, args.spark_version, args.bucket, args.user_name, args.region)
         toree_kernel(args)
         spark_defaults(args)
         r_kernel(args)

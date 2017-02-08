@@ -42,6 +42,8 @@ args = parser.parse_args()
 
 def configure_notebook(args):
     scripts_dir = '/root/scripts/'
+    templates_dir = '/root/templates/'
+    put(templates_dir + 'pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
     sudo('chmod 755 /usr/local/bin/create_configs.py')
