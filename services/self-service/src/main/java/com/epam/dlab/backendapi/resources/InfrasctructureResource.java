@@ -123,9 +123,13 @@ public class InfrasctructureResource implements InfrasctructureAPI {
     @POST
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(@Auth UserInfo userInfo, EnvStatusDTO dto) {
-        LOGGER.debug("Updating status for resources for user {}: {}", dto.getUser(), dto);
+        LOGGER.debug("Updating the status of resources for user {}: {}", dto.getUser(), dto);
         try {
-        	//envDAO.updateEnvResources(dto);
+        	if (dto.getStatus() == "failed") {
+        		LOGGER.warn("Request for the status of resources for user {} fails: {}", dto.getUser(), dto.getErrorMessage());
+        	} else {
+        		envDAO.updateEnvStatus(dto.getUser(), dto.getResourceList());
+        	}
         } catch (DlabException e) {
         	LOGGER.warn("Could not update status for resources for user {}: {}", dto.getUser(), e.getLocalizedMessage(), e);
         }

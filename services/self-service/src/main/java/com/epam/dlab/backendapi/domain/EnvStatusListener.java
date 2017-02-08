@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.dao.EnvStatusDAO;
 import com.epam.dlab.constants.ServiceConsts;
-import com.epam.dlab.dto.status.EnvResourceDTO;
 import com.epam.dlab.dto.status.EnvResourceList;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.InfrasctructureAPI;
@@ -137,7 +136,7 @@ public class EnvStatusListener implements Managed, Runnable {
 			if (resourceList.getHostList() != null || resourceList.getClusterList() != null) {
 				userInfo.dto.withResourceList(resourceList);
 				LOGGER.debug("Ask docker for the status of resources for user {}: {}", userInfo.username, userInfo.dto);
-				provisioningService.post(InfrasctructureAPI.INFRASTRUCTURE_STATUS, userInfo.accessToken, userInfo.dto, EnvResourceDTO.class);
+				provisioningService.post(InfrasctructureAPI.INFRASTRUCTURE_STATUS, userInfo.accessToken, userInfo.dto, String.class);
 			}
 		} catch (Exception e) {
 			LOGGER.warn("Ask docker for the status of resources for user {} fails: {}", e.getLocalizedMessage(), e);

@@ -305,7 +305,7 @@ public class EnvStatusDAO extends BaseDAO {
      * @exception DlabException
      */
     public void updateEnvStatus(String user, EnvResourceList list) throws DlabException {
-    	if (list.getHostList() == null || list.getHostList().size() == 0) {
+    	if (list == null || list.getHostList() == null || list.getHostList().size() == 0) {
     		return;
     	}
     	
