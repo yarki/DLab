@@ -55,6 +55,9 @@ public class UserInstanceDTO {
     private Date uptime;
     @JsonProperty("computational_resources")
     private List<UserComputationalResourceDTO> resources = new ArrayList<>();
+    @JsonProperty("private_ip")
+    private String privateIp;
+
 
     /** Returns the unique id for the notebook. */
     public String getId() {
@@ -221,6 +224,22 @@ public class UserInstanceDTO {
         return this;
     }
 
+    /** Returns private IP address. */
+    public String getPrivateIp() {
+        return privateIp;
+    }
+
+    /** Sets private IP address. */
+    public void setPrivateIp(String privateIp) {
+        this.privateIp = privateIp;
+    }
+
+    /** Sets private IP address. */
+    public UserInstanceDTO withPrivateIp(String privateIp) {
+        setPrivateIp(privateIp);
+        return this;
+    }
+
     /** Returns a list of user's computational resources for notebook. */
     public List<UserComputationalResourceDTO> getResources() {
         return resources;
@@ -250,6 +269,7 @@ public class UserInstanceDTO {
     	        .add("shape", shape)
     	        .add("status", status)
     	        .add("uptime", uptime)
+                .add("privateIp", privateIp)
     	        .add("exploratoryUrl", exploratoryUrl)
     	        .add("resources", resources)
     	        .toString();
