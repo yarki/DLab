@@ -1,3 +1,22 @@
+/***************************************************************************
+
+Copyright (c) 2016, EPAM SYSTEMS INC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+****************************************************************************/
+
+
 package com.epam.dlab.backendapi.domain;
 
 import java.util.HashMap;
@@ -9,38 +28,52 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.dao.EnvStatusDAO;
-import com.epam.dlab.mongo.MongoService;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
+import com.epam.dlab.backendapi.dao.SettingsDAO;
+import com.epam.dlab.constants.ServiceConsts;
+import com.epam.dlab.dto.status.EnvResourceDTO;
+import com.epam.dlab.dto.status.EnvResourceList;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.InfrasctructureAPI;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 import io.dropwizard.lifecycle.Managed;
-import io.dropwizard.setup.Environment;
 
+/** Send requests to the docker for update the status of environment.
+ */
 @Singleton
 public class EnvStatusListener implements Managed, Runnable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnvStatusListener.class);
 	
+	/** Environment status listener. */
 	private static EnvStatusListener listener;
-		
-	public static synchronized void listen(String username) {
-		LOGGER.debug("EnvStatus listener will be added the status check for user {}", username);
-		listener.userMap.put(username, System.currentTimeMillis());
+	
+	/** Append the status checker for user to environment status listener.
+	 * @param username the name of user.
+	 * @param accessToken the access token for user.
+	 * @param awsRegion the name of AWS region.
+	 */
+	public static synchronized void listen(String username, String accessToken, String awsRegion) {
+		LOGGER.debug("EnvStatus listener will be added the status checker for user {}", username);
+		EnvStatusListenerUserInfo userInfo = new EnvStatusListenerUserInfo(username, accessToken, awsRegion);
+		listener.userMap.put(username, userInfo);
 		if (listener.thread == null) {
-			LOGGER.debug("EnvStatus listener not running and will be started ...");
+			LOGGER.info("EnvStatus listener not running and will be started ...");
 			listener.thread = new Thread(listener, listener.getClass().getSimpleName());
 			listener.thread.start();
 		}
 	}
 	
+	/** Remove the status checker for user from environment status listener.
+	 * @param username the name of user.
+	 */
 	public static void listenStop(String username) {
-		LOGGER.debug("EnvStatus listener will be removed the status check for user {}", username);
+		LOGGER.debug("EnvStatus listener will be removed the status checker for user {}", username);
 		synchronized (listener.userMap) {
 			listener.userMap.remove(username);
 			if (listener.userMap.size() == 0) {
-				LOGGER.debug("EnvStatus listener will be terminated because no have the checkers anymore");
+				LOGGER.info("EnvStatus listener will be terminated because no have the status checkers anymore");
 				try {
 					listener.stop();
 				} catch (Exception e) {
@@ -53,21 +86,32 @@ public class EnvStatusListener implements Managed, Runnable {
 	/** Thread of the folder listener. */
 	private Thread thread;
 
+	/** Timeout for check the status of environment in milliseconds. */
 	private long checkStatusTimeoutMillis;
 	
 	@Inject
 	private SelfServiceApplicationConfiguration configuration;
 	
 	@Inject
+    private SettingsDAO settingsDAO;
+	
+	@Inject
 	private EnvStatusDAO dao;
 	
-	private Map<String, Long> userMap = new HashMap<String, Long>();
+    @Inject
+    @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
+    private RESTService provisioningService;
+
+    /** Map of users for the checker. */
+	private Map<String, EnvStatusListenerUserInfo> userMap = new HashMap<String, EnvStatusListenerUserInfo>();
 	
 	@Override
 	public void start() throws Exception {
 		if (listener == null) {
 			listener = this;
-			checkStatusTimeoutMillis = configuration.getCheckEnvStatusTimeout().toMilliseconds();
+			checkStatusTimeoutMillis = configuration
+					.getCheckEnvStatusTimeout()
+					.toMilliseconds();
 		}
 	}
 
@@ -80,7 +124,23 @@ public class EnvStatusListener implements Managed, Runnable {
 				listener.thread = null;
 				listener.userMap.clear();
 			}
-			LOGGER.debug("EnvStatus listener has been stopped");
+			LOGGER.info("EnvStatus listener has been stopped");
+		}
+	}
+	
+	/** Send request to docker for check the status of user environment.
+	 * @param userInfo user info.
+	 */
+	private void checkStatus(EnvStatusListenerUserInfo userInfo) {
+		try {
+			EnvResourceList resourceList = dao.findEnvResources(userInfo.username);
+			if (resourceList.getHostList() != null || resourceList.getClusterList() != null) {
+				userInfo.dto.withResourceList(resourceList);
+				LOGGER.debug("Ask docker for the status of resources for user {}: {}", userInfo.username, userInfo.dto);
+				provisioningService.post(InfrasctructureAPI.INFRASTRUCTURE_STATUS, userInfo.accessToken, userInfo.dto, EnvResourceDTO.class);
+			}
+		} catch (Exception e) {
+			LOGGER.warn("Ask docker for the status of resources for user {} fails: {}", e.getLocalizedMessage(), e);
 		}
 	}
 	
@@ -89,20 +149,15 @@ public class EnvStatusListener implements Managed, Runnable {
 		while (true) {
 			try {
 				long ticks = System.currentTimeMillis();
-				for (Entry<String, Long> item : userMap.entrySet()) {
-					if (item.getValue() < ticks) {
-						LOGGER.debug("EnvStatus listener check status for user {}" + item.getKey());
-						item.setValue(ticks + checkStatusTimeoutMillis);
+				for (Entry<String, EnvStatusListenerUserInfo> item : userMap.entrySet()) {
+					EnvStatusListenerUserInfo userInfo = item.getValue();
+					if (userInfo.getNextCheckTimeMillis() < ticks) {
+						LOGGER.debug("EnvStatus listener check status for user {}", item.getKey());
+						userInfo.setNextCheckTimeMillis(ticks + checkStatusTimeoutMillis);
+						checkStatus(userInfo);
 					}
 				}
 				
-				synchronized (userMap) {
-					if (userMap.isEmpty()) {
-						thread = null;
-						LOGGER.debug("EnvStatus listener has been stopped because no have the checkers anymore");
-						return;
-					}
-				}
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				LOGGER.debug("EnvStatus listener has been interrupted");
@@ -112,29 +167,4 @@ public class EnvStatusListener implements Managed, Runnable {
 			}
 		}
 	}
-
-	
-	private static Injector createInjector(SelfServiceApplicationConfiguration configuration, Environment environment) {
-		return Guice.createInjector(new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(SelfServiceApplicationConfiguration.class).toInstance(configuration);
-                bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
-            }
-        });
-    }
-	
-	public static void main(String[] args) throws Exception {
-		EnvStatusListener statuslistener = new EnvStatusListener();
-		//Injector injector = createInjector();
-		//injector.injectMembers(statuslistener);
-		statuslistener.start();
-		
-		EnvStatusListener.listen("user1");
-		Thread.sleep(1500);
-		EnvStatusListener.listen("user2");
-		
-		Thread.sleep(10000);
-	}
-
 }

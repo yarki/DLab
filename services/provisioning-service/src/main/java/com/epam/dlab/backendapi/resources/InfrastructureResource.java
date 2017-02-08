@@ -18,8 +18,9 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
-import com.epam.dlab.auth.UserInfo;
-import io.dropwizard.auth.Auth;
+import static com.epam.dlab.backendapi.core.commands.DockerAction.STATUS;
+
+import java.io.IOException;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -50,10 +51,6 @@ import com.google.inject.Inject;
 
 import io.dropwizard.auth.Auth;
 import io.dropwizard.util.Duration;
-
-import static com.epam.dlab.backendapi.core.commands.DockerAction.STATUS;
-
-import java.io.IOException;
 
 @Path("/infrastructure")
 @Consumes(MediaType.APPLICATION_JSON)

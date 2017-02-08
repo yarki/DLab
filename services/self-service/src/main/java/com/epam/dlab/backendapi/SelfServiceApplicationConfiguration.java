@@ -67,4 +67,9 @@ public class SelfServiceApplicationConfiguration extends ServiceConfiguration {
     public Duration getCheckEnvStatusTimeout() {
     	return checkEnvStatusTimeout;
     }
+    
+    public SelfServiceApplicationConfiguration withCheckEnvStatusTimeout(Duration checkEnvStatusTimeout) {
+    	this.checkEnvStatusTimeout = checkEnvStatusTimeout;
+    	return this;
+    }
 }

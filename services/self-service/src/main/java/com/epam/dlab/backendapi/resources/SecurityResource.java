@@ -21,9 +21,11 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.MongoCollections;
 import com.epam.dlab.backendapi.dao.SecurityDAO;
+import com.epam.dlab.backendapi.domain.EnvStatusListener;
 import com.epam.dlab.dto.UserCredentialDTO;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.SecurityAPI;
+import com.google.common.base.MoreObjects;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -41,6 +43,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static com.epam.dlab.auth.SecurityRestAuthenticator.SECURITY_SERVICE;
+
+import java.util.List;
+import java.util.Map.Entry;
 
 /** Provides the REST API for the user authorization.
  */
@@ -66,7 +71,16 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
         LOGGER.debug("Try login for user {}", credential.getUsername());
         try {
             dao.writeLoginAttempt(credential);
-            return securityService.post(LOGIN, credential, Response.class);
+            Response response = securityService.post(LOGIN, credential, Response.class);
+            LOGGER.debug("Response from security is {}, {}, {}", response, response.getStatus(), response.getEntity());
+            for (Entry<String, List<String>> header : response.getStringHeaders().entrySet()) {
+            	LOGGER.debug("Security header {}", MoreObjects.toStringHelper(header)
+            			.add("key", header.getKey())
+            			.add("value", header.getValue()));
+            }
+            //String token = response.getBody().asString();
+            //EnvStatusListener.listen(credential.getUsername(), accessToken, settingsDAO.getAwsRegion());
+            return response;
         } catch (Throwable t) {
         	LOGGER.error("Try login for user {} fail", credential.getUsername(), t);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(t.getLocalizedMessage()).build();
@@ -82,6 +96,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
     public Response logout(@Auth UserInfo userInfo) {
         LOGGER.debug("Try logout for accessToken {}", userInfo.getAccessToken());
         try {
+        	EnvStatusListener.listenStop(userInfo.getName());
             return securityService.post(LOGOUT, userInfo.getAccessToken(), Response.class);
         } catch(Throwable t) {
         	LOGGER.error("Try logout for accessToken {}", userInfo.getAccessToken(), t.getLocalizedMessage());

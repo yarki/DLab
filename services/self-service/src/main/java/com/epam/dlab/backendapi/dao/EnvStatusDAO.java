@@ -148,10 +148,9 @@ public class EnvStatusDAO extends BaseDAO {
 			}
 		}
     	
-    	return (hostList.size() == 0 ? null :
-    		new EnvResourceList()
-    			.withHostList(hostList)
-    			.withClusterList(clusterList.size() > 0 ? clusterList : null));
+    	return new EnvResourceList()
+    			.withHostList(hostList.size() > 0 ? hostList : null)
+    			.withClusterList(clusterList.size() > 0 ? clusterList : null);
     }
 
     /** Translate the status of instance in Amazon into exploratory's status.
