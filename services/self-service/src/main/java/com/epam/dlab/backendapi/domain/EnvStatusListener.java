@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.dao.EnvStatusDAO;
-import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.status.EnvResourceDTO;
 import com.epam.dlab.dto.status.EnvResourceList;
@@ -55,6 +54,10 @@ public class EnvStatusListener implements Managed, Runnable {
 	 * @param awsRegion the name of AWS region.
 	 */
 	public static synchronized void listen(String username, String accessToken, String awsRegion) {
+		if (listener.userMap.containsKey(username)) {
+			LOGGER.debug("EnvStatus listener the status checker for user {} already exist", username);
+			return;
+		}
 		LOGGER.debug("EnvStatus listener will be added the status checker for user {}", username);
 		EnvStatusListenerUserInfo userInfo = new EnvStatusListenerUserInfo(username, accessToken, awsRegion);
 		listener.userMap.put(username, userInfo);
@@ -91,9 +94,6 @@ public class EnvStatusListener implements Managed, Runnable {
 	
 	@Inject
 	private SelfServiceApplicationConfiguration configuration;
-	
-	@Inject
-    private SettingsDAO settingsDAO;
 	
 	@Inject
 	private EnvStatusDAO dao;

@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.EnvStatusDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
+import com.epam.dlab.backendapi.domain.EnvStatusListener;
 import com.epam.dlab.backendapi.resources.dto.HealthStatusDTO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.contracts.HealthChecker;
@@ -88,6 +89,15 @@ public class InfrasctructureResource implements InfrasctructureAPI {
     
     
     @POST
+    @Path(ApiCallbacks.STATUS_URI + "_listener")
+    public Response runEnvListener(@Auth UserInfo userInfo) {
+    	LOGGER.debug("Starting EnvStatusListener for user {}", userInfo.getName());
+    	EnvStatusListener.listen(userInfo.getName(), userInfo.getAccessToken(), settingsDAO.getAwsRegion());
+    	LOGGER.debug("EnvStatusListener started");
+    	return Response.ok().build();
+    }
+    
+    @POST
     @Path(ApiCallbacks.STATUS_URI + "_test")
     public Response statusTest(@Auth UserInfo userInfo) {
         LOGGER.debug("Looking ids of resources for user {}", userInfo.getName());
@@ -100,10 +110,10 @@ public class InfrasctructureResource implements InfrasctructureAPI {
     			.withResourceList(resourceList);
         LOGGER.debug("Ask docker for the status of resources for user {}: {}", userInfo.getName(), dto);
     	
-		provisioningService.post(INFRASTRUCTURE_STATUS, userInfo.getAccessToken(), dto, EnvResourceDTO.class);
+		String uuid = provisioningService.post(INFRASTRUCTURE_STATUS, userInfo.getAccessToken(), dto, String.class);
     	
         LOGGER.debug("Request has been send to docker");
-		return Response.ok().build();
+		return Response.ok(uuid).build();
     }
     
     /** Updates the status of the resources for user.

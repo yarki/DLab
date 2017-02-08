@@ -95,7 +95,8 @@ public class InfrastructureResource implements DockerCommands {
                                     .withName(nameContainer(dto.getEdgeUserName(), STATUS, "resources"))
                                     .withVolumeForRootKeys(configuration.getKeyDirectory())
                                     .withVolumeForResponse(configuration.getImagesDirectory())
-                                    .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+                                    .withVolumeForLog(configuration.getDockerLogDirectory(), Directories.EDGE_LOG_DIRECTORY)
+                                    .withResource(getResourceType())
                                     .withRequestId(uuid)
                                     .withConfKeyName(configuration.getAdminKey())
                                     .withActionStatus(configuration.getEdgeImage()),
@@ -117,6 +118,6 @@ public class InfrastructureResource implements DockerCommands {
     }
 
     public String getResourceType() {
-        return Directories.EDGE_LOG_DIRECTORY;
+        return "status";
     }
 }
