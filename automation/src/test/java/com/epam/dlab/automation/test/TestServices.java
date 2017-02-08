@@ -128,6 +128,7 @@ public class TestServices {
         Assert.assertEquals(responseForActivateAccessKey.getBody().asString(), "Username or password are not valid");
         
         LoginDto testUserLogin = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
+        LOGGER.info("Logging in with credentials {}:{}", PropertyValue.getUsername(), PropertyValue.getPassword());
         Response responseTestUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, testUserLogin);
         Assert.assertEquals(responseTestUser.statusCode(), HttpStatusCode.OK);
  		
