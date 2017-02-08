@@ -176,9 +176,6 @@ if __name__ == "__main__":
     ensure_python3_libraries(args.os_user)
     ensure_python3_specific_version(python3_version, args.os_user)
 
-    print "Installing virtualenv"
-    ensure_libraries_py(os_user)
-
     print "Installing Livy for local kernels"
     install_local_livy(args)
 
