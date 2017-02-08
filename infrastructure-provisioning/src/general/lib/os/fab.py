@@ -181,12 +181,12 @@ def configure_jupyter(os_user, jupyter_conf_file, templates_dir):
             sudo('echo \'c.KernelSpecManager.ensure_native_kernel = False\' >> ' + jupyter_conf_file)
             put(templates_dir + 'jupyter-notebook.service', '/tmp/jupyter-notebook.service')
             sudo("chmod 644 /tmp/jupyter-notebook.service")
-            sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
-            sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/jupyter-notebook.service")
             if os.environ['application'] == 'tensor':
                 sudo("sed -i 's|ExecStart=/bin/bash -c \"/usr/local/bin/jupyter notebook --config CONF_PATH\"|"
                      "ExecStart=/bin/bash -c \"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/cudnn/lib64; "
                      "/usr/local/bin/jupyter notebook --config CONF_PATH\"|' /tmp/jupyter-notebook.service")
+            sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
+            sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/jupyter-notebook.service")
             sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
             sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
             sudo('mkdir /mnt/var')

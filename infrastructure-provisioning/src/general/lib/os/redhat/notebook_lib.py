@@ -245,7 +245,7 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo('wget https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp27-none-linux_x86_64.whl')
             sudo('wget https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp35-cp35m-linux_x86_64.whl')
             sudo('python2.7 -m pip install --upgrade tensorflow_gpu-' + tensorflow_version + '-cp27-none-linux_x86_64.whl')
-            run('python3.5 -m pip install --upgrade tensorflow_gpu-' + tensorflow_version + '-cp35-cp35m-linux_x86_64.whl')
+            run('python3 -m pip install --upgrade tensorflow_gpu-' + tensorflow_version + '-cp35-cp35m-linux_x86_64.whl')
             sudo('mkdir /var/log/tensorboard')
             put(templates_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
             put(templates_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
