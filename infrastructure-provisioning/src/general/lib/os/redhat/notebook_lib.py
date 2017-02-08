@@ -153,8 +153,7 @@ def ensure_python3_specific_version(python3_version, os_user):
 def ensure_python2_libraries(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/python2_libraries_ensured'):
         try:
-            if os.environ['application'] == 'tensor':
-                sudo('yum install -y https://forensics.cert.org/centos/cert/7/x86_64/pyparsing-2.0.3-1.el7.noarch.rpm')
+            sudo('yum install -y https://forensics.cert.org/centos/cert/7/x86_64/pyparsing-2.0.3-1.el7.noarch.rpm')
             sudo('yum install -y python-setuptools python-wheel')
             sudo('yum install -y python-virtualenv openssl-devel python-devel openssl-libs libxml2-devel libxslt-devel')
             sudo('python2 -m pip install backports.shutil_get_terminal_size ipython ipykernel')
