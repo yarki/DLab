@@ -869,6 +869,7 @@ def pyspark_kernel(kernels_dir, emr_version, cluster_name, spark_version, bucket
 def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket, user_name, spark_version, spark_dir, os_user):
     try:
         port_number_found = False
+        zeppelin_restarted = False
         default_port = 8998
         livy_port = ''
         livy_path = '/opt/' + emr_version + '/' + cluster_name + '/livy/'
@@ -890,7 +891,11 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
               '\/spark\/python\/lib\/py4j-src.zip,file:\/opt\/' + emr_version + '\/' + cluster_name +
               '\/spark\/python\/lib\/pyspark.zip/\' /opt/' + emr_version + '/' + cluster_name +
               '/spark/conf/spark-defaults.conf')
-        local('service zeppelin-notebook restart')
+        local('sudo service zeppelin-notebook restart')
+        while not zeppelin_restarted:
+            result = local('nc -z localhost 8080; echo $?', capture=True)
+            if result == '0':
+                zeppelin_restarted = True
         local('sleep 5')
         local('echo \"Configuring emr spark interpreter for Zeppelin\"')
         installing_python(region, bucket, user_name, cluster_name)
