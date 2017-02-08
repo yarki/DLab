@@ -63,7 +63,7 @@ public class EnvStatusDAO extends BaseDAO {
 	 * @param includeStatus include status or not to the list.
 	 */
 	private void addResource(List<EnvResource> list, Document document, String statusFieldName) {
-		LOGGER.debug("Add resource from {}", document);
+		LOGGER.trace("Add resource from {}", document);
 		String instanceId = document.getString(INSTANCE_ID);
 		if (instanceId != null) {
 			UserInstanceStatus status = UserInstanceStatus.of(document.getString(statusFieldName));
@@ -194,7 +194,7 @@ public class EnvStatusDAO extends BaseDAO {
      * @exception DlabException
      */
     private void updateEdgeStatus(String user, List<EnvResource> hostList) throws DlabException {
-    	LOGGER.debug("Update EDGE status for user {}", user);
+    	LOGGER.trace("Update EDGE status for user {}", user);
     	Document edge = getEdgeNode(user);
     	String instanceId;
     	if (edge == null ||
@@ -207,12 +207,12 @@ public class EnvStatusDAO extends BaseDAO {
     		return;
     	}
     	
-    	LOGGER.debug("Update EDGE status for user {} with instance_id {} from {} to {}",
+    	LOGGER.trace("Update EDGE status for user {} with instance_id {} from {} to {}",
     			user, instanceId, edge.getString(EDGE_STATUS), r.getStatus());
     	String oldStatus = edge.getString(EDGE_STATUS);
     	UserInstanceStatus oStatus = (oldStatus == null ? UserInstanceStatus.CREATING : UserInstanceStatus.of(oldStatus));
     	UserInstanceStatus status = getInstanceNewStatus(oStatus, r.getStatus());
-    	LOGGER.debug("Translate EDGE status for user {} with instanceId {} from {} to {}",
+    	LOGGER.trace("EDGE status translated for user {} with instanceId {} from {} to {}",
     			user, instanceId, r.getStatus(), status);
     	if (oStatus != status) {
         	LOGGER.debug("EDGE status will be updated from {} to {}", oldStatus, status);
@@ -230,13 +230,13 @@ public class EnvStatusDAO extends BaseDAO {
      */
     private void updateExploratoryStatus(String user, String exploratoryName,
     		String oldStatus, String newStatus) {
-    	LOGGER.debug("Update exploratory status for user {} with exploratory {} from {} to {}", user, exploratoryName, oldStatus, newStatus);
+    	LOGGER.trace("Update exploratory status for user {} with exploratory {} from {} to {}", user, exploratoryName, oldStatus, newStatus);
     	UserInstanceStatus oStatus = UserInstanceStatus.of(oldStatus);
     	UserInstanceStatus status = getInstanceNewStatus(oStatus, newStatus);
-    	LOGGER.debug("Translate exploratory status for user {} with exploratory {} from {} to {}", user, exploratoryName, newStatus, status);
+    	LOGGER.trace("Exploratory status translated for user {} with exploratory {} from {} to {}", user, exploratoryName, newStatus, status);
 
     	if (oStatus != status) {
-        	LOGGER.debug("Exploratory status will be updated from {} to {}", oldStatus, status);
+        	LOGGER.debug("Exploratory status for user {} with exploratory {} will be updated from {} to {}", user, exploratoryName, oldStatus, status);
         	updateOne(USER_INSTANCES,
         			exploratoryCondition(user, exploratoryName),
         			Updates.set(STATUS, status.toString()));
@@ -261,6 +261,7 @@ public class EnvStatusDAO extends BaseDAO {
     	switch (oldStatus) {
 			case CREATING:
 			case CONFIGURING:
+			case RUNNING:
 				return (status.in(UserInstanceStatus.TERMINATED, UserInstanceStatus.TERMINATING) ? status : oldStatus);
 			case TERMINATING:
 				return (status.in(UserInstanceStatus.TERMINATED) ? status : oldStatus);
@@ -279,15 +280,16 @@ public class EnvStatusDAO extends BaseDAO {
      */
 	private void updateComputationalStatus(String user, String exploratoryName, String clusterId,
 			String oldStatus, String newStatus) {
-    	LOGGER.debug("Update computational status for user {} with exploratory {} and instanceId {} from {} to {}",
+    	LOGGER.trace("Update computational status for user {} with exploratory {} and instanceId {} from {} to {}",
     			user, exploratoryName, clusterId, oldStatus, newStatus);
     	UserInstanceStatus oStatus = UserInstanceStatus.of(oldStatus);
     	UserInstanceStatus status = getComputationalNewStatus(oStatus, newStatus);
-    	LOGGER.debug("Translate computational status for user {} with exploratory {} and instanceId {} from {} to {}",
+    	LOGGER.trace("Translate computational status for user {} with exploratory {} and instanceId {} from {} to {}",
     			user, exploratoryName, clusterId, newStatus, status);
 
     	if (oStatus != status) {
-        	LOGGER.debug("Computational status will be updated from {} to {}", oldStatus, status);
+        	LOGGER.debug("Computational status for user {} with exploratory {} and instanceId {} will be updated from {} to {}",
+        			user, exploratoryName, clusterId, oldStatus, status);
         	Document values = new Document(COMPUTATIONAL_STATUS_FILTER, status.toString());
         	updateOne(USER_INSTANCES,
         			and(exploratoryCondition(user, exploratoryName),

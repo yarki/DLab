@@ -140,6 +140,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     private UserInstanceStatus calcStatus(DockerAction action, boolean success) {
         if (success) {
             switch (action) {
+            	case STATUS:
+            		return UserInstanceStatus.CREATED; // Any status besides failed
                 case CREATE:
                     return UserInstanceStatus.RUNNING;
                 case CONFIGURE:

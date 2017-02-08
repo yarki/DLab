@@ -79,4 +79,3 @@ public class ResourcesStatusCallbackHandler extends ResourceCallbackHandler<EnvS
         		.withUptime(Date.from(Instant.now()));
     }
 }
-

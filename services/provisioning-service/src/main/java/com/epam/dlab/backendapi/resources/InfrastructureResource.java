@@ -50,7 +50,6 @@ import com.epam.dlab.rest.client.RESTService;
 import com.google.inject.Inject;
 
 import io.dropwizard.auth.Auth;
-import io.dropwizard.util.Duration;
 
 @Path("/infrastructure")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -58,8 +57,6 @@ import io.dropwizard.util.Duration;
 public class InfrastructureResource implements DockerCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(InfrastructureResource.class);
     
-    private static final Duration REQUEST_STATUS_TIMEOUT = Duration.minutes(1);
-
     @Inject
     private ProvisioningServiceApplicationConfiguration configuration;
     @Inject
@@ -80,10 +77,10 @@ public class InfrastructureResource implements DockerCommands {
     @Path("/status")
     @POST
     public String status(@Auth UserInfo ui, EnvResourceDTO dto) throws IOException, InterruptedException {
-    	LOGGER.debug("Request the status of resources for user {}: {}", ui.getName(), dto);
+    	LOGGER.trace("Request the status of resources for user {}: {}", ui.getName(), dto);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
-        		REQUEST_STATUS_TIMEOUT,
+        		configuration.getRequestEnvStatusTimeout(),
                 getFileHandlerCallback(STATUS, uuid, dto, ui.getAccessToken()));
         try {
             commandExecuter.executeAsync(
@@ -103,8 +100,8 @@ public class InfrastructureResource implements DockerCommands {
                             dto
                     )
             );
-        } catch (Throwable t) {
-            throw new DlabException("Could not create computational resource cluster", t);
+        } catch (Throwable e) {
+            throw new DlabException("Docker's command \"" + getResourceType() + "\" is fail: " + e.getLocalizedMessage(), e);
         }
         return uuid;
     }
