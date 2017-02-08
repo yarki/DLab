@@ -11,3 +11,6 @@ target
 /services/common/bin
 /services/security-service/bin
 /automation/test-output
+/automation/log
+/automation/*.log
+keys

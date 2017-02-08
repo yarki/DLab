@@ -2,7 +2,7 @@ package com.epam.dlab.automation.aws;
 
 public enum AmazonInstanceState {
     
-    RUNNING("running"), TERMINATED("terminated");
+    RUNNING("RUNNING"), TERMINATED("TERMINATED");
     private String value;
 
     AmazonInstanceState(String value) {
