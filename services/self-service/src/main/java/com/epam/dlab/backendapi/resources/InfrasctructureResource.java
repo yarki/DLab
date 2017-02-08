@@ -29,6 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.epam.dlab.backendapi.resources.dto.HealthStatusPageDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,17 +76,26 @@ public class InfrasctructureResource implements InfrasctructureAPI {
     @Named(PROVISIONING_HEALTH_CHECKER)
     private HealthChecker provisioningHealthChecker;
 
-    /** Returns the status of infrastructure: database and provisioning service.
+    /** Returns the status of infrastructure: edge.
      * @param userInfo user info.
      */
     @GET
     @Path(ApiCallbacks.STATUS_URI)
-    public HealthStatusDTO status(@Auth UserInfo userInfo) {
+    public HealthStatusPageDTO status(@Auth UserInfo userInfo) {
+        return envDAO.getHealthStatusPageDTO(userInfo.getName());
+    }
+
+    /** Returns the status of infrastructure: database and provisioning service.
+     * @param userInfo user info.
+     */
+    @GET
+    @Path(ApiCallbacks.STATUS_URI+"_old")
+    public HealthStatusDTO statusOld(@Auth UserInfo userInfo) {
         return new HealthStatusDTO()
                 .withMongoAlive(mongoHealthChecker.isAlive(userInfo))
                 .withProvisioningAlive(provisioningHealthChecker.isAlive(userInfo));
     }
-    
+
     
     @POST
     @Path(ApiCallbacks.STATUS_URI + "_test")

@@ -31,6 +31,9 @@ import static com.mongodb.client.model.Projections.include;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.epam.dlab.backendapi.resources.dto.HealthStatusEnum;
+import com.epam.dlab.backendapi.resources.dto.HealthStatusPageDTO;
+import com.epam.dlab.backendapi.resources.dto.HealthStatusResourcePageDTO;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -48,10 +51,11 @@ public class EnvStatusDAO extends BaseDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnvStatusDAO.class);
 
 	private static final String EDGE_STATUS = "edge_status";
+	private static final String EDGE_PUBLIC_IP = "public_ip";
 	private static final String COMPUTATIONAL_STATUS = COMPUTATIONAL_RESOURCES + "." + STATUS;
 	private static final String COMPUTATIONAL_STATUS_FILTER = COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS;
 
-    private static final Bson INCLUDE_EDGE_FIELDS = include(INSTANCE_ID, EDGE_STATUS);
+    private static final Bson INCLUDE_EDGE_FIELDS = include(INSTANCE_ID, EDGE_STATUS, EDGE_PUBLIC_IP);
 	private static final Bson INCLUDE_EXP_FIELDS = include(INSTANCE_ID, STATUS,
 								COMPUTATIONAL_RESOURCES + "." + INSTANCE_ID, COMPUTATIONAL_STATUS);
 	private static final Bson INCLUDE_EXP_UPDATE_FIELDS = include(EXPLORATORY_NAME, INSTANCE_ID, STATUS,
@@ -224,7 +228,7 @@ public class EnvStatusDAO extends BaseDAO {
     
     /** Update the status of exploratory if it needed.
      * @param user the user name
-     * @param instanceId the id of instance
+     * @param exploratoryName the name of exploratory
      * @param oldStatus old status
      * @param newStatus new status
      */
@@ -273,7 +277,8 @@ public class EnvStatusDAO extends BaseDAO {
     
     /** Update the status of exploratory if it needed.
      * @param user the user name
-     * @param instanceId the id of instance
+     * @param exploratoryName the name of exploratory
+     * @param clusterId the Id of cluster
      * @param oldStatus old status
      * @param newStatus new status
      */
@@ -298,6 +303,32 @@ public class EnvStatusDAO extends BaseDAO {
         			new Document(SET, values));
     	}
 	}
+
+    /** Finds and returns the of computational resource.
+     * @param user user name.
+     * @exception DlabException
+     */
+    public HealthStatusPageDTO getHealthStatusPageDTO(String user) throws DlabException {
+        HealthStatusEnum commonStatus;
+        Document edge = getEdgeNode(user);
+        if (edge != null) {
+            String edgeStatus = edge.getString(EDGE_STATUS);
+            String edgePublicIp = edge.getString(EDGE_PUBLIC_IP);
+            String edgeType = "Edge Node";
+            List<HealthStatusResourcePageDTO> listResource = new ArrayList<>();
+            listResource.add(new HealthStatusResourcePageDTO().withType(edgeType).withResourceId(edgePublicIp).withStatus(edgeStatus));
+
+            if (UserInstanceStatus.RUNNING == UserInstanceStatus.of(edgeStatus)) {
+                commonStatus=HealthStatusEnum.OK;
+            } else {
+                commonStatus=HealthStatusEnum.ERROR;
+            }
+
+            return new HealthStatusPageDTO().withStatus(commonStatus).withListResources(listResource);
+        } else
+            throw new DlabException("EdgeNode for user " + user + " not found.");
+    }
+
 
 	/** Updates the status of exploratory and computational for user.
      * @param user the name of user.
