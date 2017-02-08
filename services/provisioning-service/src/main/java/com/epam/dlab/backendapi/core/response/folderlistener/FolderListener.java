@@ -50,10 +50,10 @@ public class FolderListener implements Runnable {
 	public static final long LISTENER_TIMEOUT_MILLLIS = 1000;
 	
 	/** Timeout of the idle for the folder listener in milliseconds. */
-	public static final long LISTENER_IDLE_TIMEOUT_MILLLIS = 5000;
+	public static final long LISTENER_IDLE_TIMEOUT_MILLLIS = 600  * 1000;
 
 	/** Timeout of waiting for the directory creation in milliseconds. */
-	private static final long WAIT_DIR_TIMEOUT_MILLIS = 500; 
+	private static final long WAIT_DIR_TIMEOUT_MILLIS = 500;
 
 	/** List of the folder listeners. */
 	private static final List<FolderListener> listeners = new ArrayList<FolderListener>();
@@ -86,7 +86,7 @@ public class FolderListener implements Runnable {
 		FolderListener listener;
 		WatchItem item;
 		
-		LOGGER.debug("Looking for folder listener to folder \"{}\" ...", directoryName);
+		LOGGER.trace("Looking for folder listener to folder \"{}\" ...", directoryName);
 		synchronized (listeners) {
 			for (int i = 0; i < listeners.size(); i++) {
 				listener = listeners.get(i);
@@ -193,14 +193,14 @@ public class FolderListener implements Runnable {
 		if (file.exists()) {
     		return true;
     	} else {
-    		LOGGER.debug("Folder listener \"{}\" waiting for the directory creation", getDirectoryName());
+    		LOGGER.trace("Folder listener \"{}\" waiting for the directory creation", getDirectoryName());
     	}
 
 		long expiredTimeMillis = itemList.get(0).getExpiredTimeMillis();
 		while (expiredTimeMillis >= System.currentTimeMillis()) {
     		Thread.sleep(WAIT_DIR_TIMEOUT_MILLIS);
     		if (file.exists()) {
-        		LOGGER.debug("Folder listener \"{}\" - directory has been created", getDirectoryName());
+        		LOGGER.trace("Folder listener \"{}\" - directory has been created", getDirectoryName());
         		return true;
         	}
     	}
@@ -212,7 +212,7 @@ public class FolderListener implements Runnable {
 	 * completed successfully. Returns <b>false</b> if all the file handlers has been processed
 	 * or initialization fails. */
 	private boolean init() {
-		LOGGER.debug("Folder listener initializing for \"{}\" ...", getDirectoryName());
+		LOGGER.trace("Folder listener initializing for \"{}\" ...", getDirectoryName());
     	
 		try {
     		if (!waitForDirectory()) {
@@ -246,7 +246,7 @@ public class FolderListener implements Runnable {
 			throw new DlabException("Can't create folder listener for \"" + getDirectoryName() + "\".", e);
 		}
 
-		LOGGER.debug("Folder listener has been initialized for \"{}\" ...", getDirectoryName());
+		LOGGER.trace("Folder listener has been initialized for \"{}\" ...", getDirectoryName());
 		return true;
 	}
 	
@@ -275,10 +275,15 @@ public class FolderListener implements Runnable {
 					continue;
 				case TIMEOUT_EXPIRED:
 					LOGGER.warn("Folder listener \"{}\" remove expired file handler for UUID {}", getDirectoryName(), uuid);
+					try {
+						item.getFileHandlerCallback().handleError("Request timeout expired");
+					} catch (Exception e){
+						LOGGER.error("Folder listener \"{}\" caused exception for UUID {}", getDirectoryName(), uuid, e);
+					}
 					break;
 				case IS_DONE:
 					if ( item.getFutureResult() ) {
-						LOGGER.debug("Folder listener \"{}\" remove processed file handler for UUID {}, handler result is {}", getDirectoryName(), uuid, item.getFutureResult());
+						LOGGER.trace("Folder listener \"{}\" remove processed file handler for UUID {}, handler result is {}", getDirectoryName(), uuid, item.getFutureResult());
 					} else {
 						LOGGER.warn("Folder listener \"{}\" remove processed file handler for UUID {}, handler result is {}", getDirectoryName(), uuid, item.getFutureResult());
 					}
@@ -346,7 +351,7 @@ public class FolderListener implements Runnable {
 								if (fileName.endsWith(JSON_EXTENSION)) {
 									WatchItem item = itemList.getItem(fileName);
 									if (item != null && item.getFileName() == null) {
-										LOGGER.debug("Folder listener \"{}\" handles the file {}", getDirectoryName(), fileName);
+										LOGGER.trace("Folder listener \"{}\" handles the file {}", getDirectoryName(), fileName);
 										item.setFileName(fileName);
 										if (itemList.processItem(item)) {
 											LOGGER.debug("Folder listener \"{}\" processes the file {}", getDirectoryName(), fileName);

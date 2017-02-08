@@ -33,20 +33,16 @@ import com.epam.dlab.backendapi.resources.dto.HealthStatusPageDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.EnvStatusDAO;
-import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.resources.dto.HealthStatusDTO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.contracts.HealthChecker;
-import com.epam.dlab.dto.status.EnvResourceDTO;
-import com.epam.dlab.dto.status.EnvResourceList;
 import com.epam.dlab.dto.status.EnvStatusDTO;
-import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
 import com.epam.dlab.rest.contracts.InfrasctructureAPI;
-import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -60,8 +56,6 @@ import io.dropwizard.auth.Auth;
 public class InfrasctructureResource implements InfrasctructureAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(InfrasctructureResource.class);
 
-    @Inject
-    private SettingsDAO settingsDAO;
     @Inject
     private EnvStatusDAO envDAO;
     
@@ -89,6 +83,7 @@ public class InfrasctructureResource implements InfrasctructureAPI {
      * @param userInfo user info.
      */
     @GET
+    
     @Path(ApiCallbacks.STATUS_URI+"_old")
     public HealthStatusDTO statusOld(@Auth UserInfo userInfo) {
         return new HealthStatusDTO()
@@ -97,25 +92,6 @@ public class InfrasctructureResource implements InfrasctructureAPI {
     }
 
     
-    @POST
-    @Path(ApiCallbacks.STATUS_URI + "_test")
-    public Response statusTest(@Auth UserInfo userInfo) {
-        LOGGER.debug("Looking ids of resources for user {}", userInfo.getName());
-
-        EnvResourceList resourceList = envDAO.findEnvResources(userInfo.getName());
-		EnvResourceDTO dto = new EnvResourceDTO()
-    			.withAwsRegion(settingsDAO.getAwsRegion())
-    			.withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-    			.withIamUserName(userInfo.getName())
-    			.withResourceList(resourceList);
-        LOGGER.debug("Ask docker for the status of resources for user {}: {}", userInfo.getName(), dto);
-    	
-		provisioningService.post(INFRASTRUCTURE_STATUS, userInfo.getAccessToken(), dto, EnvResourceDTO.class);
-    	
-        LOGGER.debug("Request has been send to docker");
-		return Response.ok().build();
-    }
-    
     /** Updates the status of the resources for user.
      * @param dto DTO info about the statuses of resources.
      * @return Always return code 200 (OK).
@@ -123,10 +99,14 @@ public class InfrasctructureResource implements InfrasctructureAPI {
     @POST
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(@Auth UserInfo userInfo, EnvStatusDTO dto) {
-        LOGGER.debug("Updating status for resources for user {}: {}", dto.getUser(), dto);
+        LOGGER.trace("Updating the status of resources for user {}: {}", dto.getUser(), dto);
         try {
-        	//envDAO.updateEnvResources(dto);
-        } catch (DlabException e) {
+        	if (UserInstanceStatus.FAILED == UserInstanceStatus.of(dto.getStatus())) {
+        		LOGGER.warn("Request for the status of resources for user {} fails: {}", dto.getUser(), dto.getErrorMessage());
+        	} else {
+        		envDAO.updateEnvStatus(dto.getUser(), dto.getResourceList());
+        	}
+        } catch (Throwable e) {
         	LOGGER.warn("Could not update status for resources for user {}: {}", dto.getUser(), e.getLocalizedMessage(), e);
         }
         // Always necessary send OK

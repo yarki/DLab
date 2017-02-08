@@ -39,8 +39,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     protected ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
     private static final String STATUS_FIELD = "status";
-    private static final String RESPONSE_NODE = "response";
-    private static final String RESULT_NODE = "result";
+    protected static final String RESPONSE_NODE = "response";
+    protected static final String RESULT_NODE = "result";
     private static final String ERROR_NODE = "error";
 
     private static final String OK_STATUS = "ok";
@@ -76,11 +76,11 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     }
     
     private void selfServicePost(T object) throws DlabException {
-        LOGGER.debug("Send post request to self service for UUID {}, object {}", originalUuid, object);
+        LOGGER.trace("Send post request to self service for UUID {}, object {}", originalUuid, object);
         try {
         	selfService.post(getCallbackURI(), accessToken, object, resultType);
-        } catch (Exception e) {
-        	LOGGER.error("Send request or responce error for UUID {}: {}", e.getLocalizedMessage(), originalUuid, e);
+        } catch (Throwable e) {
+        	LOGGER.error("Send request or response error for UUID {}: {}", e.getLocalizedMessage(), originalUuid, e);
         	throw new DlabException("Send request or responce error for UUID " + originalUuid + ": " + e.getLocalizedMessage(), e);
         }
     }
@@ -140,6 +140,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     private UserInstanceStatus calcStatus(DockerAction action, boolean success) {
         if (success) {
             switch (action) {
+            	case STATUS:
+            		return UserInstanceStatus.CREATED; // Any status besides failed
                 case CREATE:
                     return UserInstanceStatus.RUNNING;
                 case CONFIGURE:

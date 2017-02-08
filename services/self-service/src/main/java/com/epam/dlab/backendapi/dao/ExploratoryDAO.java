@@ -51,6 +51,7 @@ public class ExploratoryDAO extends BaseDAO {
     private static final String EXPLORATORY_URL_URL = "url";
     private static final String EXPLORATORY_USER = "exploratory_user";
     private static final String EXPLORATORY_PASSWORD = "exploratory_pass";
+    private static final String EXPLORATORY_PRIVATE_IP = "private_ip";
     protected static final String UPTIME = "up_time";
     protected static final String COMPUTATIONAL_RESOURCES = "computational_resources";
 
@@ -147,6 +148,7 @@ public class ExploratoryDAO extends BaseDAO {
         if (dto.getExploratoryId() != null) {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());
         }
+        
         if (dto.getExploratoryUrl() != null) {
             values.append(EXPLORATORY_URL, dto.getExploratoryUrl().stream()
                     .map(url -> new LinkedHashMap<String, String>() {{
@@ -154,6 +156,22 @@ public class ExploratoryDAO extends BaseDAO {
                         put(EXPLORATORY_URL_URL, url.getUrl());
                     }})
                     .collect(Collectors.toList()));
+        } else if (dto.getPrivateIp() != null) {
+        	UserInstanceDTO inst = fetchExploratoryFields(dto.getUser(),dto.getExploratoryName());
+	        if (!inst.getPrivateIp().equals(dto.getPrivateIp())) { // IP was changed
+	        	if (inst.getExploratoryUrl() != null) {
+	        		values.append(EXPLORATORY_URL, inst.getExploratoryUrl().stream()
+	                	.map(url -> new LinkedHashMap<String, String>() {{
+	                		put(EXPLORATORY_URL_DESC, url.getDescription());
+	                        put(EXPLORATORY_URL_URL, url.getUrl().replace(inst.getPrivateIp(),dto.getPrivateIp()));
+	                        }})
+	                	.collect(Collectors.toList()));
+	        	}
+	        }
+        }
+
+        if (dto.getPrivateIp() != null) {
+            values.append(EXPLORATORY_PRIVATE_IP, dto.getPrivateIp());
         }
         if (dto.getExploratoryUser() != null) {
             values.append(EXPLORATORY_USER, dto.getExploratoryUser());

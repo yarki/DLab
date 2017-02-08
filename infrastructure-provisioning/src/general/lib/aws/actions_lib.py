@@ -202,6 +202,13 @@ def create_instance(definitions, instance_tag):
             instances = ec2.create_instances(ImageId=definitions.ami_id, MinCount=1, MaxCount=1,
                                              BlockDeviceMappings=[
                                                  {
+                                                     "DeviceName": "/dev/sda1",
+                                                     "Ebs":
+                                                         {
+                                                             "VolumeSize": 12
+                                                         }
+                                                 },
+                                                 {
                                                      "DeviceName": "/dev/sdb",
                                                      "Ebs":
                                                          {
@@ -790,9 +797,9 @@ def get_files(s3client, s3resource, dist, bucket, local):
                 s3resource.meta.client.download_file(bucket, file.get('Key'), local + os.sep + file.get('Key'))
 
 
-def installing_python(args):
-    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
-    s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
+def installing_python(region, bucket, user_name, cluster_name):
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=region)
+    s3_client.download_file(bucket, user_name + '/' + cluster_name + '/python_version', '/tmp/python_version')
     with file('/tmp/python_version') as f:
         python_version = f.read()
     python_version = python_version[0:5]
@@ -810,3 +817,50 @@ def installing_python(args):
         local(venv_command + ' && sudo -i ' + pip_command + ' install -U pip --no-cache-dir')
         local(venv_command + ' && sudo -i ' + pip_command + ' install ipython ipykernel --no-cache-dir')
         local(venv_command + ' && sudo -i ' + pip_command + ' install boto boto3 NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
+
+
+def pyspark_kernel(kernels_dir, emr_version, cluster_name, spark_version, bucket, user_name, region):
+    spark_path = '/opt/' + emr_version + '/' + cluster_name + '/spark/'
+    local('mkdir -p ' + kernels_dir + 'pyspark_' + cluster_name + '/')
+    kernel_path = kernels_dir + "pyspark_" + cluster_name + "/kernel.json"
+    template_file = "/tmp/pyspark_emr_template.json"
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('CLUSTER_NAME', cluster_name)
+    text = text.replace('SPARK_VERSION', 'Spark-' + spark_version)
+    text = text.replace('SPARK_PATH', spark_path)
+    text = text.replace('PYTHON_SHORT_VERSION', '2.7')
+    text = text.replace('PYTHON_FULL_VERSION', '2.7')
+    text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
+    text = text.replace('EMR_VERSION', emr_version)
+    with open(kernel_path, 'w') as f:
+        f.write(text)
+    local('touch /tmp/kernel_var.json')
+    local(
+        "PYJ=`find /opt/" + emr_version + "/" + cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+    local('sudo mv /tmp/kernel_var.json ' + kernel_path)
+    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=region)
+    s3_client.download_file(bucket, user_name + '/' + cluster_name + '/python_version', '/tmp/python_version')
+    with file('/tmp/python_version') as f:
+        python_version = f.read()
+    # python_version = python_version[0:3]
+    if python_version != '\n':
+        installing_python(region, bucket, user_name, cluster_name)
+        local('mkdir -p ' + kernels_dir + 'py3spark_' + cluster_name + '/')
+        kernel_path = kernels_dir + "py3spark_" + cluster_name + "/kernel.json"
+        template_file = "/tmp/pyspark_emr_template.json"
+        with open(template_file, 'r') as f:
+            text = f.read()
+        text = text.replace('CLUSTER_NAME', cluster_name)
+        text = text.replace('SPARK_VERSION', 'Spark-' + spark_version)
+        text = text.replace('SPARK_PATH', spark_path)
+        text = text.replace('PYTHON_SHORT_VERSION', python_version[0:3])
+        text = text.replace('PYTHON_FULL_VERSION', python_version[0:5])
+        text = text.replace('PYTHON_PATH', '/opt/python/python' + python_version[:5] + '/bin/python' + python_version[:3])
+        text = text.replace('EMR_VERSION', emr_version)
+        with open(kernel_path, 'w') as f:
+            f.write(text)
+        local('touch /tmp/kernel_var.json')
+        local(
+            "PYJ=`find /opt/" + emr_version + "/" + cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+        local('sudo mv /tmp/kernel_var.json ' + kernel_path)

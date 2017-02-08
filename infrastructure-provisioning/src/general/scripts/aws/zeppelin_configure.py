@@ -109,9 +109,10 @@ if __name__ == "__main__":
                              "backend_hostname": get_instance_hostname(notebook_config['instance_name']),
                              "backend_port": "8080",
                              "nginx_template_dir": "/root/templates/"}
-        params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --os_user {}" \
+        params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --os_user {} --spark_version {} --hadoop_version {} --zeppelin_version {}" \
             .format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['aws_region'],
-                    json.dumps(additional_config), os.environ['conf_os_user'])
+                    json.dumps(additional_config), os.environ['conf_os_user'], os.environ['notebook_spark_version'],
+                    os.environ['notebook_hadoop_version'], os.environ['notebook_zeppelin_version'])
         try:
             local("~/scripts/{}.py {}".format('configure_zeppelin_node', params))
         except:
