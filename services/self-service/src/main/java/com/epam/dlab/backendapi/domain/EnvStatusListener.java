@@ -132,10 +132,11 @@ public class EnvStatusListener implements Managed, Runnable {
 	 */
 	private void checkStatus(EnvStatusListenerUserInfo userInfo) {
 		try {
+			LOGGER.trace("EnvStatus listener check status for user {}", userInfo.getUsername());
 			EnvResourceList resourceList = dao.findEnvResources(userInfo.username);
 			if (resourceList.getHostList() != null || resourceList.getClusterList() != null) {
 				userInfo.dto.withResourceList(resourceList);
-				LOGGER.debug("Ask docker for the status of resources for user {}: {}", userInfo.username, userInfo.dto);
+				LOGGER.trace("Ask docker for the status of resources for user {}: {}", userInfo.username, userInfo.dto);
 				provisioningService.post(InfrasctructureAPI.INFRASTRUCTURE_STATUS, userInfo.accessToken, userInfo.dto, String.class);
 			}
 		} catch (Exception e) {
@@ -151,7 +152,6 @@ public class EnvStatusListener implements Managed, Runnable {
 				for (Entry<String, EnvStatusListenerUserInfo> item : userMap.entrySet()) {
 					EnvStatusListenerUserInfo userInfo = item.getValue();
 					if (userInfo.getNextCheckTimeMillis() < ticks) {
-						LOGGER.debug("EnvStatus listener check status for user {}", item.getKey());
 						userInfo.setNextCheckTimeMillis(ticks + checkStatusTimeoutMillis);
 						checkStatus(userInfo);
 					}
@@ -159,7 +159,7 @@ public class EnvStatusListener implements Managed, Runnable {
 				
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				LOGGER.debug("EnvStatus listener has been interrupted");
+				LOGGER.trace("EnvStatus listener has been interrupted");
 				break;
 			} catch (Exception e) {
 				LOGGER.warn("EnvStatus listener unhandled error: {}", e.getLocalizedMessage(), e);
