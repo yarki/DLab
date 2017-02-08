@@ -43,65 +43,7 @@ def enable_proxy(proxy_host, proxy_port):
             sys.exit(1)
 
 
-def ensure_spark_scala(scala_link, spark_link, spark_version, hadoop_version, pyspark_local_path_dir, py3spark_local_path_dir, templates_dir, scala_kernel_path, scala_version, os_user, files_dir):
-    if not exists('/home/{}/.ensure_dir/spark_scala_ensured'.format(os_user)):
-        try:
-            sudo('yum install -y java-1.8.0-openjdk-devel')
-            sudo('yum install -y java-1.8.0-openjdk')
-            sudo('wget {}scala-{}.rpm -O /tmp/scala.rpm'.format(scala_link, scala_version))
-            sudo('rpm -i /tmp/scala.rpm')
-
-            sudo('wget ' + spark_link + ' -O /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz')
-            sudo('tar -zxvf /tmp/spark-' + spark_version + '-bin-hadoop' + hadoop_version + '.tgz -C /opt/')
-            sudo('mv /opt/spark-' + spark_version + '-bin-hadoop' + hadoop_version + ' /opt/spark')
-            sudo('mkdir -p ' + pyspark_local_path_dir)
-            sudo('mkdir -p ' + py3spark_local_path_dir)
-            sudo('touch ' + pyspark_local_path_dir + 'kernel.json')
-            sudo('touch ' + py3spark_local_path_dir + 'kernel.json')
-            put(templates_dir + 'pyspark_local_template.json', '/tmp/pyspark_local_template.json')
-            put(templates_dir + 'py3spark_local_template.json', '/tmp/py3spark_local_template.json')
-            sudo(
-                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/pyspark_local_template.json")
-            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/pyspark_local_template.json')
-            sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
-            sudo(
-                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/py3spark_local_template.json")
-            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/py3spark_local_template.json')
-            sudo('\cp /tmp/py3spark_local_template.json ' + py3spark_local_path_dir + 'kernel.json')
-            sudo('pip install --pre toree --no-cache-dir')
-            sudo('ln -s /opt/spark/ /usr/local/spark')
-            sudo('jupyter toree install')
-            sudo('mv ' + scala_kernel_path + 'lib/* /tmp/')
-            put(files_dir + 'toree-assembly-0.2.0.jar', '/tmp/toree-assembly-0.2.0.jar')
-            sudo('mv /tmp/toree-assembly-0.2.0.jar ' + scala_kernel_path + 'lib/')
-            sudo('sed -i "s|Apache Toree - Scala|Local Apache Toree - Scala (Scala-' + scala_version + ', Spark-' + spark_version + ')|g" ' + scala_kernel_path + 'kernel.json')
-            sudo('touch /home/{}/.ensure_dir/spark_scala_ensured'.format(os_user))
-        except:
-            sys.exit(1)
-
-
-def ensure_python3_kernel(os_user):
-    if not exists('/home/{}/.ensure_dir/python3_kernel_ensured'.format(os_user)):
-        try:
-            sudo('yum install -y python-setuptools python-wheel')
-            sudo('yum install -y python34-setuptools python34-pip')
-            sudo('yum install -y openssl-devel openssl-libs python-virtualenv python-devel python34-devel libxml2-devel libxslt-devel')
-            sudo('pip3 install ipython ipykernel --no-cache-dir')
-            sudo('python3 -m ipykernel install')
-            # Preserve Python 2 kernel
-            sudo('python2 -m pip install --upgrade setuptools pip')
-            sudo('python2 -m pip install backports.shutil_get_terminal_size ipython ipykernel')
-            sudo('echo y | python2 -m pip uninstall backports.shutil_get_terminal_size')
-            sudo('python2 -m pip install backports.shutil_get_terminal_size')
-            sudo('python2 -m ipykernel install')
-            sudo('touch /home/{}/.ensure_dir/python3_kernel_ensured'.format(os_user))
-        except:
-            sys.exit(1)
-
-
-def ensure_r_kernel(spark_version, os_user):
-    templates_dir = '/root/templates/'
-    kernels_dir = '/home/{}/.local/share/jupyter/kernels/'.format(os_user)
+def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
     if not exists('/home/{}/.ensure_dir/r_kernel_ensured'.format(os_user)):
         try:
             sudo('yum install -y cmake')
@@ -139,7 +81,7 @@ def ensure_matplot(os_user):
     if not exists('/home/{}/.ensure_dir/matplot_ensured'.format(os_user)):
         try:
             sudo('yum install -y python-matplotlib --nogpgcheck')
-            sudo('pip install matplotlib --no-cache-dir')
+            sudo('pip2 install matplotlib --no-cache-dir')
             sudo('pip3 install matplotlib --no-cache-dir')
             sudo('touch /home/{}/.ensure_dir/matplot_ensured'.format(os_user))
         except:
@@ -156,20 +98,6 @@ def ensure_sbt(os_user):
             sys.exit(1)
 
 
-def ensure_libraries_py2(os_user):
-    if not exists('/home/{}/.ensure_dir/ensure_libraries_py2_installed'.format(os_user)):
-        try:
-            sudo('export LC_ALL=C')
-            sudo('yum clean all')
-            sudo('yum install -y zlib-devel libjpeg-turbo-devel --nogpgcheck')
-            sudo('pip2 install -U pip --no-cache-dir')
-            sudo('pip2 install boto boto3 --no-cache-dir')
-            sudo('pip2 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn fabvenv fabric-virtualenv --no-cache-dir')
-            sudo('touch /home/{}/.ensure_dir/ensure_libraries_py2_installed'.format(os_user))
-        except:
-            sys.exit(1)
-
-
 def ensure_jre_jdk(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/jre_jdk_ensured'):
         try:
@@ -180,33 +108,74 @@ def ensure_jre_jdk(os_user):
             sys.exit(1)
 
 
-def ensure_python3_kernel_zeppelin(python3_version, os_user):
-    if not exists('/home/' + os_user + '/.ensure_dir/python3_kernel_ensured'):
+def ensure_scala(scala_link, scala_version, os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/scala_ensured'):
         try:
-            sudo('yum install -y yum-utils python34-pip python34 openssl-devel python34-devel')
-            sudo('pip3 install -U pip setuptools --no-cache-dir')
+            sudo('wget {}scala-{}.rpm -O /tmp/scala.rpm'.format(scala_link, scala_version))
+            sudo('rpm -i /tmp/scala.rpm')
+            sudo('touch /home/' + os_user + '/.ensure_dir/scala_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_additional_python_libs(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/additional_python_libs_ensured'):
+        try:
+            sudo('yum clean all')
+            sudo('yum install -y zlib-devel libjpeg-turbo-devel --nogpgcheck')
+            if os.environ['application'] == 'jupyter' or os.environ['application'] == 'zeppelin':
+                sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+                sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+            if os.environ['application'] == 'tensor':
+                sudo('pip2 install keras opencv-python h5py --no-cache-dir')
+                sudo('python2 -m ipykernel install')
+                sudo('pip3 install keras opencv-python h5py --no-cache-dir')
+                sudo('python3 -m ipykernel install')
+            sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_python3_specific_version(python3_version, os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/python3_specific_version_ensured'):
+        try:
+            sudo('yum install -y yum-utils python34 openssl-devel')
             sudo('yum -y groupinstall development')
             if len(python3_version) < 4:
                 python3_version = python3_version + ".0"
             sudo('wget https://www.python.org/ftp/python/{0}/Python-{0}.tgz'.format(python3_version))
             sudo('tar xzf Python-{0}.tgz; cd Python-{0}; ./configure --prefix=/usr/local; make altinstall'.format(python3_version))
-            sudo('touch /home/' + os_user + '/.ensure_dir/python3_kernel_ensured')
+            sudo('touch /home/' + os_user + '/.ensure_dir/python3_specific_version_ensured')
         except:
             sys.exit(1)
 
 
-def ensure_libraries_py(os_user):
-    if not exists('/home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed'):
+def ensure_python2_libraries(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/python2_libraries_ensured'):
         try:
-            sudo('export LC_ALL=C')
-            sudo('yum install -y python34-pip python-virtualenv openssl-devel python-devel python34-devel')
+            sudo('yum install -y https://forensics.cert.org/centos/cert/7/x86_64/pyparsing-2.0.3-1.el7.noarch.rpm')
+            sudo('yum install -y python-setuptools python-wheel')
+            sudo('yum install -y python-virtualenv openssl-devel python-devel openssl-libs libxml2-devel libxslt-devel')
+            sudo('python2 -m pip install backports.shutil_get_terminal_size ipython ipykernel')
+            sudo('echo y | python2 -m pip uninstall backports.shutil_get_terminal_size')
+            sudo('python2 -m pip install backports.shutil_get_terminal_size')
             sudo('pip2 install -U pip setuptools --no-cache-dir')
-            sudo('pip3 install -U pip setuptools --no-cache-dir')
             sudo('pip2 install boto3 --no-cache-dir')
             sudo('pip2 install fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('touch /home/' + os_user + '/.ensure_dir/python2_libraries_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_python3_libraries(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/python3_libraries_ensured'):
+        try:
+            sudo('yum install -y python34-pip python34-devel')
+            sudo('pip3 install -U pip setuptools --no-cache-dir')
             sudo('pip3 install boto3 --no-cache-dir')
             sudo('pip3 install fabvenv fabric-virtualenv --no-cache-dir')
-            sudo('touch /home/' + os_user + '/.ensure_dir/ensure_libraries_py_installed')
+            sudo('pip3 install ipython ipykernel --no-cache-dir')
+            sudo('touch /home/' + os_user + '/.ensure_dir/python3_libraries_ensured')
         except:
             sys.exit(1)
 
@@ -259,9 +228,9 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo('yum clean all')
             sudo('yum -y install cuda')
             sudo('pip3 innstall --upgrade pip wheel numpy')
-
             sudo('mv /usr/local/cuda-8.0 /opt/')
             sudo('ln -s /opt/cuda-8.0 /usr/local/cuda-8.0')
+            sudo('rm -f /home/' + os_user + '/cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64-rpm')
             # install cuDNN
             put(files_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
             run('tar xvzf /tmp/cudnn-8.0-linux-x64-v5.1.tgz -C /tmp')
@@ -282,6 +251,8 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/tensorboard-python*")
             sudo("chmod 644 /tmp/tensorboard-python*")
             sudo('\cp /tmp/tensorboard-python* /etc/systemd/system/')
+            sudo('mkdir -p /var/log/tensorboard_py2; chown ' + os_user + ':' + os_user + ' -R /var/log/tensorboard_py2')
+            sudo('mkdir -p /var/log/tensorboard_py3; chown ' + os_user + ':' + os_user + ' -R /var/log/tensorboard_py3')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable tensorboard-python2")
             sudo("systemctl enable tensorboard-python3")

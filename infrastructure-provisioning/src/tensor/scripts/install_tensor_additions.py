@@ -25,7 +25,6 @@ import argparse
 import json
 import sys
 from dlab.notebook_lib import *
-from dlab.fab import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
@@ -50,3 +49,4 @@ if __name__ == "__main__":
 
     print "Installing notebook additions: matplotlib."
     ensure_matplot(args.os_user)
+

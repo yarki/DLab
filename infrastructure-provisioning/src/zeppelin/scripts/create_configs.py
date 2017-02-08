@@ -54,6 +54,7 @@ yarn_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/conf/'
 
 def configure_zeppelin_emr_interpreter(args):
     try:
+        zeppelin_restarted = False
         spark_libs = "/opt/" + args.emr_version + "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-core*.jar /opt/" + args.emr_version + "/jars/usr/lib/hadoop/hadoop-aws*.jar /opt/" + args.emr_version + "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-s3-*.jar /opt/" + args.emr_version + "/jars/usr/lib/hadoop-lzo/lib/hadoop-lzo-*.jar"
         local('echo \"Configuring emr path for Zeppelin\"')
         local('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/' + args.emr_version + '\/' + args.cluster_name + '\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
@@ -61,8 +62,11 @@ def configure_zeppelin_emr_interpreter(args):
         local('echo \"spark.jars $(ls ' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/' + args.emr_version + '/' + args.cluster_name + '/spark/conf/spark-defaults.conf')
         local('echo \"spark.executorEnv.PYTHONPATH pyspark.zip:py4j-src.zip\" >> /opt/' + args.emr_version + '/' + args.cluster_name + '/spark/conf/spark-defaults.conf')
         local('sed -i \'/spark.yarn.dist.files/s/$/,file:\/opt\/' + args.emr_version + '\/' + args.cluster_name + '\/spark\/python\/lib\/py4j-src.zip,file:\/opt\/' + args.emr_version + '\/' + args.cluster_name + '\/spark\/python\/lib\/pyspark.zip/\' /opt/' + args.emr_version + '/' +  args.cluster_name + '/spark/conf/spark-defaults.conf')
-        local('service zeppelin-notebook restart')
-        local('sleep 5')
+        local('sudo service zeppelin-notebook restart')
+        while not zeppelin_restarted:
+            result = local('nc -z localhost 8080; echo $?', capture=True)
+            if result == '0':
+                zeppelin_restarted = True
         local('echo \"Configuring emr spark interpreter for Zeppelin\"')
         template_file = "/tmp/emr_spark_interpreter.json"
         p_versions = ["2", "3"]
