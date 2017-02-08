@@ -29,7 +29,7 @@ import sys
 parser = argparse.ArgumentParser()
 parser.add_argument('--hostname', type=str, default='')
 parser.add_argument('--keyfile', type=str, default='')
-parser.add_argument('--pip_packages', type=str, default='boto3 argparse fabric jupyter awscli')
+parser.add_argument('--pip_packages', type=str, default='boto3 argparse fabric awscli')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 parser.add_argument('--user', type=str, default='')
 args = parser.parse_args()
