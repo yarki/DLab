@@ -36,17 +36,16 @@ parser.add_argument('--keyfile', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--additional_config', type=str, default='{"empty":"string"}')
 parser.add_argument('--os_user', type=str, default='')
+parser.add_argument('--spark_version', type=str, default='')
+parser.add_argument('--hadoop_version', type=str, default='')
+parser.add_argument('--zeppelin_version', type=str, default='')
 args = parser.parse_args()
 
-spark_version = os.environ['notebook_spark_version']
-hadoop_version = os.environ['notebook_hadoop_version']
-latest_zeppelin_version = "0.7.0"
-latest_zeppelin_link = "http://www-us.apache.org/dist/zeppelin/zeppelin-" + latest_zeppelin_version + "/zeppelin-" + \
-                       latest_zeppelin_version + "-bin-netinst.tgz"
-old_zeppelin_version = "0.6.2"
-old_zeppelin_link = "http://archive.apache.org/dist/zeppelin/zeppelin-" + old_zeppelin_version + \
-                    "/zeppelin-" + old_zeppelin_version + "-bin-netinst.tgz"
-zeppelin_version = ''
+spark_version = args.spark_version
+hadoop_version = args.hadoop_version
+zeppelin_version = args.zeppelin_version
+zeppelin_link = "http://archive.apache.org/dist/zeppelin/zeppelin-" + zeppelin_version + "/zeppelin-" + \
+                zeppelin_version + "-bin-netinst.tgz"
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
 zeppelin_interpreters = "md,python"
 python3_version = "3.4"
@@ -59,13 +58,7 @@ s3_jars_dir = '/opt/jars/'
 def configure_zeppelin(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/zeppelin_ensured'):
         try:
-            try:
-                sudo('wget ' + latest_zeppelin_link + ' -O /tmp/zeppelin-' + latest_zeppelin_version
-                     + '-bin-netinst.tgz')
-                zeppelin_version = latest_zeppelin_version
-            except:
-                sudo('wget ' + old_zeppelin_link + ' -O /tmp/zeppelin-' + old_zeppelin_version + '-bin-netinst.tgz')
-                zeppelin_version = old_zeppelin_version
+            sudo('wget ' + zeppelin_link + ' -O /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz')
             sudo('tar -zxvf /tmp/zeppelin-' + zeppelin_version + '-bin-netinst.tgz -C /opt/')
             sudo('ln -s /opt/zeppelin-' + zeppelin_version + '-bin-netinst /opt/zeppelin')
             sudo('cp /opt/zeppelin/conf/zeppelin-env.sh.template /opt/zeppelin/conf/zeppelin-env.sh')
