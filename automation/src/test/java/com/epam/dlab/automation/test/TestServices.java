@@ -94,7 +94,7 @@ public class TestServices {
         InstanceState instanceState = ssnInstance.getState();
         publicIp = ssnInstance.getPublicIpAddress();
         LOGGER.info("Public Ip is: {}", publicIp);
-        Assert.assertEquals(instanceState.getName(), AmazonInstanceState.RUNNING,
+        Assert.assertEquals(instanceState.getName(), AmazonInstanceState.RUNNING.value(),
                             "AmazonHelper instance state is not running");
         LOGGER.info("AmazonHelper instance state is running");
     }
@@ -304,7 +304,7 @@ public class TestServices {
         Assert.assertEquals(respStartNotebook.statusCode(), HttpStatusCode.OK);
         
         gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, noteBookName, "starting", PropertyValue.getTimeoutNotebookStartup());
-        if (!gettingStatus.contains("running"))
+        if (!gettingStatus.contains(AmazonInstanceState.RUNNING.value()))
             throw new Exception("Notebook " + noteBookName + " has not been started");
         LOGGER.info("    Notebook {} has been started", noteBookName);
 
@@ -332,7 +332,7 @@ public class TestServices {
         
         LOGGER.info("   Waiting until EMR has been configured ...");
         gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrNewName, "configuring", PropertyValue.getTimeoutEMRCreate());
-        if (!gettingStatus.contains("running"))
+        if (!gettingStatus.contains(AmazonInstanceState.RUNNING.value()))
             throw new Exception("EMR " + emrNewName + " has not been configured");
         LOGGER.info("   EMR {} has been configured", emrNewName);
 
@@ -381,7 +381,7 @@ public class TestServices {
         
         LOGGER.info("   Waiting until EMR has been configured ...");
         gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrNewName2, "configuring", PropertyValue.getTimeoutEMRCreate());
-        if (!gettingStatus.contains("running"))
+        if (!gettingStatus.contains(AmazonInstanceState.RUNNING.value()))
             throw new Exception("EMR " + emrNewName2 + " has not been configured");
         LOGGER.info("   EMR  {} has been configured", emrNewName2);
 
