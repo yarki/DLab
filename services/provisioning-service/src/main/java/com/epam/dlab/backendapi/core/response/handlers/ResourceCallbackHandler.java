@@ -79,8 +79,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         LOGGER.trace("Send post request to self service for UUID {}, object {}", originalUuid, object);
         try {
         	selfService.post(getCallbackURI(), accessToken, object, resultType);
-        } catch (Exception e) {
-        	LOGGER.error("Send request or responce error for UUID {}: {}", e.getLocalizedMessage(), originalUuid, e);
+        } catch (Throwable e) {
+        	LOGGER.error("Send request or response error for UUID {}: {}", e.getLocalizedMessage(), originalUuid, e);
         	throw new DlabException("Send request or responce error for UUID " + originalUuid + ": " + e.getLocalizedMessage(), e);
         }
     }

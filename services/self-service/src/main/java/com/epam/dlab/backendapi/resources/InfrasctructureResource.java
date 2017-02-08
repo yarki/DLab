@@ -39,7 +39,6 @@ import com.epam.dlab.backendapi.resources.dto.HealthStatusDTO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.contracts.HealthChecker;
 import com.epam.dlab.dto.status.EnvStatusDTO;
-import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
 import com.epam.dlab.rest.contracts.InfrasctructureAPI;
@@ -95,7 +94,7 @@ public class InfrasctructureResource implements InfrasctructureAPI {
         	} else {
         		envDAO.updateEnvStatus(dto.getUser(), dto.getResourceList());
         	}
-        } catch (DlabException e) {
+        } catch (Throwable e) {
         	LOGGER.warn("Could not update status for resources for user {}: {}", dto.getUser(), e.getLocalizedMessage(), e);
         }
         // Always necessary send OK

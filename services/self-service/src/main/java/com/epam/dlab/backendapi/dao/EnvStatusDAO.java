@@ -334,6 +334,9 @@ public class EnvStatusDAO extends BaseDAO {
     		}
     		
     		// Update computational
+    		if (list.getClusterList() == null) {
+    			continue;
+    		}
 			@SuppressWarnings("unchecked")
 			List<Document> compList = (List<Document>) exp.get(COMPUTATIONAL_RESOURCES);
 			if (compList == null) {
