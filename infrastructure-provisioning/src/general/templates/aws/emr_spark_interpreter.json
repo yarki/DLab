@@ -1,6 +1,6 @@
 {
-  "name": "PySpark (Python-PYTHON_FULL_VERSION / SPARK_VERSION) [CLUSTER_NAME]",
-  "group": "spark",
+  "name": "PySpark (Python-PYTHON_FULL_VERSION_FOR_NAME / SPARK_VERSION) [CLUSTER_NAME]",
+  "group": "livy",
   "properties": {
     "zeppelin.livy.concurrentSQL": "false",
     "livy.spark.master": "local[*]",
@@ -22,11 +22,6 @@
     "zeppelin.pyspark.python": "pythonPYTHON_FULL_VERSION",
     "zeppelin.dep.localrepo": "local-repo",
     "zeppelin.dep.additionalRemoteRepository": "spark-packages,http://dl.bintray.com/spark-packages/maven,false;",
-    "livy.spark.yarn.jar": "",
-    "livy.spark.driver.extraClassPath": ":/usr/lib/hadoop-lzo/lib/*:/usr/lib/hadoop/hadoop-aws.jar:/usr/share/aws/aws-java-sdk/*:/usr/share/aws/emr/emrfs/conf:/usr/share/aws/emr/emrfs/lib/*:/usr/share/aws/emr/emrfs/auxlib/*:/usr/share/aws/emr/security/conf:/usr/share/aws/emr/security/lib/* ",
-    "livy.spark.executor.extraClassPath": ":/usr/lib/hadoop-lzo/lib/*:/usr/lib/hadoop/hadoop-aws.jar:/usr/share/aws/aws-java-sdk/*:/usr/share/aws/emr/emrfs/conf:/usr/share/aws/emr/emrfs/lib/*:/usr/share/aws/emr/emrfs/auxlib/*:/usr/share/aws/emr/security/conf:/usr/share/aws/emr/security/lib/* ",
-    "livy.spark.executor.extraLibraryPath": "/usr/lib/hadoop/lib/native:/usr/lib/hadoop-lzo/lib/native",
-    "livy.spark.driver.extraLibraryPath": "/usr/lib/hadoop/lib/native:/usr/lib/hadoop-lzo/lib/native",
     "livy.spark.hadoop.fs.s3a.fast.upload": "true"
   },
     "interpreterGroup": [

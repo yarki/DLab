@@ -910,7 +910,8 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
             fr = open(template_file, 'r+')
             text = fr.read()
             text = text.replace('CLUSTER_NAME', cluster_name)
-            text = text.replace('PYTHON_FULL_VERSION', p_version.replace('.', ','))
+            text = text.replace('PYTHON_FULL_VERSION', p_version)
+            text = text.replace('PYTHON_FULL_VERSION_FOR_NAME', p_version.replace('.', ','))
             text = text.replace('SPARK_VERSION', spark_version.replace('.', ','))
             text = text.replace('CLUSTER_NAME', cluster_name)
             text = text.replace('SPARK_HOME', spark_dir)
@@ -937,7 +938,7 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
                     local('sleep 5')
                     pass
         local('sudo echo "livy.server.port = ' + str(livy_port) + '" >> ' + livy_path + 'conf/livy.conf')
-        local(''' sudo echo "SPARK_HOME=' ''' + spark_dir + ''' '" >> ''' + livy_path + '''conf/livy-env.sh''')
+        local(''' sudo echo "SPARK_HOME=''' + spark_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
         local('sudo sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
         local('sudo ' + livy_path + 'bin/livy-server start')
         local('touch /home/' + os_user + '/.ensure_dir/emr_' + cluster_name + '_interpreter_ensured')

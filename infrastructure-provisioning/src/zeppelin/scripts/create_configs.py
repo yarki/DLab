@@ -58,12 +58,13 @@ def install_remote_livy(args):
     install_maven_emr()
     install_livy_dependencies_emr()
     with lcd('/opt/' + args.emr_version + '/' + args.cluster_name + '/'):
-        local('sudo -i git init')
+        local('sudo chown -R ' + args.os_user + ':' + args.os_user + ' /opt/' + args.emr_version + '/')
+        local('git init')
         local('sudo rm -rf /opt/' + args.emr_version + '/' + args.cluster_name + '/livy/')
-        local('sudo -i git clone https://github.com/cloudera/livy.git')
+        local('git clone https://github.com/cloudera/livy.git')
     livy_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/livy/'
     with lcd(livy_path):
-        local('sudo -i mvn package -f ' + livy_path + 'pom.xml -DskipTests -Dhttp.proxyHost=' +
+        local('mvn package -DskipTests -Dhttp.proxyHost=' +
               args.edge_hostname + ' -Dhttp.proxyPort=' + args.proxy_port + ' -Dhttps.proxyHost=' +
               args.edge_hostname + ' -Dhttps.proxyPort=' + args.proxy_port)
     local('sudo mkdir -p /var/run/livy')

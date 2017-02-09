@@ -49,11 +49,13 @@ def enable_proxy(proxy_host, proxy_port):
 def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/r_local_kernel_ensured'):
         try:
+            sudo('R -e "IRkernel::installspec()"')
             r_version = sudo("R --version | awk '/version / {print $3}'")
             put(templates_dir + 'r_template.json', '/tmp/r_template.json')
             sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
             sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
             sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
+            sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
             sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
             sudo('touch /home/' + os_user + '/.ensure_dir/r_local_kernel_ensured')
         except:
@@ -79,8 +81,6 @@ def ensure_r(os_user):
             sudo('R -e "library(\'devtools\');install.packages(repos=\'http://cran.us.r-project.org\',c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
-            sudo('R -e "IRkernel::installspec()"')
-            sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
             sudo('touch /home/' + os_user + '/.ensure_dir/r_ensured')
         except:
             sys.exit(1)
