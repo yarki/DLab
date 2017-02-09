@@ -119,13 +119,13 @@ limitations under the License.
   border-radius: 50%;
   z-index: 1;
 }
-.navbar .statusbar .ok {
+.navbar .statusbar .OK {
   color: #81b44a;
 }
-.navbar .statusbar .warning {
+.navbar .statusbar .WARNING {
   color: #f7b500;
 }
-.navbar .statusbar .critical {
+.navbar .statusbar .ERROR {
   color: #ef5c4b;
 }
 

@@ -48,10 +48,8 @@ export class HealthStatusComponent {
   loadHealthStatusList(healthStatusList): Array<EnvironmentStatusModel> {
     return healthStatusList.list_resources.map((value) => {
       return new EnvironmentStatusModel(
-        value.instance_type,
-        value.cloud_type,
-        value.instance_ip,
-        value.instance_path,
+        value.type,
+        value.resource_id,
         value.status);
     });
   }

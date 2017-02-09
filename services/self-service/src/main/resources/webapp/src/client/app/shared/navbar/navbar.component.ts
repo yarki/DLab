@@ -31,7 +31,7 @@ import { UserResourceService } from '../../services/userResource.service';
 
 export class NavbarComponent implements OnInit {
   currentUserName: string;
-  healthStatus: string;
+  healthStatus: any;
 
   constructor(
     private applicationSecurityService: ApplicationSecurityService,
@@ -59,7 +59,7 @@ export class NavbarComponent implements OnInit {
   getEnvironmentHealthStatus() {
     this.userResourceService.getEnvironmentHealthStatus()
       .subscribe((result) => {
-        console.log(result);
+        this.healthStatus = result.status;
       });
   }
 }
