@@ -78,7 +78,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     }
     
     private void selfServicePost(T object) throws DlabException {
-        LOGGER.debug("Send post request to self service for UUID {}, object {}", originalUuid, object);
+        LOGGER.debug("Send post request to self service " + getCallbackURI() + " for UUID {}, object {}", originalUuid, object);
         try {
         	selfService.post(getCallbackURI(), accessToken, object, resultType);
         } catch (Exception e) {

@@ -48,8 +48,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.util.Optional;
-
 import static com.epam.dlab.UserInstanceStatus.*;
 
 /** Provides the REST API for the exploratory.
