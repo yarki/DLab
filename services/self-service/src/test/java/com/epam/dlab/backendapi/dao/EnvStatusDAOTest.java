@@ -34,6 +34,9 @@ import org.junit.Test;
 
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
+import com.epam.dlab.backendapi.resources.dto.HealthStatusEnum;
+import com.epam.dlab.backendapi.resources.dto.HealthStatusPageDTO;
+import com.epam.dlab.backendapi.resources.dto.HealthStatusResource;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.dto.status.EnvResourceList;
@@ -86,12 +89,12 @@ public class EnvStatusDAOTest extends DAOTestBase {
         private String instanceId;
         @JsonProperty("edge_status")
         private String edgeStatus;
-        @JsonProperty("ip")
-        private String privateIp;
+        @JsonProperty("public_ip")
+        private String publicIp;
     }
 
     @Test
-    public void findEnvResources() {
+    public void testEnvStatus() {
     	final String user = "user1";
     	final String exploratoryName = "exp1";
     	final String computationalName = "comp1";
@@ -99,7 +102,7 @@ public class EnvStatusDAOTest extends DAOTestBase {
     	// Add EDGE
     	EdgeInfo edge = new EdgeInfo();
     	edge.instanceId = "instance0";
-    	edge.privateIp = "privIp";
+    	edge.publicIp = "35.23.78.35";
     	edge.edgeStatus = "stopped";
     	expDAO.insertOne(USER_AWS_CREDENTIALS, edge, user);
     	
@@ -146,9 +149,15 @@ public class EnvStatusDAOTest extends DAOTestBase {
         // Check new status
         UserAWSCredentialDTO userCred = keyDAO.getUserAWSCredential(user);
         assertEquals("running", userCred.getEdgeStatus());
-        
         assertEquals("stopped", expDAO.fetchExploratoryStatus(user, exploratoryName).toString());
         assertEquals("terminating", compDAO.fetchComputationalFields(user, exploratoryName, computationalName).getStatus());
+        
+        // Health status
+        HealthStatusPageDTO hStatus = envDAO.getHealthStatusPageDTO(user);
+        assertEquals(hStatus.getStatus(), HealthStatusEnum.OK);
+        HealthStatusResource rStatus = hStatus.getListResources().get(0);
+        assertEquals(rStatus.getStatus(), "running");
+        assertEquals(rStatus.getResourceId(), edge.publicIp);
     }
 
 }

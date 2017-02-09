@@ -23,49 +23,51 @@ import com.google.common.base.MoreObjects;
 
 import java.util.List;
 
-/** Stores the health statuses for services.
+/** Stores the health statuses for environment resources.
  */
 public class HealthStatusPageDTO {
-    @JsonProperty("status")
+    @JsonProperty
     private HealthStatusEnum status;
     @JsonProperty("list_resources")
-    private List<HealthStatusResourcePageDTO> listResources;
+    private List<HealthStatusResource> listResources;
 
+    /** Return the status of environment. */
     public HealthStatusEnum getStatus() {
         return status;
     }
 
+    /** Set the status of environment. */
     public void setStatus(HealthStatusEnum status) {
         this.status = status;
     }
 
-    public List<HealthStatusResourcePageDTO> getListResources() {
-        return listResources;
-    }
-
-    public void setListResources(List<HealthStatusResourcePageDTO> listResources) {
-        this.listResources = listResources;
-    }
-
+    /** Set the status of environment. */
     public HealthStatusPageDTO withStatus(HealthStatusEnum status) {
         setStatus(status);
         return this;
     }
 
-    public HealthStatusPageDTO withListResources(List<HealthStatusResourcePageDTO> listResources) {
+    /** Return the list of resources. */
+    public List<HealthStatusResource> getListResources() {
+        return listResources;
+    }
+
+    /** Set the list of resources. */
+    public void setListResources(List<HealthStatusResource> listResources) {
+        this.listResources = listResources;
+    }
+
+    /** Set the list of resources. */
+    public HealthStatusPageDTO withListResources(List<HealthStatusResource> listResources) {
         setListResources(listResources);
         return this;
     }
-
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("status", status)
-                .add("provisioningAlive", listResources)
+                .add("listResources", listResources)
                 .toString();
     }
-
-
-
 }
