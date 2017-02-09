@@ -3,7 +3,7 @@
   "group": "livy",
   "properties": {
     "zeppelin.livy.concurrentSQL": "false",
-    "livy.spark.master": "local[*]",
+    "livy.spark.master": "yarn",
     "livy.spark.home":"SPARK_HOME",
     "livy.pyspark.python": "pythonPYTHON_FULL_VERSION",
     "livy.spark.hadoop.fs.s3a.endpoint": "https://s3-AWS_REGION.amazonaws.com",

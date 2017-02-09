@@ -899,12 +899,22 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
         local('sleep 5')
         local('echo \"Configuring emr spark interpreter for Zeppelin\"')
         installing_python(region, bucket, user_name, cluster_name)
+        while not port_number_found:
+            port_free = local('sudo nc -z localhost ' + str(default_port) + '; echo $?', capture=True)
+            if port_free == '1':
+                livy_port = default_port
+                port_number_found = True
+            else:
+                default_port += 1
+        local('sudo echo "livy.server.port = ' + str(livy_port) + '" >> ' + livy_path + 'conf/livy.conf')
+        local(''' sudo echo "SPARK_HOME=''' + spark_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
+        local('sudo sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
         s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=region)
         s3_client.download_file(bucket, user_name + '/' + cluster_name + '/python_version',
                                 '/tmp/python_version')
         with file('/tmp/python_version') as f:
             python_version = f.read()
-        template_file = "/tmp/emr_spark_interpreter.json"
+        template_file = "/tmp/emr_pyspark_interpreter.json"
         p_versions = ["2.7", python_version[0:5]]
         for p_version in p_versions:
             fr = open(template_file, 'r+')
@@ -913,16 +923,8 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
             text = text.replace('PYTHON_FULL_VERSION', p_version)
             text = text.replace('PYTHON_FULL_VERSION_FOR_NAME', p_version.replace('.', ','))
             text = text.replace('SPARK_VERSION', spark_version.replace('.', ','))
-            text = text.replace('CLUSTER_NAME', cluster_name)
             text = text.replace('SPARK_HOME', spark_dir)
             text = text.replace('AWS_REGION', region)
-            while not port_number_found:
-                port_free = local('sudo nc -z localhost ' + str(default_port) + '; echo $?', capture=True)
-                if port_free == '1':
-                    livy_port = default_port
-                    port_number_found = True
-                else:
-                    default_port += 1
             text = text.replace('LIVY_PORT', str(livy_port))
             tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
             fw = open(tmp_file, 'w')
@@ -937,9 +939,48 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
                 except:
                     local('sleep 5')
                     pass
-        local('sudo echo "livy.server.port = ' + str(livy_port) + '" >> ' + livy_path + 'conf/livy.conf')
-        local(''' sudo echo "SPARK_HOME=''' + spark_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
-        local('sudo sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
+        scala_version = local("dpkg -l scala | grep scala | awk '{print $3}'", capture=True)
+        template_file = "/tmp/emr_scala_interpreter.json"
+        fr = open(template_file, 'r+')
+        text = fr.read()
+        text = text.replace('CLUSTER_NAME', cluster_name)
+        text = text.replace('SCALA_VERSION', scala_version.replace('.', ','))
+        text = text.replace('SPARK_VERSION', spark_version.replace('.', ','))
+        text = text.replace('SPARK_HOME', spark_dir)
+        text = text.replace('AWS_REGION', region)
+        text = text.replace('LIVY_PORT', str(livy_port))
+        fw = open(template_file, 'w')
+        fw.write(text)
+        fw.close()
+        for _ in range(5):
+            try:
+                local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d " +
+                      "@/tmp/emr_scala_interpreter.json http://localhost:8080/api/interpreter/setting")
+                break
+            except:
+                local('sleep 5')
+                pass
+        r_version = local("R --version | awk '/version / {print $3}'", capture=True)
+        template_file = "/tmp/emr_r_interpreter.json"
+        fr = open(template_file, 'r+')
+        text = fr.read()
+        text = text.replace('CLUSTER_NAME', cluster_name)
+        text = text.replace('R_VERSION', r_version.replace('.', ','))
+        text = text.replace('SPARK_VERSION', spark_version.replace('.', ','))
+        text = text.replace('SPARK_HOME', spark_dir)
+        text = text.replace('AWS_REGION', region)
+        text = text.replace('LIVY_PORT', str(livy_port))
+        fw = open(template_file, 'w')
+        fw.write(text)
+        fw.close()
+        for _ in range(5):
+            try:
+                local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d " +
+                      "@/tmp/emr_r_interpreter.json http://localhost:8080/api/interpreter/setting")
+                break
+            except:
+                local('sleep 5')
+                pass
         local('sudo ' + livy_path + 'bin/livy-server start')
         local('touch /home/' + os_user + '/.ensure_dir/emr_' + cluster_name + '_interpreter_ensured')
     except:

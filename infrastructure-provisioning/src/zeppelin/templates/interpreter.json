@@ -26,6 +26,10 @@
       },
       "interpreterGroup": [
         {
+          "class": "org.apache.zeppelin.livy.LivySparkInterpreter",
+          "name": "spark"
+        },
+        {
           "class": "org.apache.zeppelin.spark.PySparkInterpreter",
           "name": "pyspark"
         }
@@ -64,6 +68,10 @@
       },
       "interpreterGroup": [
         {
+          "class": "org.apache.zeppelin.livy.LivySparkInterpreter",
+          "name": "spark"
+        },
+        {
           "class": "org.apache.zeppelin.spark.PySparkInterpreter",
           "name": "pyspark"
         }
@@ -77,8 +85,8 @@
       }
     },
     "2C6RJRBD3": {
-      "id": "2C6RJRBD2",
-      "name": "Local Scala (Scala-SCALA_VERSION / Spark-SP_VER)",
+      "id": "2C6RJRBD3",
+      "name": "Local Spark Scala (Scala-SCALA_VERSION / Spark-SP_VER)",
       "group": "livy",
       "properties": {
         "zeppelin.livy.concurrentSQL": "false",
@@ -101,8 +109,12 @@
       },
       "interpreterGroup": [
         {
-          "class": "org.apache.zeppelin.spark.SparkInterpreter",
+          "class": "org.apache.zeppelin.livy.LivySparkInterpreter",
           "name": "spark"
+        },
+        {
+          "class": "org.apache.zeppelin.spark.SparkInterpreter",
+          "name": "scala"
         }
       ],
       "dependencies": [],
@@ -114,8 +126,8 @@
       }
     },
     "2C6RJRBD4": {
-      "id": "2C6RJRBD2",
-      "name": "Local R (R-R_VERSION / Spark-SP_VER)",
+      "id": "2C6RJRBD4",
+      "name": "Local SparkR (R-R_VERSION / Spark-SP_VER)",
       "group": "livy",
       "properties": {
         "zeppelin.livy.concurrentSQL": "false",
@@ -142,8 +154,12 @@
       },
       "interpreterGroup": [
         {
+          "class": "org.apache.zeppelin.livy.LivySparkInterpreter",
+          "name": "spark"
+        },
+        {
           "class": "org.apache.zeppelin.spark.SparkRInterpreter",
-          "name": "r"
+          "name": "sparkr"
         }
       ],
       "dependencies": [],
