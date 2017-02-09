@@ -153,7 +153,7 @@ public class EnvStatusDAOTest extends DAOTestBase {
         assertEquals("terminating", compDAO.fetchComputationalFields(user, exploratoryName, computationalName).getStatus());
         
         // Health status
-        HealthStatusPageDTO hStatus = envDAO.getHealthStatusPageDTO(user);
+        HealthStatusPageDTO hStatus = envDAO.getHealthStatusPageDTO(user, true);
         assertEquals(hStatus.getStatus(), HealthStatusEnum.OK);
         HealthStatusResource rStatus = hStatus.getListResources().get(0);
         assertEquals(rStatus.getStatus(), "running");

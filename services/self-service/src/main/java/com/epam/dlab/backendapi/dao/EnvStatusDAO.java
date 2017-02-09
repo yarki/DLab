@@ -307,10 +307,11 @@ public class EnvStatusDAO extends BaseDAO {
 	}
 
     /** Finds and returns the of computational resource.
-     * @param user user name.
+     * @param user the name of user.
+     * @param fullReport return full report if <b>true</b> otherwise common status only.
      * @exception DlabException
      */
-    public HealthStatusPageDTO getHealthStatusPageDTO(String user) throws DlabException {
+    public HealthStatusPageDTO getHealthStatusPageDTO(String user, boolean fullReport) throws DlabException {
         List<HealthStatusResource> listResource = new ArrayList<>();
         HealthStatusEnum commonStatus = HealthStatusEnum.OK;
         
@@ -318,18 +319,20 @@ public class EnvStatusDAO extends BaseDAO {
         Document edge = getEdgeNode(user);
         if (edge != null) {
             String edgeStatus = edge.getString(EDGE_STATUS);
-            listResource.add(new HealthStatusResource()
-            					.withType("Edge Node")
-            					.withResourceId(edge.getString(EDGE_PUBLIC_IP))
-            					.withStatus(edgeStatus));
             if (UserInstanceStatus.RUNNING != UserInstanceStatus.of(edgeStatus)) {
                 commonStatus=HealthStatusEnum.ERROR;
+            }
+            if (fullReport) {
+	            listResource.add(new HealthStatusResource()
+	            					.withType("Edge Node")
+	            					.withResourceId(edge.getString(EDGE_PUBLIC_IP))
+	            					.withStatus(edgeStatus));
             }
         }
 
         return new HealthStatusPageDTO()
         		.withStatus(commonStatus)
-        		.withListResources(listResource);
+        		.withListResources(fullReport ? listResource : null);
     }
 
 

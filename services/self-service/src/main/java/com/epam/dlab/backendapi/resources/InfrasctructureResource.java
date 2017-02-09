@@ -22,10 +22,12 @@ import static com.epam.dlab.backendapi.core.health.HealthChecks.MONGO_HEALTH_CHE
 import static com.epam.dlab.backendapi.core.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -75,8 +77,8 @@ public class InfrasctructureResource implements InfrasctructureAPI {
      */
     @GET
     @Path(ApiCallbacks.STATUS_URI)
-    public HealthStatusPageDTO status(@Auth UserInfo userInfo) {
-        return envDAO.getHealthStatusPageDTO(userInfo.getName());
+    public HealthStatusPageDTO status(@Auth UserInfo userInfo, @QueryParam("full") @DefaultValue("false") boolean fullReport) {
+        return envDAO.getHealthStatusPageDTO(userInfo.getName(), fullReport);
     }
 
     /** Returns the status of infrastructure: database and provisioning service.
