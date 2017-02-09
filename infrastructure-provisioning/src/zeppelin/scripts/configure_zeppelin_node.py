@@ -45,6 +45,8 @@ args = parser.parse_args()
 
 spark_version = args.spark_version
 hadoop_version = args.hadoop_version
+scala_version = '2.11.8'
+scala_link = "http://www.scala-lang.org/files/archive/"
 zeppelin_version = args.zeppelin_version
 zeppelin_link = "http://archive.apache.org/dist/zeppelin/zeppelin-" + zeppelin_version + "/zeppelin-" + \
                 zeppelin_version + "-bin-netinst.tgz"
@@ -99,7 +101,10 @@ def configure_local_kernels(args):
     put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
     sudo('sed -i "s|AWSREGION|' + args.region + '|g" /tmp/interpreter.json')
     sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
-    sudo('sed -i "s|SP_VER|' + args.spark_version + '|g" /tmp/interpreter.json')
+    sudo('sed -i "s|SP_VER|' + args.spark_version.replace('.', ',') + '|g" /tmp/interpreter.json')
+    sudo('sed -i "s|SCALA_VERSION|' + scala_version.replace('.', ',') + '|g" /tmp/interpreter.json')
+    r_version = sudo("R --version | awk '/version / {print $3}'")
+    sudo('sed -i "s|R_VERSION|' + r_version.replace('.', ',') + '|g" /tmp/interpreter.json')
     while not port_number_found:
         port_free = sudo('nc -z localhost ' + str(default_port) + '; echo $?')
         if port_free == '1':
@@ -165,6 +170,12 @@ if __name__ == "__main__":
 
     print "Install local jars"
     ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
+
+    print "Installing scala"
+    ensure_scala(scala_link, scala_version, args.os_user)
+
+    print "Installing R"
+    ensure_r(args.os_user)
 
     print "Install Zeppelin"
     configure_zeppelin(args.os_user)

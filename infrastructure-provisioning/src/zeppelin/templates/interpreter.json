@@ -2,7 +2,7 @@
   "interpreterSettings": {
     "2C6RJRBD1": {
       "id": "2C6RJRBD1",
-      "name": "Local PySpark (Python-2.7 / Spark-SP_VER)",
+      "name": "Local PySpark (Python-2,7 / Spark-SP_VER)",
       "group": "livy",
       "properties": {
         "zeppelin.livy.concurrentSQL": "false",
@@ -22,13 +22,9 @@
         "zeppelin.spark.concurrentSQL": "false",
         "zeppelin.spark.useHiveContext": "true",
         "zeppelin.spark.maxResult": "1000",
-        "spark.app.name": "Zeppelin"
+        "livy.spark.app.name": "Zeppelin"
       },
       "interpreterGroup": [
-        {
-          "class": "org.apache.zeppelin.livy.LivyPySparkInterpreter",
-          "name": "pyspark"
-        },
         {
           "class": "org.apache.zeppelin.spark.PySparkInterpreter",
           "name": "pyspark"
@@ -44,7 +40,7 @@
     },
     "2C6RJRBD2": {
       "id": "2C6RJRBD2",
-      "name": "Local PySpark (Python-3.5 / Spark-SP_VER)",
+      "name": "Local PySpark (Python-3,5 / Spark-SP_VER)",
       "group": "livy",
       "properties": {
         "zeppelin.livy.concurrentSQL": "false",
@@ -64,16 +60,90 @@
         "zeppelin.spark.concurrentSQL": "false",
         "zeppelin.spark.useHiveContext": "true",
         "zeppelin.spark.maxResult": "1000",
-        "spark.app.name": "Zeppelin"
+        "livy.spark.app.name": "Zeppelin"
       },
       "interpreterGroup": [
         {
-          "class": "org.apache.zeppelin.livy.LivyPySparkInterpreter",
-          "name": "pyspark"
-        },
-        {
           "class": "org.apache.zeppelin.spark.PySparkInterpreter",
           "name": "pyspark"
+        }
+      ],
+      "dependencies": [],
+      "option": {
+        "remote": true,
+        "perNoteSession": false,
+        "perNoteProcess": false,
+        "isExistingProcess": false
+      }
+    },
+    "2C6RJRBD3": {
+      "id": "2C6RJRBD2",
+      "name": "Local Scala (Scala-SCALA_VERSION / Spark-SP_VER)",
+      "group": "livy",
+      "properties": {
+        "zeppelin.livy.concurrentSQL": "false",
+        "livy.spark.master": "local[*]",
+        "livy.spark.home":"/opt/spark/",
+        "livy.spark.hadoop.fs.s3a.endpoint": "https://s3-AWSREGION.amazonaws.com",
+        "zeppelin.livy.spark.sql.maxResult": "1000",
+        "zeppelin.interpreter.localRepo": "/opt/zeppelin/local-repo/2CAC665T6",
+        "zeppelin.livy.url": "http://localhost:LIVYPORT",
+        "zeppelin.spark.printREPLOutput": "true",
+        "spark.hadoop.fs.s3a.buffer.dir": "/tmp",
+        "spark.hadoop.fs.s3a.fast.upload": "true",
+        "zeppelin.dep.additionalRemoteRepository": "spark-packages,http://dl.bintray.com/spark-packages/maven,false;",
+        "zeppelin.spark.importImplicit": "true",
+        "zeppelin.spark.sql.stacktrace": "false",
+        "zeppelin.spark.concurrentSQL": "false",
+        "zeppelin.spark.useHiveContext": "true",
+        "zeppelin.spark.maxResult": "1000",
+        "livy.spark.app.name": "Zeppelin"
+      },
+      "interpreterGroup": [
+        {
+          "class": "org.apache.zeppelin.spark.SparkInterpreter",
+          "name": "spark"
+        }
+      ],
+      "dependencies": [],
+      "option": {
+        "remote": true,
+        "perNoteSession": false,
+        "perNoteProcess": false,
+        "isExistingProcess": false
+      }
+    },
+    "2C6RJRBD4": {
+      "id": "2C6RJRBD2",
+      "name": "Local R (R-R_VERSION / Spark-SP_VER)",
+      "group": "livy",
+      "properties": {
+        "zeppelin.livy.concurrentSQL": "false",
+        "livy.spark.master": "local[*]",
+        "livy.spark.home":"/opt/spark/",
+        "livy.spark.hadoop.fs.s3a.endpoint": "https://s3-AWSREGION.amazonaws.com",
+        "zeppelin.livy.spark.sql.maxResult": "1000",
+        "zeppelin.interpreter.localRepo": "/opt/zeppelin/local-repo/2CAC665T6",
+        "zeppelin.livy.url": "http://localhost:LIVYPORT",
+        "zeppelin.spark.printREPLOutput": "true",
+        "spark.hadoop.fs.s3a.buffer.dir": "/tmp",
+        "spark.hadoop.fs.s3a.fast.upload": "true",
+        "zeppelin.dep.additionalRemoteRepository": "spark-packages,http://dl.bintray.com/spark-packages/maven,false;",
+        "zeppelin.spark.importImplicit": "true",
+        "zeppelin.spark.sql.stacktrace": "false",
+        "zeppelin.R.knitr": "true",
+        "zeppelin.spark.concurrentSQL": "false",
+        "zeppelin.spark.useHiveContext": "true",
+        "zeppelin.spark.maxResult": "1000",
+        "livy.spark.app.name": "Zeppelin",
+        "zeppelin.R.image.width": "100%",
+        "zeppelin.R.render.options": "out.format \u003d \u0027html\u0027, comment \u003d NA, echo \u003d FALSE, results \u003d \u0027asis\u0027, message \u003d F, warning \u003d F",
+        "zeppelin.R.cmd": "R"
+      },
+      "interpreterGroup": [
+        {
+          "class": "org.apache.zeppelin.spark.SparkRInterpreter",
+          "name": "r"
         }
       ],
       "dependencies": [],

@@ -59,6 +59,7 @@ def install_remote_livy(args):
     install_livy_dependencies_emr()
     with lcd('/opt/' + args.emr_version + '/' + args.cluster_name + '/'):
         local('sudo -i git init')
+        local('sudo rm -rf /opt/' + args.emr_version + '/' + args.cluster_name + '/livy/')
         local('sudo -i git clone https://github.com/cloudera/livy.git')
     livy_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/livy/'
     with lcd(livy_path):
