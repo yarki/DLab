@@ -30,7 +30,6 @@ public class HealthStatusResource {
     private String resourceId;
     @JsonProperty("status")
     private String status;
-    @JsonProperty("status")
 
     /** Return the type of resource. */
     public String getType() {
