@@ -19,12 +19,13 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { NavbarModule } from './../shared/navbar/index';
 import { routing  } from './health-status.routes';
 
 import { HealthStatusComponent } from './health-status.component';
 
 @NgModule({
-    imports: [CommonModule, RouterModule, routing],
+    imports: [CommonModule, RouterModule, routing, NavbarModule],
     declarations: [HealthStatusComponent],
     exports: [HealthStatusComponent]
 })

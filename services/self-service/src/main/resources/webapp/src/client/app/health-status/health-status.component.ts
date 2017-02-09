@@ -46,7 +46,7 @@ export class HealthStatusComponent {
   }
 
   loadHealthStatusList(healthStatusList): Array<EnvironmentStatusModel> {
-    return healthStatusList.map((value) => {
+    return healthStatusList.list_resources.map((value) => {
       return new EnvironmentStatusModel(
         value.instance_type,
         value.cloud_type,

@@ -41,6 +41,7 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {
     this.currentUserName = this.getUserName();
+    this.getEnvironmentHealthStatus();
   }
 
   getUserName() {

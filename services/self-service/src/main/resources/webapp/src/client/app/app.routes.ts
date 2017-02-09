@@ -33,6 +33,10 @@ export const routes: Routes = [{
     component: HomeComponent,
     canActivate: [AuthorizationGuard]
   }, {
+    path: 'environment_health_status',
+    loadChildren: 'app/health-status/health-status.module#HealthStatusModule',
+    canActivate: [AuthorizationGuard]
+ }, {
     path: 'login',
     component: LoginComponent
   }, {
@@ -48,8 +52,4 @@ export const routes: Routes = [{
     component: NotFoundComponent
   }];
 
-// {
-//     path: 'environment_health_status',
-//     loadChildren: 'app/health-status/health-status.module#HealthStatusModule',
-//     canActivate: [AuthorizationGuard]
-//  }
+
