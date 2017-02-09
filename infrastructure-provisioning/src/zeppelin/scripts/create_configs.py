@@ -62,9 +62,9 @@ def install_remote_livy(args):
         local('sudo -i git clone https://github.com/cloudera/livy.git')
     livy_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/livy/'
     with lcd(livy_path):
-        local('sudo -i mvn package -DskipTests -Dhttp.proxyHost=' + args.edge_hostname + ' -Dhttp.proxyPort=' +
-              args.proxy_port + ' -Dhttps.proxyHost=' + args.edge_hostname +
-              ' -Dhttps.proxyPort=' + args.proxy_port)
+        local('sudo -i mvn package -f ' + livy_path + 'pom.xml -DskipTests -Dhttp.proxyHost=' +
+              args.edge_hostname + ' -Dhttp.proxyPort=' + args.proxy_port + ' -Dhttps.proxyHost=' +
+              args.edge_hostname + ' -Dhttps.proxyPort=' + args.proxy_port)
     local('sudo mkdir -p /var/run/livy')
     local('sudo mkdir -p ' + livy_path + '/logs')
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
