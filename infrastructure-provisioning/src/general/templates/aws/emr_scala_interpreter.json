@@ -24,10 +24,6 @@
     {
       "class": "org.apache.zeppelin.livy.LivySparkInterpreter",
       "name": "spark"
-    },
-    {
-      "class": "org.apache.zeppelin.spark.SparkInterpreter",
-      "name": "scala"
     }
   ],
   "dependencies": [],
