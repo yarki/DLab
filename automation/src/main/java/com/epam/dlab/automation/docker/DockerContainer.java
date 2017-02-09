@@ -18,7 +18,7 @@ public class DockerContainer {
     @JsonProperty("ImageID")
     private String ImageID;
     
-    @JsonProperty("DockerCommands")
+    @JsonProperty("Command")
     private String Command;
     
     @JsonProperty("Created")

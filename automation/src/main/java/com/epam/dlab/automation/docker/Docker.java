@@ -17,8 +17,9 @@ public class Docker {
     public static void checkDockerStatus(String dockerImageName, String publicIP)
             throws IOException, JSchException, InterruptedException {
         
-        LOGGER.info("Check docker status for instanse {} and image {}", publicIP, dockerImageName);
-        
+        LOGGER.info("Check docker status for instance {} and image {}", publicIP, dockerImageName);
+
+        // TODO: hardcoded name
         Session session = SSHConnect.getConnect("ubuntu", publicIP, 22);
         ChannelExec getResult = SSHConnect.setCommand(session, DockerCommands.GET_CONTAINERS);
         InputStream in = getResult.getInputStream();
