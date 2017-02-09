@@ -50,7 +50,6 @@ def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
             sudo('yum -y install libcur*')
             sudo('echo -e "[base]\nname=CentOS-7-Base\nbaseurl=http://buildlogs.centos.org/centos/7/os/x86_64-20140704-1/\ngpgcheck=1\ngpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7\npriority=1\nexclude=php mysql" >> /etc/yum.repos.d/CentOS-base.repo')
             sudo('yum install -y R R-core R-core-devel R-devel --nogpgcheck')
-
             sudo('R CMD javareconf')
             sudo('cd /root; git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
             sudo('R -e "install.packages(\'R6\',repos=\'http://cran.us.r-project.org\')"')
@@ -72,6 +71,7 @@ def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
             sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
             sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
+            sudo('ln -s /usr/lib64/R/ /usr/lib/R')
             sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
             sudo('touch /home/{}/.ensure_dir/r_kernel_ensured'.format(os_user))
         except:
