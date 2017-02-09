@@ -17,6 +17,7 @@
  ****************************************************************************/
 package com.epam.dlab.backendapi.resources.dto;
 
+/** Statuses for the environment resource. */
 public enum HealthStatusEnum {
     ERROR,
     WARNING,
@@ -37,14 +38,4 @@ public enum HealthStatusEnum {
         }
         return null;
     }
-
-    public boolean in(HealthStatusEnum ... statusList) {
-        for (HealthStatusEnum status : statusList) {
-            if (this.equals(status)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

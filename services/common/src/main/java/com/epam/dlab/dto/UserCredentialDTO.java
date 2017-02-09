@@ -51,8 +51,8 @@ public class UserCredentialDTO {
     public ToStringHelper toStringHelper(Object self) {
     	return MoreObjects.toStringHelper(self)
     	        .add("username", username)
-    	        .add("password", password)
-    	        .add("accessToken", "***");
+    	        .add("password", password == null ? null : "***")
+    	        .add("accessToken", accessToken == null ? null : "***");
     }
     
     @Override

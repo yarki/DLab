@@ -21,9 +21,9 @@ package com.epam.dlab.backendapi.resources.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
-/** Stores the health statuses for services.
+/** Stores the health status for user environment.
  */
-public class HealthStatusResourcePageDTO {
+public class HealthStatusResource {
     @JsonProperty("type")
     private String type;
     @JsonProperty("resource_id")
@@ -32,46 +32,53 @@ public class HealthStatusResourcePageDTO {
     private String status;
     @JsonProperty("status")
 
+    /** Return the type of resource. */
     public String getType() {
         return type;
     }
 
+    /** Set the type of resource. */
     public void setType(String type) {
         this.type = type;
     }
 
-    public String getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceId(String resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-
-    public HealthStatusResourcePageDTO withStatus(String Status) {
-        setStatus(Status);
-        return this;
-    }
-
-    public HealthStatusResourcePageDTO withType(String type) {
+    /** Set the type of resource. */
+    public HealthStatusResource withType(String type) {
         setType(type);
         return this;
     }
 
-    public HealthStatusResourcePageDTO withResourceId(String resourceId) {
+    /** Return the id of resource (ip address, path, etc). */
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    /** Set the id of resource (ip address, path, etc). */
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    /** Set the id of resource (ip address, path, etc). */
+    public HealthStatusResource withResourceId(String resourceId) {
         setResourceId(resourceId);
         return this;
     }
 
+    /** Return the status of resource. */
+    public String getStatus() {
+        return status;
+    }
+    
+    /** Set the status of resource. */
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /** Set the status of resource. */
+    public HealthStatusResource withStatus(String Status) {
+        setStatus(Status);
+        return this;
+    }
 
     @Override
     public String toString() {
@@ -81,6 +88,4 @@ public class HealthStatusResourcePageDTO {
                 .add("status",status)
     	        .toString();
     }
-
-
 }

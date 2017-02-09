@@ -33,7 +33,7 @@ import java.util.List;
 
 import com.epam.dlab.backendapi.resources.dto.HealthStatusEnum;
 import com.epam.dlab.backendapi.resources.dto.HealthStatusPageDTO;
-import com.epam.dlab.backendapi.resources.dto.HealthStatusResourcePageDTO;
+import com.epam.dlab.backendapi.resources.dto.HealthStatusResource;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -307,28 +307,32 @@ public class EnvStatusDAO extends BaseDAO {
 	}
 
     /** Finds and returns the of computational resource.
-     * @param user user name.
+     * @param user the name of user.
+     * @param fullReport return full report if <b>true</b> otherwise common status only.
      * @exception DlabException
      */
-    public HealthStatusPageDTO getHealthStatusPageDTO(String user) throws DlabException {
-        HealthStatusEnum commonStatus;
+    public HealthStatusPageDTO getHealthStatusPageDTO(String user, boolean fullReport) throws DlabException {
+        List<HealthStatusResource> listResource = new ArrayList<>();
+        HealthStatusEnum commonStatus = HealthStatusEnum.OK;
+        
+        // Add EDGE node
         Document edge = getEdgeNode(user);
         if (edge != null) {
             String edgeStatus = edge.getString(EDGE_STATUS);
-            String edgePublicIp = edge.getString(EDGE_PUBLIC_IP);
-            String edgeType = "Edge Node";
-            List<HealthStatusResourcePageDTO> listResource = new ArrayList<>();
-            listResource.add(new HealthStatusResourcePageDTO().withType(edgeType).withResourceId(edgePublicIp).withStatus(edgeStatus));
-
-            if (UserInstanceStatus.RUNNING == UserInstanceStatus.of(edgeStatus)) {
-                commonStatus=HealthStatusEnum.OK;
-            } else {
+            if (UserInstanceStatus.RUNNING != UserInstanceStatus.of(edgeStatus)) {
                 commonStatus=HealthStatusEnum.ERROR;
             }
+            if (fullReport) {
+	            listResource.add(new HealthStatusResource()
+	            					.withType("Edge Node")
+	            					.withResourceId(edge.getString(EDGE_PUBLIC_IP))
+	            					.withStatus(edgeStatus));
+            }
+        }
 
-            return new HealthStatusPageDTO().withStatus(commonStatus).withListResources(listResource);
-        } else
-            throw new DlabException("EdgeNode for user " + user + " not found.");
+        return new HealthStatusPageDTO()
+        		.withStatus(commonStatus)
+        		.withListResources(fullReport ? listResource : null);
     }
 
 

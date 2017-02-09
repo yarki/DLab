@@ -26,6 +26,7 @@ import com.epam.dlab.backendapi.domain.EnvStatusListener;
 import com.epam.dlab.dto.UserCredentialDTO;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.SecurityAPI;
+import com.google.common.base.MoreObjects;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -71,7 +72,14 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
         LOGGER.debug("Try login for user {}", credential.getUsername());
         try {
             dao.writeLoginAttempt(credential);
-            return securityService.post(LOGIN, credential, Response.class);
+            Response response = securityService.post(LOGIN, credential, Response.class);
+LOGGER.debug("Login response {}", MoreObjects.toStringHelper(response).add("response", response));
+LOGGER.debug("Login response status {}", response.getStatus());
+LOGGER.debug("Login response entity {}", MoreObjects.toStringHelper(response.getEntity()).add("entity", response.getEntity()));
+LOGGER.debug("Login response headers {}", MoreObjects.toStringHelper(response).add("headers", response.getHeaders()));
+LOGGER.debug("Login response string headers {}", MoreObjects.toStringHelper(response).add("stringHeaders", response.getStringHeaders()));
+LOGGER.debug("Login response metadata {}", MoreObjects.toStringHelper(response).add("metadata", response.getMetadata()));
+			return response;
         } catch (Throwable t) {
         	LOGGER.error("Try login for user {} fail", credential.getUsername(), t);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(t.getLocalizedMessage()).build();
@@ -87,7 +95,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
     @POST
     @Path("/authorize")
     public Response authorize(@Auth UserInfo userInfo, @Valid @NotBlank String username) {
-        LOGGER.debug("Try authorize accessToken {}", userInfo.getAccessToken());
+        LOGGER.debug("Try authorize accessToken {} for user info {}", userInfo.getAccessToken(), userInfo);
         Status status = userInfo.getName().toLowerCase().equals(username.toLowerCase()) ?
                 Status.OK :
                 Status.FORBIDDEN;
