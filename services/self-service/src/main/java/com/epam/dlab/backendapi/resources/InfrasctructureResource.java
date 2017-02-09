@@ -39,6 +39,7 @@ import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.EnvStatusDAO;
 import com.epam.dlab.backendapi.resources.dto.HealthStatusDTO;
+import com.epam.dlab.backendapi.resources.dto.HealthStatusEnum;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.contracts.HealthChecker;
 import com.epam.dlab.dto.status.EnvStatusDTO;
@@ -77,8 +78,16 @@ public class InfrasctructureResource implements InfrasctructureAPI {
      */
     @GET
     @Path(ApiCallbacks.STATUS_URI)
-    public HealthStatusPageDTO status(@Auth UserInfo userInfo, @QueryParam("full") @DefaultValue("false") boolean fullReport) {
-        return envDAO.getHealthStatusPageDTO(userInfo.getName(), fullReport);
+    public HealthStatusPageDTO status(@Auth UserInfo userInfo/*, @QueryParam("full") @DefaultValue("false") boolean fullReport*/) {
+    	//LOGGER.trace("Prepre the status of resources for user {}, report type {}", userInfo.getName(), fullReport);
+    	try {
+    		HealthStatusPageDTO status = envDAO.getHealthStatusPageDTO(userInfo.getName(), true/*fullReport*/);
+    		LOGGER.debug("Return the status of resources for user {}: {}", userInfo.getName(), status);
+    		return status;
+    	} catch (Throwable e) {
+    		LOGGER.warn("Could not return status of resources for user {}: {}", userInfo.getName(), e.getLocalizedMessage(), e);
+    	}
+        return new HealthStatusPageDTO().withStatus(HealthStatusEnum.ERROR);
     }
 
     /** Returns the status of infrastructure: database and provisioning service.
@@ -109,7 +118,7 @@ public class InfrasctructureResource implements InfrasctructureAPI {
         		envDAO.updateEnvStatus(dto.getUser(), dto.getResourceList());
         	}
         } catch (Throwable e) {
-        	LOGGER.warn("Could not update status for resources for user {}: {}", dto.getUser(), e.getLocalizedMessage(), e);
+        	LOGGER.warn("Could not update status of resources for user {}: {}", dto.getUser(), e.getLocalizedMessage(), e);
         }
         // Always necessary send OK
         return Response.ok().build();
