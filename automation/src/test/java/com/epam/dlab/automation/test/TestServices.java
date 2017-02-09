@@ -1,32 +1,32 @@
 package com.epam.dlab.automation.test;
 
-import com.epam.dlab.automation.aws.AmazonHelper;
-import com.epam.dlab.automation.helper.TestNamingHelper;
-import com.epam.dlab.automation.helper.HelperMethods;
-import com.epam.dlab.automation.helper.PropertyValue;
-import com.epam.dlab.automation.aws.AmazonInstanceState;
-import com.epam.dlab.automation.model.CreateNotebookDto;
-import com.epam.dlab.automation.model.DeployEMRDto;
-import com.epam.dlab.automation.model.LoginDto;
-import com.epam.dlab.automation.docker.AckStatus;
-import com.epam.dlab.automation.docker.Docker;
-import com.epam.dlab.automation.docker.SSHConnect;
-import com.epam.dlab.automation.http.HttpRequest;
-import com.epam.dlab.automation.repository.ContentType;
-import com.epam.dlab.automation.http.HttpStatusCode;
-import com.epam.dlab.automation.repository.ApiPath;
-import com.epam.dlab.automation.jenkins.JenkinsCall;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Tag;
+import com.epam.dlab.automation.aws.AmazonHelper;
+import com.epam.dlab.automation.aws.AmazonInstanceState;
+import com.epam.dlab.automation.docker.AckStatus;
+import com.epam.dlab.automation.docker.Docker;
+import com.epam.dlab.automation.docker.SSHConnect;
+import com.epam.dlab.automation.helper.HelperMethods;
+import com.epam.dlab.automation.helper.PropertyValue;
+import com.epam.dlab.automation.helper.TestNamingHelper;
+import com.epam.dlab.automation.http.HttpRequest;
+import com.epam.dlab.automation.http.HttpStatusCode;
+import com.epam.dlab.automation.jenkins.JenkinsCall;
+import com.epam.dlab.automation.model.CreateNotebookDto;
+import com.epam.dlab.automation.model.DeployEMRDto;
+import com.epam.dlab.automation.model.LoginDto;
+import com.epam.dlab.automation.repository.ApiPath;
+import com.epam.dlab.automation.repository.ContentType;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -73,6 +73,7 @@ public class TestServices {
         testLogin();
         LOGGER.info("Test Finished");
     }
+
 
     @Test(priority = 2)
     public void runDLabScenario() throws Exception {
@@ -141,7 +142,7 @@ public class TestServices {
         Assert.assertEquals(responseForActivateAccessKey.getBody().asString(), "Username or password are not valid");
         
         LoginDto testUserLogin = new LoginDto(PropertyValue.getUsername(), PropertyValue.getPassword(), "");
-        LOGGER.info("Logging in with credentials {}:{}", "Usein_Faradzhev@epam.com", "uf123"/*PropertyValue.getUsername(), PropertyValue.getPassword()*/);
+        LOGGER.info("Logging in with credentials {}:{}", PropertyValue.getUsername(), PropertyValue.getPassword());
         Response responseTestUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, testUserLogin);
         Assert.assertEquals(responseTestUser.statusCode(), HttpStatusCode.OK);
  		
