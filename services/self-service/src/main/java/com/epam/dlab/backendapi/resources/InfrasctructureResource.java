@@ -43,6 +43,7 @@ import com.epam.dlab.backendapi.resources.dto.HealthStatusEnum;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.contracts.HealthChecker;
 import com.epam.dlab.dto.status.EnvStatusDTO;
+import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
 import com.epam.dlab.rest.contracts.InfrasctructureAPI;
@@ -78,30 +79,53 @@ public class InfrasctructureResource implements InfrasctructureAPI {
      */
     @GET
     @Path(ApiCallbacks.STATUS_URI)
-    public HealthStatusPageDTO status(@Auth UserInfo userInfo/*, @QueryParam("full") @DefaultValue("false") boolean fullReport*/) {
-    	//LOGGER.trace("Prepre the status of resources for user {}, report type {}", userInfo.getName(), fullReport);
+    public HealthStatusPageDTO status(@Auth UserInfo userInfo) throws DlabException {
+    	LOGGER.debug("Request the status of resources for user {}", userInfo.getName());
     	try {
-    		HealthStatusPageDTO status = envDAO.getHealthStatusPageDTO(userInfo.getName(), true/*fullReport*/);
+    		HealthStatusPageDTO status = envDAO.getHealthStatusPageDTO(userInfo.getName(), true);
     		LOGGER.debug("Return the status of resources for user {}: {}", userInfo.getName(), status);
     		return status;
     	} catch (Throwable e) {
     		LOGGER.warn("Could not return status of resources for user {}: {}", userInfo.getName(), e.getLocalizedMessage(), e);
+    		throw new DlabException("Could not return status of resources: " + e.getLocalizedMessage(), e);
     	}
-        return new HealthStatusPageDTO().withStatus(HealthStatusEnum.ERROR);
     }
 
-    /** Returns the status of infrastructure: database and provisioning service.
+    /** Returns the status of infrastructure: edge.
      * @param userInfo user info.
      */
     @GET
-    
-    @Path(ApiCallbacks.STATUS_URI+"_old")
-    public HealthStatusDTO statusOld(@Auth UserInfo userInfo) {
-        return new HealthStatusDTO()
-                .withMongoAlive(mongoHealthChecker.isAlive(userInfo))
-                .withProvisioningAlive(provisioningHealthChecker.isAlive(userInfo));
+    @Path(ApiCallbacks.STATUS_URI + "_int")
+    public HealthStatusPageDTO status(@Auth UserInfo userInfo, @QueryParam("full") @DefaultValue("0") int fullReport) throws DlabException {
+    	LOGGER.debug("Request the status of resources for user {}, report type {}", userInfo.getName(), fullReport);
+    	try {
+    		HealthStatusPageDTO status = envDAO.getHealthStatusPageDTO(userInfo.getName(), fullReport != 0);
+    		LOGGER.debug("Return the status of resources for user {}: {}", userInfo.getName(), status);
+    		return status;
+    	} catch (Throwable e) {
+    		LOGGER.warn("Could not return status of resources for user {}: {}", userInfo.getName(), e.getLocalizedMessage(), e);
+    		throw new DlabException("Could not return status of resources: " + e.getLocalizedMessage(), e);
+    	}
     }
 
+    /** Returns the status of infrastructure: edge.
+     * @param userInfo user info.
+     */
+    @GET
+    @Path(ApiCallbacks.STATUS_URI + "_page")
+    public HealthStatusPageDTO status(@Auth UserInfo userInfo, @QueryParam("full") @DefaultValue("false") boolean fullReport) throws DlabException  {
+    	LOGGER.debug("Request the status of resources for user {}, report type {}", userInfo.getName(), fullReport);
+    	try {
+    		HealthStatusPageDTO status = envDAO.getHealthStatusPageDTO(userInfo.getName(), fullReport);
+    		LOGGER.debug("Return the status of resources for user {}: {}", userInfo.getName(), status);
+    		return status;
+    	} catch (Throwable e) {
+    		LOGGER.warn("Could not return status of resources for user {}: {}", userInfo.getName(), e.getLocalizedMessage(), e);
+    		throw new DlabException("Could not return status of resources: " + e.getLocalizedMessage(), e);
+    	}
+    }
+    
+    
     
     /** Updates the status of the resources for user.
      * @param dto DTO info about the statuses of resources.
