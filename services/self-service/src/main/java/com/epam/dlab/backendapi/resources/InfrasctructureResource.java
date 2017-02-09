@@ -38,8 +38,6 @@ import org.slf4j.LoggerFactory;
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.EnvStatusDAO;
-import com.epam.dlab.backendapi.resources.dto.HealthStatusDTO;
-import com.epam.dlab.backendapi.resources.dto.HealthStatusEnum;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.contracts.HealthChecker;
 import com.epam.dlab.dto.status.EnvStatusDTO;

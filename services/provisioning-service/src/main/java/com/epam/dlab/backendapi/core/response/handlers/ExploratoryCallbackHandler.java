@@ -79,7 +79,7 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     	}
 
     	String exploratoryId = getTextValue(resultNode.get(EXPLORATORY_ID_FIELD));
-    	if (exploratoryId.equals("")) {
+    	if (getAction() == DockerAction.CREATE && exploratoryId == null) {
             LOGGER.warn("Empty field {} for UUID () in JSON {}", RESPONSE_NODE + "." + RESULT_NODE + "." + EXPLORATORY_ID_FIELD, getUUID(), nodeUrl.toString());
         }
 

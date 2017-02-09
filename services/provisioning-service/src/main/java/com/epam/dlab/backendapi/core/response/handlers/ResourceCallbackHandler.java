@@ -76,11 +76,11 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     }
     
     private void selfServicePost(T object) throws DlabException {
-        LOGGER.trace("Send post request to self service for UUID {}, object {}", originalUuid, object);
+        LOGGER.debug("Send post request to self service {} for UUID {}, object {}", getCallbackURI(), originalUuid, object);
         try {
         	selfService.post(getCallbackURI(), accessToken, object, resultType);
         } catch (Throwable e) {
-        	LOGGER.error("Send request or response error for UUID {}: {}", e.getLocalizedMessage(), originalUuid, e);
+        	LOGGER.error("Send request or response error for UUID {}: {}", originalUuid, e.getLocalizedMessage(), e);
         	throw new DlabException("Send request or responce error for UUID " + originalUuid + ": " + e.getLocalizedMessage(), e);
         }
     }

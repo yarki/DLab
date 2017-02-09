@@ -333,14 +333,41 @@ def get_emr_list(tag_name, type='Key', emr_count=False, emr_active=False):
         logging.error("Error with getting EMR list: " + str(err) + "\n Traceback: " + traceback.print_exc(
             file=sys.stdout))
         append_result(str({"error": "Error with getting EMR list",
-                   "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+                           "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 
-def get_not_configured_emr(tag_name, return_name=False):
+def get_not_configured_emr_list(tag_name, instance_name):
     try:
         emr = boto3.client('emr')
-        clusters_list = get_emr_list(tag_name, 'Key')
+        clusters = emr.list_clusters(ClusterStates=['WAITING'])
+        clusters = clusters.get('Clusters')
+        clusters_list = []
+        for i in clusters:
+            tags_found = 0
+            response = emr.describe_cluster(ClusterId=i.get('Id'))
+            time.sleep(2)
+            tag = response.get('Cluster').get('Tags')
+            for j in tag:
+                if tag_name in j.get('Key'):
+                    tags_found += 1
+                if instance_name in j.get('Value'):
+                    tags_found += 1
+            if tags_found >= 2:
+                clusters_list.append(i.get('Id'))
+        return clusters_list
+    except Exception as err:
+        logging.error("Error with getting not configured EMR list: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        append_result(str({"error": "Error with getting not configured EMR list",
+                           "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
+
+
+def get_not_configured_emr(tag_name, instance_name, return_name=False):
+    try:
+        emr = boto3.client('emr')
+        clusters_list = get_not_configured_emr_list(tag_name, instance_name)
         if clusters_list:
             for cluster_id in clusters_list:
                 response = emr.describe_cluster(ClusterId=cluster_id)
