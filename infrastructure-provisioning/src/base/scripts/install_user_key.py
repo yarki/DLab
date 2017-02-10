@@ -19,6 +19,7 @@
 # ******************************************************************************
 
 from fabric.api import *
+from dlab.fab import *
 import argparse
 import json
 import sys
@@ -39,13 +40,6 @@ def copy_key(config):
     else:
         return False
 
-
-def ensure_ciphers():
-    sudo('echo "KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256" >> /etc/ssh/sshd_config')
-    sudo('echo "Ciphers aes256-gcm@openssh.com,aes128-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr" >> /etc/ssh/sshd_config')
-    sudo('echo "    KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256" >> /etc/ssh/ssh_config')
-    sudo('echo "    Ciphers aes256-gcm@openssh.com,aes128-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr" >> /etc/ssh/ssh_config')
-    sudo('systemctl reload sshd')
 
 ##############
 # Run script #
