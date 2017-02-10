@@ -83,7 +83,7 @@ def ensure_matplot(os_user):
         try:
             sudo('yum install -y python-matplotlib --nogpgcheck')
             sudo('pip2 install matplotlib --no-cache-dir')
-            sudo('pip3 install matplotlib --no-cache-dir')
+            sudo('python3.5 -m pip install matplotlib --no-cache-dir')
             sudo('touch /home/{}/.ensure_dir/matplot_ensured'.format(os_user))
         except:
             sys.exit(1)
@@ -126,12 +126,12 @@ def ensure_additional_python_libs(os_user):
             sudo('yum install -y zlib-devel libjpeg-turbo-devel --nogpgcheck')
             if os.environ['application'] == 'jupyter' or os.environ['application'] == 'zeppelin':
                 sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
-                sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+                sudo('python3.5 -m pip install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
             if os.environ['application'] == 'tensor':
                 sudo('pip2 install keras opencv-python h5py --no-cache-dir')
                 sudo('python2 -m ipykernel install')
-                sudo('pip3 install keras opencv-python h5py --no-cache-dir')
-                sudo('python3 -m ipykernel install')
+                sudo('python3.5 -m pip install keras opencv-python h5py --no-cache-dir')
+                sudo('python3.5 -m ipykernel install')
             sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
         except:
             sys.exit(1)
@@ -171,11 +171,12 @@ def ensure_python2_libraries(os_user):
 def ensure_python3_libraries(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/python3_libraries_ensured'):
         try:
-            sudo('yum install -y python34-pip python34-devel')
-            sudo('pip3 install -U pip setuptools --no-cache-dir')
-            sudo('pip3 install boto3 --no-cache-dir')
-            sudo('pip3 install fabvenv fabric-virtualenv --no-cache-dir')
-            sudo('pip3 install ipython ipykernel --no-cache-dir')
+            sudo('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
+            sudo('yum install -y python35u python35u-pip python35u-devel')
+            sudo('python3.5 -m pip install -U pip setuptools --no-cache-dir')
+            sudo('python3.5 -m pip install boto3 --no-cache-dir')
+            sudo('python3.5 -m pip install fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('python3.5 -m pip install ipython ipykernel --no-cache-dir')
             sudo('touch /home/' + os_user + '/.ensure_dir/python3_libraries_ensured')
         except:
             sys.exit(1)
@@ -228,7 +229,7 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo('mv cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64-rpm cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64.rpm; rpm -i cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64.rpm')
             sudo('yum clean all')
             sudo('yum -y install cuda')
-            sudo('pip3 install --upgrade pip wheel numpy')
+            sudo('python3.5 -m pip install --upgrade pip wheel numpy')
             sudo('mv /usr/local/cuda-8.0 /opt/')
             sudo('ln -s /opt/cuda-8.0 /usr/local/cuda-8.0')
             sudo('rm -f /home/' + os_user + '/cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64-rpm')
