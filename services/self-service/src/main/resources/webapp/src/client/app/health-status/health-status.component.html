@@ -17,31 +17,7 @@ limitations under the License.
 ----------------------------------------------------------------------------------------------------------- -->
 
 <sd-navbar></sd-navbar>
+
 <div class="sub_nav"></div>
 
-<table class="dashboard_table">
-  <tr>
-    <th class="th_name">Type</th>
-    <th>Resource id</th>
-    <th class="th_status">Status</th>
-    <th class="th_actions">Action</th>
-  </tr>
-  <tr *ngFor="let env of environmentsHealthStatuses">
-    <td>{{env.type}}</td>
-    <td>{{env.resource_id}}</td>
-    <td class="status" ngClass="{{env.status || ''}}">{{env.status}}</td>
-    <td>
-      <div class="dropdown">
-        <span data-toggle="dropdown" class="actions not-allowed"></span>
-        <!--<div class="dropdown-menu">
-          <ul class="list-unstyled">
-            <li *ngIf="env.status.toLowerCase() == 'terminated'">Recreate</li>
-            <li *ngIf="env.status.toLowerCase() == 'stopped'">Start</li>
-            <li *ngIf="env.status.toLowerCase() == 'running'">Stop</li>
-            <li *ngIf="env.status.toLowerCase() == 'running'">Terminate</li>
-          </ul>
-        </div>-->
-      </div>
-    </td>
-  </tr>
-</table>
+<health-status-grid></health-status-grid>

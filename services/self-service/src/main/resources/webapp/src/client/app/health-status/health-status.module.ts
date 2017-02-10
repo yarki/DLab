@@ -23,9 +23,10 @@ import { NavbarModule } from './../shared/navbar/index';
 import { routing  } from './health-status.routes';
 
 import { HealthStatusComponent } from './health-status.component';
+import { HealthStatusGridModule } from './components/health-status-grid/health-status-grid.module';
 
 @NgModule({
-    imports: [CommonModule, RouterModule, routing, NavbarModule],
+    imports: [CommonModule, RouterModule, routing, NavbarModule, HealthStatusGridModule],
     declarations: [HealthStatusComponent],
     exports: [HealthStatusComponent]
 })

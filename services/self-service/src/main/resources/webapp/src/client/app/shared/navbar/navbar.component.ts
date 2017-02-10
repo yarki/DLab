@@ -58,8 +58,8 @@ export class NavbarComponent implements OnInit {
 
   getEnvironmentHealthStatus() {
     this.userResourceService.getEnvironmentHealthStatus()
-      .subscribe((result) => {
-        this.healthStatus = result.status;
-      });
+      .subscribe(
+        (result) => this.healthStatus = result.status,
+        (error) => {});
   }
 }
