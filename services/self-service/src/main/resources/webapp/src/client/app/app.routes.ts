@@ -18,6 +18,7 @@ limitations under the License.
 
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
+import { HealthStatusComponent } from './health-status/health-status.component';
 import { LoginComponent } from './login/login.component';
 import { AccessNotebookGuide } from './help/accessnotebookguide/accessnotebookguide.component';
 import { PublicKeyGuide } from './help/publickeyguide/publickeyguide.component';
@@ -34,7 +35,7 @@ export const routes: Routes = [{
     canActivate: [AuthorizationGuard]
   }, {
     path: 'environment_health_status',
-    loadChildren: 'app/health-status/health-status.module#HealthStatusModule',
+    component: HealthStatusComponent,
     canActivate: [AuthorizationGuard]
  }, {
     path: 'login',
