@@ -921,7 +921,7 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
             text = fr.read()
             text = text.replace('CLUSTER_NAME', cluster_name)
             text = text.replace('PYTHON_FULL_VERSION', p_version)
-            text = text.replace('PYTHON_FULL_VERSION_FOR_NAME', p_version.replace('.', ','))
+            text = text.replace('PYTHON_FOR_NAME_FULL_VERSION', p_version.replace('.', ','))
             text = text.replace('SPARK_VERSION', spark_version.replace('.', ','))
             text = text.replace('SPARK_HOME', spark_dir)
             text = text.replace('AWS_REGION', region)

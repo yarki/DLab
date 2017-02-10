@@ -1,5 +1,5 @@
 {
-  "name": "PySpark (Python-PYTHON_FULL_VERSION_FOR_NAME / SPARK_VERSION) [CLUSTER_NAME]",
+  "name": "PySpark (Python-PYTHON_FOR_NAME_FULL_VERSION / SPARK_VERSION) [CLUSTER_NAME]",
   "group": "livy",
   "properties": {
     "zeppelin.livy.concurrentSQL": "false",
@@ -7,7 +7,6 @@
     "livy.spark.home":"SPARK_HOME",
     "livy.pyspark.python": "pythonPYTHON_FULL_VERSION",
     "livy.spark.hadoop.fs.s3a.endpoint": "https://s3-AWS_REGION.amazonaws.com",
-    "zeppelin.livy.spark.sql.maxResult": "1000",
     "zeppelin.interpreter.localRepo": "/opt/zeppelin/local-repo/2CAC665T6",
     "zeppelin.livy.url": "http://localhost:LIVY_PORT",
     "livy.spark.hadoop.fs.s3a.buffer.dir": "/tmp",
@@ -17,7 +16,6 @@
     "zeppelin.spark.printREPLOutput": "true",
     "zeppelin.spark.maxResult": "1000",
     "zeppelin.spark.concurrentSQL": "false",
-    "zeppelin.spark.sql.stacktrace": "false",
     "zeppelin.spark.importImplicit": "true",
     "zeppelin.pyspark.python": "pythonPYTHON_FULL_VERSION",
     "zeppelin.dep.localrepo": "local-repo",

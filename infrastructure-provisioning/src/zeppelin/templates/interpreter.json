@@ -95,7 +95,7 @@
         "livy.spark.hadoop.fs.s3a.endpoint": "https://s3-AWSREGION.amazonaws.com",
         "zeppelin.livy.spark.sql.maxResult": "1000",
         "zeppelin.interpreter.localRepo": "/opt/zeppelin/local-repo/2CAC665T6",
-        "zeppelin.livy.url": "http://localhost:LIVYPORT",
+        "zeppelin.livy.url": "http://localhost:LIVY_PORT",
         "zeppelin.spark.printREPLOutput": "true",
         "spark.hadoop.fs.s3a.buffer.dir": "/tmp",
         "spark.hadoop.fs.s3a.fast.upload": "true",

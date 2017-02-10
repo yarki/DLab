@@ -112,7 +112,7 @@ def configure_local_kernels(args):
             port_number_found = True
         else:
             default_port += 1
-    sudo('sed -i "s|LIVYPORT|' + str(livy_port) + '|g" /tmp/interpreter.json')
+    sudo('sed -i "s|LIVY_PORT|' + str(livy_port) + '|g" /tmp/interpreter.json')
     sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
     sudo('echo "livy.server.port = ' + str(livy_port) + '" >> /opt/livy/conf/livy.conf')
     sudo('''echo "SPARK_HOME='/opt/spark/'" >> /opt/livy/conf/livy-env.sh''')
