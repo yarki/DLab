@@ -27,18 +27,29 @@ import java.util.List;
  */
 public class HealthStatusPageDTO {
     @JsonProperty
-    private HealthStatusEnum status;
+    private String status;
     @JsonProperty("list_resources")
     private List<HealthStatusResource> listResources;
 
     /** Return the status of environment. */
-    public HealthStatusEnum getStatus() {
+    public String getStatus() {
         return status;
     }
 
     /** Set the status of environment. */
-    public void setStatus(HealthStatusEnum status) {
+    public void setStatus(String status) {
         this.status = status;
+    }
+
+    /** Set the status of environment. */
+    public void setStatus(HealthStatusEnum status) {
+        this.status = status == null ? null : status.toString();
+    }
+
+    /** Set the status of environment. */
+    public HealthStatusPageDTO withStatus(String status) {
+        setStatus(status);
+        return this;
     }
 
     /** Set the status of environment. */

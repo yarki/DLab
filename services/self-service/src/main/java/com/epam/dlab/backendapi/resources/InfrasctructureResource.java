@@ -77,23 +77,6 @@ public class InfrasctructureResource implements InfrasctructureAPI {
      */
     @GET
     @Path(ApiCallbacks.STATUS_URI)
-    public HealthStatusPageDTO status(@Auth UserInfo userInfo) throws DlabException {
-    	LOGGER.debug("Request the status of resources for user {}", userInfo.getName());
-    	try {
-    		HealthStatusPageDTO status = envDAO.getHealthStatusPageDTO(userInfo.getName(), true);
-    		LOGGER.debug("Return the status of resources for user {}: {}", userInfo.getName(), status);
-    		return status;
-    	} catch (Throwable e) {
-    		LOGGER.warn("Could not return status of resources for user {}: {}", userInfo.getName(), e.getLocalizedMessage(), e);
-    		throw new DlabException("Could not return status of resources: " + e.getLocalizedMessage(), e);
-    	}
-    }
-
-    /** Returns the status of infrastructure: edge.
-     * @param userInfo user info.
-     */
-    @GET
-    @Path(ApiCallbacks.STATUS_URI + "_int")
     public HealthStatusPageDTO status(@Auth UserInfo userInfo, @QueryParam("full") @DefaultValue("0") int fullReport) throws DlabException {
     	LOGGER.debug("Request the status of resources for user {}, report type {}", userInfo.getName(), fullReport);
     	try {
@@ -105,25 +88,6 @@ public class InfrasctructureResource implements InfrasctructureAPI {
     		throw new DlabException("Could not return status of resources: " + e.getLocalizedMessage(), e);
     	}
     }
-
-    /** Returns the status of infrastructure: edge.
-     * @param userInfo user info.
-     */
-    @GET
-    @Path(ApiCallbacks.STATUS_URI + "_page")
-    public HealthStatusPageDTO status(@Auth UserInfo userInfo, @QueryParam("full") @DefaultValue("false") boolean fullReport) throws DlabException  {
-    	LOGGER.debug("Request the status of resources for user {}, report type {}", userInfo.getName(), fullReport);
-    	try {
-    		HealthStatusPageDTO status = envDAO.getHealthStatusPageDTO(userInfo.getName(), fullReport);
-    		LOGGER.debug("Return the status of resources for user {}: {}", userInfo.getName(), status);
-    		return status;
-    	} catch (Throwable e) {
-    		LOGGER.warn("Could not return status of resources for user {}: {}", userInfo.getName(), e.getLocalizedMessage(), e);
-    		throw new DlabException("Could not return status of resources: " + e.getLocalizedMessage(), e);
-    	}
-    }
-    
-    
     
     /** Updates the status of the resources for user.
      * @param dto DTO info about the statuses of resources.
