@@ -40,6 +40,13 @@ def copy_key(config):
         return False
 
 
+def ensure_ciphers():
+    sudo('echo "KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256" >> /etc/ssh/sshd_config')
+    sudo('echo "Ciphers aes256-gcm@openssh.com,aes128-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr" >> /etc/ssh/sshd_config')
+    sudo('echo "    KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256" >> /etc/ssh/ssh_config')
+    sudo('echo "    Ciphers aes256-gcm@openssh.com,aes128-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr" >> /etc/ssh/ssh_config')
+    sudo('systemctl reload sshd')
+
 ##############
 # Run script #
 ##############
@@ -53,9 +60,16 @@ if __name__ == "__main__":
     except:
         sys.exit(2)
 
+    print "Ensuring safest ssh ciphers"
+    try:
+        ensure_ciphers()
+    except:
+        sys.exit(1)
+
     print "Installing users key..."
     if copy_key(deeper_config):
         sys.exit(0)
     else:
         print "Users keyfile {0}.pub could not be found at {1}/{0}".format(args.keyfile, deeper_config['user_keydir'])
         sys.exit(1)
+
