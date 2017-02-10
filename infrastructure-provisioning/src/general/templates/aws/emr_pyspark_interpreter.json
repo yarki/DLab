@@ -1,5 +1,5 @@
 {
-  "name": "PySpark (Python-PYTHON_FOR_NAME_FULL_VERSION / SPARK_VERSION) [CLUSTER_NAME]",
+  "name": "PySpark (Python-PYTHON_FOR_NAME_FULL_VERSION / Spark-SPARK_VERSION) [CLUSTER_NAME]",
   "group": "livy",
   "properties": {
     "zeppelin.livy.concurrentSQL": "false",
@@ -24,12 +24,8 @@
   },
     "interpreterGroup": [
       {
-        "class": "org.apache.zeppelin.livy.LivyPySparkInterpreter",
-        "name": "pyspark"
-      },
-      {
-        "class": "org.apache.zeppelin.spark.PySparkInterpreter",
-        "name": "pyspark"
+        "class": "org.apache.zeppelin.livy.PYTHON_LIVY_CLASS",
+        "name": "PYTHON_CLASS_NAME"
       }
     ],
   "dependencies": [],

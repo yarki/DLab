@@ -926,6 +926,12 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
             text = text.replace('SPARK_HOME', spark_dir)
             text = text.replace('AWS_REGION', region)
             text = text.replace('LIVY_PORT', str(livy_port))
+            if p_version == '2.7':
+                text = text.replace('PYTHON_LIVY_CLASS', 'LivyPySparkInterpreter')
+                text = text.replace('PYTHON_CLASS_NAME', 'pyspark')
+            else:
+                text = text.replace('PYTHON_LIVY_CLASS', 'LivyPySpark3Interpreter')
+                text = text.replace('PYTHON_CLASS_NAME', 'pyspark3')
             tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
             fw = open(tmp_file, 'w')
             fw.write(text)

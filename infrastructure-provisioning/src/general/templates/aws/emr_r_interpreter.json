@@ -1,5 +1,5 @@
 {
-  "name": "SparkR (R-R_VERSION / Spark-SPARK_VERSION)",
+  "name": "SparkR (R-R_VERSION / Spark-SPARK_VERSION) [CLUSTER_NAME]",
   "group": "livy",
   "properties": {
     "livy.spark.master": "yarn",
@@ -23,11 +23,7 @@
   },
   "interpreterGroup": [
     {
-      "class": "org.apache.zeppelin.livy.LivySparkInterpreter",
-      "name": "spark"
-    },
-    {
-      "class": "org.apache.zeppelin.spark.SparkRInterpreter",
+      "class": "org.apache.zeppelin.livy.LivySparkRInterpreter",
       "name": "sparkr"
     }
   ],

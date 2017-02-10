@@ -57,6 +57,7 @@ yarn_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/conf/'
 def install_remote_livy(args):
     install_maven_emr()
     install_livy_dependencies_emr()
+    local('sudo service zeppelin-notebook stop')
     with lcd('/opt/' + args.emr_version + '/' + args.cluster_name + '/'):
         local('sudo chown -R ' + args.os_user + ':' + args.os_user + ' /opt/' + args.emr_version + '/')
         local('git init')
