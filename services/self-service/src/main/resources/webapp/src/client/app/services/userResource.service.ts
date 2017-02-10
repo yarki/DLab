@@ -109,8 +109,9 @@ export class UserResourceService {
   }
 
   public getEnvironmentStatuses(): Observable<Response> {
+    let body = '?full=1';
     return this.applicationServiceFacade
-    .buildGetEnvironmentStatuses()
+    .buildGetEnvironmentStatuses(body)
     .map((response: Response) => response.json());
   }
 

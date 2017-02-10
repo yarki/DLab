@@ -28,7 +28,7 @@ import { EnvironmentStatusModel } from './environment-status.model';
                 '../components/resources-grid/resources-grid.component.css']
 })
 export class HealthStatusComponent {
-  environmentsHealthStatuses: EnvironmentStatusModel[];
+  environmentsHealthStatuses: Array<EnvironmentStatusModel>;
 
   constructor(
     private userResourceService: UserResourceService
@@ -46,11 +46,12 @@ export class HealthStatusComponent {
   }
 
   loadHealthStatusList(healthStatusList): Array<EnvironmentStatusModel> {
-    return healthStatusList.list_resources.map((value) => {
-      return new EnvironmentStatusModel(
-        value.type,
-        value.resource_id,
-        value.status);
-    });
+    if (healthStatusList.list_resources)
+      return healthStatusList.list_resources.map((value) => {
+        return new EnvironmentStatusModel(
+          value.type,
+          value.resource_id,
+          value.status);
+      });
   }
 }

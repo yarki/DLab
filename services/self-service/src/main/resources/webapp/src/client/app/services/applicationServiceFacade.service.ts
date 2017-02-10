@@ -162,10 +162,10 @@ export class ApplicationServiceFacade {
       this.getRequestOptions(true, true));
   }
 
-  public buildGetEnvironmentStatuses(): Observable<Response> {
+  public buildGetEnvironmentStatuses(data): Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
       this.requestRegistry.Item(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUS),
-      null,
+      data,
       this.getRequestOptions(true, true));
   }
 
@@ -209,7 +209,9 @@ export class ApplicationServiceFacade {
       return this.http.delete(body ? url + JSON.parse(body) : url, opt);
     } else if (method === RequestMethod.Put) {
       return this.http.put(url, body, opt);
-    } else return this.http.get(url, opt);
+    } else return this.http.get(body ? (url + body) : url, opt);
+
+    // else return this.http.get(url, opt);
   }
 
   private getRequestOptions(json: boolean, auth: boolean): RequestOptions {
