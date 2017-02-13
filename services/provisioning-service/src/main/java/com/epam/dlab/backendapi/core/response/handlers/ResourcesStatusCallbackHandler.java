@@ -91,11 +91,11 @@ public class ResourcesStatusCallbackHandler extends ResourceCallbackHandler<EnvS
     		LOGGER.warn("Could not retrive the status of resources for UUID {} and user {}: {}",
     				uuid, getDto().getIamUserName(), e.getLocalizedMessage(), e);
     	}
-    	return true; // Always necessary return true for status request
+    	return true; // Always necessary return true for status response
     }
     
     @Override
     public void handleError(String errorMessage) {
-    	// Nothing action for status request
+    	// Nothing action for status response
     }
 }
