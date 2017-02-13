@@ -76,7 +76,7 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
             UploadFileDTO dto = new UploadFileDTO()
                     .withEdge(edge)
                     .withContent(content);
-            return provisioningService.post(KEY_LOADER, dto, String.class);
+            return provisioningService.post(KEY_LOADER, userInfo.getAccessToken(), dto, String.class);
         } catch (Exception e) {
         	LOGGER.error("The upload of the user key for user {} fails", userInfo.getName(), e);
             keyDAO.deleteKey(userInfo.getName());
