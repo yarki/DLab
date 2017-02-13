@@ -60,6 +60,7 @@ def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
             sudo('R -e "install.packages(\'caTools\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'ggplot2\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'formatR\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "library(\'devtools\');install.packages(repos=\'http://cran.us.r-project.org\',c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
@@ -185,8 +186,6 @@ def ensure_python3_libraries(os_user):
 def install_rstudio(os_user, local_spark_path, rstudio_pass):
     if not exists('/home/' + os_user + '/.ensure_dir/rstudio_ensured'):
         try:
-            sudo('yum install -y java-1.8.0-openjdk-devel')
-            sudo('yum install -y java-1.8.0-openjdk')
             sudo('yum install -y cmake')
             sudo('yum -y install libcur*')
             sudo('echo -e "[base]\nname=CentOS-7-Base\nbaseurl=http://buildlogs.centos.org/centos/7/os/x86_64-20140704-1/\ngpgcheck=1\ngpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7\npriority=1\nexclude=php mysql" >> /etc/yum.repos.d/CentOS-base.repo')
