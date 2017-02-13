@@ -30,6 +30,7 @@ def ensure_docker_daemon(dlab_path, os_user):
         if not exists('{}tmp/docker_daemon_ensured'.format(dlab_path)):
             sudo('yum update-minimal --security -y')
             sudo('curl -fsSL https://get.docker.com/ | sh')
+            sudo('usermod -aG docker {}'.format(os_user))
             sudo('systemctl enable docker.service')
             sudo('systemctl start docker')
             sudo('touch {}tmp/docker_daemon_ensured'.format(dlab_path))

@@ -40,10 +40,13 @@ spark_version = os.environ['notebook_spark_version']
 hadoop_version = os.environ['notebook_hadoop_version']
 tensorflow_version = os.environ['notebook_tensorflow_version']
 spark_link = "http://d3kbcqa49mib13.cloudfront.net/spark-" + spark_version + "-bin-hadoop" + hadoop_version + ".tgz"
+pyspark_local_path_dir = '/home/' + args.os_user + '/.local/share/jupyter/kernels/pyspark_local/'
+py3spark_local_path_dir = '/home/' + args.os_user + '/.local/share/jupyter/kernels/py3spark_local/'
 local_spark_path = '/opt/spark/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 files_dir = '/root/files/'
+jupyter_conf_file = '/home/' + args.os_user + '/.local/share/jupyter/jupyter_notebook_config.py'
 
 
 ##############
@@ -65,17 +68,23 @@ if __name__ == "__main__":
     print "Mount additional volume"
     prepare_disk(args.os_user)
 
-    print "Install python libraries"
-    ensure_libraries_py(args.os_user)
+    print "Install Java"
+    ensure_jre_jdk(args.os_user)
+
+    print "Install python2 libraries"
+    ensure_python2_libraries(args.os_user)
+
+    print "Install python3 libraries"
+    ensure_python3_libraries(args.os_user)
 
     print "Install TensorFlow"
     install_tensor(args.os_user, tensorflow_version, files_dir, templates_dir)
 
+    print "Install Jupyter"
+    configure_jupyter(args.os_user, jupyter_conf_file, templates_dir)
+
     print "Install local Spark"
     ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path )
 
-    print "Install local S3 kernels"
-    ensure_s3_kernel(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
-
-
-
+    print "Install local jars"
+    ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)

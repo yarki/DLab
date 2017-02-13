@@ -48,8 +48,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.util.Optional;
-
 import static com.epam.dlab.UserInstanceStatus.*;
 
 /** Provides the REST API for the exploratory.
@@ -68,12 +66,14 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
 
-    /** Creates the exploratory environment for user.
+    /**
+     * Creates the exploratory environment for user.
+     *
      * @param userInfo user info.
-     * @param formDTO description for the exploratory environment.
+     * @param formDTO  description for the exploratory environment.
      * @return {@link Response.Status#OK} request for provisioning service has been accepted.<br>
      * {@link Response.Status#FOUND} request for provisioning service has been duplicated.
-     * @exception DlabException
+     * @throws DlabException
      */
     @PUT
     public Response create(@Auth UserInfo userInfo, @Valid @NotNull ExploratoryCreateFormDTO formDTO) throws DlabException {
@@ -81,41 +81,37 @@ public class ExploratoryResource implements ExploratoryAPI {
                 formDTO.getImage(), formDTO.getName(), userInfo.getName());
         boolean isAdded = false;
         try {
-        	isAdded = infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
-        			.withUser(userInfo.getName())
-        			.withExploratoryName(formDTO.getName())
-        			.withStatus(CREATING.toString())
-        			.withImageName(formDTO.getImage())
-        			.withImageVersion(formDTO.getVersion())
-        			.withTemplateName(formDTO.getTemplateName())
+            infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
+                    .withUser(userInfo.getName())
+                    .withExploratoryName(formDTO.getName())
+                    .withStatus(CREATING.toString())
+                    .withImageName(formDTO.getImage())
+                    .withImageVersion(formDTO.getVersion())
+                    .withTemplateName(formDTO.getTemplateName())
                     .withShape(formDTO.getShape()));
-        	if (isAdded) {
-                ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
-                        .withServiceBaseName(settingsDAO.getServiceBaseName())
-                        .withExploratoryName(formDTO.getName())
-                        .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                        .withIamUserName(userInfo.getName())
-                        .withNotebookImage(formDTO.getImage())
-                        .withApplicationName(getApplicationName(formDTO.getImage()))
-                        .withNotebookInstanceType(formDTO.getShape())
-                        .withAwsRegion(settingsDAO.getAwsRegion())
-                        .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups())
-                        .withConfOsUser(settingsDAO.getConfOsUser())
-                        .withConfOsFamily(settingsDAO.getConfOsFamily());
-                LOGGER.debug("Created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
-                return Response
-                        .ok(provisioningService.post(EXPLORATORY_CREATE, userInfo.getAccessToken(), dto, String.class))
-                        .build();
-            } else {
-                LOGGER.debug("Used existing exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
-                return Response.status(Response.Status.FOUND).build();
-            }
+
+            ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
+                    .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withExploratoryName(formDTO.getName())
+                    .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                    .withIamUserName(userInfo.getName())
+                    .withNotebookImage(formDTO.getImage())
+                    .withApplicationName(getApplicationName(formDTO.getImage()))
+                    .withNotebookInstanceType(formDTO.getShape())
+                    .withAwsRegion(settingsDAO.getAwsRegion())
+                    .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups())
+                    .withConfOsUser(settingsDAO.getConfOsUser())
+                    .withConfOsFamily(settingsDAO.getConfOsFamily());
+            LOGGER.debug("Created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
+            return Response
+                    .ok(provisioningService.post(EXPLORATORY_CREATE, userInfo.getAccessToken(), dto, String.class))
+                    .build();
         } catch (Throwable t) {
-        	LOGGER.error("Could not update the status of exploratory environment {} with name {} for user {}",
+            LOGGER.error("Could not update the status of exploratory environment {} with name {} for user {}",
                     formDTO.getImage(), formDTO.getName(), userInfo.getName(), t);
-        	if (isAdded) {
-        		updateExploratoryStatusSilent(userInfo.getName(), formDTO.getName(), FAILED);
-        	}
+            if (isAdded) {
+                updateExploratoryStatusSilent(userInfo.getName(), formDTO.getName(), FAILED);
+            }
             throw new DlabException("Could not create exploratory environment " + formDTO.getName() + " for user " + userInfo.getName() + ": " + t.getLocalizedMessage(), t);
         }
     }
@@ -202,13 +198,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         }
         
         try {
-            Optional<UserInstanceDTO> opt =
-                    infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), name);
-            if(!opt.isPresent()) {
-                throw new DlabException(String.format("Exploratory instance with name {} not found.", name));
-            }
-
-            UserInstanceDTO userInstance = opt.get();
+            UserInstanceDTO userInstance = infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), name);
             ExploratoryStopDTO dto = new ExploratoryStopDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookImage(userInstance.getImageName())
@@ -269,12 +259,8 @@ public class ExploratoryResource implements ExploratoryAPI {
     private String action(UserInfo userInfo, String exploratoryName, String action, UserInstanceStatus status) throws DlabException {
         try {
             updateExploratoryStatus(userInfo.getName(), exploratoryName, status);
-            Optional<UserInstanceDTO> opt =
-                    infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), exploratoryName);
-            if(!opt.isPresent())
-                throw new DlabException(String.format("Exploratory instance with name {} not found.", exploratoryName));
 
-            UserInstanceDTO userInstance = opt.get();
+            UserInstanceDTO userInstance = infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), exploratoryName);
             ExploratoryActionDTO<?> dto = new ExploratoryActionDTO<>()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookImage(userInstance.getImageName())

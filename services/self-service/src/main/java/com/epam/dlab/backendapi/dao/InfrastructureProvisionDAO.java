@@ -25,7 +25,6 @@ import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
-import com.mongodb.MongoWriteException;
 import com.mongodb.client.result.UpdateResult;
 
 import org.bson.Document;
@@ -55,6 +54,7 @@ public class InfrastructureProvisionDAO extends BaseDAO {
     private static final String EXPLORATORY_URL_URL = "url";
     private static final String EXPLORATORY_USER = "exploratory_user";
     private static final String EXPLORATORY_PASSWORD = "exploratory_pass";
+    private static final String EXPLORATORY_PRIVATE_IP = "private_ip";
     private static final String UPTIME = "up_time";
     private static final String COMPUTATIONAL_RESOURCES = "computational_resources";
     private static final String COMPUTATIONAL_NAME = "computational_name";
@@ -116,26 +116,25 @@ public class InfrastructureProvisionDAO extends BaseDAO {
      * @param exploratoryName the name of exploratory.
      * @exception DlabException
      */
-    public Optional<UserInstanceDTO> fetchExploratoryFields(String user, String exploratoryName) throws DlabException {
-        return findOne(USER_INSTANCES,
+    public UserInstanceDTO fetchExploratoryFields(String user, String exploratoryName) throws DlabException {
+
+        Optional<UserInstanceDTO> opt = findOne(USER_INSTANCES,
                 exploratoryCondition(user, exploratoryName),
                 fields(exclude(COMPUTATIONAL_RESOURCES)),
                 UserInstanceDTO.class);
+
+        if( opt.isPresent() ) {
+            return opt.get();
+        }
+        throw new DlabException(String.format("Exploratory instance for user {} with name {} not found.", user, exploratoryName));
     }
 
     /** Inserts the info about notebook into Mongo database.
-     * @param dto the info about notebook 
-     * @return <b>true</b> if operation was successful, otherwise <b>false</b>.
+     * @param dto the info about notebook
      * @exception DlabException
      */
-    public boolean insertExploratory(UserInstanceDTO dto) throws DlabException {
-        try {
-            insertOne(USER_INSTANCES, dto);
-            return true;
-        } catch (MongoWriteException e) {
-        	// TODO: Lost error message
-            return false;
-        }
+    public void insertExploratory(UserInstanceDTO dto) throws DlabException {
+        insertOne(USER_INSTANCES, dto);
     }
 
     /** Updates the status of exploratory in Mongo database.
@@ -166,6 +165,8 @@ public class InfrastructureProvisionDAO extends BaseDAO {
         if (dto.getExploratoryId() != null) {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());
         }
+
+
         if (dto.getExploratoryUrl() != null) {
             values.append(EXPLORATORY_URL, dto.getExploratoryUrl().stream()
                     .map(url -> new LinkedHashMap<String, String>() {{
@@ -173,7 +174,26 @@ public class InfrastructureProvisionDAO extends BaseDAO {
                         put(EXPLORATORY_URL_URL, url.getUrl());
                     }})
                     .collect(Collectors.toList()));
+        } else {
+            if (dto.getPrivateIp() != null) {
+                UserInstanceDTO inst = fetchExploratoryFields(dto.getUser(),dto.getExploratoryName());
+                if (!inst.getPrivateIp().equals(dto.getPrivateIp())) { // IP was changed
+                    if (inst.getExploratoryUrl() != null) {
+                        values.append(EXPLORATORY_URL, inst.getExploratoryUrl().stream()
+                                .map(url -> new LinkedHashMap<String, String>() {{
+                                    put(EXPLORATORY_URL_DESC, url.getDescription());
+                                    put(EXPLORATORY_URL_URL, url.getUrl().replace(inst.getPrivateIp(),dto.getPrivateIp()));
+                                }})
+                                .collect(Collectors.toList()));
+                    }
+                }
+            }
         }
+
+        if (dto.getPrivateIp() != null) {
+            values.append(EXPLORATORY_PRIVATE_IP, dto.getPrivateIp());
+        }
+
         if (dto.getExploratoryUser() != null) {
             values.append(EXPLORATORY_USER, dto.getExploratoryUser());
         }

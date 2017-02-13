@@ -62,8 +62,17 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
+        ip_address = get_instance_ip_address(notebook_config['notebook_name']).get('Private')
+        dns_name = get_instance_hostname(notebook_config['notebook_name'])
+        print '[SUMMARY]'
+        logging.info('[SUMMARY]')
+        print "Instance name: " + notebook_config['notebook_name']
+        print "Private DNS: " + dns_name
+        print "Private IP: " + ip_address
         with open("/root/result.json", 'w') as result:
-            res = {"notebook_name": notebook_config['notebook_name'],
+            res = {"hostname": dns_name,
+                   "ip": ip_address,
+                   "notebook_name": notebook_config['notebook_name'],
                    "Tag_name": notebook_config['tag_name'],
                    "Action": "Start up notebook server"}
             print json.dumps(res)

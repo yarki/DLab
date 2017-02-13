@@ -81,7 +81,7 @@ def prepare_disk(os_user):
             sys.exit(1)
 
 
-def ensure_s3_kernel(os_user, s3_jars_dir, files_dir, region, templates_dir):
+def ensure_local_jars(os_user, s3_jars_dir, files_dir, region, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/s3_kernel_ensured'):
         try:
             sudo('mkdir -p ' + s3_jars_dir)
@@ -107,11 +107,6 @@ def ensure_local_spark(os_user, spark_link, spark_version, hadoop_version, local
             sudo('touch /home/' + os_user + '/.ensure_dir/local_spark_ensured')
         except:
             sys.exit(1)
-
-
-#ef checksum_check(file):
-#    result = local('md5sum -c ' + file, capture=True)
-#    return result
 
 
 def prepare(emr_dir, yarn_dir):
@@ -171,3 +166,64 @@ def put_resource_status(resource, status, dlab_path, os_user):
     env.key_filename = [keyfile]
     env.host_string = os_user + '@' + hostname
     sudo('python ' + dlab_path + 'tmp/resource_status.py --resource {} --status {}'.format(resource, status))
+
+
+def configure_jupyter(os_user, jupyter_conf_file, templates_dir):
+    if not exists('/home/' + os_user + '/.ensure_dir/jupyter_ensured'):
+        try:
+            sudo('pip install jupyter --no-cache-dir')
+            sudo('rm -rf ' + jupyter_conf_file)
+            sudo('jupyter notebook --generate-config --config ' + jupyter_conf_file)
+            sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
+            sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
+            sudo('echo \'c.NotebookApp.cookie_secret = b"' + id_generator() + '"\' >> ' + jupyter_conf_file)
+            sudo('''echo "c.NotebookApp.token = u''" >> ''' + jupyter_conf_file)
+            sudo('echo \'c.KernelSpecManager.ensure_native_kernel = False\' >> ' + jupyter_conf_file)
+            put(templates_dir + 'jupyter-notebook.service', '/tmp/jupyter-notebook.service')
+            sudo("chmod 644 /tmp/jupyter-notebook.service")
+            if os.environ['application'] == 'tensor':
+                sudo("sed -i 's|ExecStart=/bin/bash -c \"/usr/local/bin/jupyter notebook --config CONF_PATH\"|"
+                     "ExecStart=/bin/bash -c \"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/cudnn/lib64; "
+                     "/usr/local/bin/jupyter notebook --config CONF_PATH\"|' /tmp/jupyter-notebook.service")
+            sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
+            sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/jupyter-notebook.service")
+            sudo('\cp /tmp/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service')
+            sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
+            sudo('mkdir /mnt/var')
+            sudo('chown ' + os_user + ':' + os_user + ' /mnt/var')
+            sudo("systemctl daemon-reload")
+            sudo("systemctl enable jupyter-notebook")
+            sudo("systemctl start jupyter-notebook")
+            sudo('touch /home/' + os_user + '/.ensure_dir/jupyter_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_pyspark_local_kernel(os_user, pyspark_local_path_dir, templates_dir, spark_version):
+    if not exists('/home/' + os_user + '/.ensure_dir/pyspark_local_kernel_ensured'):
+        try:
+            sudo('mkdir -p ' + pyspark_local_path_dir)
+            sudo('touch ' + pyspark_local_path_dir + 'kernel.json')
+            put(templates_dir + 'pyspark_local_template.json', '/tmp/pyspark_local_template.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/pyspark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/pyspark_local_template.json')
+            sudo('\cp /tmp/pyspark_local_template.json ' + pyspark_local_path_dir + 'kernel.json')
+            sudo('touch /home/' + os_user + '/.ensure_dir/pyspark_local_kernel_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_py3spark_local_kernel(os_user, py3spark_local_path_dir, templates_dir, spark_version):
+    if not exists('/home/' + os_user + '/.ensure_dir/py3spark_local_kernel_ensured'):
+        try:
+            sudo('mkdir -p ' + py3spark_local_path_dir)
+            sudo('touch ' + py3spark_local_path_dir + 'kernel.json')
+            put(templates_dir + 'py3spark_local_template.json', '/tmp/py3spark_local_template.json')
+            sudo(
+                "PYJ=`find /opt/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; sed -i 's|PY4J|'$PYJ'|g' /tmp/py3spark_local_template.json")
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/py3spark_local_template.json')
+            sudo('\cp /tmp/py3spark_local_template.json ' + py3spark_local_path_dir + 'kernel.json')
+            sudo('touch /home/' + os_user + '/.ensure_dir/py3spark_local_kernel_ensured')
+        except:
+            sys.exit(1)

@@ -22,8 +22,6 @@ import static com.epam.dlab.UserInstanceStatus.CREATING;
 import static com.epam.dlab.UserInstanceStatus.FAILED;
 import static com.epam.dlab.UserInstanceStatus.TERMINATING;
 
-import java.util.Optional;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -124,7 +122,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withVersion(formDTO.getVersion()));
         if (isAdded) {
             try {
-            	UserInstanceDTO instance = getExploratoryInstance(userInfo.getName(), formDTO.getNotebookName());
+            	UserInstanceDTO instance = infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), formDTO.getNotebookName());
                 ComputationalCreateDTO dto = new ComputationalCreateDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withExploratoryName(formDTO.getNotebookName())
@@ -180,7 +178,7 @@ public class ComputationalResource implements ComputationalAPI {
             try {
             	UserComputationalResourceDTO computational = infrastructureProvisionDAO
             			.fetchComputationalFields(userInfo.getName(), dto.getExploratoryName(), dto.getComputationalName());
-            	UserInstanceDTO instance = getExploratoryInstance(userInfo.getName(), dto.getExploratoryName());
+            	UserInstanceDTO instance = infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), dto.getExploratoryName());
             	ComputationalConfigDTO dtoConf = new ComputationalConfigDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withApplicationName(getApplicationName(instance.getImageName()))
@@ -191,9 +189,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                         .withIamUserName(userInfo.getName())
                         .withAwsRegion(settingsDAO.getAwsRegion())
-                        .withConfOsUser(settingsDAO.getConfOsUser())
-                        .withConfOsFamily(settingsDAO.getConfOsFamily()) //TODO: Remove and check it
-                        ;
+                        .withConfOsUser(settingsDAO.getConfOsUser());
             	provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dtoConf, String.class);
             } catch (Throwable e) {
             	LOGGER.error("Could not send request for configuration of the computational resource {} for user {}: ",
@@ -236,7 +232,6 @@ public class ComputationalResource implements ComputationalAPI {
                     .withClusterName(computationalId)
                     .withConfKeyDir(settingsDAO.getConfKeyDir())
                     .withConfOsUser(settingsDAO.getConfOsUser())
-                    .withConfOsFamily(settingsDAO.getConfOsFamily()) //TODO: Remove and check it
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withAwsRegion(settingsDAO.getAwsRegion());
@@ -266,19 +261,7 @@ public class ComputationalResource implements ComputationalAPI {
                 .withStatus(status);
         infrastructureProvisionDAO.updateComputationalStatus(computationalStatus);
     }
-    
-    /** Finds and returns the instance of exploratory.
-     * @param username name of user.
-     * @param exploratoryName name of exploratory.
-     * @throws DlabException
-     */
-    private UserInstanceDTO getExploratoryInstance(String username, String exploratoryName) throws DlabException {
-    	Optional<UserInstanceDTO> opt = infrastructureProvisionDAO.fetchExploratoryFields(username, exploratoryName);
-        if( opt.isPresent() ) {
-            return opt.get();
-        }
-        throw new DlabException(String.format("Exploratory instance for user {} with name {} not found.", username, exploratoryName));
-    }
+
 
     /** Returns the name of application for notebook: jupiter, rstudio, etc. */
     private String getApplicationName(String imageName) {

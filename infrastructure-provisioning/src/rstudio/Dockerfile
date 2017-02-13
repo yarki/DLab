@@ -26,7 +26,7 @@ COPY rstudio/ /root/
 COPY general/scripts/${CLOUD}/rstudio_* /root/scripts/
 COPY general/scripts/os/notebook_configure_proxy.py /root/scripts/
 COPY general/lib/os/${OS}/notebook_lib.py /usr/lib/python2.7/dlab/notebook_lib.py
-COPY general/templates/os/common/notebook_spark-defaults_local.conf /root/templates/
+COPY general/templates/os/notebook_spark-defaults_local.conf /root/templates/
 COPY general/files/os/notebook_local_jars.tar.gz /root/files/
 
 RUN chmod a+x /root/fabfile.py; \

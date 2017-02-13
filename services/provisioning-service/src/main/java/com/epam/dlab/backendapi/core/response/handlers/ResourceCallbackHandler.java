@@ -40,8 +40,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
 
     private static final String INSTANCE_ID_FIELD = "instance_id";
     private static final String STATUS_FIELD = "status";
-    private static final String RESPONSE_NODE = "response";
-    private static final String RESULT_NODE = "result";
+    protected static final String RESPONSE_NODE = "response";
+    protected static final String RESULT_NODE = "result";
     private static final String ERROR_NODE = "error";
     private static final String CONF_NODE = "conf";
 
@@ -78,7 +78,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     }
     
     private void selfServicePost(T object) throws DlabException {
-        LOGGER.debug("Send post request to self service for UUID {}, object {}", originalUuid, object);
+        LOGGER.debug("Send post request to self service " + getCallbackURI() + " for UUID {}, object {}", originalUuid, object);
         try {
         	selfService.post(getCallbackURI(), accessToken, object, resultType);
         } catch (Exception e) {
