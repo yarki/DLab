@@ -69,13 +69,13 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     		baseStatus.withComputationalId(getTextValue(resultNode.get(COMPUTATIONAL_ID_FIELD)));
     		if (UserInstanceStatus.of(baseStatus.getStatus()) == UserInstanceStatus.RUNNING) {
     			baseStatus.withStatus(UserInstanceStatus.CONFIGURING);
+    			ComputationalConfigure.configure(uuid, (ComputationalCreateDTO)getDto());
     		}
     		break;
 		case CONFIGURE:
 			baseStatus
 				.withComputationalName(getDto().getComputationalName())
 				.withUptime(null);
-			ComputationalConfigure.configure(uuid, (ComputationalCreateDTO)getDto());
 			break;
 		default:
 			break;
