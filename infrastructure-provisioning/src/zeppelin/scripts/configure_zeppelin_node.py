@@ -99,7 +99,7 @@ def configure_local_kernels(args):
     default_port = 8998
     livy_port = ''
     put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
-    sudo('sed -i "s|AWSREGION|' + args.region + '|g" /tmp/interpreter.json')
+    sudo('sed -i "s|AWS_REGION|' + args.region + '|g" /tmp/interpreter.json')
     sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
     while not port_number_found:
         port_free = sudo('nc -z localhost ' + str(default_port) + '; echo $?')
