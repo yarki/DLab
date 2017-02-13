@@ -241,10 +241,8 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo("chmod 644 /tmp/tensorboard.service")
             sudo('\cp /tmp/tensorboard.service /etc/systemd/system/')
             sudo("systemctl daemon-reload")
-            sudo("systemctl enable tensorboard-python2")
-            sudo("systemctl enable tensorboard-python3")
-            sudo("systemctl start tensorboard-python2")
-            sudo("systemctl start tensorboard-python3")
+            sudo("systemctl enable tensorboard")
+            sudo("systemctl start tensorboard")
             # install Theano
             sudo('python2.7 -m pip install Theano')
             sudo('python3 -m pip install Theano')
