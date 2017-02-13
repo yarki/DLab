@@ -163,7 +163,7 @@ public class ComputationalResource implements ComputationalAPI {
      */
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(@Auth UserInfo userInfo, ComputationalStatusDTO dto) throws DlabException {
+    public Response status(ComputationalStatusDTO dto) throws DlabException {
         LOGGER.debug("Updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto);
         String uuid = dto.getRequestId();
         RequestId.checkAndRemove(uuid);

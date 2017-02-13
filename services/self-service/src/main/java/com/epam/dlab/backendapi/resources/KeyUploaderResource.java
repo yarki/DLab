@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.domain.KeyUploader;
+import com.epam.dlab.backendapi.domain.RequestId;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.exceptions.DlabException;
@@ -98,7 +99,8 @@ public class KeyUploaderResource {
         String content;
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {
             content = buffer.lines().collect(Collectors.joining("\n"));
-            keyUploader.startKeyUpload(userInfo, content);
+            RequestId.put(userInfo.getName(),
+            		keyUploader.startKeyUpload(userInfo, content));
         } catch (IOException|DlabException e) {
     		LOGGER.error("Could not upload the key for user {}", userInfo.getName(), e);
     		throw new DlabException("Could not upload the key for user " + userInfo.getName() + ": " + e.getLocalizedMessage(), e);
@@ -112,8 +114,9 @@ public class KeyUploaderResource {
      */
     @POST
     @Path("/callback")
-    public Response loadKeyResponse(@Auth UserInfo ui, UploadFileResultDTO uploadKeyResult) {
+    public Response loadKeyResponse(UploadFileResultDTO uploadKeyResult) {
         LOGGER.debug("Upload the key result for user {}", uploadKeyResult.getUser(), uploadKeyResult.isSuccess());
+        RequestId.checkAndRemove(uploadKeyResult.getRequestId());
         try {
         	keyUploader.onKeyUploadComplete(uploadKeyResult);
         } catch (DlabException e) {
