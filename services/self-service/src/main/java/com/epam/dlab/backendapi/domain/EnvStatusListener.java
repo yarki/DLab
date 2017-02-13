@@ -137,7 +137,8 @@ public class EnvStatusListener implements Managed, Runnable {
 			if (resourceList.getHostList() != null || resourceList.getClusterList() != null) {
 				userInfo.dto.withResourceList(resourceList);
 				LOGGER.trace("Ask docker for the status of resources for user {}: {}", userInfo.username, userInfo.dto);
-				provisioningService.post(InfrasctructureAPI.INFRASTRUCTURE_STATUS, userInfo.accessToken, userInfo.dto, String.class);
+				String uuid = provisioningService.post(InfrasctructureAPI.INFRASTRUCTURE_STATUS, userInfo.accessToken, userInfo.dto, String.class);
+                RequestId.put(userInfo.username, uuid);
 			}
 		} catch (Exception e) {
 			LOGGER.warn("Ask docker for the status of resources for user {} fails: {}", e.getLocalizedMessage(), e);

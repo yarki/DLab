@@ -21,6 +21,8 @@ package com.epam.dlab.dto.keyload;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UploadFileResultDTO {
+	@JsonProperty("request_id")
+    private String requestId;
     @JsonProperty
     private String user;
     @JsonProperty
@@ -28,15 +30,30 @@ public class UploadFileResultDTO {
     @JsonProperty
     private UserAWSCredentialDTO credential;
 
-    public UploadFileResultDTO() {
+    public String getRequestId() {
+        return requestId;
     }
 
-    public UploadFileResultDTO(String user) {
-        this.user = user;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public UploadFileResultDTO withRequestId(String requestId) {
+        setRequestId(requestId);
+        return this;
     }
 
     public String getUser() {
         return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public UploadFileResultDTO withUser(String user) {
+        setUser(user);
+        return this;
     }
 
     public boolean isSuccess() {

@@ -42,6 +42,12 @@ import static com.epam.dlab.constants.ServiceConsts.SECURITY_SERVICE_NAME;
 import static com.epam.dlab.constants.ServiceConsts.SELF_SERVICE_NAME;
 
 public class ProvisioningServiceApplication extends Application<ProvisioningServiceApplicationConfiguration> {
+	private static Injector injector;
+	
+	public static Injector getInjector() {
+		return injector;
+	}
+	
     public static void main(String[] args) throws Exception {
         new ProvisioningServiceApplication().run(args);
     }
@@ -58,7 +64,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         DlabProcess.getInstance().setProcessTimeout(configuration.getProcessTimeout());
         DlabProcess.getInstance().setMaxProcessesPerBox(configuration.getProcessMaxThreadsPerJvm());
         DlabProcess.getInstance().setMaxProcessesPerUser(configuration.getProcessMaxThreadsPerUser());
-        Injector injector = createInjector(configuration, environment);
+        injector = createInjector(configuration, environment);
         injector.getInstance(SecurityFactory.class).configure(injector, environment);
         environment.lifecycle().manage(injector.getInstance(DirectoriesCreator.class));
         environment.lifecycle().manage(injector.getInstance(DockerWarmuper.class));
