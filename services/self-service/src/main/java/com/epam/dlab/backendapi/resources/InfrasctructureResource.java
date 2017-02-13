@@ -106,7 +106,7 @@ public class InfrasctructureResource implements InfrasctructureAPI {
         } catch (Throwable e) {
         	LOGGER.warn("Could not update status of resources for user {}: {}", dto.getUser(), e.getLocalizedMessage(), e);
         }
-        // Always necessary send OK
+        // Always necessary send OK for status request
         return Response.ok().build();
     }
 

@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.dlab.backendapi.core.commands.DockerAction;
 import com.epam.dlab.dto.status.EnvResourceDTO;
 import com.epam.dlab.dto.status.EnvResourceList;
@@ -36,6 +39,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ResourcesStatusCallbackHandler extends ResourceCallbackHandler<EnvStatusDTO> {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ResourcesStatusCallbackHandler.class);
 	private static ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 	
     private final String uuid;
@@ -77,5 +81,21 @@ public class ResourcesStatusCallbackHandler extends ResourceCallbackHandler<EnvS
         return baseStatus
         		.withResourceList(resourceList)
         		.withUptime(Date.from(Instant.now()));
+    }
+    
+    @Override
+    public boolean handle(String fileName, byte[] content) throws Exception {
+    	try {
+    		return super.handle(fileName, content);
+    	} catch (Throwable e) {
+    		LOGGER.warn("Could not retrive the status of resources for UUID {} and user {}: {}",
+    				uuid, getDto().getIamUserName(), e.getLocalizedMessage(), e);
+    	}
+    	return true; // Always necessary return true for status request
+    }
+    
+    @Override
+    public void handleError(String errorMessage) {
+    	// Nothing action for status request
     }
 }
