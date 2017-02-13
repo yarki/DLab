@@ -631,12 +631,12 @@ def get_list_instance_statuses(instance_ids):
                 inst = i.get('Instances')
                 for j in inst:
                     host['id'] = j.get('InstanceId')
-                    host['state'] = j.get('State').get('Name')
+                    host['status'] = j.get('State').get('Name')
                     data.append(host)
         except:
             host['resource_type'] = 'host'
             host['id'] = h.get('id')
-            host['state'] = 'terminated'
+            host['status'] = 'terminated'
             data.append(host)
     return data
 
@@ -649,15 +649,15 @@ def get_list_cluster_statuses(cluster_ids, data=[]):
             response = client.describe_cluster(ClusterId=i.get('id')).get('Cluster')
             host['id'] = i.get('id')
             if response.get('Status').get('State').lower() == 'waiting':
-                host['state'] = 'running'
+                host['status'] = 'running'
             elif response.get('Status').get('State').lower() == 'running':
-                host['state'] = 'configuring'
+                host['status'] = 'configuring'
             else:
-                host['state'] = response.get('Status').get('State').lower()
+                host['status'] = response.get('Status').get('State').lower()
             data.append(host)
         except:
             host['id'] = i.get('id')
-            host['state'] = 'terminated'
+            host['status'] = 'terminated'
             data.append(host)
     return data
 

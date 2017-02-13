@@ -15,13 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ****************************************************************************/
+package com.epam.dlab.rest.contracts;
 
-export class EnvironmentStatusModel {
-  constructor(
-    public type: string,
-    public cloud_type: string,
-    public ip: string,
-    public path: string,
-    public status: string
-  ) { }
+public interface InfrasctructureAPI {
+    public static final String INFRASTRUCTURE = "/infrastructure";
+    public static final String INFRASTRUCTURE_STATUS = INFRASTRUCTURE + "/status";
 }

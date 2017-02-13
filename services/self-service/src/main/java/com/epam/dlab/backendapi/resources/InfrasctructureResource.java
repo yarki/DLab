@@ -18,26 +18,53 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
-import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.resources.dto.HealthStatusDTO;
-import com.epam.dlab.contracts.HealthChecker;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import io.dropwizard.auth.Auth;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
 import static com.epam.dlab.backendapi.core.health.HealthChecks.MONGO_HEALTH_CHECKER;
 import static com.epam.dlab.backendapi.core.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.epam.dlab.backendapi.resources.dto.HealthStatusPageDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.epam.dlab.UserInstanceStatus;
+import com.epam.dlab.auth.UserInfo;
+import com.epam.dlab.backendapi.dao.EnvStatusDAO;
+import com.epam.dlab.constants.ServiceConsts;
+import com.epam.dlab.contracts.HealthChecker;
+import com.epam.dlab.dto.status.EnvStatusDTO;
+import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.ApiCallbacks;
+import com.epam.dlab.rest.contracts.InfrasctructureAPI;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
+import io.dropwizard.auth.Auth;
 
 /** Provides the REST API for the basic information about infrastructure.
  */
 @Path("/infrastructure")
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class InfrasctructureResource {
+public class InfrasctructureResource implements InfrasctructureAPI {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InfrasctructureResource.class);
+
+    @Inject
+    private EnvStatusDAO envDAO;
+    
+    @Inject
+    @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
+    private RESTService provisioningService;
+
     @Inject
     @Named(MONGO_HEALTH_CHECKER)
     private HealthChecker mongoHealthChecker;
@@ -45,14 +72,42 @@ public class InfrasctructureResource {
     @Named(PROVISIONING_HEALTH_CHECKER)
     private HealthChecker provisioningHealthChecker;
 
-    /** Returns the status of infrastructure: database and provisioning service.
+    /** Returns the status of infrastructure: edge.
      * @param userInfo user info.
      */
     @GET
-    @Path("/status")
-    public HealthStatusDTO status(@Auth UserInfo userInfo) {
-        return new HealthStatusDTO()
-                .withMongoAlive(mongoHealthChecker.isAlive(userInfo))
-                .withProvisioningAlive(provisioningHealthChecker.isAlive(userInfo));
+    @Path(ApiCallbacks.STATUS_URI)
+    public HealthStatusPageDTO status(@Auth UserInfo userInfo, @QueryParam("full") @DefaultValue("0") int fullReport) throws DlabException {
+    	LOGGER.debug("Request the status of resources for user {}, report type {}", userInfo.getName(), fullReport);
+    	try {
+    		HealthStatusPageDTO status = envDAO.getHealthStatusPageDTO(userInfo.getName(), fullReport != 0);
+    		LOGGER.debug("Return the status of resources for user {}: {}", userInfo.getName(), status);
+    		return status;
+    	} catch (Throwable e) {
+    		LOGGER.warn("Could not return status of resources for user {}: {}", userInfo.getName(), e.getLocalizedMessage(), e);
+    		throw new DlabException("Could not return status of resources: " + e.getLocalizedMessage(), e);
+    	}
     }
+    
+    /** Updates the status of the resources for user.
+     * @param dto DTO info about the statuses of resources.
+     * @return Always return code 200 (OK).
+     */
+    @POST
+    @Path(ApiCallbacks.STATUS_URI)
+    public Response status(@Auth UserInfo userInfo, EnvStatusDTO dto) {
+        LOGGER.trace("Updating the status of resources for user {}: {}", dto.getUser(), dto);
+        try {
+        	if (UserInstanceStatus.FAILED == UserInstanceStatus.of(dto.getStatus())) {
+        		LOGGER.warn("Request for the status of resources for user {} fails: {}", dto.getUser(), dto.getErrorMessage());
+        	} else {
+        		envDAO.updateEnvStatus(dto.getUser(), dto.getResourceList());
+        	}
+        } catch (Throwable e) {
+        	LOGGER.warn("Could not update status of resources for user {}: {}", dto.getUser(), e.getLocalizedMessage(), e);
+        }
+        // Always necessary send OK for status request
+        return Response.ok().build();
+    }
+
 }
