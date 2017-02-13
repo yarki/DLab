@@ -23,6 +23,7 @@ import static com.epam.dlab.constants.ServiceConsts.PROVISIONING_SERVICE_NAME;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
@@ -55,7 +56,11 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
     @Override
     public KeyLoadStatus checkKey(UserInfo userInfo) throws DlabException {
     	LOGGER.trace("Find the status of the user key for {}", userInfo.getName());
-        return keyDAO.findKeyStatus(userInfo.getName());
+    	KeyLoadStatus status = keyDAO.findKeyStatus(userInfo.getName());
+    	if (status == KeyLoadStatus.SUCCESS) {
+    		// TODO: Start the listener for status
+    	}
+        return status;
     }
 
     @Override
@@ -89,7 +94,11 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
     	LOGGER.debug("The upload of the user key for user {} has been completed, status is {}", uploadKeyResult.getUser(), uploadKeyResult.isSuccess());
         keyDAO.updateKey(uploadKeyResult.getUser(), KeyLoadStatus.getStatus(uploadKeyResult.isSuccess()));
         if (uploadKeyResult.isSuccess()) {
-            keyDAO.saveCredential(uploadKeyResult.getUser(), uploadKeyResult.getCredential());
+        	keyDAO.saveCredential(uploadKeyResult.getUser(),
+        			uploadKeyResult
+        				.getCredential()
+        				.withEdgeStatus(UserInstanceStatus.RUNNING));
+            // TODO: Start the listener for status
         } else {
             keyDAO.deleteKey(uploadKeyResult.getUser());
         }

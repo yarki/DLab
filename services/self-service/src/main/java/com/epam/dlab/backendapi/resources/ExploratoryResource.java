@@ -21,13 +21,14 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
-import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
+import com.epam.dlab.backendapi.dao.ComputationalDAO;
+import com.epam.dlab.backendapi.dao.ExploratoryDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.domain.RequestId;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.backendapi.resources.dto.ExploratoryActionFormDTO;
 import com.epam.dlab.backendapi.resources.dto.ExploratoryCreateFormDTO;
-import com.epam.dlab.dto.StatusBaseDTO;
+import com.epam.dlab.dto.StatusEnvBaseDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryCreateDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
@@ -62,7 +63,9 @@ public class ExploratoryResource implements ExploratoryAPI {
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
-    private InfrastructureProvisionDAO infrastructureProvisionDAO;
+    private ExploratoryDAO infExpDAO;
+    @Inject
+    private ComputationalDAO infCompDAO;
     @Inject
     @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
@@ -82,7 +85,7 @@ public class ExploratoryResource implements ExploratoryAPI {
                 formDTO.getImage(), formDTO.getName(), userInfo.getName());
         boolean isAdded = false;
         try {
-            infrastructureProvisionDAO.insertExploratory(new UserInstanceDTO()
+            infExpDAO.insertExploratory(new UserInstanceDTO()
                     .withUser(userInfo.getName())
                     .withExploratoryName(formDTO.getName())
                     .withStatus(CREATING.toString())
@@ -94,7 +97,7 @@ public class ExploratoryResource implements ExploratoryAPI {
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withExploratoryName(formDTO.getName())
-                    .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookImage(formDTO.getImage())
                     .withApplicationName(getApplicationName(formDTO.getImage()))
@@ -132,7 +135,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         UserInstanceStatus currentStatus;
         
         try {
-        	currentStatus = infrastructureProvisionDAO.fetchExploratoryStatus(dto.getUser(), dto.getExploratoryName());
+        	currentStatus = infExpDAO.fetchExploratoryStatus(dto.getUser(), dto.getExploratoryName());
         } catch (DlabException e) {
         	LOGGER.error("Could not get current status for exploratory environment {} for user {}",
         			dto.getExploratoryName(), dto.getUser(), e);
@@ -143,7 +146,7 @@ public class ExploratoryResource implements ExploratoryAPI {
         		dto.getExploratoryName(), dto.getUser(), currentStatus);
 
         try {
-            infrastructureProvisionDAO.updateExploratoryFields(dto);
+            infExpDAO.updateExploratoryFields(dto);
             if (currentStatus == TERMINATING) {
             	updateComputationalStatuses(dto.getUser(), dto.getExploratoryName(), UserInstanceStatus.of(dto.getStatus()));
             } else if (currentStatus == STOPPING) {
@@ -201,12 +204,12 @@ public class ExploratoryResource implements ExploratoryAPI {
         }
         
         try {
-            UserInstanceDTO userInstance = infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), name);
+            UserInstanceDTO userInstance = infExpDAO.fetchExploratoryFields(userInfo.getName(), name);
             ExploratoryStopDTO dto = new ExploratoryStopDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookImage(userInstance.getImageName())
                     .withExploratoryName(name)
-                    .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(userInstance.getExploratoryId())
                     .withConfKeyDir(settingsDAO.getConfKeyDir())
@@ -266,12 +269,12 @@ public class ExploratoryResource implements ExploratoryAPI {
         try {
             updateExploratoryStatus(userInfo.getName(), exploratoryName, status);
 
-            UserInstanceDTO userInstance = infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), exploratoryName);
+            UserInstanceDTO userInstance = infExpDAO.fetchExploratoryFields(userInfo.getName(), exploratoryName);
             ExploratoryActionDTO<?> dto = new ExploratoryActionDTO<>()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookImage(userInstance.getImageName())
                     .withExploratoryName(exploratoryName)
-                    .withNotebookUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withNotebookInstanceName(userInstance.getExploratoryId())
                     .withAwsRegion(settingsDAO.getAwsRegion())
@@ -292,7 +295,7 @@ public class ExploratoryResource implements ExploratoryAPI {
      * @param exploratoryName name of exploratory environment.
      * @param status status for exploratory environment.
      */
-    private StatusBaseDTO<?> createStatusDTO(String user, String exploratoryName, UserInstanceStatus status) {
+    private StatusEnvBaseDTO<?> createStatusDTO(String user, String exploratoryName, UserInstanceStatus status) {
         return new ExploratoryStatusDTO()
                 .withUser(user)
                 .withExploratoryName(exploratoryName)
@@ -307,8 +310,8 @@ public class ExploratoryResource implements ExploratoryAPI {
      */
     private void updateComputationalStatuses(String user, String exploratoryName, UserInstanceStatus status) throws DlabException {
         LOGGER.debug("updating status for all computational resources of {} for user {}: {}", exploratoryName, user, status);
-        StatusBaseDTO<?> exploratoryStatus = createStatusDTO(user, exploratoryName, status);
-        infrastructureProvisionDAO.updateComputationalStatusesForExploratory(exploratoryStatus);
+        StatusEnvBaseDTO<?> exploratoryStatus = createStatusDTO(user, exploratoryName, status);
+        infCompDAO.updateComputationalStatusesForExploratory(exploratoryStatus);
     }
 
     /** Updates the status of exploratory environment.
@@ -318,8 +321,8 @@ public class ExploratoryResource implements ExploratoryAPI {
      * @throws DlabException
      */
     private void updateExploratoryStatus(String user, String exploratoryName, UserInstanceStatus status) throws DlabException {
-        StatusBaseDTO<?> exploratoryStatus = createStatusDTO(user, exploratoryName, status);
-        infrastructureProvisionDAO.updateExploratoryStatus(exploratoryStatus);
+        StatusEnvBaseDTO<?> exploratoryStatus = createStatusDTO(user, exploratoryName, status);
+        infExpDAO.updateExploratoryStatus(exploratoryStatus);
     }
 
     /** Updates the status of exploratory environment without exceptions. If exception occurred then logging it.

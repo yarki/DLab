@@ -94,7 +94,7 @@ public class ExploratoryResource implements DockerCommands {
 
         RunDockerCommand runDockerCommand = new RunDockerCommand()
                 .withInteractive()
-                .withName(nameContainer(dto.getNotebookUserName(), action, dto.getExploratoryName()))
+                .withName(nameContainer(dto.getEdgeUserName(), action, dto.getExploratoryName()))
                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                 .withVolumeForResponse(configuration.getImagesDirectory())
                 .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())

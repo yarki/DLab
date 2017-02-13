@@ -38,12 +38,10 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCallbackHandler.class);
     protected ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 
-    private static final String INSTANCE_ID_FIELD = "instance_id";
     private static final String STATUS_FIELD = "status";
     protected static final String RESPONSE_NODE = "response";
     protected static final String RESULT_NODE = "result";
     private static final String ERROR_NODE = "error";
-    private static final String CONF_NODE = "conf";
 
     private static final String OK_STATUS = "ok";
 
@@ -76,11 +74,11 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     }
     
     private void selfServicePost(T object) throws DlabException {
-        LOGGER.debug("Send post request to self service " + getCallbackURI() + " for UUID {}, object {}", originalUuid, object);
+        LOGGER.debug("Send post request to self service {} for UUID {}, object {}", getCallbackURI(), originalUuid, object);
         try {
         	selfService.post(getCallbackURI(), object, resultType);
-        } catch (Exception e) {
-        	LOGGER.error("Send request or responce error for UUID {}: {}", e.getLocalizedMessage(), originalUuid, e);
+        } catch (Throwable e) {
+        	LOGGER.error("Send request or response error for UUID {}: {}", originalUuid, e.getLocalizedMessage(), e);
         	throw new DlabException("Send request or responce error for UUID " + originalUuid + ": " + e.getLocalizedMessage(), e);
         }
     }
@@ -94,16 +92,11 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         T result = getBaseStatusDTO(status);
         
         JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
-        if (action == DockerAction.CREATE) {
-        	result.setInstanceId(getTextValue(resultNode.get(INSTANCE_ID_FIELD)));
-        }
-
         if (success) {
             LOGGER.debug("Did {} resource for user: {}, UUID: {}", action, user, originalUuid);
         } else {
             LOGGER.error("Could not {} resource for user: {}, UUID: {}", action, user, originalUuid);
             result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
-            resultNode = resultNode.get(CONF_NODE);
         }
         result = parseOutResponse(resultNode, result);
         
@@ -146,6 +139,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     private UserInstanceStatus calcStatus(DockerAction action, boolean success) {
         if (success) {
             switch (action) {
+            	case STATUS:
+            		return UserInstanceStatus.CREATED; // Any status besides failed
                 case CREATE:
                     return UserInstanceStatus.RUNNING;
                 case CONFIGURE:
