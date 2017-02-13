@@ -289,6 +289,56 @@ def create_attach_policy(policy_name, role_name, file_path):
         traceback.print_exc(file=sys.stdout)
 
 
+def allocate_elastic_ip():
+    try:
+        client = boto3.client('ec2')
+        response = client.allocate_address(Domain='vpc')
+        return response.get('AllocationId')
+    except Exception as err:
+        logging.info("Unable to allocate Elastic IP: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        append_result(str({"error": "Unable to allocate Elastic IP",
+                           "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
+
+
+def release_elastic_ip(allocation_id):
+    try:
+        client = boto3.client('ec2')
+        client.release_address(AllocationId=allocation_id)
+    except Exception as err:
+        logging.info("Unable to release Elastic IP: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        append_result(str({"error": "Unable to release Elastic IP",
+                           "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
+
+
+def associate_elastic_ip(instance_id, allocation_id):
+    try:
+        client = boto3.client('ec2')
+        response = client.associate_address(InstanceId=instance_id, AllocationId=allocation_id)
+        return response.get('AssociationId')
+    except Exception as err:
+        logging.info("Unable to associate Elastic IP: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        append_result(str({"error": "Unable to associate Elastic IP",
+                           "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
+
+
+def disassociate_elastic_ip(association_id):
+    try:
+        client = boto3.client('ec2')
+        client.disassociate_address(AssociationId=association_id)
+    except Exception as err:
+        logging.info("Unable to disassociate Elastic IP: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        append_result(str({"error": "Unable to disassociate Elastic IP",
+                           "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
+
+
 def remove_ec2(tag_name, tag_value):
     try:
         ec2 = boto3.resource('ec2')
@@ -299,6 +349,16 @@ def remove_ec2(tag_name, tag_value):
         instances = list(inst)
         if instances:
             for instance in instances:
+                try:
+                    response = client.describe_instances(InstanceIds=[instance.id])
+                    for i in response.get('Reservations'):
+                        for h in i.get('Instances'):
+                            elastic_ip = h.get('PublicIpAddress')
+                            allocation_id = get_allocation_id_by_elastic_ip(elastic_ip)
+                            release_elastic_ip(allocation_id)
+                            print "Releasing Elastic IP: " + elastic_ip
+                except:
+                    print "There is no Elastic IP to diassociate from instance: " + instance.id
                 client.terminate_instances(InstanceIds=[instance.id])
                 waiter = client.get_waiter('instance_terminated')
                 waiter.wait(InstanceIds=[instance.id])

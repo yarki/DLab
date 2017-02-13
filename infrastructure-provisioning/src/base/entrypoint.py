@@ -138,3 +138,7 @@ if __name__ == "__main__":
     elif args.action == 'configure':
         with hide('running'):
             local("/bin/configure.py")
+
+    elif args.action == 'recreate':
+        with hide('running'):
+            local("/bin/recreate.py")
