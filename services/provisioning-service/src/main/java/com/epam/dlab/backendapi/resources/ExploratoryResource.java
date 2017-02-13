@@ -69,13 +69,13 @@ public class ExploratoryResource implements DockerCommands {
 
     @Path("/start")
     @POST
-    public String start(@Auth UserInfo ui, ExploratoryActionDTO dto) throws IOException, InterruptedException {
+    public String start(@Auth UserInfo ui, ExploratoryActionDTO<?> dto) throws IOException, InterruptedException {
         return action(ui.getName(), ui.getAccessToken(), dto, DockerAction.START);
     }
 
     @Path("/terminate")
     @POST
-    public String terminate(@Auth UserInfo ui, ExploratoryActionDTO dto) throws IOException, InterruptedException {
+    public String terminate(@Auth UserInfo ui, ExploratoryActionDTO<?> dto) throws IOException, InterruptedException {
         return action(ui.getName(), ui.getAccessToken(), dto, DockerAction.TERMINATE);
     }
 
@@ -85,7 +85,7 @@ public class ExploratoryResource implements DockerCommands {
         return action(ui.getName(), ui.getAccessToken(), dto, DockerAction.STOP);
     }
 
-    private String action(String username, String accessToken, ExploratoryBaseDTO dto, DockerAction action) throws IOException, InterruptedException {
+    private String action(String username, String accessToken, ExploratoryBaseDTO<?> dto, DockerAction action) throws IOException, InterruptedException {
         LOGGER.debug("{} exploratory environment", action);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
@@ -94,7 +94,7 @@ public class ExploratoryResource implements DockerCommands {
 
         RunDockerCommand runDockerCommand = new RunDockerCommand()
                 .withInteractive()
-                .withName(nameContainer(dto.getNotebookUserName(), action, dto.getExploratoryName()))
+                .withName(nameContainer(dto.getEdgeUserName(), action, dto.getExploratoryName()))
                 .withVolumeForRootKeys(configuration.getKeyDirectory())
                 .withVolumeForResponse(configuration.getImagesDirectory())
                 .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
@@ -108,7 +108,7 @@ public class ExploratoryResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ExploratoryBaseDTO dto, String accessToken) {
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ExploratoryBaseDTO<?> dto, String accessToken) {
         return new ExploratoryCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName(), accessToken);
     }
 

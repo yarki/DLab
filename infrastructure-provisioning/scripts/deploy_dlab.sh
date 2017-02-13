@@ -35,8 +35,8 @@ function buildServices(){
 function buildDockers(){
   # Build base and ssn docker
   cd infrastructure-provisioning/aws/src || exit 1
-  sudo docker build --file base/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-base base/
-  sudo docker build --file ssn/Dockerfile -t docker.epmc-bdcc.projects.epam.com/dlab-aws-ssn .
+  sudo docker build --file base/Dockerfile -t docker.dlab-base base/
+  sudo docker build --file ssn/Dockerfile -t docker.dlab-ssn .
 }
 
 function deployDlab(){
@@ -58,7 +58,7 @@ function deployDlab(){
         -e "aws_region=us-west-2" -e "aws_vpc_id=vpc-588a2c3d" -e "aws_subnet_id=subnet-1e6c9347" \
         -e "aws_security_groups_ids=sg-e338c89a" -e "conf_key_name=BDCC-DSS-POC" -e "conf_service_base_name=$Infrastructure_Tag" \
         -e "aws_access_key=$Access_Key_ID" -e "aws_secret_access_key=$Secret_Access_Key" \
-        docker.epmc-bdcc.projects.epam.com/dlab-aws-ssn --action "$1"
+        docker.dlab-ssn --action "$1"
 }
 
 function terminateDlab(){
@@ -66,7 +66,7 @@ function terminateDlab(){
   sudo docker run -i -v /root/BDCC-DSS-POC.pem:/root/keys/BDCC-DSS-POC.pem \
     -e "aws_region=$Region" -e "conf_service_base_name=$Infrastructure_Tag" \
     -e "resource=ssn" -e "aws_access_key=$Access_Key_ID" -e "aws_secret_access_key=$Secret_Access_Key" \
-    docker.epmc-bdcc.projects.epam.com/dlab-aws-ssn --action "$1"
+    docker.dlab-ssn --action "$1"
 }
 
 case "$Action" in

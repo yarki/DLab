@@ -17,7 +17,6 @@
  ****************************************************************************/
 package com.epam.dlab.backendapi.core;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface ICommandExecutor {

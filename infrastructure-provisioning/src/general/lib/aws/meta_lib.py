@@ -631,12 +631,12 @@ def get_list_instance_statuses(instance_ids):
                 inst = i.get('Instances')
                 for j in inst:
                     host['id'] = j.get('InstanceId')
-                    host['state'] = j.get('State').get('Name')
+                    host['status'] = j.get('State').get('Name')
                     data.append(host)
         except:
             host['resource_type'] = 'host'
             host['id'] = h.get('id')
-            host['state'] = 'terminated'
+            host['status'] = 'terminated'
             data.append(host)
     return data
 
@@ -649,14 +649,26 @@ def get_list_cluster_statuses(cluster_ids, data=[]):
             response = client.describe_cluster(ClusterId=i.get('id')).get('Cluster')
             host['id'] = i.get('id')
             if response.get('Status').get('State').lower() == 'waiting':
-                host['state'] = 'running'
+                host['status'] = 'running'
             elif response.get('Status').get('State').lower() == 'running':
-                host['state'] = 'configuring'
+                host['status'] = 'configuring'
             else:
-                host['state'] = response.get('Status').get('State').lower()
+                host['status'] = response.get('Status').get('State').lower()
             data.append(host)
         except:
             host['id'] = i.get('id')
-            host['state'] = 'terminated'
+            host['status'] = 'terminated'
             data.append(host)
     return data
+
+
+def get_allocation_id_by_elastic_ip(elastic_ip):
+    try:
+        client = boto3.client('ec2')
+        response = client.describe_addresses(PublicIps=[elastic_ip]).get('Addresses')
+        for i in response:
+            return i.get('AllocationId')
+    except Exception as err:
+        logging.error("Error with getting allocation id by elastic ip: " + elastic_ip + " : " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        append_result(str({"error": "Error with getting allocation id by elastic ip", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)

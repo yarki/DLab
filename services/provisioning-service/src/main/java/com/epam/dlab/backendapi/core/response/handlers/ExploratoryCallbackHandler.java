@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 public class ExploratoryCallbackHandler extends ResourceCallbackHandler<ExploratoryStatusDTO> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExploratoryCallbackHandler.class);
 	
+    private static final String INSTANCE_ID_FIELD = "instance_id";
     private static final String EXPLORATORY_ID_FIELD = "notebook_name";
     private static final String EXPLORATORY_PRIVATE_IP_FIELD = "ip";
     private static final String EXPLORATORY_URL_FIELD = "exploratory_url";
@@ -78,11 +79,12 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     	}
 
     	String exploratoryId = getTextValue(resultNode.get(EXPLORATORY_ID_FIELD));
-    	if (exploratoryId.equals("")) {
+    	if (getAction() == DockerAction.CREATE && exploratoryId == null) {
             LOGGER.warn("Empty field {} for UUID () in JSON {}", RESPONSE_NODE + "." + RESULT_NODE + "." + EXPLORATORY_ID_FIELD, getUUID(), nodeUrl.toString());
         }
 
     	return baseStatus
+    			.withInstanceId(getTextValue(resultNode.get(INSTANCE_ID_FIELD)))
                 .withExploratoryId(exploratoryId)
                 .withExploratoryUrl(url)
                 .withPrivateIp(getTextValue(resultNode.get(EXPLORATORY_PRIVATE_IP_FIELD)))

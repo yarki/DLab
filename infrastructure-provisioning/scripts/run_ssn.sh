@@ -25,7 +25,7 @@ popd > /dev/null
 ##################
 # Project common
 ##################
-PROJECT_PREFIX=docker.epmc-bdcc.projects.epam.com/dlab-aws
+PROJECT_PREFIX=docker.dlab
 DOCKER_IMAGE=ssn
 DOCKER_IMAGE_SOURCE_DIR=$SCRIPTPATH/../../src
 

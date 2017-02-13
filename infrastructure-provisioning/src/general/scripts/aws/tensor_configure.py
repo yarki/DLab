@@ -197,7 +197,6 @@ if __name__ == "__main__":
     print "TensorBoard python2 log dir: /var/log/tensorboard_py2"
     print "TensorBoard python3 log dir: /var/log/tensorboard_py3"
     print "Jupyter URL: " + jupyter_ip_url
-    print "Jupyter URL: " + jupyter_ip_url
     print 'SSH access (from Edge node, via IP address): ssh -i ' + notebook_config[
         'key_name'] + '.pem ' + os.environ['conf_os_user'] + '@' + ip_address
     print 'SSH access (from Edge node, via FQDN): ssh -i ' + notebook_config['key_name'] + '.pem ' \

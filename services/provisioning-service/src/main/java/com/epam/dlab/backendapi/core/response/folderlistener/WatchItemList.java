@@ -176,7 +176,7 @@ public class WatchItemList {
 	 * @param item the file handler.
 	 */
 	private void runAsync(WatchItem item) {
-		LOGGER.debug("Process file {} for folder {}", item.getFileName(), directoryFullName);
+		LOGGER.trace("Process file {} for folder {}", item.getFileName(), directoryFullName);
 		item.setFuture(CompletableFuture.supplyAsync(
 				new AsyncFileHandler(item.getFileName(), getDirectoryName(),
 					item.getFileHandlerCallback(), Duration.milliseconds(item.getFileLengthCheckDelay()))));
@@ -212,7 +212,7 @@ public class WatchItemList {
 			}
 		}
 		if (count > 0) {
-			LOGGER.debug("Starts processing {} files for folder {}", count, directoryName);
+			LOGGER.trace("Starts processing {} files for folder {}", count, directoryName);
 		}
 		return count;
 	}
