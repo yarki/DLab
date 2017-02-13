@@ -43,7 +43,7 @@ public class UserInfo implements Principal {
 
     @JsonCreator
     public UserInfo(@JsonProperty("username") String username, @JsonProperty("access_token") String accessToken) {
-        this.username = (username == null ? null : username.toLowerCase());
+        this.username = username;
         this.accessToken = accessToken;
     }
 
