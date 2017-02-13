@@ -81,7 +81,7 @@ public class InfrastructureResource implements DockerCommands {
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
         		configuration.getRequestEnvStatusTimeout(),
-                getFileHandlerCallback(STATUS, uuid, dto, ui.getAccessToken()));
+                getFileHandlerCallback(STATUS, uuid, dto));
         try {
             commandExecuter.executeAsync(
                     ui.getName(),
@@ -106,8 +106,8 @@ public class InfrastructureResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, EnvResourceDTO dto, String accessToken) {
-        return new ResourcesStatusCallbackHandler(selfService, action, originalUuid, dto, accessToken);
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, EnvResourceDTO dto) {
+        return new ResourcesStatusCallbackHandler(selfService, action, originalUuid, dto);
     }
 
     private String nameContainer(String user, DockerAction action, String name) {
