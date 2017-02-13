@@ -52,16 +52,14 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     private final String originalUuid;
     private final DockerAction action;
     private final Class<T> resultType;
-    private final String accessToken;
 
     @SuppressWarnings("unchecked")
-    public ResourceCallbackHandler(RESTService selfService, String user, String originalUuid, DockerAction action, String accessToken) {
+    public ResourceCallbackHandler(RESTService selfService, String user, String originalUuid, DockerAction action) {
         this.selfService = selfService;
         this.user = user;
         this.originalUuid = originalUuid;
         this.action = action;
         this.resultType = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        this.accessToken = accessToken;
     }
 
     @Override
@@ -80,7 +78,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     private void selfServicePost(T object) throws DlabException {
         LOGGER.debug("Send post request to self service " + getCallbackURI() + " for UUID {}, object {}", originalUuid, object);
         try {
-        	selfService.post(getCallbackURI(), accessToken, object, resultType);
+        	selfService.post(getCallbackURI(), object, resultType);
         } catch (Exception e) {
         	LOGGER.error("Send request or responce error for UUID {}: {}", e.getLocalizedMessage(), originalUuid, e);
         	throw new DlabException("Send request or responce error for UUID " + originalUuid + ": " + e.getLocalizedMessage(), e);
@@ -132,6 +130,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     protected T getBaseStatusDTO(UserInstanceStatus status) {
         try {
             return (T) resultType.newInstance()
+            		.withRequestId(originalUuid)
             		.withUser(user)
             		.withStatus(status)
             		.withUptime(getUptime(status));

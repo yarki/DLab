@@ -45,10 +45,10 @@ import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
+import com.epam.dlab.backendapi.domain.RequestId;
 import com.epam.dlab.backendapi.resources.dto.ComputationalCreateFormDTO;
 import com.epam.dlab.backendapi.resources.dto.ComputationalLimitsDTO;
 import com.epam.dlab.constants.ServiceConsts;
-import com.epam.dlab.dto.computational.ComputationalConfigDTO;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
@@ -139,9 +139,9 @@ public class ComputationalResource implements ComputationalAPI {
                         .withAwsRegion(settingsDAO.getAwsRegion())
                         .withConfOsUser(settingsDAO.getConfOsUser())
                         .withConfOsFamily(settingsDAO.getConfOsFamily());
-                return Response
-                        .ok(provisioningService.post(EMR_CREATE, userInfo.getAccessToken(), dto, String.class))
-                        .build();
+                String uuid = provisioningService.post(EMR_CREATE, userInfo.getAccessToken(), dto, String.class);
+                RequestId.put(userInfo.getName(), uuid);
+                return Response.ok(uuid).build();
             } catch (Throwable t) {
             	try {
             		updateComputationalStatus(userInfo.getName(), formDTO.getNotebookName(), formDTO.getName(), FAILED);
@@ -165,6 +165,9 @@ public class ComputationalResource implements ComputationalAPI {
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(@Auth UserInfo userInfo, ComputationalStatusDTO dto) throws DlabException {
         LOGGER.debug("Updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto);
+        String uuid = dto.getRequestId();
+        RequestId.checkAndRemove(uuid);
+        
         try {
         	infrastructureProvisionDAO.updateComputationalFields(dto);
         } catch (DlabException e) {
@@ -174,29 +177,8 @@ public class ComputationalResource implements ComputationalAPI {
         			" for user " + dto.getUser() + " to " + dto.getStatus() + ": " + e.getLocalizedMessage(), e);
         }
         if (UserInstanceStatus.CONFIGURING == UserInstanceStatus.of(dto.getStatus())) {
-            LOGGER.debug("Send request for configuration of the computational resource {} for user {}", dto.getComputationalName(), dto.getUser());
-            try {
-            	UserComputationalResourceDTO computational = infrastructureProvisionDAO
-            			.fetchComputationalFields(userInfo.getName(), dto.getExploratoryName(), dto.getComputationalName());
-            	UserInstanceDTO instance = infrastructureProvisionDAO.fetchExploratoryFields(userInfo.getName(), dto.getExploratoryName());
-            	ComputationalConfigDTO dtoConf = new ComputationalConfigDTO()
-                        .withServiceBaseName(settingsDAO.getServiceBaseName())
-                        .withApplicationName(getApplicationName(instance.getImageName()))
-                        .withExploratoryName(dto.getExploratoryName())
-                        .withComputationalName(computational.getComputationalName())
-                        .withNotebookInstanceName(instance.getExploratoryId())
-                        .withVersion(computational.getVersion())
-                        .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                        .withIamUserName(userInfo.getName())
-                        .withAwsRegion(settingsDAO.getAwsRegion())
-                        .withConfOsUser(settingsDAO.getConfOsUser());
-            	provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dtoConf, String.class);
-            } catch (Throwable e) {
-            	LOGGER.error("Could not send request for configuration of the computational resource {} for user {}: ",
-            			dto.getComputationalName(), userInfo.getName(), e);
-            	throw new DlabException("Could not send request for configuration of the computational resource " +
-            			dto.getComputationalName() + " for user " + userInfo.getName() + ": " + e.getLocalizedMessage(), e);
-            }
+            LOGGER.debug("Waiting for configuration of the computational resource {} for user {}", dto.getComputationalName(), dto.getUser());
+            RequestId.put(dto.getUser(), uuid);
         }
         return Response.ok().build();
     }
@@ -235,7 +217,10 @@ public class ComputationalResource implements ComputationalAPI {
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
                     .withIamUserName(userInfo.getName())
                     .withAwsRegion(settingsDAO.getAwsRegion());
-            return provisioningService.post(EMR_TERMINATE, userInfo.getAccessToken(), dto, String.class);
+
+            String uuid = provisioningService.post(EMR_TERMINATE, userInfo.getAccessToken(), dto, String.class);
+            RequestId.put(userInfo.getName(), uuid);
+            return uuid;
         } catch (Throwable t) {
         	try {
         		updateComputationalStatus(userInfo.getName(), exploratoryName, computationalName, FAILED);

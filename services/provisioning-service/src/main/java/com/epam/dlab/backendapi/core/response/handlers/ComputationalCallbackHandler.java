@@ -21,6 +21,7 @@ package com.epam.dlab.backendapi.core.response.handlers;
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.backendapi.core.commands.DockerAction;
 import com.epam.dlab.dto.computational.ComputationalBaseDTO;
+import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.rest.client.RESTService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,8 +40,8 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     	return uuid;
     }
     
-    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto, String accessToken) {
-        super(selfService, dto.getIamUserName(), originalUuid, action, accessToken);
+    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto) {
+        super(selfService, dto.getIamUserName(), originalUuid, action);
     	this.uuid = originalUuid;
         this.dto = dto;
     }
@@ -74,6 +75,7 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
 			baseStatus
 				.withComputationalName(getDto().getComputationalName())
 				.withUptime(null);
+			ComputationalConfigure.configure(uuid, (ComputationalCreateDTO)getDto());
 			break;
 		default:
 			break;

@@ -23,6 +23,7 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
+import com.epam.dlab.backendapi.domain.RequestId;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.backendapi.resources.dto.ExploratoryActionFormDTO;
 import com.epam.dlab.backendapi.resources.dto.ExploratoryCreateFormDTO;
@@ -103,9 +104,10 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withConfOsUser(settingsDAO.getConfOsUser())
                     .withConfOsFamily(settingsDAO.getConfOsFamily());
             LOGGER.debug("Created exploratory environment {} for user {}", formDTO.getName(), userInfo.getName());
-            return Response
-                    .ok(provisioningService.post(EXPLORATORY_CREATE, userInfo.getAccessToken(), dto, String.class))
-                    .build();
+
+            String uuid = provisioningService.post(EXPLORATORY_CREATE, userInfo.getAccessToken(), dto, String.class);
+            RequestId.put(userInfo.getName(), uuid);
+            return Response.ok(uuid).build();
         } catch (Throwable t) {
             LOGGER.error("Could not update the status of exploratory environment {} with name {} for user {}",
                     formDTO.getImage(), formDTO.getName(), userInfo.getName(), t);
@@ -123,9 +125,10 @@ public class ExploratoryResource implements ExploratoryAPI {
      */
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(@Auth UserInfo userInfo, ExploratoryStatusDTO dto) throws DlabException {
+    public Response status(ExploratoryStatusDTO dto) throws DlabException {
         LOGGER.debug("Updating status for exploratory environment {} for user {} to {}",
-        		dto.getExploratoryName(), userInfo.getName(), dto.getStatus());
+        		dto.getExploratoryName(), dto.getUser(), dto.getStatus());
+        RequestId.checkAndRemove(dto.getRequestId());
         UserInstanceStatus currentStatus;
         
         try {
@@ -209,7 +212,10 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withConfKeyDir(settingsDAO.getConfKeyDir())
                     .withConfOsUser(settingsDAO.getConfOsUser())
                     .withAwsRegion(settingsDAO.getAwsRegion());
-            return provisioningService.post(EXPLORATORY_STOP, userInfo.getAccessToken(), dto, String.class);
+
+            String uuid = provisioningService.post(EXPLORATORY_STOP, userInfo.getAccessToken(), dto, String.class);
+            RequestId.put(userInfo.getName(), uuid);
+            return uuid;
         } catch (Throwable t) {
         	LOGGER.error("Could not stop exploratory environment {} for user {}",
                     name, userInfo.getName(), t);
@@ -271,7 +277,10 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withAwsRegion(settingsDAO.getAwsRegion())
                     .withConfOsUser(settingsDAO.getConfOsUser())
                     .withConfOsFamily(settingsDAO.getConfOsFamily());
-            return provisioningService.post(action, userInfo.getAccessToken(), dto, String.class);
+
+            String uuid = provisioningService.post(action, userInfo.getAccessToken(), dto, String.class);
+            RequestId.put(userInfo.getName(), uuid);
+            return uuid;
         } catch (Throwable t) {
         	updateExploratoryStatusSilent(userInfo.getName(), exploratoryName, FAILED);
             throw new DlabException("Could not " + action + " exploratory environment " + exploratoryName + ": " + t.getLocalizedMessage(), t);
