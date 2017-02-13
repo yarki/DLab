@@ -101,10 +101,6 @@ def configure_local_kernels(args):
     put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
     sudo('sed -i "s|AWSREGION|' + args.region + '|g" /tmp/interpreter.json')
     sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
-    sudo('sed -i "s|SP_VER|' + args.spark_version.replace('.', ',') + '|g" /tmp/interpreter.json')
-    sudo('sed -i "s|SCALA_VERSION|' + scala_version.replace('.', ',') + '|g" /tmp/interpreter.json')
-    r_version = sudo("R --version | awk '/version / {print $3}'")
-    sudo('sed -i "s|R_VERSION|' + r_version.replace('.', ',') + '|g" /tmp/interpreter.json')
     while not port_number_found:
         port_free = sudo('nc -z localhost ' + str(default_port) + '; echo $?')
         if port_free == '1':
@@ -121,25 +117,27 @@ def configure_local_kernels(args):
 
 
 def install_local_livy(args):
-    install_maven()
-    install_livy_dependencies()
-    with cd('/opt/'):
-        sudo('git init')
-        sudo('git clone https://github.com/cloudera/livy.git')
-    with cd('/opt/livy/'):
-        sudo('mvn package -DskipTests -Dhttp.proxyHost=' + args.edge_hostname + ' -Dhttp.proxyPort=' +
-             args.proxy_port + ' -Dhttps.proxyHost=' + args.edge_hostname +
-             ' -Dhttps.proxyPort=' + args.proxy_port)
-    sudo('mkdir -p /var/run/livy')
-    sudo('mkdir -p /opt/livy/logs')
-    sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
-    sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /opt/livy/')
-    put(templates_dir + 'livy-server.service', '/tmp/livy-server.service')
-    sudo("sed -i 's|OS_USER|" + args.os_user + "|' /tmp/livy-server.service")
-    sudo("chmod 644 /tmp/livy-server.service")
-    sudo('cp /tmp/livy-server.service /etc/systemd/system/livy-server.service')
-    sudo("systemctl daemon-reload")
-    sudo("systemctl enable livy-server")
+    if not exists('/home/' + args.os_user + '/.ensure_dir/local_livy_ensured'):
+        install_maven()
+        install_livy_dependencies()
+        with cd('/opt/'):
+            sudo('git init')
+            sudo('git clone https://github.com/cloudera/livy.git')
+        with cd('/opt/livy/'):
+            sudo('mvn package -DskipTests -Dhttp.proxyHost=' + args.edge_hostname + ' -Dhttp.proxyPort=' +
+                 args.proxy_port + ' -Dhttps.proxyHost=' + args.edge_hostname +
+                 ' -Dhttps.proxyPort=' + args.proxy_port)
+        sudo('mkdir -p /var/run/livy')
+        sudo('mkdir -p /opt/livy/logs')
+        sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
+        sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /opt/livy/')
+        put(templates_dir + 'livy-server.service', '/tmp/livy-server.service')
+        sudo("sed -i 's|OS_USER|" + args.os_user + "|' /tmp/livy-server.service")
+        sudo("chmod 644 /tmp/livy-server.service")
+        sudo('cp /tmp/livy-server.service /etc/systemd/system/livy-server.service')
+        sudo("systemctl daemon-reload")
+        sudo("systemctl enable livy-server")
+        sudo('touch /home/' + args.os_user + '/.ensure_dir/local_livy_ensured')
 
 
 ##############
