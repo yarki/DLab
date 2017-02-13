@@ -96,7 +96,7 @@ public class InfrasctructureResource implements InfrasctructureAPI {
      */
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(@Auth UserInfo userInfo, EnvStatusDTO dto) {
+    public Response status(EnvStatusDTO dto) {
         LOGGER.trace("Updating the status of resources for user {}: {}", dto.getUser(), dto);
         RequestId.checkAndRemove(dto.getRequestId());
         try {
