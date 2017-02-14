@@ -54,7 +54,7 @@ spark_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
 yarn_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/conf/'
 
 
-def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket, user_name, spark_version, spark_dir, os_user):
+def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_dir, os_user, yarn_dir):
     try:
         port_number_found = False
         zeppelin_restarted = False
@@ -94,7 +94,9 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, bucket
             else:
                 default_port += 1
         local('sudo echo "livy.server.port = ' + str(livy_port) + '" >> ' + livy_path + 'conf/livy.conf')
+        local('sudo echo "livy.spark.master = yarn" >> ' + livy_path + 'conf/livy.conf')
         local(''' sudo echo "SPARK_HOME=''' + spark_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
+        local(''' sudo echo "HADOOP_CONF_DIR=''' + yarn_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
         local('sudo sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
         template_file = "/tmp/emr_interpreter.json"
         fr = open(template_file, 'r+')
@@ -152,5 +154,5 @@ if __name__ == "__main__":
         spark_defaults(args)
         configuring_notebook(args.emr_version)
         install_remote_livy(args)
-        configure_zeppelin_emr_interpreter(args.emr_version, args.cluster_name, args.region, args.bucket,
-                                           args.user_name, args.spark_version, spark_dir, args.os_user)
+        configure_zeppelin_emr_interpreter(args.emr_version, args.cluster_name, args.region, spark_dir, args.os_user,
+                                           yarn_dir)
