@@ -63,7 +63,7 @@ public class ComputationalResource implements DockerCommands {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private ICommandExecutor commandExecuter;
+    private ICommandExecutor commandExecutor;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject
@@ -79,7 +79,7 @@ public class ComputationalResource implements DockerCommands {
                 getFileHandlerCallback(CREATE, uuid, dto));
         try {
             long timeout = configuration.getResourceStatusPollTimeout().toSeconds();
-            commandExecuter.executeAsync(
+            commandExecutor.executeAsync(
                     ui.getName(),
                     uuid,
                     commandBuilder.buildCommand(
@@ -114,7 +114,7 @@ public class ComputationalResource implements DockerCommands {
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(TERMINATE, uuid, dto));
         try {
-            commandExecuter.executeAsync(
+            commandExecutor.executeAsync(
                     ui.getName(),
                     uuid,
                     commandBuilder.buildCommand(

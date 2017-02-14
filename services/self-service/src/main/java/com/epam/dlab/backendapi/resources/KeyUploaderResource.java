@@ -40,7 +40,6 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
@@ -165,10 +164,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         try {
             keyDAO.updateKey(dto.getUser(), KeyLoadStatus.getStatus(dto.isSuccess()));
             if (dto.isSuccess()) {
-            	keyDAO.saveCredential(dto.getUser(),
-            			dto
-            				.getCredential()
-            				.withEdgeStatus(UserInstanceStatus.RUNNING));
+            	keyDAO.saveCredential(dto.getUser(), dto.getCredential());
             } else {
                 keyDAO.deleteKey(dto.getUser());
             }

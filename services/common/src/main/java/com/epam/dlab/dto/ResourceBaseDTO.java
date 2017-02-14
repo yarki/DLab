@@ -27,6 +27,8 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     private String awsRegion;
     @JsonProperty("aws_iam_user")
     private String awsIamUser;
+    @JsonProperty("edge_user_name")
+    private String edgeUserName;
 
     @SuppressWarnings("unchecked")
 	private final T self = (T)this;
@@ -57,10 +59,24 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
         return self;
     }
 
+    public String getEdgeUserName() {
+        return edgeUserName;
+    }
+
+    public void setEdgeUserName(String edgeUserName) {
+        this.edgeUserName = edgeUserName;
+    }
+
+    public T withEdgeUserName(String edgeUserName) {
+        setEdgeUserName(edgeUserName);
+        return self;
+    }
+
     public ToStringHelper toStringHelper(Object self) {
     	return MoreObjects.toStringHelper(self)
     	        .add("awsRegion", awsRegion)
-    	        .add("awsIamUser", awsIamUser);
+    	        .add("awsIamUser", awsIamUser)
+    	        .add("edgeUserName", edgeUserName);
     }
     
     @Override

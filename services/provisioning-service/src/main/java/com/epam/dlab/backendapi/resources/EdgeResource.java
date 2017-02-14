@@ -43,6 +43,7 @@ import com.epam.dlab.backendapi.core.commands.DockerCommands;
 import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.core.response.handlers.EdgeCallbackHandler;
+import com.epam.dlab.dto.ResourceSysBaseDTO;
 import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.epam.dlab.rest.client.RESTService;
 import com.google.inject.Inject;
@@ -60,7 +61,7 @@ public class EdgeResource implements DockerCommands {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private ICommandExecutor commandExecuter;
+    private ICommandExecutor commandExecutor;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject
@@ -71,6 +72,18 @@ public class EdgeResource implements DockerCommands {
     @POST
     public String create(@Auth UserInfo ui, EdgeCreateDTO dto) throws IOException, InterruptedException {
     	return create(ui.getName(), EDGE + STATUS_URI, dto);
+    }
+
+    @Path("/start")
+    @POST
+    public String start(@Auth UserInfo ui, EdgeCreateDTO dto) throws IOException, InterruptedException {
+    	return action(ui.getName(), dto, DockerAction.START);
+    }
+
+    @Path("/stop")
+    @POST
+    public String stop(@Auth UserInfo ui, EdgeCreateDTO dto) throws IOException, InterruptedException {
+    	return action(ui.getName(), dto, DockerAction.START);
     }
 
     public String create(String username, String callbackURI, EdgeCreateDTO dto) throws IOException, InterruptedException {
@@ -90,7 +103,29 @@ public class EdgeResource implements DockerCommands {
                 .withConfKeyName(configuration.getAdminKey())
                 .withActionCreate(configuration.getEdgeImage());
 
-        commandExecuter.executeAsync(username, uuid, commandBuilder.buildCommand(runDockerCommand,dto));
+        commandExecutor.executeAsync(username, uuid, commandBuilder.buildCommand(runDockerCommand,dto));
+        return uuid;
+    }
+
+    private String action(String username, ResourceSysBaseDTO<?> dto, DockerAction action) throws IOException, InterruptedException {
+    	LOGGER.debug("{} EDGE node for user {}: {}", action, username, dto);
+        String uuid = DockerCommands.generateUUID();
+        folderListenerExecutor.start(configuration.getKeyLoaderDirectory(),
+        		configuration.getKeyLoaderPollTimeout(),
+                getFileHandlerCallback(action, uuid, dto.getAwsIamUser(), EDGE + STATUS_URI));
+        RunDockerCommand runDockerCommand = new RunDockerCommand()
+                .withInteractive()
+                .withName(nameContainer(dto.getEdgeUserName(), action))
+                .withVolumeForRootKeys(configuration.getKeyDirectory())
+                .withVolumeForResponse(configuration.getKeyLoaderDirectory())
+                .withVolumeForLog(configuration.getDockerLogDirectory(), getResourceType())
+                .withResource(getResourceType())
+                .withRequestId(uuid)
+                .withConfKeyName(configuration.getAdminKey())
+                .withImage(configuration.getEdgeImage())
+                .withAction(action);
+
+        commandExecutor.executeAsync(username, uuid, commandBuilder.buildCommand(runDockerCommand,dto));
         return uuid;
     }
 
@@ -98,6 +133,10 @@ public class EdgeResource implements DockerCommands {
         return new EdgeCallbackHandler(selfService, action, uuid, user, callbackURI);
     }
 
+    private String nameContainer(String user, DockerAction action) {
+        return nameContainer(user, action.toString(), "exploratory", getResourceType());
+    }
+    
     @Override
     public String getResourceType() {
         return Directories.EDGE_LOG_DIRECTORY;

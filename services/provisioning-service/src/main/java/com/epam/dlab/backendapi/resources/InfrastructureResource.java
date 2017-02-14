@@ -62,7 +62,7 @@ public class InfrastructureResource implements DockerCommands {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private ICommandExecutor commandExecuter;
+    private ICommandExecutor commandExecutor;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject
@@ -83,7 +83,7 @@ public class InfrastructureResource implements DockerCommands {
         		configuration.getRequestEnvStatusTimeout(),
                 getFileHandlerCallback(STATUS, uuid, dto));
         try {
-            commandExecuter.executeAsync(
+            commandExecutor.executeAsync(
                     ui.getName(),
                     uuid,
                     commandBuilder.buildCommand(

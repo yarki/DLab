@@ -20,6 +20,7 @@ package com.epam.dlab.backendapi.core.response.handlers;
 
 import java.io.IOException;
 
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.backendapi.core.commands.DockerAction;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
@@ -49,8 +50,10 @@ public class EdgeCallbackHandler extends ResourceCallbackHandler<UploadFileResul
     	}
 
         try {
+        	UserAWSCredentialDTO credential = MAPPER.readValue(resultNode.toString(), UserAWSCredentialDTO.class);
         	return baseStatus
-            		.withCredential(MAPPER.readValue(resultNode.toString(), UserAWSCredentialDTO.class));
+            		.withCredential(credential
+            				.withEdgeStatus(UserInstanceStatus.RUNNING));
         } catch (IOException e) {
         	throw new DlabException("Cannot parse the EDGE info in JSON: " + e.getLocalizedMessage(), e);
         }

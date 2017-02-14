@@ -21,44 +21,14 @@ package com.epam.dlab.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
-abstract public class ResourceEnvBaseDTO<T extends ResourceEnvBaseDTO<?>> extends ResourceBaseDTO<T> {
-    @JsonProperty("conf_service_base_name")
-    private String serviceBaseName;
+abstract public class ResourceEnvBaseDTO<T extends ResourceEnvBaseDTO<?>> extends ResourceSysBaseDTO<T> {
     @JsonProperty("exploratory_name")
     private String exploratoryName;
-    @JsonProperty("edge_user_name")
-    private String edgeUserName;
-    @JsonProperty("conf_os_user")
-    private String confOsUser;
-    @JsonProperty("conf_os_family")
-    private String confOsFamily;
     @JsonProperty("application")
     private String applicationName;
 
     @SuppressWarnings("unchecked")
 	private final T self = (T)this;
-
-    public String getServiceBaseName() {
-        return serviceBaseName;
-    }
-
-    public void setServiceBaseName(String serviceBaseName) {
-        this.serviceBaseName = serviceBaseName;
-    }
-
-    public T withServiceBaseName(String serviceBaseName) {
-        setServiceBaseName(serviceBaseName);
-        return self;
-    }
-
-    public T withAwsRegion(String region) {
-        setAwsRegion(region);
-        return self;
-    }
-
-    public String getEdgeUserName() {
-        return edgeUserName;
-    }
 
     public String getExploratoryName() {
         return exploratoryName;
@@ -70,41 +40,6 @@ abstract public class ResourceEnvBaseDTO<T extends ResourceEnvBaseDTO<?>> extend
 
     public T withExploratoryName(String exploratoryName) {
         setExploratoryName(exploratoryName);
-        return self;
-    }
-
-    public void setEdgeUserName(String edgeUserName) {
-        this.edgeUserName = edgeUserName;
-    }
-
-    public T withEdgeUserName(String edgeUserName) {
-        setEdgeUserName(edgeUserName);
-        return self;
-    }
-
-    public String getConfOsUser() {
-        return confOsUser;
-    }
-
-    public void setConfOsUser(String confOsUser) {
-        this.confOsUser = confOsUser;
-    }
-
-    public T withConfOsUser(String confOsUser) {
-        setConfOsUser(confOsUser);
-        return self;
-    }
-    
-    public String getConfOsFamily() {
-        return confOsFamily;
-    }
-
-    public void setConfOsFamily(String confOsFamily) {
-        this.confOsFamily = confOsFamily;
-    }
-
-    public T withConfOsFamily(String confOsFamily) {
-        setConfOsFamily(confOsFamily);
         return self;
     }
 
@@ -124,12 +59,8 @@ abstract public class ResourceEnvBaseDTO<T extends ResourceEnvBaseDTO<?>> extend
     @Override
     public ToStringHelper toStringHelper(Object self) {
     	return super.toStringHelper(self)
-    	        .add("serviceBaseName", serviceBaseName)
     	        .add("applicationName", applicationName)
-    	        .add("exploratoryName", exploratoryName)
-    	        .add("edgeUserName", edgeUserName)
-    	        .add("confOsUser", confOsUser)
-    	        .add("confOsFamily", confOsFamily);
+    	        .add("exploratoryName", exploratoryName);
     }
     
     @Override

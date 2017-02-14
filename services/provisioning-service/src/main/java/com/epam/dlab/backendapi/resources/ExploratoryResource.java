@@ -54,7 +54,7 @@ public class ExploratoryResource implements DockerCommands {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private ICommandExecutor commandExecuter;
+    private ICommandExecutor commandExecutor;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject
@@ -104,7 +104,7 @@ public class ExploratoryResource implements DockerCommands {
                 .withImage(dto.getNotebookImage())
                 .withAction(action);
 
-        commandExecuter.executeAsync(username, uuid, commandBuilder.buildCommand(runDockerCommand, dto));
+        commandExecutor.executeAsync(username, uuid, commandBuilder.buildCommand(runDockerCommand, dto));
         return uuid;
     }
 

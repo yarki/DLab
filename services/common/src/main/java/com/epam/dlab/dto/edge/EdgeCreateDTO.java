@@ -12,10 +12,10 @@
 
 package com.epam.dlab.dto.edge;
 
-import com.epam.dlab.dto.ResourceEnvBaseDTO;
+import com.epam.dlab.dto.ResourceSysBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class EdgeCreateDTO extends ResourceEnvBaseDTO<EdgeCreateDTO> {
+public class EdgeCreateDTO extends ResourceSysBaseDTO<EdgeCreateDTO> {
     @JsonProperty("aws_vpc_id")
     private String awsVpcId;
     @JsonProperty("aws_subnet_id")

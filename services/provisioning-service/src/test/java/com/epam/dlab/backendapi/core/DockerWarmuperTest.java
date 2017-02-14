@@ -98,7 +98,7 @@ public class DockerWarmuperTest {
             protected void configure() {
                 bind(FolderListenerExecutor.class).toInstance(mock(FolderListenerExecutor.class));
                 bind(ProvisioningServiceApplicationConfiguration.class).toInstance(createConfiguration());
-                bind(ICommandExecutor.class).toInstance(createCommandExecuter());
+                bind(ICommandExecutor.class).toInstance(createCommandExecutor());
             }
         });
     }
@@ -110,7 +110,7 @@ public class DockerWarmuperTest {
         return result;
     }
 
-    private ICommandExecutor createCommandExecuter() {
+    private ICommandExecutor createCommandExecutor() {
         ICommandExecutor result = mock(ICommandExecutor.class);
         try {
             when(result.executeSync(anyString(),anyString(),anyString())).thenReturn(Collections.singletonList("executeResult"));
