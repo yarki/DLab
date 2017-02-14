@@ -18,54 +18,41 @@ limitations under the License.
 
 package com.epam.dlab.dto.keyload;
 
+import com.epam.dlab.UserInstanceStatus;
+import com.epam.dlab.dto.StatusBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects.ToStringHelper;
 
-public class UploadFileResultDTO {
-	@JsonProperty("request_id")
-    private String requestId;
-    @JsonProperty
-    private String user;
-    @JsonProperty
-    private boolean success;
+public class UploadFileResultDTO extends StatusBaseDTO<UploadFileResultDTO> {
     @JsonProperty
     private UserAWSCredentialDTO credential;
-
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
-
-    public UploadFileResultDTO withRequestId(String requestId) {
-        setRequestId(requestId);
-        return this;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public UploadFileResultDTO withUser(String user) {
-        setUser(user);
-        return this;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
 
     public UserAWSCredentialDTO getCredential() {
         return credential;
     }
 
-    public void setSuccessAndCredential(UserAWSCredentialDTO credential) {
-        this.success = true;
+    public void setCredential(UserAWSCredentialDTO credential) {
         this.credential = credential;
+    }
+
+    public UploadFileResultDTO withCredential(UserAWSCredentialDTO credential) {
+    	setCredential(credential);
+    	return this;
+    }
+    
+    public boolean isSuccess() {
+    	UserInstanceStatus status = UserInstanceStatus.valueOf(getStatus());
+    	return (status != null && status != UserInstanceStatus.FAILED);
+    }
+
+    @Override
+    public ToStringHelper toStringHelper(Object self) {
+    	return super.toStringHelper(self)
+    			.add("credential", credential);
+    }
+    
+    @Override
+    public String toString() {
+    	return toStringHelper(this).toString();
     }
 }

@@ -91,7 +91,7 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
 
     @Override
     public void onKeyUploadComplete(UploadFileResultDTO uploadKeyResult) throws DlabException {
-    	LOGGER.debug("The upload of the user key for user {} has been completed, status is {}", uploadKeyResult.getUser(), uploadKeyResult.isSuccess());
+    	LOGGER.debug("The upload of the user key for user {} has been completed, status is {}", uploadKeyResult.getUser(), uploadKeyResult.getStatus());
         keyDAO.updateKey(uploadKeyResult.getUser(), KeyLoadStatus.getStatus(uploadKeyResult.isSuccess()));
         if (uploadKeyResult.isSuccess()) {
         	keyDAO.saveCredential(uploadKeyResult.getUser(),

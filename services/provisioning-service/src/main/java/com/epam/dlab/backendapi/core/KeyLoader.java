@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.commands.CommandBuilder;
 import com.epam.dlab.backendapi.core.commands.DockerCommands;
@@ -61,6 +62,22 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
     @Inject
     private RESTService selfService;
 
+    /*
+	EdgeCreateDTO
++request_id = unique id  that generated automatically
++conf_resource = name of the template 
++conf_os_user = name of the ssh user
++conf_os_family = name of the linux distributive family, which is supported by DLAB (debian/ubuntu)
++conf_service_base_name = unique infrastructurevalue that previously was used when SSN being provisioned 
++conf_key_name = name of the uploaded ssh key file (without ".pem")
++edge_user_name = any unique value
+	aws_edge_instance_size =  shape of the ec2-instance
++aws_vpc_id =  id of VPC where infrasructure is being deployed
++aws_region = aws region where infrastructure was deployed
++aws_security_groups_ids = id of the SSN instance's security group 
++aws_subnet_id = id of the public subnet where EDGE will be deployed
++aws_iam_user = name of aws iam user
+*/
     public String uploadKey(String username, UploadFileDTO dto) throws IOException, InterruptedException {
         saveKeyToFile(dto);
         String uuid = DockerCommands.generateUUID();
@@ -116,10 +133,12 @@ public class KeyLoader implements DockerCommands, SelfServiceAPI {
                 JsonNode document = MAPPER.readTree(content);
                 UploadFileResultDTO result = getUploadFileResultDTO();
                 if (KeyLoadStatus.isSuccess(document.get(STATUS_FIELD).textValue())) {
-                    result.setSuccessAndCredential(extractCredential(document));
+                	result
+                		.withStatus(UserInstanceStatus.RUNNING)
+                		.withCredential(extractCredential(document));
                 }
                 selfService.post(KEY_LOADER, result, UploadFileResultDTO.class);
-                return result.isSuccess();
+                return !UserInstanceStatus.FAILED.equals(result.getStatus());
             }
 
             @Override
