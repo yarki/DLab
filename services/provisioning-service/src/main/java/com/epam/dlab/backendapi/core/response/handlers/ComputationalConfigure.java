@@ -64,7 +64,7 @@ public class ComputationalConfigure implements DockerCommands {
                 .withNotebookInstanceName(dto.getNotebookInstanceName())
                 .withVersion(dto.getVersion())
                 .withEdgeUserName(dto.getEdgeUserName())
-                .withIamUserName(dto.getIamUserName())
+                .withAwsIamUser(dto.getAwsIamUser())
                 .withAwsRegion(dto.getAwsRegion())
                 .withConfOsUser(dto.getConfOsUser());
     	ComputationalConfigure conf = new ComputationalConfigure();

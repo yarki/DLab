@@ -137,8 +137,8 @@ public class ComputationalResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto) {
-        return new ComputationalCallbackHandler(selfService, action, originalUuid, dto);
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String uuid, ComputationalBaseDTO<?> dto) {
+        return new ComputationalCallbackHandler(selfService, action, uuid, dto);
     }
 
     private String nameContainer(String user, DockerAction action, String name) {

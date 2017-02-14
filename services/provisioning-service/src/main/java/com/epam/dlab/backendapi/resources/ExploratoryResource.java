@@ -108,8 +108,8 @@ public class ExploratoryResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, ExploratoryBaseDTO<?> dto) {
-        return new ExploratoryCallbackHandler(selfService, action, originalUuid, dto.getIamUserName(), dto.getExploratoryName());
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String uuid, ExploratoryBaseDTO<?> dto) {
+        return new ExploratoryCallbackHandler(selfService, action, uuid, dto.getAwsIamUser(), dto.getExploratoryName());
     }
 
     private String nameContainer(String user, DockerAction action, String name) {

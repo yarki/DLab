@@ -20,7 +20,7 @@ class EnvStatusListenerUserInfo {
     	dto = new EnvResourceDTO()
     			.withAwsRegion(awsRegion)
     			.withEdgeUserName(UsernameUtils.removeDomain(username))
-    			.withIamUserName(username);
+    			.withAwsIamUser(username);
 	}
 
     public long getNextCheckTimeMillis() {

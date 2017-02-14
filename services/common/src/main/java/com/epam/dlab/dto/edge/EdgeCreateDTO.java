@@ -20,8 +20,6 @@ public class EdgeCreateDTO extends ResourceEnvBaseDTO<EdgeCreateDTO> {
     private String awsVpcId;
     @JsonProperty("aws_subnet_id")
     private String awsSubnetId;
-    @JsonProperty("aws_iam_user")
-    private String iamUser;
     @JsonProperty("aws_security_groups_ids")
     private String awsSecurityGroupIds;
 
@@ -49,19 +47,6 @@ public class EdgeCreateDTO extends ResourceEnvBaseDTO<EdgeCreateDTO> {
 
     public EdgeCreateDTO withAwsSubnetId(String awsSubnetId) {
         setAwsSubnetId(awsSubnetId);
-        return this;
-    }
-
-    public String getIamUser() {
-        return iamUser;
-    }
-
-    public void setIamUser(String iamUser) {
-        this.iamUser = iamUser;
-    }
-
-    public EdgeCreateDTO withIamUser(String iamUser) {
-        setIamUser(iamUser);
         return this;
     }
 

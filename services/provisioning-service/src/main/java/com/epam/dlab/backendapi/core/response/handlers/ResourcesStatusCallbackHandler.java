@@ -42,17 +42,10 @@ public class ResourcesStatusCallbackHandler extends ResourceCallbackHandler<EnvS
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResourcesStatusCallbackHandler.class);
 	private static ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 	
-    private final String uuid;
     private final EnvResourceDTO dto;
 
-    @Override
-    public String getUUID() {
-    	return uuid;
-    }
-    
-    public ResourcesStatusCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, EnvResourceDTO dto) {
-        super(selfService, dto.getIamUserName(), originalUuid, action);
-    	this.uuid = originalUuid;
+    public ResourcesStatusCallbackHandler(RESTService selfService, DockerAction action, String uuid, EnvResourceDTO dto) {
+        super(selfService, dto.getAwsIamUser(), uuid, action);
         this.dto = dto;
     }
     
@@ -66,7 +59,7 @@ public class ResourcesStatusCallbackHandler extends ResourceCallbackHandler<EnvS
     }
 
     @Override
-    protected EnvStatusDTO parseOutResponse(JsonNode resultNode, EnvStatusDTO baseStatus) {
+    protected EnvStatusDTO parseOutResponse(JsonNode resultNode, EnvStatusDTO baseStatus) throws DlabException {
     	if (resultNode == null) {
     		return baseStatus;
     	}
@@ -89,7 +82,7 @@ public class ResourcesStatusCallbackHandler extends ResourceCallbackHandler<EnvS
     		return super.handle(fileName, content);
     	} catch (Throwable e) {
     		LOGGER.warn("Could not retrive the status of resources for UUID {} and user {}: {}",
-    				uuid, getDto().getIamUserName(), e.getLocalizedMessage(), e);
+    				getUUID(), getDto().getAwsIamUser(), e.getLocalizedMessage(), e);
     	}
     	return true; // Always necessary return true for status response
     }

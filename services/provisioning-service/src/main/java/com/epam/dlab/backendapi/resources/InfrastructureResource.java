@@ -106,8 +106,8 @@ public class InfrastructureResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, EnvResourceDTO dto) {
-        return new ResourcesStatusCallbackHandler(selfService, action, originalUuid, dto);
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String uuid, EnvResourceDTO dto) {
+        return new ResourcesStatusCallbackHandler(selfService, action, uuid, dto);
     }
 
     private String nameContainer(String user, DockerAction action, String name) {

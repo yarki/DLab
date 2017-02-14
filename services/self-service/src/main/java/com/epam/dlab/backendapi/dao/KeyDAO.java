@@ -30,12 +30,12 @@ import com.epam.dlab.exceptions.DlabException;
  */
 public class KeyDAO extends BaseDAO {
 	
-	/** Write the user key to Mongo database.
+	/** Store the user key to Mongo database.
 	 * @param user user name
 	 * @param content key
 	 * @exception DlabException
 	 */
-    public void uploadKey(final String user, String content) throws DlabException {
+    public void insertKey(final String user, String content) throws DlabException {
         UserKeyDTO key = new UserKeyDTO().withContent(content).withStatus(KeyLoadStatus.NEW.getStatus());
         insertOne(USER_KEYS, key, user);
     }

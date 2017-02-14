@@ -138,7 +138,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                         .withVersion(formDTO.getVersion())
                         .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                        .withIamUserName(userInfo.getName())
+                        .withAwsIamUser(userInfo.getName())
                         .withAwsRegion(settingsDAO.getAwsRegion())
                         .withConfOsUser(settingsDAO.getConfOsUser())
                         .withConfOsFamily(settingsDAO.getConfOsFamily());
@@ -218,7 +218,7 @@ public class ComputationalResource implements ComputationalAPI {
                     .withConfKeyDir(settingsDAO.getConfKeyDir())
                     .withConfOsUser(settingsDAO.getConfOsUser())
                     .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                    .withIamUserName(userInfo.getName())
+                    .withAwsIamUser(userInfo.getName())
                     .withAwsRegion(settingsDAO.getAwsRegion());
 
             String uuid = provisioningService.post(EMR_TERMINATE, userInfo.getAccessToken(), dto, String.class);

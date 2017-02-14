@@ -18,6 +18,8 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
+import static com.epam.dlab.constants.ServiceConsts.PROVISIONING_SERVICE_NAME;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,13 +40,21 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.domain.KeyUploader;
+import com.epam.dlab.backendapi.dao.KeyDAO;
+import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.domain.RequestId;
+import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
+import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.KeyLoaderAPI;
+import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import io.dropwizard.auth.Auth;
 
@@ -52,11 +62,17 @@ import io.dropwizard.auth.Auth;
  */
 @Path("/user/access_key")
 @Produces(MediaType.APPLICATION_JSON)
-public class KeyUploaderResource {
+public class KeyUploaderResource implements KeyLoaderAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
 
     @Inject
-    private KeyUploader keyUploader;
+    private KeyDAO keyDAO;
+    @Inject
+    private SettingsDAO settingsDAO;
+
+    @Inject
+    @Named(PROVISIONING_SERVICE_NAME)
+    private RESTService provisioningService;
 
     /** Finds and returns the status of the user key.
      * @param userInfo user info.
@@ -72,7 +88,7 @@ public class KeyUploaderResource {
     	LOGGER.debug("Check the status of the user key for {}", userInfo.getName());
     	KeyLoadStatus status;
     	try {
-    		status = keyUploader.checkKey(userInfo);
+    		status = keyDAO.findKeyStatus(userInfo.getName());
         	LOGGER.debug("The status of the user key for {} is {}", userInfo.getName(), status.name());
     	} catch (DlabException e) {
     		LOGGER.error("Check the status of the user key for {} fails", userInfo.getName(), e);
@@ -99,8 +115,7 @@ public class KeyUploaderResource {
         String content;
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {
             content = buffer.lines().collect(Collectors.joining("\n"));
-            RequestId.put(userInfo.getName(),
-            		keyUploader.startKeyUpload(userInfo, content));
+            RequestId.put(userInfo.getName(), startKeyUpload(userInfo, content));
         } catch (IOException|DlabException e) {
     		LOGGER.error("Could not upload the key for user {}", userInfo.getName(), e);
     		throw new DlabException("Could not upload the key for user " + userInfo.getName() + ": " + e.getLocalizedMessage(), e);
@@ -108,20 +123,58 @@ public class KeyUploaderResource {
         return Response.ok().build();
     }
 
+    /** Store the user key into database and file system, create EDGE node.
+     * @param userInfo user info.
+     * @param content content of file key
+     * @throws DlabException
+     */
+    private String startKeyUpload(UserInfo userInfo, String content) throws DlabException {
+    	LOGGER.debug("The upload of the user key will be started for user {}", userInfo.getName());
+        keyDAO.insertKey(userInfo.getName(), content);
+        try {
+            EdgeCreateDTO edge = new EdgeCreateDTO()
+                    .withAwsIamUser(userInfo.getName())
+                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                    .withServiceBaseName(settingsDAO.getServiceBaseName())
+                    .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups())
+                    .withAwsRegion(settingsDAO.getAwsRegion())
+                    .withAwsVpcId(settingsDAO.getAwsVpcId())
+                    .withAwsSubnetId(settingsDAO.getAwsSubnetId())
+                    .withConfOsUser(settingsDAO.getConfOsUser())
+                    .withConfOsFamily(settingsDAO.getConfOsFamily());
+            UploadFileDTO dto = new UploadFileDTO()
+                    .withEdge(edge)
+                    .withContent(content);
+            return provisioningService.post(KEY_LOADER, userInfo.getAccessToken(), dto, String.class);
+        } catch (Exception e) {
+        	LOGGER.error("The upload of the user key for user {} fails", userInfo.getName(), e);
+            keyDAO.deleteKey(userInfo.getName());
+            throw new DlabException("Could not upload the key", e);
+        }
+    }
+    
     /** Stores the result of the upload the user key.
-     * @param uploadKeyResult result of the upload the user key.
+     * @param dto result of the upload the user key.
      * @return 200 OK
      */
     @POST
     @Path("/callback")
-    public Response loadKeyResponse(UploadFileResultDTO uploadKeyResult) {
-        LOGGER.debug("Upload the key result for user {}", uploadKeyResult.getUser(), uploadKeyResult.isSuccess());
-        RequestId.checkAndRemove(uploadKeyResult.getRequestId());
+    public Response loadKeyResponse(UploadFileResultDTO dto) {
+        LOGGER.debug("Upload the key result for user {}", dto.getUser(), dto.isSuccess());
+        RequestId.checkAndRemove(dto.getRequestId());
         try {
-        	keyUploader.onKeyUploadComplete(uploadKeyResult);
+            keyDAO.updateKey(dto.getUser(), KeyLoadStatus.getStatus(dto.isSuccess()));
+            if (dto.isSuccess()) {
+            	keyDAO.saveCredential(dto.getUser(),
+            			dto
+            				.getCredential()
+            				.withEdgeStatus(UserInstanceStatus.RUNNING));
+            } else {
+                keyDAO.deleteKey(dto.getUser());
+            }
         } catch (DlabException e) {
-    		LOGGER.error("Could not upload the key result for user {}", uploadKeyResult.getUser(), e);
-    		throw new DlabException("Could not upload the key result for user " + uploadKeyResult.getUser() + ": " + e.getLocalizedMessage(), e);
+    		LOGGER.error("Could not upload the key result for user {}", dto.getUser(), e);
+    		throw new DlabException("Could not upload the key result for user " + dto.getUser() + ": " + e.getLocalizedMessage(), e);
     	}
         return Response.ok().build();
     }

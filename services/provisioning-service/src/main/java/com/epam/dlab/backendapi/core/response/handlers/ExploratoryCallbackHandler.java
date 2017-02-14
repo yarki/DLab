@@ -22,6 +22,7 @@ import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.backendapi.core.commands.DockerAction;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryURL;
+import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,16 +47,9 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     private static final String EXPLORATORY_PASSWORD_FIELD = "exploratory_pass";
 
     private final String exploratoryName;
-    private final String uuid;
-    
-    @Override
-    public String getUUID() {
-    	return uuid;
-    }
 
-    public ExploratoryCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, String user, String exploratoryName) {
-        super(selfService, user, originalUuid, action);
-        this.uuid = originalUuid;
+    public ExploratoryCallbackHandler(RESTService selfService, DockerAction action, String uuid, String user, String exploratoryName) {
+        super(selfService, user, uuid, action);
         this.exploratoryName = exploratoryName;
     }
 
@@ -64,7 +58,8 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
         return EXPLORATORY + STATUS_URI;
     }
 
-    protected ExploratoryStatusDTO parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO baseStatus) {
+	@Override
+    protected ExploratoryStatusDTO parseOutResponse(JsonNode resultNode, ExploratoryStatusDTO baseStatus) throws DlabException {
     	if (resultNode == null) {
     		return baseStatus;
     	}
@@ -92,6 +87,7 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
                 .withExploratoryPassword(getTextValue(resultNode.get(EXPLORATORY_PASSWORD_FIELD)));
     }
 
+    @Override
     protected ExploratoryStatusDTO getBaseStatusDTO(UserInstanceStatus status) {
         return super.getBaseStatusDTO(status).withExploratoryName(exploratoryName);
     }
