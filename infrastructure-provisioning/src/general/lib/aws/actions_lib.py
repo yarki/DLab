@@ -694,7 +694,7 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                 env.user = "{}".format(ssh_user)
                 env.key_filename = "{}".format(key_path)
                 env.host_string = env.user + "@" + env.hosts
-                sudo('/opt/' + emr_version + '/' + emr_name + '/livy/bin/livy-server stop')
+                sudo("screen -ls | grep " + emr_name + " | cut -d. -f1 | awk '{print $1}' | xargs kill")
                 sudo('rm -rf  /opt/' + emr_version + '/' + emr_name + '/')
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
                 if exists('/home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, emr_name)):
@@ -1001,7 +1001,7 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
             except:
                 local('sleep 5')
                 pass
-        local('sudo ' + livy_path + 'bin/livy-server start')
+        local('sudo screen -S ' + cluster_name + ' -d -m ' + livy_path + 'bin/livy-server')
         local('touch /home/' + os_user + '/.ensure_dir/emr_' + cluster_name + '_interpreter_ensured')
     except:
             sys.exit(1)
