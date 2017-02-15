@@ -216,13 +216,17 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/tensor_ensured'):
         try:
             # install cuda
-            sudo('curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_8.0.44-1_amd64.deb')
-            sudo('dpkg -i cuda-repo-ubuntu1604_8.0.44-1_amd64.deb')
-            sudo('apt-get update')
-            sudo('apt-get -y install cuda')
+            #sudo('curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_8.0.44-1_amd64.deb')
+            #sudo('dpkg -i cuda-repo-ubuntu1604_8.0.44-1_amd64.deb')
+            #sudo('apt-get update')
+            #sudo('apt-get -y install cuda')
+            sudo('apt -y install aptitude')
+            sudo('aptitude -y install nvidia-367')
+            sudo('wget -P /opt https://developer.nvidia.com/compute/cuda/8.0/prod/local_installers/cuda_8.0.44_linux-run')
+            sudo('sh /opt/cuda_8.0.44_linux-run --silent')
             sudo('mv /usr/local/cuda-8.0 /opt/')
             sudo('ln -s /opt/cuda-8.0 /usr/local/cuda-8.0')
-            sudo('rm -f /home/' + os_user + '/cuda-repo-ubuntu1604_8.0.44-1_amd64.deb')
+            sudo('rm -f /home/' + os_user + '/cuda_8.0.44_linux-run')
             # install cuDNN
             put(files_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
             run('tar xvzf /tmp/cudnn-8.0-linux-x64-v5.1.tgz -C /tmp')
