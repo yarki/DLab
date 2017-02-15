@@ -239,8 +239,6 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             # install TensorFlow and run TensorBoard
             sudo('python2.7 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp27-none-linux_x86_64.whl')
             sudo('python3 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp35-cp35m-linux_x86_64.whl')
-            sudo('rm -rf  /usr/lib/python2.7/site-packages/numpy*')
-            sudo('python2.7 -m pip install -U numpy')
             sudo('mkdir /var/log/tensorboard; chown ' + os_user + ':' + os_user + ' -R /var/log/tensorboard')
             put(templates_dir + 'tensorboard.service', '/tmp/tensorboard.service')
             sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/tensorboard.service")
@@ -252,6 +250,8 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             # install Theano
             sudo('python2.7 -m pip install Theano')
             sudo('python3 -m pip install Theano')
+            sudo('rm -rf  /usr/lib/python2.7/site-packages/numpy*')
+            sudo('python2.7 -m pip install -U numpy')
             sudo('touch /home/' + os_user + '/.ensure_dir/tensor_ensured')
         except:
             sys.exit(1)
