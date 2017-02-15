@@ -19,7 +19,7 @@ package com.epam.dlab.backendapi.dao;
 
 import static com.epam.dlab.backendapi.dao.BaseDAO.USER;
 import static com.epam.dlab.backendapi.dao.ExploratoryDAO.EXPLORATORY_NAME;
-import static com.epam.dlab.backendapi.dao.MongoCollections.USER_AWS_CREDENTIALS;
+import static com.epam.dlab.backendapi.dao.MongoCollections.USER_EDGE;
 import static com.epam.dlab.backendapi.dao.MongoCollections.USER_INSTANCES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -37,8 +37,8 @@ import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.backendapi.resources.dto.HealthStatusEnum;
 import com.epam.dlab.backendapi.resources.dto.HealthStatusPageDTO;
 import com.epam.dlab.backendapi.resources.dto.HealthStatusResource;
+import com.epam.dlab.dto.edge.EdgeInfoDTO;
 import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
-import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.dto.status.EnvResourceList;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mongodb.BasicDBObject;
@@ -52,7 +52,7 @@ public class EnvStatusDAOTest extends DAOTestBase {
     private KeyDAO keyDAO;
     
     public EnvStatusDAOTest() {
-        super(USER_AWS_CREDENTIALS, USER_INSTANCES);
+        super(USER_EDGE, USER_INSTANCES);
     }
 
     @Before
@@ -104,7 +104,7 @@ public class EnvStatusDAOTest extends DAOTestBase {
     	edge.instanceId = "instance0";
     	edge.publicIp = "35.23.78.35";
     	edge.edgeStatus = "stopped";
-    	expDAO.insertOne(USER_AWS_CREDENTIALS, edge, user);
+    	expDAO.insertOne(USER_EDGE, edge, user);
     	
     	// Add exploratory
         UserInstanceDTO exp1 = new UserInstanceDTO()
@@ -147,7 +147,7 @@ public class EnvStatusDAOTest extends DAOTestBase {
         envDAO.updateEnvStatus(user, resList);
 
         // Check new status
-        UserAWSCredentialDTO userCred = keyDAO.getUserAWSCredential(user);
+        EdgeInfoDTO userCred = keyDAO.getEdgeInfo(user);
         assertEquals("running", userCred.getEdgeStatus());
         assertEquals("stopped", expDAO.fetchExploratoryStatus(user, exploratoryName).toString());
         assertEquals("terminating", compDAO.fetchComputationalFields(user, exploratoryName, computationalName).getStatus());

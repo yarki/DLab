@@ -51,7 +51,6 @@ import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.KeyLoaderAPI;
-import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -133,7 +132,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         try {
             EdgeCreateDTO edge = new EdgeCreateDTO()
                     .withAwsIamUser(userInfo.getName())
-                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
+                    .withEdgeUserName(userInfo.getSimpleName())
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups())
                     .withAwsRegion(settingsDAO.getAwsRegion())
@@ -164,7 +163,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         try {
             keyDAO.updateKey(dto.getUser(), KeyLoadStatus.getStatus(dto.isSuccess()));
             if (dto.isSuccess()) {
-            	keyDAO.saveCredential(dto.getUser(), dto.getCredential());
+            	keyDAO.updateEdgeInfo(dto.getUser(), dto.getEdgeInfo());
             } else {
                 keyDAO.deleteKey(dto.getUser());
             }

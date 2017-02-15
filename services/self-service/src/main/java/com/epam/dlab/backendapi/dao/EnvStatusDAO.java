@@ -21,6 +21,7 @@ package com.epam.dlab.backendapi.dao;
 import static com.epam.dlab.backendapi.dao.ExploratoryDAO.COMPUTATIONAL_RESOURCES;
 import static com.epam.dlab.backendapi.dao.ExploratoryDAO.EXPLORATORY_NAME;
 import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
+import static com.epam.dlab.backendapi.dao.KeyDAO.EDGE_STATUS;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.elemMatch;
@@ -50,7 +51,6 @@ import com.mongodb.client.model.Updates;
 public class EnvStatusDAO extends BaseDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnvStatusDAO.class);
 
-	private static final String EDGE_STATUS = "edge_status";
 	private static final String EDGE_PUBLIC_IP = "public_ip";
 	private static final String COMPUTATIONAL_STATUS = COMPUTATIONAL_RESOURCES + "." + STATUS;
 	private static final String COMPUTATIONAL_STATUS_FILTER = COMPUTATIONAL_RESOURCES + FIELD_SET_DELIMETER + STATUS;
@@ -98,7 +98,7 @@ public class EnvStatusDAO extends BaseDAO {
 	 * @param user the name of user.
 	 */
 	private Document getEdgeNode(String user) {
-		return findOne(USER_AWS_CREDENTIALS,
+		return findOne(USER_EDGE,
     			eq(ID, user),
     			fields(INCLUDE_EDGE_FIELDS, excludeId())).orElse(null);
 	}
@@ -220,7 +220,7 @@ public class EnvStatusDAO extends BaseDAO {
     			user, instanceId, r.getStatus(), status);
     	if (oStatus != status) {
         	LOGGER.debug("EDGE status will be updated from {} to {}", oldStatus, status);
-    		updateOne(USER_AWS_CREDENTIALS,
+    		updateOne(USER_EDGE,
         		eq(ID, user),
         		Updates.set(EDGE_STATUS, status.toString()));
     	}

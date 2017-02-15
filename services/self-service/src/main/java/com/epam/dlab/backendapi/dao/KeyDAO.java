@@ -19,16 +19,23 @@ limitations under the License.
 package com.epam.dlab.backendapi.dao;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Projections.excludeId;
+import static com.mongodb.client.model.Projections.fields;
+import static com.mongodb.client.model.Projections.include;
 import static com.mongodb.client.model.Updates.set;
 
+import org.bson.Document;
+
+import com.epam.dlab.dto.edge.EdgeInfoDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
-import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.dto.keyload.UserKeyDTO;
 import com.epam.dlab.exceptions.DlabException;
+import com.mongodb.client.model.Updates;
 
 /** DAO for manage the user key.
  */
 public class KeyDAO extends BaseDAO {
+	protected static final String EDGE_STATUS = "edge_status";
 	
 	/** Store the user key to Mongo database.
 	 * @param user user name
@@ -56,20 +63,23 @@ public class KeyDAO extends BaseDAO {
         mongoService.getCollection(USER_KEYS).deleteOne(eq(ID, user));
     }
 
-	/** Write the credential of user to Mongo database.
+	/** Store the EDGE of user to Mongo database.
 	 * @param user user name
-	 * @param credential the credential of user
+	 * @param edgeInfo the EDGE of user
 	 * @exception DlabException
 	 */
-    public void saveCredential(String user, UserAWSCredentialDTO credential) throws DlabException {
-        insertOne(USER_AWS_CREDENTIALS, credential, user);
+    public void updateEdgeInfo(String user, EdgeInfoDTO edgeInfo) throws DlabException {
+        updateOne(USER_EDGE,
+        		eq(ID, user),
+        		convertToBson(edgeInfo),
+        		true);
     }
 
-    public UserAWSCredentialDTO getUserAWSCredential(String user) {
-    	return findOne(USER_AWS_CREDENTIALS,
+    public EdgeInfoDTO getEdgeInfo(String user) {
+    	return findOne(USER_EDGE,
     			eq(ID, user),
-    			UserAWSCredentialDTO.class)
-    			.orElse(new UserAWSCredentialDTO());
+    			EdgeInfoDTO.class)
+    			.orElse(new EdgeInfoDTO());
     }
 
 	/** Finds and returns the status of user key.
@@ -81,5 +91,27 @@ public class KeyDAO extends BaseDAO {
                 .map(UserKeyDTO::getStatus)
                 .map(KeyLoadStatus::findByStatus)
                 .orElse(KeyLoadStatus.NONE);
+    }
+    
+    /** Updates the status of EDGE node.
+     * @param user user name
+	 * @param status status of EDGE node
+     * @throws DlabException
+     */
+    public void updateEdgeStatus(String user, String status) throws DlabException {
+    	updateOne(USER_EDGE,
+        		eq(ID, user),
+        		Updates.set(EDGE_STATUS, status));
+    }
+
+    /** Return the status of EDGE node.
+     * @param user user name
+     * @throws DlabException
+     */
+    public String getEdgeStatus(String user) throws DlabException {
+    	Document d = findOne(USER_EDGE,
+    			eq(ID, user),
+    			fields(include(EDGE_STATUS), excludeId())).orElse(null);
+    	return (d == null ? "" : d.getString(EDGE_STATUS));
     }
 }

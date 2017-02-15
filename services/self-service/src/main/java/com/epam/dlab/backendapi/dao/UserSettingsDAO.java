@@ -61,7 +61,7 @@ public class UserSettingsDAO extends BaseDAO {
 	 * @param settings user preferences in JSON format.
 	 */
     public void setUISettings(@Auth UserInfo userInfo, @NotBlank String settings) {
-    	update(USER_UI_SETTINGS,
+    	updateOne(USER_UI_SETTINGS,
     			eq(ID, userInfo.getName()),
     			set(VALUE, settings),
     			true);

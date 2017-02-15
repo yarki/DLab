@@ -20,23 +20,24 @@ package com.epam.dlab.dto.keyload;
 
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
+import com.epam.dlab.dto.edge.EdgeInfoDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
 public class UploadFileResultDTO extends StatusBaseDTO<UploadFileResultDTO> {
     @JsonProperty
-    private UserAWSCredentialDTO credential;
+    private EdgeInfoDTO edgeInfo;
 
-    public UserAWSCredentialDTO getCredential() {
-        return credential;
+    public EdgeInfoDTO getEdgeInfo() {
+        return edgeInfo;
     }
 
-    public void setCredential(UserAWSCredentialDTO credential) {
-        this.credential = credential;
+    public void setEdgeInfo(EdgeInfoDTO edgeInfo) {
+        this.edgeInfo = edgeInfo;
     }
 
-    public UploadFileResultDTO withCredential(UserAWSCredentialDTO credential) {
-    	setCredential(credential);
+    public UploadFileResultDTO withEdgeInfo(EdgeInfoDTO edgeInfo) {
+    	setEdgeInfo(edgeInfo);
     	return this;
     }
     
@@ -48,7 +49,7 @@ public class UploadFileResultDTO extends StatusBaseDTO<UploadFileResultDTO> {
     @Override
     public ToStringHelper toStringHelper(Object self) {
     	return super.toStringHelper(self)
-    			.add("credential", credential);
+    			.add("credential", edgeInfo);
     }
     
     @Override

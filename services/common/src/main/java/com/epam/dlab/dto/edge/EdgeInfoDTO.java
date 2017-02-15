@@ -16,14 +16,14 @@ limitations under the License.
 
 ****************************************************************************/
 
-package com.epam.dlab.dto.keyload;
+package com.epam.dlab.dto.edge;
 
 import com.epam.dlab.UserInstanceStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserAWSCredentialDTO {
+public class EdgeInfoDTO {
 	public static final String USER_OWN_BUCKET_NAME = "user_own_bicket_name";
 	
     @JsonProperty("instance_id")
@@ -73,7 +73,7 @@ public class UserAWSCredentialDTO {
 		return edgeStatus;
 	}
 	
-	public UserAWSCredentialDTO withEdgeStatus(UserInstanceStatus status) {
+	public EdgeInfoDTO withEdgeStatus(UserInstanceStatus status) {
 		edgeStatus = status.toString();
 		return this;
 	}

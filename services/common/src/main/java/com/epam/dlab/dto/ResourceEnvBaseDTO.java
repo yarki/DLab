@@ -21,7 +21,7 @@ package com.epam.dlab.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
-abstract public class ResourceEnvBaseDTO<T extends ResourceEnvBaseDTO<?>> extends ResourceSysBaseDTO<T> {
+public class ResourceEnvBaseDTO<T extends ResourceEnvBaseDTO<?>> extends ResourceSysBaseDTO<T> {
     @JsonProperty("exploratory_name")
     private String exploratoryName;
     @JsonProperty("application")

@@ -54,6 +54,10 @@ public class UserInfo implements Principal {
         return username;
     }
 
+    public String getSimpleName() {
+        return (username == null ? null : username.replaceAll("@.*", ""));
+    }
+
     @JsonProperty("access_token")
     public String getAccessToken() {
         return accessToken;

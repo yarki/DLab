@@ -21,7 +21,7 @@ package com.epam.dlab.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
-abstract public class ResourceSysBaseDTO<T extends ResourceSysBaseDTO<?>> extends ResourceBaseDTO<T> {
+public class ResourceSysBaseDTO<T extends ResourceSysBaseDTO<?>> extends ResourceBaseDTO<T> {
     @JsonProperty("conf_service_base_name")
     private String serviceBaseName;
     @JsonProperty("conf_os_user")

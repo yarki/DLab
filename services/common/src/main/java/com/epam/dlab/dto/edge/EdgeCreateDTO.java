@@ -14,6 +14,7 @@ package com.epam.dlab.dto.edge;
 
 import com.epam.dlab.dto.ResourceSysBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects.ToStringHelper;
 
 public class EdgeCreateDTO extends ResourceSysBaseDTO<EdgeCreateDTO> {
     @JsonProperty("aws_vpc_id")
@@ -22,6 +23,8 @@ public class EdgeCreateDTO extends ResourceSysBaseDTO<EdgeCreateDTO> {
     private String awsSubnetId;
     @JsonProperty("aws_security_groups_ids")
     private String awsSecurityGroupIds;
+    @JsonProperty("edge_elastic_ip")
+    private String edgeElasticIp;
 
     public String getAwsVpcId() {
         return awsVpcId;
@@ -63,4 +66,30 @@ public class EdgeCreateDTO extends ResourceSysBaseDTO<EdgeCreateDTO> {
         return this;
     }
 
+    public String getEdgeElasticIp() {
+        return edgeElasticIp;
+    }
+
+    public void setEdgeElasticIp(String edgeElasticIp) {
+        this.edgeElasticIp = edgeElasticIp;
+    }
+
+    public EdgeCreateDTO withEdgeElasticIp(String edgeElasticIp) {
+        setAwsSecurityGroupIds(edgeElasticIp);
+        return this;
+    }
+    
+    @Override
+    public ToStringHelper toStringHelper(Object self) {
+    	return super.toStringHelper(self)
+    	        .add("awsVpcId", awsVpcId)
+    	        .add("awsSubnetId", awsSubnetId)
+    	        .add("awsSecurityGroupIds", awsSecurityGroupIds)
+    	        .add("edgeElasticIp", edgeElasticIp);
+    }
+    
+    @Override
+    public String toString() {
+    	return toStringHelper(this).toString();
+    }
 }

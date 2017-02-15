@@ -16,23 +16,11 @@ limitations under the License.
 
 ****************************************************************************/
 
-package com.epam.dlab.backendapi.dao;
+package com.epam.dlab.rest.contracts;
 
-/** Names of Mongo collections. */
-public interface MongoCollections {
-	/** Environment settings. */
-    String SETTINGS = "settings";
-    /** Attempts of the user login into DLab. */
-    String LOGIN_ATTEMPTS = "loginAttempts";
-    /** Attempts the actions of docker. */
-    String DOCKER_ATTEMPTS = "dockerAttempts";
-    /** User keys and credentials. */
-    String USER_KEYS = "userKeys";
-    /** User AWS credentials. */
-    String USER_EDGE = "userAWSCredentials";
-    /** Instances of user. */
-    String USER_INSTANCES = "userInstances";
-    /** Name of shapes. */
-    String SHAPES = "shapes";
-    String USER_UI_SETTINGS = "userUISettings";
+public interface EdgeAPI {
+    String EDGE = "edge";
+    String EDGE_CREATE = EDGE + "/create";
+    String EDGE_START = EDGE + "/start";
+    String EDGE_STOP = EDGE + "/stop";
 }
