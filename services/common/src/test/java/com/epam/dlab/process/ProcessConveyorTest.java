@@ -69,6 +69,7 @@ public class ProcessConveyorTest {
             pingCommand = "ping -c 5 localhost";
         }
 
+        ProcessId ping = new ProcessId(user, "ping");
         ArrayList<CompletableFuture<ProcessInfo>> cf = new ArrayList<>();
         DlabProcess.getInstance().setMaxProcessesPerBox(2);
         for(int i = 0; i < 5; i++) {
@@ -98,6 +99,7 @@ public class ProcessConveyorTest {
             pingCommand = "ping -c 5 localhost";
         }
 
+        ProcessId ping = new ProcessId(user, "ping");
         ArrayList<CompletableFuture<ProcessInfo>> cf = new ArrayList<>();
         for(int i = 0; i < 5; i++) {
             cf.add(DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand.split(" ")));
@@ -208,6 +210,7 @@ public class ProcessConveyorTest {
         } else {
             pingCommand = "ping localhost";
         }
+        ProcessId ping = new ProcessId(user, "ping");
         DlabProcess.getInstance().setProcessTimeout(5, TimeUnit.SECONDS);
         CompletableFuture<ProcessInfo> cf = DlabProcess.getInstance().start(new ProcessId(user, "ping"), pingCommand.split(" "));
         ProcessInfo pi = cf.get();
