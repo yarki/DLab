@@ -323,7 +323,7 @@ def get_emr_list(tag_name, type='Key', emr_count=False, emr_active=False):
         clusters_list = []
         for i in clusters:
             response = emr.describe_cluster(ClusterId=i.get('Id'))
-            time.sleep(2)
+            time.sleep(5)
             tag = response.get('Cluster').get('Tags')
             for j in tag:
                 if tag_name in j.get(type):
@@ -346,7 +346,7 @@ def get_not_configured_emr_list(tag_name, instance_name):
         for i in clusters:
             tags_found = 0
             response = emr.describe_cluster(ClusterId=i.get('Id'))
-            time.sleep(2)
+            time.sleep(5)
             tag = response.get('Cluster').get('Tags')
             for j in tag:
                 if tag_name in j.get('Key'):
@@ -371,7 +371,7 @@ def get_not_configured_emr(tag_name, instance_name, return_name=False):
         if clusters_list:
             for cluster_id in clusters_list:
                 response = emr.describe_cluster(ClusterId=cluster_id)
-                time.sleep(2)
+                time.sleep(5)
                 tag = response.get('Cluster').get('Tags')
                 for j in tag:
                     if j.get('Value') == 'not-configured':
@@ -400,7 +400,7 @@ def get_emr_id_by_name(name):
         clusters = clusters.get('Clusters')
         for i in clusters:
             response = emr.describe_cluster(ClusterId=i.get('Id'))
-            time.sleep(2)
+            time.sleep(5)
             if response.get('Cluster').get('Name') == name:
                 cluster_id = i.get('Id')
         if cluster_id == '':
@@ -445,7 +445,7 @@ def provide_index(resource_type, tag_name, tag_value=''):
             emr = boto3.client('emr')
             for i in list:
                 response = emr.describe_cluster(ClusterId=i)
-                time.sleep(2)
+                time.sleep(5)
                 number = response.get('Cluster').get('Name').split('-')[-1]
                 if number not in ids:
                     ids.append(int(number))
@@ -585,7 +585,7 @@ def get_spark_version(cluster_name):
     clusters = clusters.get('Clusters')
     for i in clusters:
         response = emr.describe_cluster(ClusterId=i.get('Id'))
-        time.sleep(2)
+        time.sleep(5)
         if response.get("Cluster").get("Name") == cluster_name:
             response =  response.get("Cluster").get("Applications")
             for j in response:
@@ -601,7 +601,7 @@ def get_hadoop_version(cluster_name):
     clusters = clusters.get('Clusters')
     for i in clusters:
         response = emr.describe_cluster(ClusterId=i.get('Id'))
-        time.sleep(2)
+        time.sleep(5)
         if response.get("Cluster").get("Name") == cluster_name:
             response =  response.get("Cluster").get("Applications")
             for j in response:
