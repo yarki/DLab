@@ -133,6 +133,8 @@ def ensure_additional_python_libs(os_user):
                 sudo('python2 -m ipykernel install')
                 sudo('python3.5 -m pip install keras opencv-python h5py --no-cache-dir')
                 sudo('python3.5 -m ipykernel install')
+                sudo('rm -rf  /usr/lib64/python2.7/site-packages/numpy*')
+                sudo('python2.7 -m pip install -U numpy')
             sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
         except:
             sys.exit(1)
@@ -258,8 +260,6 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             # install Theano
             sudo('python2.7 -m pip install Theano')
             sudo('python3.5 -m pip install Theano')
-            sudo('rm -rf  /usr/lib64/python2.7/site-packages/numpy*')
-            sudo('python2.7 -m pip install -U numpy')
             sudo('touch /home/' + os_user + '/.ensure_dir/tensor_ensured')
         except:
             sys.exit(1)
