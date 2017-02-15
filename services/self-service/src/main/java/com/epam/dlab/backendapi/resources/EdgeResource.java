@@ -21,11 +21,9 @@ package com.epam.dlab.backendapi.resources;
 import static com.epam.dlab.UserInstanceStatus.FAILED;
 import static com.epam.dlab.UserInstanceStatus.STARTING;
 import static com.epam.dlab.UserInstanceStatus.STOPPING;
-import static com.epam.dlab.UserInstanceStatus.TERMINATED;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -41,7 +39,6 @@ import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.domain.RequestId;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.ResourceSysBaseDTO;
-import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
@@ -67,50 +64,6 @@ public class EdgeResource implements EdgeAPI {
     @Inject
     @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
-
-    /** Creates the EDGE node for user.
-     * @param userInfo user info.
-     * @return {@link Response.Status#OK} request for provisioning service has been accepted.<br>
-     * @throws DlabException
-     */
-    @PUT
-    public Response create(@Auth UserInfo userInfo) throws DlabException {
-        LOGGER.debug("Creating edge node for user {}", userInfo.getName());
-        UserInstanceStatus status = UserInstanceStatus.of(keyDAO.getEdgeStatus(userInfo.getName()));
-        if (status == null || !status.in(FAILED, TERMINATED)) {
-        	LOGGER.error("Could not create EDGE node for user {} because the status of instance {}", userInfo.getName(), status);
-            throw new DlabException("Could not create EDGE node because the status of instance " + status);
-        }
-        
-        EdgeCreateDTO dto;
-        try {
-        	keyDAO.updateEdgeStatus(userInfo.getName(), UserInstanceStatus.CREATING.toString());
-        	dto = new EdgeCreateDTO()
-            	.withAwsIamUser(userInfo.getName())
-            	.withAwsRegion(settingsDAO.getAwsRegion())
-            	.withAwsSecurityGroupIds(settingsDAO.getAwsSecurityGroups())
-            	.withAwsSubnetId(settingsDAO.getAwsSubnetId())
-            	.withAwsVpcId(settingsDAO.getAwsVpcId())
-            	.withConfOsFamily(settingsDAO.getConfOsFamily())
-            	.withConfOsUser(settingsDAO.getConfOsUser())
-            	.withEdgeUserName(userInfo.getSimpleName())
-            	.withServiceBaseName(settingsDAO.getServiceBaseName())
-            	.withEdgeElasticIp(keyDAO.getEdgeInfo(userInfo.getName()).getPublicIp());
-        } catch (DlabException e) {
-        	LOGGER.error("Could not update the status of EDGE node for user {}", userInfo.getName(), e);
-            throw new DlabException("Could not create EDGE node: " + e.getLocalizedMessage(), e);
-        }
-        
-        try {
-            String uuid = provisioningService.post(EDGE_CREATE, userInfo.getAccessToken(), dto, String.class);
-            RequestId.put(userInfo.getName(), uuid);
-            return Response.ok(uuid).build();
-        } catch (Throwable e) {
-            LOGGER.error("Could not create the EDGE node for user {}", userInfo.getName(), e);
-            keyDAO.updateEdgeStatus(userInfo.getName(), UserInstanceStatus.FAILED.toString());
-            throw new DlabException("Could not create EDGE node: " + e.getLocalizedMessage(), e);
-        }
-    }
 
     /** Starts EDGE node for user.
      * @param userInfo user info.
@@ -156,17 +109,8 @@ public class EdgeResource implements EdgeAPI {
     public Response status(UploadFileResultDTO dto) throws DlabException {
     	RequestId.checkAndRemove(dto.getRequestId());
     	try {
-    		if (dto.getEdgeInfo() == null) {
-	        	LOGGER.debug("Updating the status of EDGE node for user {} to {}", dto.getUser(), dto.getStatus());
-	        	keyDAO.updateEdgeStatus(dto.getUser(), dto.getStatus());
-	        } else {
-    			LOGGER.debug("EDGE node has been created for user {}: {}", dto.getUser(), dto);
-    			if (dto.isSuccess()) {
-    				keyDAO.updateEdgeInfo(dto.getUser(), dto.getEdgeInfo());
-	        	} else {
-		        	keyDAO.updateEdgeStatus(dto.getUser(), dto.getStatus());
-	        	}
-	        }
+    		LOGGER.debug("Updating the status of EDGE node for user {} to {}", dto.getUser(), dto.getStatus());
+	        keyDAO.updateEdgeStatus(dto.getUser(), dto.getStatus());
     	} catch (DlabException e) {
         	LOGGER.error("Could not update status of EDGE node for user {} to {}", dto.getUser(), dto.getStatus(), e);
         	throw new DlabException("Could not update status of EDGE node to " + dto.getStatus() + ": " + e.getLocalizedMessage(), e);

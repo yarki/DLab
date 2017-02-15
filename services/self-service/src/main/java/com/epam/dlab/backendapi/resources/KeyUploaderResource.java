@@ -18,6 +18,8 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
+import static com.epam.dlab.UserInstanceStatus.FAILED;
+import static com.epam.dlab.UserInstanceStatus.TERMINATED;
 import static com.epam.dlab.constants.ServiceConsts.PROVISIONING_SERVICE_NAME;
 
 import java.io.BufferedReader;
@@ -40,6 +42,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
@@ -48,6 +51,7 @@ import com.epam.dlab.dto.edge.EdgeCreateDTO;
 import com.epam.dlab.dto.keyload.KeyLoadStatus;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.dto.keyload.UploadFileResultDTO;
+import com.epam.dlab.dto.keyload.UserKeyDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.KeyLoaderAPI;
@@ -113,22 +117,64 @@ public class KeyUploaderResource implements KeyLoaderAPI {
         String content;
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(uploadedInputStream))) {
             content = buffer.lines().collect(Collectors.joining("\n"));
-            RequestId.put(userInfo.getName(), startKeyUpload(userInfo, content));
         } catch (IOException|DlabException e) {
     		LOGGER.error("Could not upload the key for user {}", userInfo.getName(), e);
     		throw new DlabException("Could not upload the key for user " + userInfo.getName() + ": " + e.getLocalizedMessage(), e);
     	}
+        startKeyUpload(userInfo, content, null);
         return Response.ok().build();
+    }
+    
+    /** Creates the EDGE node and upload the user key  for user.
+     * @param userInfo user info.
+     * @return {@link Response.Status#OK} request for provisioning service has been accepted.<br>
+     * @throws DlabException
+     */
+    @POST
+    @Path("/recover")
+    public Response recover(@Auth UserInfo userInfo) throws DlabException {
+        LOGGER.debug("Creating edge node for user {}", userInfo.getName());
+
+        UserInstanceStatus status = UserInstanceStatus.of(keyDAO.getEdgeStatus(userInfo.getName()));
+    	if (status == null || !status.in(FAILED, TERMINATED)) {
+        	LOGGER.error("Could not create EDGE node for user {} because the status of instance is {}", userInfo.getName(), status);
+            throw new DlabException("Could not create EDGE node because the status of instance is " + status);
+        }
+
+    	UserKeyDTO key = keyDAO.fetchKey(userInfo.getName());
+    	KeyLoadStatus keyStatus = KeyLoadStatus.findByStatus(key.getStatus());
+    	if (keyStatus == null || keyStatus != KeyLoadStatus.SUCCESS) {
+        	LOGGER.error("Could not create EDGE node for user {} because the status of user key is {}", userInfo.getName(), keyStatus);
+            throw new DlabException("Could not create EDGE node because the status of user key is " + keyStatus);
+        }
+    	
+        try {
+        	keyDAO.updateEdgeStatus(userInfo.getName(), UserInstanceStatus.CREATING.toString());
+        } catch (DlabException e) {
+        	LOGGER.error("Could not update the status of EDGE node for user {}", userInfo.getName(), e);
+            throw new DlabException("Could not create EDGE node: " + e.getLocalizedMessage(), e);
+        }
+        
+        try {
+            String uuid = startKeyUpload(userInfo,
+            		key.getContent(),
+            		keyDAO.getEdgeInfo(userInfo.getName()).getPublicIp());
+            return Response.ok(uuid).build();
+        } catch (Throwable e) {
+            LOGGER.error("Could not create the EDGE node for user {}", userInfo.getName(), e);
+            keyDAO.updateEdgeStatus(userInfo.getName(), UserInstanceStatus.FAILED.toString());
+            throw new DlabException("Could not create EDGE node: " + e.getLocalizedMessage(), e);
+        }
     }
 
     /** Store the user key into database and file system, create EDGE node.
      * @param userInfo user info.
-     * @param content content of file key
+     * @param keyContent content of file key
      * @throws DlabException
      */
-    private String startKeyUpload(UserInfo userInfo, String content) throws DlabException {
-    	LOGGER.debug("The upload of the user key will be started for user {}", userInfo.getName());
-        keyDAO.insertKey(userInfo.getName(), content);
+    private String startKeyUpload(UserInfo userInfo, String keyContent, String publicIp) throws DlabException {
+    	LOGGER.debug("The upload of the user key and creation EDGE node will be started for user {}", userInfo.getName());
+        keyDAO.insertKey(userInfo.getName(), keyContent);
         try {
             EdgeCreateDTO edge = new EdgeCreateDTO()
                     .withAwsIamUser(userInfo.getName())
@@ -139,15 +185,19 @@ public class KeyUploaderResource implements KeyLoaderAPI {
                     .withAwsVpcId(settingsDAO.getAwsVpcId())
                     .withAwsSubnetId(settingsDAO.getAwsSubnetId())
                     .withConfOsUser(settingsDAO.getConfOsUser())
-                    .withConfOsFamily(settingsDAO.getConfOsFamily());
+                    .withConfOsFamily(settingsDAO.getConfOsFamily())
+		            .withEdgeElasticIp(publicIp);
+            
             UploadFileDTO dto = new UploadFileDTO()
                     .withEdge(edge)
-                    .withContent(content);
-            return provisioningService.post(KEY_LOADER, userInfo.getAccessToken(), dto, String.class);
+                    .withContent(keyContent);
+            String uuid = provisioningService.post(KEY_LOADER, userInfo.getAccessToken(), dto, String.class);
+            RequestId.put(userInfo.getName(), uuid);
+            return uuid;
         } catch (Exception e) {
-        	LOGGER.error("The upload of the user key for user {} fails", userInfo.getName(), e);
+        	LOGGER.error("The upload of the user key and create EDGE node for user {} fails", userInfo.getName(), e);
             keyDAO.deleteKey(userInfo.getName());
-            throw new DlabException("Could not upload the key", e);
+            throw new DlabException("Could not upload the key and create EDGE node: " + e.getLocalizedMessage(), e);
         }
     }
     
@@ -158,18 +208,23 @@ public class KeyUploaderResource implements KeyLoaderAPI {
     @POST
     @Path("/callback")
     public Response loadKeyResponse(UploadFileResultDTO dto) {
-        LOGGER.debug("Upload the key result for user {}", dto.getUser(), dto.isSuccess());
+        LOGGER.debug("Upload the key result and EDGE node info for user {}", dto.getUser(), dto.isSuccess());
         RequestId.checkAndRemove(dto.getRequestId());
         try {
             keyDAO.updateKey(dto.getUser(), KeyLoadStatus.getStatus(dto.isSuccess()));
             if (dto.isSuccess()) {
             	keyDAO.updateEdgeInfo(dto.getUser(), dto.getEdgeInfo());
             } else {
-                keyDAO.deleteKey(dto.getUser());
+            	UserInstanceStatus status = UserInstanceStatus.of(keyDAO.getEdgeStatus(dto.getUser()));
+            	if (status == null) {
+            		// Upload the key first time
+            		LOGGER.debug("Delete the key for user {}", dto.getUser(), dto.isSuccess());
+            		keyDAO.deleteKey(dto.getUser());
+            	}
             }
         } catch (DlabException e) {
-    		LOGGER.error("Could not upload the key result for user {}", dto.getUser(), e);
-    		throw new DlabException("Could not upload the key result for user " + dto.getUser() + ": " + e.getLocalizedMessage(), e);
+    		LOGGER.error("Could not upload the key result and create EDGE node for user {}", dto.getUser(), e);
+    		throw new DlabException("Could not upload the key result and create EDGE node for user " + dto.getUser() + ": " + e.getLocalizedMessage(), e);
     	}
         return Response.ok().build();
     }

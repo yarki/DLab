@@ -24,6 +24,8 @@ import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
 import static com.mongodb.client.model.Updates.set;
 
+import java.util.Optional;
+
 import org.bson.Document;
 
 import com.epam.dlab.dto.edge.EdgeInfoDTO;
@@ -43,7 +45,9 @@ public class KeyDAO extends BaseDAO {
 	 * @exception DlabException
 	 */
     public void insertKey(final String user, String content) throws DlabException {
-        UserKeyDTO key = new UserKeyDTO().withContent(content).withStatus(KeyLoadStatus.NEW.getStatus());
+        UserKeyDTO key = new UserKeyDTO()
+        		.withContent(content)
+        		.withStatus(KeyLoadStatus.NEW.getStatus());
         insertOne(USER_KEYS, key, user);
     }
 
@@ -61,6 +65,21 @@ public class KeyDAO extends BaseDAO {
 	 */
     public void deleteKey(String user) {
         mongoService.getCollection(USER_KEYS).deleteOne(eq(ID, user));
+    }
+    
+    /** Finds and returns the user key.
+     * @param user user name.
+     * @exception DlabException
+     */
+    public UserKeyDTO fetchKey(String user) throws DlabException {
+        Optional<UserKeyDTO> opt = findOne(USER_KEYS,
+        		eq(ID, user),
+        		UserKeyDTO.class);
+
+        if( opt.isPresent() ) {
+            return opt.get();
+        }
+        throw new DlabException("Key of user " + user + " not found.");
     }
 
 	/** Store the EDGE of user to Mongo database.
