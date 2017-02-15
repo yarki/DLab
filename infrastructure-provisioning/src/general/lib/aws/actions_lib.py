@@ -714,6 +714,7 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                             request.get_method = lambda: 'DELETE'
                             url = opener.open(request)
                             print url.read()
+                    sudo('chown ' + ssh_user + ':' + ssh_user + ' -R /opt/zeppelin/')
                     sudo("service zeppelin-notebook restart")
                     sudo('rm -rf /home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, emr_name))
                 if exists('/home/{}/.ensure_dir/rstudio_emr_ensured'.format(ssh_user)):
@@ -960,6 +961,7 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
               '\/spark\/python\/lib\/py4j-src.zip,file:\/opt\/' + emr_version + '\/' + cluster_name +
               '\/spark\/python\/lib\/pyspark.zip/\' /opt/' + emr_version + '/' + cluster_name +
               '/spark/conf/spark-defaults.conf')
+        local('sudo chown ' + os_user + ':' + os_user + ' -R /opt/zeppelin/')
         local('sudo service zeppelin-notebook restart')
         while not zeppelin_restarted:
             result = local('nc -z localhost 8080; echo $?', capture=True)

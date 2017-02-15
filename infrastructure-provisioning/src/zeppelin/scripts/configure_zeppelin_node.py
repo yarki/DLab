@@ -85,6 +85,7 @@ def configure_zeppelin(os_user):
             sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/zeppelin-notebook.service")
             sudo("chmod 644 /tmp/zeppelin-notebook.service")
             sudo('cp /tmp/zeppelin-notebook.service /etc/systemd/system/zeppelin-notebook.service')
+            sudo('chown ' + os_user + ':' + os_user + ' -R /opt/zeppelin/')
             sudo("systemctl daemon-reload")
             sudo("systemctl enable zeppelin-notebook")
             sudo("systemctl start zeppelin-notebook")
