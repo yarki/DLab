@@ -42,7 +42,7 @@ public class UploadFileResultDTO extends StatusBaseDTO<UploadFileResultDTO> {
     }
     
     public boolean isSuccess() {
-    	UserInstanceStatus status = UserInstanceStatus.valueOf(getStatus());
+    	UserInstanceStatus status = UserInstanceStatus.of(getStatus());
     	return (status != null && status != UserInstanceStatus.FAILED);
     }
 
