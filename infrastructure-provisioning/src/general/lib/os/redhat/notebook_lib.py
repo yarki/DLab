@@ -129,8 +129,8 @@ def ensure_additional_python_libs(os_user):
                 sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
                 sudo('python3.5 -m pip install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
             if os.environ['application'] == 'tensor':
-                sudo('pip2 install keras opencv-python h5py --no-cache-dir')
-                sudo('python2 -m ipykernel install')
+                sudo('python2.7 -m pip install keras opencv-python h5py --no-cache-dir')
+                sudo('python2.7 -m ipykernel install')
                 sudo('python3.5 -m pip install keras opencv-python h5py --no-cache-dir')
                 sudo('python3.5 -m ipykernel install')
                 sudo('rm -rf  /usr/lib64/python2.7/site-packages/numpy*')
