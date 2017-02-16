@@ -85,6 +85,9 @@ def ensure_matplot(os_user):
             sudo('yum install -y python-matplotlib --nogpgcheck')
             sudo('pip2 install matplotlib --no-cache-dir')
             sudo('python3.5 -m pip install matplotlib --no-cache-dir')
+            if os.environ['application'] == 'tensor':
+                sudo('rm -rf  /usr/lib64/python2.7/site-packages/numpy*')
+                sudo('python2.7 -m pip install -U numpy')
             sudo('touch /home/{}/.ensure_dir/matplot_ensured'.format(os_user))
         except:
             sys.exit(1)
@@ -133,8 +136,6 @@ def ensure_additional_python_libs(os_user):
                 sudo('python2.7 -m ipykernel install')
                 sudo('python3.5 -m pip install keras opencv-python h5py --no-cache-dir')
                 sudo('python3.5 -m ipykernel install')
-                sudo('rm -rf  /usr/lib64/python2.7/site-packages/numpy*')
-                sudo('python2.7 -m pip install -U numpy')
             sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
         except:
             sys.exit(1)
