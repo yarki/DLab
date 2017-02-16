@@ -88,7 +88,7 @@ public class SecurityResource implements MongoCollections, SecurityAPI {
     @Path("/authorize")
     public Response authorize(@Auth UserInfo userInfo, @Valid @NotBlank String username) {
         LOGGER.debug("Try authorize accessToken {} for user info {}", userInfo.getAccessToken(), userInfo);
-        Status status = userInfo.getName().toLowerCase().equals(username.toLowerCase()) ?
+        Status status = userInfo.getName().equalsIgnoreCase(username) ?
                 Status.OK :
                 Status.FORBIDDEN;
         if (status == Status.OK) {

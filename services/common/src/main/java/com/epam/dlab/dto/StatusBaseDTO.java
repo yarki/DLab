@@ -27,6 +27,8 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import java.util.Date;
 
 abstract public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
+	@JsonProperty("request_id")
+    private String requestId;
     @JsonProperty
     private String user;
     @JsonProperty
@@ -38,6 +40,19 @@ abstract public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
 
     @SuppressWarnings("unchecked")
 	private final T self = (T)this;
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public T withRequestId(String requestId) {
+        setRequestId(requestId);
+        return self;
+    }
 
     public String getUser() {
         return user;
@@ -98,6 +113,7 @@ abstract public class StatusBaseDTO<T extends StatusBaseDTO<?>> {
     
     public ToStringHelper toStringHelper(Object self) {
     	return MoreObjects.toStringHelper(self)
+    			.add("requestId", requestId)
     	        .add("user", user)
     	        .add("status", status)
     	        .add("errorMessage", errorMessage)

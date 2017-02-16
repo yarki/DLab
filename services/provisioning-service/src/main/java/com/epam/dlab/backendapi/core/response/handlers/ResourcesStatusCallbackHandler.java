@@ -50,8 +50,8 @@ public class ResourcesStatusCallbackHandler extends ResourceCallbackHandler<EnvS
     	return uuid;
     }
     
-    public ResourcesStatusCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, EnvResourceDTO dto, String accessToken) {
-        super(selfService, dto.getIamUserName(), originalUuid, action, accessToken);
+    public ResourcesStatusCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, EnvResourceDTO dto) {
+        super(selfService, dto.getIamUserName(), originalUuid, action);
     	this.uuid = originalUuid;
         this.dto = dto;
     }

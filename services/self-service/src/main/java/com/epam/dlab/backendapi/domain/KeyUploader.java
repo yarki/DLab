@@ -20,8 +20,6 @@ package com.epam.dlab.backendapi.domain;
 
 import static com.epam.dlab.constants.ServiceConsts.PROVISIONING_SERVICE_NAME;
 
-import javax.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +64,7 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
     }
 
     @Override
-    public void startKeyUpload(UserInfo userInfo, String content) throws DlabException {
+    public String startKeyUpload(UserInfo userInfo, String content) throws DlabException {
     	LOGGER.debug("The upload of the user key will be started for user {}", userInfo.getName());
         keyDAO.uploadKey(userInfo.getName(), content);
         try {
@@ -83,12 +81,7 @@ public class KeyUploader implements KeyLoaderAPI, IKeyUploader {
             UploadFileDTO dto = new UploadFileDTO()
                     .withEdge(edge)
                     .withContent(content);
-            Response response = provisioningService.post(KEY_LOADER, userInfo.getAccessToken(), dto, Response.class);
-        	LOGGER.debug("The upload of the user key for user {} response status {}", userInfo.getName(), response.getStatus());
-            
-            if (Response.Status.ACCEPTED.getStatusCode() != response.getStatus()) {
-                keyDAO.deleteKey(userInfo.getName());
-            }
+            return provisioningService.post(KEY_LOADER, userInfo.getAccessToken(), dto, String.class);
         } catch (Exception e) {
         	LOGGER.error("The upload of the user key for user {} fails", userInfo.getName(), e);
             keyDAO.deleteKey(userInfo.getName());
