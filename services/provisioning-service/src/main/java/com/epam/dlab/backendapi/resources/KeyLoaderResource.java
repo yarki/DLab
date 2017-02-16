@@ -31,7 +31,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 @Path("/keyloader")
@@ -44,9 +43,8 @@ public class KeyLoaderResource {
     private KeyLoader keyLoader;
 
     @POST
-    public Response loadKey(@Auth UserInfo ui, UploadFileDTO dto) throws IOException, InterruptedException {
+    public String loadKey(@Auth UserInfo ui, UploadFileDTO dto) throws IOException, InterruptedException {
         LOGGER.debug("load key for user {}", dto.getEdge().getIamUser());
-        keyLoader.uploadKey(ui.getName(), ui.getAccessToken(), dto);
-        return Response.accepted().build();
+        return keyLoader.uploadKey(ui.getName(), dto);
     }
 }

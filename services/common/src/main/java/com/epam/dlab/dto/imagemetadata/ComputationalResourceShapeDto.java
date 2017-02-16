@@ -22,7 +22,6 @@ import com.epam.dlab.utils.ObjectUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import java.util.Comparator;
 import java.util.Objects;
 
 public class ComputationalResourceShapeDto {

@@ -25,7 +25,8 @@ public enum DockerAction {
     CONFIGURE,
     RUN,
     STOP,
-    TERMINATE;
+    TERMINATE,
+    STATUS;
 
     @Override
     public String toString() {

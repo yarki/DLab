@@ -65,16 +65,6 @@ public class KeyDAO extends BaseDAO {
         insertOne(USER_AWS_CREDENTIALS, credential, user);
     }
 
-	/** Finds and returns the IP address of EDGE notebook for user.
-	 * @param user user name
-	 * @exception DlabException
-	 */
-    public String getUserEdgeIP(String user) throws DlabException {
-        return findOne(USER_AWS_CREDENTIALS, eq(ID, user), UserAWSCredentialDTO.class)
-                .orElse(new UserAWSCredentialDTO())
-                .getPublicIp();
-	}
-    
     public UserAWSCredentialDTO getUserAWSCredential(String user) {
     	return findOne(USER_AWS_CREDENTIALS,
     			eq(ID, user),

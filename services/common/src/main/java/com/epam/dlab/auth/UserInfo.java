@@ -42,8 +42,9 @@ public class UserInfo implements Principal {
     private boolean awsUser = false;
 
     @JsonCreator
-    public UserInfo(@JsonProperty("username") String username, @JsonProperty("access_token") String accessToken) {
-        this.username = username;
+    public UserInfo(@JsonProperty("username") String username,
+    				@JsonProperty("access_token") String accessToken) {
+        this.username = (username == null ? null : username.toLowerCase());
         this.accessToken = accessToken;
     }
 

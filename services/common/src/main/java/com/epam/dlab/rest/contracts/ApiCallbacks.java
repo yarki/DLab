@@ -21,5 +21,6 @@ public class ApiCallbacks {
     public static final String API = "/api";
     public static final String COMPUTATIONAL = API + "/infrastructure_provision/computational_resources";
     public static final String EXPLORATORY = API + "/infrastructure_provision/exploratory_environment";
+    public static final String INFRASTRUCTURE = API + "/infrastructure";
     public static final String STATUS_URI = "/status";
 }

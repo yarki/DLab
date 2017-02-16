@@ -35,8 +35,7 @@ export class ApplicationServiceFacade {
   private static readonly COMPUTATIONAL_RESOURCES = 'computational_resources';
   private static readonly COMPUTATIONAL_RESOURCES_LIMITS = 'computational_resources_limits';
   private static readonly USER_PREFERENCES = 'user_preferences';
-  private static readonly HEALTH_STATUS_STATE = 'health_status_state';
-  private static readonly ENVIRONMENT_HEALTH_STATUSES = 'environment_health_statuses';
+  private static readonly ENVIRONMENT_HEALTH_STATUS = 'environment_health_status';
   private accessTokenKey: string = 'access_token';
   private requestRegistry: Dictionary<string>;
 
@@ -158,15 +157,15 @@ export class ApplicationServiceFacade {
 
   public buildGetEnvironmentHealthStatus(): Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
-      this.requestRegistry.Item(ApplicationServiceFacade.HEALTH_STATUS_STATE),
+      this.requestRegistry.Item(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUS),
       null,
       this.getRequestOptions(true, true));
   }
 
-  public buildGetEnvironmentStatuses(): Observable<Response> {
+  public buildGetEnvironmentStatuses(data): Observable<Response> {
     return this.buildRequest(RequestMethod.Get,
-      this.requestRegistry.Item(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUSES),
-      null,
+      this.requestRegistry.Item(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUS),
+      data,
       this.getRequestOptions(true, true));
   }
 
@@ -200,8 +199,7 @@ export class ApplicationServiceFacade {
     this.requestRegistry.Add(ApplicationServiceFacade.USER_PREFERENCES, '/api/user/settings');
 
     // Environment Health Status
-    this.requestRegistry.Add(ApplicationServiceFacade.HEALTH_STATUS_STATE, 'app/health-status/data_status.json');
-    this.requestRegistry.Add(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUSES, 'app/health-status/data.json');
+    this.requestRegistry.Add(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUS, '/api/infrastructure/status');
   }
 
   private buildRequest(method: RequestMethod, url: string, body: any, opt: RequestOptions): Observable<Response> {
@@ -211,7 +209,9 @@ export class ApplicationServiceFacade {
       return this.http.delete(body ? url + JSON.parse(body) : url, opt);
     } else if (method === RequestMethod.Put) {
       return this.http.put(url, body, opt);
-    } else return this.http.get(url, opt);
+    } else return this.http.get(body ? (url + body) : url, opt);
+
+    // else return this.http.get(url, opt);
   }
 
   private getRequestOptions(json: boolean, auth: boolean): RequestOptions {

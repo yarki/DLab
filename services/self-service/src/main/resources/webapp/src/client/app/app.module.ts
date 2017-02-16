@@ -28,6 +28,7 @@ import { LoginModule } from './login/login.module';
 import { AccessNotebookGuideModule } from './help/accessnotebookguide/accessnotebookguide.module';
 import { PublicKeyGuideModule } from './help/publickeyguide/publickeyguide.module';
 import { NotFoundModule } from './not-found/not-found.module';
+import { HealthStatusModule } from './health-status/health-status.module';
 
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { AuthorizationGuard } from './security/authorization.guard';
@@ -49,7 +50,8 @@ import { ApplicationSecurityService } from './services/applicationSecurity.servi
     LoginModule,
     AccessNotebookGuideModule,
     PublicKeyGuideModule,
-    NotFoundModule
+    NotFoundModule,
+    HealthStatusModule
   ],
   declarations: [AppComponent],
   providers: [{

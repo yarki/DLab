@@ -47,12 +47,13 @@ s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 files_dir = '/root/files/'
 local_spark_path = '/opt/spark/'
+toree_link = 'https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0/snapshots/dev1/toree-pip/toree-0.2.0.dev1.tar.gz'
 
 
 def ensure_toree_local_kernel():
     if not exists('/home/' + args.os_user + '/.ensure_dir/toree_local_kernel_ensured'):
         try:
-            sudo('pip install --pre toree --no-cache-dir')
+            sudo('pip install ' + toree_link + ' --no-cache-dir')
             sudo('ln -s /opt/spark/ /usr/local/spark')
             sudo('jupyter toree install')
             sudo('mv ' + scala_kernel_path + 'lib/* /tmp/')

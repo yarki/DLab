@@ -125,7 +125,7 @@ limitations under the License.
 .navbar .statusbar .warning {
   color: #f7b500;
 }
-.navbar .statusbar .critical {
+.navbar .statusbar .error {
   color: #ef5c4b;
 }
 
