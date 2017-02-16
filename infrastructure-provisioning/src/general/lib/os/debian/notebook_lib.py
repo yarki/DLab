@@ -226,7 +226,8 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             #sudo('sh /opt/cuda_8.0.44_linux-run --silent')
             sudo('mv /usr/local/cuda-8.0 /opt/')
             sudo('ln -s /opt/cuda-8.0 /usr/local/cuda-8.0')
-            sudo('rm -f /opt/cuda_8.0.44_linux-run')
+            sudo('rm -f /home/' + os_user + '/cuda-repo-ubuntu1604_8.0.44-1_amd64.deb')
+            #sudo('rm -f /opt/cuda_8.0.44_linux-run')
             # install cuDNN
             put(files_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
             run('tar xvzf /tmp/cudnn-8.0-linux-x64-v5.1.tgz -C /tmp')
