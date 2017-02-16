@@ -19,7 +19,9 @@ limitations under the License.
 package com.epam.dlab.backendapi.resources;
 
 import static com.epam.dlab.UserInstanceStatus.FAILED;
+import static com.epam.dlab.UserInstanceStatus.RUNNING;
 import static com.epam.dlab.UserInstanceStatus.STARTING;
+import static com.epam.dlab.UserInstanceStatus.STOPPED;
 import static com.epam.dlab.UserInstanceStatus.STOPPING;
 
 import javax.ws.rs.Consumes;
@@ -74,7 +76,13 @@ public class EdgeResource implements EdgeAPI {
     @Path("/start")
     public String start(@Auth UserInfo userInfo) throws DlabException {
         LOGGER.debug("Starting EDGE node for user {}", userInfo.getName());
-        try {
+        UserInstanceStatus status = UserInstanceStatus.of(keyDAO.getEdgeStatus(userInfo.getName()));
+    	if (status == null || !status.in(STOPPED)) {
+        	LOGGER.error("Could not start EDGE node for user {} because the status of instance is {}", userInfo.getName(), status);
+            throw new DlabException("Could not start EDGE node because the status of instance is " + status);
+        }
+
+    	try {
         	return action(userInfo, EDGE_START, STARTING);
         } catch (DlabException e) {
         	LOGGER.error("Could not start EDGE node for user {}", userInfo.getName(), e);
@@ -91,7 +99,13 @@ public class EdgeResource implements EdgeAPI {
     @Path("/stop")
     public String stop(@Auth UserInfo userInfo) throws DlabException {
         LOGGER.debug("Stopping EDGE node for user {}", userInfo.getName());
-        try {
+        UserInstanceStatus status = UserInstanceStatus.of(keyDAO.getEdgeStatus(userInfo.getName()));
+    	if (status == null || !status.in(RUNNING)) {
+        	LOGGER.error("Could not stop EDGE node for user {} because the status of instance is {}", userInfo.getName(), status);
+            throw new DlabException("Could not stop EDGE node because the status of instance is " + status);
+        }
+
+    	try {
         	return action(userInfo, EDGE_STOP, STOPPING);
         } catch (DlabException e) {
         	LOGGER.error("Could not stop EDGE node for user {}", userInfo.getName(), e);

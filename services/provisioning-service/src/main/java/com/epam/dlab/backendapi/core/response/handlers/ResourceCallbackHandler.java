@@ -79,8 +79,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     }
     
     private void selfServicePost(T object) throws DlabException {
-        LOGGER.debug("Send post request to self service {} for UUID {}, type {}, instance {}",
-        		getCallbackURI(), uuid, resultType.getName(), object);
+        LOGGER.debug("Send post request to self service {} for UUID {}, object is {}",
+        		getCallbackURI(), uuid, object);
         try {
         	selfService.post(getCallbackURI(), object, resultType);
         } catch (Throwable e) {
@@ -91,7 +91,8 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
 
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
-        LOGGER.debug("Got file {} while waiting for UUID {}, for action {}, docker responce: {}", fileName, uuid, action.name(), new String(content));
+        LOGGER.debug("Got file {} while waiting for UUID {}, for action {}, docker responce: {}",
+        		fileName, uuid, action.name(), new String(content));
         JsonNode document = MAPPER.readTree(content);
         boolean success = isSuccess(document);
         UserInstanceStatus status = calcStatus(action, success);

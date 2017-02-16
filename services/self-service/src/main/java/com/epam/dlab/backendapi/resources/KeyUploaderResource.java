@@ -63,6 +63,7 @@ import io.dropwizard.auth.Auth;
 /** Provides the REST API for upload the user key.
  */
 @Path("/user/access_key")
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class KeyUploaderResource implements EdgeAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);

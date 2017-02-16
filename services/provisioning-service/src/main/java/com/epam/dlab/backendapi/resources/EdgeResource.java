@@ -90,7 +90,7 @@ public class EdgeResource implements DockerCommands {
     @POST
     @Path("/stop")
     public String stop(@Auth UserInfo ui, ResourceSysBaseDTO<?> dto) throws IOException, InterruptedException {
-    	return action(ui.getName(), dto, EDGE + STATUS_URI, DockerAction.START);
+    	return action(ui.getName(), dto, EDGE + STATUS_URI, DockerAction.STOP);
     }
 
     protected String action(String username, ResourceSysBaseDTO<?> dto, String callbackURI, DockerAction action) throws IOException, InterruptedException {
