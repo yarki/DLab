@@ -49,7 +49,7 @@ public class UploadFileResultDTO extends StatusBaseDTO<UploadFileResultDTO> {
     @Override
     public ToStringHelper toStringHelper(Object self) {
     	return super.toStringHelper(self)
-    			.add("credential", edgeInfo);
+    			.add("edgeInfo", edgeInfo);
     }
     
     @Override

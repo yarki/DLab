@@ -32,7 +32,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EdgeCallbackHandler extends ResourceCallbackHandler<UploadFileResultDTO> {
     protected ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
-	private final String callbackURI;
+	
+    private final String callbackURI;
 
     public EdgeCallbackHandler(RESTService selfService, DockerAction action, String uuid, String user, String callbackURI) {
         super(selfService, user, uuid, action);

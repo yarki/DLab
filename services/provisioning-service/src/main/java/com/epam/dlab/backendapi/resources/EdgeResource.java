@@ -49,11 +49,12 @@ import com.epam.dlab.backendapi.core.response.handlers.EdgeCallbackHandler;
 import com.epam.dlab.dto.ResourceSysBaseDTO;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
 import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.rest.contracts.EdgeAPI;
 import com.google.inject.Inject;
 
 import io.dropwizard.auth.Auth;
 
-@Path("/edge")
+@Path(EdgeAPI.EDGE)
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class EdgeResource implements DockerCommands {

@@ -19,7 +19,7 @@ limitations under the License.
 package com.epam.dlab.rest.contracts;
 
 public interface EdgeAPI {
-    String EDGE = "edge";
+    String EDGE = "infrastructure/edge";
     String EDGE_CREATE = EDGE + "/create";
     String EDGE_START = EDGE + "/start";
     String EDGE_STOP = EDGE + "/stop";
