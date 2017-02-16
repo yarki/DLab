@@ -88,9 +88,12 @@ public class KeyDAO extends BaseDAO {
 	 * @exception DlabException
 	 */
     public void updateEdgeInfo(String user, EdgeInfoDTO edgeInfo) throws DlabException {
+    	Document d = new Document(SET,
+    					convertToBson(edgeInfo)
+    						.append(ID, user));
         updateOne(USER_EDGE,
         		eq(ID, user),
-        		convertToBson(edgeInfo),
+        		d,
         		true);
     }
 

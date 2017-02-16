@@ -79,7 +79,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     }
     
     private void selfServicePost(T object) throws DlabException {
-        LOGGER.debug("Send post request to self service {} for UUID {}, object is {}",
+    	debugMessage("Send post request to self service {} for UUID {}, object is {}",
         		getCallbackURI(), uuid, object);
         try {
         	selfService.post(getCallbackURI(), object, resultType);
@@ -91,7 +91,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
 
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
-        LOGGER.debug("Got file {} while waiting for UUID {}, for action {}, docker responce: {}",
+    	debugMessage("Got file {} while waiting for UUID {}, for action {}, docker responce: {}",
         		fileName, uuid, action.name(), new String(content));
         JsonNode document = MAPPER.readTree(content);
         boolean success = isSuccess(document);
@@ -100,7 +100,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         
         JsonNode resultNode = document.get(RESPONSE_NODE).get(RESULT_NODE);
         if (success) {
-            LOGGER.debug("Did {} resource for user: {}, UUID: {}", action, user, uuid);
+        	debugMessage("Did {} resource for user: {}, UUID: {}", action, user, uuid);
         } else {
             LOGGER.error("Could not {} resource for user: {}, UUID: {}", action, user, uuid);
             result.setErrorMessage(getTextValue(resultNode.get(ERROR_NODE)));
@@ -171,5 +171,13 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
 
     protected String getTextValue(JsonNode jsonNode) {
         return jsonNode != null ? jsonNode.textValue() : null;
+    }
+    
+    private void debugMessage(String format, Object... arguments) {
+    	if (action == DockerAction.STATUS) {
+    		LOGGER.trace(format, arguments);
+    	} else {
+    		LOGGER.debug(format, arguments);
+    	}
     }
 }
