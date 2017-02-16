@@ -54,7 +54,7 @@ import com.epam.dlab.dto.keyload.UploadFileResultDTO;
 import com.epam.dlab.dto.keyload.UserKeyDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
-import com.epam.dlab.rest.contracts.KeyLoaderAPI;
+import com.epam.dlab.rest.contracts.EdgeAPI;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -64,7 +64,7 @@ import io.dropwizard.auth.Auth;
  */
 @Path("/user/access_key")
 @Produces(MediaType.APPLICATION_JSON)
-public class KeyUploaderResource implements KeyLoaderAPI {
+public class KeyUploaderResource implements EdgeAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyUploaderResource.class);
 
     @Inject
@@ -191,7 +191,7 @@ public class KeyUploaderResource implements KeyLoaderAPI {
             UploadFileDTO dto = new UploadFileDTO()
                     .withEdge(edge)
                     .withContent(keyContent);
-            String uuid = provisioningService.post(KEY_LOADER, userInfo.getAccessToken(), dto, String.class);
+            String uuid = provisioningService.post(EDGE_CREATE, userInfo.getAccessToken(), dto, String.class);
             RequestId.put(userInfo.getName(), uuid);
             return uuid;
         } catch (Exception e) {

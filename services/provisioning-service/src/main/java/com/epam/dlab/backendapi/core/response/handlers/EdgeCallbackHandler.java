@@ -45,18 +45,19 @@ public class EdgeCallbackHandler extends ResourceCallbackHandler<UploadFileResul
     }
 
     protected UploadFileResultDTO parseOutResponse(JsonNode resultNode, UploadFileResultDTO baseStatus) throws DlabException {
-    	if (resultNode == null || getAction() != DockerAction.CREATE) {
-    		return baseStatus;
+    	if (resultNode != null &&
+    		getAction() == DockerAction.CREATE &&
+    		UserInstanceStatus.of(baseStatus.getStatus()) != UserInstanceStatus.FAILED) {
+            try {
+            	EdgeInfoDTO credential = MAPPER.readValue(resultNode.toString(), EdgeInfoDTO.class)
+            			.withEdgeStatus(UserInstanceStatus.RUNNING);
+            	baseStatus.withEdgeInfo(credential);
+            } catch (IOException e) {
+            	throw new DlabException("Cannot parse the EDGE info in JSON: " + e.getLocalizedMessage(), e);
+            }
     	}
 
-        try {
-        	EdgeInfoDTO credential = MAPPER.readValue(resultNode.toString(), EdgeInfoDTO.class);
-        	return baseStatus
-            		.withEdgeInfo(credential
-            				.withEdgeStatus(UserInstanceStatus.RUNNING));
-        } catch (IOException e) {
-        	throw new DlabException("Cannot parse the EDGE info in JSON: " + e.getLocalizedMessage(), e);
-        }
+		return baseStatus;
     }
     
     @Override

@@ -21,6 +21,8 @@ package com.epam.dlab.dto.edge;
 import com.epam.dlab.UserInstanceStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EdgeInfoDTO {
@@ -77,4 +79,26 @@ public class EdgeInfoDTO {
 		edgeStatus = status.toString();
 		return this;
 	}
+
+    public ToStringHelper toStringHelper(Object self) {
+    	return MoreObjects.toStringHelper(self)
+    			.add("instanceId", instanceId)
+    			.add("hostname", hostname)
+    			.add("publicIp", publicIp)
+    			.add("privateIp", privateIp)
+    			.add("keyName", keyName)
+    			.add("userOwnBucketName", userOwnBucketName)
+    			.add("tunnelPort", tunnelPort)
+    			.add("socksPort", socksPort)
+    			.add("notebookSg", notebookSg)
+    			.add("notebookProfile", notebookProfile)
+    			.add("notebookSubnet", notebookSubnet)
+    			.add("edgeSG", edgeSG)
+    			.add("edgeStatus", edgeStatus);
+    }
+    
+    @Override
+    public String toString() {
+    	return toStringHelper(this).toString();
+    }
 }

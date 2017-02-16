@@ -75,7 +75,7 @@ public class EdgeCreateDTO extends ResourceSysBaseDTO<EdgeCreateDTO> {
     }
 
     public EdgeCreateDTO withEdgeElasticIp(String edgeElasticIp) {
-        setAwsSecurityGroupIds(edgeElasticIp);
+    	setEdgeElasticIp(edgeElasticIp);
         return this;
     }
     
