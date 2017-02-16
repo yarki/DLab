@@ -694,7 +694,11 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                 env.user = "{}".format(ssh_user)
                 env.key_filename = "{}".format(key_path)
                 env.host_string = env.user + "@" + env.hosts
-                sudo("screen -ls | grep " + emr_name + " | cut -d. -f1 | awk '{print $1}' | xargs kill")
+                livy_port = sudo("cat /opt/" + emr_version + "/" + emr_name
+                                 + "/livy/conf/livy.conf | grep livy.server.port | tail -n 1 | awk '{printf $3}'")
+                process_number = sudo("netstat -natp 2>/dev/null | grep ':" + livy_port +
+                                      "' | awk '{print $7}' | sed 's|/.*||g'")
+                sudo('kill -9 ' + process_number)
                 sudo('rm -rf  /opt/' + emr_version + '/' + emr_name + '/')
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
                 if exists('/home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, emr_name)):
@@ -1001,7 +1005,14 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
             except:
                 local('sleep 5')
                 pass
-        local('sudo screen -S ' + cluster_name + ' -d -m ' + livy_path + 'bin/livy-server')
+        local('sudo cp /opt/livy-server-cluster.service /etc/systemd/system/livy-server-' + str(livy_port) + '.service')
+        local("sudo sed -i 's|OS_USER|" + os_user + "|' /etc/systemd/system/livy-server-" + str(livy_port) + '.service')
+        local("sudo sed -i 's|LIVY_PATH|" + livy_path + "|' /etc/systemd/system/livy-server-" + str(livy_port)
+              + '.service')
+        local('sudo chmod 644 /etc/systemd/system/livy-server-' + str(livy_port) + '.service')
+        local("sudo systemctl daemon-reload")
+        local("sudo systemctl enable livy-server-" + str(livy_port))
+        local('sudo systemctl start livy-server-' + str(livy_port))
         local('touch /home/' + os_user + '/.ensure_dir/emr_' + cluster_name + '_interpreter_ensured')
     except:
             sys.exit(1)
