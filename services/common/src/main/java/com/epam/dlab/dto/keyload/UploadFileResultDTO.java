@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.epam.dlab.dto.keyload;
 
-import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.dto.StatusBaseDTO;
 import com.epam.dlab.dto.edge.EdgeInfoDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -41,11 +40,6 @@ public class UploadFileResultDTO extends StatusBaseDTO<UploadFileResultDTO> {
     	return this;
     }
     
-    public boolean isSuccess() {
-    	UserInstanceStatus status = UserInstanceStatus.of(getStatus());
-    	return (status != null && status != UserInstanceStatus.FAILED);
-    }
-
     @Override
     public ToStringHelper toStringHelper(Object self) {
     	return super.toStringHelper(self)

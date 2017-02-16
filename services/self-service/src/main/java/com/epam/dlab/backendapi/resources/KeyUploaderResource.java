@@ -72,7 +72,6 @@ public class KeyUploaderResource implements EdgeAPI {
     private KeyDAO keyDAO;
     @Inject
     private SettingsDAO settingsDAO;
-
     @Inject
     @Named(PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
@@ -208,18 +207,19 @@ public class KeyUploaderResource implements EdgeAPI {
      */
     @POST
     @Path("/callback")
-    public Response loadKeyResponse(UploadFileResultDTO dto) {
-        LOGGER.debug("Upload the key result and EDGE node info for user {}", dto.getUser(), dto.isSuccess());
+    public Response loadKeyResponse(UploadFileResultDTO dto) throws DlabException {
+        LOGGER.debug("Upload the key result and EDGE node info for user {}", dto.getUser(), dto.getStatus());
         RequestId.checkAndRemove(dto.getRequestId());
+        boolean isSuccess = UserInstanceStatus.of(dto.getStatus()) == UserInstanceStatus.RUNNING;
         try {
-            keyDAO.updateKey(dto.getUser(), KeyLoadStatus.getStatus(dto.isSuccess()));
-            if (dto.isSuccess()) {
+            keyDAO.updateKey(dto.getUser(), KeyLoadStatus.getStatus(isSuccess));
+            if (isSuccess) {
             	keyDAO.updateEdgeInfo(dto.getUser(), dto.getEdgeInfo());
             } else {
             	UserInstanceStatus status = UserInstanceStatus.of(keyDAO.getEdgeStatus(dto.getUser()));
             	if (status == null) {
             		// Upload the key first time
-            		LOGGER.debug("Delete the key for user {}", dto.getUser(), dto.isSuccess());
+            		LOGGER.debug("Delete the key for user {}", dto.getUser());
             		keyDAO.deleteKey(dto.getUser());
             	}
             }

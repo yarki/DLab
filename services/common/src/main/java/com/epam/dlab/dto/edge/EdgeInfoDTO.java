@@ -18,13 +18,10 @@ limitations under the License.
 
 package com.epam.dlab.dto.edge;
 
-import com.epam.dlab.UserInstanceStatus;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class EdgeInfoDTO {
 	public static final String USER_OWN_BUCKET_NAME = "user_own_bicket_name";
 	
@@ -75,8 +72,8 @@ public class EdgeInfoDTO {
 		return edgeStatus;
 	}
 	
-	public EdgeInfoDTO withEdgeStatus(UserInstanceStatus status) {
-		edgeStatus = status.toString();
+	public EdgeInfoDTO withEdgeStatus(String edgeStatus) {
+		this.edgeStatus = edgeStatus;
 		return this;
 	}
 

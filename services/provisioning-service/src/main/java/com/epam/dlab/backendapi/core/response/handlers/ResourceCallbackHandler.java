@@ -67,7 +67,7 @@ abstract public class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
     
     @Override
     public boolean checkUUID(String uuid) {
-        return uuid.equals(uuid);
+        return this.uuid.equals(uuid);
     }
     
     public String getUser() {

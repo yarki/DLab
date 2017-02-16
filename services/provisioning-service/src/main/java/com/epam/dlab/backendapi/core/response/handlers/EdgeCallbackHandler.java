@@ -51,7 +51,7 @@ public class EdgeCallbackHandler extends ResourceCallbackHandler<UploadFileResul
     		UserInstanceStatus.of(baseStatus.getStatus()) != UserInstanceStatus.FAILED) {
             try {
             	EdgeInfoDTO credential = MAPPER.readValue(resultNode.toString(), EdgeInfoDTO.class)
-            			.withEdgeStatus(UserInstanceStatus.RUNNING);
+            			.withEdgeStatus(UserInstanceStatus.RUNNING.toString());
             	baseStatus.withEdgeInfo(credential);
             } catch (IOException e) {
             	throw new DlabException("Cannot parse the EDGE info in JSON: " + e.getLocalizedMessage(), e);
