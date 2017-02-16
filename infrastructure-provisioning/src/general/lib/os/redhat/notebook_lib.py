@@ -133,6 +133,8 @@ def ensure_additional_python_libs(os_user):
                 sudo('python2 -m ipykernel install')
                 sudo('python3.5 -m pip install keras opencv-python h5py --no-cache-dir')
                 sudo('python3.5 -m ipykernel install')
+                sudo('rm -rf  /usr/lib64/python2.7/site-packages/numpy*')
+                sudo('python2.7 -m pip install -U numpy')
             sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
         except:
             sys.exit(1)
@@ -191,7 +193,6 @@ def install_rstudio(os_user, local_spark_path, rstudio_pass):
             sudo('echo -e "[base]\nname=CentOS-7-Base\nbaseurl=http://buildlogs.centos.org/centos/7/os/x86_64-20140704-1/\ngpgcheck=1\ngpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7\npriority=1\nexclude=php mysql" >> /etc/yum.repos.d/CentOS-base.repo')
             sudo('yum install -y R R-core R-core-devel R-devel --nogpgcheck')
             sudo('yum install -y --nogpgcheck https://download2.rstudio.org/rstudio-server-rhel-1.0.136-x86_64.rpm')
-
             sudo('R CMD javareconf')
             sudo('R -e \'install.packages("rmarkdown", repos = "https://cran.revolutionanalytics.com")\'')
             sudo('R -e \'install.packages("base64enc", repos = "https://cran.revolutionanalytics.com")\'')
@@ -258,8 +259,6 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             # install Theano
             sudo('python2.7 -m pip install Theano')
             sudo('python3.5 -m pip install Theano')
-            sudo('rm -rf  /usr/lib64/python2.7/site-packages/numpy*')
-            sudo('python2.7 -m pip install -U numpy')
             sudo('touch /home/' + os_user + '/.ensure_dir/tensor_ensured')
         except:
             sys.exit(1)
