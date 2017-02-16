@@ -51,6 +51,7 @@ def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
             sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
             sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
             sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
+            sudo('ln -s /usr/lib64/R/ /usr/lib/R')
             sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
             sudo('touch /home/{}/.ensure_dir/r_kernel_ensured'.format(os_user))
         except:
@@ -74,6 +75,7 @@ def ensure_r(os_user):
             sudo('R -e "install.packages(\'caTools\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "install.packages(\'ggplot2\',repos=\'http://cran.us.r-project.org\')"')
+            sudo('R -e "install.packages(\'formatR\',repos=\'http://cran.us.r-project.org\')"')
             sudo('R -e "library(\'devtools\');install.packages(repos=\'http://cran.us.r-project.org\',c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
@@ -90,7 +92,10 @@ def ensure_matplot(os_user):
         try:
             sudo('yum install -y python-matplotlib --nogpgcheck')
             sudo('pip2 install matplotlib --no-cache-dir')
-            sudo('pip3 install matplotlib --no-cache-dir')
+            sudo('python3.5 -m pip install matplotlib --no-cache-dir')
+            if os.environ['application'] == 'tensor':
+                sudo('rm -rf  /usr/lib64/python2.7/site-packages/numpy*')
+                sudo('python2.7 -m pip install -U numpy')
             sudo('touch /home/{}/.ensure_dir/matplot_ensured'.format(os_user))
         except:
             sys.exit(1)
@@ -133,12 +138,12 @@ def ensure_additional_python_libs(os_user):
             sudo('yum install -y zlib-devel libjpeg-turbo-devel --nogpgcheck')
             if os.environ['application'] == 'jupyter' or os.environ['application'] == 'zeppelin':
                 sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
-                sudo('pip3 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+                sudo('python3.5 -m pip install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
             if os.environ['application'] == 'tensor':
-                sudo('pip2 install keras opencv-python h5py --no-cache-dir')
-                sudo('python2 -m ipykernel install')
-                sudo('pip3 install keras opencv-python h5py --no-cache-dir')
-                sudo('python3 -m ipykernel install')
+                sudo('python2.7 -m pip install keras opencv-python h5py --no-cache-dir')
+                sudo('python2.7 -m ipykernel install')
+                sudo('python3.5 -m pip install keras opencv-python h5py --no-cache-dir')
+                sudo('python3.5 -m ipykernel install')
             sudo('touch /home/' + os_user + '/.ensure_dir/additional_python_libs_ensured')
         except:
             sys.exit(1)
@@ -178,11 +183,12 @@ def ensure_python2_libraries(os_user):
 def ensure_python3_libraries(os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/python3_libraries_ensured'):
         try:
-            sudo('yum install -y python34-pip python34-devel')
-            sudo('pip3 install -U pip setuptools --no-cache-dir')
-            sudo('pip3 install boto3 --no-cache-dir')
-            sudo('pip3 install fabvenv fabric-virtualenv --no-cache-dir')
-            sudo('pip3 install ipython ipykernel --no-cache-dir')
+            sudo('yum -y install https://centos7.iuscommunity.org/ius-release.rpm')
+            sudo('yum install -y python35u python35u-pip python35u-devel')
+            sudo('python3.5 -m pip install -U pip setuptools --no-cache-dir')
+            sudo('python3.5 -m pip install boto3 --no-cache-dir')
+            sudo('python3.5 -m pip install fabvenv fabric-virtualenv --no-cache-dir')
+            sudo('python3.5 -m pip install ipython ipykernel --no-cache-dir')
             sudo('touch /home/' + os_user + '/.ensure_dir/python3_libraries_ensured')
         except:
             sys.exit(1)
@@ -191,14 +197,11 @@ def ensure_python3_libraries(os_user):
 def install_rstudio(os_user, local_spark_path, rstudio_pass):
     if not exists('/home/' + os_user + '/.ensure_dir/rstudio_ensured'):
         try:
-            sudo('yum install -y java-1.8.0-openjdk-devel')
-            sudo('yum install -y java-1.8.0-openjdk')
             sudo('yum install -y cmake')
             sudo('yum -y install libcur*')
             sudo('echo -e "[base]\nname=CentOS-7-Base\nbaseurl=http://buildlogs.centos.org/centos/7/os/x86_64-20140704-1/\ngpgcheck=1\ngpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7\npriority=1\nexclude=php mysql" >> /etc/yum.repos.d/CentOS-base.repo')
             sudo('yum install -y R R-core R-core-devel R-devel --nogpgcheck')
             sudo('yum install -y --nogpgcheck https://download2.rstudio.org/rstudio-server-rhel-1.0.136-x86_64.rpm')
-
             sudo('R CMD javareconf')
             sudo('R -e \'install.packages("rmarkdown", repos = "https://cran.revolutionanalytics.com")\'')
             sudo('R -e \'install.packages("base64enc", repos = "https://cran.revolutionanalytics.com")\'')
@@ -235,10 +238,10 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo('mv cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64-rpm cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64.rpm; rpm -i cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64.rpm')
             sudo('yum clean all')
             sudo('yum -y install cuda')
-            sudo('pip3 install --upgrade pip wheel numpy')
+            sudo('python3.5 -m pip install --upgrade pip wheel numpy')
             sudo('mv /usr/local/cuda-8.0 /opt/')
             sudo('ln -s /opt/cuda-8.0 /usr/local/cuda-8.0')
-            sudo('rm -f /home/' + os_user + '/cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64-rpm')
+            sudo('rm -rf /home/' + os_user + '/cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64.rpm')
             # install cuDNN
             put(files_dir + 'cudnn-8.0-linux-x64-v5.1.tgz', '/tmp/cudnn-8.0-linux-x64-v5.1.tgz')
             run('tar xvzf /tmp/cudnn-8.0-linux-x64-v5.1.tgz -C /tmp')
@@ -250,53 +253,21 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             run('echo "export LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH:/opt/cudnn/lib64\"" >> ~/.bash_profile')
             # install TensorFlow and run TensorBoard
             sudo('wget https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp27-none-linux_x86_64.whl')
-            sudo('wget https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp34-cp34m-linux_x86_64.whl')
+            sudo('wget https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-' + tensorflow_version + '-cp35-cp35m-linux_x86_64.whl')
             sudo('python2.7 -m pip install --upgrade tensorflow_gpu-' + tensorflow_version + '-cp27-none-linux_x86_64.whl')
-            run('python3 -m pip install --upgrade tensorflow_gpu-' + tensorflow_version + '-cp34-cp34m-linux_x86_64.whl')
-            sudo('mkdir /var/log/tensorboard')
-            put(templates_dir + 'tensorboard-python2.service', '/tmp/tensorboard-python2.service')
-            put(templates_dir + 'tensorboard-python3.service', '/tmp/tensorboard-python3.service')
-            sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/tensorboard-python*")
-            sudo("chmod 644 /tmp/tensorboard-python*")
-            sudo('\cp /tmp/tensorboard-python* /etc/systemd/system/')
-            sudo('mkdir -p /var/log/tensorboard_py2; chown ' + os_user + ':' + os_user + ' -R /var/log/tensorboard_py2')
-            sudo('mkdir -p /var/log/tensorboard_py3; chown ' + os_user + ':' + os_user + ' -R /var/log/tensorboard_py3')
+            sudo('python3.5 -m pip install --upgrade tensorflow_gpu-' + tensorflow_version + '-cp35-cp35m-linux_x86_64.whl')
+            sudo('rm -rf /home/' + os_user + '/tensorflow_gpu-*')
+            sudo('mkdir /var/log/tensorboard; chown ' + os_user + ':' + os_user + ' -R /var/log/tensorboard')
+            put(templates_dir + 'tensorboard.service', '/tmp/tensorboard.service')
+            sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/tensorboard.service")
+            sudo("chmod 644 /tmp/tensorboard.service")
+            sudo('\cp /tmp/tensorboard.service /etc/systemd/system/')
             sudo("systemctl daemon-reload")
-            sudo("systemctl enable tensorboard-python2")
-            sudo("systemctl enable tensorboard-python3")
-            sudo("systemctl start tensorboard-python2")
-            sudo("systemctl start tensorboard-python3")
+            sudo("systemctl enable tensorboard")
+            sudo("systemctl start tensorboard")
             # install Theano
             sudo('python2.7 -m pip install Theano')
-            sudo('python3 -m pip install Theano')
+            sudo('python3.5 -m pip install Theano')
             sudo('touch /home/' + os_user + '/.ensure_dir/tensor_ensured')
         except:
             sys.exit(1)
-
-
-def install_maven():
-    sudo('yum install -y unzip')
-    with cd('/tmp/'):
-        sudo('wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip')
-        sudo('unzip apache-maven-3.3.9-bin.zip')
-        sudo('mv apache-maven-3.3.9/ /opt/maven')
-        sudo('ln -s /opt/maven/bin/mvn /usr/bin/mvn')
-
-
-def install_livy_dependencies():
-    sudo('pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
-    sudo('pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')
-
-
-def install_maven_emr():
-    local('sudo yum install -y unzip')
-    with lcd('/tmp/'):
-        local('sudo wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip')
-        local('sudo unzip apache-maven-3.3.9-bin.zip')
-        local('sudo mv apache-maven-3.3.9/ /opt/maven')
-        local('sudo ln -s /opt/maven/bin/mvn /usr/bin/mvn')
-
-
-def install_livy_dependencies_emr():
-    local('sudo pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
-    local('sudo pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')

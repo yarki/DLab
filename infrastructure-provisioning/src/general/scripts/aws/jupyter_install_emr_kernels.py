@@ -58,6 +58,8 @@ def configure_notebook(args):
     local('scp -i {} /usr/lib/python2.7/dlab/* {}:/tmp/dlab_libs/'.format(args.keyfile, env.host_string))
     run('chmod a+x /tmp/dlab_libs/*')
     sudo('mv /tmp/dlab_libs/* /usr/lib/python2.7/dlab/')
+    if exists('/usr/lib64'):
+        sudo('ln -s /usr/lib/python2.7/dlab /usr/lib64/python2.7/dlab')
 
 
 if __name__ == "__main__":

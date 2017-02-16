@@ -167,12 +167,6 @@ if __name__ == "__main__":
             },
             {
                 "PrefixListIds": [],
-                "FromPort": 6007,
-                "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}],
-                "ToPort": 6007, "IpProtocol": "tcp", "UserIdGroupPairs": []
-            },
-            {
-                "PrefixListIds": [],
                 "FromPort": 20888,
                 "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}],
                 "ToPort": 20888, "IpProtocol": "tcp", "UserIdGroupPairs": []
