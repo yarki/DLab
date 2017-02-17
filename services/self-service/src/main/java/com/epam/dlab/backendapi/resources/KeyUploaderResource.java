@@ -133,7 +133,7 @@ public class KeyUploaderResource implements EdgeAPI {
     @POST
     @Path("/recover")
     public Response recover(@Auth UserInfo userInfo) throws DlabException {
-        LOGGER.debug("Creating edge node for user {}", userInfo.getName());
+        LOGGER.debug("Recreating edge node for user {}", userInfo.getName());
 
         UserInstanceStatus status = UserInstanceStatus.of(keyDAO.getEdgeStatus(userInfo.getName()));
     	if (status == null || !status.in(FAILED, TERMINATED)) {
@@ -173,8 +173,11 @@ public class KeyUploaderResource implements EdgeAPI {
      * @throws DlabException
      */
     private String startKeyUpload(UserInfo userInfo, String keyContent, String publicIp) throws DlabException {
-    	LOGGER.debug("The upload of the user key and creation EDGE node will be started for user {}", userInfo.getName());
-        keyDAO.insertKey(userInfo.getName(), keyContent);
+		LOGGER.debug("The upload of the user key and creation EDGE node will be started for user {}", userInfo.getName());
+    	if (publicIp == null) {
+    		keyDAO.insertKey(userInfo.getName(), keyContent);
+    	}
+    	
         try {
             EdgeCreateDTO edge = new EdgeCreateDTO()
                     .withAwsIamUser(userInfo.getName())
@@ -208,7 +211,7 @@ public class KeyUploaderResource implements EdgeAPI {
     @POST
     @Path("/callback")
     public Response loadKeyResponse(UploadFileResultDTO dto) throws DlabException {
-        LOGGER.debug("Upload the key result and EDGE node info for user {}", dto.getUser(), dto.getStatus());
+        LOGGER.debug("Upload the key result and EDGE node info for user {}: {}", dto.getUser(), dto);
         RequestId.checkAndRemove(dto.getRequestId());
         boolean isSuccess = UserInstanceStatus.of(dto.getStatus()) == UserInstanceStatus.RUNNING;
         try {
