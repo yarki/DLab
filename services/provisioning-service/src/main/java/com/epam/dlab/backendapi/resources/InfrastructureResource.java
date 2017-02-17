@@ -62,7 +62,7 @@ public class InfrastructureResource implements DockerCommands {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private ICommandExecutor commandExecuter;
+    private ICommandExecutor commandExecutor;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject
@@ -83,7 +83,7 @@ public class InfrastructureResource implements DockerCommands {
         		configuration.getRequestEnvStatusTimeout(),
                 getFileHandlerCallback(STATUS, uuid, dto));
         try {
-            commandExecuter.executeAsync(
+            commandExecutor.executeAsync(
                     ui.getName(),
                     uuid,
                     commandBuilder.buildCommand(
@@ -106,8 +106,8 @@ public class InfrastructureResource implements DockerCommands {
         return uuid;
     }
 
-    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String originalUuid, EnvResourceDTO dto) {
-        return new ResourcesStatusCallbackHandler(selfService, action, originalUuid, dto);
+    private FileHandlerCallback getFileHandlerCallback(DockerAction action, String uuid, EnvResourceDTO dto) {
+        return new ResourcesStatusCallbackHandler(selfService, action, uuid, dto);
     }
 
     private String nameContainer(String user, DockerAction action, String name) {

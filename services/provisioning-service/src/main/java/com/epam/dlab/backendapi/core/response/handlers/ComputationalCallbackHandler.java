@@ -23,6 +23,7 @@ import com.epam.dlab.backendapi.core.commands.DockerAction;
 import com.epam.dlab.dto.computational.ComputationalBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
+import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -33,17 +34,10 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     private static final String INSTANCE_ID_FIELD = "instance_id";
     private static final String COMPUTATIONAL_ID_FIELD = "hostname";
     
-    private final String uuid;
     private final ComputationalBaseDTO<?> dto;
 
-    @Override
-    public String getUUID() {
-    	return uuid;
-    }
-    
-    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String originalUuid, ComputationalBaseDTO<?> dto) {
-        super(selfService, dto.getIamUserName(), originalUuid, action);
-    	this.uuid = originalUuid;
+    public ComputationalCallbackHandler(RESTService selfService, DockerAction action, String uuid, ComputationalBaseDTO<?> dto) {
+        super(selfService, dto.getAwsIamUser(), uuid, action);
         this.dto = dto;
     }
     
@@ -57,7 +51,7 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     }
 
     @Override
-    protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO baseStatus) {
+    protected ComputationalStatusDTO parseOutResponse(JsonNode resultNode, ComputationalStatusDTO baseStatus) throws DlabException {
     	if (getAction() == DockerAction.CONFIGURE) {
     		baseStatus.withExploratoryName(getDto().getExploratoryName());
     	}
@@ -72,7 +66,7 @@ public class ComputationalCallbackHandler extends ResourceCallbackHandler<Comput
     			.withComputationalId(getTextValue(resultNode.get(COMPUTATIONAL_ID_FIELD)));
     		if (UserInstanceStatus.of(baseStatus.getStatus()) == UserInstanceStatus.RUNNING) {
     			baseStatus.withStatus(UserInstanceStatus.CONFIGURING);
-    			ComputationalConfigure.configure(uuid, (ComputationalCreateDTO)getDto());
+    			ComputationalConfigure.configure(getUUID(), (ComputationalCreateDTO)getDto());
     		}
     		break;
 		case CONFIGURE:

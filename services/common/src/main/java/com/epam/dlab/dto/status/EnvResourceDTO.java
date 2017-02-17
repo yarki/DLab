@@ -23,27 +23,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
 public class EnvResourceDTO extends ResourceBaseDTO<EnvResourceDTO> {
-    @JsonProperty("edge_user_name")
-    private String edgeUserName;
     @JsonProperty("edge_list_resources")
     private EnvResourceList resourceList;
     
-    /** Return the name of user for EDGE node. */
-    public String getEdgeUserName() {
-        return edgeUserName;
-    }
-
-    /** Set the name of user for EDGE node. */
-    public void setEdgeUserName(String edgeUserName) {
-        this.edgeUserName = edgeUserName;
-    }
-
-    /** Set the name of user for EDGE node. */
-    public EnvResourceDTO withEdgeUserName(String edgeUserName) {
-        setEdgeUserName(edgeUserName);
-        return this;
-    }
-
     /** Return the list of resources (hosts, clusters, storages). */
     public EnvResourceList getResourceList() {
         return resourceList;
@@ -63,7 +45,6 @@ public class EnvResourceDTO extends ResourceBaseDTO<EnvResourceDTO> {
     @Override
     public ToStringHelper toStringHelper(Object self) {
     	return super.toStringHelper(self)
-    	        .add("edgeUserName", edgeUserName)
     			.add("resourceList", resourceList);
     }
     

@@ -48,7 +48,7 @@ public class DockerResource implements DockerCommands {
     @Inject
     private MetadataHolder metadataHolder;
     @Inject
-    private ICommandExecutor commandExecuter;
+    private ICommandExecutor commandExecutor;
 
     @GET
     @Path("{type}")
@@ -64,7 +64,7 @@ public class DockerResource implements DockerCommands {
     public String run(@Auth UserInfo ui, String image) throws IOException, InterruptedException {
         LOGGER.debug("run docker image {}", image);
         String uuid = DockerCommands.generateUUID();
-        commandExecuter.executeAsync(
+        commandExecutor.executeAsync(
                 ui.getName(),
                 uuid,
                 new RunDockerCommand()

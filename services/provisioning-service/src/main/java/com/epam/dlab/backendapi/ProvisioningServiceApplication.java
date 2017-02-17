@@ -72,8 +72,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         jersey.register(new RuntimeExceptionMapper());
         jersey.register(new JsonProcessingExceptionMapper());
         jersey.register(injector.getInstance(DockerResource.class));
-        jersey.register(injector.getInstance(KeyLoaderResource.class));
-        jersey.register(injector.getInstance(KeyLoaderResource.class));
+        jersey.register(injector.getInstance(EdgeResource.class));
         jersey.register(injector.getInstance(ExploratoryResource.class));
         jersey.register(injector.getInstance(ComputationalResource.class));
         jersey.register(injector.getInstance(InfrastructureResource.class));

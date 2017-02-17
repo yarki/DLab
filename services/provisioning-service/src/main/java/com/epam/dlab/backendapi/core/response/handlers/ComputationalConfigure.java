@@ -49,7 +49,7 @@ public class ComputationalConfigure implements DockerCommands {
     @Inject
     private FolderListenerExecutor folderListenerExecutor;
     @Inject
-    private ICommandExecutor commandExecuter;
+    private ICommandExecutor commandExecutor;
     @Inject
     private CommandBuilder commandBuilder;
     @Inject
@@ -64,7 +64,7 @@ public class ComputationalConfigure implements DockerCommands {
                 .withNotebookInstanceName(dto.getNotebookInstanceName())
                 .withVersion(dto.getVersion())
                 .withEdgeUserName(dto.getEdgeUserName())
-                .withIamUserName(dto.getIamUserName())
+                .withAwsIamUser(dto.getAwsIamUser())
                 .withAwsRegion(dto.getAwsRegion())
                 .withConfOsUser(dto.getConfOsUser());
     	ComputationalConfigure conf = new ComputationalConfigure();
@@ -79,7 +79,7 @@ public class ComputationalConfigure implements DockerCommands {
                 configuration.getResourceStatusPollTimeout(),
                 getFileHandlerCallback(CONFIGURE, uuid, dto));
         try {
-            commandExecuter.executeAsync(
+            commandExecutor.executeAsync(
             		dto.getEdgeUserName(),
                     uuid,
                     commandBuilder.buildCommand(
