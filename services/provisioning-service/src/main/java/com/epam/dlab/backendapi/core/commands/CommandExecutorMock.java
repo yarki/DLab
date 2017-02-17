@@ -1,4 +1,4 @@
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.backendapi.core.commands;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.commands;
 
-import com.epam.dlab.backendapi.core.ICommandExecutor;
 import com.epam.dlab.process.DlabProcess;
 import com.epam.dlab.process.ProcessId;
 import com.epam.dlab.process.ProcessInfo;

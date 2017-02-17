@@ -21,6 +21,8 @@ package com.epam.dlab.backendapi;
 import com.epam.dlab.auth.SecurityFactory;
 import com.epam.dlab.backendapi.core.*;
 import com.epam.dlab.backendapi.core.commands.CommandExecutor;
+import com.epam.dlab.backendapi.core.commands.CommandExecutorMock;
+import com.epam.dlab.backendapi.core.commands.ICommandExecutor;
 import com.epam.dlab.backendapi.resources.*;
 import com.epam.dlab.process.DlabProcess;
 import com.epam.dlab.rest.client.RESTService;
