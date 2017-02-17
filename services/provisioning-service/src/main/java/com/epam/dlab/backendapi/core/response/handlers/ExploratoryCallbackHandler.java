@@ -69,13 +69,13 @@ public class ExploratoryCallbackHandler extends ResourceCallbackHandler<Explorat
     		try {
 				url = MAPPER.readValue(nodeUrl.toString(), new TypeReference<List<ExploratoryURL>>() {});
 			} catch (IOException e) {
-				LOGGER.warn("Cannot parse field {} for UUID () in JSON {}", EXPLORATORY_URL_FIELD, getUUID(), nodeUrl.toString(), e);
+				LOGGER.warn("Cannot parse field {} for UUID {} in JSON", RESPONSE_NODE + "." + RESULT_NODE + "." + EXPLORATORY_URL_FIELD, getUUID(), e);
 			}
     	}
 
     	String exploratoryId = getTextValue(resultNode.get(EXPLORATORY_ID_FIELD));
     	if (getAction() == DockerAction.CREATE && exploratoryId == null) {
-            LOGGER.warn("Empty field {} for UUID () in JSON {}", RESPONSE_NODE + "." + RESULT_NODE + "." + EXPLORATORY_ID_FIELD, getUUID(), nodeUrl.toString());
+            LOGGER.warn("Empty field {} for UUID {} in JSON", RESPONSE_NODE + "." + RESULT_NODE + "." + EXPLORATORY_ID_FIELD, getUUID());
         }
 
     	return baseStatus
