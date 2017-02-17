@@ -357,7 +357,8 @@ def remove_ec2(tag_name, tag_value):
                             allocation_id = get_allocation_id_by_elastic_ip(elastic_ip)
                             release_elastic_ip(allocation_id)
                             print "Releasing Elastic IP: " + elastic_ip
-                except:
+                except Exception as err:
+                    print err
                     print "There is no Elastic IP to diassociate from instance: " + instance.id
                 client.terminate_instances(InstanceIds=[instance.id])
                 waiter = client.get_waiter('instance_terminated')
