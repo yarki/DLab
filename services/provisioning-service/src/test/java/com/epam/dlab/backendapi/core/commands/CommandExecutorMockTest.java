@@ -18,19 +18,46 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.commands;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import com.epam.dlab.backendapi.core.response.handlers.ExploratoryCallbackHandler;
+import com.epam.dlab.rest.client.RESTServiceMock;
+
+@Ignore
 public class CommandExecutorMockTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutorMock.class);
-
-    private ICommandExecutor getCommandExecutor() {
+    private CommandExecutorMock getCommandExecutor() {
     	return new CommandExecutorMock();
     }
     
+    private String getRequestId(CommandExecutorMock exec) {
+    	return exec.getVariables().get("request_id");
+    }
+    
+    private String getEdgeUserName(CommandExecutorMock exec) {
+    	return exec.getVariables().get("edge_user_name");
+    }
+    
+    private String getExploratoryName(CommandExecutorMock exec) {
+    	return exec.getVariables().get("exploratory_name");
+    }
+    
+    private void handleExploratory(String cmd, DockerAction action) throws Exception {
+    	CommandExecutorMock exec = getCommandExecutor();
+    	exec.executeAsync("user", "uuid", cmd);
+
+    	RESTServiceMock selfService = new RESTServiceMock();
+    	ExploratoryCallbackHandler handler = new ExploratoryCallbackHandler(selfService, action,
+    			getRequestId(exec), getEdgeUserName(exec), getExploratoryName(exec));
+    	handler.handle(exec.getResponseFileName(), Files.readAllBytes(Paths.get(exec.getResponseFileName())));
+    }
+    
+    
     @Test
-    public void describe()  {
+    public void describe() {
     	String cmd =
     		"docker run " +
     		"-v /home/ubuntu/keys:/root/keys " +
@@ -43,7 +70,7 @@ public class CommandExecutorMockTest {
     }
     
     @Test
-    public void edgeCreate()  {
+    public void edgeCreate() {
     	String cmd =
     		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"user@epam.com\",\"edge_user_name\":\"user\"," +
     		"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
@@ -60,7 +87,7 @@ public class CommandExecutorMockTest {
     }
     
     @Test
-    public void notebookCreate()  {
+    public void notebookCreate() throws Exception {
     	String cmd =
     		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"user@epam.com\",\"edge_user_name\":\"user\"," +
     		"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
@@ -74,11 +101,11 @@ public class CommandExecutorMockTest {
     		"-e \"request_id=f720f30b-5949-4919-a50b-ce7af58d6fe9\" " +
     		"-e \"conf_key_name=BDCC-DSS-POC\" " +
     		"docker.dlab-zeppelin --action create";
-    	getCommandExecutor().executeAsync("user", "uuid", cmd);
+    	handleExploratory(cmd, DockerAction.CREATE);
     }
     
     @Test
-    public void notebookStop()  {
+    public void notebookStop() throws Exception {
     	String cmd =
     		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"user@epam.com\",\"edge_user_name\":\"user\"," +
     		"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\"," +
@@ -92,11 +119,11 @@ public class CommandExecutorMockTest {
     		"-e \"request_id=33998e05-7781-432e-b748-bf3f0e7f9342\" " +
     		"-e \"conf_key_name=BDCC-DSS-POC\" " +
     		"docker.dlab-zeppelin --action stop";
-    	getCommandExecutor().executeAsync("user", "uuid", cmd);
+    	handleExploratory(cmd, DockerAction.STOP);
     }
     
     @Test
-    public void notebookStart()  {
+    public void notebookStart() throws Exception {
     	String cmd =
     		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"user@epam.com\",\"edge_user_name\":\"user\"," +
     		"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
@@ -110,11 +137,11 @@ public class CommandExecutorMockTest {
     		"-e \"request_id=d50b9d20-1b1a-415f-8e47-ed0aca029e73\" " +
     		"-e \"conf_key_name=BDCC-DSS-POC\" " +
     		"docker.dlab-zeppelin --action start";
-    	getCommandExecutor().executeAsync("user", "uuid", cmd);
+    	handleExploratory(cmd, DockerAction.START);
     }
     
     @Test
-    public void notebookTerminate()  {
+    public void notebookTerminate() throws Exception {
     	String cmd =
     		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"user@epam.com\",\"edge_user_name\":\"user\"," +
     		"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
@@ -128,6 +155,6 @@ public class CommandExecutorMockTest {
     		"-e \"request_id=de217441-9757-4c4e-b020-548f66b58e00\" " +
     		"-e \"conf_key_name=BDCC-DSS-POC\" " +
     		"docker.dlab-zeppelin --action terminate";
-    	getCommandExecutor().executeAsync("user", "uuid", cmd);
+    	handleExploratory(cmd, DockerAction.TERMINATE);
     }
 }

@@ -47,6 +47,18 @@ public class CommandExecutorMock implements ICommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutorMock.class);
 
     private ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+    
+    private Map<String, String> variables = new HashMap<String, String>();
+    
+    private String responseFileName;
+    
+    public Map<String, String> getVariables() {
+    	return variables;
+    }
+    
+    public String getResponseFileName() {
+    	return responseFileName;
+    }
 
     @Override
     public List<String> executeSync(String user, String uuid, String command) throws IOException, InterruptedException {
@@ -66,6 +78,9 @@ public class CommandExecutorMock implements ICommandExecutor {
     public void executeAsync(String user, String uuid, String command) {
         LOGGER.debug("Command execution Async: {}", command);
 
+        variables.clear();
+        responseFileName = null;
+        
     	CommandParserMock parser = new CommandParserMock(command);
     	LOGGER.debug("Args is {}", parser);
     	DockerAction action = DockerAction.of(parser.getAction());
@@ -80,11 +95,11 @@ public class CommandExecutorMock implements ICommandExecutor {
     	String responsePath = parser.getVariable().get("/response");
     	LOGGER.debug("resourse type is {}, requestId is {}, pesponse path is {}", resourceType, requestId, responsePath);
 
-    	Map<String, String> jsonVars = new HashMap<String, String>(parser.getEnvironment());
-    	jsonVars.putAll(getJsonVariables(parser.getJson()));
-    	jsonVars.put("instance_id", "i-" + requestId.replace("-", "").substring(0, 17));
-    	jsonVars.put("notebook_id", requestId.replace("-", "").substring(17, 22));
-    	LOGGER.debug("jsonVars is {}", jsonVars);
+    	variables.putAll(parser.getEnvironment());
+    	variables.putAll(getJsonVariables(parser.getJson()));
+    	variables.put("instance_id", "i-" + requestId.replace("-", "").substring(0, 17));
+    	variables.put("notebook_id", requestId.replace("-", "").substring(17, 22));
+    	LOGGER.debug("jsonVars is {}", variables);
     	
     	switch (action) {
 		case DESCRIBE:
@@ -94,7 +109,7 @@ public class CommandExecutorMock implements ICommandExecutor {
 		case START:
 		case STOP:
 		case TERMINATE:
-			action(user, resourceType, action, requestId, responsePath, jsonVars);
+			action(user, resourceType, action, requestId, responsePath);
 			break;
 		case CONFIGURE:
 			break;
@@ -142,7 +157,7 @@ public class CommandExecutorMock implements ICommandExecutor {
      */
     public void describe(String resourceType, String uuid, String responsePath) {
     	String templateFileName = getAbsolutePath(ServiceUtils.getUserDir(), "../../infrastructure-provisioning/src", resourceType, "description.json");
-    	String responseFileName = getAbsolutePath(responsePath, uuid + ".json");
+    	responseFileName = getAbsolutePath(responsePath, uuid + ".json");
 
     	LOGGER.debug("Create response file from {} to {}", templateFileName, responseFileName);
     	File fileResponse = new File(responseFileName);
@@ -154,11 +169,11 @@ public class CommandExecutorMock implements ICommandExecutor {
 		}
     }
     
-    public void action(String user, String resourceType, DockerAction action, String uuid, String responsePath, Map<String, String> jsonVars) {
-    	String prefixFileName = (action == DockerAction.CREATE ? resourceType : "notebook") + "_";
+    public void action(String user, String resourceType, DockerAction action, String uuid, String responsePath) {
+    	String prefixFileName = (resourceType.equals("edge") ? resourceType : "notebook") + "_";
     	String templateFileName = prefixFileName + action.toString() + ".json";
-    	String responseFileName = getAbsolutePath(responsePath, prefixFileName + user + "_" + uuid + ".json");
-    	setResponse(templateFileName, responseFileName, jsonVars);
+    	responseFileName = getAbsolutePath(responsePath, prefixFileName + user + "_" + uuid + ".json");
+    	setResponse(templateFileName, responseFileName);
     }
     
     protected String getTextValue(JsonNode jsonNode) {
@@ -189,7 +204,7 @@ public class CommandExecutorMock implements ICommandExecutor {
     	return vars;
     }
     
-    public void setResponse(String sourceFileName, String targetFileName, Map<String, String> variables) throws DlabException {
+    public void setResponse(String sourceFileName, String targetFileName) throws DlabException {
     	String content;
     	URL url = Resources.getResource(sourceFileName);
     	try {
