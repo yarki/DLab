@@ -57,7 +57,6 @@ import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
 import com.epam.dlab.rest.contracts.ComputationalAPI;
-import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -137,8 +136,8 @@ public class ComputationalResource implements ComputationalAPI {
                         .withMasterInstanceType(formDTO.getMasterInstanceType())
                         .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                         .withVersion(formDTO.getVersion())
-                        .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                        .withIamUserName(userInfo.getName())
+                        .withEdgeUserName(userInfo.getSimpleName())
+                        .withAwsIamUser(userInfo.getName())
                         .withAwsRegion(settingsDAO.getAwsRegion())
                         .withConfOsUser(settingsDAO.getConfOsUser())
                         .withConfOsFamily(settingsDAO.getConfOsFamily());
@@ -217,8 +216,8 @@ public class ComputationalResource implements ComputationalAPI {
                     .withClusterName(computationalId)
                     .withConfKeyDir(settingsDAO.getConfKeyDir())
                     .withConfOsUser(settingsDAO.getConfOsUser())
-                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                    .withIamUserName(userInfo.getName())
+                    .withEdgeUserName(userInfo.getSimpleName())
+                    .withAwsIamUser(userInfo.getName())
                     .withAwsRegion(settingsDAO.getAwsRegion());
 
             String uuid = provisioningService.post(EMR_TERMINATE, userInfo.getAccessToken(), dto, String.class);

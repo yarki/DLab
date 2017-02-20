@@ -25,8 +25,10 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
     @JsonProperty("aws_region")
     private String awsRegion;
-    @JsonProperty("iam_user_name")
-    private String iamUserName;
+    @JsonProperty("aws_iam_user")
+    private String awsIamUser;
+    @JsonProperty("edge_user_name")
+    private String edgeUserName;
 
     @SuppressWarnings("unchecked")
 	private final T self = (T)this;
@@ -44,23 +46,37 @@ abstract public class ResourceBaseDTO<T extends ResourceBaseDTO<?>> {
         return self;
     }
 
-    public String getIamUserName() {
-        return iamUserName;
+    public String getAwsIamUser() {
+        return awsIamUser;
     }
 
-    public void setIamUserName(String iamUserName) {
-        this.iamUserName = iamUserName;
+    public void setAwsIamUser(String awsIamUser) {
+        this.awsIamUser = awsIamUser;
     }
 
-    public T withIamUserName(String iamUserName) {
-        setIamUserName(iamUserName);
+    public T withAwsIamUser(String awsIamUser) {
+        setAwsIamUser(awsIamUser);
+        return self;
+    }
+
+    public String getEdgeUserName() {
+        return edgeUserName;
+    }
+
+    public void setEdgeUserName(String edgeUserName) {
+        this.edgeUserName = edgeUserName;
+    }
+
+    public T withEdgeUserName(String edgeUserName) {
+        setEdgeUserName(edgeUserName);
         return self;
     }
 
     public ToStringHelper toStringHelper(Object self) {
     	return MoreObjects.toStringHelper(self)
-    	        .add("iamUserName", iamUserName)
-    	        .add("awsRegion", awsRegion);
+    	        .add("awsRegion", awsRegion)
+    	        .add("awsIamUser", awsIamUser)
+    	        .add("edgeUserName", edgeUserName);
     }
     
     @Override
