@@ -26,7 +26,8 @@ import json
 from fabric.api import *
 from fabric.contrib.files import exists
 import logging
-from meta_lib import *
+from dlab.meta_lib import *
+from dlab.meta_lib import get_allocation_id_by_elastic_ip
 from dlab.fab import *
 import traceback
 import urllib2
