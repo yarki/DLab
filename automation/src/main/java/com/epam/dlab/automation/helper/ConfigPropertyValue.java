@@ -67,12 +67,12 @@ public class ConfigPropertyValue {
             System.exit(0);
         }
         CLUSTER_OS_USERNAME  = System.getProperty(CLUSTER_USER, "");
-        if(StringUtils.isEmpty(jenkinsBuildNumber)) {
+        if(StringUtils.isEmpty(CLUSTER_OS_USERNAME)) {
             LOGGER.error(new Exception("Missed required parameter 'cluster.user'"));
             System.exit(0);
         }
         CLUSTER_OS_FAMILY  = System.getProperty(CLUSTER_OS, "");
-        if(StringUtils.isEmpty(jenkinsBuildNumber)) {
+        if(StringUtils.isEmpty(CLUSTER_OS_USERNAME)) {
             LOGGER.error(new Exception("Missed required parameter 'cluster.os'"));
             System.exit(0);
         }
@@ -113,10 +113,10 @@ public class ConfigPropertyValue {
 
             //TODO: replace/set os_username, os_family, jenkins job name,
             if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_USER))) {
-                props.setProperty(CLUSTER_OS_USERNAME, System.getProperty(CLUSTER_USER));
+                props.setProperty(CLUSTER_USER, System.getProperty(CLUSTER_USER));
             }
             if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_OS))) {
-                props.setProperty(CLUSTER_OS_FAMILY, System.getProperty(CLUSTER_OS));
+                props.setProperty(CLUSTER_USER, System.getProperty(CLUSTER_OS));
             }
             if (StringUtils.isNotEmpty(System.getProperty(AWS_REGION))) {
                 props.setProperty(AWS_REGION, System.getProperty(AWS_REGION));
