@@ -18,9 +18,6 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
-import static com.epam.dlab.backendapi.core.health.HealthChecks.MONGO_HEALTH_CHECKER;
-import static com.epam.dlab.backendapi.core.health.HealthChecks.PROVISIONING_HEALTH_CHECKER;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -31,7 +28,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.epam.dlab.backendapi.resources.dto.HealthStatusPageDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,15 +35,12 @@ import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.EnvStatusDAO;
 import com.epam.dlab.backendapi.domain.RequestId;
-import com.epam.dlab.constants.ServiceConsts;
-import com.epam.dlab.contracts.HealthChecker;
+import com.epam.dlab.backendapi.resources.dto.HealthStatusPageDTO;
 import com.epam.dlab.dto.status.EnvStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
-import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
 import com.epam.dlab.rest.contracts.InfrasctructureAPI;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import io.dropwizard.auth.Auth;
 
@@ -61,17 +54,6 @@ public class InfrasctructureResource implements InfrasctructureAPI {
 
     @Inject
     private EnvStatusDAO envDAO;
-    
-    @Inject
-    @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
-    private RESTService provisioningService;
-
-    @Inject
-    @Named(MONGO_HEALTH_CHECKER)
-    private HealthChecker mongoHealthChecker;
-    @Inject
-    @Named(PROVISIONING_HEALTH_CHECKER)
-    private HealthChecker provisioningHealthChecker;
 
     /** Returns the status of infrastructure: edge.
      * @param userInfo user info.

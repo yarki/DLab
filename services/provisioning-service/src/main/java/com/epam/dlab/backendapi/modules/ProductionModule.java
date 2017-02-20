@@ -18,9 +18,12 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.modules;
 
-import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.core.DockerWarmuper;
+import com.epam.dlab.backendapi.core.MetadataHolder;
+import com.epam.dlab.backendapi.core.commands.CommandExecutor;
+import com.epam.dlab.backendapi.core.commands.ICommandExecutor;
 import com.epam.dlab.constants.ServiceConsts;
-import com.epam.dlab.mongo.MongoService;
 import com.epam.dlab.rest.client.RESTService;
 import com.google.inject.name.Names;
 import io.dropwizard.setup.Environment;
@@ -31,23 +34,24 @@ import com.epam.dlab.ModuleBase;
 
 /** Production class for an application configuration of SelfService.
  */
-public class ProductionModule extends ModuleBase<SelfServiceApplicationConfiguration> {
+public class ProductionModule extends ModuleBase<ProvisioningServiceApplicationConfiguration> {
 	
 	/** Instantiates an application configuration of SelfService for production environment.
      * @param configuration application configuration of SelfService.
      * @param environment environment of SelfService.
      */
-    public ProductionModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
+    public ProductionModule(ProvisioningServiceApplicationConfiguration configuration, Environment environment) {
         super(configuration, environment);
     }
 
     @Override
     protected void configure() {
-        bind(SelfServiceApplicationConfiguration.class).toInstance(configuration);
-        bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
+        bind(ProvisioningServiceApplicationConfiguration.class).toInstance(configuration);
         bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
                 .toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE));
-        bind(RESTService.class).annotatedWith(Names.named(ServiceConsts.PROVISIONING_SERVICE_NAME))
-                .toInstance(configuration.getProvisioningFactory().build(environment, ServiceConsts.PROVISIONING_SERVICE_NAME));
+        bind(RESTService.class).annotatedWith(Names.named(ServiceConsts.SELF_SERVICE_NAME))
+                .toInstance(configuration.getProvisioningFactory().build(environment, ServiceConsts.SELF_SERVICE_NAME));
+        bind(MetadataHolder.class).to(DockerWarmuper.class);
+        bind(ICommandExecutor.class).to(CommandExecutor.class).asEagerSingleton();
     }
 }
