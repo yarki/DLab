@@ -54,7 +54,11 @@ public class ConfigPropertyValue {
 
 
     private static final Properties props = new Properties();
-    
+
+    public static final String CLUSTER_USER = "cluster.user";
+
+    public static final String CLUSTER_OS = "cluster.os";
+
     static {
         CONFIG_FILE_NAME = PropertiesResolver.getConfFileLocation();
         jenkinsBuildNumber = System.getProperty("jenkins.buildNumber", "");
@@ -62,12 +66,12 @@ public class ConfigPropertyValue {
             LOGGER.error(new Exception("Missed required parameter 'jenkins.buildNumber'"));
             System.exit(0);
         }
-        CLUSTER_OS_USERNAME  = System.getProperty("cluster.user", "");
+        CLUSTER_OS_USERNAME  = System.getProperty(CLUSTER_USER, "");
         if(StringUtils.isEmpty(jenkinsBuildNumber)) {
             LOGGER.error(new Exception("Missed required parameter 'cluster.user'"));
             System.exit(0);
         }
-        CLUSTER_OS_FAMILY  = System.getProperty("cluster.os", "");
+        CLUSTER_OS_FAMILY  = System.getProperty(CLUSTER_OS, "");
         if(StringUtils.isEmpty(jenkinsBuildNumber)) {
             LOGGER.error(new Exception("Missed required parameter 'cluster.os'"));
             System.exit(0);
@@ -108,11 +112,11 @@ public class ConfigPropertyValue {
             props.load(fin);
 
             //TODO: replace/set os_username, os_family, jenkins job name,
-            if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_OS_USERNAME))) {
-                props.setProperty(CLUSTER_OS_USERNAME, System.getProperty(CLUSTER_OS_USERNAME));
+            if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_USER))) {
+                props.setProperty(CLUSTER_USER, System.getProperty(CLUSTER_USER));
             }
-            if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_OS_FAMILY))) {
-                props.setProperty(CLUSTER_OS_FAMILY, System.getProperty(CLUSTER_OS_FAMILY));
+            if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_OS))) {
+                props.setProperty(CLUSTER_OS, System.getProperty(CLUSTER_OS));
             }
             if (StringUtils.isNotEmpty(System.getProperty(AWS_REGION))) {
                 props.setProperty(AWS_REGION, System.getProperty(AWS_REGION));
