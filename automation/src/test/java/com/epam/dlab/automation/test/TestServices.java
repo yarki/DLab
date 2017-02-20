@@ -49,6 +49,7 @@ public class TestServices {
 	private String serviceBaseName;
     private String ssnURL;
     private String publicIp;
+    private String privateIp;
 
     @BeforeClass
     public void Setup() throws InterruptedException {
@@ -110,6 +111,8 @@ public class TestServices {
         InstanceState instanceState = ssnInstance.getState();
         publicIp = ssnInstance.getPublicIpAddress();
         LOGGER.info("Public Ip is: {}", publicIp);
+        privateIp = ssnInstance.getPrivateIpAddress();
+        LOGGER.info("Private Ip is: {}", privateIp);
         Assert.assertEquals(instanceState.getName(), AmazonInstanceState.RUNNING.value(),
                             "AmazonHelper instance state is not running");
         LOGGER.info("AmazonHelper instance state is running");
@@ -209,7 +212,8 @@ public class TestServices {
             Assert.assertEquals(200, respCheckKey.getStatusCode(), "Failed to check User Key.");
         }
 
-        Docker.checkDockerStatus(nodePrefix + "_create_edge_", publicIp);
+//        Docker.checkDockerStatus(nodePrefix + "_create_edge_", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_create_edge_", privateIp);
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-edge", AmazonInstanceState.RUNNING.value());
 
         
@@ -246,7 +250,8 @@ public class TestServices {
         LOGGER.info("   Notebook {} has been created", noteBookName);
 
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-nb-" + noteBookName, AmazonInstanceState.RUNNING.value());
-        Docker.checkDockerStatus(nodePrefix + "_create_exploratory_NotebookAutoTest", publicIp);
+//        Docker.checkDockerStatus(nodePrefix + "_create_exploratory_NotebookAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_create_exploratory_NotebookAutoTest", privateIp);
 
         //get notebook IP
         String notebookIp = AmazonHelper.getInstance(amazonNodePrefix + "-nb-" + noteBookName)
@@ -280,8 +285,9 @@ public class TestServices {
         LOGGER.info("   EMR {} has been deployed", emrName);
 
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.RUNNING.value());
-        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
-        
+//        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", privateIp);
+
         LOGGER.info("   Waiting until EMR has been configured ...");
 
         gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrName, "configuring", ConfigPropertyValue.getTimeoutEMRCreate());
@@ -290,13 +296,15 @@ public class TestServices {
         LOGGER.info("   EMR {} has been configured", emrName);
 
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.RUNNING.value());
-        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
+//        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", privateIp);
 
         LOGGER.info("   Check bucket {}", getBucketName());
         AmazonHelper.printBucketGrants(getBucketName());
         
         //run python script
-        testPython(publicIp, notebookIp, emrName, getEmrClusterName(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName));
+//        testPython(publicIp, notebookIp, emrName, getEmrClusterName(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName));
+        testPython(privateIp, notebookIp, emrName, getEmrClusterName(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName));
 
         
         LOGGER.info("8. Notebook will be stopped ...");
@@ -324,7 +332,8 @@ public class TestServices {
         LOGGER.info("   Computational resources has been terminated for Notebook {}", noteBookName);
 
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrName, AmazonInstanceState.TERMINATED.value());
-        Docker.checkDockerStatus(nodePrefix + "_stop_exploratory_NotebookAutoTest", publicIp);
+//        Docker.checkDockerStatus(nodePrefix + "_stop_exploratory_NotebookAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_stop_exploratory_NotebookAutoTest", privateIp);
 
         
         LOGGER.info("9. Notebook will be started ...");
@@ -340,7 +349,8 @@ public class TestServices {
         LOGGER.info("    Notebook {} has been started", noteBookName);
 
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-nb-" + noteBookName, AmazonInstanceState.RUNNING.value());
-        Docker.checkDockerStatus(nodePrefix + "_start_exploratory_NotebookAutoTest", publicIp);
+//        Docker.checkDockerStatus(nodePrefix + "_start_exploratory_NotebookAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_start_exploratory_NotebookAutoTest", privateIp);
 
         
         LOGGER.info("10. New EMR will be deployed for termination ...");
@@ -369,7 +379,8 @@ public class TestServices {
         LOGGER.info("   EMR {} has been configured", emrNewName);
 
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName, AmazonInstanceState.RUNNING.value());
-        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
+//        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", privateIp);
 
         LOGGER.info("    New EMR will be terminated ...");
         final String ssnTerminateEMRURL = getSnnURL(ApiPath.getTerminateEMRUrl(noteBookName, emrNewName));
@@ -386,7 +397,8 @@ public class TestServices {
         LOGGER.info("    New EMR {} has been terminated", emrNewName);
 
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName, AmazonInstanceState.TERMINATED.value());
-        Docker.checkDockerStatus(nodePrefix + "_terminate_computational_NewEMRAutoTest", publicIp);
+//        Docker.checkDockerStatus(nodePrefix + "_terminate_computational_NewEMRAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_terminate_computational_NewEMRAutoTest", privateIp);
 
         
         LOGGER.info("11. New EMR will be deployed for notebook termination ...");
@@ -418,7 +430,8 @@ public class TestServices {
         LOGGER.info("   EMR  {} has been configured", emrNewName2);
 
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName2, AmazonInstanceState.RUNNING.value());
-        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
+//        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", privateIp);
 
         
         LOGGER.info("12. Notebook will be terminated ...");
@@ -444,7 +457,8 @@ public class TestServices {
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED.value());
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName2, AmazonInstanceState.TERMINATED.value());
 
-        Docker.checkDockerStatus(nodePrefix + "_terminate_exploratory_NotebookAutoTestt", publicIp);
+//        Docker.checkDockerStatus(nodePrefix + "_terminate_exploratory_NotebookAutoTestt", publicIp);
+        Docker.checkDockerStatus(nodePrefix + "_terminate_exploratory_NotebookAutoTestt", privateIp);
     }
     
     private String getBucketName() {

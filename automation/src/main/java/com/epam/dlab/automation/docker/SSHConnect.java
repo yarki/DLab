@@ -30,6 +30,8 @@ public class SSHConnect {
         jsch.addIdentity(ConfigPropertyValue.getAccessKeyPrivFileName());
         session = jsch.getSession(username, host, port);
         session.setConfig(config);
+
+        LOGGER.info("Connecting as {} to {}:{}", username, host, port);
         session.connect();
 
         LOGGER.info("Getting connected to {}:{}", host, port);
