@@ -16,9 +16,10 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { UserResourceService } from '../../../services/userResource.service';
 import { EnvironmentStatusModel } from './environment-status.model';
+import { ConfirmationDialogType } from '../../../components/confirmation-dialog/confirmation-dialog-type.enum';
 
 @Component({
   moduleId: module.id,
@@ -29,6 +30,8 @@ import { EnvironmentStatusModel } from './environment-status.model';
 })
 export class HealthStatusGridComponent {
    environmentsHealthStatuses: Array<EnvironmentStatusModel>;
+
+   @ViewChild('confirmationDialog') confirmationDialog;
 
     constructor(
       private userResourceService: UserResourceService
@@ -54,4 +57,18 @@ export class HealthStatusGridComponent {
             value.status);
         });
     }
+
+    healthStatusAction(data, action: string) {
+      // POST /api/infrastructure/edge/start
+      // POST /api/infrastructure/edge/stop
+      // POST /api/user/access_key/recover
+
+     if (action === 'run') {
+       
+    } else if (action === 'stop') {
+      this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.StopEdgeNode);
+    } else if (action === 'recreate') {
+      // this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.TerminateExploratory);
+    }
+  }
 }

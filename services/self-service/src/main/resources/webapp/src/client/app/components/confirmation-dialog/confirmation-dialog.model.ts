@@ -46,9 +46,10 @@ export class ConfirmationDialogModel {
   }
 
   public isAliveResources(resources): boolean {
-    for (var i = 0, len = resources.length; i < len; i++)
-      if (resources[i].status.toLowerCase() === 'running')
-        return true;
+    if(resources)
+      for (var i = 0, len = resources.length; i < len; i++)
+        if (resources[i].status.toLowerCase() === 'running')
+          return true;
 
     return false;
   }
@@ -62,6 +63,10 @@ export class ConfirmationDialogModel {
     return this.userResourceService.suspendExploratoryEnvironment(this.notebook, 'terminate');
   }
 
+  private stopEdgeNode(): Observable<Response> {
+    return this.userResourceService.suspendEdgeNode();
+  }
+
   private setup(confirmationType: ConfirmationDialogType, notebook: any, fnProcessResults: any, fnProcessErrors: any): void {
 
     let containRunningResourcesStopMessage = 'Exploratory Environment will be stopped\
@@ -71,6 +76,8 @@ export class ConfirmationDialogModel {
     let containRunningResourcesTerminateMessage = 'Exploratory Environment and all connected computational resources\
      will be terminated.';
     let defaultTerminateMessage = 'Exploratory Environment will be terminated.';
+
+    let edgeNodeStopMessage = 'Edge Node will be stopped';
 
     switch (confirmationType) {
       case ConfirmationDialogType.StopExploratory: {
@@ -89,6 +96,16 @@ export class ConfirmationDialogModel {
           (response: Response) => fnProcessErrors(response));
       }
         break;
+
+      case ConfirmationDialogType.StopEdgeNode: {
+        this.title = edgeNodeStopMessage;
+        this.notebook = notebook;
+        this.confirmAction = () => this.stopEdgeNode()
+          .subscribe((response: Response) => fnProcessResults(response),
+          (response: Response) => fnProcessErrors(response));
+      }
+        break;
+
       default: {
         this.title = this.isAliveResources(notebook.resources) ? containRunningResourcesTerminateMessage : defaultTerminateMessage;
         this.notebook = notebook;

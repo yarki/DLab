@@ -29,16 +29,21 @@ limitations under the License.
     <td class="status" ngClass="{{env.status || ''}}">{{env.status}}</td>
     <td>
       <div class="dropdown">
-        <span data-toggle="dropdown" class="actions not-allowed"></span>
-        <!--<div class="dropdown-menu">
+        <span data-toggle="dropdown" class="actions"></span>
+        <div class="dropdown-menu">
           <ul class="list-unstyled">
-            <li *ngIf="env.status.toLowerCase() == 'terminated'">Recreate</li>
-            <li *ngIf="env.status.toLowerCase() == 'stopped'">Start</li>
-            <li *ngIf="env.status.toLowerCase() == 'running'">Stop</li>
-            <li *ngIf="env.status.toLowerCase() == 'running'">Terminate</li>
+            <!--*ngIf="env.status.toLowerCase() == 'running'" -->
+            <!--*ngIf="env.status.toLowerCase() == 'stopped'"-->
+            <!-- *ngIf="env.status.toLowerCase() == 'terminated'"-->
+            <li (click)="healthStatusAction(env, 'stop')">Stop</li>
+            <li (click)="healthStatusAction(env, 'run')">Start</li>
+            <li (click)="healthStatusAction(env, 'recreate')">Recreate</li>
+            <!--<li *ngIf="env.status.toLowerCase() == 'running'">Terminate</li>-->
           </ul>
-        </div>-->
+        </div>
       </div>
     </td>
   </tr>
 </table>
+
+<confirmation-dialog #confirmationDialog (buildGrid)="buildGrid($event)"></confirmation-dialog>

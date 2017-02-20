@@ -116,4 +116,10 @@ export class UserResourceService {
     .map((response: Response) => response.json())
     .catch((error: any) => error);
   }
+
+  public suspendEdgeNode(): Observable<Response> {
+    return this.applicationServiceFacade
+      .buildSuspendEdgeNodeRequest()
+      .map((response: Response) => response);
+  }
 }
