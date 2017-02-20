@@ -152,8 +152,8 @@ public class ConfigPropertyValue {
         printProperty(TIMEOUT_EMR_TERMINATE);
 
         printProperty(PYTHON_TEST_FILES);
-        printProperty(CLUSTER_OS_USERNAME);
-        printProperty(CLUSTER_OS_FAMILY);
+        printProperty(CLUSTER_USER);
+        printProperty(CLUSTER_OS);
     }
     
     
