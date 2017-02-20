@@ -19,12 +19,14 @@ limitations under the License.
 package com.epam.dlab.auth;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 import java.security.Principal;
 import java.util.*;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfo implements Principal {
 
     private final String username;
@@ -52,6 +54,10 @@ public class UserInfo implements Principal {
     @JsonProperty("username")
     public String getName() {
         return username;
+    }
+
+    public String getSimpleName() {
+        return (username == null ? null : username.replaceAll("@.*", ""));
     }
 
     @JsonProperty("access_token")

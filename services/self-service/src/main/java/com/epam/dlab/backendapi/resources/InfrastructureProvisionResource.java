@@ -37,9 +37,9 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.ExploratoryDAO;
 import com.epam.dlab.backendapi.dao.KeyDAO;
 import com.epam.dlab.constants.ServiceConsts;
+import com.epam.dlab.dto.edge.EdgeInfoDTO;
 import com.epam.dlab.dto.imagemetadata.ComputationalMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ExploratoryMetadataDTO;
-import com.epam.dlab.dto.keyload.UserAWSCredentialDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.DockerAPI;
@@ -86,11 +86,11 @@ public class InfrastructureProvisionResource implements DockerAPI {
     }
 
     private List<Document> appendEdgeInfo(Iterable<Document> documents, String username) {
-        UserAWSCredentialDTO cred = keyDAO.getUserAWSCredential(username);
+        EdgeInfoDTO cred = keyDAO.getEdgeInfo(username);
         return StreamSupport.stream(documents.spliterator(), false)
                 .map(document -> document
                 		.append(EDGE_IP, cred.getPublicIp())
-                		.append(UserAWSCredentialDTO.USER_OWN_BUCKET_NAME, cred.getUserOwnBucketName()))
+                		.append(EdgeInfoDTO.USER_OWN_BUCKET_NAME, cred.getUserOwnBucketName()))
                 .collect(Collectors.toList());
     }
 

@@ -133,12 +133,12 @@ public class EnvStatusListener implements Managed, Runnable {
 	private void checkStatus(EnvStatusListenerUserInfo userInfo) {
 		try {
 			LOGGER.trace("EnvStatus listener check status for user {}", userInfo.getUsername());
-			EnvResourceList resourceList = dao.findEnvResources(userInfo.username);
+			EnvResourceList resourceList = dao.findEnvResources(userInfo.getUsername());
 			if (resourceList.getHostList() != null || resourceList.getClusterList() != null) {
-				userInfo.dto.withResourceList(resourceList);
-				LOGGER.trace("Ask docker for the status of resources for user {}: {}", userInfo.username, userInfo.dto);
-				String uuid = provisioningService.post(InfrasctructureAPI.INFRASTRUCTURE_STATUS, userInfo.accessToken, userInfo.dto, String.class);
-                RequestId.put(userInfo.username, uuid);
+				userInfo.getDTO().withResourceList(resourceList);
+				LOGGER.trace("Ask docker for the status of resources for user {}: {}", userInfo.getUsername(), userInfo.getDTO());
+				String uuid = provisioningService.post(InfrasctructureAPI.INFRASTRUCTURE_STATUS, userInfo.getAccessToken(), userInfo.getDTO(), String.class);
+                RequestId.put(userInfo.getUsername(), uuid);
 			}
 		} catch (Exception e) {
 			LOGGER.warn("Ask docker for the status of resources for user {} fails: {}", e.getLocalizedMessage(), e);

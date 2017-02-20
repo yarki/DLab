@@ -46,6 +46,21 @@ def enable_proxy(proxy_host, proxy_port):
 def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
     if not exists('/home/{}/.ensure_dir/r_kernel_ensured'.format(os_user)):
         try:
+            r_version = sudo("R --version | awk '/version / {print $3}'")
+            put(templates_dir + 'r_template.json', '/tmp/r_template.json')
+            sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
+            sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
+            sudo('ln -s /usr/lib64/R/ /usr/lib/R')
+            sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
+            sudo('touch /home/{}/.ensure_dir/r_kernel_ensured'.format(os_user))
+        except:
+            sys.exit(1)
+
+
+def ensure_r(os_user):
+    if not exists('/home/{}/.ensure_dir/r_ensured'.format(os_user)):
+        try:
             sudo('yum install -y cmake')
             sudo('yum -y install libcur*')
             sudo('echo -e "[base]\nname=CentOS-7-Base\nbaseurl=http://buildlogs.centos.org/centos/7/os/x86_64-20140704-1/\ngpgcheck=1\ngpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7\npriority=1\nexclude=php mysql" >> /etc/yum.repos.d/CentOS-base.repo')
@@ -66,15 +81,8 @@ def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
             sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
             run('R -e "IRkernel::installspec()"')
-            r_version = sudo("R --version | awk '/version / {print $3}'")
-            put(templates_dir + 'r_template.json', '/tmp/r_template.json')
-            sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
-            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
-            sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
             sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
-            sudo('ln -s /usr/lib64/R/ /usr/lib/R')
-            sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
-            sudo('touch /home/{}/.ensure_dir/r_kernel_ensured'.format(os_user))
+            sudo('touch /home/{}/.ensure_dir/r_ensured'.format(os_user))
         except:
             sys.exit(1)
 

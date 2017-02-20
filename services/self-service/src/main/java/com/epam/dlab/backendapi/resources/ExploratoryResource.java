@@ -37,7 +37,6 @@ import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
 import com.epam.dlab.rest.contracts.ExploratoryAPI;
-import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.Auth;
@@ -97,8 +96,8 @@ public class ExploratoryResource implements ExploratoryAPI {
             ExploratoryCreateDTO dto = new ExploratoryCreateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withExploratoryName(formDTO.getName())
-                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                    .withIamUserName(userInfo.getName())
+                    .withEdgeUserName(userInfo.getSimpleName())
+                    .withAwsIamUser(userInfo.getName())
                     .withNotebookImage(formDTO.getImage())
                     .withApplicationName(getApplicationName(formDTO.getImage()))
                     .withNotebookInstanceType(formDTO.getShape())
@@ -209,8 +208,8 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookImage(userInstance.getImageName())
                     .withExploratoryName(name)
-                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                    .withIamUserName(userInfo.getName())
+                    .withEdgeUserName(userInfo.getSimpleName())
+                    .withAwsIamUser(userInfo.getName())
                     .withNotebookInstanceName(userInstance.getExploratoryId())
                     .withConfKeyDir(settingsDAO.getConfKeyDir())
                     .withConfOsUser(settingsDAO.getConfOsUser())
@@ -274,8 +273,8 @@ public class ExploratoryResource implements ExploratoryAPI {
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withNotebookImage(userInstance.getImageName())
                     .withExploratoryName(exploratoryName)
-                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                    .withIamUserName(userInfo.getName())
+                    .withEdgeUserName(userInfo.getSimpleName())
+                    .withAwsIamUser(userInfo.getName())
                     .withNotebookInstanceName(userInstance.getExploratoryId())
                     .withAwsRegion(settingsDAO.getAwsRegion())
                     .withConfOsUser(settingsDAO.getConfOsUser())

@@ -49,8 +49,8 @@ import io.dropwizard.auth.Auth;
 @Path("/infrastructure")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class InfrasctructureResource implements InfrasctructureAPI {
-    private static final Logger LOGGER = LoggerFactory.getLogger(InfrasctructureResource.class);
+public class InfrastructureResource implements InfrasctructureAPI {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InfrastructureResource.class);
 
     @Inject
     private EnvStatusDAO envDAO;

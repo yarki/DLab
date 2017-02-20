@@ -18,7 +18,9 @@ limitations under the License.
 
 package com.epam.dlab.rest.contracts;
 
-public interface SelfServiceAPI {
-    String KEY_LOADER = "api/user/access_key/callback";
-    String USER_SETTINGS = "api/user/settings";
+public interface EdgeAPI {
+    String EDGE = "infrastructure/edge";
+    String EDGE_CREATE = EDGE + "/create";
+    String EDGE_START = EDGE + "/start";
+    String EDGE_STOP = EDGE + "/stop";
 }
