@@ -72,7 +72,7 @@ public class ConfigPropertyValue {
             System.exit(0);
         }
         CLUSTER_OS_FAMILY  = System.getProperty(CLUSTER_OS, "");
-        if(StringUtils.isEmpty(CLUSTER_OS_USERNAME)) {
+        if(StringUtils.isEmpty(CLUSTER_OS_FAMILY)) {
             LOGGER.error(new Exception("Missed required parameter 'cluster.os'"));
             System.exit(0);
         }
