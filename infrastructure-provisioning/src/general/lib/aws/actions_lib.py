@@ -355,11 +355,14 @@ def remove_ec2(tag_name, tag_value):
                     for i in response.get('Reservations'):
                         for h in i.get('Instances'):
                             elastic_ip = h.get('PublicIpAddress')
-                            response = client.describe_addresses(PublicIps=[elastic_ip]).get('Addresses')
-                            for el_ip in response:
-                                allocation_id = el_ip.get('AllocationId')
-                            release_elastic_ip(allocation_id)
-                            print "Releasing Elastic IP: " + elastic_ip
+                            try:
+                                response = client.describe_addresses(PublicIps=[elastic_ip]).get('Addresses')
+                                for el_ip in response:
+                                    allocation_id = el_ip.get('AllocationId')
+                                    release_elastic_ip(allocation_id)
+                                    print "Releasing Elastic IP: " + elastic_ip
+                            except:
+                                print "There is no such Elastic IP: " + elastic_ip
                 except Exception as err:
                     print err
                     print "There is no Elastic IP to diassociate from instance: " + instance.id
