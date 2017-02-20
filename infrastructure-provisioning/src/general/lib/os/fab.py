@@ -136,8 +136,8 @@ def spark_defaults(args):
     local("""bash -c 'echo "spark.hadoop.fs.s3a.endpoint    """ + endpoint_url + """" >> """ + spark_def_path + """'""")
 
 
-def configuring_notebook(args):
-    jars_path = '/opt/' + args.emr_version + '/jars/'
+def configuring_notebook(emr_version):
+    jars_path = '/opt/' + emr_version + '/jars/'
     local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
 
 
@@ -183,7 +183,7 @@ def configure_jupyter(os_user, jupyter_conf_file, templates_dir):
             sudo("chmod 644 /tmp/jupyter-notebook.service")
             if os.environ['application'] == 'tensor':
                 sudo("sed -i 's|ExecStart=/bin/bash -c \"/usr/local/bin/jupyter notebook --config CONF_PATH\"|"
-                     "ExecStart=/bin/bash -c \"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/cudnn/lib64; "
+                     "ExecStart=/bin/bash -c \"export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/cudnn/lib64:/usr/local/cuda/lib64; "
                      "/usr/local/bin/jupyter notebook --config CONF_PATH\"|' /tmp/jupyter-notebook.service")
             sudo("sed -i 's|CONF_PATH|" + jupyter_conf_file + "|' /tmp/jupyter-notebook.service")
             sudo("sed -i 's|OS_USR|" + os_user + "|' /tmp/jupyter-notebook.service")

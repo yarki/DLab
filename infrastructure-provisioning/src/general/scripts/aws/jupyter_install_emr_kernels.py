@@ -35,6 +35,8 @@ parser.add_argument('--notebook_ip', type=str, default='')
 parser.add_argument('--emr_excluded_spark_properties', type=str, default='')
 parser.add_argument('--edge_user_name', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
+parser.add_argument('--edge_hostname', type=str, default='')
+parser.add_argument('--proxy_port', type=str, default='')
 args = parser.parse_args()
 
 
