@@ -1,6 +1,6 @@
 <#include "ssn.yml">
 
-mocked: true
+mocked: false
 
 keyDirectory: /home/${sys['user.name']}/keys
 responseDirectory: /opt/dlab/tmp
