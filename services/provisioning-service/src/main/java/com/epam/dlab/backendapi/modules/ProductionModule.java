@@ -49,8 +49,7 @@ public class ProductionModule extends ModuleBase<ProvisioningServiceApplicationC
         bind(ProvisioningServiceApplicationConfiguration.class).toInstance(configuration);
         bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
                 .toInstance(configuration.getSecurityFactory().build(environment, SECURITY_SERVICE));
-        bind(RESTService.class).annotatedWith(Names.named(ServiceConsts.SELF_SERVICE_NAME))
-                .toInstance(configuration.getProvisioningFactory().build(environment, ServiceConsts.SELF_SERVICE_NAME));
+        bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, ServiceConsts.SELF_SERVICE_NAME));
         bind(MetadataHolder.class).to(DockerWarmuper.class);
         bind(ICommandExecutor.class).to(CommandExecutor.class).asEagerSingleton();
     }
