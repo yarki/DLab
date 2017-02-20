@@ -343,6 +343,7 @@ def remove_ec2(tag_name, tag_value):
     try:
         ec2 = boto3.resource('ec2')
         client = boto3.client('ec2')
+        allocation_id = ''
         inst = ec2.instances.filter(
             Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'stopped', 'pending', 'stopping']},
                      {'Name': 'tag:{}'.format(tag_name), 'Values': ['{}'.format(tag_value)]}])
@@ -354,7 +355,9 @@ def remove_ec2(tag_name, tag_value):
                     for i in response.get('Reservations'):
                         for h in i.get('Instances'):
                             elastic_ip = h.get('PublicIpAddress')
-                            allocation_id = get_allocation_id_by_elastic_ip(elastic_ip)
+                            response = client.describe_addresses(PublicIps=[elastic_ip]).get('Addresses')
+                            for el_ip in response:
+                                allocation_id = el_ip.get('AllocationId')
                             release_elastic_ip(allocation_id)
                             print "Releasing Elastic IP: " + elastic_ip
                 except Exception as err:
