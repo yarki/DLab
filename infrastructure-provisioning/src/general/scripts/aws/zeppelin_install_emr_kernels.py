@@ -35,6 +35,8 @@ parser.add_argument('--notebook_ip', type=str, default='')
 parser.add_argument('--emr_excluded_spark_properties', type=str, default='')
 parser.add_argument('--edge_user_name', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
+parser.add_argument('--edge_hostname', type=str, default='')
+parser.add_argument('--proxy_port', type=str, default='')
 args = parser.parse_args()
 
 
@@ -42,7 +44,7 @@ def configure_notebook(args):
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
     files_dir = '/root/files/'
-    put(templates_dir + 'emr_spark_interpreter.json', '/tmp/emr_spark_interpreter.json')
+    put(templates_dir + 'emr_interpreter.json', '/tmp/emr_interpreter.json')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
     sudo('chmod 755 /usr/local/bin/create_configs.py')
@@ -66,4 +68,5 @@ if __name__ == "__main__":
     sudo("/usr/bin/python /usr/local/bin/create_configs.py --bucket " + args.bucket + " --cluster_name "
          + args.cluster_name + " --emr_version " + args.emr_version + " --spark_version " + spark_version
          + " --hadoop_version " + hadoop_version + " --region " + args.region + " --excluded_lines '"
-         + args.emr_excluded_spark_properties + "' --user_name " + args.edge_user_name + " --os_user " + args.os_user)
+         + args.emr_excluded_spark_properties + "' --user_name " + args.edge_user_name + " --os_user " + args.os_user +
+         " --edge_hostname " + args.edge_hostname + " --proxy_port " + args.proxy_port)

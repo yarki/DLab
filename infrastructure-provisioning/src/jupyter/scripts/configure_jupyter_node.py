@@ -115,5 +115,8 @@ if __name__ == "__main__":
     print "Install Toree-Scala kernel for Jupyter"
     ensure_toree_local_kernel()
 
+    print "Installing R"
+    ensure_r(args.os_user)
+
     print "Install R kernel for Jupyter"
     ensure_r_local_kernel(spark_version, args.os_user, templates_dir, r_kernels_dir)

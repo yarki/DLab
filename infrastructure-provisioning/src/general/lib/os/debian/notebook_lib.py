@@ -49,6 +49,22 @@ def enable_proxy(proxy_host, proxy_port):
 def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/r_local_kernel_ensured'):
         try:
+            sudo('R -e "IRkernel::installspec()"')
+            r_version = sudo("R --version | awk '/version / {print $3}'")
+            put(templates_dir + 'r_template.json', '/tmp/r_template.json')
+            sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
+            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
+            sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
+            sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
+            sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
+            sudo('touch /home/' + os_user + '/.ensure_dir/r_local_kernel_ensured')
+        except:
+            sys.exit(1)
+
+
+def ensure_r(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/r_ensured'):
+        try:
             sudo('apt-get install -y r-base r-base-dev r-cran-rcurl')
             sudo('apt-get install -y libcurl4-openssl-dev libssl-dev libreadline-dev')
             sudo('apt-get install -y cmake')
@@ -65,15 +81,7 @@ def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
             sudo('R -e "library(\'devtools\');install.packages(repos=\'http://cran.us.r-project.org\',c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
-            sudo('R -e "IRkernel::installspec()"')
-            r_version = sudo("R --version | awk '/version / {print $3}'")
-            put(templates_dir + 'r_template.json', '/tmp/r_template.json')
-            sudo('sed -i "s|R_VER|' + r_version + '|g" /tmp/r_template.json')
-            sudo('sed -i "s|SP_VER|' + spark_version + '|g" /tmp/r_template.json')
-            sudo('\cp -f /tmp/r_template.json {}/ir/kernel.json'.format(kernels_dir))
-            sudo('cd /usr/local/spark/R/lib/SparkR; R -e "devtools::install(\'.\')"')
-            sudo('chown -R ' + os_user + ':' + os_user + ' /home/' + os_user + '/.local')
-            sudo('touch /home/' + os_user + '/.ensure_dir/r_local_kernel_ensured')
+            sudo('touch /home/' + os_user + '/.ensure_dir/r_ensured')
         except:
             sys.exit(1)
 
@@ -249,3 +257,23 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo('touch /home/' + os_user + '/.ensure_dir/tensor_ensured')
         except:
             sys.exit(1)
+
+
+def install_maven():
+    sudo('apt-get -y install maven')
+
+
+def install_livy_dependencies():
+    sudo('apt-get -y install libkrb5-dev')
+    sudo('pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
+    sudo('pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')
+
+
+def install_maven_emr():
+    local('sudo apt-get -y install maven')
+
+
+def install_livy_dependencies_emr():
+    local('sudo apt-get -y install libkrb5-dev')
+    local('sudo pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
+    local('sudo pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')

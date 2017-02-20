@@ -136,8 +136,8 @@ def spark_defaults(args):
     local("""bash -c 'echo "spark.hadoop.fs.s3a.endpoint    """ + endpoint_url + """" >> """ + spark_def_path + """'""")
 
 
-def configuring_notebook(args):
-    jars_path = '/opt/' + args.emr_version + '/jars/'
+def configuring_notebook(emr_version):
+    jars_path = '/opt/' + emr_version + '/jars/'
     local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
 
 
