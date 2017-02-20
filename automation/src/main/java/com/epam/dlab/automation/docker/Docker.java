@@ -1,5 +1,6 @@
 package com.epam.dlab.automation.docker;
 
+import com.epam.dlab.automation.helper.ConfigPropertyValue;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -19,8 +20,8 @@ public class Docker {
         
         LOGGER.info("Check docker status for instance {} and image {}", publicIP, dockerImageName);
 
-        // TODO: hardcoded name
-        Session session = SSHConnect.getConnect("ubuntu", publicIP, 22);
+        // TODO: hardcoded port
+        Session session = SSHConnect.getConnect(ConfigPropertyValue.CLUSTER_OS_USERNAME, publicIP, 22);
         ChannelExec getResult = SSHConnect.setCommand(session, DockerCommands.GET_CONTAINERS);
         InputStream in = getResult.getInputStream();
         List<DockerContainer> dockerContainerList = SSHConnect.getDockerContainerList(in);

@@ -1,6 +1,6 @@
 package com.epam.dlab.automation.http;
 
-import com.epam.dlab.automation.helper.PropertyValue;
+import com.epam.dlab.automation.helper.ConfigPropertyValue;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
@@ -38,7 +38,7 @@ public class HttpRequest {
     
     public Response webApiPost(String url, String contentType, String token){
         return given().contentType(contentType).header("Authorization", "Bearer " + token).
-            multiPart(new File(PropertyValue.getAccessKeyPubFileName())).formParam(PropertyValue.getAccessKeyPubFileName()).contentType(contentType).when().post(url);
+            multiPart(new File(ConfigPropertyValue.getAccessKeyPubFileName())).formParam(ConfigPropertyValue.getAccessKeyPubFileName()).contentType(contentType).when().post(url);
     }
     
     public Response webApiPost(String url, String contentType, Object body, String token){

@@ -1,14 +1,9 @@
 package com.epam.dlab.automation.docker;
 
-import com.epam.dlab.automation.helper.PropertyValue;
-import com.fasterxml.jackson.core.JsonParseException;
+import com.epam.dlab.automation.helper.ConfigPropertyValue;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,10 +23,11 @@ public class SSHConnect {
     public static Session getConnect(String username, String host, int port) throws JSchException {
         Session session;
         JSch jsch = new JSch();
+
         Properties config = new Properties(); 
         config.put("StrictHostKeyChecking", "no");
         
-        jsch.addIdentity(PropertyValue.getAccessKeyPrivFileName());
+        jsch.addIdentity(ConfigPropertyValue.getAccessKeyPrivFileName());
         session = jsch.getSession(username, host, port);
         session.setConfig(config);
         session.connect();
@@ -40,13 +36,38 @@ public class SSHConnect {
         return session;
     }
 
+    public static Session getSession(String username, String host, int port) throws JSchException {
+        Session session;
+        JSch jsch = new JSch();
+
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+
+        jsch.addIdentity(ConfigPropertyValue.getAccessKeyPrivFileName());
+        session = jsch.getSession(username, host, port);
+        session.setConfig(config);
+        session.connect();
+
+
+        LOGGER.info("Getting connected to {}:{}", host, port);
+        return session;
+    }
+
+    public static ChannelSftp getChannelSftp(Session session) throws JSchException {
+        Channel channel = session.openChannel("sftp");
+        channel.connect();
+        ChannelSftp channelSftp =(ChannelSftp)channel;
+
+        return channelSftp;
+    }
+
     public static Session getForwardedConnect(String username, String hostAlias, int port) throws JSchException {
         Session session;
         JSch jsch = new JSch();
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
 
-        jsch.addIdentity(PropertyValue.getAccessKeyPrivFileName());
+        jsch.addIdentity(ConfigPropertyValue.getAccessKeyPrivFileName());
         //TODO: figure out what is 127.0.0.1 and why it is hardcoded
         session = jsch.getSession(username, LOCALHOST_IP, port);
         session.setConfig(config);
@@ -67,7 +88,7 @@ public class SSHConnect {
         return channelExec;
     }
 
-    public static List<DockerContainer> getDockerContainerList(InputStream in) throws JsonParseException, JsonMappingException, IOException {
+    public static List<DockerContainer> getDockerContainerList(InputStream in) throws IOException {
         
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));         
         String line;
@@ -109,6 +130,19 @@ public class SSHConnect {
     public static AckStatus checkAck(ChannelExec channel) throws IOException, InterruptedException {
         channel.setOutputStream(System.out, true);
     	channel.setErrStream(System.err, true);
+
+        int status;
+        while(channel.getExitStatus() == -1) {
+            Thread.sleep(1000);
+        }
+        status = channel.getExitStatus();
+
+        return new AckStatus(status, "");
+    }
+
+    public static AckStatus checkAck(ChannelSftp channel) throws IOException, InterruptedException {
+        channel.setOutputStream(System.out, true);
+//        channel.setErrStream(System.err, true);
 
         int status;
         while(channel.getExitStatus() == -1) {

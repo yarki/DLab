@@ -1,5 +1,6 @@
 package com.epam.dlab.automation.helper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -8,13 +9,13 @@ import java.io.FileReader;
 import java.time.Duration;
 import java.util.Properties;
 
-public class PropertyValue {
+public class ConfigPropertyValue {
 
-    private final static Logger LOGGER = LogManager.getLogger(PropertyValue.class);
+    private final static Logger LOGGER = LogManager.getLogger(ConfigPropertyValue.class);
 
-	private static final boolean DEV_MODE;
+//	private static final boolean DEV_MODE;
 	public static final String CONFIG_FILE_NAME;
-	public static final String APPLICATION_CONFIG_FILE_NAME = "application.properties";
+
 
 	private static final String JENKINS_USERNAME="JENKINS_USERNAME";
 	private static final String JENKINS_PASSWORD="JENKINS_PASSWORD";
@@ -44,23 +45,37 @@ public class PropertyValue {
 	public static final String TIMEOUT_NOTEBOOK_TERMINATE="TIMEOUT_NOTEBOOK_TERMINATE";
 	public static final String TIMEOUT_EMR_CREATE="TIMEOUT_EMR_CREATE";
 	public static final String TIMEOUT_EMR_TERMINATE="TIMEOUT_EMR_TERMINATE";
-	
-	private static String jenkinsBuildNumber;
+
+    public static final String PYTHON_TEST_FILES="PYTHON_TEST_FILES";
+
+    public static String jenkinsBuildNumber;
+    public static String CLUSTER_OS_USERNAME;
+    public static String CLUSTER_OS_FAMILY;
+
 
     private static final Properties props = new Properties();
     
     static {
-    	DEV_MODE = System.getProperty("run.mode", "remote").equalsIgnoreCase("dev");
-    	jenkinsBuildNumber = System.getProperty("jenkins.buildNumber", "");
-    	if (jenkinsBuildNumber.isEmpty()) {
-    		jenkinsBuildNumber = null;
-    	}
-    	//TODO: avoid this hard coded path
-    	CONFIG_FILE_NAME = (DEV_MODE ? "config.properties" : "/var/lib/jenkins/AutoTestData/config.properties");
+        CONFIG_FILE_NAME = PropertiesResolver.getConfFileLocation();
+        jenkinsBuildNumber = System.getProperty("jenkins.buildNumber", "");
+        if(StringUtils.isEmpty(jenkinsBuildNumber)) {
+            LOGGER.error(new Exception("Missed required parameter 'jenkins.buildNumber'"));
+            System.exit(0);
+        }
+        CLUSTER_OS_USERNAME  = System.getProperty("cluster.user", "");
+        if(StringUtils.isEmpty(jenkinsBuildNumber)) {
+            LOGGER.error(new Exception("Missed required parameter 'cluster.user'"));
+            System.exit(0);
+        }
+        CLUSTER_OS_FAMILY  = System.getProperty("cluster.os", "");
+        if(StringUtils.isEmpty(jenkinsBuildNumber)) {
+            LOGGER.error(new Exception("Missed required parameter 'cluster.os'"));
+            System.exit(0);
+        }
     	loadProperties();
     }
     
-    private PropertyValue() { }
+    private ConfigPropertyValue() { }
 	
     private static Duration getDuration(String duaration) {
     	return Duration.parse("PT" + duaration);
@@ -88,11 +103,24 @@ public class PropertyValue {
 	
 	private static void loadProperties() {
         try {
-                File f1 = new File(CONFIG_FILE_NAME);
-                FileReader fin = new FileReader(f1);
-                props.load(fin);
+            File f1 = new File(CONFIG_FILE_NAME);
+            FileReader fin = new FileReader(f1);
+            props.load(fin);
+
+            //TODO: replace/set os_username, os_family, jenkins job name,
+            if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_OS_USERNAME))) {
+                props.setProperty(CLUSTER_OS_USERNAME, System.getProperty(CLUSTER_OS_USERNAME));
+            }
+            if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_OS_FAMILY))) {
+                props.setProperty(CLUSTER_OS_FAMILY, System.getProperty(CLUSTER_OS_FAMILY));
+            }
+            if (StringUtils.isNotEmpty(System.getProperty(AWS_REGION))) {
+                props.setProperty(AWS_REGION, System.getProperty(AWS_REGION));
+            }
+
+
         } catch (Exception e) {
-                throw new RuntimeException("Load properties from \"" + CONFIG_FILE_NAME + "\" fails. " + e.getLocalizedMessage(), e);
+            throw new RuntimeException("Load properties from \"" + CONFIG_FILE_NAME + "\" fails. " + e.getLocalizedMessage(), e);
         }
         
         printProperty(JENKINS_USERNAME);
@@ -118,6 +146,10 @@ public class PropertyValue {
         printProperty(TIMEOUT_NOTEBOOK_TERMINATE);
         printProperty(TIMEOUT_EMR_CREATE);
         printProperty(TIMEOUT_EMR_TERMINATE);
+
+        printProperty(PYTHON_TEST_FILES);
+        printProperty(CLUSTER_OS_USERNAME);
+        printProperty(CLUSTER_OS_FAMILY);
     }
     
     
@@ -126,7 +158,7 @@ public class PropertyValue {
     }
 
     public static void setJenkinsBuildNumber(String jenkinsBuildNumber) {
-    	PropertyValue.jenkinsBuildNumber = jenkinsBuildNumber;
+    	ConfigPropertyValue.jenkinsBuildNumber = jenkinsBuildNumber;
     }
 
     public static String getJenkinsUsername() {
@@ -144,7 +176,7 @@ public class PropertyValue {
     public static String getUsernameSimple() {
     	String s = get(USERNAME);
 		int i = s.indexOf('@');
-		return (i == -1 ? s : s.substring(0, i));
+		return (i == -1 ? s : s.substring(0, i).toLowerCase());
 	}
 
     public static String getPassword() {
@@ -203,7 +235,7 @@ public class PropertyValue {
     }
 
 	public static String getAwsRegion() {
-	    return get(AWS_REGION);
+	    return get(AWS_REGION, System.getProperty(AWS_REGION));
 	}
 
 	public static Duration getAwsRequestTimeout() {

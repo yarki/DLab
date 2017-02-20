@@ -1,6 +1,6 @@
 package com.epam.dlab.automation.aws;
 
-import com.epam.dlab.automation.helper.PropertyValue;
+import com.epam.dlab.automation.helper.ConfigPropertyValue;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
@@ -27,11 +27,11 @@ public class AmazonHelper {
 	private static final Duration CHECK_TIMEOUT = Duration.parse("PT10m");
 	
 	private static AWSCredentials getCredentials() {
-		return new BasicAWSCredentials(PropertyValue.getAwsAccessKeyId(), PropertyValue.getAwsSecretAccessKey());
+		return new BasicAWSCredentials(ConfigPropertyValue.getAwsAccessKeyId(), ConfigPropertyValue.getAwsSecretAccessKey());
 	}
 	
 	private static Region getRegion() {
-		return Region.getRegion(Regions.fromName(PropertyValue.getAwsRegion()));
+		return Region.getRegion(Regions.fromName(ConfigPropertyValue.getAwsRegion()));
 	}
 	
     public static List<Instance> getInstances(String instanceName) throws Exception {
@@ -67,7 +67,7 @@ public class AmazonHelper {
     public static void checkAmazonStatus(String instanceName, String expAmazonState) throws Exception {
         LOGGER.info("Check status of instance {} on AmazonHelper:", instanceName);
         String instanceState;
-        long requestTimeout = PropertyValue.getAwsRequestTimeout().toMillis();
+        long requestTimeout = ConfigPropertyValue.getAwsRequestTimeout().toMillis();
     	long timeout = CHECK_TIMEOUT.toMillis();
         long expiredTime = System.currentTimeMillis() + timeout;
 
