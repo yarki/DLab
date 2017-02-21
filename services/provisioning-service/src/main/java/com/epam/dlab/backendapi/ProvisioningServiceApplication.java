@@ -65,7 +65,7 @@ public class ProvisioningServiceApplication extends Application<ProvisioningServ
         DlabProcess.getInstance().setMaxProcessesPerBox(configuration.getProcessMaxThreadsPerJvm());
         DlabProcess.getInstance().setMaxProcessesPerUser(configuration.getProcessMaxThreadsPerUser());
         
-        Injector injector = Guice.createInjector(ModuleFactory.getModule(configuration, environment));
+        injector = Guice.createInjector(ModuleFactory.getModule(configuration, environment));
         injector.getInstance(SecurityFactory.class).configure(injector, environment);
         
         environment.lifecycle().manage(injector.getInstance(DirectoriesCreator.class));

@@ -68,7 +68,9 @@ public class ComputationalConfigure implements DockerCommands {
                 .withAwsRegion(dto.getAwsRegion())
                 .withConfOsUser(dto.getConfOsUser());
     	ComputationalConfigure conf = new ComputationalConfigure();
-    	ProvisioningServiceApplication.getInjector().injectMembers(conf);
+    	ProvisioningServiceApplication
+    		.getInjector()
+    		.injectMembers(conf);
     	return conf.configure(uuid, dtoConf);
     }
     

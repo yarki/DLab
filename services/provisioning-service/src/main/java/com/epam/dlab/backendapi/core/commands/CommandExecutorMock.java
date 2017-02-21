@@ -35,9 +35,14 @@ import org.apache.commons.codec.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.epam.dlab.UserInstanceStatus;
+import com.epam.dlab.dto.status.EnvResource;
+import com.epam.dlab.dto.status.EnvResourceList;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.utils.ServiceUtils;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
@@ -46,11 +51,15 @@ import com.google.common.io.Resources;
 public class CommandExecutorMock implements ICommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutorMock.class);
 
-    private ObjectMapper MAPPER = new ObjectMapper().configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+    private ObjectMapper MAPPER = new ObjectMapper()
+    		.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true)
+    		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     
     private Map<String, String> variables = new HashMap<String, String>();
     
     private String responseFileName;
+    
+    private String jsonContent;
     
     public Map<String, String> getVariables() {
     	return variables;
@@ -59,6 +68,11 @@ public class CommandExecutorMock implements ICommandExecutor {
     public String getResponseFileName() {
     	return responseFileName;
     }
+
+    public String getJsonContent() {
+    	return jsonContent;
+    }
+
 
     @Override
     public List<String> executeSync(String user, String uuid, String command) throws IOException, InterruptedException {
@@ -93,6 +107,7 @@ public class CommandExecutorMock implements ICommandExecutor {
     	String resourceType = getResourceType(parser.getOther());
     	String requestId = parser.getEnvironment().get("request_id");
     	String responsePath = parser.getVariable().get("/response");
+    	jsonContent = parser.getJson();
     	LOGGER.debug("resourse type is {}, requestId is {}, pesponse path is {}", resourceType, requestId, responsePath);
 
     	variables.putAll(parser.getEnvironment());
@@ -114,6 +129,8 @@ public class CommandExecutorMock implements ICommandExecutor {
 		case CONFIGURE:
 			break;
 		case STATUS:
+			variables.put("list_resources", getResponseStatus());
+			action(user, resourceType, action, requestId, responsePath);
 			break;
 		default:
 			break;
@@ -176,6 +193,35 @@ public class CommandExecutorMock implements ICommandExecutor {
     	setResponse(templateFileName, responseFileName);
     }
     
+    public String getResponseStatus() {
+    	EnvResourceList resourceList;
+    	try {
+        	JsonNode json = MAPPER.readTree(getJsonContent());
+			json = json.get("edge_list_resources");
+			resourceList = MAPPER.readValue(json.toString(), EnvResourceList.class);
+		} catch (IOException e) {
+			throw new DlabException("Can't parse json content: " + e.getLocalizedMessage(), e);
+		}
+    	
+    	if (resourceList.getHostList() !=  null) {
+    		for (EnvResource host : resourceList.getHostList()) {
+    			host.setStatus(UserInstanceStatus.RUNNING.toString());
+    		}
+    	}
+    	if (resourceList.getClusterList() != null) {
+    		for (EnvResource host : resourceList.getClusterList()) {
+    			host.setStatus(UserInstanceStatus.RUNNING.toString());
+    		}
+    	}
+    	
+    	try {
+			return MAPPER.writeValueAsString(resourceList);
+		} catch (JsonProcessingException e) {
+			throw new DlabException("Can't generate json content: " + e.getLocalizedMessage(), e);
+		}
+    }
+
+    
     protected String getTextValue(JsonNode jsonNode) {
         return jsonNode != null ? jsonNode.textValue() : null;
     }
@@ -230,7 +276,7 @@ public class CommandExecutorMock implements ICommandExecutor {
     	String cmd;
 
     	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
-    			"\"edge_list_resources\":{\"host\":[{\"id\":\"i-05c1a0d0ad030cdc5\"}]}}' | " +
+    			"\"edge_list_resources\":{\"host\":[{\"id\":\"i-05c1a0d0ad030cdc1\"}, {\"id\":\"i-05c1a0d0ad030cdc2\"}]}}' | " +
     			"docker run -i --name usein_faradzhev_status_resources_1487607145484 " +
     			"-v /home/ubuntu/keys:/root/keys " +
     			"-v /opt/dlab/tmp/result:/response " +
@@ -239,6 +285,60 @@ public class CommandExecutorMock implements ICommandExecutor {
     			"-e \"request_id=0fb82e16-deb2-4b18-9ab3-f9f1c12d9e62\" " +
     			"-e \"conf_key_name=BDCC-DSS-POC\" " +
     			"docker.dlab-edge --action status";
-    	commandExecutor.executeAsync("user", "uuid", cmd);
+    	//commandExecutor.executeAsync("user", "uuid", cmd);
+
+    	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
+    			"\"conf_service_base_name\":\"usein1122v3\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
+    			"\"exploratory_name\":\"useinj1\",\"application\":\"jupyter\",\"computational_name\":\"useine1\"," +
+    			"\"emr_instance_count\":\"2\",\"emr_master_instance_type\":\"c4.large\",\"emr_slave_instance_type\":\"c4.large\"," +
+    			"\"emr_version\":\"emr-5.2.0\",\"notebook_instance_name\":\"usein1122v3-usein_faradzhev-nb-useinj1-1b198\"," +
+    			"\"notebook_template_name\":\"Jupyter 1.5\"}' | " +
+    			"docker run -i --name usein_faradzhev_create_computational_useine1_1487653987822 " +
+    			"-v /home/ubuntu/keys:/root/keys " +
+    			"-v /opt/dlab/tmp/result:/response " +
+    			"-v /var/opt/dlab/log/emr:/logs/emr " +
+    			"-e \"conf_resource=emr\" " +
+    			"-e \"request_id=917db3fd-3c17-4e79-8462-482a71a5d96f\" " +
+    			"-e \"ec2_role=EMR_EC2_DefaultRole\" " +
+    			"-e \"emr_timeout=3600\" " +
+    			"-e \"service_role=EMR_DefaultRole\" " +
+    			"-e \"conf_key_name=BDCC-DSS-POC\" " +
+    			"docker.dlab-emr --action create";
+    	//commandExecutor.executeAsync("user", "uuid", cmd);
+    	//GOT RESPONSE
+    	
+    	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"" +
+    			",\"conf_service_base_name\":\"usein1122v3\",\"conf_os_user\":\"ubuntu\",\"exploratory_name\":\"useinj1\"," +
+    			"\"computational_name\":\"useine1\",\"emr_cluster_name\":\"\"," +
+    			"\"notebook_instance_name\":\"usein1122v3-usein_faradzhev-nb-useinj1-1b198\",\"conf_key_dir\":\"/root/keys\"}' | " +
+    			"docker run -i --name usein_faradzhev_terminate_computational_useine1_1487657251858 " +
+    			"-v /home/ubuntu/keys:/root/keys " +
+    			"-v /opt/dlab/tmp/result:/response " +
+    			"-v /var/opt/dlab/log/emr:/logs/emr " +
+    			"-e \"conf_resource=emr\" " +
+    			"-e \"request_id=2d5c23b8-d312-4fad-8a3c-0b813550d841\" " +
+    			"-e \"conf_key_name=BDCC-DSS-POC\" " +
+    			"docker.dlab-emr --action terminate";
+    	//commandExecutor.executeAsync("user", "uuid", cmd);
+   	
+/*
+
+
+{
+   "status": "ok",
+   "response": {
+      "result": {
+         "Action": "Terminate EMR cluster",
+         "user_own_bucket_name": "usein1122v3-ssn-bucket",
+         "EMR_name": "??????????",
+         "notebook_name": "usein1122v3-usein_faradzhev-nb-useinj1-1b198"
+      },
+      "log": "/var/log/dlab/emr/emr_usein_faradzhev_2d5c23b8-d312-4fad-8a3c-0b813550d841.log"
+   },
+   "request_id": "2d5c23b8-d312-4fad-8a3c-0b813550d841"
+}
+
+
+*/
     }
 }
