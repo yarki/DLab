@@ -153,7 +153,7 @@ def ensure_python3_specific_version(python3_version, os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/python3_specific_version_ensured'):
         try:
             sudo('yum install -y yum-utils python34 openssl-devel')
-            sudo('yum -y groupinstall development')
+            sudo('yum -y groupinstall development --nogpgcheck')
             if len(python3_version) < 4:
                 python3_version = python3_version + ".0"
             sudo('wget https://www.python.org/ftp/python/{0}/Python-{0}.tgz'.format(python3_version))
@@ -168,7 +168,7 @@ def ensure_python2_libraries(os_user):
         try:
             sudo('yum install -y https://forensics.cert.org/centos/cert/7/x86_64/pyparsing-2.0.3-1.el7.noarch.rpm')
             sudo('yum install -y python-setuptools python-wheel')
-            sudo('yum install -y python-virtualenv openssl-devel python-devel openssl-libs libxml2-devel libxslt-devel')
+            sudo('yum install -y python-virtualenv openssl-devel python-devel openssl-libs libxml2-devel libxslt-devel --nogpgcheck')
             sudo('python2 -m pip install backports.shutil_get_terminal_size ipython ipykernel')
             sudo('echo y | python2 -m pip uninstall backports.shutil_get_terminal_size')
             sudo('python2 -m pip install backports.shutil_get_terminal_size')
