@@ -271,3 +271,25 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo('touch /home/' + os_user + '/.ensure_dir/tensor_ensured')
         except:
             sys.exit(1)
+
+
+def install_maven():
+    sudo('wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz -O /tmp/maven.tar.gz')
+    sudo('tar -zxvf /tmp/maven.tar.gz -C /opt/')
+    sudo('ln -s /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn')
+
+
+def install_livy_dependencies():
+    sudo('pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
+    sudo('pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')
+
+
+def install_maven_emr():
+    local('sudo wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz -O /tmp/maven.tar.gz')
+    local('sudo tar -zxvf /tmp/maven.tar.gz -C /opt/')
+    local('sudo ln -s /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn')
+
+
+def install_livy_dependencies_emr():
+    local('sudo pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
+    local('sudo pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')
