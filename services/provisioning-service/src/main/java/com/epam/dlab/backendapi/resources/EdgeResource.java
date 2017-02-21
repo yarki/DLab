@@ -120,7 +120,7 @@ public class EdgeResource implements DockerCommands {
     }
 
     private String nameContainer(String user, DockerAction action) {
-        return nameContainer(user, action.toString(), "exploratory", getResourceType());
+        return nameContainer(user, action.toString(), getResourceType());
     }
     
     @Override

@@ -206,7 +206,7 @@ public class CommandExecutorMock implements ICommandExecutor {
     public void action(String user, String resourceType, DockerAction action, String uuid, String responsePath) {
     	String prefixFileName = (resourceType.equals("edge") || resourceType.equals("emr") ?
     			resourceType : "notebook") + "_";
-    	String templateFileName = prefixFileName + action.toString() + ".json";
+    	String templateFileName = "mock_response/" + prefixFileName + action.toString() + ".json";
     	responseFileName = getAbsolutePath(responsePath, prefixFileName + user + "_" + uuid + ".json");
     	setResponse(templateFileName, responseFileName);
     }
