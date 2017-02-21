@@ -228,86 +228,17 @@ public class CommandExecutorMock implements ICommandExecutor {
     public static void main(String [] args) {
     	ICommandExecutor commandExecutor = new CommandExecutorMock();
     	String cmd;
-    	cmd = "docker run " +
-    			"-v /home/ubuntu/keys:/root/keys " +
-    			"-v /opt/dlab/tmp/result:/response " +
-    			"-v /var/opt/dlab/log/notebook:/logs/notebook " +
-    			"-e \"conf_resource=notebook\" " +
-    			"-e \"request_id=28ba67a4-b2ee-4753-a406-892977089ad9\" " +
-    			"docker.dlab-zeppelin:latest --action describe";
-    	commandExecutor.executeAsync("user", "uuid", cmd);
-    	
+
     	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
-    			"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
-    			"\"aws_vpc_id\":\"vpc-83c469e4\",\"aws_subnet_id\":\"subnet-22db937a\",\"aws_security_groups_ids\":\"sg-4d42dc35\"}' | " +
-    			"docker run -i --name usein_faradzhev_create_exploratory_edge_1487309918496 " +
+    			"\"edge_list_resources\":{\"host\":[{\"id\":\"i-05c1a0d0ad030cdc5\"}]}}' | " +
+    			"docker run -i --name usein_faradzhev_status_resources_1487607145484 " +
     			"-v /home/ubuntu/keys:/root/keys " +
     			"-v /opt/dlab/tmp/result:/response " +
     			"-v /var/opt/dlab/log/edge:/logs/edge " +
-    			"-e \"conf_resource=edge\" " +
-    			"-e \"request_id=b8267ae6-07b0-44ef-a489-7714b20cf0a4\" " +
+    			"-e \"conf_resource=status\" " +
+    			"-e \"request_id=0fb82e16-deb2-4b18-9ab3-f9f1c12d9e62\" " +
     			"-e \"conf_key_name=BDCC-DSS-POC\" " +
-    			"docker.dlab-edge --action create";
+    			"docker.dlab-edge --action status";
     	commandExecutor.executeAsync("user", "uuid", cmd);
-
-    	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
-    			"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
-    			"\"exploratory_name\":\"useinxz1\",\"application\":\"zeppelin\",\"notebook_image\":\"docker.dlab-zeppelin\"," +
-    			"\"aws_notebook_instance_type\":\"t2.medium\",\"aws_security_groups_ids\":\"sg-4d42dc35\"}' | " +
-    			"docker run -i --name usein_faradzhev_create_exploratory_useinxz1_1487312574572 " +
-    			"-v /home/ubuntu/keys:/root/keys " +
-    			"-v /opt/dlab/tmp/result:/response " +
-    			"-v /var/opt/dlab/log/notebook:/logs/notebook " +
-    			"-e \"conf_resource=notebook\" " +
-    			"-e \"request_id=f720f30b-5949-4919-a50b-ce7af58d6fe9\" " +
-    			"-e \"conf_key_name=BDCC-DSS-POC\" " +
-    			"docker.dlab-zeppelin --action create";
-    	commandExecutor.executeAsync("user", "uuid", cmd);
-
-    	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
-    			"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\"," +
-    			"\"exploratory_name\":\"useinxz1\",\"notebook_image\":\"docker.dlab-zeppelin\"," +
-    			"\"notebook_instance_name\":\"usein1120v13-usein_faradzhev-nb-useinxz1-78af3\",\"conf_key_dir\":\"/root/keys\"}' | " +
-    			"docker run -i --name usein_faradzhev_stop_exploratory_useinxz1_1487315364165 " +
-    			"-v /home/ubuntu/keys:/root/keys " +
-    			"-v /opt/dlab/tmp/result:/response " +
-    			"-v /var/opt/dlab/log/notebook:/logs/notebook " +
-    			"-e \"conf_resource=notebook\" " +
-    			"-e \"request_id=33998e05-7781-432e-b748-bf3f0e7f9342\" " +
-    			"-e \"conf_key_name=BDCC-DSS-POC\" " +
-    			"docker.dlab-zeppelin --action stop";
-    	commandExecutor.executeAsync("user", "uuid", cmd);
-    	
-    	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
-    			"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
-    			"\"exploratory_name\":\"useinxz1\",\"notebook_image\":\"docker.dlab-zeppelin\"," +
-    			"\"notebook_instance_name\":\"usein1120v13-usein_faradzhev-nb-useinxz1-78af3\"}' | " +
-    			"docker run -i --name usein_faradzhev_start_exploratory_useinxz1_1487316756857 " +
-    			"-v /home/ubuntu/keys:/root/keys " +
-    			"-v /opt/dlab/tmp/result:/response " +
-    			"-v /var/opt/dlab/log/notebook:/logs/notebook " +
-    			"-e \"conf_resource=notebook\" " +
-    			"-e \"request_id=d50b9d20-1b1a-415f-8e47-ed0aca029e73\" " +
-    			"-e \"conf_key_name=BDCC-DSS-POC\" " +
-    			"docker.dlab-zeppelin --action start";
-    	commandExecutor.executeAsync("user", "uuid", cmd);
-    	
-    	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
-    			"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
-    			"\"exploratory_name\":\"useinxz1\",\"notebook_image\":\"docker.dlab-zeppelin\"," +
-    			"\"notebook_instance_name\":\"usein1120v13-usein_faradzhev-nb-useinxz1-78af3\"}' | " +
-    			"docker run -i --name usein_faradzhev_terminate_exploratory_useinxz1_1487318040180 " +
-    			"-v /home/ubuntu/keys:/root/keys " +
-    			"-v /opt/dlab/tmp/result:/response " +
-    			"-v /var/opt/dlab/log/notebook:/logs/notebook " +
-    			"-e \"conf_resource=notebook\" " +
-    			"-e \"request_id=de217441-9757-4c4e-b020-548f66b58e00\" " +
-    			"-e \"conf_key_name=BDCC-DSS-POC\" " +
-    			"docker.dlab-zeppelin --action terminate";
-    	commandExecutor.executeAsync("user", "uuid", cmd);
-/*
-
-
- */
     }
 }
