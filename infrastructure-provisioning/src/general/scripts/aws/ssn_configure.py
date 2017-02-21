@@ -51,6 +51,18 @@ if __name__ == "__main__":
         sg_name = instance_name + '-SG'
         pre_defined_vpc = False
         pre_defined_sg = False
+        try:
+            os.environ['aws_vpc_id']
+        except KeyError:
+            tag = {"Key": tag_name, "Value": "{}-subnet".format(service_base_name)}
+            os.environ['aws_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
+            os.environ['aws_subnet_id'] = get_subnet_by_tag(tag, True)
+            pre_defined_vpc = True
+        try:
+            os.environ['aws_security_groups_ids']
+        except KeyError:
+            os.environ['aws_security_groups_ids'] = get_security_group_by_name(sg_name)
+            pre_defined_sg = True
     except:
         sys.exit(1)
 
