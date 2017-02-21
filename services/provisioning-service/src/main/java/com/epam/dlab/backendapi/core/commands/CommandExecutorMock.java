@@ -56,19 +56,20 @@ public class CommandExecutorMock implements ICommandExecutor {
     		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     
     private Map<String, String> variables = new HashMap<String, String>();
-    
     private String responseFileName;
-    
     private String jsonContent;
     
+    /** Return variables for substitution into Json response file. */
     public Map<String, String> getVariables() {
     	return variables;
     }
     
+    /** Response file name. */
     public String getResponseFileName() {
     	return responseFileName;
     }
 
+    /** Json content for docker. */
     public String getJsonContent() {
     	return jsonContent;
     }
@@ -104,29 +105,30 @@ public class CommandExecutorMock implements ICommandExecutor {
     		throw new DlabException("Docker action not defined");
     	}
     	
-    	String resourceType = getResourceType(parser.getOther());
+    	String resourceType = getResourceType(parser.getEnvironment());
+    	String imageType = getImageType(parser.getOther());
     	String requestId = parser.getEnvironment().get("request_id");
     	String responsePath = parser.getVariable().get("/response");
     	jsonContent = parser.getJson();
-    	LOGGER.debug("resourse type is {}, requestId is {}, pesponse path is {}", resourceType, requestId, responsePath);
+    	LOGGER.debug("resourceType is {}, imageType is {}, requestId is {}, response path is {}", resourceType, imageType, requestId, responsePath);
 
     	variables.putAll(parser.getEnvironment());
     	variables.putAll(getJsonVariables(parser.getJson()));
     	variables.put("instance_id", "i-" + requestId.replace("-", "").substring(0, 17));
+    	variables.put("cluster_id", "j-" + requestId.replace("-", "").substring(0, 13).toUpperCase());
     	variables.put("notebook_id", requestId.replace("-", "").substring(17, 22));
     	LOGGER.debug("jsonVars is {}", variables);
     	
     	switch (action) {
 		case DESCRIBE:
-			describe(resourceType, requestId, responsePath);
+			describe(imageType, requestId, responsePath);
 			break;
 		case CREATE:
 		case START:
 		case STOP:
 		case TERMINATE:
-			action(user, resourceType, action, requestId, responsePath);
-			break;
 		case CONFIGURE:
+			action(user, resourceType, action, requestId, responsePath);
 			break;
 		case STATUS:
 			variables.put("list_resources", getResponseStatus());
@@ -160,20 +162,28 @@ public class CommandExecutorMock implements ICommandExecutor {
     
     /** Return name of resource: edge, emr, ...
      * @param args list of arguments.
+     * @exception if resource type name not found.
+     */
+    public static String getResourceType(Map<String, String> environment) throws DlabException {
+		return environment.get("conf_resource");
+    }
+    
+    /** Return name of image type: edge, jupyter, zeppelin, ...
+     * @param args list of arguments.
      * @exception if image name not found.
      */
-    public static String getResourceType(List<String> args) throws DlabException {
+    public static String getImageType(List<String> args) throws DlabException {
 		String imageName = getImageName(args);
 		return imageName.replace("docker.dlab-", "").replace(":latest", "");
     }
     
     /** Describe action.
      * @param uuid UUID for request.
-     * @param resourceType name of docker image.
+     * @param imageType name of docker image.
      * @param responsePath path for response file.
      */
-    public void describe(String resourceType, String uuid, String responsePath) {
-    	String templateFileName = getAbsolutePath(ServiceUtils.getUserDir(), "../../infrastructure-provisioning/src", resourceType, "description.json");
+    public void describe(String imageType, String uuid, String responsePath) {
+    	String templateFileName = getAbsolutePath(ServiceUtils.getUserDir(), "../../infrastructure-provisioning/src", imageType, "description.json");
     	responseFileName = getAbsolutePath(responsePath, uuid + ".json");
 
     	LOGGER.debug("Create response file from {} to {}", templateFileName, responseFileName);
@@ -186,14 +196,24 @@ public class CommandExecutorMock implements ICommandExecutor {
 		}
     }
     
+    /** Perform docker action.
+     * @param user the name of user.
+     * @param resourceType the name of resource type: edge, emr, zeppelin, etc.
+     * @param action docker action.
+     * @param uuid UUID for response.
+     * @param responsePath the path to store response file.
+     */
     public void action(String user, String resourceType, DockerAction action, String uuid, String responsePath) {
-    	String prefixFileName = (resourceType.equals("edge") ? resourceType : "notebook") + "_";
+    	String prefixFileName = (resourceType.equals("edge") || resourceType.equals("emr") ?
+    			resourceType : "notebook") + "_";
     	String templateFileName = prefixFileName + action.toString() + ".json";
     	responseFileName = getAbsolutePath(responsePath, prefixFileName + user + "_" + uuid + ".json");
     	setResponse(templateFileName, responseFileName);
     }
     
-    public String getResponseStatus() {
+    /** Return the section of resource statuses for docker action status.
+     */
+    private String getResponseStatus() {
     	EnvResourceList resourceList;
     	try {
         	JsonNode json = MAPPER.readTree(getJsonContent());
@@ -221,12 +241,18 @@ public class CommandExecutorMock implements ICommandExecutor {
 		}
     }
 
-    
-    protected String getTextValue(JsonNode jsonNode) {
+    /** Return the value of json property or <b>null</b>.
+     * @param jsonNode - Json node.
+     */
+    private String getTextValue(JsonNode jsonNode) {
         return jsonNode != null ? jsonNode.textValue() : null;
     }
     
-    public Map<String, String> getJsonVariables(String jsonContent) {
+    /** Extract Json properties from json content.
+     * @param jsonContent Json content.
+     * @return
+     */
+    private Map<String, String> getJsonVariables(String jsonContent) {
     	Map<String, String> vars = new HashMap<String, String>();
     	if (jsonContent == null) {
     		return vars;
@@ -250,7 +276,12 @@ public class CommandExecutorMock implements ICommandExecutor {
     	return vars;
     }
     
-    public void setResponse(String sourceFileName, String targetFileName) throws DlabException {
+    /** Write response file.
+     * @param sourceFileName template file name.
+     * @param targetFileName response file name.
+     * @throws DlabException if can't read template or write response files.
+     */
+    private void setResponse(String sourceFileName, String targetFileName) throws DlabException {
     	String content;
     	URL url = Resources.getResource(sourceFileName);
     	try {
@@ -276,69 +307,17 @@ public class CommandExecutorMock implements ICommandExecutor {
     	String cmd;
 
     	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
-    			"\"edge_list_resources\":{\"host\":[{\"id\":\"i-05c1a0d0ad030cdc1\"}, {\"id\":\"i-05c1a0d0ad030cdc2\"}]}}' | " +
-    			"docker run -i --name usein_faradzhev_status_resources_1487607145484 " +
-    			"-v /home/ubuntu/keys:/root/keys " +
-    			"-v /opt/dlab/tmp/result:/response " +
-    			"-v /var/opt/dlab/log/edge:/logs/edge " +
-    			"-e \"conf_resource=status\" " +
-    			"-e \"request_id=0fb82e16-deb2-4b18-9ab3-f9f1c12d9e62\" " +
-    			"-e \"conf_key_name=BDCC-DSS-POC\" " +
-    			"docker.dlab-edge --action status";
-    	//commandExecutor.executeAsync("user", "uuid", cmd);
-
-    	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
-    			"\"conf_service_base_name\":\"usein1122v3\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
-    			"\"exploratory_name\":\"useinj1\",\"application\":\"jupyter\",\"computational_name\":\"useine1\"," +
-    			"\"emr_instance_count\":\"2\",\"emr_master_instance_type\":\"c4.large\",\"emr_slave_instance_type\":\"c4.large\"," +
-    			"\"emr_version\":\"emr-5.2.0\",\"notebook_instance_name\":\"usein1122v3-usein_faradzhev-nb-useinj1-1b198\"," +
-    			"\"notebook_template_name\":\"Jupyter 1.5\"}' | " +
-    			"docker run -i --name usein_faradzhev_create_computational_useine1_1487653987822 " +
+    			"\"conf_service_base_name\":\"usein1122v4\",\"conf_os_user\":\"ubuntu\",\"exploratory_name\":\"useinj1\"," +
+    			"\"application\":\"jupyter\",\"computational_name\":\"useine2\",\"emr_version\":\"emr-5.2.0\"," +
+    			"\"notebook_instance_name\":\"usein1122v4-usein_faradzhev-nb-useinj1-b0a2e\"}' | " +
+    			"docker run -i --name usein_faradzhev_configure_computational_useine2_1487676513703 " +
     			"-v /home/ubuntu/keys:/root/keys " +
     			"-v /opt/dlab/tmp/result:/response " +
     			"-v /var/opt/dlab/log/emr:/logs/emr " +
     			"-e \"conf_resource=emr\" " +
-    			"-e \"request_id=917db3fd-3c17-4e79-8462-482a71a5d96f\" " +
-    			"-e \"ec2_role=EMR_EC2_DefaultRole\" " +
-    			"-e \"emr_timeout=3600\" " +
-    			"-e \"service_role=EMR_DefaultRole\" " +
+    			"-e \"request_id=dc3c1002-c07d-442b-99f9-18085aeb2881\" " +
     			"-e \"conf_key_name=BDCC-DSS-POC\" " +
-    			"docker.dlab-emr --action create";
-    	//commandExecutor.executeAsync("user", "uuid", cmd);
-    	//GOT RESPONSE
-    	
-    	cmd = "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"" +
-    			",\"conf_service_base_name\":\"usein1122v3\",\"conf_os_user\":\"ubuntu\",\"exploratory_name\":\"useinj1\"," +
-    			"\"computational_name\":\"useine1\",\"emr_cluster_name\":\"\"," +
-    			"\"notebook_instance_name\":\"usein1122v3-usein_faradzhev-nb-useinj1-1b198\",\"conf_key_dir\":\"/root/keys\"}' | " +
-    			"docker run -i --name usein_faradzhev_terminate_computational_useine1_1487657251858 " +
-    			"-v /home/ubuntu/keys:/root/keys " +
-    			"-v /opt/dlab/tmp/result:/response " +
-    			"-v /var/opt/dlab/log/emr:/logs/emr " +
-    			"-e \"conf_resource=emr\" " +
-    			"-e \"request_id=2d5c23b8-d312-4fad-8a3c-0b813550d841\" " +
-    			"-e \"conf_key_name=BDCC-DSS-POC\" " +
-    			"docker.dlab-emr --action terminate";
-    	//commandExecutor.executeAsync("user", "uuid", cmd);
-   	
-/*
-
-
-{
-   "status": "ok",
-   "response": {
-      "result": {
-         "Action": "Terminate EMR cluster",
-         "user_own_bucket_name": "usein1122v3-ssn-bucket",
-         "EMR_name": "??????????",
-         "notebook_name": "usein1122v3-usein_faradzhev-nb-useinj1-1b198"
-      },
-      "log": "/var/log/dlab/emr/emr_usein_faradzhev_2d5c23b8-d312-4fad-8a3c-0b813550d841.log"
-   },
-   "request_id": "2d5c23b8-d312-4fad-8a3c-0b813550d841"
-}
-
-
-*/
+    			"docker.dlab-jupyter --action configure";
+    	commandExecutor.executeAsync("user", "uuid", cmd);
     }
 }

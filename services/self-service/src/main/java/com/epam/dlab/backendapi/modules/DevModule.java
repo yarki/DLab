@@ -28,12 +28,9 @@ import javax.ws.rs.core.Response;
 
 import com.epam.dlab.ModuleBase;
 import com.epam.dlab.auth.UserInfo;
-import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.DockerWarmuper;
-import com.epam.dlab.backendapi.core.MetadataHolder;
-import com.epam.dlab.backendapi.core.commands.CommandExecutorMock;
-import com.epam.dlab.backendapi.core.commands.ICommandExecutor;
+import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.constants.ServiceConsts;
+import com.epam.dlab.mongo.MongoService;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.DockerAPI;
 import com.epam.dlab.rest.contracts.SecurityAPI;
@@ -41,25 +38,26 @@ import com.google.inject.name.Names;
 
 import io.dropwizard.setup.Environment;
 
-/** Mock class for an application configuration of Provisioning Service for tests.
+/** Mock class for an application configuration of SelfService for developer mode.
  */
-public class MockModule extends ModuleBase<ProvisioningServiceApplicationConfiguration> implements SecurityAPI, DockerAPI {
+public class DevModule extends ModuleBase<SelfServiceApplicationConfiguration> implements SecurityAPI, DockerAPI {
 	
-	/** Instantiates an application configuration of SelfService for tests.
+	/** Instantiates an application configuration of SelfService for developer mode.
      * @param configuration application configuration of SelfService.
      * @param environment environment of SelfService.
      */
-    public MockModule(ProvisioningServiceApplicationConfiguration configuration, Environment environment) {
+    public DevModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
         super(configuration, environment);
     }
 
     @Override
     protected void configure() {
-        bind(ProvisioningServiceApplicationConfiguration.class).toInstance(configuration);
-        bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE)).toInstance(createAuthenticationService());
-        bind(RESTService.class).toInstance(configuration.getSelfFactory().build(environment, ServiceConsts.SELF_SERVICE_NAME));
-        bind(MetadataHolder.class).to(DockerWarmuper.class);
-        bind(ICommandExecutor.class).to(CommandExecutorMock.class).asEagerSingleton();
+        bind(SelfServiceApplicationConfiguration.class).toInstance(configuration);
+        bind(MongoService.class).toInstance(configuration.getMongoFactory().build(environment));
+        bind(RESTService.class).annotatedWith(Names.named(SECURITY_SERVICE))
+                .toInstance(createAuthenticationService());
+        bind(RESTService.class).annotatedWith(Names.named(ServiceConsts.PROVISIONING_SERVICE_NAME))
+        		.toInstance(configuration.getProvisioningFactory().build(environment, ServiceConsts.PROVISIONING_SERVICE_NAME));
     }
 
     /** Creates and returns the mock object for authentication service.

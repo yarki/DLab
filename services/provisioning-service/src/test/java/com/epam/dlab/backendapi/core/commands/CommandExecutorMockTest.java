@@ -55,7 +55,6 @@ public class CommandExecutorMockTest {
     	handler.handle(exec.getResponseFileName(), Files.readAllBytes(Paths.get(exec.getResponseFileName())));
     }
     
-    
     @Test
     public void describe() {
     	String cmd =
@@ -85,6 +84,55 @@ public class CommandExecutorMockTest {
     		"docker.dlab-edge --action create";
     	getCommandExecutor().executeAsync("user", "uuid", cmd);
     }
+    
+    @Test
+    public void edgeStop() {
+    	String cmd =
+    	    "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
+    	    "\"conf_service_base_name\":\"usein1122v4\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"}' | " +
+    	    "docker run -i --name usein_faradzhev_stop_exploratory_edge_1487677431773 " +
+    	    "-v /home/ubuntu/keys:/root/keys " +
+    	    "-v /opt/dlab/tmp/result:/response " +
+    	    "-v /var/opt/dlab/log/edge:/logs/edge " +
+    	    "-e \"conf_resource=edge\" " +
+    	    "-e \"request_id=2ba3d8f7-654b-48aa-9386-e815b296a957\" " +
+    	    "-e \"conf_key_name=BDCC-DSS-POC\" " +
+    	    "docker.dlab-edge --action stop";
+    	getCommandExecutor().executeAsync("user", "uuid", cmd);
+    }
+    
+    @Test
+    public void edgeStart() {
+    	String cmd =
+    		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
+    	    "\"conf_service_base_name\":\"usein1122v4\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"}' | " +
+    	    "docker run -i --name usein_faradzhev_start_exploratory_edge_1487677538220 " +
+    	    "-v /home/ubuntu/keys:/root/keys " +
+    	    "-v /opt/dlab/tmp/result:/response " +
+    	    "-v /var/opt/dlab/log/edge:/logs/edge " +
+    	    "-e \"conf_resource=edge\" " +
+    	    "-e \"request_id=d2f6fbae-979e-4b08-9c0d-559a103ec0cc\" " +
+    	    "-e \"conf_key_name=BDCC-DSS-POC\" " +
+    	    "docker.dlab-edge --action start";
+       	getCommandExecutor().executeAsync("user", "uuid", cmd);
+    }
+    
+    @Test
+    public void edgeStatus() {
+    	String cmd =
+    		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
+    		"\"edge_list_resources\":{\"host\":[{\"id\":\"i-05c1a0d0ad030cdc1\"}, {\"id\":\"i-05c1a0d0ad030cdc2\"}]}}' | " +
+    		"docker run -i --name usein_faradzhev_status_resources_1487607145484 " +
+    		"-v /home/ubuntu/keys:/root/keys " +
+    		"-v /opt/dlab/tmp/result:/response " +
+    		"-v /var/opt/dlab/log/edge:/logs/edge " +
+    		"-e \"conf_resource=status\" " +
+    		"-e \"request_id=0fb82e16-deb2-4b18-9ab3-f9f1c12d9e62\" " +
+    		"-e \"conf_key_name=BDCC-DSS-POC\" " +
+    		"docker.dlab-edge --action status";
+       	getCommandExecutor().executeAsync("user", "uuid", cmd);
+    }
+    
     
     @Test
     public void notebookCreate() throws Exception {
@@ -157,4 +205,65 @@ public class CommandExecutorMockTest {
     		"docker.dlab-zeppelin --action terminate";
     	handleExploratory(cmd, DockerAction.TERMINATE);
     }
+    
+    
+    @Test
+    public void emrCreate() throws Exception {
+    	String cmd =
+    		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
+    		"\"conf_service_base_name\":\"usein1122v3\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
+    	    "\"exploratory_name\":\"useinj1\",\"application\":\"jupyter\",\"computational_name\":\"useine1\"," +
+    	    "\"emr_instance_count\":\"2\",\"emr_master_instance_type\":\"c4.large\",\"emr_slave_instance_type\":\"c4.large\"," +
+    	    "\"emr_version\":\"emr-5.2.0\",\"notebook_instance_name\":\"usein1122v3-usein_faradzhev-nb-useinj1-1b198\"," +
+    	    "\"notebook_template_name\":\"Jupyter 1.5\"}' | " +
+    	    "docker run -i --name usein_faradzhev_create_computational_useine1_1487653987822 " +
+    	    "-v /home/ubuntu/keys:/root/keys " +
+    	    "-v /opt/dlab/tmp/result:/response " +
+    	    "-v /var/opt/dlab/log/emr:/logs/emr " +
+    	    "-e \"conf_resource=emr\" " +
+    	    "-e \"request_id=917db3fd-3c17-4e79-8462-482a71a5d96f\" " +
+    	    "-e \"ec2_role=EMR_EC2_DefaultRole\" " +
+    	    "-e \"emr_timeout=3600\" " +
+    	    "-e \"service_role=EMR_DefaultRole\" " +
+    	    "-e \"conf_key_name=BDCC-DSS-POC\" " +
+    	    "docker.dlab-emr --action create";
+    	getCommandExecutor().executeAsync("user", "uuid", cmd);
+    }
+    
+    @Test
+    public void emrConfigure() throws Exception {
+    	String cmd =
+    		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"," +
+    		"\"conf_service_base_name\":\"usein1122v4\",\"conf_os_user\":\"ubuntu\",\"exploratory_name\":\"useinj1\"," +
+    		"\"application\":\"jupyter\",\"computational_name\":\"useine2\",\"emr_version\":\"emr-5.2.0\"," +
+    		"\"notebook_instance_name\":\"usein1122v4-usein_faradzhev-nb-useinj1-b0a2e\"}' | " +
+    		"docker run -i --name usein_faradzhev_configure_computational_useine2_1487676513703 " +
+    		"-v /home/ubuntu/keys:/root/keys " +
+    		"-v /opt/dlab/tmp/result:/response " +
+    		"-v /var/opt/dlab/log/emr:/logs/emr " +
+    		"-e \"conf_resource=emr\" " +
+    		"-e \"request_id=dc3c1002-c07d-442b-99f9-18085aeb2881\" " +
+    		"-e \"conf_key_name=BDCC-DSS-POC\" " +
+    		"docker.dlab-jupyter --action configure";
+    	getCommandExecutor().executeAsync("user", "uuid", cmd);
+    }
+    
+    @Test
+    public void emrTerminate() throws Exception {
+    	String cmd =
+    		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"usein_faradzhev@epam.com\",\"edge_user_name\":\"usein_faradzhev\"" +
+    	    ",\"conf_service_base_name\":\"usein1122v3\",\"conf_os_user\":\"ubuntu\",\"exploratory_name\":\"useinj1\"," +
+    	    "\"computational_name\":\"useine1\",\"emr_cluster_name\":\"usein1122v3-usein_faradzhev-emr-useinj1-useine1-d2db9\"," +
+    	    "\"notebook_instance_name\":\"usein1122v3-usein_faradzhev-nb-useinj1-1b198\",\"conf_key_dir\":\"/root/keys\"}' | " +
+    	    "docker run -i --name usein_faradzhev_terminate_computational_useine1_1487657251858 " +
+    	    "-v /home/ubuntu/keys:/root/keys " +
+    	    "-v /opt/dlab/tmp/result:/response " +
+    	    "-v /var/opt/dlab/log/emr:/logs/emr " +
+    	    "-e \"conf_resource=emr\" " +
+    	    "-e \"request_id=2d5c23b8-d312-4fad-8a3c-0b813550d841\" " +
+    	    "-e \"conf_key_name=BDCC-DSS-POC\" " +
+    	    "docker.dlab-emr --action terminate";
+    	getCommandExecutor().executeAsync("user", "uuid", cmd);
+    }
+    
 }
