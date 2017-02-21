@@ -76,8 +76,6 @@ if __name__ == "__main__":
                     traceback.print_exc()
                     raise Exception
                 os.environ['aws_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
-                enable_vpc_dns(os.environ['aws_vpc_id'])
-                rt_id = create_rt(os.environ['aws_vpc_id'], tag_name, service_base_name)
             except Exception as err:
                 append_result("Failed to create VPC. Exception:" + str(err))
                 sys.exit(1)
