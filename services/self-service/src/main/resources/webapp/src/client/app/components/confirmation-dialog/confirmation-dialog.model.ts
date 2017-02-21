@@ -96,7 +96,6 @@ export class ConfirmationDialogModel {
           (response: Response) => fnProcessErrors(response));
       }
         break;
-
       case ConfirmationDialogType.StopEdgeNode: {
         this.title = edgeNodeStopMessage;
         this.notebook = notebook;
@@ -105,7 +104,6 @@ export class ConfirmationDialogModel {
           (response: Response) => fnProcessErrors(response));
       }
         break;
-
       default: {
         this.title = this.isAliveResources(notebook.resources) ? containRunningResourcesTerminateMessage : defaultTerminateMessage;
         this.notebook = notebook;

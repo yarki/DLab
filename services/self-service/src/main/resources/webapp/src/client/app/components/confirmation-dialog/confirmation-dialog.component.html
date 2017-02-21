@@ -19,7 +19,10 @@ limitations under the License.
 
 <modal-dialog #bindDialog modalClass="confirmation-dialog modal-md">
   <modal-header>
-    <h4 class="modal-title">Exploratory Environment: {{model.notebook.name}}</h4>
+    <h4 class="modal-title">
+      <span *ngIf="model.notebook.name">Exploratory Environment: {{model.notebook.name}}</span>
+      <span *ngIf="model.notebook.type">{{model.notebook.type}}</span>
+    </h4>
   </modal-header>
   <modal-content>
       <div class="row">
@@ -27,7 +30,7 @@ limitations under the License.
           <p>{{model.title}}</p>
         </div>
       </div>
-      <div class="row">
+      <div *ngIf="model.notebook.resources" class="row">
         <div class="col-xs-6">
           <p>Computational resources:</p>
         </div>

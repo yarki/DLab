@@ -117,9 +117,21 @@ export class UserResourceService {
     .catch((error: any) => error);
   }
 
+  public runEdgeNode(): Observable<Response> {
+    return this.applicationServiceFacade
+      .buildRunEdgeNodeRequest()
+      .map((response: Response) => response);
+  }
+
   public suspendEdgeNode(): Observable<Response> {
     return this.applicationServiceFacade
       .buildSuspendEdgeNodeRequest()
+      .map((response: Response) => response);
+  }
+
+  public recreateEdgeNode(): Observable<Response> {
+    return this.applicationServiceFacade
+      .buildRecreateEdgeNodeRequest()
       .map((response: Response) => response);
   }
 }

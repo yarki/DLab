@@ -59,16 +59,16 @@ export class HealthStatusGridComponent {
     }
 
     healthStatusAction(data, action: string) {
-      // POST /api/infrastructure/edge/start
-      // POST /api/infrastructure/edge/stop
-      // POST /api/user/access_key/recover
-
-     if (action === 'run') {
-       
-    } else if (action === 'stop') {
-      this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.StopEdgeNode);
-    } else if (action === 'recreate') {
-      // this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.TerminateExploratory);
-    }
+      if (action === 'run') {
+        this.userResourceService
+          .runEdgeNode()
+          .subscribe(() => this.buildGrid());
+      } else if (action === 'stop') {
+        this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.StopEdgeNode);
+      } else if (action === 'recreate') {
+        this.userResourceService
+          .recreateEdgeNode()
+          .subscribe(() => this.buildGrid());
+      }
   }
 }
