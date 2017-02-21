@@ -62,7 +62,9 @@ if __name__ == "__main__":
         vpc_cidr = '172.31.0.0/16'
         sg_name = instance_name + '-SG'
 
-        if os.environ['aws_vpc_id'] == '' or os.environ['aws_vpc_id'] == 'PUT_YOUR_VALUE_HERE':
+        try:
+            os.environ['aws_vpc_id']
+        except KeyError:
             try:
                 pre_defined_vpc = True
                 logging.info('[CREATE VPC AND ROUTE TABLE]')
@@ -80,7 +82,9 @@ if __name__ == "__main__":
                 append_result("Failed to create VPC. Exception:" + str(err))
                 sys.exit(1)
 
-        if os.environ['aws_subnet_id'] == '' or os.environ['aws_subnet_id'] == 'PUT_YOUR_VALUE_HERE':
+        try:
+            os.environ['aws_subnet_id']
+        except KeyError:
             try:
                 pre_defined_vpc = True
                 logging.info('[CREATE SUBNET]')
@@ -106,7 +110,9 @@ if __name__ == "__main__":
                     remove_vpc(os.environ['aws_vpc_id'])
                 sys.exit(1)
 
-        if os.environ['aws_security_groups_ids'] == '' or os.environ['aws_security_groups_ids'] == 'PUT_YOUR_VALUE_HERE':
+        try:
+            os.environ['aws_security_groups_ids']
+        except KeyError:
             try:
                 pre_defined_sg = True
                 logging.info('[CREATE SG FOR SSN]')
