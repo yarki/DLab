@@ -37,6 +37,7 @@ if __name__ == "__main__":
     if args.vpc != '':
         try:
             vpc_id = get_vpc_by_cidr(args.vpc)
+            print "SSN VPC ID BLYAA: " + vpc_id
             if vpc_id != '':
                 print "Creating vpc %s in region %s with tag %s." % (args.vpc, args.region, json.dumps(tag))
                 vpc_id = create_vpc(args.vpc, tag)
