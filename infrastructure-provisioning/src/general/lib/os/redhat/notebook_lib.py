@@ -281,7 +281,7 @@ def install_maven():
 
 def install_livy_dependencies():
     sudo('pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
-    sudo('pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')
+    sudo('pip3.5 install cloudpickle requests requests-kerberos flake8 flaky pytest')
 
 
 def install_maven_emr():
@@ -292,4 +292,4 @@ def install_maven_emr():
 
 def install_livy_dependencies_emr():
     local('sudo pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
-    local('sudo pip3 install cloudpickle requests requests-kerberos flake8 flaky pytest')
+    local('sudo pip3.5 install cloudpickle requests requests-kerberos flake8 flaky pytest')
