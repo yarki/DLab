@@ -19,7 +19,7 @@ limitations under the License.
 import { Component, ViewEncapsulation, OnInit } from '@angular/core';
 import { ApplicationSecurityService } from '../../services/applicationSecurity.service';
 import { AppRoutingService } from '../../routing/appRouting.service';
-import { UserResourceService } from '../../services/userResource.service';
+import { HealthStatusService } from '../../services/healthStatus.service';
 
 @Component({
   moduleId: module.id,
@@ -36,7 +36,7 @@ export class NavbarComponent implements OnInit {
   constructor(
     private applicationSecurityService: ApplicationSecurityService,
     private appRoutingService: AppRoutingService,
-    private userResourceService: UserResourceService
+    private hserResourceService: HealthStatusService
   ) { }
 
   ngOnInit() {
@@ -57,9 +57,8 @@ export class NavbarComponent implements OnInit {
   }
 
   getEnvironmentHealthStatus() {
-    this.userResourceService.getEnvironmentHealthStatus()
+    this.hserResourceService.getEnvironmentHealthStatus()
       .subscribe(
-        (result) => this.healthStatus = result.status,
-        (error) => {});
+        (result) => this.healthStatus = result.status);
   }
 }

@@ -17,7 +17,7 @@ limitations under the License.
 ****************************************************************************/
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { UserResourceService } from '../../../services/userResource.service';
+import { HealthStatusService } from '../../../services/healthStatus.service';
 import { EnvironmentStatusModel } from './environment-status.model';
 import { ConfirmationDialogType } from '../../../components/confirmation-dialog/confirmation-dialog-type.enum';
 
@@ -34,7 +34,7 @@ export class HealthStatusGridComponent {
    @ViewChild('confirmationDialog') confirmationDialog;
 
     constructor(
-      private userResourceService: UserResourceService
+      private healthStatusService: HealthStatusService
     ) { }
 
     ngOnInit(): void {
@@ -42,10 +42,8 @@ export class HealthStatusGridComponent {
     }
 
     buildGrid(): void {
-      this.userResourceService.getEnvironmentStatuses()
-        .subscribe(
-          (result) => { this.environmentsHealthStatuses = this.loadHealthStatusList(result); },
-          (error) => {});
+      this.healthStatusService.getEnvironmentStatuses()
+        .subscribe((result) => { this.environmentsHealthStatuses = this.loadHealthStatusList(result); });
     }
 
     loadHealthStatusList(healthStatusList): Array<EnvironmentStatusModel> {
@@ -60,13 +58,13 @@ export class HealthStatusGridComponent {
 
     healthStatusAction(data, action: string) {
       if (action === 'run') {
-        this.userResourceService
+        this.healthStatusService
           .runEdgeNode()
           .subscribe(() => this.buildGrid());
       } else if (action === 'stop') {
         this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.StopEdgeNode);
       } else if (action === 'recreate') {
-        this.userResourceService
+        this.healthStatusService
           .recreateEdgeNode()
           .subscribe(() => this.buildGrid());
       }
