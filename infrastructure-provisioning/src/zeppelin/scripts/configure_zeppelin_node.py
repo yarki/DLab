@@ -41,11 +41,11 @@ parser.add_argument('--hadoop_version', type=str, default='')
 parser.add_argument('--zeppelin_version', type=str, default='')
 parser.add_argument('--edge_hostname', type=str, default='')
 parser.add_argument('--proxy_port', type=str, default='')
+parser.add_argument('--scala_version', type=str, default='')
 args = parser.parse_args()
 
 spark_version = args.spark_version
 hadoop_version = args.hadoop_version
-scala_version = '2.11.8'
 scala_link = "http://www.scala-lang.org/files/archive/"
 zeppelin_version = args.zeppelin_version
 zeppelin_link = "http://archive.apache.org/dist/zeppelin/zeppelin-" + zeppelin_version + "/zeppelin-" + \
@@ -173,7 +173,7 @@ if __name__ == "__main__":
     ensure_local_jars(args.os_user, s3_jars_dir, files_dir, args.region, templates_dir)
 
     print "Installing scala"
-    ensure_scala(scala_link, scala_version, args.os_user)
+    ensure_scala(scala_link, args.scala_version, args.os_user)
 
     print "Installing R"
     ensure_r(args.os_user)

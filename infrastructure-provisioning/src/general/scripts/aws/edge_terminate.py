@@ -54,12 +54,6 @@ def terminate_edge_node(tag_name, user_name, tag_value, nb_sg, edge_sg, allocati
     except:
         sys.exit(1)
 
-    print "Removing Elastic IP"
-    try:
-        release_elastic_ip(allocation_id)
-    except:
-        sys.exit(1)
-
     print "Removing s3 bucket"
     try:
         remove_s3('edge', user_name)
