@@ -36,7 +36,7 @@ export class NavbarComponent implements OnInit {
   constructor(
     private applicationSecurityService: ApplicationSecurityService,
     private appRoutingService: AppRoutingService,
-    private hserResourceService: HealthStatusService
+    private healthStatusService: HealthStatusService
   ) { }
 
   ngOnInit() {
@@ -56,8 +56,8 @@ export class NavbarComponent implements OnInit {
       () => this.appRoutingService.redirectToLoginPage());
   }
 
-  getEnvironmentHealthStatus() {
-    this.hserResourceService.getEnvironmentHealthStatus()
+  getEnvironmentHealthStatus(): void {
+    this.healthStatusService.getEnvironmentHealthStatus()
       .subscribe(
         (result) => this.healthStatus = result.status);
   }
