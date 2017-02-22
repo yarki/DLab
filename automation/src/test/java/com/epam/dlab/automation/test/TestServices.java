@@ -70,7 +70,7 @@ public class TestServices {
     }
 
 
-    @Test(priority = 1)
+    @Test(priority = 1, dependsOnMethods = "runJenkins")
     public void runSsnLogin() throws Exception {
         LOGGER.info("Test Started");
         testLoginSsnService();
@@ -78,7 +78,7 @@ public class TestServices {
     }
 
 
-    @Test(priority = 2)
+    @Test(priority = 2, dependsOnMethods = "runSsnLogin")
     public void runDLabScenario() throws Exception {
         LOGGER.info("Test Started");
         testDLabScenario();
@@ -112,7 +112,7 @@ public class TestServices {
     	
     	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
 
-        LOGGER.info("Check status of SSN node on AmazonHelper:");
+        LOGGER.info("Check status of SSN node on AmazonHelper: %s", serviceBaseName);
         Instance ssnInstance = AmazonHelper.getInstance(serviceBaseName + "-ssn");
         InstanceState instanceState = ssnInstance.getState();
         publicIp = ssnInstance.getPublicIpAddress();
@@ -223,20 +223,12 @@ public class TestServices {
         final String ssnProUserResURL = getSnnURL(ApiPath.PROVISIONED_RES);
         LOGGER.info("   SSN provisioned user resources URL is {}", ssnProUserResURL);
 
-        //todo: read from file
-        //TODO: hardcoded names, shapes, versions, etc.
-        CreateNotebookDto createNoteBookRequest = //new CreateNotebookDto();
+        CreateNotebookDto createNoteBookRequest =
                 NodeReader.readNode(
                 Paths.get( PropertiesResolver.getClusterConfFileLocation(), "notebook1.json").toString(),
                 CreateNotebookDto.class);
-//        createNoteBookRequest.setImage("docker.epmc-bdcc.projects.epam.com/dlab-aws-jupyter");
-//        createNoteBookRequest.setImage("docker.dlab-jupyter");
-        //docker.dlab-jupyter
-//        docker.dlab-
-//        createNoteBookRequest.setTemplateName("Jupyter 1.5");
         createNoteBookRequest.setName(noteBookName);
-//        createNoteBookRequest.setShape("r3.xlarge");
-//        createNoteBookRequest.setVersion("jupyter-1.6");
+
         Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
                                                                       createNoteBookRequest, token);
         LOGGER.info("   responseCreateNotebook.getBody() is {}", responseCreateNotebook.getBody().asString());
@@ -266,12 +258,7 @@ public class TestServices {
                 NodeReader.readNode(
                 Paths.get(PropertiesResolver.getClusterConfFileLocation(), "EMR.json").toString(),
                 DeployEMRDto.class);
-//                new DeployEMRDto();
-//        final String emrVersion="emr-5.2.0";
-//        deployEMR.setEmr_instance_count("2"); // TODO: Set to 3
-//        deployEMR.setEmr_master_instance_type("m4.large");
-//        deployEMR.setEmr_slave_instance_type("m4.large");
-//        deployEMR.setEmr_version(emrVersion);
+
         deployEMR.setName(emrName);
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
@@ -354,12 +341,8 @@ public class TestServices {
 
         
         LOGGER.info("10. New EMR will be deployed for termination ...");
-        //todo: read from file
-        final String emrNewName = "New" + emrName; 
-//        deployEMR.setEmr_instance_count("2");
-//        deployEMR.setEmr_master_instance_type("m4.large");
-//        deployEMR.setEmr_slave_instance_type("m4.large");
-//        deployEMR.setEmr_version(emrVersion);
+
+        final String emrNewName = "New" + emrName;
         deployEMR.setName(emrNewName);
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMRNew = new HttpRequest().webApiPut(ssnCompResURL,
@@ -406,10 +389,6 @@ public class TestServices {
         
         LOGGER.info("    SSN terminate EMR URL is {}", ssnTerminateEMRURL);
 		LOGGER.info("    New EMR will be deployed ...");
-//        deployEMR.setEmr_instance_count("2");
-//        deployEMR.setEmr_master_instance_type("m4.large");
-//        deployEMR.setEmr_slave_instance_type("m4.large");
-//        deployEMR.setEmr_version(emrVersion);
         deployEMR.setName(emrNewName2);
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMRAnotherNew = new HttpRequest().webApiPut(ssnCompResURL,
@@ -475,61 +454,7 @@ public class TestServices {
         throw new Exception("Could not detect cluster name for EMR " + emrName);
     }
 
-//    private void copyFileToSSN(String filename, String ip) throws IOException, InterruptedException {
-//        String sourceDir = PropertiesResolver.getPythonFilesLocation();
-//
-//        LOGGER.info("Copying {}...", filename);
-//        String command = String.format(ScpCommands.copyToSSNCommand,
-//        		ConfigPropertyValue.getAccessKeyPrivFileName(),
-//                Paths.get(sourceDir, filename).toString(),
-//                ip);
-//        AckStatus status = HelperMethods.executeCommand(command);
-//        LOGGER.info("Copied {}: {}", filename, status.toString());
-//        Assert.assertTrue(status.isOk());
-//    }
-
-
-//    private void copyFileToSSN2(Session session, String filename, String ssnIp) throws IOException, InterruptedException, JSchException {
-//        String sourceDir = PropertiesResolver.getPythonFilesLocation();
-//
-//        LOGGER.info("Copying {}...", filename);
-//        Assert.assertTrue(new File(Paths.get(sourceDir, filename).toString()).exists());
-//        String command = String.format(ScpCommands.copyToSSNCommand,
-//                ConfigPropertyValue.getAccessKeyPrivFileName(),
-//                Paths.get(sourceDir, filename).toString(),
-//                ssnIp);
-////        AckStatus status = HelperMethods.executeCommand(command);
-//        LOGGER.info("  Run command: {}", command);
-//        ChannelExec copyResult = SSHConnect.setCommand(session, command);
-//        AckStatus status = SSHConnect.checkAck(copyResult);
-//        LOGGER.info("Copied {}: {}", Paths.get(sourceDir, filename).toString(), status.toString());
-//        Assert.assertTrue(status.isOk());
-//    }
-
-//    private void copyFileToSSN3(Session session, String filename, String ssnIp) throws IOException, InterruptedException, JSchException {
-//        String sourceDir = PropertiesResolver.getPythonFilesLocation();
-//
-//        LOGGER.info("Copying {}...", filename);
-//        File file = new File(Paths.get(sourceDir, filename).toString());
-//        Assert.assertTrue(file.exists());
-//
-//        session.connect();
-//        Channel channel = session.openChannel("sftp");
-//        channel.connect();
-//        ChannelSftp c =(ChannelSftp)channel;
-//        FileInputStream src = new FileInputStream(file);
-//
-//        try {
-//
-//            c.put(src, String.format("/home/%s/%s", ConfigPropertyValue.CLUSTER_OS_USERNAME, filename));
-//
-//        } catch (SftpException e) {
-//            LOGGER.error(e);
-//            Assert.assertFalse(true);
-//        }
-//    }
-
-    private void copyFileToSSN33(ChannelSftp channel, String filename) throws IOException, InterruptedException, JSchException {
+    private void copyFileToSSN(ChannelSftp channel, String filename) throws IOException, InterruptedException, JSchException {
         String sourceDir = PropertiesResolver.getPythonFilesLocation();
 
         LOGGER.info("Copying {}...", filename);
@@ -566,51 +491,6 @@ public class TestServices {
         Assert.assertTrue(status.isOk());
     }
 
-//    private void copyFileToNotebook2(Session session, String filename, String notebookIp) throws JSchException, IOException, InterruptedException {
-//
-//        String sourceDir = PropertiesResolver.getPythonFilesLocation();
-//        LOGGER.info("Copying {}...", filename);
-//        File file = new File(Paths.get(sourceDir, filename).toString());
-//        Assert.assertTrue(file.exists());
-//
-//        session.connect();
-//        Channel channel = session.openChannel("sftp");
-//        channel.connect();
-//        ChannelSftp c = (ChannelSftp) channel;
-//        FileInputStream src = new FileInputStream(filename);
-//
-//        try {
-//
-//            c.put(src, String.format("/tmp/%s", ConfigPropertyValue.CLUSTER_OS_USERNAME, filename));
-//
-//        } catch (SftpException e) {
-//            LOGGER.error(e);
-//            Assert.assertFalse(true);
-//        }
-//
-//    }
-//    private void copyFileToNotebook22(ChannelSftp channelSftp, String filename) throws JSchException, IOException, InterruptedException {
-//
-//        String sourceDir = PropertiesResolver.getPythonFilesLocation();
-//        LOGGER.info("Copying {}...", filename);
-//        File file = new File(Paths.get(sourceDir, filename).toString());
-//        Assert.assertTrue(file.exists());
-//
-//        FileInputStream src = new FileInputStream(filename);
-//
-//        try {
-//
-//            channelSftp.put(src, String.format("/tmp/%s", ConfigPropertyValue.CLUSTER_OS_USERNAME, filename));
-//
-//        } catch (SftpException e) {
-//            LOGGER.error(e);
-//            Assert.assertFalse(true);
-//        }
-//    }
-
-
-    //TODO: think how to run locally through the putty
-    // copy this files into project and copy from project to self service.
     private void testPython(String ssnIP, String noteBookIp, String emrName, String cluster_name)
             throws JSchException, IOException, InterruptedException {
 
@@ -626,7 +506,7 @@ public class TestServices {
             channelSftp = SSHConnect.getChannelSftp(ssnSession);
 
             for (String filename : files) {
-                copyFileToSSN33(channelSftp, filename);
+                copyFileToSSN(channelSftp, filename);
             }
         } finally {
             if(channelSftp != null && !channelSftp.isConnected()) {
@@ -637,11 +517,8 @@ public class TestServices {
         LOGGER.info("Copying files to Notebook {}...", noteBookIp);
         String command;
         AckStatus status;
-//        Session noteBookSession = null;
-//        ChannelSftp noteBookChannelSftp = null;
+
         try {
-//             noteBookSession = SSHConnect.getSession(ConfigPropertyValue.CLUSTER_OS_USERNAME, noteBookIp, 22);
-//             noteBookChannelSftp = SSHConnect.getChannelSftp(noteBookSession);
 
             for (String filename : files) {
             	copyFileToNotebook(ssnSession, filename, noteBookIp);
