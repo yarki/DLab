@@ -32,13 +32,9 @@ limitations under the License.
         <span data-toggle="dropdown" class="actions"></span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">
-            <!--*ngIf="env.status.toLowerCase() == 'running'" -->
-            <!--*ngIf="env.status.toLowerCase() == 'stopped'"-->
-            <!-- *ngIf="env.status.toLowerCase() == 'terminated'"-->
-            <li (click)="healthStatusAction(env, 'stop')">Stop</li>
-            <li (click)="healthStatusAction(env, 'run')">Start</li>
-            <li (click)="healthStatusAction(env, 'recreate')">Recreate</li>
-            <!--<li *ngIf="env.status.toLowerCase() == 'running'">Terminate</li>-->
+            <li (click)="healthStatusAction(env, 'stop')" *ngIf="env.status.toLowerCase() == 'running'">Stop</li>
+            <li (click)="healthStatusAction(env, 'run')" *ngIf="env.status.toLowerCase() == 'stopped'">Start</li>
+            <li (click)="healthStatusAction(env, 'recreate')" *ngIf="env.status.toLowerCase() == 'terminated'">Recreate</li>
           </ul>
         </div>
       </div>
