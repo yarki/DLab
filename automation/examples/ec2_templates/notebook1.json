@@ -1,0 +1,7 @@
+{
+  "image" : "docker.dlab-jupyter",
+  "name" : "set the name",
+  "shape" : "r3.xlarge",
+  "version" : "jupyter-1.6",
+  "template_name" : "Jupyter 1.5"
+}
