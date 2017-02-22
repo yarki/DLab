@@ -112,7 +112,7 @@ public class TestServices {
     	
     	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
 
-        LOGGER.info("Check status of SSN node on AmazonHelper: %s", serviceBaseName);
+        LOGGER.info("Check status of SSN node on AmazonHelper: {}", serviceBaseName);
         Instance ssnInstance = AmazonHelper.getInstance(serviceBaseName + "-ssn");
         InstanceState instanceState = ssnInstance.getState();
         publicIp = ssnInstance.getPublicIpAddress();
