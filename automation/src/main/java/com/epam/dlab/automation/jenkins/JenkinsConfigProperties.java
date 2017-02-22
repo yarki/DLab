@@ -4,15 +4,15 @@ package com.epam.dlab.automation.jenkins;
 public class JenkinsConfigProperties {
 
     static final long JENKINS_REQUEST_TIMEOUT = 5000;
+
     static String AUTHORIZATION = "Authorization";
-    static String AUTHORIZATION_KEY ="Basic YWRtaW46Vmxlc3VSYWRpbGFzRWxrYQ==";
+    static String AUTHORIZATION_KEY ="Basic %s";//the replacement is decoded to base64 user:password
 
 
     static String SUCCESS_STATUS = "true";
-    //TODO: jenkins job name is hardcoded
-    static String JENKINS_JOB_NAME_SEARCH = "/Auto_tests/search/";
+    static String JENKINS_JOB_NAME_SEARCH = "/";
 
-    //TODO: separate access and secret keys from this url and other configurable parameters
+    //TODO: introduce configurable value for cloud provider
     static String JENKINS_JOB_START_BODY = "\"name=Access_Key_ID&value=%s" +
             "&name=Secret_Access_Key&value=%s" +
             "&name=Infrastructure_Tag&value=%s" +

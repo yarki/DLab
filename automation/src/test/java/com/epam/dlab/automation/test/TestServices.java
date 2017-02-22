@@ -71,9 +71,9 @@ public class TestServices {
 
 
     @Test(priority = 1)
-    public void runLogin() throws Exception {
+    public void runSsnLogin() throws Exception {
         LOGGER.info("Test Started");
-        testLogin();
+        testLoginSsnService();
         LOGGER.info("Test Finished");
     }
 
@@ -106,6 +106,12 @@ public class TestServices {
         LOGGER.info("JenkinsURL is: " + ssnURL);
         LOGGER.info("ServiceBaseName is: " + serviceBaseName);
 
+    }
+    
+    private void testLoginSsnService() throws Exception {
+    	
+    	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
+
         LOGGER.info("Check status of SSN node on AmazonHelper:");
         Instance ssnInstance = AmazonHelper.getInstance(serviceBaseName + "-ssn");
         InstanceState instanceState = ssnInstance.getState();
@@ -114,13 +120,8 @@ public class TestServices {
         privateIp = ssnInstance.getPrivateIpAddress();
         LOGGER.info("Private Ip is: {}", privateIp);
         Assert.assertEquals(instanceState.getName(), AmazonInstanceState.RUNNING.value(),
-                            "AmazonHelper instance state is not running");
+                "AmazonHelper instance state is not running");
         LOGGER.info("AmazonHelper instance state is running");
-    }
-    
-    private void testLogin() throws Exception {
-    	
-    	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
         
         LOGGER.info("2. Waiting for SSN service ...");
         Assert.assertEquals(waitForSSNService(ConfigPropertyValue.getTimeoutNotebookCreate()), true, "SSN service was not started");
@@ -212,7 +213,6 @@ public class TestServices {
             Assert.assertEquals(200, respCheckKey.getStatusCode(), "Failed to check User Key.");
         }
 
-//        Docker.checkDockerStatus(nodePrefix + "_create_edge_", publicIp);
         Docker.checkDockerStatus(nodePrefix + "_create_edge_", privateIp);
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-edge", AmazonInstanceState.RUNNING.value());
 
@@ -544,7 +544,7 @@ public class TestServices {
 
         } catch (SftpException e) {
             LOGGER.error(e);
-            Assert.assertFalse(true);
+            Assert.assertTrue(false);
         }
     }
     
@@ -614,7 +614,7 @@ public class TestServices {
     private void testPython(String ssnIP, String noteBookIp, String emrName, String cluster_name)
             throws JSchException, IOException, InterruptedException {
 
-    	String [] files = ConfigPropertyValue.get(ConfigPropertyValue.PYTHON_TEST_FILES).split(",");
+    	String [] files = ConfigPropertyValue.get(ConfigPropertyValue.JUPYTER_SCENARIO_FILES).split(",");
         // it is assumed there should be 1 python file.
         String pyFileName = Arrays.stream(files).filter(file -> file.endsWith(".py")).findFirst().get();
 

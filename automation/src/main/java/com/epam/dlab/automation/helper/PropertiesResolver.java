@@ -18,8 +18,8 @@ public class PropertiesResolver {
     //keys from application.properties(dev-application.properties)
     private static String CONF_FILE_LOCATION_PROPERTY = "conf.file.location";
     private static String KEYS_DIRECTORY_LOCATION_PROPERTY = "keys.directory.location";
-    private static String PYTHON_FILES_LOCATION_PROPERTY = "python.files.location";
-    private static String CLUSTER_CONFIG_FILE_LOCATION_PROPERTY = "cluster.config.file.location";
+    private static String PYTHON_FILES_LOCATION_PROPERTY = "scenario.jupyter.files.location";
+    private static String CLUSTER_CONFIG_FILE_LOCATION_PROPERTY = "ec2.config.files.location";
 
     private static Properties properties = new Properties();
 

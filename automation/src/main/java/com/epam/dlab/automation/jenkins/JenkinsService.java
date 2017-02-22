@@ -8,6 +8,7 @@ import com.jayway.restassured.authentication.FormAuthConfig;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
@@ -49,11 +50,6 @@ public class JenkinsService {
     
     private String getQueueStatus() {
     	return getWhen(ContentType.XML)
-//                given()
-//                .header(JenkinsConfigProperties.AUTHORIZATION, JenkinsConfigProperties.AUTHORIZATION_KEY)
-//    			.auth().form(ConfigPropertyValue.getJenkinsUsername(), ConfigPropertyValue.getJenkinsPassword(), config)
-//                .contentType(ContentType.XML)
-//                .when()
                 .get(JenkinsUrls.API).getBody()
                 .xmlPath()
                 .getString(JenkinsResponseElements.IN_QUEUE_ELEMENT);
@@ -89,21 +85,6 @@ public class JenkinsService {
                         ConfigPropertyValue.CLUSTER_OS_USERNAME, ConfigPropertyValue.CLUSTER_OS_FAMILY,
                         awsAccessKeyId, awsSecretAccessKey, dateAsString,
                         ConfigPropertyValue.CLUSTER_OS_USERNAME, ConfigPropertyValue.CLUSTER_OS_FAMILY))
-//                        "name=Access_Key_ID&value=" + awsAccessKeyId +
-//                        "&name=Secret_Access_Key&value=" + awsSecretAccessKey +
-//                        "&name=Infrastructure_Tag&value=" + dateAsString +
-//                        "name=OS_user&value="+"ubuntu" +
-//                        "&name=Cloud_provider&value=aws&name=OS_family&value=" + "debian" +
-//                        "&name=Action&value=create" +
-//                        "&json=%7B%22parameter"+
-//                        "%22%3A+%5B%7B%22name%22%3A+%22Access_Key_ID%22%2C+%22value%22%3A+%22" + awsAccessKeyId +
-//                        "%22%7D%2C+%7B%22name%22%3A+%22Secret_Access_Key%22%2C+%22value%22%3A+%22"+ awsSecretAccessKey +
-//                        "%22%7D%2C+%7B%22name%22%3A+%22Infrastructure_Tag%22%2C+%22value%22%3A+%22" + dateAsString +
-//                        "%22%7D%2C+%7B%22name%22%3A+%22OS_user%22%2C+%22value%22%3A+%22"+"ubuntu" +
-//                        "%22%7D%2C+%7B%22name%22%3A+%22Cloud_provider%22%2C+%22value%22%3A+%22aws" +
-//                        "%22%7D%2C+%7B%22name%22%3A+%22OS_family%22%2C+%22value%22%3A+%22"+"debian" +
-//                        "%22%7D%2C+%7B%22name%22%3A+%22Action%22%2C+%22value%22%3A+%22create" +
-//                        "%22%7D%5D%7D&Submit=Build")
         		.post(jenkinsJobURL + "build");
         Assert.assertEquals(responsePostJob.statusCode(), HttpStatusCode.OK);
         
@@ -192,9 +173,15 @@ public class JenkinsService {
 
     private RequestSpecification getWhen(ContentType contentType) {
         return given()
-                .header(JenkinsConfigProperties.AUTHORIZATION, JenkinsConfigProperties.AUTHORIZATION_KEY)
+                .header(JenkinsConfigProperties.AUTHORIZATION,
+                        String.format(JenkinsConfigProperties.AUTHORIZATION_KEY, base64CredentialDecode(ConfigPropertyValue.get(ConfigPropertyValue.JENKINS_USERNAME), ConfigPropertyValue.get(ConfigPropertyValue.JENKINS_PASSWORD))))
         		.auth()
                 .form(ConfigPropertyValue.getJenkinsUsername(), ConfigPropertyValue.getJenkinsPassword(), config)
         		.contentType(contentType).when();
+    }
+
+    private static String base64CredentialDecode(String user, String password) {
+        byte[] bytesEncoded = Base64.encodeBase64(String.format("%s:%s", user, password).getBytes());
+        return new String(bytesEncoded);
     }
 }

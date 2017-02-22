@@ -12,13 +12,11 @@ import java.util.Properties;
 public class ConfigPropertyValue {
 
     private final static Logger LOGGER = LogManager.getLogger(ConfigPropertyValue.class);
-
-//	private static final boolean DEV_MODE;
-	public static final String CONFIG_FILE_NAME;
+    public static final String CONFIG_FILE_NAME;
 
 
-	private static final String JENKINS_USERNAME="JENKINS_USERNAME";
-	private static final String JENKINS_PASSWORD="JENKINS_PASSWORD";
+    public static final String JENKINS_USERNAME="JENKINS_USERNAME";
+    public static final String JENKINS_PASSWORD="JENKINS_PASSWORD";
 	private static final String USERNAME="USERNAME";
 	private static final String PASSWORD="PASSWORD";
 	private static final String NOT_IAM_USERNAME="NOT_IAM_USERNAME";
@@ -46,7 +44,7 @@ public class ConfigPropertyValue {
 	public static final String TIMEOUT_EMR_CREATE="TIMEOUT_EMR_CREATE";
 	public static final String TIMEOUT_EMR_TERMINATE="TIMEOUT_EMR_TERMINATE";
 
-    public static final String PYTHON_TEST_FILES="PYTHON_TEST_FILES";
+    public static final String JUPYTER_SCENARIO_FILES ="JUPYTER_SCENARIO_FILES";
 
     public static String jenkinsBuildNumber;
     public static String CLUSTER_OS_USERNAME;
@@ -55,9 +53,9 @@ public class ConfigPropertyValue {
 
     private static final Properties props = new Properties();
 
-    public static final String CLUSTER_USER = "cluster.user";
+    public static final String CLUSTER_USER = "cluster.username";
 
-    public static final String CLUSTER_OS = "cluster.os";
+    public static final String CLUSTER_OS = "cluster.os.family";
 
     static {
         CONFIG_FILE_NAME = PropertiesResolver.getConfFileLocation();
@@ -68,12 +66,12 @@ public class ConfigPropertyValue {
         }
         CLUSTER_OS_USERNAME  = System.getProperty(CLUSTER_USER, "");
         if(StringUtils.isEmpty(CLUSTER_OS_USERNAME)) {
-            LOGGER.error(new Exception("Missed required parameter 'cluster.user'"));
+            LOGGER.error(new Exception("Missed required parameter " + CLUSTER_USER));
             System.exit(0);
         }
         CLUSTER_OS_FAMILY  = System.getProperty(CLUSTER_OS, "");
         if(StringUtils.isEmpty(CLUSTER_OS_FAMILY)) {
-            LOGGER.error(new Exception("Missed required parameter 'cluster.os'"));
+            LOGGER.error(new Exception("Missed required parameter " + CLUSTER_OS));
             System.exit(0);
         }
     	loadProperties();
@@ -116,7 +114,7 @@ public class ConfigPropertyValue {
                 props.setProperty(CLUSTER_USER, System.getProperty(CLUSTER_USER));
             }
             if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_OS))) {
-                props.setProperty(CLUSTER_USER, System.getProperty(CLUSTER_OS));
+                props.setProperty(CLUSTER_OS, System.getProperty(CLUSTER_OS));
             }
             if (StringUtils.isNotEmpty(System.getProperty(AWS_REGION))) {
                 props.setProperty(AWS_REGION, System.getProperty(AWS_REGION));
@@ -151,7 +149,7 @@ public class ConfigPropertyValue {
         printProperty(TIMEOUT_EMR_CREATE);
         printProperty(TIMEOUT_EMR_TERMINATE);
 
-        printProperty(PYTHON_TEST_FILES);
+        printProperty(JUPYTER_SCENARIO_FILES);
         printProperty(CLUSTER_USER);
         printProperty(CLUSTER_OS);
     }

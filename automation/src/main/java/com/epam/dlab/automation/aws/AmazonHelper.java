@@ -39,7 +39,7 @@ public class AmazonHelper {
             AmazonEC2 ec2 = new AmazonEC2Client(credentials);
             ec2.setRegion(getRegion());
      
-            List<String> valuesT1 = new ArrayList<String>();
+            List<String> valuesT1 = new ArrayList<>();
             valuesT1.add(instanceName + "*");
             Filter filter = new Filter("tag:Name", valuesT1);
             
@@ -71,7 +71,6 @@ public class AmazonHelper {
     	long timeout = CHECK_TIMEOUT.toMillis();
         long expiredTime = System.currentTimeMillis() + timeout;
 
-        // TODO: Add timeout
         while ((instanceState = AmazonHelper.getInstance(instanceName)
             	.getState()
             	.getName()).equals("shutting-down")) {
