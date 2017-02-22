@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.core.commands;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,6 +30,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.utils.ServiceUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -301,7 +303,7 @@ public class CommandParserMock {
         resourceType = envMap.get("conf_resource");
         imageType = getImageName(args);
         imageType = imageType.replace("docker.dlab-", "").replace(":latest", "");
-        responsePath = varMap.get("/response");
+        responsePath = Paths.get(ServiceUtils.getUserDir(), "response").toAbsolutePath().toString();
         
     	variables.putAll(envMap);
     	variables.putAll(getJsonVariables(json));

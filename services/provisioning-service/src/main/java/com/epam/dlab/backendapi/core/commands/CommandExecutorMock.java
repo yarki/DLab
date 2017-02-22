@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,14 @@ public class CommandExecutorMock implements ICommandExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutorMock.class);
 
     private CommandExecutorMockAsync execAsync = null;
+
+	private CompletableFuture<Boolean> future;
     
-    /** Return result of execution. */
-    public boolean getResultSync() {
-    	return (execAsync == null ? true : execAsync.get());
+    /** Return result of execution. 
+     * @throws ExecutionException 
+     * @throws InterruptedException */
+    public boolean getResultSync() throws InterruptedException, ExecutionException {
+    	return (future == null ? true : future.get());
     }
     
     /** Return variables for substitution into Json response file. */
@@ -65,7 +70,7 @@ public class CommandExecutorMock implements ICommandExecutor {
     @Override
     public void executeAsync(String user, String uuid, String command) {
     	execAsync = new CommandExecutorMockAsync(user, uuid, command);
-    	CompletableFuture.supplyAsync(execAsync);
+    	future = CompletableFuture.supplyAsync(execAsync);
     }
     
 }

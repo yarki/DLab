@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,16 +36,14 @@ public class CommandExecutorMockTest {
     	return new CommandExecutorMock();
     }
     
-    private CommandExecutorMock executeAsync(String cmd) {
+    private CommandExecutorMock executeAsync(String cmd) throws IOException, InterruptedException, ExecutionException {
     	String uuid = UUID.randomUUID().toString();
     	CommandExecutorMock exec = new CommandExecutorMock();
     	exec.executeAsync("user", uuid, cmd);
     	exec.getResultSync();
-    	try {
-			Files.deleteIfExists(Paths.get(exec.getResponseFileName()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    	
+    	Files.deleteIfExists(Paths.get(exec.getResponseFileName()));
+
     	return exec;
     }
     
@@ -79,7 +78,7 @@ public class CommandExecutorMockTest {
     }
     
     @Test
-    public void describe() {
+    public void describe() throws IOException, InterruptedException, ExecutionException {
     	String cmd =
     		"docker run " +
     		"-v /home/ubuntu/keys:/root/keys " +
@@ -92,7 +91,7 @@ public class CommandExecutorMockTest {
     }
     
     @Test
-    public void edgeCreate() {
+    public void edgeCreate() throws IOException, InterruptedException, ExecutionException {
     	String cmd =
     		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"user@epam.com\",\"edge_user_name\":\"user\"," +
     		"\"conf_service_base_name\":\"usein1120v13\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"," +
@@ -109,7 +108,7 @@ public class CommandExecutorMockTest {
     }
     
     @Test
-    public void edgeStop() {
+    public void edgeStop() throws IOException, InterruptedException, ExecutionException {
     	String cmd =
     	    "echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"user@epam.com\",\"edge_user_name\":\"user\"," +
     	    "\"conf_service_base_name\":\"usein1122v4\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"}' | " +
@@ -125,7 +124,7 @@ public class CommandExecutorMockTest {
     }
     
     @Test
-    public void edgeStart() {
+    public void edgeStart() throws IOException, InterruptedException, ExecutionException {
     	String cmd =
     		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"user@epam.com\",\"edge_user_name\":\"user\"," +
     	    "\"conf_service_base_name\":\"usein1122v4\",\"conf_os_user\":\"ubuntu\",\"conf_os_family\":\"debian\"}' | " +
@@ -141,7 +140,7 @@ public class CommandExecutorMockTest {
     }
     
     @Test
-    public void edgeStatus() {
+    public void edgeStatus() throws IOException, InterruptedException, ExecutionException {
     	String cmd =
     		"echo -e '{\"aws_region\":\"us-west-2\",\"aws_iam_user\":\"user@epam.com\",\"edge_user_name\":\"user\"," +
     		"\"edge_list_resources\":{\"host\":[{\"id\":\"i-05c1a0d0ad030cdc1\"}, {\"id\":\"i-05c1a0d0ad030cdc2\"}]}}' | " +

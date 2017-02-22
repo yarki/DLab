@@ -66,7 +66,7 @@ public class CommandExecutorMockAsync implements Supplier<Boolean> {
     
 	@Override
 	public Boolean get() {
-		executeAsync(user, uuid, command);
+		run();
 		return true;
 	}
 
@@ -86,7 +86,7 @@ public class CommandExecutorMockAsync implements Supplier<Boolean> {
     	return responseFileName;
     }
 
-    public void executeAsync(String user, String uuid, String command) {
+    public void run() {
     	LOGGER.debug("Run OS command for user {} with UUID {}: {}", user, uuid, command);
 
         responseFileName = null;
@@ -128,7 +128,7 @@ public class CommandExecutorMockAsync implements Supplier<Boolean> {
      * @param first part of path.
      * @param more next path components.
      */
-    public static String getAbsolutePath(String first, String ... more) {
+    private static String getAbsolutePath(String first, String ... more) {
     	return Paths.get(first, more).toAbsolutePath().toString();
     }
 
@@ -138,7 +138,7 @@ public class CommandExecutorMockAsync implements Supplier<Boolean> {
      * @param imageType name of docker image.
      * @param responsePath path for response file.
      */
-    public void describe() {
+    private void describe() {
     	String templateFileName = getAbsolutePath(
     			ServiceUtils.getUserDir(),
     			"../../infrastructure-provisioning/src",
@@ -163,7 +163,7 @@ public class CommandExecutorMockAsync implements Supplier<Boolean> {
      * @param uuid UUID for response.
      * @param responsePath the path to store response file.
      */
-    public void action(String user, DockerAction action) {
+    private void action(String user, DockerAction action) {
     	String resourceType = parser.getResourceType();
 		String prefixFileName = (resourceType.equals("edge") || resourceType.equals("emr") ?
     			resourceType : "notebook") + "_";
@@ -224,7 +224,9 @@ public class CommandExecutorMockAsync implements Supplier<Boolean> {
     		content = content.replace("${" + key.toUpperCase() + "}", value);
     	}
     	
-    	try (BufferedWriter out = new BufferedWriter(new FileWriter(targetFileName))) {
+    	File fileResponse = new File(responseFileName);
+    	try (BufferedWriter out = new BufferedWriter(new FileWriter(fileResponse))) {
+        	Files.createParentDirs(fileResponse);
     	    out.write(content);  
     	} catch (IOException e) {
 			throw new DlabException("Can't write response file " + targetFileName + ": " + e.getLocalizedMessage(), e);
