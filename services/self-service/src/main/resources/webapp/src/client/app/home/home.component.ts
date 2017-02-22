@@ -20,6 +20,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { UserAccessKeyService } from '../services/userAccessKey.service';
 import { UserResourceService } from '../services/userResource.service';
 import { ResourcesGrid } from '../components/resources-grid/resources-grid.component';
+import { NavbarComponent } from '../shared/navbar/navbar.component';
 import { ExploratoryEnvironmentVersionModel } from '../models/exploratoryEnvironmentVersion.model';
 import { ComputationalResourceImage } from '../models/computationalResourceImage.model';
 
@@ -43,6 +44,7 @@ export class HomeComponent implements OnInit {
   @ViewChild('preloaderModal') preloaderModal;
   @ViewChild('createAnalyticalModal') createAnalyticalModal;
   @ViewChild(ResourcesGrid) resourcesGrid: ResourcesGrid;
+  @ViewChild(NavbarComponent) navbarComponent: NavbarComponent;
 
   private readonly CHECK_ACCESS_KEY_TIMEOUT : number = 20000;
 
@@ -66,6 +68,7 @@ export class HomeComponent implements OnInit {
 
   public refreshGrid(): void {
     this.resourcesGrid.buildGrid();
+    this.navbarComponent.getEnvironmentHealthStatus();
   }
 
   public toggleFiltering(): void {
