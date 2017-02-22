@@ -116,9 +116,9 @@ public class TestServices {
         Instance ssnInstance = AmazonHelper.getInstance(serviceBaseName + "-ssn");
         InstanceState instanceState = ssnInstance.getState();
         publicIp = ssnInstance.getPublicIpAddress();
-        LOGGER.info("Public Ip is: {}", publicIp);
+        LOGGER.info("Public IP is: {}", publicIp);
         privateIp = ssnInstance.getPrivateIpAddress();
-        LOGGER.info("Private Ip is: {}", privateIp);
+        LOGGER.info("Private IP is: {}", privateIp);
         Assert.assertEquals(instanceState.getName(), AmazonInstanceState.RUNNING.value(),
                 "AmazonHelper instance state is not running");
         LOGGER.info("AmazonHelper instance state is running");
@@ -213,7 +213,8 @@ public class TestServices {
             Assert.assertEquals(200, respCheckKey.getStatusCode(), "Failed to check User Key.");
         }
 
-        Docker.checkDockerStatus(nodePrefix + "_create_edge_", privateIp);
+        Docker.checkDockerStatus(nodePrefix + "_create_edge_", publicIp);
+//        Docker.checkDockerStatus(nodePrefix + "_create_edge_", privateIp);
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-edge", AmazonInstanceState.RUNNING.value());
 
         

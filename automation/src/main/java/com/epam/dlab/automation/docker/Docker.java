@@ -15,13 +15,13 @@ import java.util.List;
 public class Docker {
     private final static Logger LOGGER = LogManager.getLogger(Docker.class);
 
-    public static void checkDockerStatus(String dockerImageName, String publicIP)
+    public static void checkDockerStatus(String dockerImageName, String ip)
             throws IOException, JSchException, InterruptedException {
         
-        LOGGER.info("Check docker status for instance {} and image {}", publicIP, dockerImageName);
+        LOGGER.info("Check docker status for instance {} and image {}", ip, dockerImageName);
 
         // TODO: hardcoded port
-        Session session = SSHConnect.getConnect(ConfigPropertyValue.CLUSTER_OS_USERNAME, publicIP, 22);
+        Session session = SSHConnect.getConnect(ConfigPropertyValue.CLUSTER_OS_USERNAME, ip, 22);
         ChannelExec getResult = SSHConnect.setCommand(session, DockerCommands.GET_CONTAINERS);
         InputStream in = getResult.getInputStream();
         List<DockerContainer> dockerContainerList = SSHConnect.getDockerContainerList(in);
