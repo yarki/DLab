@@ -11,7 +11,7 @@ import java.util.Properties;
 public class PropertiesResolver {
 
     private final static Logger LOGGER = LogManager.getLogger(PropertiesResolver.class);
-    private static final boolean DEV_MODE;
+    public static final boolean DEV_MODE;
     private static String jenkinsBuildNumber;
     public static final String CONFIG_FILE_NAME;
 
