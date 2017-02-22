@@ -19,6 +19,7 @@ limitations under the License.
 package com.epam.dlab.backendapi.core;
 
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.core.commands.ICommandExecutor;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.dto.imagemetadata.*;
 import com.google.inject.AbstractModule;

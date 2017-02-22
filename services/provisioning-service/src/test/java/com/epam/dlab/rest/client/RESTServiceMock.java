@@ -16,11 +16,25 @@ limitations under the License.
 
 ****************************************************************************/
 
-package com.epam.dlab.backendapi.core.health;
+package com.epam.dlab.rest.client;
 
-/** Names of health checker services.
- * */
-public class HealthChecks {
-    public static final String MONGO_HEALTH_CHECKER = "mongoHealthChecker";
-    public static final String PROVISIONING_HEALTH_CHECKER = "provisioningHealthChecker";
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class RESTServiceMock extends RESTService {
+
+    private final static Logger LOG = LoggerFactory.getLogger(RESTService.class);
+
+    @Override
+    public <T> T post(String path, Object parameter, Class<T> clazz) {
+        LOG.debug("REST POST {},\n object {},\n response class {}", path, parameter, clazz.getName());
+        try {
+			return (T) clazz.newInstance();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+        return null;
+    }
 }

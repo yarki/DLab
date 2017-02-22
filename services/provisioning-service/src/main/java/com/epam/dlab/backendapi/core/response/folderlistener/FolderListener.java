@@ -200,7 +200,6 @@ public class FolderListener implements Runnable {
 		while (expiredTimeMillis >= System.currentTimeMillis()) {
     		Thread.sleep(WAIT_DIR_TIMEOUT_MILLIS);
     		if (file.exists()) {
-        		LOGGER.trace("Folder listener \"{}\" - directory has been created", getDirectoryName());
         		return true;
         	}
     	}
@@ -336,9 +335,7 @@ public class FolderListener implements Runnable {
 			isListen = true;
 			while (true) {
 				WatchKey key;
-				LOGGER.trace("Folder listener \"{}\" poll calling ...", getDirectoryName());
 				key = watcher.poll(LISTENER_TIMEOUT_MILLLIS, TimeUnit.MILLISECONDS);
-				LOGGER.trace("Folder listener \"{}\" poll called", getDirectoryName());
 	
 				if (key != null) {
 					for ( WatchEvent<?> event : key.pollEvents() ) {
@@ -346,7 +343,6 @@ public class FolderListener implements Runnable {
 						if (kind == ENTRY_CREATE) {
 							String fileName = event.context().toString();
 							LOGGER.trace("Folder listener \"{}\" checks the file {}", getDirectoryName(), fileName);
-
 							try {
 								if (fileName.endsWith(JSON_EXTENSION)) {
 									WatchItem item = itemList.getItem(fileName);

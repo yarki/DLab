@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.modules;
 
-import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
+import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.google.inject.AbstractModule;
 import io.dropwizard.setup.Environment;
 
@@ -30,11 +30,9 @@ public class ModuleFactory {
      * @param configuration application configuration of SelfService.
      * @param environment environment of SelfService.
      */
-    public static AbstractModule getModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
-        return (configuration.isDevMode() ?
-        			new DevModule(configuration, environment) :
-        			(configuration.isMocked() ?
-        				new MockModule(configuration, environment) :
-        				new ProductionModule(configuration, environment)));
+    public static AbstractModule getModule(ProvisioningServiceApplicationConfiguration configuration, Environment environment) {
+        return (configuration.isDevMode() || configuration.isMocked() ?
+                new MockModule(configuration, environment) :
+                new ProductionModule(configuration, environment));
     }
 }

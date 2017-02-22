@@ -22,6 +22,7 @@ import static com.epam.dlab.rest.contracts.ApiCallbacks.EDGE;
 import static com.epam.dlab.rest.contracts.ApiCallbacks.KEY_LOADER;
 import static com.epam.dlab.rest.contracts.ApiCallbacks.STATUS_URI;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -39,7 +40,7 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.Directories;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
-import com.epam.dlab.backendapi.core.ICommandExecutor;
+import com.epam.dlab.backendapi.core.commands.ICommandExecutor;
 import com.epam.dlab.backendapi.core.commands.CommandBuilder;
 import com.epam.dlab.backendapi.core.commands.DockerAction;
 import com.epam.dlab.backendapi.core.commands.DockerCommands;
@@ -48,6 +49,7 @@ import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecu
 import com.epam.dlab.backendapi.core.response.handlers.EdgeCallbackHandler;
 import com.epam.dlab.dto.ResourceSysBaseDTO;
 import com.epam.dlab.dto.keyload.UploadFileDTO;
+import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.EdgeAPI;
 import com.google.inject.Inject;
@@ -120,7 +122,7 @@ public class EdgeResource implements DockerCommands {
     }
 
     private String nameContainer(String user, DockerAction action) {
-        return nameContainer(user, action.toString(), "exploratory", getResourceType());
+        return nameContainer(user, action.toString(), getResourceType());
     }
     
     @Override
@@ -129,8 +131,13 @@ public class EdgeResource implements DockerCommands {
     }
 
     private void saveKeyToFile(UploadFileDTO dto) throws IOException {
-    	java.nio.file.Path keyFilePath = Paths.get(configuration.getKeyDirectory(), dto.getEdge().getEdgeUserName() + KEY_EXTENTION);
-        LOGGER.debug("Saving key to {}", keyFilePath.toString());
+    	java.nio.file.Path keyFilePath = Paths.get(configuration.getKeyDirectory(), dto.getEdge().getEdgeUserName() + KEY_EXTENTION).toAbsolutePath();
+    	LOGGER.debug("Saving key to {}", keyFilePath.toString());
+    	try {
+    		com.google.common.io.Files.createParentDirs(new File(keyFilePath.toString()));
+		} catch (IOException e) {
+			throw new DlabException("Can't create key folder " + keyFilePath + ": " + e.getLocalizedMessage(), e);
+		}
         Files.write(keyFilePath, dto.getContent().getBytes());
     }
 }

@@ -22,7 +22,6 @@ import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.Directories;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
-import com.epam.dlab.backendapi.core.ICommandExecutor;
 import com.epam.dlab.backendapi.core.commands.*;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.backendapi.core.response.handlers.ExploratoryCallbackHandler;
