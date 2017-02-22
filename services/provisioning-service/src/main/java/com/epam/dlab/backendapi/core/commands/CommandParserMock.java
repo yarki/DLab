@@ -209,7 +209,7 @@ public class CommandParserMock {
 		throw new DlabException("Name of docker image not found");
     }
 
-    /** Extract Json properties from json content.
+    /** Extract Json properties from Json content.
      * @param jsonContent Json content.
      * @return
      */
