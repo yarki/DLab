@@ -979,14 +979,17 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
         local('sudo chown ' + os_user + ':' + os_user + ' -R /opt/zeppelin/')
         local('sudo service zeppelin-notebook restart')
         while not zeppelin_restarted:
-            result = local('nc -z localhost 8080; echo $?', capture=True)
-            if result == '0':
+            local('sleep 5')
+            result = local('sudo bash -c "nmap -p 8080 localhost | grep closed > /dev/null" ; echo $?', capture=True)
+            result = result[:1]
+            if result == '1':
                 zeppelin_restarted = True
         local('sleep 5')
         local('echo \"Configuring emr spark interpreter for Zeppelin\"')
         while not port_number_found:
-            port_free = local('sudo nc -z localhost ' + str(default_port) + '; echo $?', capture=True)
-            if port_free == '1':
+            port_free = local('sudo bash -c "nmap -p ' + str(default_port) + ' localhost | grep closed > /dev/null" ; echo $?', capture=True)
+            port_free = port_free[:1]
+            if port_free == '0':
                 livy_port = default_port
                 port_number_found = True
             else:
