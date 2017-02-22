@@ -96,6 +96,7 @@ public class KeyUploaderResource implements EdgeAPI {
     		LOGGER.error("Check the status of the user key for {} fails", userInfo.getName(), e);
     		status = KeyLoadStatus.ERROR;
     	}
+    	//TODO: Dev mode return HttpOk
 		return Response.status(status.getHttpStatus()).build();
     }
 

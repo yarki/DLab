@@ -16,9 +16,23 @@ limitations under the License.
 
 ****************************************************************************/
 
+How to run locally the self service or provisioning service on development mode.
 
-  How to run locally the self service or provisioning service on development mode.
 
+	Install Node.js
+1. Install Node.js from https://nodejs.org/en/
+2. Add Node.js installation folder to environment variable PATH
+3. Execute command:
+	npm install npm@latest -g
+4. Change folder to ..\dlab\services\self-service\src\main\resources\webapp
+   Execute command:
+	npm i
+
+
+	Install Mongo database
+
+
+	Environment options
 1. Set configuration file ..\..\infrastructure-provisioning\aws\src\ssn\templates\ssn.yml
 # DEV_MODE="true"
 2. Add system environment variable
@@ -29,3 +43,5 @@ Unix
   ln -s ssn.yml ../../infrastructure-provisioning/src/ssn/templates/ssn.yml
 Windows
   mklink ssn.yml ..\..\infrastructure-provisioning\src\ssn\templates\ssn.yml
+
+

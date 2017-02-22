@@ -18,8 +18,10 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.core.commands;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,20 +29,35 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.epam.dlab.exceptions.DlabException;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.MoreObjects;
 
 /** Parse command for emulate commands of Docker.
  *
  */
 public class CommandParserMock {
+    private ObjectMapper MAPPER = new ObjectMapper()
+    		.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true)
+    		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
     private String command;
     private String action;
+    private String resourceType;
+    private String imageType;
+    private String requestId;
+    private String responsePath;
 	private String name;
 	private String json;
-    private Map<String, String> environment = new HashMap<String, String>();
-    private Map<String, String> variable = new HashMap<String, String>();
-    private List<String> others = new ArrayList<String>();
+    private Map<String, String> envMap = new HashMap<String, String>();
+    private Map<String, String> varMap = new HashMap<String, String>();
+    private List<String> otherArgs = new ArrayList<String>();
+    private Map<String, String> variables = new HashMap<String, String>();
 
+    public CommandParserMock() { }
+    
     public CommandParserMock(String command) {
 		parse(command);
 	}
@@ -56,6 +73,26 @@ public class CommandParserMock {
     	return action;
     }
     
+    /** Return the type of resource. */
+    public String getResourceType() {
+    	return resourceType;
+    }
+
+    /** Return the image type. */
+    public String getImageType() {
+    	return imageType;
+    }
+
+    /** Return the request id. */
+    public String getRequestId() {
+    	return requestId;
+    }
+
+    /** Return the path for response files. */
+    public String getResponsePath() {
+    	return responsePath;
+    }
+
     /** Return name of docker container. */
     public String getName() {
     	return name;
@@ -67,20 +104,9 @@ public class CommandParserMock {
     }
     
     /** Return map of environment variables. */
-    public Map<String, String> getEnvironment() {
-    	return environment;
+    public Map<String, String> getVariables() {
+    	return variables;
     }
-    
-    /** Return map of docker variables. */
-    public Map<String, String> getVariable() {
-    	return variable;
-    }
-    
-    /** Return other single arguments. */
-    public List<String> getOther() {
-    	return others;
-    }
-
     
     /** Add argument to list.
      * @param args list of arguments.
@@ -169,7 +195,55 @@ public class CommandParserMock {
     	}
     	return new ImmutablePair<String, String>(array[0], array[1]);
     }
+    
+    /** Return name of docker image.
+     * @param args list of arguments.
+     * @exception if image name not found.
+     */
+    public static String getImageName(List<String> args) throws DlabException {
+		for (String s : args) {
+			if (s.startsWith("docker.dlab-")) {
+				return s;
+			}
+		}
+		throw new DlabException("Name of docker image not found");
+    }
 
+    /** Extract Json properties from json content.
+     * @param jsonContent Json content.
+     * @return
+     */
+    private Map<String, String> getJsonVariables(String jsonContent) {
+    	Map<String, String> vars = new HashMap<String, String>();
+    	if (jsonContent == null) {
+    		return vars;
+    	}
+    	
+    	JsonNode json;
+    	try {
+			json = MAPPER.readTree(jsonContent);
+		} catch (IOException e) {
+			throw new DlabException("Can't parse json content: " + e.getLocalizedMessage(), e);
+		}
+    	
+    	Iterator<String> keys = json.fieldNames();
+    	while (keys.hasNext()) {
+    		String key = keys.next();
+    		String value = getTextValue(json.get(key));
+    		if (value != null) {
+    			vars.put(key, value);
+    		}
+    	}
+    	return vars;
+    }
+    
+    /** Return the value of json property or <b>null</b>.
+     * @param jsonNode - Json node.
+     */
+    private String getTextValue(JsonNode jsonNode) {
+        return jsonNode != null ? jsonNode.textValue() : null;
+    }
+    
     /** Parse command line.
      * @param cmd command line.
      */
@@ -177,9 +251,10 @@ public class CommandParserMock {
         json = null;
         command = null;
         action = null;
-        environment.clear();
-        variable.clear();
-        others.clear();
+        envMap.clear();
+        varMap.clear();
+        otherArgs.clear();
+        variables.clear();
 
     	List<String> args = extractArgs(cmd);
     	int i = 0;
@@ -189,10 +264,10 @@ public class CommandParserMock {
         while (i < args.size()) {
     		if ((s = getArgValue(args, i, "-v")) != null) {
     			p = getPair("-v", s, ":");
-    			variable.put(p.getValue(), p.getKey());
+    			varMap.put(p.getValue(), p.getKey());
     		} else if ((s = getArgValue(args, i, "-e")) != null) {
     			p = getPair("-e", s, "=");
-    			environment.put(p.getKey(), p.getValue());
+    			envMap.put(p.getKey(), p.getValue());
     		} else if ((s = getArgValue(args, i, "docker")) != null) {
     			command = s;
     		} else if ((s = getArgValue(args, i, "--action")) != null) {
@@ -214,8 +289,20 @@ public class CommandParserMock {
     	}
     	
     	if (args.size() > 0) {
-    		others.addAll(args);
+    		otherArgs.addAll(args);
     	}
+    	
+        resourceType = envMap.get("conf_resource");
+        imageType = getImageName(args);
+        imageType = imageType.replace("docker.dlab-", "").replace(":latest", "");
+        requestId = envMap.get("request_id");
+        responsePath = varMap.get("/response");
+        
+    	variables.putAll(envMap);
+    	variables.putAll(getJsonVariables(json));
+    	variables.put("instance_id", "i-" + requestId.replace("-", "").substring(0, 17));
+    	variables.put("cluster_id", "j-" + requestId.replace("-", "").substring(0, 13).toUpperCase());
+    	variables.put("notebook_id", requestId.replace("-", "").substring(17, 22));
     }
     
     @Override
@@ -223,10 +310,14 @@ public class CommandParserMock {
     	return MoreObjects.toStringHelper(this)
     			.add("command", command)
     			.add("action", action)
+    			.add("resourceType", resourceType)
+    			.add("imageType", imageType)
+    			.add("requestId", requestId)
+    			.add("responsePath", responsePath)
     			.add("name", name)
-    			.add("environment", environment)
-    			.add("variable", variable)
-    			.add("others", others)
+    			.add("environment", envMap)
+    			.add("variable", varMap)
+    			.add("others", otherArgs)
     			.add("json", json)
     			.toString();
     }
