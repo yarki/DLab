@@ -74,7 +74,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
                     .withRequestId(uuid)
                     .withActionDescribe(image)
                     .toCMD();
-            commandExecutor.executeAsync("warmup",DockerCommands.generateUUID(),command);
+            commandExecutor.executeAsync("warmup", uuid, command);
         }
     }
     

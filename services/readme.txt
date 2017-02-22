@@ -16,26 +16,40 @@ limitations under the License.
 
 ****************************************************************************/
 
-How to run locally the self service or provisioning service on development mode.
+How to run locally the self service and provisioning service on development mode.
 
 
-	Install Node.js
-1. Install Node.js from https://nodejs.org/en/
-2. Add Node.js installation folder to environment variable PATH
-3. Execute command:
-	npm install npm@latest -g
-4. Change folder to ..\dlab\services\self-service\src\main\resources\webapp
-   Execute command:
-	npm i
+1.	Install Mongo database
+1.1 Download MongoDB from https://www.mongodb.com/download-center
+1.2. Install database follow manual
+1.3. Run server and create accounts
+> mongo
+use admin
+db.createUser(
+   {
+     user: "admin",
+     pwd: "<password>",
+     roles: [ { role: "dbAdminAnyDatabase", db: "admin" },
+              { role: "userAdminAnyDatabase", db: "admin" },
+              { role: "readWriteAnyDatabase", db: "admin" } ]
+   }
+)
 
+use dlabdb
+db.createUser(
+   {
+     user: "admin",
+     pwd: "<password>",
+     roles: [ "dbAdmin", "userAdmin", "readWrite" ]
+   }
+)
+1.4. Load collections
+mongoimport -u admin -p <password> -d dlabdb mongo_settings.json
 
-	Install Mongo database
-
-
-	Environment options
-1. Set configuration file ..\..\infrastructure-provisioning\aws\src\ssn\templates\ssn.yml
+2.	Setting up environment options
+2.1. Set configuration file ..\..\infrastructure-provisioning\aws\src\ssn\templates\ssn.yml
 # DEV_MODE="true"
-2. Add system environment variable
+2.2. Add system environment variable
 DLAB_CONF_DIR_NAME=..\..\infrastructure-provisioning\aws\src\ssn\templates
 or create two symlinks to service\provisioning-service and service\self-service for
 ..\..\infrastructure-provisioning\aws\src\ssn\templates\ssn.yml
@@ -44,4 +58,19 @@ Unix
 Windows
   mklink ssn.yml ..\..\infrastructure-provisioning\src\ssn\templates\ssn.yml
 
+3.	Install Node.js
+3.1. Install Node.js from https://nodejs.org/en/
+3.2. Add Node.js installation folder to environment variable PATH
+3.3. Install packages
+	npm install npm@latest -g
+4. Change folder to \dlab\services\self-service\src\main\resources\webapp and install
+	npm i
+5. Buid web application:
+	npm run build.prod
 
+4.	Run application
+4.1. Run provisioning-service
+4.2. Run self-service
+4.3. Try access to http://localhost:8080
+     User: test
+     Password: <any>

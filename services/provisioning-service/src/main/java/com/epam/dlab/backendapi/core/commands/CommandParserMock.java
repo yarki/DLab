@@ -58,8 +58,8 @@ public class CommandParserMock {
 
     public CommandParserMock() { }
     
-    public CommandParserMock(String command) {
-		parse(command);
+    public CommandParserMock(String command, String uuid) {
+    	parse(command, uuid);
 	}
     
     
@@ -247,10 +247,16 @@ public class CommandParserMock {
     /** Parse command line.
      * @param cmd command line.
      */
-    public void parse(String cmd) {
-        json = null;
+    public void parse(String cmd, String uuid) {
         command = null;
         action = null;
+        resourceType = null;
+        imageType = null;
+        requestId = uuid;
+        responsePath = null;
+    	name = null;
+    	json = null;
+        
         envMap.clear();
         varMap.clear();
         otherArgs.clear();
@@ -295,11 +301,11 @@ public class CommandParserMock {
         resourceType = envMap.get("conf_resource");
         imageType = getImageName(args);
         imageType = imageType.replace("docker.dlab-", "").replace(":latest", "");
-        requestId = envMap.get("request_id");
         responsePath = varMap.get("/response");
         
     	variables.putAll(envMap);
     	variables.putAll(getJsonVariables(json));
+    	variables.put("request_id", requestId);
     	variables.put("instance_id", "i-" + requestId.replace("-", "").substring(0, 17));
     	variables.put("cluster_id", "j-" + requestId.replace("-", "").substring(0, 13).toUpperCase());
     	variables.put("notebook_id", requestId.replace("-", "").substring(17, 22));

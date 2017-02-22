@@ -21,6 +21,7 @@ package com.epam.dlab.backendapi.core.commands;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,8 +36,10 @@ public class CommandExecutorMockTest {
     }
     
     private CommandExecutorMock executeAsync(String cmd) {
+    	String uuid = UUID.randomUUID().toString();
     	CommandExecutorMock exec = new CommandExecutorMock();
-    	exec.executeAsync("user", "uuid", cmd);
+    	exec.executeAsync("user", uuid, cmd);
+    	exec.getResultSync();
     	try {
 			Files.deleteIfExists(Paths.get(exec.getResponseFileName()));
 		} catch (IOException e) {
@@ -58,8 +61,10 @@ public class CommandExecutorMockTest {
     }
     
     private void handleExploratory(String cmd, DockerAction action) throws Exception {
+    	String uuid = UUID.randomUUID().toString();
     	CommandExecutorMock exec = getCommandExecutor();
-    	exec.executeAsync("user", "uuid", cmd);
+    	exec.executeAsync("user", uuid, cmd);
+    	exec.getResultSync();
 
     	RESTServiceMock selfService = new RESTServiceMock();
     	ExploratoryCallbackHandler handler = new ExploratoryCallbackHandler(selfService, action,
