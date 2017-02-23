@@ -153,7 +153,7 @@ def ensure_python3_specific_version(python3_version, os_user):
     if not exists('/home/' + os_user + '/.ensure_dir/python3_specific_version_ensured'):
         try:
             sudo('yum install -y yum-utils python34 openssl-devel')
-            sudo('yum -y groupinstall development')
+            sudo('yum -y groupinstall development --nogpgcheck')
             if len(python3_version) < 4:
                 python3_version = python3_version + ".0"
             sudo('wget https://www.python.org/ftp/python/{0}/Python-{0}.tgz'.format(python3_version))
@@ -168,7 +168,7 @@ def ensure_python2_libraries(os_user):
         try:
             sudo('yum install -y https://forensics.cert.org/centos/cert/7/x86_64/pyparsing-2.0.3-1.el7.noarch.rpm')
             sudo('yum install -y python-setuptools python-wheel')
-            sudo('yum install -y python-virtualenv openssl-devel python-devel openssl-libs libxml2-devel libxslt-devel')
+            sudo('yum install -y python-virtualenv openssl-devel python-devel openssl-libs libxml2-devel libxslt-devel --nogpgcheck')
             sudo('python2 -m pip install backports.shutil_get_terminal_size ipython ipykernel')
             sudo('echo y | python2 -m pip uninstall backports.shutil_get_terminal_size')
             sudo('python2 -m pip install backports.shutil_get_terminal_size')
@@ -271,3 +271,25 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sudo('touch /home/' + os_user + '/.ensure_dir/tensor_ensured')
         except:
             sys.exit(1)
+
+
+def install_maven():
+    sudo('wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz -O /tmp/maven.tar.gz')
+    sudo('tar -zxvf /tmp/maven.tar.gz -C /opt/')
+    sudo('ln -fs /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn')
+
+
+def install_livy_dependencies():
+    sudo('pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
+    sudo('pip3.5 install cloudpickle requests requests-kerberos flake8 flaky pytest')
+
+
+def install_maven_emr():
+    local('wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz -O /tmp/maven.tar.gz')
+    local('sudo tar -zxvf /tmp/maven.tar.gz -C /opt/')
+    local('sudo ln -s /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn')
+
+
+def install_livy_dependencies_emr():
+    local('sudo -i pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
+    local('sudo -i pip3.5 install cloudpickle requests requests-kerberos flake8 flaky pytest')
