@@ -15,7 +15,7 @@
  limitations under the License.
 
  ****************************************************************************/
-package com.epam.dlab.backendapi.core;
+package com.epam.dlab.backendapi.core.commands;
 
 import java.util.List;
 
