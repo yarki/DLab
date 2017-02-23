@@ -19,6 +19,8 @@ limitations under the License.
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { UserAccessKeyService } from '../services/userAccessKey.service';
 import { UserResourceService } from '../services/userResource.service';
+import { HealthStatusService } from '../services/healthStatus.service';
+import { AppRoutingService } from '../routing/appRouting.service';
 import { ResourcesGrid } from '../components/resources-grid/resources-grid.component';
 import { NavbarComponent } from '../shared/navbar/navbar.component';
 import { ExploratoryEnvironmentVersionModel } from '../models/exploratoryEnvironmentVersion.model';
@@ -39,6 +41,7 @@ export class HomeComponent implements OnInit {
   exploratoryEnvironments: Array<ExploratoryEnvironmentVersionModel> = [];
   computationalResources: Array<ComputationalResourceImage> = [];
   progressDialogConfig: any;
+  healthStatus: any;
 
   @ViewChild('keyUploadModal') keyUploadModal;
   @ViewChild('preloaderModal') preloaderModal;
@@ -50,12 +53,15 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private userAccessKeyService: UserAccessKeyService,
-    private userResourceService: UserResourceService
+    private userResourceService: UserResourceService,
+    private healthStatusService: HealthStatusService,
+    private appRoutingService: AppRoutingService
   ) {
     this.userUploadAccessKeyState = HTTP_STATUS_CODES.NOT_FOUND;
   }
 
   ngOnInit() {
+    this.getEnvironmentHealthStatus();
     this.checkInfrastructureCreationProgress();
     this.progressDialogConfig = this.setProgressDialogConfiguration();
 
@@ -133,5 +139,16 @@ export class HomeComponent implements OnInit {
       text_style: 'info-label',
       aligning: 'text-center'
     };
+  }
+
+  private getEnvironmentHealthStatus() {
+    this.healthStatusService.getEnvironmentHealthStatus()
+      .subscribe(
+        (result) => {
+          this.healthStatus = result.status;
+
+          if(this.healthStatus === 'error')
+            this.resourcesGrid.healthStatus = this.healthStatus;
+        });
   }
 }

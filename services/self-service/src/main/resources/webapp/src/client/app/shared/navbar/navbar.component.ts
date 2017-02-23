@@ -56,7 +56,7 @@ export class NavbarComponent implements OnInit {
       () => this.appRoutingService.redirectToLoginPage());
   }
 
-  getEnvironmentHealthStatus(): void {
+  getEnvironmentHealthStatus() {
     this.healthStatusService.getEnvironmentHealthStatus()
       .subscribe(
         (result) => this.healthStatus = result.status);

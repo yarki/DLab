@@ -19,11 +19,28 @@ limitations under the License.
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { ApplicationServiceFacade } from './applicationServiceFacade.service';
+import { AppRoutingService } from '../routing/appRouting.service';
 import { Observable } from 'rxjs/Observable';
+import HTTP_STATUS_CODES from 'http-status-enum';
 
 @Injectable()
 export class HealthStatusService {
-  constructor(private applicationServiceFacade: ApplicationServiceFacade) { }
+  constructor(
+    private applicationServiceFacade: ApplicationServiceFacade,
+    private appRoutingService: AppRoutingService
+    ) { }
+
+   public isHealthStatusOk(): Observable<boolean> {
+      return this.applicationServiceFacade
+        .buildGetEnvironmentHealthStatus()
+        .map((response: Response) => {
+          if (response.status === HTTP_STATUS_CODES.OK)
+            if(response.json().status === 'ok')
+              return true;
+
+          return false;
+        }, this);
+  }
 
   public getEnvironmentHealthStatus(): Observable<Response> {
     return this.applicationServiceFacade
