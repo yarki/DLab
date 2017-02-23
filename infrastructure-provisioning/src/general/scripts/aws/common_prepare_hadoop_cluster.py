@@ -119,7 +119,7 @@ if __name__ == "__main__":
                     emr_conf['release_label'], emr_conf['emr_timeout'], emr_conf['subnet_cidr'],
                     emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'],
                     os.environ['conf_os_user'], emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'],
-                    os.environ['conf_key_dir'], os.environ['edge_user_name'], bool(os.environ['slave_instance_spot']),
+                    os.environ['conf_key_dir'], os.environ['edge_user_name'], bool(os.environ['emr_slave_instance_spot']),
                     str(emr_conf['slave_bid_price']))
         try:
             local("~/scripts/{}.py {}".format('emr_create', params))
