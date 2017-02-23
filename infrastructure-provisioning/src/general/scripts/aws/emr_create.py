@@ -62,6 +62,8 @@ parser.add_argument('--configurations', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--key_dir', type=str, default='')
 parser.add_argument('--edge_user_name', type=str, default='')
+parser.add_argument('--slave_instance_spot', type=bool, default=False)
+parser.add_argument('--bid_price', type=str, default='')
 args = parser.parse_args()
 
 cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/{4}/{5}/config/hive-site.xml --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
@@ -232,23 +234,48 @@ def build_emr_cluster(args):
 
     if not args.dry_run:
         socket = boto3.client('emr')
-        result = socket.run_job_flow(
-            Name=args.name,
-            ReleaseLabel=args.release_label,
-            Instances={'MasterInstanceType': args.master_instance_type,
-                       'SlaveInstanceType': args.slave_instance_type,
-                       'InstanceCount': args.instance_count,
-                       'Ec2KeyName': args.ssh_key,
-                       # 'Placement': {'AvailabilityZone': args.availability_zone},
-                       'KeepJobFlowAliveWhenNoSteps': not args.auto_terminate,
-                       'Ec2SubnetId': get_subnet_by_cidr(args.subnet)},
-            Applications=names,
-            Tags=tags,
-            Steps=steps,
-            VisibleToAllUsers=not args.auto_terminate,
-            JobFlowRole=args.ec2_role,
-            ServiceRole=args.service_role,
-            Configurations=read_json(args.configurations))
+        if args.slave_instance_spot:
+            result = socket.run_job_flow(
+                Name=args.name,
+                ReleaseLabel=args.release_label,
+                Instances={'MasterInstanceType': args.master_instance_type,
+                           'SlaveInstanceType': args.slave_instance_type,
+                           'InstanceCount': args.instance_count,
+                           'Ec2KeyName': args.ssh_key,
+                           # 'Placement': {'AvailabilityZone': args.availability_zone},
+                           'KeepJobFlowAliveWhenNoSteps': not args.auto_terminate,
+                           'Ec2SubnetId': get_subnet_by_cidr(args.subnet)},
+                Applications=names,
+                Tags=tags,
+                Steps=steps,
+                VisibleToAllUsers=not args.auto_terminate,
+                JobFlowRole=args.ec2_role,
+                ServiceRole=args.service_role,
+                Configurations=read_json(args.configurations))
+        else:
+            result = socket.run_job_flow(
+                Name=args.name,
+                ReleaseLabel=args.release_label,
+                Instances={'Ec2KeyName': args.ssh_key,
+                           'KeepJobFlowAliveWhenNoSteps': not args.auto_terminate,
+                           'Ec2SubnetId': get_subnet_by_cidr(args.subnet),
+                           'InstanceGroups': [
+                               {'Market': 'SPOT',
+                                'BidPrice': args.bid_price,
+                                'InstanceRole': 'CORE',
+                                'InstanceType': args.slave_instance_type,
+                                'InstanceCount': int(args.instance_count) - 1},
+                               {'Market': 'ON_DEMAND',
+                                'InstanceRole': 'MASTER',
+                                'InstanceType': args.master_instance_type,
+                                'InstanceCount': 1}]},
+                Applications=names,
+                Tags=tags,
+                Steps=steps,
+                VisibleToAllUsers=not args.auto_terminate,
+                JobFlowRole=args.ec2_role,
+                ServiceRole=args.service_role,
+                Configurations=read_json(args.configurations))
         print "Cluster_id " + result.get('JobFlowId')
         return result.get('JobFlowId')
 
