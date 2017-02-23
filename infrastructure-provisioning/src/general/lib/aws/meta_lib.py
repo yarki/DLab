@@ -18,7 +18,7 @@
 
 import boto3
 from botocore.client import Config
-import json
+import json, urllib2
 import time
 import logging
 import traceback
@@ -671,4 +671,32 @@ def get_allocation_id_by_elastic_ip(elastic_ip):
     except Exception as err:
         logging.error("Error with getting allocation id by elastic ip: " + elastic_ip + " : " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         append_result(str({"error": "Error with getting allocation id by elastic ip", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
+
+
+def get_ec2_price(instance_shape, region):
+    try:
+        regions = {'us-west-2': 'Oregon', 'us-east-1': 'N. Virginia', 'us-east-2': 'Ohio', 'us-west-1': 'N. California',
+                   'ca-central-1': 'Central', 'eu-west-1': 'Ireland', 'eu-central-1': 'Frankfurt',
+                   'eu-west-2': 'London', 'ap-northeast-1': 'Tokyo', 'ap-northeast-2': 'Seoul',
+                   'ap-southeast-1': 'Singapore', 'ap-southeast-2': 'Sydney', 'ap-south-1': 'Mumbai',
+                   'sa-east-1': 'Sao Paulo'}
+        response = urllib2.urlopen(
+            'https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/index.json')
+        price_json = response.read()
+        pricing = json.loads(price_json)
+        for i in pricing.get('products'):
+            if pricing.get('products').get(i).get('attributes').get('instanceType') == instance_shape\
+                    and pricing.get('products').get(i).get('attributes').get('operatingSystem') == 'Linux' \
+                    and regions.get(region) in pricing.get('products').get(i).get('attributes').get('location') \
+                    and pricing.get('products').get(i).get('attributes').get('tenancy') == 'Shared':
+                for j in pricing.get('terms').get('OnDemand').get(i):
+                    for h in pricing.get('terms').get('OnDemand').get(i).get(j).get('priceDimensions'):
+                        return float(pricing.get('terms').get('OnDemand').get(i).get(j).get('priceDimensions').get(h).
+                                     get('pricePerUnit').get('USD'))
+    except Exception as err:
+        logging.error("Error with getting EC2 price: " + str(err) + "\n Traceback: " +
+                      traceback.print_exc(file=sys.stdout))
+        append_result(str({"error": "Error with getting EC2 price",
+                           "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
