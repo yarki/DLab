@@ -57,6 +57,10 @@ local_spark_path = '/opt/spark/'
 templates_dir = '/root/templates/'
 files_dir = '/root/files/'
 s3_jars_dir = '/opt/jars/'
+if args.region == 'us-east-1':
+    endpoint_url = 'https://s3.amazonaws.com'
+else:
+    endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
 
 
 def configure_zeppelin(os_user):
@@ -100,7 +104,7 @@ def configure_local_kernels(args):
     default_port = 8998
     livy_port = ''
     put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
-    sudo('sed -i "s|AWS_REGION|' + args.region + '|g" /tmp/interpreter.json')
+    sudo('sed -i "s|ENDPOINTURL|' + endpoint_url + '|g" /tmp/interpreter.json')
     sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
     while not port_number_found:
         port_free = sudo('nmap -p ' + str(default_port) + ' localhost | grep "closed" > /dev/null; echo $?')

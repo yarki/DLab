@@ -84,11 +84,15 @@ def prepare_disk(os_user):
 def ensure_local_jars(os_user, s3_jars_dir, files_dir, region, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/s3_kernel_ensured'):
         try:
+            if region == 'us-east-1':
+                endpoint_url = 'https://s3.amazonaws.com'
+            else:
+                endpoint_url = 'https://s3-' + region + '.amazonaws.com'
             sudo('mkdir -p ' + s3_jars_dir)
             put(files_dir + 'notebook_local_jars.tar.gz', '/tmp/notebook_local_jars.tar.gz')
             sudo('tar -xzf /tmp/notebook_local_jars.tar.gz -C ' + s3_jars_dir)
             put(templates_dir + 'notebook_spark-defaults_local.conf', '/tmp/notebook_spark-defaults_local.conf')
-            sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/notebook_spark-defaults_local.conf".format(region))
+            sudo("sed -i 's|URL|{}|' /tmp/notebook_spark-defaults_local.conf".format(endpoint_url))
             if os.environ['application'] == 'zeppelin':
                 sudo('echo \"spark.jars $(ls -1 ' + s3_jars_dir + '* | tr \'\\n\' \',\')\" >> /tmp/notebook_spark-defaults_local.conf')
             sudo('\cp /tmp/notebook_spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
@@ -132,7 +136,10 @@ def spark_defaults(args):
     text = text.replace('CLUSTER', args.cluster_name)
     with open(spark_def_path, 'w') as f:
         f.write(text)
-    endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
+    if args.region == 'us-east-1':
+        endpoint_url = 'https://s3.amazonaws.com'
+    else:
+        endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
     local("""bash -c 'echo "spark.hadoop.fs.s3a.endpoint    """ + endpoint_url + """" >> """ + spark_def_path + """'""")
 
 

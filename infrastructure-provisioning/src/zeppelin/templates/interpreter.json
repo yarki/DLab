@@ -8,7 +8,7 @@
         "zeppelin.livy.concurrentSQL": "false",
         "livy.spark.master": "local[*]",
         "livy.spark.home":"/opt/spark/",
-        "livy.spark.hadoop.fs.s3a.endpoint": "https://s3-AWS_REGION.amazonaws.com",
+        "livy.spark.hadoop.fs.s3a.endpoint": "ENDPOINTURL",
         "zeppelin.interpreter.localRepo": "/opt/zeppelin/local-repo/2CAC665T6",
         "zeppelin.livy.url": "http://localhost:LIVY_PORT",
         "livy.spark.hadoop.fs.s3a.buffer.dir": "/tmp",
