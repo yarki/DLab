@@ -16,32 +16,26 @@ limitations under the License.
 
 ****************************************************************************/
 
-package com.epam.dlab.backendapi.modules;
+package com.epam.dlab;
 
-import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
-import com.epam.dlab.backendapi.core.health.HealthModule;
 import com.google.inject.AbstractModule;
+
 import io.dropwizard.setup.Environment;
 
-/** The base class for an application configuration of SelfService.
+/** The base class for an application configuration of service.
  */
-abstract class BaseModule extends AbstractModule {
-	/** Application configuration of SelfService. */
-    protected SelfServiceApplicationConfiguration configuration;
-    /** Environment of SelfService. */
+abstract public class ModuleBase<T extends ServiceConfiguration> extends AbstractModule {
+	/** Application configuration of service. */
+    protected T configuration;
+    /** Environment of service. */
     protected Environment environment;
 
-    /** Instantiates an application configuration of SelfService.
-     * @param configuration application configuration of SelfService.
-     * @param environment environment of SelfService.
+    /** Instantiates an application configuration of service.
+     * @param configuration application configuration of service.
+     * @param environment environment of service.
      */
-    public BaseModule(SelfServiceApplicationConfiguration configuration, Environment environment) {
+    public ModuleBase(T configuration, Environment environment) {
         this.configuration = configuration;
         this.environment = environment;
-    }
-
-    @Override
-    protected void configure() {
-        install(new HealthModule());
     }
 }

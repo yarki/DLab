@@ -103,8 +103,9 @@ def configure_local_kernels(args):
     sudo('sed -i "s|AWS_REGION|' + args.region + '|g" /tmp/interpreter.json')
     sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
     while not port_number_found:
-        port_free = sudo('nc -z localhost ' + str(default_port) + '; echo $?')
-        if port_free == '1':
+        port_free = sudo('nmap -p ' + str(default_port) + ' localhost | grep "closed" > /dev/null; echo $?')
+        port_free = port_free[:1]
+        if port_free == '0':
             livy_port = default_port
             port_number_found = True
         else:
