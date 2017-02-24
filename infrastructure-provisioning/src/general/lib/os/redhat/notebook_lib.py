@@ -90,7 +90,6 @@ def ensure_r(os_user):
 def ensure_matplot(os_user):
     if not exists('/home/{}/.ensure_dir/matplot_ensured'.format(os_user)):
         try:
-            sudo('yum install -y python-matplotlib --nogpgcheck')
             sudo('pip2 install matplotlib --no-cache-dir')
             sudo('python3.5 -m pip install matplotlib --no-cache-dir')
             if os.environ['application'] == 'tensor':
