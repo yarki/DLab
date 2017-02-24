@@ -125,6 +125,7 @@ public class ComputationalResource implements ComputationalAPI {
                         .withNotebookInstanceName(instance.getExploratoryId())
                         .withInstanceCount(formDTO.getInstanceCount())
                         .withMasterInstanceType(formDTO.getMasterInstanceType())
+                        .withSlaveInstanceType(formDTO.getSlaveInstanceType())
                         .withSlaveInstanceSpot(formDTO.getSlaveInstanceSpot())
                         .withSlaveInstanceSpotPctPrice(formDTO.getSlaveInstanceSpotPctPrice())
                         .withVersion(formDTO.getVersion())
