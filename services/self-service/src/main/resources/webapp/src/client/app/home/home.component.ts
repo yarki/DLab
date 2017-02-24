@@ -74,7 +74,7 @@ export class HomeComponent implements OnInit {
 
   public refreshGrid(): void {
     this.resourcesGrid.buildGrid();
-    this.navbarComponent.getEnvironmentHealthStatus();
+    this.getEnvironmentHealthStatus();
   }
 
   public toggleFiltering(): void {

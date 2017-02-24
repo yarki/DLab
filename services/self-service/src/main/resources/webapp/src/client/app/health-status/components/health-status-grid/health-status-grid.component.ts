@@ -16,9 +16,9 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { HealthStatusService } from '../../../services/healthStatus.service';
-import { EnvironmentStatusModel } from './environment-status.model';
+import { EnvironmentStatusModel } from '../../environment-status.model';
 import { ConfirmationDialogType } from '../../../components/confirmation-dialog/confirmation-dialog-type.enum';
 
 @Component({
@@ -29,7 +29,9 @@ import { ConfirmationDialogType } from '../../../components/confirmation-dialog/
               '../../../components/resources-grid/resources-grid.component.css']
 })
 export class HealthStatusGridComponent {
-   environmentsHealthStatuses: Array<EnvironmentStatusModel>;
+
+   @Input() environmentsHealthStatuses: Array<EnvironmentStatusModel>;
+   @Output() refreshGrid: EventEmitter<{}> = new EventEmitter();
 
    @ViewChild('confirmationDialog') confirmationDialog;
 
@@ -42,18 +44,7 @@ export class HealthStatusGridComponent {
     }
 
     buildGrid(): void {
-      this.healthStatusService.getEnvironmentStatuses()
-        .subscribe((result) => { this.environmentsHealthStatuses = this.loadHealthStatusList(result); });
-    }
-
-    loadHealthStatusList(healthStatusList): Array<EnvironmentStatusModel> {
-      if (healthStatusList.list_resources)
-        return healthStatusList.list_resources.map((value) => {
-          return new EnvironmentStatusModel(
-            value.type,
-            value.resource_id,
-            value.status);
-        });
+      this.refreshGrid.emit();
     }
 
     healthStatusAction(data, action: string) {
