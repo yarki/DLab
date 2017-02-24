@@ -84,9 +84,9 @@ if __name__ == "__main__":
     tag = {"Key": "{}-Tag".format(emr_conf['service_base_name']), "Value": "{}-{}-subnet".format(emr_conf['service_base_name'], os.environ['edge_user_name'])}
     emr_conf['subnet_cidr'] = get_subnet_by_tag(tag)
     emr_conf['key_path'] = os.environ['conf_key_dir'] + '/' + os.environ['conf_key_name'] + '.pem'
-    if bool(os.environ['slave_instance_spot']):
+    if bool(os.environ['emr_slave_instance_spot']):
         emr_conf['slave_bid_price'] = (float(get_ec2_price(emr_conf['slave_instance_type'], emr_conf['region'])) *
-                                       int(os.environ['slave_instance_spot_pct_price']))/100
+                                       int(os.environ['emr_slave_instance_spot_pct_price']))/100
     else:
         emr_conf['slave_bid_price'] = 0
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
                     emr_conf['release_label'], emr_conf['emr_timeout'], emr_conf['subnet_cidr'],
                     emr_conf['role_service_name'], emr_conf['role_ec2_name'], emr_conf['notebook_ip'],
                     os.environ['conf_os_user'], emr_conf['bucket_name'], emr_conf['region'], emr_conf['tags'],
-                    os.environ['conf_key_dir'], os.environ['edge_user_name'], bool(os.environ['slave_instance_spot']),
+                    os.environ['conf_key_dir'], os.environ['edge_user_name'], bool(os.environ['emr_slave_instance_spot']),
                     str(emr_conf['slave_bid_price']))
         try:
             local("~/scripts/{}.py {}".format('emr_create', params))
