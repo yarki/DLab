@@ -62,7 +62,7 @@ parser.add_argument('--configurations', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--key_dir', type=str, default='')
 parser.add_argument('--edge_user_name', type=str, default='')
-parser.add_argument('--slave_instance_spot', type=bool, default=False)
+parser.add_argument('--slave_instance_spot', type=str, default='False')
 parser.add_argument('--bid_price', type=str, default='')
 args = parser.parse_args()
 
@@ -234,7 +234,7 @@ def build_emr_cluster(args):
 
     if not args.dry_run:
         socket = boto3.client('emr')
-        if args.slave_instance_spot:
+        if args.slave_instance_spot == 'True':
             result = socket.run_job_flow(
                 Name=args.name,
                 ReleaseLabel=args.release_label,
