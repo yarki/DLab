@@ -81,7 +81,7 @@ export class ConfirmationDialogModel {
      will be terminated.';
     let defaultTerminateMessage = 'Exploratory Environment will be terminated.';
 
-    let edgeNodeStopMessage = 'Edge Node will be stopped';
+    let edgeNodeStopMessage = 'Edge node will be stopped. You will need to start it later to proceed working with DLAB.';
 
     switch (confirmationType) {
       case ConfirmationDialogType.StopExploratory: {
