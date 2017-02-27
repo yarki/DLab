@@ -523,7 +523,8 @@ public class TestServices {
                         "/tmp/" +  pyFileName,
                         ConfigPropertyValue.getAwsRegion(),
                         getBucketName(),
-                        cluster_name);
+                        cluster_name,
+                        ConfigPropertyValue.CLUSTER_OS_USERNAME);
                 LOGGER.info(String.format("Executing command %s...", command));
 
                 ChannelExec runScript1 = SSHConnect.setCommand(notebookSession, "ls -la /tmp");
