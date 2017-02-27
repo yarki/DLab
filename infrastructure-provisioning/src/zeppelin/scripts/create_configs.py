@@ -52,6 +52,10 @@ emr_dir = '/opt/' + args.emr_version + '/jars/'
 kernels_dir = '/home/' + args.os_user + '/.local/share/jupyter/kernels/'
 spark_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
 yarn_dir = '/opt/' + args.emr_version + '/' + args.cluster_name + '/conf/'
+if args.region == 'us-east-1':
+    endpoint_url = 'https://s3.amazonaws.com'
+else:
+    endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
 
 
 def install_remote_livy(args):
@@ -89,4 +93,4 @@ if __name__ == "__main__":
         install_remote_livy(args)
         installing_python(args.region, args.bucket, args.user_name, args.cluster_name)
         configure_zeppelin_emr_interpreter(args.emr_version, args.cluster_name, args.region, spark_dir, args.os_user,
-                                           yarn_dir, args.bucket, args.user_name)
+                                           yarn_dir, args.bucket, args.user_name, endpoint_url)
