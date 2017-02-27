@@ -16,8 +16,12 @@ limitations under the License.
 
 ----------------------------------------------------------------------------------------------------------- -->
 
-<sd-navbar></sd-navbar>
+<sd-navbar [healthStatus]="healthStatus"></sd-navbar>
 
-<div class="sub_nav"></div>
+<div class="sub_nav">
+  <button class="btn btn_refresh pull-right" (click)="buildGrid()">
+    <span class="glyphicon glyphicon-refresh"></span> Refresh
+  </button>
+</div>
 
-<health-status-grid></health-status-grid>
+<health-status-grid [environmentsHealthStatuses]="environmentsHealthStatuses" (refreshGrid)="buildGrid($event)"></health-status-grid>

@@ -36,6 +36,9 @@ export class ApplicationServiceFacade {
   private static readonly COMPUTATIONAL_RESOURCES_LIMITS = 'computational_resources_limits';
   private static readonly USER_PREFERENCES = 'user_preferences';
   private static readonly ENVIRONMENT_HEALTH_STATUS = 'environment_health_status';
+  private static readonly EDGE_NODE_START = 'edge_node_start';
+  private static readonly EDGE_NODE_STOP = 'edge_node_stop';
+  private static readonly EDGE_NODE_RECREATE = 'edge_node_recreate';
   private accessTokenKey: string = 'access_token';
   private requestRegistry: Dictionary<string>;
 
@@ -169,6 +172,27 @@ export class ApplicationServiceFacade {
       this.getRequestOptions(true, true));
   }
 
+  public buildRunEdgeNodeRequest(): Observable<Response>  {
+    return this.buildRequest(RequestMethod.Post,
+      this.requestRegistry.Item(ApplicationServiceFacade.EDGE_NODE_START),
+      null,
+      this.getRequestOptions(true, true));
+  }
+
+  public buildSuspendEdgeNodeRequest(): Observable<Response>  {
+    return this.buildRequest(RequestMethod.Post,
+      this.requestRegistry.Item(ApplicationServiceFacade.EDGE_NODE_STOP),
+      null,
+      this.getRequestOptions(true, true));
+  }
+
+  public buildRecreateEdgeNodeRequest(): Observable<Response>  {
+    return this.buildRequest(RequestMethod.Post,
+      this.requestRegistry.Item(ApplicationServiceFacade.EDGE_NODE_RECREATE),
+      null,
+      this.getRequestOptions(true, true));
+  }
+
   private setupRegistry(): void {
     this.requestRegistry = new Dictionary<string>();
 
@@ -200,6 +224,9 @@ export class ApplicationServiceFacade {
 
     // Environment Health Status
     this.requestRegistry.Add(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUS, '/api/infrastructure/status');
+    this.requestRegistry.Add(ApplicationServiceFacade.EDGE_NODE_START, '/api/infrastructure/edge/start');
+    this.requestRegistry.Add(ApplicationServiceFacade.EDGE_NODE_STOP, '/api/infrastructure/edge/stop');
+    this.requestRegistry.Add(ApplicationServiceFacade.EDGE_NODE_RECREATE, '/api/user/access_key/recover');
   }
 
   private buildRequest(method: RequestMethod, url: string, body: any, opt: RequestOptions): Observable<Response> {
