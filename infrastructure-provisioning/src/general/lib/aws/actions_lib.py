@@ -895,7 +895,7 @@ def installing_python(region, bucket, user_name, cluster_name):
         local(venv_command + ' && sudo -i ' + pip_command + ' install ipython ipykernel --no-cache-dir')
         local(venv_command + ' && sudo -i ' + pip_command + ' install boto boto3 NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
         local('sudo rm -rf /usr/bin/python' + python_version[0:3])
-        local('sudo ln -s /opt/python/python' + python_version + '/bin/python' + python_version[0:3] +
+        local('sudo ln -fs /opt/python/python' + python_version + '/bin/python' + python_version[0:3] +
               ' /usr/bin/python' + python_version[0:3])
 
 

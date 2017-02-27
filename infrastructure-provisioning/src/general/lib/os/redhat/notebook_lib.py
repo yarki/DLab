@@ -286,7 +286,7 @@ def install_livy_dependencies():
 def install_maven_emr():
     local('wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz -O /tmp/maven.tar.gz')
     local('sudo tar -zxvf /tmp/maven.tar.gz -C /opt/')
-    local('sudo ln -s /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn')
+    local('sudo ln -fs /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn')
 
 
 def install_livy_dependencies_emr():
