@@ -64,6 +64,9 @@ public class ConfigPropertyValue {
             LOGGER.error(new Exception("Missed required parameter 'jenkins.buildNumber'"));
             System.exit(0);
         }
+
+    	loadProperties();
+
         CLUSTER_OS_USERNAME  = System.getProperty(CLUSTER_USER, "");
         if(StringUtils.isEmpty(CLUSTER_OS_USERNAME)) {
             LOGGER.error(new Exception("Missed required parameter " + CLUSTER_USER));
@@ -74,7 +77,6 @@ public class ConfigPropertyValue {
             LOGGER.error(new Exception("Missed required parameter " + CLUSTER_OS));
             System.exit(0);
         }
-    	loadProperties();
     }
     
     private ConfigPropertyValue() { }
