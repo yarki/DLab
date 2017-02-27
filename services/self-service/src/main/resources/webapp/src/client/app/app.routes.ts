@@ -26,9 +26,8 @@ import { AuthorizationGuard } from './security/authorization.guard';
 import { NotFoundComponent } from './not-found/not-found.component';
 
 export const routes: Routes = [{
-    path: '',
-    redirectTo: 'resources_list',
-    pathMatch: 'full'
+    path: 'login',
+    component: LoginComponent
   }, {
     path: 'resources_list',
     component: HomeComponent,
@@ -37,9 +36,6 @@ export const routes: Routes = [{
     path: 'environment_health_status',
     component: HealthStatusComponent,
     canActivate: [AuthorizationGuard]
- }, {
-    path: 'login',
-    component: LoginComponent
   }, {
     path: 'help/accessnotebookguide',
     component: AccessNotebookGuide,
@@ -49,8 +45,10 @@ export const routes: Routes = [{
     component: PublicKeyGuide,
     canActivate: [AuthorizationGuard]
   }, {
+    path: '',
+    redirectTo: 'resources_list',
+    pathMatch: 'full'
+  }, {
     path: '**',
     component: NotFoundComponent
   }];
-
-

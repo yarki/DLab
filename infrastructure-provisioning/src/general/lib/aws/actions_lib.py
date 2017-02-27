@@ -48,8 +48,10 @@ def put_to_bucket(bucket_name, local_file, destination_file):
 def create_s3_bucket(bucket_name, tag, region):
     try:
         s3 = boto3.resource('s3', config=Config(signature_version='s3v4'))
-        bucket = s3.create_bucket(Bucket=bucket_name,
-                                  CreateBucketConfiguration={'LocationConstraint': region})
+        if region == "us-east-1":
+            bucket = s3.create_bucket(Bucket=bucket_name)
+        else:
+            bucket = s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={'LocationConstraint': region})
         tagging = bucket.Tagging()
         tagging.put(Tagging={'TagSet': [tag]})
         tagging.reload()
@@ -946,7 +948,7 @@ def pyspark_kernel(kernels_dir, emr_version, cluster_name, spark_version, bucket
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
 
 
-def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_dir, os_user, yarn_dir, bucket, user_name):
+def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_dir, os_user, yarn_dir, bucket, user_name, endpoint_url):
     try:
         port_number_found = False
         zeppelin_restarted = False
@@ -979,14 +981,17 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
         local('sudo chown ' + os_user + ':' + os_user + ' -R /opt/zeppelin/')
         local('sudo service zeppelin-notebook restart')
         while not zeppelin_restarted:
-            result = local('nc -z localhost 8080; echo $?', capture=True)
-            if result == '0':
+            local('sleep 5')
+            result = local('sudo bash -c "nmap -p 8080 localhost | grep closed > /dev/null" ; echo $?', capture=True)
+            result = result[:1]
+            if result == '1':
                 zeppelin_restarted = True
         local('sleep 5')
         local('echo \"Configuring emr spark interpreter for Zeppelin\"')
         while not port_number_found:
-            port_free = local('sudo nc -z localhost ' + str(default_port) + '; echo $?', capture=True)
-            if port_free == '1':
+            port_free = local('sudo bash -c "nmap -p ' + str(default_port) + ' localhost | grep closed > /dev/null" ; echo $?', capture=True)
+            port_free = port_free[:1]
+            if port_free == '0':
                 livy_port = default_port
                 port_number_found = True
             else:
@@ -1003,7 +1008,7 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
         text = fr.read()
         text = text.replace('CLUSTER_NAME', cluster_name)
         text = text.replace('SPARK_HOME', spark_dir)
-        text = text.replace('AWS_REGION', region)
+        text = text.replace('ENDPOINTURL', endpoint_url)
         text = text.replace('LIVY_PORT', str(livy_port))
         fw = open(template_file, 'w')
         fw.write(text)

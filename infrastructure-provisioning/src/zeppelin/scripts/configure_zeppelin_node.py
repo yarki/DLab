@@ -57,6 +57,10 @@ local_spark_path = '/opt/spark/'
 templates_dir = '/root/templates/'
 files_dir = '/root/files/'
 s3_jars_dir = '/opt/jars/'
+if args.region == 'us-east-1':
+    endpoint_url = 'https://s3.amazonaws.com'
+else:
+    endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
 
 
 def configure_zeppelin(os_user):
@@ -96,25 +100,28 @@ def configure_zeppelin(os_user):
 
 
 def configure_local_kernels(args):
-    port_number_found = False
-    default_port = 8998
-    livy_port = ''
-    put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
-    sudo('sed -i "s|AWS_REGION|' + args.region + '|g" /tmp/interpreter.json')
-    sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
-    while not port_number_found:
-        port_free = sudo('nc -z localhost ' + str(default_port) + '; echo $?')
-        if port_free == '1':
-            livy_port = default_port
-            port_number_found = True
-        else:
-            default_port += 1
-    sudo('sed -i "s|LIVY_PORT|' + str(livy_port) + '|g" /tmp/interpreter.json')
-    sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
-    sudo('echo "livy.server.port = ' + str(livy_port) + '" >> /opt/livy/conf/livy.conf')
-    sudo('''echo "SPARK_HOME='/opt/spark/'" >> /opt/livy/conf/livy-env.sh''')
-    sudo('sed -i "s/^/#/g" /opt/livy/conf/spark-blacklist.conf')
-    sudo("systemctl start livy-server")
+    if not exists('/home/' + args.os_user + '/.ensure_dir/local_livy_kernel_ensured'):
+        port_number_found = False
+        default_port = 8998
+        livy_port = ''
+        put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
+        sudo('sed -i "s|ENDPOINTURL|' + endpoint_url + '|g" /tmp/interpreter.json')
+        sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
+        while not port_number_found:
+            port_free = sudo('nmap -p ' + str(default_port) + ' localhost | grep "closed" > /dev/null; echo $?')
+            port_free = port_free[:1]
+            if port_free == '0':
+                livy_port = default_port
+                port_number_found = True
+            else:
+                default_port += 1
+        sudo('sed -i "s|LIVY_PORT|' + str(livy_port) + '|g" /tmp/interpreter.json')
+        sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
+        sudo('echo "livy.server.port = ' + str(livy_port) + '" >> /opt/livy/conf/livy.conf')
+        sudo('''echo "SPARK_HOME='/opt/spark/'" >> /opt/livy/conf/livy-env.sh''')
+        sudo('sed -i "s/^/#/g" /opt/livy/conf/spark-blacklist.conf')
+        sudo("systemctl start livy-server")
+        sudo('touch /home/' + args.os_user + '/.ensure_dir/local_livy_kernel_ensured')
 
 
 def install_local_livy(args):
