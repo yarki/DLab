@@ -230,7 +230,7 @@ public class UserComputationalResourceDTO {
     	        .add("masterShape", masterShape)
     			.add("slaveShape", slaveShape)
                 .add("slaveSpot", slaveSpot)
-                .add("slaveSpotPctCost", slaveSpotPctPrice)
+                .add("slaveSpotPctPrice", slaveSpotPctPrice)
     			.add("slaveNumber", slaveNumber)
     			.add("uptime", uptime)
     	        .add("status", status)
