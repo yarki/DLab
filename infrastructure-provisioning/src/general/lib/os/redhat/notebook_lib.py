@@ -272,23 +272,31 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
             sys.exit(1)
 
 
-def install_maven():
-    sudo('wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz -O /tmp/maven.tar.gz')
-    sudo('tar -zxvf /tmp/maven.tar.gz -C /opt/')
-    sudo('ln -fs /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn')
+def install_maven(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/maven_ensured'):
+        sudo('wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz -O /tmp/maven.tar.gz')
+        sudo('tar -zxvf /tmp/maven.tar.gz -C /opt/')
+        sudo('ln -fs /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn')
+        sudo('touch /home/' + os_user + '/.ensure_dir/maven_ensured')
 
 
-def install_livy_dependencies():
-    sudo('pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
-    sudo('pip3.5 install cloudpickle requests requests-kerberos flake8 flaky pytest')
+def install_livy_dependencies(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/livy_dependencies_ensured'):
+        sudo('pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
+        sudo('pip3.5 install cloudpickle requests requests-kerberos flake8 flaky pytest')
+        sudo('touch /home/' + os_user + '/.ensure_dir/livy_dependencies_ensured')
 
 
-def install_maven_emr():
-    local('wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz -O /tmp/maven.tar.gz')
-    local('sudo tar -zxvf /tmp/maven.tar.gz -C /opt/')
-    local('sudo ln -fs /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn')
+def install_maven_emr(os_user):
+    if not os.path.exists('/home/' + os_user + '/.ensure_dir/maven_ensured'):
+        local('wget http://apache.volia.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz -O /tmp/maven.tar.gz')
+        local('sudo tar -zxvf /tmp/maven.tar.gz -C /opt/')
+        local('sudo ln -fs /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn')
+        local('touch /home/' + os_user + '/.ensure_dir/maven_ensured')
 
 
-def install_livy_dependencies_emr():
-    local('sudo -i pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
-    local('sudo -i pip3.5 install cloudpickle requests requests-kerberos flake8 flaky pytest')
+def install_livy_dependencies_emr(os_user):
+    if not os.path.exists('/home/' + os_user + '/.ensure_dir/livy_dependencies_ensured'):
+        local('sudo -i pip install cloudpickle requests requests-kerberos flake8 flaky pytest')
+        local('sudo -i pip3.5 install cloudpickle requests requests-kerberos flake8 flaky pytest')
+        local('touch /home/' + os_user + '/.ensure_dir/livy_dependencies_ensured')
