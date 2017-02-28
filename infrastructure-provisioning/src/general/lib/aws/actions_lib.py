@@ -979,7 +979,7 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
               '\/spark\/python\/lib\/pyspark.zip/\' /opt/' + emr_version + '/' + cluster_name +
               '/spark/conf/spark-defaults.conf')
         local('sudo chown ' + os_user + ':' + os_user + ' -R /opt/zeppelin/')
-        local('systemctl daemon-reload')
+        local('sudo systemctl daemon-reload')
         local('sudo service zeppelin-notebook stop')
         local('sudo service zeppelin-notebook start')
         while not zeppelin_restarted:
