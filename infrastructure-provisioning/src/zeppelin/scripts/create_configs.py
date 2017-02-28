@@ -59,8 +59,8 @@ else:
 
 
 def install_remote_livy(args):
-    install_maven_emr()
-    install_livy_dependencies_emr()
+    install_maven_emr(args.os_user)
+    install_livy_dependencies_emr(args.os_user)
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R /opt/zeppelin/')
     local('sudo service zeppelin-notebook stop')
     with lcd('/opt/' + args.emr_version + '/' + args.cluster_name + '/'):
