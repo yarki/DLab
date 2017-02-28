@@ -127,8 +127,8 @@ def configure_local_kernels(args):
 
 def install_local_livy(args):
     if not exists('/home/' + args.os_user + '/.ensure_dir/local_livy_ensured'):
-        install_maven()
-        install_livy_dependencies()
+        install_maven(args.os_user)
+        install_livy_dependencies(args.os_user)
         with cd('/opt/'):
             sudo('git init')
             sudo('git clone https://github.com/cloudera/livy.git')
