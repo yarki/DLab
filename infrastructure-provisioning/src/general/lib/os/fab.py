@@ -260,23 +260,13 @@ def add_breeze_library_local(os_user):
                  breeze_tmp_dir + 'breeze-macros_2.11-0.12.jar')
             sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-parent_2.11/0.12/breeze-parent_2.11-0.12.jar -O ' +
                  breeze_tmp_dir + 'breeze-parent_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/jfree/jfreechart/1.0.19/jfreechart-1.0.19.jar -O ' +
+                 breeze_tmp_dir + 'jfreechart-1.0.19.jar')
+            sudo('wget http://central.maven.org/maven2/org/jfree/jcommon/1.0.24/jcommon-1.0.24.jar -O ' +
+                 breeze_tmp_dir + 'jcommon-1.0.24.jar')
+            sudo('wget https://brunelvis.org/jar/spark-kernel-brunel-all-2.3.jar -O ' +
+                 breeze_tmp_dir + 'spark-kernel-brunel-all-2.3.jar')
             sudo('mv ' + breeze_tmp_dir + '* ' + s3_jars_dir)
         except:
             sys.exit(1)
 
-
-def ensure_additional_scala_libs_local(os_user):
-    if not exists('/home/' + os_user + '/.ensure_dir/scala_libs_local_ensured'):
-        try:
-            tmp_dir = '/tmp/breeze_tmp_local/'
-            s3_jars_dir = '/opt/jars/'
-            sudo('mkdir -p ' + tmp_dir)
-            sudo('wget http://central.maven.org/maven2/org/jfree/jfreechart/1.0.19/jfreechart-1.0.19.jar -O ' +
-                 tmp_dir + 'jfreechart-1.0.19.jar')
-            sudo('wget http://central.maven.org/maven2/org/jfree/jcommon/1.0.24/jcommon-1.0.24.jar -O ' +
-                 tmp_dir + 'jcommon-1.0.24.jar')
-            sudo('wget https://brunelvis.org/jar/spark-kernel-brunel-all-2.0.jar -O ' +
-                 tmp_dir + 'spark-kernel-brunel-all-2.0.jar.jar')
-            sudo('mv ' + tmp_dir + '* ' + s3_jars_dir)
-        except:
-            sys.exit(1)
