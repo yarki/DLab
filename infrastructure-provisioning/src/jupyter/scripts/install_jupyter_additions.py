@@ -34,6 +34,33 @@ parser.add_argument('--os_user', type=str, default='')
 args = parser.parse_args()
 
 
+def add_breeze_library_local(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/breeze_local_ensured'):
+        try:
+            breeze_tmp_dir = '/tmp/breeze_tmp_local/'
+            s3_jars_dir = '/opt/jars/'
+            sudo('mkdir -p ' + breeze_tmp_dir)
+            sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze_2.11/0.12/breeze_2.11-0.12.jar -O ' +
+                 breeze_tmp_dir + 'breeze_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-natives_2.11/0.12/breeze-natives_2.11-0.12.jar -O ' +
+                 breeze_tmp_dir + 'breeze-natives_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-viz_2.11/0.12/breeze-viz_2.11-0.12.jar -O ' +
+                 breeze_tmp_dir + 'breeze-viz_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-macros_2.11/0.12/breeze-macros_2.11-0.12.jar -O ' +
+                 breeze_tmp_dir + 'breeze-macros_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-parent_2.11/0.12/breeze-parent_2.11-0.12.jar -O ' +
+                 breeze_tmp_dir + 'breeze-parent_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/jfree/jfreechart/1.0.19/jfreechart-1.0.19.jar -O ' +
+                 breeze_tmp_dir + 'jfreechart-1.0.19.jar')
+            sudo('wget http://central.maven.org/maven2/org/jfree/jcommon/1.0.24/jcommon-1.0.24.jar -O ' +
+                 breeze_tmp_dir + 'jcommon-1.0.24.jar')
+            sudo('wget https://brunelvis.org/jar/spark-kernel-brunel-all-2.3.jar -O ' +
+                 breeze_tmp_dir + 'spark-kernel-brunel-all-2.3.jar')
+            sudo('mv ' + breeze_tmp_dir + '* ' + s3_jars_dir)
+        except:
+            sys.exit(1)
+
+
 ##############
 # Run script #
 ##############

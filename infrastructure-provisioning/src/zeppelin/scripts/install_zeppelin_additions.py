@@ -50,6 +50,3 @@ if __name__ == "__main__":
 
     print "Installing notebook additions: matplotlib."
     ensure_matplot(args.os_user)
-
-    print "Installing Breeze library"
-    add_breeze_library_local(args.os_user)
