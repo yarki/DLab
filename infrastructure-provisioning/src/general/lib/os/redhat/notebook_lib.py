@@ -80,12 +80,10 @@ def ensure_r(os_user, r_libs):
             sys.exit(1)
 
 
-def install_rstudio(os_user, local_spark_path, rstudio_pass, rstudio_r_libs):
+def install_rstudio(os_user, local_spark_path, rstudio_pass):
     if not exists('/home/' + os_user + '/.ensure_dir/rstudio_ensured'):
         try:
             sudo('yum install -y --nogpgcheck https://download2.rstudio.org/rstudio-server-rhel-1.0.136-x86_64.rpm')
-            for i in rstudio_r_libs:
-                sudo('R -e "install.packages(\'{}\',repos=\'http://cran.us.r-project.org\')"'.format(i))
             sudo('mkdir /mnt/var')
             sudo('chown ' + os_user + ':' + os_user + ' /mnt/var')
             sudo('touch /home/' + os_user + '/.Renviron')

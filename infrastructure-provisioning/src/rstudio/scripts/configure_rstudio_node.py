@@ -44,9 +44,8 @@ local_spark_path = '/opt/spark/'
 s3_jars_dir = '/opt/jars/'
 templates_dir = '/root/templates/'
 files_dir = '/root/files/'
-r_libs = ['R6', 'pbdZMQ', 'RCurl', 'devtools', 'reshape2', 'caTools', 'rJava', 'ggplot2']
-rstudio_r_libs = ['evaluate', 'formatR', 'yaml', 'Rcpp', 'rmarkdown', 'base64enc', 'tibble']
-
+r_libs = ['R6', 'pbdZMQ', 'RCurl', 'devtools', 'reshape2', 'caTools', 'rJava', 'ggplot2', 'evaluate', 'formatR', 'yaml',
+          'Rcpp', 'rmarkdown', 'base64enc', 'tibble']
 
 ##############
 # Run script #
@@ -80,7 +79,7 @@ if __name__ == "__main__":
     ensure_r(args.os_user, r_libs)
 
     print "Install RStudio"
-    install_rstudio(args.os_user, local_spark_path, args.rstudio_pass, rstudio_r_libs)
+    install_rstudio(args.os_user, local_spark_path, args.rstudio_pass)
 
     print "Install local Spark"
     ensure_local_spark(args.os_user, spark_link, spark_version, hadoop_version, local_spark_path)
