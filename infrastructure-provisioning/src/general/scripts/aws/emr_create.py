@@ -315,7 +315,7 @@ if __name__ == "__main__":
             if spot_instances_status[0]:
                 print "Spot instances status: " + spot_instances_status[1]
             else:
-                print "Spot instances status: " + spot_instances_status[1]
+                append_result("Error with Spot request: " + spot_instances_status[1])
                 sys.exit(1)
         if wait_emr(args.s3_bucket, args.name, args.emr_timeout):
             # Append Cluster's SGs to the Notebook server to grant access
