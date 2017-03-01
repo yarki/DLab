@@ -98,7 +98,7 @@ export class ComputationalResourceCreateDialog {
     if (this.shapes[$event.model.type])
       this.shapes[$event.model.type] = $event.model.value.type;
 
-    if($event.model.type === 'slave_shape') {
+    if($event.model.type === 'slave_shape' && this.spotInstancesSelect.nativeElement['checked']) {
       this.spotInstance = $event.model.value.spot;
       this.spotInstancePrice = $event.model.value.price;
     }
