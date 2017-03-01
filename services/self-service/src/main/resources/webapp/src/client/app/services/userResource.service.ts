@@ -101,19 +101,4 @@ export class UserResourceService {
       .buildUpdateUserPreferences(body)
       .map((response: Response) => response);
   }
-
-  public getEnvironmentHealthStatus(): Observable<Response> {
-    return this.applicationServiceFacade
-    .buildGetEnvironmentHealthStatus()
-    .map((response: Response) => response.json())
-    .catch((error: any) => error);
-  }
-
-  public getEnvironmentStatuses(): Observable<Response> {
-    let body = '?full=1';
-    return this.applicationServiceFacade
-    .buildGetEnvironmentStatuses(body)
-    .map((response: Response) => response.json())
-    .catch((error: any) => error);
-  }
 }

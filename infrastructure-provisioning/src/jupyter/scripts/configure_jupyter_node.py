@@ -48,6 +48,7 @@ templates_dir = '/root/templates/'
 files_dir = '/root/files/'
 local_spark_path = '/opt/spark/'
 toree_link = 'https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0/snapshots/dev1/toree-pip/toree-0.2.0.dev1.tar.gz'
+r_libs = ['R6', 'pbdZMQ', 'RCurl', 'devtools', 'reshape2', 'caTools', 'rJava', 'ggplot2']
 
 
 def ensure_toree_local_kernel():
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     ensure_toree_local_kernel()
 
     print "Installing R"
-    ensure_r(args.os_user)
+    ensure_r(args.os_user, r_libs)
 
     print "Install R kernel for Jupyter"
     ensure_r_local_kernel(spark_version, args.os_user, templates_dir, r_kernels_dir)

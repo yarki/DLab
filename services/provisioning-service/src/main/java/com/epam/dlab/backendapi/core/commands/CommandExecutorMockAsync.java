@@ -134,9 +134,6 @@ public class CommandExecutorMockAsync implements Supplier<Boolean> {
 
     
     /** Describe action.
-     * @param uuid UUID for request.
-     * @param imageType name of docker image.
-     * @param responsePath path for response file.
      */
     private void describe() {
     	String templateFileName = getAbsolutePath(
@@ -158,10 +155,7 @@ public class CommandExecutorMockAsync implements Supplier<Boolean> {
     
     /** Perform docker action.
      * @param user the name of user.
-     * @param resourceType the name of resource type: edge, emr, zeppelin, etc.
      * @param action docker action.
-     * @param uuid UUID for response.
-     * @param responsePath the path to store response file.
      */
     private void action(String user, DockerAction action) {
     	String resourceType = parser.getResourceType();
@@ -227,7 +221,7 @@ public class CommandExecutorMockAsync implements Supplier<Boolean> {
     	File fileResponse = new File(responseFileName);
     	try (BufferedWriter out = new BufferedWriter(new FileWriter(fileResponse))) {
         	Files.createParentDirs(fileResponse);
-    	    out.write(content);  
+    	    out.write(content);
     	} catch (IOException e) {
 			throw new DlabException("Can't write response file " + targetFileName + ": " + e.getLocalizedMessage(), e);
     	}

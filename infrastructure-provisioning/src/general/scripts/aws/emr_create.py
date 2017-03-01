@@ -66,17 +66,22 @@ parser.add_argument('--slave_instance_spot', type=str, default='False')
 parser.add_argument('--bid_price', type=str, default='')
 args = parser.parse_args()
 
-cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/{4}/{5}/config/hive-site.xml --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/{4}/{5}/config/ --recursive --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/{4}/{4}.pub /tmp/{4}.pub --endpoint-url https://s3-{3}.amazonaws.com --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-            "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
-    args.s3_bucket, args.name, args.nbs_user, args.region, args.edge_user_name, args.name)
+if args.region == 'us-east-1':
+    endpoint_url = 'https://s3.amazonaws.com'
+else:
+    endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
 
-cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/jars_parser.sh /tmp/jars_parser.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
-          "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/key_importer.sh /tmp/key_importer.sh --endpoint-url https://s3-{2}.amazonaws.com --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
+cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{0}/{4}/{5}/config/hive-site.xml --endpoint-url {6} --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hadoop/conf/ s3://{0}/{4}/{5}/config/ --recursive --endpoint-url {6} --region {3}, ActionOnFailure=TERMINATE_CLUSTER, Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -mkdir /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/{4}/{4}.pub /tmp/{4}.pub --endpoint-url {6} --region {3}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+            "Name=CUSTOM_JAR, Args=sudo -u hadoop hdfs dfs -chown -R {2}:{2} /user/{2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(
+    args.s3_bucket, args.name, args.nbs_user, args.region, args.edge_user_name, args.name, endpoint_url)
+
+cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/jars_parser.sh /tmp/jars_parser.sh --endpoint-url {6} --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
+          "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/key_importer.sh /tmp/key_importer.sh --endpoint-url {6} --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
           "Name=CUSTOM_JAR, Args=sh /tmp/key_importer.sh {4}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2} {4} {5}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, args.edge_user_name, args.name)
+          "Name=CUSTOM_JAR, Args=sh /tmp/jars_parser.sh {0} {3} {2} {4} {5}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, args.edge_user_name, args.name, endpoint_url)
 
 logfile = '{}_creation.log'.format(args.name)
 logpath = '/response/' + logfile
