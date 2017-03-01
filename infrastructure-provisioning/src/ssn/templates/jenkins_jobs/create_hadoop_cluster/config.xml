@@ -28,7 +28,7 @@
                 </hudson.model.ChoiceParameterDefinition>
                 <hudson.model.StringParameterDefinition>
                     <name>slave_instance_spot_pct_price</name>
-                    <description>The percentage of EC2 instance price which will be used for Spot price</description>
+                    <description>The percentage of EC2 instance price which will be used for Spot price. If spot instances is disabled, the value of this parameter can be anything.</description>
                     <defaultValue>70</defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.ChoiceParameterDefinition>
