@@ -159,7 +159,7 @@ def ensure_additional_python_libs(os_user):
                 sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
                 sudo('python3.5 -m pip install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
             if os.environ['application'] == 'zeppelin':
-                sudo('curl -O http://mirror.switch.ch/pool/4/mirror/centos/7.3.1611/os/x86_64/Packages/tkinter-2.7.5-48.el7.x86_64.rpm')
+                sudo('curl -O ftp://mirror.switch.ch/pool/4/mirror/centos/7.3.1611/os/x86_64/Packages/tkinter-2.7.5-48.el7.x86_64.rpm')
                 sudo('yum install -y tkinter-2.7.5-48.el7.x86_64.rpm --nogpgcheck')
                 sudo('yum install -y python35u-tkinter')
             if os.environ['application'] == 'tensor':
