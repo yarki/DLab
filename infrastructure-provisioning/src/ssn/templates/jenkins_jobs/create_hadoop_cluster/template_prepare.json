@@ -14,6 +14,6 @@
     "conf_key_name":"KN",
     "aws_region":"CREG",
     "notebook_instance_name":"NNM",
-    "slave_spot_instance":"SPI",
-    "slave_instance_spot_pct_price": "SISPP"
+    "emr_slave_spot_instance":"SPI",
+    "emr_slave_instance_spot_pct_price": "SISPP"
 }
