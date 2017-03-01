@@ -24,8 +24,8 @@
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
 		</Console>
-		<File name="file" fileName="output.log" bufferedIO="false" advertiseURI="file:log.log" advertise="true">
-		</File>
+			<File name="file" fileName="output.log" bufferedIO="false" advertiseURI="file:log.log" advertise="true">
+			</File>
 	</Appenders>
 
 
