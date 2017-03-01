@@ -704,14 +704,9 @@ def get_ec2_price(instance_shape, region):
 
 def get_spot_instances_status(cluster_id):
     try:
-        emr = boto3.client('emr')
         ec2 = boto3.client('ec2')
-        instances = []
-        response = emr.list_instances(ClusterId=cluster_id, InstanceGroupTypes=['CORE']).get('Instances')
-        for i in response:
-            instances.append(i.get('Ec2InstanceId'))
         response = ec2.describe_spot_instance_requests(Filters=[
-            {'Name': 'instance-id', 'Values': instances}]).get('SpotInstanceRequests')
+            {'Name': 'availability-zone-group', 'Values': [cluster_id]}]).get('SpotInstanceRequests')
         for i in response:
             if i.get('Status').get('Code') != 'request-canceled-and-instance-running':
                 return False, i.get('Status').get('Message')
