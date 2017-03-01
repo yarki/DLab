@@ -62,7 +62,7 @@ parser.add_argument('--configurations', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--key_dir', type=str, default='')
 parser.add_argument('--edge_user_name', type=str, default='')
-parser.add_argument('--slave_instance_spot', type=bool, default=False)
+parser.add_argument('--slave_instance_spot', type=str, default='False')
 parser.add_argument('--bid_price', type=str, default='')
 args = parser.parse_args()
 
@@ -234,7 +234,7 @@ def build_emr_cluster(args):
 
     if not args.dry_run:
         socket = boto3.client('emr')
-        if args.slave_instance_spot:
+        if args.slave_instance_spot == 'True':
             result = socket.run_job_flow(
                 Name=args.name,
                 ReleaseLabel=args.release_label,
@@ -304,6 +304,14 @@ if __name__ == "__main__":
         out.write('[BUILDING NEW CLUSTER - {}\n]'.format(args.name))
         cluster_id = build_emr_cluster(args)
         out.write('Cluster ID: {}\n'.format(cluster_id))
+        if args.slave_instance_spot == 'True':
+            time.sleep(420)
+            spot_instances_status = get_spot_instances_status(cluster_id)
+            if spot_instances_status[0]:
+                out.write(spot_instances_status[1])
+            else:
+                out.write(spot_instances_status[1])
+                sys.exit(1)
         if wait_emr(args.s3_bucket, args.name, args.emr_timeout):
             # Append Cluster's SGs to the Notebook server to grant access
             sg_list=[]
