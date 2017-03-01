@@ -23,9 +23,9 @@ for i in python_kernel_name:
     text = text.replace('S3_BUCKET', args.bucket)
     text = text.replace('NUMBER', number)
     text = text.replace('KERNEL_NAME', i)
-    with open('/home/USER/PYTHON.ipynb'.replace('USER', args.os_user), 'w') as f:
+    with open('/home/{}/PYTHON.ipynb'.format(args.os_user), 'w') as f:
         f.write(text)
-    local('sudo jupyter nbconvert --execute /home/USER/PYTHON.ipynb'.replace('USER', args.os_user))
+    local('jupyter nbconvert --execute /home/{}/PYTHON.ipynb'.format(args.os_user))
     result = local('sudo echo $?', capture=True)
     if result == "0":
         res = "SUCCESS"
@@ -38,9 +38,9 @@ for i in scala_kernel_name:
         text = f.read()
     text = text.replace('S3_BUCKET', args.bucket)
     text = text.replace('KERNEL_NAME', i)
-    with open('/home/USER/SCALA.ipynb'.replace('USER', args.os_user), 'w') as f:
+    with open('/home/{}/SCALA.ipynb'.format( args.os_user), 'w') as f:
         f.write(text)
-    local('sudo jupyter nbconvert --execute /home/USER/SCALA.ipynb'.replace('USER', args.os_user))
+    local('jupyter nbconvert --execute /home/{}/SCALA.ipynb'.format(args.os_user))
     result = local('sudo echo $?', capture=True)
     if result == "0":
         res = "SUCCESS"
@@ -53,9 +53,9 @@ for i in r_kernel_name:
         text = f.read()
     text = text.replace('S3_BUCKET', args.bucket)
     text = text.replace('KERNEL_NAME', i)
-    with open('/home/USER/R.ipynb'.replace('USER', args.os_user), 'w') as f:
+    with open('/home/{}/R.ipynb'.format(args.os_user), 'w') as f:
         f.write(text)
-    local('sudo jupyter nbconvert --execute /home/USER/R.ipynb'.replace('USER', args.os_user))
+    local('jupyter nbconvert --execute /home/{}/R.ipynb'.format(args.os_user))
     result = local('sudo echo $?', capture=True)
     if result == "0":
         res = "SUCCESS"
