@@ -17,10 +17,41 @@ limitations under the License.
 ****************************************************************************/
 
 import { Component, OnInit } from '@angular/core';
+import { EnvironmentStatusModel } from './environment-status.model';
+import { HealthStatusService } from './../services/healthStatus.service';
 
 @Component({
     moduleId: module.id,
     selector: 'health-status',
     templateUrl: 'health-status.component.html'
 })
-export class HealthStatusComponent { }
+export class HealthStatusComponent { 
+
+    environmentsHealthStatuses: Array<EnvironmentStatusModel>;
+    healthStatus: string;
+
+    constructor( private healthStatusService: HealthStatusService) { }
+
+    ngOnInit(): void {
+      this.buildGrid();
+    }
+
+    buildGrid(): void {
+      this.healthStatusService.getEnvironmentStatuses()
+        .subscribe((result) => {
+            this.environmentsHealthStatuses = this.loadHealthStatusList(result); 
+        });
+    }
+
+    loadHealthStatusList(healthStatusList): Array<EnvironmentStatusModel> {
+        this.healthStatus = healthStatusList.status;
+
+        if (healthStatusList.list_resources)
+            return healthStatusList.list_resources.map((value) => {
+                return new EnvironmentStatusModel(
+                value.type,
+                value.resource_id,
+                value.status);
+            });
+    }
+}

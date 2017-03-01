@@ -16,9 +16,10 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component, OnInit } from '@angular/core';
-import { UserResourceService } from '../../../services/userResource.service';
-import { EnvironmentStatusModel } from './environment-status.model';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { HealthStatusService } from '../../../services/healthStatus.service';
+import { EnvironmentStatusModel } from '../../environment-status.model';
+import { ConfirmationDialogType } from '../../../components/confirmation-dialog/confirmation-dialog-type.enum';
 
 @Component({
   moduleId: module.id,
@@ -28,10 +29,14 @@ import { EnvironmentStatusModel } from './environment-status.model';
               '../../../components/resources-grid/resources-grid.component.css']
 })
 export class HealthStatusGridComponent {
-   environmentsHealthStatuses: Array<EnvironmentStatusModel>;
+
+   @Input() environmentsHealthStatuses: Array<EnvironmentStatusModel>;
+   @Output() refreshGrid: EventEmitter<{}> = new EventEmitter();
+
+   @ViewChild('confirmationDialog') confirmationDialog;
 
     constructor(
-      private userResourceService: UserResourceService
+      private healthStatusService: HealthStatusService
     ) { }
 
     ngOnInit(): void {
@@ -39,19 +44,20 @@ export class HealthStatusGridComponent {
     }
 
     buildGrid(): void {
-      this.userResourceService.getEnvironmentStatuses()
-        .subscribe(
-          (result) => { this.environmentsHealthStatuses = this.loadHealthStatusList(result); },
-          (error) => {});
+      this.refreshGrid.emit();
     }
 
-    loadHealthStatusList(healthStatusList): Array<EnvironmentStatusModel> {
-      if (healthStatusList.list_resources)
-        return healthStatusList.list_resources.map((value) => {
-          return new EnvironmentStatusModel(
-            value.type,
-            value.resource_id,
-            value.status);
-        });
-    }
+    healthStatusAction(data, action: string) {
+      if (action === 'run') {
+        this.healthStatusService
+          .runEdgeNode()
+          .subscribe(() => this.buildGrid());
+      } else if (action === 'stop') {
+        this.confirmationDialog.open({ isFooter: false }, data, ConfirmationDialogType.StopEdgeNode);
+      } else if (action === 'recreate') {
+        this.healthStatusService
+          .recreateEdgeNode()
+          .subscribe(() => this.buildGrid());
+      }
+  }
 }

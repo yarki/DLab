@@ -36,6 +36,7 @@ import { FormsModule } from '@angular/forms';
 import { UserAccessKeyService } from './services/userAccessKey.service';
 import { AppRoutingService } from './routing/appRouting.service';
 import { UserResourceService } from './services/userResource.service';
+import { HealthStatusService } from './services/healthStatus.service';
 import { HttpInterceptor } from './util/interceptors/httpInterceptor.service';
 import { ApplicationServiceFacade } from './services/applicationServiceFacade.service';
 import { ApplicationSecurityService } from './services/applicationSecurity.service';
@@ -70,6 +71,7 @@ import { ApplicationSecurityService } from './services/applicationSecurity.servi
     UserAccessKeyService,
     AppRoutingService,
     UserResourceService,
+    HealthStatusService,
     ApplicationServiceFacade
   ],
   bootstrap: [AppComponent]

@@ -50,13 +50,16 @@ mongoimport -u admin -p <password> -d dlabdb mongo_settings.json
 2.1. Set configuration file ..\..\infrastructure-provisioning\aws\src\ssn\templates\ssn.yml
 # DEV_MODE="true"
 2.2. Add system environment variable
-DLAB_CONF_DIR_NAME=..\..\infrastructure-provisioning\aws\src\ssn\templates
+DLAB_CONF_DIR=...\infrastructure-provisioning\src\ssn\templates\ssn.yml
 or create two symlinks to service\provisioning-service and service\self-service for
-..\..\infrastructure-provisioning\aws\src\ssn\templates\ssn.yml
+..\..\infrastructure-provisioning\src\ssn\templates\ssn.yml
 Unix
   ln -s ssn.yml ../../infrastructure-provisioning/src/ssn/templates/ssn.yml
 Windows
   mklink ssn.yml ..\..\infrastructure-provisioning\src\ssn\templates\ssn.yml
+2.3 For Unix create two folders:
+  /var/opt/dlab/log/ssn
+  /opt/dlab/tmp/result
 
 3.	Install Node.js
 3.1. Install Node.js from https://nodejs.org/en/
