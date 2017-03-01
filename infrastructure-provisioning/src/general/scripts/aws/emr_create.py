@@ -304,6 +304,14 @@ if __name__ == "__main__":
         out.write('[BUILDING NEW CLUSTER - {}\n]'.format(args.name))
         cluster_id = build_emr_cluster(args)
         out.write('Cluster ID: {}\n'.format(cluster_id))
+        if args.slave_instance_spot == 'True':
+            time.sleep(420)
+            spot_instances_status = get_spot_instances_status(cluster_id)
+            if spot_instances_status[0]:
+                out.write(spot_instances_status[1])
+            else:
+                out.write(spot_instances_status[1])
+                sys.exit(1)
         if wait_emr(args.s3_bucket, args.name, args.emr_timeout):
             # Append Cluster's SGs to the Notebook server to grant access
             sg_list=[]

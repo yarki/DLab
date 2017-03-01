@@ -700,3 +700,25 @@ def get_ec2_price(instance_shape, region):
         append_result(str({"error": "Error with getting EC2 price",
                            "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
+
+
+def get_spot_instances_status(cluster_id):
+    try:
+        emr = boto3.client('emr')
+        ec2 = boto3.client('ec2')
+        instances = []
+        response = emr.list_instances(ClusterId=cluster_id, InstanceGroupTypes=['CORE']).get('Instances')
+        for i in response:
+            instances.append(i.get('Ec2InstanceId'))
+        response = ec2.describe_spot_instance_requests(Filters=[
+            {'Name': 'instance-id', 'Values': instances}]).get('SpotInstanceRequests')
+        for i in response:
+            if i.get('Status').get('Code') != 'request-canceled-and-instance-running':
+                return False, i.get('Status').get('Message')
+        return True, "Spot instances have been successfully created!"
+    except Exception as err:
+        logging.error("Error with getting Spot instances status: " + str(err) + "\n Traceback: " +
+                      traceback.print_exc(file=sys.stdout))
+        append_result(str({"error": "Error with getting Spot instances status",
+                           "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)

@@ -107,8 +107,7 @@ if __name__ == "__main__":
         append_result("EMR waiter fail. Exception: " + str(err))
         sys.exit(1)
 
-    with hide('stderr', 'running', 'warnings'):
-        local("echo Waiting for changes to propagate; sleep 10")
+    local("echo Waiting for changes to propagate; sleep 10")
 
     try:
         logging.info('[Creating EMR Cluster]')
