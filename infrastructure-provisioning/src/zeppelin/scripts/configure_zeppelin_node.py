@@ -61,6 +61,7 @@ if args.region == 'us-east-1':
     endpoint_url = 'https://s3.amazonaws.com'
 else:
     endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
+r_libs = ['R6', 'pbdZMQ', 'RCurl', 'devtools', 'reshape2', 'caTools', 'rJava', 'ggplot2']
 
 
 def configure_zeppelin(os_user):
@@ -183,7 +184,7 @@ if __name__ == "__main__":
     ensure_scala(scala_link, args.scala_version, args.os_user)
 
     print "Installing R"
-    ensure_r(args.os_user)
+    ensure_r(args.os_user, r_libs)
 
     print "Install Zeppelin"
     configure_zeppelin(args.os_user)

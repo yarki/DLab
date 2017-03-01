@@ -61,7 +61,7 @@ def ensure_r_local_kernel(spark_version, os_user, templates_dir, kernels_dir):
             sys.exit(1)
 
 
-def ensure_r(os_user):
+def ensure_r(os_user, r_libs):
     if not exists('/home/{}/.ensure_dir/r_ensured'.format(os_user)):
         try:
             sudo('yum install -y cmake')
@@ -70,19 +70,39 @@ def ensure_r(os_user):
             sudo('yum install -y R R-core R-core-devel R-devel --nogpgcheck')
             sudo('R CMD javareconf')
             sudo('cd /root; git clone https://github.com/zeromq/zeromq4-x.git; cd zeromq4-x/; mkdir build; cd build; cmake ..; make install; ldconfig')
-            sudo('R -e "install.packages(\'R6\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'pbdZMQ\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'RCurl\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'devtools\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'reshape2\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'caTools\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'rJava\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'ggplot2\',repos=\'http://cran.us.r-project.org\')"')
-            sudo('R -e "install.packages(\'formatR\',repos=\'http://cran.us.r-project.org\')"')
+            for i in r_libs:
+                sudo('R -e "install.packages(\'{}\',repos=\'http://cran.us.r-project.org\')"'.format(i))
             sudo('R -e "library(\'devtools\');install.packages(repos=\'http://cran.us.r-project.org\',c(\'rzmq\',\'repr\',\'digest\',\'stringr\',\'RJSONIO\',\'functional\',\'plyr\'))"')
             sudo('R -e "library(\'devtools\');install_github(\'IRkernel/repr\');install_github(\'IRkernel/IRdisplay\');install_github(\'IRkernel/IRkernel\');"')
             sudo('R -e "install.packages(\'RJDBC\',repos=\'http://cran.us.r-project.org\',dep=TRUE)"')
             sudo('touch /home/{}/.ensure_dir/r_ensured'.format(os_user))
+        except:
+            sys.exit(1)
+
+
+def install_rstudio(os_user, local_spark_path, rstudio_pass):
+    if not exists('/home/' + os_user + '/.ensure_dir/rstudio_ensured'):
+        try:
+            sudo('yum install -y --nogpgcheck https://download2.rstudio.org/rstudio-server-rhel-1.0.136-x86_64.rpm')
+            sudo('mkdir /mnt/var')
+            sudo('chown ' + os_user + ':' + os_user + ' /mnt/var')
+            sudo('touch /home/' + os_user + '/.Renviron')
+            sudo('chown ' + os_user + ':' + os_user + ' /home/' + os_user + '/.Renviron')
+            sudo('''echo 'SPARK_HOME="''' + local_spark_path + '''"' >> /home/''' + os_user + '''/.Renviron''')
+            sudo('touch /home/' + os_user + '/.Rprofile')
+            sudo('chown ' + os_user + ':' + os_user + ' /home/' + os_user + '/.Rprofile')
+            sudo('''echo 'library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))' >> /home/''' + os_user + '''/.Rprofile''')
+            sudo('rstudio-server start')
+            sudo('echo "' + os_user + ':' + rstudio_pass + '" | chpasswd')
+            sudo("sed -i '/exit 0/d' /etc/rc.local")
+            sudo('''bash -c "echo \'sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/''' + os_user + '''/.Renviron\' >> /etc/rc.local"''')
+            sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
+            sudo('touch /home/' + os_user + '/.ensure_dir/rstudio_ensured')
+        except:
+            sys.exit(1)
+    else:
+        try:
+            sudo('echo "' + os_user + ':' + rstudio_pass + '" | chpasswd')
         except:
             sys.exit(1)
 
@@ -138,6 +158,10 @@ def ensure_additional_python_libs(os_user):
             if os.environ['application'] == 'jupyter' or os.environ['application'] == 'zeppelin':
                 sudo('pip2 install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
                 sudo('python3.5 -m pip install NumPy SciPy pandas Sympy Pillow sklearn --no-cache-dir')
+            if os.environ['application'] == 'zeppelin':
+                sudo('curl -O http://mirror.switch.ch/pool/4/mirror/centos/7.3.1611/os/x86_64/Packages/tkinter-2.7.5-48.el7.x86_64.rpm')
+                sudo('yum install -y tkinter-2.7.5-48.el7.x86_64.rpm --nogpgcheck')
+                sudo('yum install -y python35u-tkinter')
             if os.environ['application'] == 'tensor':
                 sudo('python2.7 -m pip install keras opencv-python h5py --no-cache-dir')
                 sudo('python2.7 -m ipykernel install')
@@ -189,41 +213,6 @@ def ensure_python3_libraries(os_user):
             sudo('python3.5 -m pip install fabvenv fabric-virtualenv --no-cache-dir')
             sudo('python3.5 -m pip install ipython ipykernel --no-cache-dir')
             sudo('touch /home/' + os_user + '/.ensure_dir/python3_libraries_ensured')
-        except:
-            sys.exit(1)
-
-
-def install_rstudio(os_user, local_spark_path, rstudio_pass):
-    if not exists('/home/' + os_user + '/.ensure_dir/rstudio_ensured'):
-        try:
-            sudo('yum install -y cmake')
-            sudo('yum -y install libcur*')
-            sudo('echo -e "[base]\nname=CentOS-7-Base\nbaseurl=http://buildlogs.centos.org/centos/7/os/x86_64-20140704-1/\ngpgcheck=1\ngpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7\npriority=1\nexclude=php mysql" >> /etc/yum.repos.d/CentOS-base.repo')
-            sudo('yum install -y R R-core R-core-devel R-devel --nogpgcheck')
-            sudo('yum install -y --nogpgcheck https://download2.rstudio.org/rstudio-server-rhel-1.0.136-x86_64.rpm')
-            sudo('R CMD javareconf')
-            sudo('R -e \'install.packages("rmarkdown", repos = "https://cran.revolutionanalytics.com")\'')
-            sudo('R -e \'install.packages("base64enc", repos = "https://cran.revolutionanalytics.com")\'')
-            sudo('R -e \'install.packages("tibble", repos = "https://cran.revolutionanalytics.com")\'')
-            sudo('mkdir /mnt/var')
-            sudo('chown ' + os_user + ':' + os_user + ' /mnt/var')
-            sudo('touch /home/' + os_user + '/.Renviron')
-            sudo('chown ' + os_user + ':' + os_user + ' /home/' + os_user + '/.Renviron')
-            sudo('''echo 'SPARK_HOME="''' + local_spark_path + '''"' >> /home/''' + os_user + '''/.Renviron''')
-            sudo('touch /home/' + os_user + '/.Rprofile')
-            sudo('chown ' + os_user + ':' + os_user + ' /home/' + os_user + '/.Rprofile')
-            sudo('''echo 'library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))' >> /home/''' + os_user + '''/.Rprofile''')
-            sudo('rstudio-server start')
-            sudo('echo "' + os_user + ':' + rstudio_pass + '" | chpasswd')
-            sudo("sed -i '/exit 0/d' /etc/rc.local")
-            sudo('''bash -c "echo \'sed -i 's/^#SPARK_HOME/SPARK_HOME/' /home/''' + os_user + '''/.Renviron\' >> /etc/rc.local"''')
-            sudo("bash -c 'echo exit 0 >> /etc/rc.local'")
-            sudo('touch /home/' + os_user + '/.ensure_dir/rstudio_ensured')
-        except:
-            sys.exit(1)
-    else:
-        try:
-            sudo('echo "' + os_user + ':' + rstudio_pass + '" | chpasswd')
         except:
             sys.exit(1)
 
