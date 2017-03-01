@@ -34,7 +34,9 @@ public class CommandBuilder {
         if (resourceBaseDTO != null) {
             builder.append("echo -e '");
             try {
-                builder.append(JsonGenerator.generateJson(resourceBaseDTO));
+                String str = JsonGenerator.generateJson(resourceBaseDTO);
+                LOGGER.info("Serialized DTO to: " +  str);
+                builder.append(str);
             } catch (JsonProcessingException e) {
                 LOGGER.error("ERROR generating json from dockerRunParameters: " + e.getMessage());
                 throw e;

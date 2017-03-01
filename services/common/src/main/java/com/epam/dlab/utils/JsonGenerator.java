@@ -32,7 +32,7 @@ public final class JsonGenerator {
     }
 
     public static String generateJson(ResourceBaseDTO<?> resourceBaseDTO, boolean pretty) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         if(pretty) {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(resourceBaseDTO);
         }
