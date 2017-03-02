@@ -72,7 +72,7 @@ limitations under the License.
             <input #spotInstancesCheck type="checkbox" (change)="selectSpotInstances($event)" /> Spot Instance
         </label>
         <div class="message" [ngClass]="{ show : spotInstancesSelect.nativeElement['checked'] }">
-          When the current Spot price rises above your bid price, the Spot instance is reclaimed by AWS so that it can be given to another customer. Make sure to backup your data onperiodic basis
+          When the current Spot price rises above your bid price, the Spot instance is reclaimed by AWS so that it can be given to another customer. Make sure to backup your data on periodic basis.
         </div>
       </div>
       <div class="text-right" *ngIf="processError">

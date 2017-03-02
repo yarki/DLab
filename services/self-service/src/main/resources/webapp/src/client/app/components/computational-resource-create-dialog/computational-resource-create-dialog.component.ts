@@ -146,7 +146,7 @@ export class ComputationalResourceCreateDialog {
       this.shapes.slave_shape = this.shapePlaceholder(filtered, 'type');
 
       this.spotInstance = this.shapePlaceholder(filtered, 'spot');
-      this.spotInstancePrice = this.shapePlaceholder(filtered, 'price')
+      this.spotInstancePrice = this.shapePlaceholder(filtered, 'price');
     } else {
        this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
         this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'slave_shape', 'description', 'json');
