@@ -144,6 +144,9 @@ export class ComputationalResourceCreateDialog {
       this.slave_shapes_list.setDefaultOptions(filtered, this.shapePlaceholder(filtered, 'description'),
         'slave_shape', 'description', 'json');
       this.shapes.slave_shape = this.shapePlaceholder(filtered, 'type');
+
+      this.spotInstance = this.shapePlaceholder(filtered, 'spot');
+      this.spotInstancePrice = this.shapePlaceholder(filtered, 'price')
     } else {
        this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
         this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'slave_shape', 'description', 'json');
@@ -193,7 +196,7 @@ export class ComputationalResourceCreateDialog {
     });
   }
 
-  private shapePlaceholder(resourceShapes, byField: string): string {
+  private shapePlaceholder(resourceShapes, byField: string) {
     for (var index in resourceShapes) return resourceShapes[index][0][byField];
   }
 
