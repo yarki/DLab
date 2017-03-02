@@ -44,7 +44,7 @@ db.createUser(
    }
 )
 1.4. Load collections
-mongoimport -u admin -p <password> -d dlabdb mongo_settings.json
+mongoimport -u admin -p <password> -d dlabdb -c settings mongo_settings.json
 
 2.	Setting up environment options
 2.1. Set configuration file ..\..\infrastructure-provisioning\aws\src\ssn\templates\ssn.yml
