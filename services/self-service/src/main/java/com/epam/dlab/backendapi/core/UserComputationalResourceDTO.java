@@ -36,13 +36,13 @@ public class UserComputationalResourceDTO {
     private String status;
     @JsonProperty("up_time")
     private Date uptime;
-    @JsonProperty("master_node_shape")
+    @JsonProperty("master_shape")
     private String masterShape;
-    @JsonProperty("slave_node_shape")
+    @JsonProperty("slave_shape")
     private String slaveShape;
-    @JsonProperty("slave_node_spot")
+    @JsonProperty("slave_spot")
     private Boolean slaveSpot = false;
-    @JsonProperty("slave_node_spot_pct_price")
+    @JsonProperty("slave_spot_pct_price")
     private Integer slaveSpotPctPrice;
     @JsonProperty("total_instance_number")
     private String slaveNumber;

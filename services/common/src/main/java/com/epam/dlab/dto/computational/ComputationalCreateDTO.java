@@ -151,6 +151,8 @@ public class ComputationalCreateDTO extends ComputationalBaseDTO<ComputationalCr
     	        .add("version", version)
     	        .add("masterInstanceType", masterInstanceType)
     	        .add("slaveInstanceType", slaveInstanceType)
+    	        .add("slaveInstanceSpot", slaveInstanceSpot)
+    	        .add("slaveInstanceSpotPctPrice", slaveInstanceSpotPctPrice)
     	        .add("instanceCount", instanceCount);
     }
     
