@@ -47,10 +47,10 @@ db.createUser(
 mongoimport -u admin -p <password> -d dlabdb -c settings mongo_settings.json
 
 2.	Setting up environment options
-2.1. Set configuration file ..\..\infrastructure-provisioning\aws\src\ssn\templates\ssn.yml
+2.1. Set configuration file ..\..\infrastructure-provisioning\src\ssn\templates\ssn.yml
 # DEV_MODE="true"
 2.2. Add system environment variable
-DLAB_CONF_DIR=...\infrastructure-provisioning\src\ssn\templates\ssn.yml
+DLAB_CONF_DIR=...\infrastructure-provisioning\src\ssn\templates
 or create two symlinks to service\provisioning-service and service\self-service for
 ..\..\infrastructure-provisioning\src\ssn\templates\ssn.yml
 Unix
