@@ -36,6 +36,7 @@ def enable_proxy(proxy_host, proxy_port):
             proxy_string = "http://%s:%s" % (proxy_host, proxy_port)
             sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
             sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
+            sudo('echo export ftp_proxy=' + proxy_string + ' >> /etc/profile')
             sudo("echo 'proxy={}' >> /etc/yum.conf".format(proxy_string))
             sudo('yum clean all')
             sudo('touch /tmp/proxy_enabled ')
