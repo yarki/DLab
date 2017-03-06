@@ -369,7 +369,6 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
         local(''' sudo echo "export HADOOP_CONF_DIR=''' + yarn_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
         local(''' sudo echo "export PYSPARK3_PYTHON=python''' + python_version[0:3] + '''" >> ''' +
               livy_path + '''conf/livy-env.sh''')
-        local('sudo sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
         template_file = "/tmp/emr_interpreter.json"
         fr = open(template_file, 'r+')
         text = fr.read()
