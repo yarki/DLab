@@ -24,8 +24,8 @@ import random
 import sys
 import string
 import json, uuid, time, datetime
-from dlab.meta_lib import get_instance_hostname
-from dlab.actions_lib import get_cluster_python_version
+from dlab.meta_lib import *
+from dlab.actions_lib import *
 
 
 def ensure_pip(requisites):
