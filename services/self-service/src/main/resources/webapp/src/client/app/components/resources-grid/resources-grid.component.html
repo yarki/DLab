@@ -71,10 +71,12 @@ limitations under the License.
     </td>
     <td>
       <div class="dropdown">
-        <span data-toggle="dropdown" class="actions" (click)="dropdownPosition($event)" [ngClass]="{'disabled': env.status.toLowerCase() == 'creating' ||
+        <span data-toggle="dropdown" class="actions" (click)="dropdownPosition($event)" 
+              [ngClass]="{'disabled': env.status.toLowerCase() == 'creating' ||
                                       env.status.toLowerCase() == 'failed' ||
                                       env.status.toLowerCase() == 'terminating' ||
-                                      env.status.toLowerCase() == 'terminated'}">
+                                      env.status.toLowerCase() == 'terminated' ||
+                                      healthStatus === 'error'}">
         </span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">

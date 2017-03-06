@@ -108,7 +108,7 @@ public class WatchItemList {
 					list.add(index - 1, item);
 				}
 			} else {
-				LOGGER.debug("Handler for UUID {} for folder {} will be replaced. Old item is: {}",
+				LOGGER.warn("Handler for UUID {} for folder {} will be replaced. Old item is: {}",
 						fileHandlerCallback.getUUID(), directoryFullName, get(index));
 				list.set(index, item);
 			}

@@ -19,9 +19,10 @@ limitations under the License.
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HealthStatusGridComponent } from './health-status-grid.component';
+import { ConfirmationDialogModule } from './../../../components/confirmation-dialog/index';
 
 @NgModule({
-    imports: [CommonModule],
+    imports: [CommonModule, ConfirmationDialogModule],
     declarations: [HealthStatusGridComponent],
     exports: [HealthStatusGridComponent]
 })

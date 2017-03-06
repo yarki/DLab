@@ -84,11 +84,15 @@ def prepare_disk(os_user):
 def ensure_local_jars(os_user, s3_jars_dir, files_dir, region, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/s3_kernel_ensured'):
         try:
+            if region == 'us-east-1':
+                endpoint_url = 'https://s3.amazonaws.com'
+            else:
+                endpoint_url = 'https://s3-' + region + '.amazonaws.com'
             sudo('mkdir -p ' + s3_jars_dir)
             put(files_dir + 'notebook_local_jars.tar.gz', '/tmp/notebook_local_jars.tar.gz')
             sudo('tar -xzf /tmp/notebook_local_jars.tar.gz -C ' + s3_jars_dir)
             put(templates_dir + 'notebook_spark-defaults_local.conf', '/tmp/notebook_spark-defaults_local.conf')
-            sudo("sed -i 's/URL/https:\/\/s3-{}.amazonaws.com/' /tmp/notebook_spark-defaults_local.conf".format(region))
+            sudo("sed -i 's|URL|{}|' /tmp/notebook_spark-defaults_local.conf".format(endpoint_url))
             if os.environ['application'] == 'zeppelin':
                 sudo('echo \"spark.jars $(ls -1 ' + s3_jars_dir + '* | tr \'\\n\' \',\')\" >> /tmp/notebook_spark-defaults_local.conf')
             sudo('\cp /tmp/notebook_spark-defaults_local.conf /opt/spark/conf/spark-defaults.conf')
@@ -132,7 +136,10 @@ def spark_defaults(args):
     text = text.replace('CLUSTER', args.cluster_name)
     with open(spark_def_path, 'w') as f:
         f.write(text)
-    endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
+    if args.region == 'us-east-1':
+        endpoint_url = 'https://s3.amazonaws.com'
+    else:
+        endpoint_url = 'https://s3-' + args.region + '.amazonaws.com'
     local("""bash -c 'echo "spark.hadoop.fs.s3a.endpoint    """ + endpoint_url + """" >> """ + spark_def_path + """'""")
 
 
@@ -235,3 +242,161 @@ def ensure_ciphers():
     sudo('echo -e "\tKexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256" >> /etc/ssh/ssh_config')
     sudo('echo -e "\tCiphers aes256-gcm@openssh.com,aes128-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr" >> /etc/ssh/ssh_config')
     sudo('systemctl reload sshd')
+
+
+def installing_python(region, bucket, user_name, cluster_name):
+    get_cluster_python_version(region, bucket, user_name, cluster_name)
+    with file('/tmp/python_version') as f:
+        python_version = f.read()
+    python_version = python_version[0:5]
+    if not os.path.exists('/opt/python/python' + python_version):
+        local('wget https://www.python.org/ftp/python/' + python_version + '/Python-' + python_version + '.tgz -O /tmp/Python-' + python_version + '.tgz' )
+        local('tar zxvf /tmp/Python-' + python_version + '.tgz -C /tmp/')
+        with lcd('/tmp/Python-' + python_version):
+            local('./configure --prefix=/opt/python/python' + python_version + ' --with-zlib-dir=/usr/local/lib/ --with-ensurepip=install')
+            local('sudo make altinstall')
+        with lcd('/tmp/'):
+            local('sudo rm -rf Python-' + python_version + '/')
+        local('sudo -i virtualenv /opt/python/python' + python_version)
+        venv_command = '/bin/bash /opt/python/python' + python_version + '/bin/activate'
+        pip_command = '/opt/python/python' + python_version + '/bin/pip' + python_version[:3]
+        local(venv_command + ' && sudo -i ' + pip_command + ' install -U pip --no-cache-dir')
+        local(venv_command + ' && sudo -i ' + pip_command + ' install ipython ipykernel --no-cache-dir')
+        local(venv_command + ' && sudo -i ' + pip_command + ' install boto boto3 NumPy SciPy Matplotlib pandas Sympy Pillow sklearn --no-cache-dir')
+        local('sudo rm -rf /usr/bin/python' + python_version[0:3])
+        local('sudo ln -fs /opt/python/python' + python_version + '/bin/python' + python_version[0:3] +
+              ' /usr/bin/python' + python_version[0:3])
+
+
+def pyspark_kernel(kernels_dir, emr_version, cluster_name, spark_version, bucket, user_name, region):
+    spark_path = '/opt/' + emr_version + '/' + cluster_name + '/spark/'
+    local('mkdir -p ' + kernels_dir + 'pyspark_' + cluster_name + '/')
+    kernel_path = kernels_dir + "pyspark_" + cluster_name + "/kernel.json"
+    template_file = "/tmp/pyspark_emr_template.json"
+    with open(template_file, 'r') as f:
+        text = f.read()
+    text = text.replace('CLUSTER_NAME', cluster_name)
+    text = text.replace('SPARK_VERSION', 'Spark-' + spark_version)
+    text = text.replace('SPARK_PATH', spark_path)
+    text = text.replace('PYTHON_SHORT_VERSION', '2.7')
+    text = text.replace('PYTHON_FULL_VERSION', '2.7')
+    text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
+    text = text.replace('EMR_VERSION', emr_version)
+    with open(kernel_path, 'w') as f:
+        f.write(text)
+    local('touch /tmp/kernel_var.json')
+    local(
+        "PYJ=`find /opt/" + emr_version + "/" + cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+    local('sudo mv /tmp/kernel_var.json ' + kernel_path)
+    get_cluster_python_version(region, bucket, user_name, cluster_name)
+    with file('/tmp/python_version') as f:
+        python_version = f.read()
+    # python_version = python_version[0:3]
+    if python_version != '\n':
+        installing_python(region, bucket, user_name, cluster_name)
+        local('mkdir -p ' + kernels_dir + 'py3spark_' + cluster_name + '/')
+        kernel_path = kernels_dir + "py3spark_" + cluster_name + "/kernel.json"
+        template_file = "/tmp/pyspark_emr_template.json"
+        with open(template_file, 'r') as f:
+            text = f.read()
+        text = text.replace('CLUSTER_NAME', cluster_name)
+        text = text.replace('SPARK_VERSION', 'Spark-' + spark_version)
+        text = text.replace('SPARK_PATH', spark_path)
+        text = text.replace('PYTHON_SHORT_VERSION', python_version[0:3])
+        text = text.replace('PYTHON_FULL_VERSION', python_version[0:5])
+        text = text.replace('PYTHON_PATH', '/opt/python/python' + python_version[:5] + '/bin/python' + python_version[:3])
+        text = text.replace('EMR_VERSION', emr_version)
+        with open(kernel_path, 'w') as f:
+            f.write(text)
+        local('touch /tmp/kernel_var.json')
+        local(
+            "PYJ=`find /opt/" + emr_version + "/" + cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
+        local('sudo mv /tmp/kernel_var.json ' + kernel_path)
+
+
+def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_dir, os_user, yarn_dir, bucket, user_name, endpoint_url):
+    try:
+        port_number_found = False
+        zeppelin_restarted = False
+        default_port = 8998
+        get_cluster_python_version(region, bucket, user_name, cluster_name)
+        with file('/tmp/python_version') as f:
+            python_version = f.read()
+        python_version = python_version[0:5]
+        livy_port = ''
+        livy_path = '/opt/' + emr_version + '/' + cluster_name + '/livy/'
+        spark_libs = "/opt/" + emr_version + "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-core*.jar /opt/" + \
+                     emr_version + "/jars/usr/lib/hadoop/hadoop-aws*.jar /opt/" + emr_version + \
+                     "/jars/usr/share/aws/aws-java-sdk/aws-java-sdk-s3-*.jar /opt/" + emr_version + \
+                     "/jars/usr/lib/hadoop-lzo/lib/hadoop-lzo-*.jar"
+        local('echo \"Configuring emr path for Zeppelin\"')
+        local('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/' + emr_version + '\/' +
+              cluster_name + '\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
+        local('sed -i \"s/^export HADOOP_CONF_DIR.*/export HADOOP_CONF_DIR=\/opt\/' + emr_version + '\/' +
+              cluster_name + '\/conf/\" /opt/' + emr_version + '/' + cluster_name +
+              '/spark/conf/spark-env.sh')
+        local('echo \"spark.jars $(ls ' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/' + emr_version + '/' +
+              cluster_name + '/spark/conf/spark-defaults.conf')
+        local('echo \"spark.executorEnv.PYTHONPATH pyspark.zip:py4j-src.zip\" >> /opt/' + emr_version + '/' +
+              cluster_name + '/spark/conf/spark-defaults.conf')
+        local('sed -i \'/spark.yarn.dist.files/s/$/,file:\/opt\/' + emr_version + '\/' + cluster_name +
+              '\/spark\/python\/lib\/py4j-src.zip,file:\/opt\/' + emr_version + '\/' + cluster_name +
+              '\/spark\/python\/lib\/pyspark.zip/\' /opt/' + emr_version + '/' + cluster_name +
+              '/spark/conf/spark-defaults.conf')
+        local('sudo chown ' + os_user + ':' + os_user + ' -R /opt/zeppelin/')
+        local('sudo systemctl daemon-reload')
+        local('sudo service zeppelin-notebook stop')
+        local('sudo service zeppelin-notebook start')
+        while not zeppelin_restarted:
+            local('sleep 5')
+            result = local('sudo bash -c "nmap -p 8080 localhost | grep closed > /dev/null" ; echo $?', capture=True)
+            result = result[:1]
+            if result == '1':
+                zeppelin_restarted = True
+        local('sleep 5')
+        local('echo \"Configuring emr spark interpreter for Zeppelin\"')
+        while not port_number_found:
+            port_free = local('sudo bash -c "nmap -p ' + str(default_port) + ' localhost | grep closed > /dev/null" ; echo $?', capture=True)
+            port_free = port_free[:1]
+            if port_free == '0':
+                livy_port = default_port
+                port_number_found = True
+            else:
+                default_port += 1
+        local('sudo echo "livy.server.port = ' + str(livy_port) + '" >> ' + livy_path + 'conf/livy.conf')
+        local('sudo echo "livy.spark.master = yarn" >> ' + livy_path + 'conf/livy.conf')
+        local(''' sudo echo "export SPARK_HOME=''' + spark_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
+        local(''' sudo echo "export HADOOP_CONF_DIR=''' + yarn_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
+        local(''' sudo echo "export PYSPARK3_PYTHON=python''' + python_version[0:3] + '''" >> ''' +
+              livy_path + '''conf/livy-env.sh''')
+        local('sudo sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
+        template_file = "/tmp/emr_interpreter.json"
+        fr = open(template_file, 'r+')
+        text = fr.read()
+        text = text.replace('CLUSTER_NAME', cluster_name)
+        text = text.replace('SPARK_HOME', spark_dir)
+        text = text.replace('ENDPOINTURL', endpoint_url)
+        text = text.replace('LIVY_PORT', str(livy_port))
+        fw = open(template_file, 'w')
+        fw.write(text)
+        fw.close()
+        for _ in range(5):
+            try:
+                local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d " +
+                      "@/tmp/emr_interpreter.json http://localhost:8080/api/interpreter/setting")
+                break
+            except:
+                local('sleep 5')
+                pass
+        local('sudo cp /opt/livy-server-cluster.service /etc/systemd/system/livy-server-' + str(livy_port) + '.service')
+        local("sudo sed -i 's|OS_USER|" + os_user + "|' /etc/systemd/system/livy-server-" + str(livy_port) + '.service')
+        local("sudo sed -i 's|LIVY_PATH|" + livy_path + "|' /etc/systemd/system/livy-server-" + str(livy_port)
+              + '.service')
+        local('sudo chmod 644 /etc/systemd/system/livy-server-' + str(livy_port) + '.service')
+        local("sudo systemctl daemon-reload")
+        local("sudo systemctl enable livy-server-" + str(livy_port))
+        local('sudo systemctl start livy-server-' + str(livy_port))
+        local('touch /home/' + os_user + '/.ensure_dir/emr_' + cluster_name + '_interpreter_ensured')
+    except:
+            sys.exit(1)
+

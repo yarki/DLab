@@ -28,10 +28,10 @@ import com.epam.dlab.backendapi.ProvisioningServiceApplication;
 import com.epam.dlab.backendapi.ProvisioningServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.Directories;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
-import com.epam.dlab.backendapi.core.ICommandExecutor;
 import com.epam.dlab.backendapi.core.commands.CommandBuilder;
 import com.epam.dlab.backendapi.core.commands.DockerAction;
 import com.epam.dlab.backendapi.core.commands.DockerCommands;
+import com.epam.dlab.backendapi.core.commands.ICommandExecutor;
 import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecutor;
 import com.epam.dlab.dto.computational.ComputationalBaseDTO;
@@ -68,7 +68,9 @@ public class ComputationalConfigure implements DockerCommands {
                 .withAwsRegion(dto.getAwsRegion())
                 .withConfOsUser(dto.getConfOsUser());
     	ComputationalConfigure conf = new ComputationalConfigure();
-    	ProvisioningServiceApplication.getInjector().injectMembers(conf);
+    	ProvisioningServiceApplication
+    		.getInjector()
+    		.injectMembers(conf);
     	return conf.configure(uuid, dtoConf);
     }
     
