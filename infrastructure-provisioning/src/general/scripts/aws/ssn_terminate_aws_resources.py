@@ -121,5 +121,7 @@ if __name__ == "__main__":
                 print "There is no such Internet gateway"
             remove_route_tables(args.tag_name, True)
             remove_vpc(vpc_id)
+        else:
+            print "There is no pre-defined SSN VPC"
     except:
-        print "There is no pre-defined SSN VPC"
+        sys.exit(1)
