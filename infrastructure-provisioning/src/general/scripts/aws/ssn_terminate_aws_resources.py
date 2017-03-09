@@ -110,15 +110,16 @@ if __name__ == "__main__":
     print "Removing SSN VPC"
     try:
         vpc_id = get_vpc_by_tag(args.tag_name, args.service_base_name)
-        try:
-            remove_vpc_endpoints(vpc_id)
-        except:
-            print "There is no such VPC Endpoint"
-        try:
-            remove_internet_gateways(vpc_id, args.tag_name, args.service_base_name)
-        except:
-            print "There is no such Internet gateway"
-        remove_route_tables(args.tag_name, True)
-        remove_vpc(vpc_id)
+        if vpc_id != '':
+            try:
+                remove_vpc_endpoints(vpc_id)
+            except:
+                print "There is no such VPC Endpoint"
+            try:
+                remove_internet_gateways(vpc_id, args.tag_name, args.service_base_name)
+            except:
+                print "There is no such Internet gateway"
+            remove_route_tables(args.tag_name, True)
+            remove_vpc(vpc_id)
     except:
         print "There is no pre-defined SSN VPC"
