@@ -71,7 +71,7 @@ if __name__ == "__main__":
         remove_sgroups(args.nb_sg)
         remove_sgroups(args.edge_sg)
         try:
-            remove_sgroups(args.service_base_name + '-Tag')
+            remove_sgroups(args.tag_name)
         except:
             print "There is no pre-defined SSN SG"
     except:
@@ -110,6 +110,7 @@ if __name__ == "__main__":
     print "Removing SSN VPC"
     try:
         vpc_id = get_vpc_by_tag(args.tag_name, args.service_base_name)
+        remove_internet_gateways(vpc_id, args.tag_name, args.service_base_name)
         remove_vpc(vpc_id)
     except:
         print "There is no pre-defined SSN VPC"
