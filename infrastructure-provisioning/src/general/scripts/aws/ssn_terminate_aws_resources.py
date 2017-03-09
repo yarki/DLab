@@ -111,6 +111,7 @@ if __name__ == "__main__":
     try:
         vpc_id = get_vpc_by_tag(args.tag_name, args.service_base_name)
         remove_internet_gateways(vpc_id, args.tag_name, args.service_base_name)
+        remove_route_tables(args.tag_name, True)
         remove_vpc(vpc_id)
     except:
         print "There is no pre-defined SSN VPC"
