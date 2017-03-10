@@ -27,6 +27,8 @@ import { UploadKeyDialogModule } from './../components/key-upload-dialog/index';
 import { ExploratoryEnvironmentCreateDialogModule } from './../components/exploratory-environment-create-dialog/index';
 import { ApplicationSecurityService } from '../services/applicationSecurity.service';
 
+import { MaterialModule } from '@angular/material'
+
 @NgModule({
   imports: [
     CommonModule,
@@ -35,7 +37,8 @@ import { ApplicationSecurityService } from '../services/applicationSecurity.serv
     ProgressDialogModule,
     UploadKeyDialogModule,
     ExploratoryEnvironmentCreateDialogModule,
-    NavbarModule
+    NavbarModule,
+    MaterialModule.forRoot()
   ],
   declarations: [HomeComponent],
   exports: [HomeComponent],

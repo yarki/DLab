@@ -17,6 +17,10 @@ limitations under the License.
 ****************************************************************************/
 
 @import 'https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800';
+
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons';
+@import '../node_modules/@angular/material/core/theming/prebuilt/deeppurple-amber.css';
+
 [hidden] {
   display: none !important;
 }
