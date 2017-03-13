@@ -4,22 +4,6 @@
 #
 #Print usage statement if incorrect number of command line args
 
-if [ "$#" -lt 5 ]; then
-  echo "Usage: ./deploy_dlab.sh <INFRASTRUCTURE_TAG> <ACCESS_KEY_ID> <SECRET_ACCESS_KEY> <AWS_REGION> <OS_FAMILY> <CLOUD_PROVIDER> <OS_USER> <ACTION>"
-  exit 1
-fi
-
-Infrastructure_Tag=$1
-Access_Key_ID=$2
-Secret_Access_Key=$3
-Region=$4
-OS_family=$5
-Cloud_provider=$6
-OS_user=$7
-Action=$8
-
-if [ -z "${WORKSPACE+x}" ]; then WORKSPACE="$PWD"; echo "WORKSPACE is not set, using current dir: $WORKSPACE"; else echo "Using workspace path from environment variable: $WORKSPACE"; fi
-
 function buildFrontend(){
   # Build front-end
   cd "$WORKSPACE"/services/self-service/src/main/resources/webapp/ || exit 1
@@ -56,11 +40,11 @@ function deployDlab(){
   cp "$WORKSPACE"/services/security-service/target/security-service-1.0.jar "$WORKSPACE"/web_app/security-service/
 
   # Create SSN node and deploy DLab
-  sudo docker run -i -v /root/BDCC-DSS-POC.pem:/root/keys/BDCC-DSS-POC.pem \
+  sudo docker run -i -v ${Key_path}${Key_name}.pem:/root/keys/${Key_name}.pem \
     -v "$WORKSPACE"/web_app:/root/web_app -e "conf_os_family=$OS_family" -e "conf_os_user=$OS_user" \
-        -e "conf_cloud_provider=$Cloud_provider" -e "resource=ssn" -e "aws_ssn_instance_size=t2.medium" \
-        -e "aws_region=us-west-2" -e "aws_vpc_id=vpc-83c469e4" -e "aws_subnet_id=subnet-22db937a" \
-        -e "aws_security_groups_ids=sg-4d42dc35,sg-f19a0389,sg-71e27b09,sg-d3e67fab" -e "conf_key_name=BDCC-DSS-POC" \
+        -e "conf_cloud_provider=$Cloud_provider" -e "conf_resource=ssn" -e "aws_ssn_instance_size=t2.medium" \
+        -e "aws_region=us-west-2" -e "aws_vpc_id=$VPC_id" -e "aws_subnet_id=$Subnet_id" \
+        -e "aws_security_groups_ids=$Sg_ids" -e "conf_key_name=$Key_name" \
         -e "conf_service_base_name=$Infrastructure_Tag" \
         -e "aws_access_key=$Access_Key_ID" -e "aws_secret_access_key=$Secret_Access_Key" \
         docker.dlab-ssn --action "$1"
@@ -68,37 +52,132 @@ function deployDlab(){
 
 function terminateDlab(){
   # Drop Dlab environment with selected infrastructure tag
-  sudo docker run -i -v /root/BDCC-DSS-POC.pem:/root/keys/BDCC-DSS-POC.pem \
+  sudo docker run -i -v ${Key_path}${Key_name}.pem:/root/keys/${Key_name}.pem \
     -e "aws_region=$Region" -e "conf_service_base_name=$Infrastructure_Tag" \
-    -e "resource=ssn" -e "aws_access_key=$Access_Key_ID" -e "aws_secret_access_key=$Secret_Access_Key" \
+    -e "conf_resource=ssn" -e "aws_access_key=$Access_Key_ID" -e "aws_secret_access_key=$Secret_Access_Key" \
     docker.dlab-ssn --action "$1"
 }
 
-case "$Action" in
 
-  build)
-    if buildFrontend; then echo "Front-end build was successfull, moving to next step!"; else exit 1; fi
-    if buildServices; then echo "Services build was successfull, moving to next step!"; else exit 1; fi
-    if buildDockers; then echo "Docker images build was successfull, moving to next step!"; else exit 1; fi
-    ;;
+function print_help {
+    echo "[OPTIONS]:"
+    echo "--infrastructure_tag : unique name for DLab environment"
+    echo "--access_key_id : AWS Access Key ID"
+    echo "--secret_access_key : AWS Secret Access Key"
+    echo "--region : AWS region"
+    echo "--os_family : Operating system type. Available options: debian, redhat"
+    echo "--cloud_provider : Where DLab should be deployed. Available options: aws"
+    echo "--os_user : Name of OS user. By default for Debian - ubuntu, RedHat - ec2-user"
+    echo "--vpc_id : AWS VPC ID"
+    echo "--subnet_id : AWS Subnet ID"
+    echo "--sg_ids : One of more comma-separated Security groups IDs for SSN"
+    echo "--key_path : Path to admin key (WITHOUT KEY NAME)"
+    echo "--key_name : Admin key name (WITHOUT '.pem')"
+    echo "--action : Available options: build, deploy, create, terminate"
+    echo "-h / --help : Show this help message"
+}
 
-  deploy)
-    if deployDlab "create"; then echo "Dlab deploy was successfull, moving to next step!"; else exit 1; fi
-    ;;
+function main {
+    if [ -z "${WORKSPACE+x}" ]; then WORKSPACE="$PWD"; echo "WORKSPACE is not set, using current dir: $WORKSPACE"; else echo "Using workspace path from environment variable: $WORKSPACE"; fi
 
-  create)
-    if buildFrontend; then echo "Front-end build was successfull, moving to next step!"; else exit 1; fi
-    if buildServices; then echo "Services build was successfull, moving to next step!"; else exit 1; fi
-    if buildDockers; then echo "Docker images build was successfull, moving to next step!"; else exit 1; fi
-    if deployDlab "create"; then echo "Dlab deploy was successfull, moving to next step!"; else exit 1; fi
-    ;;
+    case "$Action" in
 
-  terminate)
-    terminateDlab "terminate"
-    ;;
+      build)
+        if buildFrontend; then echo "Front-end build was successful, moving to next step!"; else exit 1; fi
+        if buildServices; then echo "Services build was successful, moving to next step!"; else exit 1; fi
+        if buildDockers; then echo "Docker images build was successful, moving to next step!"; else exit 1; fi
+        ;;
 
-  *)
-    echo "Wrong action parameter! Valid parameters are: \"build\",\"deploy\",\"create\",\"terminate\""
-    ;;
+      deploy)
+        if deployDlab "create"; then echo "Dlab deploy was successful, moving to next step!"; else exit 1; fi
+        ;;
 
-esac
+      create)
+        if buildFrontend; then echo "Front-end build was successful, moving to next step!"; else exit 1; fi
+        if buildServices; then echo "Services build was successful, moving to next step!"; else exit 1; fi
+        if buildDockers; then echo "Docker images build was successful, moving to next step!"; else exit 1; fi
+        if deployDlab "create"; then echo "DLab deploy was successful, moving to next step!"; else exit 1; fi
+        ;;
+
+      terminate)
+        terminateDlab "terminate"
+        ;;
+
+      *)
+        echo "Wrong action parameter! Valid parameters are: \"build\",\"deploy\",\"create\",\"terminate\""
+        ;;
+
+    esac
+}
+
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+
+    case $key in
+        --infrastructure_tag)
+        Infrastructure_Tag="$2"
+        shift # past argument
+        ;;
+        --access_key_id)
+        Access_Key_ID="$2"
+        shift # past argument
+        ;;
+        --secret_access_key)
+        Secret_Access_Key="$2"
+        shift # past argument
+        ;;
+        --region)
+        Region="$2"
+        shift # past argument
+        ;;
+        --os_family)
+        OS_family="$2"
+        shift # past argument
+        ;;
+        --cloud_provider)
+        Cloud_provider="$2"
+        shift # past argument
+        ;;
+        --os_user)
+        OS_user="$2"
+        shift # past argument
+        ;;
+        --vpc_id)
+        VPC_id="$2"
+        shift # past argument
+        ;;
+        --subnet_id)
+        Subnet_id="$2"
+        shift # past argument
+        ;;
+        --sg_ids)
+        Sg_ids="$2"
+        shift # past argument
+        ;;
+        --key_path)
+        Key_path="$2"
+        shift # past argument
+        ;;
+        --key_name)
+        Key_name="$2"
+        shift # past argument
+        ;;
+        --action)
+        Action="$2"
+        shift # past argument
+        ;;
+        -h|--help)
+        print_help
+        exit
+        ;;
+        *)
+        echo "Unknown option $1."
+        print_help
+        exit
+        ;;
+    esac
+    shift
+done
+
+main
