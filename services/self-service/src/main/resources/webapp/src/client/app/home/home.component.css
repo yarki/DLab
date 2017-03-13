@@ -20,18 +20,10 @@ limitations under the License.
   outline: none;
 }
 
-.butt {
-  padding: 6px 25px;
-  border-radius: 0;
-  border-color: #35afd5;
-  font: 600 16px/1.45 'Open Sans';
-}
-
 .butt.butt-create {
   color: #35afd5;
 }
 
-.butt.btn-create i {
-    margin: 0 5px 0 0;
-    font-size: 18px;
+.butt.butt-filter {
+  margin-right: 10px;
 }

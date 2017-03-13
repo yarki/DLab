@@ -21,16 +21,21 @@ limitations under the License.
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 @import '../node_modules/@angular/material/core/theming/prebuilt/deeppurple-amber.css';
 
-/* material */
 
-span.mat-button-wrapper {
-    color: #35afd5;
+/* material buttons */
+.mat-raised-button.butt {
+  width: 160px;
+  height: 35px;
+  padding: 0 20px;
+  border-radius: 0;
+  font: 600 16px/1.45 'Open Sans';
+  color: #577289;
 }
 
-.mat-raised-button {
-    box-shadow: 0 3px 6px -1px #35afd5;
+.mat-raised-button.butt i {
+  margin: 0 5px 0 0;
+  font-size: 18px;
 }
-
 
 [hidden] {
   display: none !important;
@@ -65,15 +70,11 @@ body {
   color: #d9534f;
 }
 
-.btn {
-  font-size: 16px;
-}
-
 .sub_nav {
   height: 60px;
   padding: 12px 15px;
 }
-
+/*
 .sub_nav .btn {
   background: none;
   font-weight: 600;
@@ -90,20 +91,7 @@ body {
 
 .sub_nav .btn .glyphicon {
   margin-right: 4px;
-}
-
-/*.sub_nav .btn_create {
-  border-color: #35afd5;
-  color: #35afd5;
 }*/
-.sub_nav .btn_create::hover {
-  border-color: #2a8faf;
-  color: #119eca;
-}
-
-.sub_nav .btn_hide {
-  margin-right: 10px;
-}
 
 .modal .btn {
   margin-top: 20px;
@@ -178,6 +166,7 @@ body {
 .tooltip-wrap {
   position: relative;
   -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   /* webkit flicker fix */
   -webkit-font-smoothing: antialiased;
   /* webkit text rendering fix */
