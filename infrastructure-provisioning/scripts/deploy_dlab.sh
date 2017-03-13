@@ -17,6 +17,8 @@
 #
 # ******************************************************************************
 
+set -e
+
 function buildFrontend(){
   # Build front-end
   cd "$WORKSPACE"/services/self-service/src/main/resources/webapp/ || exit 1
