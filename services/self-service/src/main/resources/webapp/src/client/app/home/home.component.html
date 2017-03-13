@@ -18,9 +18,15 @@ limitations under the License.
 <sd-navbar [healthStatus]="healthStatus"></sd-navbar>
 
 <div class="sub_nav">
-  <button class="btn btn_create" [disabled]="userUploadAccessKeyState == 202" (click)="createNotebook_btnClick()">
+  <!--<button class="btn btn_create" [disabled]="userUploadAccessKeyState == 202" (click)="createNotebook_btnClick()">
     <span class="glyphicon glyphicon glyphicon-plus" ></span> Create new
+  </button>-->
+
+  <button md-raised-button class="butt butt-create" [disabled]="userUploadAccessKeyState == 202" (click)="createNotebook_btnClick()">
+    <i class="fa fa-plus" aria-hidden="true"></i>
+    <span>Create new</span>
   </button>
+
   <button class="btn btn_refresh pull-right" (click)="refreshGrid()">
     <span class="glyphicon glyphicon-refresh"></span> Refresh
   </button>
@@ -31,12 +37,6 @@ limitations under the License.
   </button>
   <span *ngIf="userUploadAccessKeyState == 500" class="alert alert-danger">Error happened during user access key upload. Please try to reupload the key.</span>
 </div>
-<md-card>
-    <button md-button>All</button>
-    <button md-raised-button>Of</button>
-    <button md-raised-button color="primary">The</button>
-    <button md-raised-button color="accent">Buttons</button>
-  </md-card>
 <resources-grid></resources-grid>
 
 <exploratory-environment-create-dialog #createAnalyticalModal (buildGrid)="refreshGrid($event)"></exploratory-environment-create-dialog>

@@ -21,6 +21,17 @@ limitations under the License.
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 @import '../node_modules/@angular/material/core/theming/prebuilt/deeppurple-amber.css';
 
+/* material */
+
+span.mat-button-wrapper {
+    color: #35afd5;
+}
+
+.mat-raised-button {
+    box-shadow: 0 3px 6px -1px #35afd5;
+}
+
+
 [hidden] {
   display: none !important;
 }
@@ -81,10 +92,10 @@ body {
   margin-right: 4px;
 }
 
-.sub_nav .btn_create {
+/*.sub_nav .btn_create {
   border-color: #35afd5;
   color: #35afd5;
-}
+}*/
 .sub_nav .btn_create::hover {
   border-color: #2a8faf;
   color: #119eca;
