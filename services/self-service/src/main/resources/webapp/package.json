@@ -136,6 +136,7 @@
     "@angular/router": "~3.4.1",
     "@types/core-js": "^0.9.35",
     "core-js": "^2.4.1",
+    "font-awesome": "^4.7.0",
     "http-status-enum": "^1.0.2",
     "intl": "^1.2.5",
     "rxjs": "~5.0.3",
