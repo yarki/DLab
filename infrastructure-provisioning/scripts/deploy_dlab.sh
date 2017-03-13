@@ -1,16 +1,29 @@
 #!/bin/bash
+# *****************************************************************************
 #
-# This script will create a cluster
+# Copyright (c) 2016, EPAM SYSTEMS INC
 #
-#Print usage statement if incorrect number of command line args
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ******************************************************************************
 
 function buildFrontend(){
   # Build front-end
   cd "$WORKSPACE"/services/self-service/src/main/resources/webapp/ || exit 1
-  sudo npm install gulp
-  sudo npm install
-  sudo npm run build.prod
-  sudo chown -R "$USER" "$WORKSPACE"/*
+  sudo npm install gulp &&\
+  sudo npm install &&\
+  sudo npm run build.prod &&\
+  sudo chown -R "$USER" "$WORKSPACE"/* &&\
   cd "$WORKSPACE"/ || exit 1
 }
 
