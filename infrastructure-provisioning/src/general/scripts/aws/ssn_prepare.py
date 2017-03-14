@@ -63,7 +63,8 @@ if __name__ == "__main__":
         sg_name = instance_name + '-SG'
 
         try:
-            os.environ['aws_vpc_id']
+            if os.environ['aws_vpc_id'] == '':
+                raise KeyError
         except KeyError:
             try:
                 pre_defined_vpc = True
@@ -81,7 +82,8 @@ if __name__ == "__main__":
                 sys.exit(1)
 
         try:
-            os.environ['aws_subnet_id']
+            if os.environ['aws_subnet_id'] == '':
+                raise KeyError
         except KeyError:
             try:
                 pre_defined_vpc = True
@@ -109,7 +111,8 @@ if __name__ == "__main__":
                 sys.exit(1)
 
         try:
-            os.environ['aws_security_groups_ids']
+            if os.environ['aws_security_groups_ids'] == '':
+                raise KeyError
         except KeyError:
             try:
                 pre_defined_sg = True
