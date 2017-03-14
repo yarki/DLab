@@ -120,7 +120,6 @@ def configure_local_kernels(args):
         sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
         sudo('echo "livy.server.port = ' + str(livy_port) + '" >> /opt/livy/conf/livy.conf')
         sudo('''echo "SPARK_HOME='/opt/spark/'" >> /opt/livy/conf/livy-env.sh''')
-        sudo('sed -i "s/^/#/g" /opt/livy/conf/spark-blacklist.conf')
         sudo("systemctl start livy-server")
         sudo('touch /home/' + args.os_user + '/.ensure_dir/local_livy_kernel_ensured')
 

@@ -29,7 +29,10 @@ limitations under the License.
     <td class="status" ngClass="{{env.status || ''}}">{{env.status}}</td>
     <td>
       <div class="dropdown">
-        <span data-toggle="dropdown" class="actions"></span>
+        <span data-toggle="dropdown" class="actions" 
+              [ngClass]="{'disabled': env.status.toLowerCase() !== 'running' &&
+                                      env.status.toLowerCase() !== 'stopped' &&
+                                      env.status.toLowerCase() !== 'terminated'}"></span>
         <div class="dropdown-menu">
           <ul class="list-unstyled">
             <li (click)="healthStatusAction(env, 'stop')" *ngIf="env.status.toLowerCase() == 'running'">Stop</li>
