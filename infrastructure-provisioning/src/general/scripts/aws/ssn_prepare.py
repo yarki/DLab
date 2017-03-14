@@ -111,7 +111,7 @@ if __name__ == "__main__":
                 sys.exit(1)
 
         try:
-            if os.environ['aws_subnet_id'] == '':
+            if os.environ['aws_security_groups_ids'] == '':
                 raise KeyError
         except KeyError:
             try:
