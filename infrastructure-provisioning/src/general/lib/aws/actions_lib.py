@@ -734,6 +734,14 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                     sudo('systemctl daemon-reload')
                     sudo("service zeppelin-notebook stop")
                     sudo("service zeppelin-notebook start")
+                    zeppelin_restarted = False
+                    while not zeppelin_restarted:
+                        sudo('sleep 5')
+                        result = sudo('nmap -p 8080 localhost | grep "closed" > /dev/null; echo $?')
+                        result = result[:1]
+                        if result == '1':
+                            zeppelin_restarted = True
+                    sudo('sleep 5')
                     sudo('rm -rf /home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, emr_name))
                 if exists('/home/{}/.ensure_dir/rstudio_emr_ensured'.format(ssh_user)):
                     sudo("sed -i '/" + emr_name + "/d' /home/{}/.Renviron".format(ssh_user))

@@ -145,8 +145,8 @@ if __name__ == "__main__":
         logging.info('[INSTALLING USERs KEY]')
         additional_config = {"user_keyname": notebook_config['user_keyname'],
                              "user_keydir": "/root/keys/"}
-        params = "--hostname {} --keyfile {} --additional_config '{}'".format(
-            instance_hostname, keyfile_name, json.dumps(additional_config))
+        params = "--hostname {} --keyfile {} --additional_config '{}' --user {}".format(
+            instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:

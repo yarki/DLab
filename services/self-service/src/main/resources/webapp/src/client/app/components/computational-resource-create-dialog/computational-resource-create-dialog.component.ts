@@ -36,6 +36,8 @@ export class ComputationalResourceCreateDialog {
   model: ComputationalResourceCreateModel;
   notebook_instance: any;
   shapes: any;
+  spotInstance: boolean = false;
+  spotInstancePrice: number = 0;
   computationalResourceExist: boolean = false;
   checkValidity: boolean = false;
   clusterNamePattern: string = '[-_a-zA-Z0-9]+';
@@ -55,6 +57,7 @@ export class ComputationalResourceCreateDialog {
   @ViewChild('templatesList') templates_list;
   @ViewChild('masterShapesList') master_shapes_list;
   @ViewChild('shapesSlaveList') slave_shapes_list;
+  @ViewChild('spotInstancesCheck') spotInstancesSelect;
 
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
@@ -94,6 +97,11 @@ export class ComputationalResourceCreateDialog {
 
     if (this.shapes[$event.model.type])
       this.shapes[$event.model.type] = $event.model.value.type;
+
+    if($event.model.type === 'slave_shape' && this.spotInstancesSelect.nativeElement['checked']) {
+      this.spotInstance = $event.model.value.spot;
+      this.spotInstancePrice = $event.model.value.price;
+    }
   }
 
   public createComputationalResource($event, data, shape_master: string, shape_slave: string) {
@@ -105,7 +113,8 @@ export class ComputationalResourceCreateDialog {
       return false;
     }
 
-    this.model.setCreatingParams(data.cluster_alias_name, data.instance_number, shape_master, shape_slave);
+    this.model.setCreatingParams(data.cluster_alias_name, data.instance_number, shape_master, shape_slave,
+      this.spotInstance, this.spotInstancePrice);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
@@ -120,6 +129,32 @@ export class ComputationalResourceCreateDialog {
           return true;
 
     return false;
+  }
+
+  public selectSpotInstances($event): void {
+    if($event.target.checked) {
+      let filtered = JSON.parse(JSON.stringify(this.slave_shapes_list.items));
+      for(var item in  this.slave_shapes_list.items) {
+          filtered[item] = filtered[item].filter(el => el.spot);
+          if(filtered[item].length <= 0) {
+            delete filtered[item];
+          }
+      }
+
+      this.slave_shapes_list.setDefaultOptions(filtered, this.shapePlaceholder(filtered, 'description'),
+        'slave_shape', 'description', 'json');
+      this.shapes.slave_shape = this.shapePlaceholder(filtered, 'type');
+
+      this.spotInstance = this.shapePlaceholder(filtered, 'spot');
+      this.spotInstancePrice = this.shapePlaceholder(filtered, 'price');
+    } else {
+       this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
+        this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'slave_shape', 'description', 'json');
+      this.shapes.slave_shape = this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'type');
+
+      this.spotInstance = false;
+      this.spotInstancePrice = 0;
+    }
   }
 
   public open(params, notebook_instance): void {
@@ -161,7 +196,7 @@ export class ComputationalResourceCreateDialog {
     });
   }
 
-  private shapePlaceholder(resourceShapes, byField: string): string {
+  private shapePlaceholder(resourceShapes, byField: string) {
     for (var index in resourceShapes) return resourceShapes[index][0][byField];
   }
 
@@ -197,6 +232,10 @@ export class ComputationalResourceCreateDialog {
     this.checkValidity = false;
     this.processError = false;
     this.errorMessage = '';
+
+    this.spotInstance = false;
+    this.spotInstancePrice = 0;
+    this.spotInstancesSelect.nativeElement['checked'] = false;
 
     this.initFormModel();
     this.getComputationalResourceLimits();

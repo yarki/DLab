@@ -154,13 +154,12 @@ def append_result(error):
     with open('/root/result.json', 'a+') as f:
         text = f.read()
     if len(text) == 0:
-        res = '{}'
+        res = '{"error": ""}'
         with open('/root/result.json', 'w') as f:
             f.write(res)
     with open("/root/result.json") as f:
-        res = {"[" + st + "]-" + str(uuid.uuid4())[:4] + " Error": error}
         data = json.load(f)
-    data.update(res)
+    data['error'] = data['error'] + " [Error-" + st + "]:" + error
     with open("/root/result.json", 'w') as f:
         json.dump(data, f)
     print data
