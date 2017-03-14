@@ -28,16 +28,16 @@ import HTTP_STATUS_CODES from 'http-status-enum';
 @Component({
   moduleId: module.id,
   selector: 'computational-resource-create-dialog',
-  templateUrl: 'computational-resource-create-dialog.component.html'
+  templateUrl: 'computational-resource-create-dialog.component.html',
+  styleUrls: ['./computational-resource-create-dialog.component.css'],
 })
 
 export class ComputationalResourceCreateDialog {
-
   model: ComputationalResourceCreateModel;
   notebook_instance: any;
   shapes: any;
   spotInstance: boolean = false;
-  spotInstancePrice: number = 0;
+  minSpotPrice: number = 40;
   computationalResourceExist: boolean = false;
   checkValidity: boolean = false;
   clusterNamePattern: string = '[-_a-zA-Z0-9]+';
@@ -100,7 +100,6 @@ export class ComputationalResourceCreateDialog {
 
     if($event.model.type === 'slave_shape' && this.spotInstancesSelect.nativeElement['checked']) {
       this.spotInstance = $event.model.value.spot;
-      this.spotInstancePrice = $event.model.value.price;
     }
   }
 
@@ -114,7 +113,7 @@ export class ComputationalResourceCreateDialog {
     }
 
     this.model.setCreatingParams(data.cluster_alias_name, data.instance_number, shape_master, shape_slave,
-      this.spotInstance, this.spotInstancePrice);
+      this.spotInstance, data.instance_price);
     this.model.confirmAction();
     $event.preventDefault();
     return false;
@@ -146,14 +145,14 @@ export class ComputationalResourceCreateDialog {
       this.shapes.slave_shape = this.shapePlaceholder(filtered, 'type');
 
       this.spotInstance = this.shapePlaceholder(filtered, 'spot');
-      this.spotInstancePrice = this.shapePlaceholder(filtered, 'price');
+      this.createComputationalResourceForm.controls['instance_price'].setValue(this.minSpotPrice);
     } else {
-       this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
+      this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
         this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'slave_shape', 'description', 'json');
       this.shapes.slave_shape = this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'type');
 
       this.spotInstance = false;
-      this.spotInstancePrice = 0;
+      this.createComputationalResourceForm.controls['instance_price'].setValue(0);
     }
   }
 
@@ -192,7 +191,8 @@ export class ComputationalResourceCreateDialog {
   private initFormModel(): void {
     this.createComputationalResourceForm = this._fb.group({
       cluster_alias_name: ['', [Validators.required, Validators.pattern(this.clusterNamePattern)]],
-      instance_number: ['', [Validators.required, Validators.pattern(this.nodeCountPattern), this.validInstanceNumberRange.bind(this)]]
+      instance_number: ['', [Validators.required, Validators.pattern(this.nodeCountPattern), this.validInstanceNumberRange.bind(this)]],
+      instance_price: [0, [this.validInstanceSpotRange.bind(this)]]
     });
   }
 
@@ -212,6 +212,10 @@ export class ComputationalResourceCreateDialog {
 
   private validInstanceNumberRange(control) {
     return control.value >= this.minInstanceNumber && control.value <= this.maxInstanceNumber ? null : { valid: false };
+  }
+
+  private validInstanceSpotRange(control) {
+    return this.spotInstancesSelect.nativeElement['checked'] ? (control.value >= this.minSpotPrice && control.value <= 100 ? null : { valid: false }): control.value;
   }
 
   private setDefaultParams(): void {
@@ -234,9 +238,7 @@ export class ComputationalResourceCreateDialog {
     this.errorMessage = '';
 
     this.spotInstance = false;
-    this.spotInstancePrice = 0;
     this.spotInstancesSelect.nativeElement['checked'] = false;
-
     this.initFormModel();
     this.getComputationalResourceLimits();
     this.model.resetModel();
