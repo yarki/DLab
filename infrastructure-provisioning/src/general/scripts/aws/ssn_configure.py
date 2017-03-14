@@ -50,16 +50,25 @@ if __name__ == "__main__":
         vpc_cidr = '172.31.0.0/16'
         sg_name = instance_name + '-SG'
         pre_defined_vpc = False
+        pre_defined_subnet = False
         pre_defined_sg = False
         try:
-            os.environ['aws_vpc_id']
+            if os.environ['aws_vpc_id'] == '':
+                raise KeyError
         except KeyError:
             tag = {"Key": tag_name, "Value": "{}-subnet".format(service_base_name)}
             os.environ['aws_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
-            os.environ['aws_subnet_id'] = get_subnet_by_tag(tag, True)
             pre_defined_vpc = True
         try:
-            os.environ['aws_security_groups_ids']
+            if os.environ['aws_subnet_id'] == '':
+                raise KeyError
+        except KeyError:
+            tag = {"Key": tag_name, "Value": "{}-subnet".format(service_base_name)}
+            os.environ['aws_subnet_id'] = get_subnet_by_tag(tag, True)
+            pre_defined_subnet = True
+        try:
+            if os.environ['aws_security_groups_ids'] == '':
+                raise KeyError
         except KeyError:
             os.environ['aws_security_groups_ids'] = get_security_group_by_name(sg_name)
             pre_defined_sg = True
@@ -86,10 +95,11 @@ if __name__ == "__main__":
         remove_s3(instance)
         if pre_defined_sg:
             remove_sgroups(tag_name)
-        if pre_defined_vpc:
-            remove_vpc_endpoints(os.environ['aws_vpc_id'])
+        if pre_defined_subnet:
             remove_internet_gateways(os.environ['aws_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['aws_vpc_id'])
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['aws_vpc_id'])
         sys.exit(1)
@@ -115,10 +125,11 @@ if __name__ == "__main__":
         remove_s3(instance)
         if pre_defined_sg:
             remove_sgroups(tag_name)
-        if pre_defined_vpc:
-            remove_vpc_endpoints(os.environ['aws_vpc_id'])
+        if pre_defined_subnet:
             remove_internet_gateways(os.environ['aws_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['aws_vpc_id'])
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['aws_vpc_id'])
         sys.exit(1)
@@ -150,10 +161,11 @@ if __name__ == "__main__":
         remove_s3(instance)
         if pre_defined_sg:
             remove_sgroups(tag_name)
-        if pre_defined_vpc:
-            remove_vpc_endpoints(os.environ['aws_vpc_id'])
+        if pre_defined_subnet:
             remove_internet_gateways(os.environ['aws_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['aws_vpc_id'])
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['aws_vpc_id'])
         sys.exit(1)
@@ -179,10 +191,11 @@ if __name__ == "__main__":
         remove_s3(instance)
         if pre_defined_sg:
             remove_sgroups(tag_name)
-        if pre_defined_vpc:
-            remove_vpc_endpoints(os.environ['aws_vpc_id'])
+        if pre_defined_subnet:
             remove_internet_gateways(os.environ['aws_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['aws_vpc_id'])
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['aws_vpc_id'])
         sys.exit(1)
@@ -246,10 +259,11 @@ if __name__ == "__main__":
         remove_s3(instance)
         if pre_defined_sg:
             remove_sgroups(tag_name)
-        if pre_defined_vpc:
-            remove_vpc_endpoints(os.environ['aws_vpc_id'])
+        if pre_defined_subnet:
             remove_internet_gateways(os.environ['aws_vpc_id'], tag_name, service_base_name)
             remove_subnets(service_base_name + "-subnet")
+        if pre_defined_vpc:
+            remove_vpc_endpoints(os.environ['aws_vpc_id'])
             remove_route_tables(tag_name, True)
             remove_vpc(os.environ['aws_vpc_id'])
         sys.exit(1)
