@@ -35,6 +35,12 @@ public class ComputationalResourceShapeDto {
     private String ram;
     @JsonProperty("Cpu")
     private int cpu;
+    @JsonProperty("Spot")
+    private boolean spot = false;
+
+    @JsonProperty("SpotPctPrice")
+    private int spotPctPrice = 70;
+
 
     public ComputationalResourceShapeDto(){
     }
@@ -45,6 +51,16 @@ public class ComputationalResourceShapeDto {
         this.description = description;
         this.ram = ram;
         this.cpu = cpu;
+    }
+
+    public ComputationalResourceShapeDto(String type, String size, String description, String ram, int cpu, boolean spot, int spotPctPrice) {
+        this.type = type;
+        this.size = size;
+        this.description = description;
+        this.ram = ram;
+        this.cpu = cpu;
+        this.spot = spot;
+        this.spotPctPrice = spotPctPrice;
     }
 
     public String getType() {
@@ -79,6 +95,22 @@ public class ComputationalResourceShapeDto {
         this.cpu = cpu;
     }
 
+    public boolean isSpot() {
+        return spot;
+    }
+
+    public void setSpot(boolean spot) {
+        this.spot = spot;
+    }
+
+    public int getSpotPctPrice() {
+        return spotPctPrice;
+    }
+
+    public void setSpotPctPrice(int spotPctPrice) {
+        this.spotPctPrice = spotPctPrice;
+    }
+
     @Override
     public boolean equals(Object obj) {
         return ObjectUtils.areObjectsEqual(this, obj,
@@ -86,12 +118,14 @@ public class ComputationalResourceShapeDto {
                 o -> o.size,
                 o -> o.description,
                 o -> o.ram,
-                o -> o.cpu);
+                o -> o.cpu,
+                o -> o.spot,
+                o -> o.spotPctPrice);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(type, size, description, ram, cpu);
+        int result = Objects.hash(type, size, description, ram, cpu, spot, spotPctPrice);
         return result;
     }
 
