@@ -248,7 +248,7 @@ def build_emr_cluster(args):
                            'Ec2SubnetId': get_subnet_by_cidr(args.subnet),
                            'InstanceGroups': [
                                {'Market': 'SPOT',
-                                'BidPrice': args.bid_price,
+                                'BidPrice': args.bid_price[:5],
                                 'InstanceRole': 'CORE',
                                 'InstanceType': args.slave_instance_type,
                                 'InstanceCount': int(args.instance_count) - 1},
