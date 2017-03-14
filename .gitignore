@@ -9,7 +9,10 @@ target
 .settings
 /automation/bin
 /services/common/bin
+/services/provisioning-service/bin
 /services/security-service/bin
+/services/self-service/bin
+/services/provisioning-service/response
 /automation/test-output
 /automation/log
 /automation/*.log

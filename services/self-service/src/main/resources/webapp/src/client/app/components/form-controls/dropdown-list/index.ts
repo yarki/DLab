@@ -26,7 +26,12 @@ import { UnderscorelessPipeModule } from '../../../util/pipes/underscoreless-pip
 export * from './dropdown-list.component';
 
 @NgModule({
-  imports: [CommonModule, ClickOutsideModule, KeysPipeModule, UnderscorelessPipeModule],
+  imports: [
+    CommonModule,
+    ClickOutsideModule,
+    KeysPipeModule,
+    UnderscorelessPipeModule
+  ],
   declarations: [DropdownList],
   exports: [DropdownList]
 })

@@ -35,18 +35,6 @@ parser.add_argument('--os_user', type=str, default='')
 args = parser.parse_args()
 
 
-def ensure_libraries_py3():
-    if not exists('/home/' + args.os_user + '/.ensure_dir/ensure_libraries_py3_installed'):
-        try:
-            sudo('pip3 install -U pip --no-cache-dir')
-            sudo('pip3 install boto boto3 --no-cache-dir')
-            sudo('pip3 install NumPy SciPy Sympy --no-cache-dir')
-            sudo('pip3 install Matplotlib Pillow --no-cache-dir')
-            sudo('pip3 install pandas sklearn fabvenv fabric-virtualenv --no-cache-dir')
-            sudo('touch /home/' + args.os_user + '/.ensure_dir/ensure_libraries_py3_installed')
-        except:
-            sys.exit(1)
-
 ##############
 # Run script #
 ##############
@@ -57,11 +45,8 @@ if __name__ == "__main__":
     env.host_string = args.os_user + '@' + args.hostname
     deeper_config = json.loads(args.additional_config)
 
-    print "Installing required libraries for Python 2.7"
-    ensure_libraries_py2(args.os_user)
-
-    print "Installing required libraries for Python 3"
-    ensure_libraries_py3()
+    print "Installing additional Python libraries"
+    ensure_additional_python_libs(args.os_user)
 
     print "Installing notebook additions: matplotlib."
     ensure_matplot(args.os_user)

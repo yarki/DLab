@@ -51,6 +51,18 @@ if __name__ == "__main__":
         sg_name = instance_name + '-SG'
         pre_defined_vpc = False
         pre_defined_sg = False
+        try:
+            os.environ['aws_vpc_id']
+        except KeyError:
+            tag = {"Key": tag_name, "Value": "{}-subnet".format(service_base_name)}
+            os.environ['aws_vpc_id'] = get_vpc_by_tag(tag_name, service_base_name)
+            os.environ['aws_subnet_id'] = get_subnet_by_tag(tag, True)
+            pre_defined_vpc = True
+        try:
+            os.environ['aws_security_groups_ids']
+        except KeyError:
+            os.environ['aws_security_groups_ids'] = get_security_group_by_name(sg_name)
+            pre_defined_sg = True
     except:
         sys.exit(1)
 
@@ -59,7 +71,7 @@ if __name__ == "__main__":
 
         logging.info('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
         print('[INSTALLING PREREQUISITES TO SSN INSTANCE]')
-        params = "--hostname {} --keyfile {} --pip_packages 'boto3 argparse fabric awscli pymongo' --user {}". \
+        params = "--hostname {} --keyfile {} --pip_packages 'boto3 argparse fabric awscli pymongo pyyaml' --user {}". \
             format(instance_hostname, "/root/keys/" + os.environ['conf_key_name'] + ".pem", os.environ['conf_os_user'])
 
         try:
@@ -149,31 +161,6 @@ if __name__ == "__main__":
     try:
         logging.info('[CONFIGURE SSN INSTANCE UI]')
         print('[CONFIGURE SSN INSTANCE UI]')
-        params = "--hostname {} --keyfile {} " \
-                 "--pip_packages 'pymongo pyyaml'". \
-            format(instance_hostname, "/root/keys/{}.pem".format(os.environ['conf_key_name']))
-
-        try:
-            local("~/scripts/{}.py {}".format('install_prerequisites', params))
-        except:
-            traceback.print_exc()
-            raise Exception
-    except Exception as err:
-        append_result("Unable to preconfigure UI. Exception: " + str(err))
-        remove_ec2(tag_name, instance_name)
-        remove_all_iam_resources(instance)
-        remove_s3(instance)
-        if pre_defined_sg:
-            remove_sgroups(tag_name)
-        if pre_defined_vpc:
-            remove_vpc_endpoints(os.environ['aws_vpc_id'])
-            remove_internet_gateways(os.environ['aws_vpc_id'], tag_name, service_base_name)
-            remove_subnets(service_base_name + "-subnet")
-            remove_route_tables(tag_name, True)
-            remove_vpc(os.environ['aws_vpc_id'])
-        sys.exit(1)
-
-    try:
         params = "--hostname {} --keyfile {} --dlab_path {} --os_user {} --os_family {} --request_id {} --resource {} --region {} --service_base_name {} --security_groups_ids {} --vpc_id {} --subnet_id {}". \
             format(instance_hostname, "/root/keys/{}.pem".format(os.environ['conf_key_name']), os.environ['ssn_dlab_path'],
                    os.environ['conf_os_user'], os.environ['conf_os_family'], os.environ['request_id'], os.environ['conf_resource'], os.environ['aws_region'],
@@ -186,7 +173,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Unable to upload UI. Exception: " + str(err))
+        append_result("Unable to configure UI. Exception: " + str(err))
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)

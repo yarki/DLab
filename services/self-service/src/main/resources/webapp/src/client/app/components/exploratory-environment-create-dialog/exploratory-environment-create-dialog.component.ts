@@ -88,6 +88,7 @@ export class ExploratoryEnvironmentCreateDialog {
       this.model.setSelectedTemplate($event.model.index);
       this.shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
         this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'shape', 'description', 'json');
+      this.environment_shape = this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'type');
     }
 
     if($event.model.type === 'shape')

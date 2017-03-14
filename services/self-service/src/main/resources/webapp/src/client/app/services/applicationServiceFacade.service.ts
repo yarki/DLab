@@ -35,6 +35,10 @@ export class ApplicationServiceFacade {
   private static readonly COMPUTATIONAL_RESOURCES = 'computational_resources';
   private static readonly COMPUTATIONAL_RESOURCES_LIMITS = 'computational_resources_limits';
   private static readonly USER_PREFERENCES = 'user_preferences';
+  private static readonly ENVIRONMENT_HEALTH_STATUS = 'environment_health_status';
+  private static readonly EDGE_NODE_START = 'edge_node_start';
+  private static readonly EDGE_NODE_STOP = 'edge_node_stop';
+  private static readonly EDGE_NODE_RECREATE = 'edge_node_recreate';
   private accessTokenKey: string = 'access_token';
   private requestRegistry: Dictionary<string>;
 
@@ -154,6 +158,40 @@ export class ApplicationServiceFacade {
       this.getRequestOptions(true, true));
   }
 
+  public buildGetEnvironmentHealthStatus(): Observable<Response> {
+    return this.buildRequest(RequestMethod.Get,
+      this.requestRegistry.Item(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUS),
+      null,
+      this.getRequestOptions(true, true));
+  }
+
+  public buildGetEnvironmentStatuses(data): Observable<Response> {
+    return this.buildRequest(RequestMethod.Get,
+      this.requestRegistry.Item(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUS),
+      data,
+      this.getRequestOptions(true, true));
+  }
+
+  public buildRunEdgeNodeRequest(): Observable<Response>  {
+    return this.buildRequest(RequestMethod.Post,
+      this.requestRegistry.Item(ApplicationServiceFacade.EDGE_NODE_START),
+      null,
+      this.getRequestOptions(true, true));
+  }
+
+  public buildSuspendEdgeNodeRequest(): Observable<Response>  {
+    return this.buildRequest(RequestMethod.Post,
+      this.requestRegistry.Item(ApplicationServiceFacade.EDGE_NODE_STOP),
+      null,
+      this.getRequestOptions(true, true));
+  }
+
+  public buildRecreateEdgeNodeRequest(): Observable<Response>  {
+    return this.buildRequest(RequestMethod.Post,
+      this.requestRegistry.Item(ApplicationServiceFacade.EDGE_NODE_RECREATE),
+      null,
+      this.getRequestOptions(true, true));
+  }
 
   private setupRegistry(): void {
     this.requestRegistry = new Dictionary<string>();
@@ -183,6 +221,12 @@ export class ApplicationServiceFacade {
 
     // Filtering Configuration
     this.requestRegistry.Add(ApplicationServiceFacade.USER_PREFERENCES, '/api/user/settings');
+
+    // Environment Health Status
+    this.requestRegistry.Add(ApplicationServiceFacade.ENVIRONMENT_HEALTH_STATUS, '/api/infrastructure/status');
+    this.requestRegistry.Add(ApplicationServiceFacade.EDGE_NODE_START, '/api/infrastructure/edge/start');
+    this.requestRegistry.Add(ApplicationServiceFacade.EDGE_NODE_STOP, '/api/infrastructure/edge/stop');
+    this.requestRegistry.Add(ApplicationServiceFacade.EDGE_NODE_RECREATE, '/api/user/access_key/recover');
   }
 
   private buildRequest(method: RequestMethod, url: string, body: any, opt: RequestOptions): Observable<Response> {
@@ -192,7 +236,9 @@ export class ApplicationServiceFacade {
       return this.http.delete(body ? url + JSON.parse(body) : url, opt);
     } else if (method === RequestMethod.Put) {
       return this.http.put(url, body, opt);
-    } else return this.http.get(url, opt);
+    } else return this.http.get(body ? (url + body) : url, opt);
+
+    // else return this.http.get(url, opt);
   }
 
   private getRequestOptions(json: boolean, auth: boolean): RequestOptions {

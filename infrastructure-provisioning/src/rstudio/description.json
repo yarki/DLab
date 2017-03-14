@@ -5,7 +5,6 @@
       {"Size": "XS", "Description": "t2.medium", "Type": "t2.medium","Ram": "4 GB","Cpu": "2"}
     ],
     "Memory optimized" : [
-      {"Size": "XS", "Description": "t2.medium", "Type": "t2.medium","Ram": "4 GB","Cpu": "2"},
       {"Size": "S", "Description": "r3.xlarge", "Type": "r3.xlarge","Ram": "30.5 GB","Cpu": "4"},
       {"Size": "M", "Description": "r3.4xlarge", "Type": "r3.4xlarge","Ram": "122 GB","Cpu": "16"},
       {"Size": "L", "Description": "r3.8xlarge", "Type": "r3.8xlarge","Ram": "244 GB","Cpu": "32"}
@@ -22,10 +21,10 @@
   "exploratory_environment_versions" :
   [
     {
-      "template_name": "R 3.3.2",
-      "description": "Base image with r node creation routines",
+      "template_name": "R-Studio 3.3.2",
+      "description": "Base image with r-studio node creation routines",
       "environment_type": "exploratory",
-      "version": "r-3.3.2",
+      "version": "R-studio-3.3.2",
       "vendor": "AWS"
     }
   ]

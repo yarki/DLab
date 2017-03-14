@@ -44,6 +44,7 @@ export class ResourcesGrid implements OnInit {
   collapseFilterRow: boolean = false;
   filtering: boolean = false;
   activeFiltering: boolean = false;
+  healthStatus: string = '';
 
   @ViewChild('computationalResourceModal') computationalResourceModal;
   @ViewChild('confirmationDialog') confirmationDialog;
@@ -141,6 +142,14 @@ export class ResourcesGrid implements OnInit {
     this.buildGrid();
   }
 
+  aliveStatuses(сonfig): void {
+    for (let index in this.filterConfiguration) {
+      if(сonfig[index] && сonfig[index] instanceof Array)
+         сonfig[index] = сonfig[index].filter(item => this.filterConfiguration[index].includes(item));
+    }
+
+    return сonfig;
+  }
 
   onUpdate($event) {
     this.filterForm[$event.type] = $event.model;
@@ -193,9 +202,11 @@ export class ResourcesGrid implements OnInit {
   getUserPreferences(): void {
     this.userResourceService.getUserPreferences()
       .subscribe((result) => {
-        this.filterForm = this.loadUserPreferences(result);
+
+        this.isActiveFilter(result);
+        this.filterForm = this.loadUserPreferences(this.aliveStatuses(result));
+
         this.applyFilter_btnClick(this.filterForm);
-        this.isActiveFilter();
       }, (error) => {
         // FIXME: to avoid SyntaxError: in case of empty database
         this.applyFilter_btnClick(this.filterForm);
@@ -215,11 +226,11 @@ export class ResourcesGrid implements OnInit {
       });
   }
 
-  isActiveFilter(): void {
+  isActiveFilter(filterConfig): void {
     this.activeFiltering = false;
 
-    for (let index in this.filterForm)
-      if (this.filterForm[index].length)
+    for (let index in filterConfig)
+      if (filterConfig[index].length)
         this.activeFiltering = true;
   }
 

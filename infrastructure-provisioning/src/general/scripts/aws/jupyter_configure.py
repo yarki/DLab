@@ -101,8 +101,10 @@ if __name__ == "__main__":
     try:
         logging.info('[CONFIGURE JUPYTER NOTEBOOK INSTANCE]')
         print '[CONFIGURE JUPYTER NOTEBOOK INSTANCE]'
-        params = "--hostname {} --keyfile {} --region {} --spark_version {} --hadoop_version {} --os_user {}".\
-            format(instance_hostname, keyfile_name, os.environ['aws_region'], os.environ['notebook_spark_version'], os.environ['notebook_hadoop_version'], os.environ['conf_os_user'])
+        params = "--hostname {} --keyfile {} --region {} --spark_version {} --hadoop_version {} --os_user {} --scala_version {}".\
+            format(instance_hostname, keyfile_name, os.environ['aws_region'], os.environ['notebook_spark_version'],
+                   os.environ['notebook_hadoop_version'], os.environ['conf_os_user'],
+                   os.environ['notebook_scala_version'])
         try:
             local("~/scripts/{}.py {}".format('configure_jupyter_node', params))
         except:
@@ -134,8 +136,8 @@ if __name__ == "__main__":
         logging.info('[INSTALLING USERs KEY]')
         additional_config = {"user_keyname": notebook_config['user_keyname'],
                              "user_keydir": "/root/keys/"}
-        params = "--hostname {} --keyfile {} --additional_config '{}'".format(
-            instance_hostname, keyfile_name, json.dumps(additional_config))
+        params = "--hostname {} --keyfile {} --additional_config '{}' --user {}".format(
+            instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
@@ -143,16 +145,23 @@ if __name__ == "__main__":
             raise Exception
     except Exception as err:
         append_result("Failed installing users key. Exception: " + str(err))
+        remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
-    # checking the need for image creation
-    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
-    if ami_id == '':
-        print "Looks like it's first time we configure notebook server. Creating image."
-        image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
-                                              image_name=notebook_config['expected_ami_name'])
-        if image_id != '':
-            print "Image was successfully created. It's ID is " + image_id
+    try:
+        print '[CREATING AMI]'
+        logging.info('[CREATING AMI]')
+        ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
+        if ami_id == '':
+            print "Looks like it's first time we configure notebook server. Creating image."
+            image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
+                                                  image_name=notebook_config['expected_ami_name'])
+            if image_id != '':
+                print "Image was successfully created. It's ID is " + image_id
+    except Exception as err:
+        append_result("Failed installing users key. Exception: " + str(err))
+        remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
+        sys.exit(1)
 
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')

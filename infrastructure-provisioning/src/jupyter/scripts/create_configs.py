@@ -76,53 +76,6 @@ def r_kernel(args):
         f.write(text)
 
 
-def pyspark_kernel(args):
-    spark_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
-    local('mkdir -p ' + kernels_dir + 'pyspark_' + args.cluster_name + '/')
-    kernel_path = kernels_dir + "pyspark_" + args.cluster_name + "/kernel.json"
-    template_file = "/tmp/pyspark_emr_template.json"
-    with open(template_file, 'r') as f:
-        text = f.read()
-    text = text.replace('CLUSTER_NAME', args.cluster_name)
-    text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-    text = text.replace('SPARK_PATH', spark_path)
-    text = text.replace('PYTHON_SHORT_VERSION', '2.7')
-    text = text.replace('PYTHON_FULL_VERSION', '2.7')
-    text = text.replace('PYTHON_PATH', '/usr/bin/python2.7')
-    text = text.replace('EMR_VERSION', args.emr_version)
-    with open(kernel_path, 'w') as f:
-        f.write(text)
-    local('touch /tmp/kernel_var.json')
-    local(
-        "PYJ=`find /opt/" + args.emr_version + "/" + args.cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
-    local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-    s3_client = boto3.client('s3', config=Config(signature_version='s3v4'), region_name=args.region)
-    s3_client.download_file(args.bucket, args.user_name + '/' + args.cluster_name + '/python_version', '/tmp/python_version')
-    with file('/tmp/python_version') as f:
-        python_version = f.read()
-    # python_version = python_version[0:3]
-    if python_version != '\n':
-        installing_python(args)
-        local('mkdir -p ' + kernels_dir + 'py3spark_' + args.cluster_name + '/')
-        kernel_path = kernels_dir + "py3spark_" + args.cluster_name + "/kernel.json"
-        template_file = "/tmp/pyspark_emr_template.json"
-        with open(template_file, 'r') as f:
-            text = f.read()
-        text = text.replace('CLUSTER_NAME', args.cluster_name)
-        text = text.replace('SPARK_VERSION', 'Spark-' + args.spark_version)
-        text = text.replace('SPARK_PATH', spark_path)
-        text = text.replace('PYTHON_SHORT_VERSION', python_version[0:3])
-        text = text.replace('PYTHON_FULL_VERSION', python_version[0:5])
-        text = text.replace('PYTHON_PATH', '/opt/python/python' + python_version[:5] + '/bin/python' + python_version[:3])
-        text = text.replace('EMR_VERSION', args.emr_version)
-        with open(kernel_path, 'w') as f:
-            f.write(text)
-        local('touch /tmp/kernel_var.json')
-        local(
-            "PYJ=`find /opt/" + args.emr_version + "/" + args.cluster_name + "/spark/ -name '*py4j*.zip' | tr '\\n' ':' | sed 's|:$||g'`; cat " + kernel_path + " | sed 's|PY4J|'$PYJ'|g' > /tmp/kernel_var.json")
-        local('sudo mv /tmp/kernel_var.json ' + kernel_path)
-
-
 def toree_kernel(args):
     spark_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/spark/'
     scala_version = local("dpkg -l scala | grep scala | awk '{print $3}'", capture=True)
@@ -190,6 +143,12 @@ def add_breeze_library_emr(args):
           breeze_tmp_dir + 'breeze-macros_2.11-0.12.jar')
     local('wget http://central.maven.org/maven2/org/scalanlp/breeze-parent_2.11/0.12/breeze-parent_2.11-0.12.jar -O ' +
           breeze_tmp_dir + 'breeze-parent_2.11-0.12.jar')
+    local('wget http://central.maven.org/maven2/org/jfree/jfreechart/1.0.19/jfreechart-1.0.19.jar -O ' +
+          breeze_tmp_dir + 'jfreechart-1.0.19.jar')
+    local('wget http://central.maven.org/maven2/org/jfree/jcommon/1.0.24/jcommon-1.0.24.jar -O ' +
+          breeze_tmp_dir + 'jcommon-1.0.24.jar')
+    local('wget https://brunelvis.org/jar/spark-kernel-brunel-all-2.3.jar -O ' +
+          breeze_tmp_dir + 'spark-kernel-brunel-all-2.3.jar')
     local('sudo mv ' + breeze_tmp_dir + '* ' + new_jars_directory_path)
     local(""" sudo bash -c "sed -i '/spark.driver.extraClassPath/s/$/:\/opt\/""" + args.emr_version +
           """\/jars\/usr\/other\/*/' """ + spark_defaults_path + """" """)
@@ -204,9 +163,9 @@ if __name__ == "__main__":
             jars(args, emr_dir)
         yarn(args, yarn_dir)
         install_emr_spark(args)
-        pyspark_kernel(args)
+        pyspark_kernel(kernels_dir, args.emr_version, args.cluster_name, args.spark_version, args.bucket, args.user_name, args.region)
         toree_kernel(args)
         spark_defaults(args)
         r_kernel(args)
-        configuring_notebook(args)
+        configuring_notebook(args.emr_version)
         add_breeze_library_emr(args)

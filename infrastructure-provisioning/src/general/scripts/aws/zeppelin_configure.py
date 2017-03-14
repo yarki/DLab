@@ -109,9 +109,11 @@ if __name__ == "__main__":
                              "backend_hostname": get_instance_hostname(notebook_config['instance_name']),
                              "backend_port": "8080",
                              "nginx_template_dir": "/root/templates/"}
-        params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --os_user {}" \
+        params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --os_user {} --spark_version {} --hadoop_version {} --edge_hostname {} --proxy_port {} --zeppelin_version {} --scala_version {}" \
             .format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['aws_region'],
-                    json.dumps(additional_config), os.environ['conf_os_user'])
+                    json.dumps(additional_config), os.environ['conf_os_user'], os.environ['notebook_spark_version'],
+                    os.environ['notebook_hadoop_version'], edge_instance_hostname, '3128',
+                    os.environ['notebook_zeppelin_version'], os.environ['notebook_scala_version'])
         try:
             local("~/scripts/{}.py {}".format('configure_zeppelin_node', params))
         except:
@@ -143,8 +145,8 @@ if __name__ == "__main__":
         logging.info('[INSTALLING USERs KEY]')
         additional_config = {"user_keyname": notebook_config['user_keyname'],
                              "user_keydir": "/root/keys/"}
-        params = "--hostname {} --keyfile {} --additional_config '{}'".format(
-            instance_hostname, keyfile_name, json.dumps(additional_config))
+        params = "--hostname {} --keyfile {} --additional_config '{}' --user {}".format(
+            instance_hostname, keyfile_name, json.dumps(additional_config), os.environ['conf_os_user'])
         try:
             local("~/scripts/{}.py {}".format('install_user_key', params))
         except:
@@ -152,16 +154,23 @@ if __name__ == "__main__":
             raise Exception
     except Exception as err:
         append_result("Failed installing users key. Exception: " + str(err))
+        remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
-    # checking the need for image creation
-    ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
-    if ami_id == '':
-        print "Looks like it's first time we configure notebook server. Creating image."
-        image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
-                                              image_name=notebook_config['expected_ami_name'])
-        if image_id != '':
-            print "Image was successfully created. It's ID is " + image_id
+    try:
+        print '[CREATING AMI]'
+        logging.info('[CREATING AMI]')
+        ami_id = get_ami_id_by_name(notebook_config['expected_ami_name'])
+        if ami_id == '':
+            print "Looks like it's first time we configure notebook server. Creating image."
+            image_id = create_image_from_instance(instance_name=notebook_config['instance_name'],
+                                                  image_name=notebook_config['expected_ami_name'])
+            if image_id != '':
+                print "Image was successfully created. It's ID is " + image_id
+    except Exception as err:
+        append_result("Failed installing users key. Exception: " + str(err))
+        remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
+        sys.exit(1)
 
     # generating output information
     ip_address = get_instance_ip_address(notebook_config['instance_name']).get('Private')

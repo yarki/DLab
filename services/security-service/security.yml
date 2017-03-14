@@ -18,7 +18,7 @@
 inactiveUserTimeoutMillSec: 7200000
 ldapConnectionConfig:
 #  ldapHost: localhost
-  ldapHost: ec2-52-33-6-197.us-west-2.compute.amazonaws.com
+  ldapHost: ec2-52-36-63-161.us-west-2.compute.amazonaws.com
 #  ldapPort: 3890
   ldapPort: 389
   name: cn=admin,dc=example,dc=com
@@ -132,7 +132,9 @@ logging:
     com.epam: DEBUG
     com.aegisql: INFO
   appenders:
-#    - type: console
+<#if DEV_MODE == "true">
+    - type: console
+</#if>
     - type: file
       currentLogFilename: ${LOG_ROOT_DIR}/ssn/security.log
       archive: true
