@@ -38,13 +38,18 @@ limitations under the License.
   font-size: 20px;
   vertical-align: sub;
 }
+.mat-raised-button.butt.butt-success {
+  background-color: #49af38;
+  margin-left: 15px;
+  color: #fff;
+}
 
 .mat-button-focus-overlay {
   background-color: rgba(255, 0, 0, 0)!important;
 }
 
 .mat-button-ripple.mat-button-ripple-round.mat-ripple {
-    border-radius: 0;
+  border-radius: 0;
 }
 
 [hidden] {
@@ -84,24 +89,6 @@ body {
   height: 60px;
   padding: 12px 15px;
 }
-/*
-.sub_nav .btn {
-  background: none;
-  font-weight: 600;
-  padding: 6px 25px;
-  min-width: 165px;
-  color: #577289;
-  border: 1px solid #4E6A82;
-  outline: none;
-}
-
-.sub_nav .btn:active {
-  outline: none;
-}
-
-.sub_nav .btn .glyphicon {
-  margin-right: 4px;
-}*/
 
 .modal .btn {
   margin-top: 20px;
@@ -152,6 +139,7 @@ body {
 
 .not-allowed {
   cursor: not-allowed !important;
+  opacity: 0.6;
 }
 
 @-webkit-keyframes spin {
@@ -268,3 +256,8 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+/* helper classes */
+.text-center { text-align: center!important; }
+.m-top-10 { margin-top: 10px; }
+.m-top-30 { margin-top: 30px; }
