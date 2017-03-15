@@ -39,6 +39,7 @@ parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--dry_run', type=str, default='false')
 parser.add_argument('--emr_version', type=str, default='')
 parser.add_argument('--spark_version', type=str, default='')
+parser.add_argument('--scala_version', type=str, default='')
 parser.add_argument('--hadoop_version', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--excluded_lines', type=str, default='')
@@ -70,9 +71,9 @@ def install_remote_livy(args):
         local('git clone https://github.com/cloudera/livy.git')
     livy_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/livy/'
     with lcd(livy_path):
-        local('mvn package -DskipTests -Dhttp.proxyHost=' +
-              args.edge_hostname + ' -Dhttp.proxyPort=' + args.proxy_port + ' -Dhttps.proxyHost=' +
-              args.edge_hostname + ' -Dhttps.proxyPort=' + args.proxy_port)
+        local('mvn package -DskipTests -Dspark-' + args.spark_version[:3] + ' -Dscala-' + args.scala_version[:4]
+              + ' -Dhttp.proxyHost=' + args.edge_hostname + ' -Dhttp.proxyPort=' + args.proxy_port
+              + ' -Dhttps.proxyHost=' + args.edge_hostname + ' -Dhttps.proxyPort=' + args.proxy_port)
     local('sudo mkdir -p /var/run/livy')
     local('sudo mkdir -p ' + livy_path + '/logs')
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
