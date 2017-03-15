@@ -37,7 +37,7 @@ export class ComputationalResourceCreateDialog {
   notebook_instance: any;
   shapes: any;
   spotInstance: boolean = false;
-  minSpotPrice: number = 40;
+  
   computationalResourceExist: boolean = false;
   checkValidity: boolean = false;
   clusterNamePattern: string = '[-_a-zA-Z0-9]+';
@@ -48,6 +48,8 @@ export class ComputationalResourceCreateDialog {
 
   public minInstanceNumber: number;
   public maxInstanceNumber: number;
+  public minSpotPrice: number;
+  public maxSpotPrice: number;
 
   public createComputationalResourceForm: FormGroup;
 
@@ -145,7 +147,7 @@ export class ComputationalResourceCreateDialog {
       this.shapes.slave_shape = this.shapePlaceholder(filtered, 'type');
 
       this.spotInstance = this.shapePlaceholder(filtered, 'spot');
-      this.createComputationalResourceForm.controls['instance_price'].setValue(this.minSpotPrice);
+      this.createComputationalResourceForm.controls['instance_price'].setValue(this.shapePlaceholder(filtered, 'price'));
     } else {
       this.slave_shapes_list.setDefaultOptions(this.model.selectedItem.shapes.resourcesShapeTypes,
         this.shapePlaceholder(this.model.selectedItem.shapes.resourcesShapeTypes, 'description'), 'slave_shape', 'description', 'json');
@@ -201,10 +203,13 @@ export class ComputationalResourceCreateDialog {
   }
 
   private getComputationalResourceLimits(): void {
-    this.userResourceService.getComputationalResourcesLimits()
+    this.userResourceService.getComputationalResourcesConfiguration()
       .subscribe((limits) => {
         this.minInstanceNumber = limits.min_emr_instance_count;
         this.maxInstanceNumber = limits.max_emr_instance_count;
+
+        this.minSpotPrice = limits.min_emr_spot_instance_bid_pct;
+        this.maxSpotPrice = limits.max_emr_spot_instance_bid_pct;
 
         this.createComputationalResourceForm.controls['instance_number'].setValue(this.minInstanceNumber);
       });

@@ -43,7 +43,7 @@ limitations under the License.
 }
 
 .checkbox-group .spot-details.show {
-  height: 120px;
+  height: 140px;
   visibility: visible;
   opacity: 1;
 }
