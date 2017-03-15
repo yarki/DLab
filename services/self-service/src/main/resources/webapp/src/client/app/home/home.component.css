@@ -19,3 +19,11 @@ limitations under the License.
 .btn_refresh {
   outline: none;
 }
+
+.butt.butt-create {
+  color: #35afd5;
+}
+
+.butt.butt-filter {
+  margin-right: 10px;
+}
