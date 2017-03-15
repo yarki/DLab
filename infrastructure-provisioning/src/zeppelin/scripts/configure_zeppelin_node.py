@@ -132,7 +132,8 @@ def install_local_livy(args):
             sudo('git init')
             sudo('git clone https://github.com/cloudera/livy.git')
         with cd('/opt/livy/'):
-            sudo('mvn package -DskipTests -Dhttp.proxyHost=' + args.edge_hostname + ' -Dhttp.proxyPort=' +
+            sudo('mvn package -DskipTests -Dspark-' + args.spark_version[:3] + ' -Dscala-' + args.scala_version[:4] +
+                 ' -Dhttp.proxyHost=' + args.edge_hostname + ' -Dhttp.proxyPort=' +
                  args.proxy_port + ' -Dhttps.proxyHost=' + args.edge_hostname +
                  ' -Dhttps.proxyPort=' + args.proxy_port)
         sudo('mkdir -p /var/run/livy')
