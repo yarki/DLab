@@ -17,6 +17,21 @@
                     <defaultValue></defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.ChoiceParameterDefinition>
+                  <name>slave_spot_instance</name>
+                  <description>instance life cycle for EMR slaves</description>
+                  <choices class="java.util.Arrays$ArrayList">
+                    <a class="string-array">
+                      <string>False</string>
+                      <string>True</string>
+                    </a>
+                  </choices>
+                </hudson.model.ChoiceParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>slave_instance_spot_pct_price</name>
+                    <description>The percentage of EC2 instance price which will be used for Spot price. If spot instances is disabled, the value of this parameter can be anything.</description>
+                    <defaultValue>70</defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.ChoiceParameterDefinition>
                     <name>Master_node_size</name>
                     <description>
                         Memory optimized: S: r3.xlarge
@@ -220,7 +235,7 @@
     <builders>
         <hudson.tasks.Shell>
             <command>rand=`openssl rand -hex 10`;
-                sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/create_hadoop_cluster/template_prepare.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/EUN/&apos;${User_name}&apos;/g&apos; | sed &apos;s/ESR/&apos;${Service_role}&apos;/g&apos; | sed &apos;s/EE2R/&apos;${EMR_EC2_role}&apos;/g&apos; | sed &apos;s/EVER/&apos;${Release_label}&apos;/g&apos; | sed &apos;s/EMIT/&apos;${Master_node_size}&apos;/g&apos; | sed &apos;s/ESMT/&apos;${Slave_node_size}&apos;/g&apos; | sed &apos;s/GOS/&apos;${os_user}&apos;/g&apos; | sed &apos;s/EIC/&apos;${Nodes_Count}&apos;/g&apos; | sed &apos;s/ETIM/&apos;${Timeout}&apos;/g&apos; | sed &apos;s/KN/&apos;${SSH_Key_Name}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sed &apos;s/NNM/&apos;${Notebook_name}&apos;/g&apos; | sudo docker run -i -v /home/${os_user}/keys:/root/keys  -v /opt/dlab/tmp/result:/response -v /var/opt/dlab/log/emr:/logs/emr  docker.dlab-emr --action create;
+                sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/create_hadoop_cluster/template_prepare.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/SPI/&apos;${slave_spot_instance}&apos;/g&apos; | sed &apos;s/SISPP/&apos;${slave_instance_spot_pct_price}&apos;/g&apos; | sed &apos;s/EUN/&apos;${User_name}&apos;/g&apos; | sed &apos;s/ESR/&apos;${Service_role}&apos;/g&apos; | sed &apos;s/EE2R/&apos;${EMR_EC2_role}&apos;/g&apos; | sed &apos;s/EVER/&apos;${Release_label}&apos;/g&apos; | sed &apos;s/EMIT/&apos;${Master_node_size}&apos;/g&apos; | sed &apos;s/ESMT/&apos;${Slave_node_size}&apos;/g&apos; | sed &apos;s/GOS/&apos;${os_user}&apos;/g&apos; | sed &apos;s/EIC/&apos;${Nodes_Count}&apos;/g&apos; | sed &apos;s/ETIM/&apos;${Timeout}&apos;/g&apos; | sed &apos;s/KN/&apos;${SSH_Key_Name}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sed &apos;s/NNM/&apos;${Notebook_name}&apos;/g&apos; | sudo docker run -i -v /home/${os_user}/keys:/root/keys  -v /opt/dlab/tmp/result:/response -v /var/opt/dlab/log/emr:/logs/emr  docker.dlab-emr --action create;
                 rand=`openssl rand -hex 10`;
                 sed &apos;s/RID/&apos;${rand}&apos;/g&apos; /var/lib/jenkins/jobs/create_hadoop_cluster/template_configure.json | sed &apos;s/SBN/&apos;${Service_base_name}&apos;/g&apos; | sed &apos;s/EUN/&apos;${User_name}&apos;/g&apos; | sed &apos;s/EVER/&apos;${Release_label}&apos;/g&apos; | sed &apos;s/KN/&apos;${SSH_Key_Name}&apos;/g&apos; | sed &apos;s/CREG/&apos;${Region}&apos;/g&apos; | sed &apos;s/APP/&apos;${notebook_app}&apos;/g&apos; | sed &apos;s/NNM/&apos;${Notebook_name}&apos;/g&apos; | sed &apos;s/GOS/&apos;${os_user}&apos;/g&apos; | sudo docker run -i -v /home/${os_user}/keys:/root/keys  -v /opt/dlab/tmp/result:/response -v /var/opt/dlab/log/emr:/logs/emr  docker.dlab-${notebook_app} --action configure;
             </command>

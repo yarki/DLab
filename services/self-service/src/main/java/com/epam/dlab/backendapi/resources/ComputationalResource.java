@@ -18,26 +18,6 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
-import static com.epam.dlab.UserInstanceStatus.CREATING;
-import static com.epam.dlab.UserInstanceStatus.FAILED;
-import static com.epam.dlab.UserInstanceStatus.TERMINATING;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
@@ -59,8 +39,17 @@ import com.epam.dlab.rest.contracts.ApiCallbacks;
 import com.epam.dlab.rest.contracts.ComputationalAPI;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-
 import io.dropwizard.auth.Auth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import static com.epam.dlab.UserInstanceStatus.*;
 
 /** Provides the REST API for the computational resource.
  */
@@ -120,6 +109,8 @@ public class ComputationalResource implements ComputationalAPI {
                         .withStatus(CREATING.toString())
                         .withMasterShape(formDTO.getMasterInstanceType())
                         .withSlaveShape(formDTO.getSlaveInstanceType())
+                        .withSlaveSpot(formDTO.getSlaveInstanceSpot())
+                        .withSlaveSpotPctPrice(formDTO.getSlaveInstanceSpotPctPrice())
                         .withSlaveNumber(formDTO.getInstanceCount())
                         .withVersion(formDTO.getVersion()));
         if (isAdded) {
@@ -135,6 +126,8 @@ public class ComputationalResource implements ComputationalAPI {
                         .withInstanceCount(formDTO.getInstanceCount())
                         .withMasterInstanceType(formDTO.getMasterInstanceType())
                         .withSlaveInstanceType(formDTO.getSlaveInstanceType())
+                        .withSlaveInstanceSpot(formDTO.getSlaveInstanceSpot())
+                        .withSlaveInstanceSpotPctPrice(formDTO.getSlaveInstanceSpotPctPrice())
                         .withVersion(formDTO.getVersion())
                         .withEdgeUserName(userInfo.getSimpleName())
                         .withAwsIamUser(userInfo.getName())
@@ -169,7 +162,7 @@ public class ComputationalResource implements ComputationalAPI {
         LOGGER.debug("Updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto);
         String uuid = dto.getRequestId();
         RequestId.checkAndRemove(uuid);
-        
+
         try {
         	infCompDAO.updateComputationalFields(dto);
         } catch (DlabException e) {

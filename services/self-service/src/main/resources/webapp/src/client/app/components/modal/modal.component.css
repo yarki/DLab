@@ -343,3 +343,24 @@ limitations under the License.
 .progress-dialog .modal-body {
   padding: 30px 30px 45px 30px;
 }
+
+.checkbox-group {
+  text-align: right;
+  margin-bottom: 15px;
+}
+
+.checkbox-group .message {
+  color: #35afd5;
+  font-size: 13px;
+  text-align: justify;
+  height: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: all .35s linear .2s;
+}
+
+.checkbox-group .message.show {
+  height: 50px;
+  visibility: visible;
+  opacity: 1;
+}
