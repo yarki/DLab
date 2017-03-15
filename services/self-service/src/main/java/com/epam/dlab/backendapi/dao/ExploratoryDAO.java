@@ -18,28 +18,25 @@
 
 package com.epam.dlab.backendapi.dao;
 
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Projections.exclude;
-import static com.mongodb.client.model.Projections.excludeId;
-import static com.mongodb.client.model.Projections.fields;
-import static com.mongodb.client.model.Projections.include;
-import static com.mongodb.client.model.Updates.set;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
+import com.epam.dlab.UserInstanceStatus;
+import com.epam.dlab.backendapi.core.UserInstanceDTO;
+import com.epam.dlab.backendapi.util.DateRemoverUtil;
+import com.epam.dlab.dto.StatusEnvBaseDTO;
+import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
+import com.epam.dlab.exceptions.DlabException;
+import com.mongodb.client.result.UpdateResult;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
-import com.epam.dlab.UserInstanceStatus;
-import com.epam.dlab.backendapi.core.UserInstanceDTO;
-import com.epam.dlab.dto.StatusEnvBaseDTO;
-import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
-import com.epam.dlab.exceptions.DlabException;
-import com.mongodb.client.result.UpdateResult;
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Updates.set;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /** DAO for user exploratory.
  */
@@ -143,7 +140,8 @@ public class ExploratoryDAO extends BaseDAO {
     		values.append(INSTANCE_ID, dto.getInstanceId());
     	}
         if (dto.getErrorMessage() != null) {
-            values.append(ERROR_MESSAGE, dto.getErrorMessage());
+            values.append(ERROR_MESSAGE,
+                    DateRemoverUtil.removeDateFormErrorMessage(dto.getErrorMessage(), DateRemoverUtil.ERROR_DATE_FORMAT));
         }
         if (dto.getExploratoryId() != null) {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());

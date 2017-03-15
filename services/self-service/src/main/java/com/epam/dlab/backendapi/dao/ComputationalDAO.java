@@ -20,6 +20,7 @@ package com.epam.dlab.backendapi.dao;
 
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
+import com.epam.dlab.backendapi.util.DateRemoverUtil;
 import com.epam.dlab.dto.StatusEnvBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
@@ -169,11 +170,12 @@ public class ComputationalDAO extends BaseDAO {
         		values.append(computationalFieldFilter(INSTANCE_ID), dto.getInstanceId());
         	}
             if (null !=  dto.getErrorMessage()) {
-                values.append(computationalFieldFilter(ERROR_MESSAGE), dto.getErrorMessage());
+                values.append(computationalFieldFilter(ERROR_MESSAGE),
+                        DateRemoverUtil.removeDateFormErrorMessage(dto.getErrorMessage(), DateRemoverUtil.ERROR_DATE_FORMAT));
             }
         	if (dto.getComputationalId() != null) {
                 values.append(computationalFieldFilter(COMPUTATIONAL_ID), dto.getComputationalId());
-            }
+            })
             return updateOne(USER_INSTANCES, and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                     elemMatch(COMPUTATIONAL_RESOURCES,
                             and(eq(COMPUTATIONAL_NAME, dto.getComputationalName()),
