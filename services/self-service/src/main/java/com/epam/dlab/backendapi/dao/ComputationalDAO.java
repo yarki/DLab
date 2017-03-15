@@ -18,31 +18,24 @@
 
 package com.epam.dlab.backendapi.dao;
 
-import static com.epam.dlab.UserInstanceStatus.TERMINATED;
-import static com.epam.dlab.backendapi.dao.ExploratoryDAO.COMPUTATIONAL_RESOURCES;
-import static com.epam.dlab.backendapi.dao.ExploratoryDAO.UPTIME;
-import static com.epam.dlab.backendapi.dao.ExploratoryDAO.exploratoryCondition;
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.not;
-import static com.mongodb.client.model.Projections.elemMatch;
-import static com.mongodb.client.model.Projections.excludeId;
-import static com.mongodb.client.model.Projections.fields;
-import static com.mongodb.client.model.Projections.include;
-import static com.mongodb.client.model.Updates.push;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.bson.Document;
-
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
 import com.epam.dlab.dto.StatusEnvBaseDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.mongodb.client.result.UpdateResult;
+import org.bson.Document;
+
+import java.util.List;
+import java.util.Optional;
+
+import static com.epam.dlab.UserInstanceStatus.TERMINATED;
+import static com.epam.dlab.backendapi.dao.ExploratoryDAO.*;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Projections.elemMatch;
+import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Updates.push;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /** DAO for user computational resources.
  */
@@ -175,6 +168,9 @@ public class ComputationalDAO extends BaseDAO {
         	if (dto.getInstanceId() != null) {
         		values.append(computationalFieldFilter(INSTANCE_ID), dto.getInstanceId());
         	}
+            if (null !=  dto.getErrorMessage()) {
+                values.append(computationalFieldFilter(ERROR_MESSAGE), dto.getErrorMessage());
+            }
         	if (dto.getComputationalId() != null) {
                 values.append(computationalFieldFilter(COMPUTATIONAL_ID), dto.getComputationalId());
             }
