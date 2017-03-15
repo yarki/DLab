@@ -168,6 +168,9 @@ public class ComputationalDAO extends BaseDAO {
         	if (dto.getInstanceId() != null) {
         		values.append(computationalFieldFilter(INSTANCE_ID), dto.getInstanceId());
         	}
+            if (null !=  dto.getErrorMessage()) {
+                values.append(computationalFieldFilter(ERROR_MESSAGE), dto.getErrorMessage());
+            }
         	if (dto.getComputationalId() != null) {
                 values.append(computationalFieldFilter(COMPUTATIONAL_ID), dto.getComputationalId());
             }
