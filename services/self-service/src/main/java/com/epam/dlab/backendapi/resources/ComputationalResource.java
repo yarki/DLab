@@ -28,7 +28,7 @@ import com.epam.dlab.backendapi.dao.ExploratoryDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.domain.RequestId;
 import com.epam.dlab.backendapi.resources.dto.ComputationalCreateFormDTO;
-import com.epam.dlab.backendapi.resources.dto.ComputationalLimitsDTO;
+import com.epam.dlab.backendapi.resources.dto.UIConfigurationDTO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
@@ -76,11 +76,13 @@ public class ComputationalResource implements ComputationalAPI {
      * @param userInfo user info.
      */
     @GET
-    @Path("/limits")
-    public ComputationalLimitsDTO getLimits(@Auth UserInfo userInfo) {
-    	ComputationalLimitsDTO limits = new ComputationalLimitsDTO()
+    @Path("/configuration")
+    public UIConfigurationDTO getUIConfiguration(@Auth UserInfo userInfo) {
+    	UIConfigurationDTO limits = new UIConfigurationDTO()
     			.withMinEmrInstanceCount(configuration.getMinEmrInstanceCount())
-    			.withMaxEmrInstanceCount(configuration.getMaxEmrInstanceCount());
+    			.withMaxEmrInstanceCount(configuration.getMaxEmrInstanceCount())
+    			.withMaxEmrSpotInstanceBidPct(configuration.getMaxEmrSpotInstanceBidPct())
+    			.withMinEmrSpotInstanceBidPct(configuration.getMinEmrSpotInstanceBidPct());
     	LOGGER.debug("Returns limits for user {}: {}", userInfo.getName(), limits.toString());
         return limits;
     }

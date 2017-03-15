@@ -18,12 +18,11 @@ limitations under the License.
 
 package com.epam.dlab.backendapi;
 
-import javax.validation.Valid;
-
 import com.epam.dlab.ServiceConfiguration;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import io.dropwizard.util.Duration;
+
+import javax.validation.Valid;
 
 /** Configuration for Self Service.
  */
@@ -40,6 +39,15 @@ public class SelfServiceApplicationConfiguration extends ServiceConfiguration {
     @Valid
     @JsonProperty
     private int maxEmrInstanceCount;
+
+
+    @Valid
+    @JsonProperty
+    private int minEmrSpotInstanceBidPct;
+
+    @Valid
+    @JsonProperty
+    private int maxEmrSpotInstanceBidPct;
     
     @Valid
     @JsonProperty
@@ -65,7 +73,15 @@ public class SelfServiceApplicationConfiguration extends ServiceConfiguration {
     public Duration getCheckEnvStatusTimeout() {
     	return checkEnvStatusTimeout;
     }
-    
+
+    public int getMinEmrSpotInstanceBidPct() {
+        return minEmrSpotInstanceBidPct;
+    }
+
+    public int getMaxEmrSpotInstanceBidPct() {
+        return maxEmrSpotInstanceBidPct;
+    }
+
     public SelfServiceApplicationConfiguration withCheckEnvStatusTimeout(Duration checkEnvStatusTimeout) {
     	this.checkEnvStatusTimeout = checkEnvStatusTimeout;
     	return this;
