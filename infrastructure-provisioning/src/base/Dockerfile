@@ -60,7 +60,6 @@ COPY base/ /root
 COPY general/conf/* /root/conf/
 COPY general/api/*.py /bin/
 COPY general/scripts/${CLOUD}/common_* /root/scripts/
-COPY general/templates/os/common/* /root/templates/
 COPY general/lib/${CLOUD}/* /usr/lib/python2.7/dlab/
 COPY general/lib/os/${OS}/common_lib.py /usr/lib/python2.7/dlab/common_lib.py
 COPY general/lib/os/fab.py /usr/lib/python2.7/dlab/fab.py

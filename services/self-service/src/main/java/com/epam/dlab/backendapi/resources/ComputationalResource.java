@@ -18,39 +18,18 @@ limitations under the License.
 
 package com.epam.dlab.backendapi.resources;
 
-import static com.epam.dlab.UserInstanceStatus.CREATING;
-import static com.epam.dlab.UserInstanceStatus.FAILED;
-import static com.epam.dlab.UserInstanceStatus.TERMINATING;
-
-import java.util.Optional;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.epam.dlab.UserInstanceStatus;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.SelfServiceApplicationConfiguration;
 import com.epam.dlab.backendapi.core.UserComputationalResourceDTO;
 import com.epam.dlab.backendapi.core.UserInstanceDTO;
-import com.epam.dlab.backendapi.dao.InfrastructureProvisionDAO;
+import com.epam.dlab.backendapi.dao.ComputationalDAO;
+import com.epam.dlab.backendapi.dao.ExploratoryDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
+import com.epam.dlab.backendapi.domain.RequestId;
 import com.epam.dlab.backendapi.resources.dto.ComputationalCreateFormDTO;
 import com.epam.dlab.backendapi.resources.dto.ComputationalLimitsDTO;
 import com.epam.dlab.constants.ServiceConsts;
-import com.epam.dlab.dto.computational.ComputationalConfigDTO;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
@@ -58,11 +37,19 @@ import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
 import com.epam.dlab.rest.contracts.ComputationalAPI;
-import com.epam.dlab.utils.UsernameUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-
 import io.dropwizard.auth.Auth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import static com.epam.dlab.UserInstanceStatus.*;
 
 /** Provides the REST API for the computational resource.
  */
@@ -75,7 +62,9 @@ public class ComputationalResource implements ComputationalAPI {
     @Inject
     private SettingsDAO settingsDAO;
     @Inject
-    private InfrastructureProvisionDAO infrastructureProvisionDAO;
+    private ExploratoryDAO infExpDAO;
+    @Inject
+    private ComputationalDAO infCompDAO;
     @Inject
     @Named(ServiceConsts.PROVISIONING_SERVICE_NAME)
     private RESTService provisioningService;
@@ -114,17 +103,19 @@ public class ComputationalResource implements ComputationalAPI {
             		", maximum is " + configuration.getMaxEmrInstanceCount() + ".");
         }
 
-        boolean isAdded = infrastructureProvisionDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
+        boolean isAdded = infCompDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
                 new UserComputationalResourceDTO()
                         .withComputationalName(formDTO.getName())
                         .withStatus(CREATING.toString())
                         .withMasterShape(formDTO.getMasterInstanceType())
                         .withSlaveShape(formDTO.getSlaveInstanceType())
+                        .withSlaveSpot(formDTO.getSlaveInstanceSpot())
+                        .withSlaveSpotPctPrice(formDTO.getSlaveInstanceSpotPctPrice())
                         .withSlaveNumber(formDTO.getInstanceCount())
                         .withVersion(formDTO.getVersion()));
         if (isAdded) {
             try {
-            	UserInstanceDTO instance = getExploratoryInstance(userInfo.getName(), formDTO.getNotebookName());
+            	UserInstanceDTO instance = infExpDAO.fetchExploratoryFields(userInfo.getName(), formDTO.getNotebookName());
                 ComputationalCreateDTO dto = new ComputationalCreateDTO()
                         .withServiceBaseName(settingsDAO.getServiceBaseName())
                         .withExploratoryName(formDTO.getNotebookName())
@@ -135,15 +126,17 @@ public class ComputationalResource implements ComputationalAPI {
                         .withInstanceCount(formDTO.getInstanceCount())
                         .withMasterInstanceType(formDTO.getMasterInstanceType())
                         .withSlaveInstanceType(formDTO.getSlaveInstanceType())
+                        .withSlaveInstanceSpot(formDTO.getSlaveInstanceSpot())
+                        .withSlaveInstanceSpotPctPrice(formDTO.getSlaveInstanceSpotPctPrice())
                         .withVersion(formDTO.getVersion())
-                        .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                        .withIamUserName(userInfo.getName())
+                        .withEdgeUserName(userInfo.getSimpleName())
+                        .withAwsIamUser(userInfo.getName())
                         .withAwsRegion(settingsDAO.getAwsRegion())
                         .withConfOsUser(settingsDAO.getConfOsUser())
                         .withConfOsFamily(settingsDAO.getConfOsFamily());
-                return Response
-                        .ok(provisioningService.post(EMR_CREATE, userInfo.getAccessToken(), dto, String.class))
-                        .build();
+                String uuid = provisioningService.post(EMR_CREATE, userInfo.getAccessToken(), dto, String.class);
+                RequestId.put(userInfo.getName(), uuid);
+                return Response.ok(uuid).build();
             } catch (Throwable t) {
             	try {
             		updateComputationalStatus(userInfo.getName(), formDTO.getNotebookName(), formDTO.getName(), FAILED);
@@ -165,10 +158,13 @@ public class ComputationalResource implements ComputationalAPI {
      */
     @POST
     @Path(ApiCallbacks.STATUS_URI)
-    public Response status(@Auth UserInfo userInfo, ComputationalStatusDTO dto) throws DlabException {
+    public Response status(ComputationalStatusDTO dto) throws DlabException {
         LOGGER.debug("Updating status for computational resource {} for user {}: {}", dto.getComputationalName(), dto.getUser(), dto);
+        String uuid = dto.getRequestId();
+        RequestId.checkAndRemove(uuid);
+
         try {
-        	infrastructureProvisionDAO.updateComputationalFields(dto);
+        	infCompDAO.updateComputationalFields(dto);
         } catch (DlabException e) {
         	LOGGER.error("Could not update status for computational resource {} for user {} to {}: {}",
         			dto.getComputationalName(), dto.getUser(), dto.getStatus(), e.getLocalizedMessage(), e);
@@ -176,31 +172,8 @@ public class ComputationalResource implements ComputationalAPI {
         			" for user " + dto.getUser() + " to " + dto.getStatus() + ": " + e.getLocalizedMessage(), e);
         }
         if (UserInstanceStatus.CONFIGURING == UserInstanceStatus.of(dto.getStatus())) {
-            LOGGER.debug("Send request for configuration of the computational resource {} for user {}", dto.getComputationalName(), dto.getUser());
-            try {
-            	UserComputationalResourceDTO computational = infrastructureProvisionDAO
-            			.fetchComputationalFields(userInfo.getName(), dto.getExploratoryName(), dto.getComputationalName());
-            	UserInstanceDTO instance = getExploratoryInstance(userInfo.getName(), dto.getExploratoryName());
-            	ComputationalConfigDTO dtoConf = new ComputationalConfigDTO()
-                        .withServiceBaseName(settingsDAO.getServiceBaseName())
-                        .withApplicationName(getApplicationName(instance.getImageName()))
-                        .withExploratoryName(dto.getExploratoryName())
-                        .withComputationalName(computational.getComputationalName())
-                        .withNotebookInstanceName(instance.getExploratoryId())
-                        .withVersion(computational.getVersion())
-                        .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                        .withIamUserName(userInfo.getName())
-                        .withAwsRegion(settingsDAO.getAwsRegion())
-                        .withConfOsUser(settingsDAO.getConfOsUser())
-                        .withConfOsFamily(settingsDAO.getConfOsFamily()) //TODO: Remove and check it
-                        ;
-            	provisioningService.post(EMR_CONFIGURE, userInfo.getAccessToken(), dtoConf, String.class);
-            } catch (Throwable e) {
-            	LOGGER.error("Could not send request for configuration of the computational resource {} for user {}: ",
-            			dto.getComputationalName(), userInfo.getName(), e);
-            	throw new DlabException("Could not send request for configuration of the computational resource " +
-            			dto.getComputationalName() + " for user " + userInfo.getName() + ": " + e.getLocalizedMessage(), e);
-            }
+            LOGGER.debug("Waiting for configuration of the computational resource {} for user {}", dto.getComputationalName(), dto.getUser());
+            RequestId.put(dto.getUser(), uuid);
         }
         return Response.ok().build();
     }
@@ -226,8 +199,8 @@ public class ComputationalResource implements ComputationalAPI {
     	}
         
         try {
-            String exploratoryId = infrastructureProvisionDAO.fetchExploratoryId(userInfo.getName(), exploratoryName);
-            String computationalId = infrastructureProvisionDAO.fetchComputationalId(userInfo.getName(), exploratoryName, computationalName);
+            String exploratoryId = infExpDAO.fetchExploratoryId(userInfo.getName(), exploratoryName);
+            String computationalId = infCompDAO.fetchComputationalId(userInfo.getName(), exploratoryName, computationalName);
             ComputationalTerminateDTO dto = new ComputationalTerminateDTO()
                     .withServiceBaseName(settingsDAO.getServiceBaseName())
                     .withExploratoryName(exploratoryName)
@@ -236,11 +209,13 @@ public class ComputationalResource implements ComputationalAPI {
                     .withClusterName(computationalId)
                     .withConfKeyDir(settingsDAO.getConfKeyDir())
                     .withConfOsUser(settingsDAO.getConfOsUser())
-                    .withConfOsFamily(settingsDAO.getConfOsFamily()) //TODO: Remove and check it
-                    .withEdgeUserName(UsernameUtils.removeDomain(userInfo.getName()))
-                    .withIamUserName(userInfo.getName())
+                    .withEdgeUserName(userInfo.getSimpleName())
+                    .withAwsIamUser(userInfo.getName())
                     .withAwsRegion(settingsDAO.getAwsRegion());
-            return provisioningService.post(EMR_TERMINATE, userInfo.getAccessToken(), dto, String.class);
+
+            String uuid = provisioningService.post(EMR_TERMINATE, userInfo.getAccessToken(), dto, String.class);
+            RequestId.put(userInfo.getName(), uuid);
+            return uuid;
         } catch (Throwable t) {
         	try {
         		updateComputationalStatus(userInfo.getName(), exploratoryName, computationalName, FAILED);
@@ -264,21 +239,9 @@ public class ComputationalResource implements ComputationalAPI {
                 .withExploratoryName(exploratoryName)
                 .withComputationalName(computationalName)
                 .withStatus(status);
-        infrastructureProvisionDAO.updateComputationalStatus(computationalStatus);
+        infCompDAO.updateComputationalStatus(computationalStatus);
     }
-    
-    /** Finds and returns the instance of exploratory.
-     * @param username name of user.
-     * @param exploratoryName name of exploratory.
-     * @throws DlabException
-     */
-    private UserInstanceDTO getExploratoryInstance(String username, String exploratoryName) throws DlabException {
-    	Optional<UserInstanceDTO> opt = infrastructureProvisionDAO.fetchExploratoryFields(username, exploratoryName);
-        if( opt.isPresent() ) {
-            return opt.get();
-        }
-        throw new DlabException(String.format("Exploratory instance for user {} with name {} not found.", username, exploratoryName));
-    }
+
 
     /** Returns the name of application for notebook: jupiter, rstudio, etc. */
     private String getApplicationName(String imageName) {

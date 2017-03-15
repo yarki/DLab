@@ -261,6 +261,11 @@ public class TestServices {
                 Paths.get(PropertiesResolver.getClusterConfFileLocation(), "EMR.json").toString(),
                 DeployEMRDto.class);
 
+        DeployEMRDto deployEMRSpot40 =
+                NodeReader.readNode(
+                        Paths.get(PropertiesResolver.getClusterConfFileLocation(), "EMR_spot.json").toString(),
+                        DeployEMRDto.class);
+
         deployEMR.setName(emrName);
         deployEMR.setNotebook_name(noteBookName);
         Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
@@ -375,31 +380,31 @@ public class TestServices {
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName, AmazonInstanceState.TERMINATED.value());
         Docker.checkDockerStatus(nodePrefix + "_terminate_computational_NewEMRAutoTest", ipForTest);
         
-        LOGGER.info("11. New EMR will be deployed for notebook termination ...");
-        final String emrNewName2 = "AnotherNew" + emrName;
-        
-        LOGGER.info("    SSN terminate EMR URL is {}", ssnTerminateEMRURL);
+        LOGGER.info("11. New EMR with spot instances will be deployed for notebook termination ...");
+        final String emrWithSpots = "SpotInstances" + emrName;
+        final String ssnTerminateEMRSpotURL = getSnnURL(ApiPath.getTerminateEMRUrl(noteBookName, emrWithSpots));
+        LOGGER.info("    SSN terminate EMR URL is {}", ssnTerminateEMRSpotURL);
 		LOGGER.info("    New EMR will be deployed ...");
-        deployEMR.setName(emrNewName2);
-        deployEMR.setNotebook_name(noteBookName);
-        Response responseDeployingEMRAnotherNew = new HttpRequest().webApiPut(ssnCompResURL,
-                                                                              ContentType.JSON, deployEMR,
+        deployEMRSpot40.setName(emrWithSpots);
+        deployEMRSpot40.setNotebook_name(noteBookName);
+        Response responseDeployingEMRAnotherWithSpots = new HttpRequest().webApiPut(ssnCompResURL,
+                                                                              ContentType.JSON, deployEMRSpot40,
                                                                               token);
-        LOGGER.info("    responseDeployingEMRAnotherNew.getBody() is {}", responseDeployingEMRAnotherNew.getBody().asString());
-        Assert.assertEquals(responseDeployingEMRAnotherNew.statusCode(), HttpStatusCode.OK);
+        LOGGER.info("    responseDeployingEMRAnotherWithSpots.getBody() is {}", responseDeployingEMRAnotherWithSpots.getBody().asString());
+        Assert.assertEquals(responseDeployingEMRAnotherWithSpots.statusCode(), HttpStatusCode.OK);
 
-        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrNewName2, "creating", ConfigPropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrWithSpots, "creating", ConfigPropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains("configuring"))
-            throw new Exception("New emr " + emrNewName2 + " has not been deployed");
-        LOGGER.info("    New emr {} has been deployed", emrNewName2);
+            throw new Exception("New emr " + emrWithSpots + " has not been deployed");
+        LOGGER.info("    New emr {} has been deployed", emrWithSpots);
         
         LOGGER.info("   Waiting until EMR has been configured ...");
-        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrNewName2, "configuring", ConfigPropertyValue.getTimeoutEMRCreate());
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, noteBookName, emrWithSpots, "configuring", ConfigPropertyValue.getTimeoutEMRCreate());
         if (!gettingStatus.contains(AmazonInstanceState.RUNNING.value()))
-            throw new Exception("EMR " + emrNewName2 + " has not been configured");
-        LOGGER.info("   EMR  {} has been configured", emrNewName2);
+            throw new Exception("EMR " + emrWithSpots + " has not been configured");
+        LOGGER.info("   EMR  {} has been configured", emrWithSpots);
 
-        AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName2, AmazonInstanceState.RUNNING.value());
+        AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrWithSpots, AmazonInstanceState.RUNNING.value());
         Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", ipForTest);
 
         LOGGER.info("12. Notebook will be terminated ...");
@@ -417,13 +422,13 @@ public class TestServices {
 					.webApiGet(ssnProUserResURL, token)
 					.getBody()
 					.jsonPath(),
-				noteBookName, emrNewName2);
+				noteBookName, emrWithSpots);
         if (!gettingStatus.contains("terminated"))
             throw new Exception("EMR has not been terminated for Notebook " + noteBookName);
         LOGGER.info("    EMR has been terminated for Notebook {}", noteBookName);
 
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-nb-NotebookAutoTest", AmazonInstanceState.TERMINATED.value());
-        AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrNewName2, AmazonInstanceState.TERMINATED.value());
+        AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + noteBookName + "-" + emrWithSpots, AmazonInstanceState.TERMINATED.value());
 
         Docker.checkDockerStatus(nodePrefix + "_terminate_exploratory_NotebookAutoTestt", ipForTest);
     }

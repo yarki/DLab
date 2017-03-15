@@ -35,11 +35,15 @@ parser.add_argument('--notebook_ip', type=str, default='')
 parser.add_argument('--emr_excluded_spark_properties', type=str, default='')
 parser.add_argument('--edge_user_name', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
+parser.add_argument('--edge_hostname', type=str, default='')
+parser.add_argument('--proxy_port', type=str, default='')
 args = parser.parse_args()
 
 
 def configure_notebook(args):
     scripts_dir = '/root/scripts/'
+    templates_dir = '/root/templates/'
+    put(templates_dir + 'pyspark_emr_template.json', '/tmp/pyspark_emr_template.json')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
     sudo('chmod 755 /usr/local/bin/create_configs.py')
@@ -48,6 +52,8 @@ def configure_notebook(args):
     local('scp -i {} /usr/lib/python2.7/dlab/* {}:/tmp/dlab_libs/'.format(args.keyfile, env.host_string))
     run('chmod a+x /tmp/dlab_libs/*')
     sudo('mv /tmp/dlab_libs/* /usr/lib/python2.7/dlab/')
+    if exists('/usr/lib64'):
+        sudo('ln -fs /usr/lib/python2.7/dlab /usr/lib64/python2.7/dlab')
 
 
 if __name__ == "__main__":

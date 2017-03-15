@@ -6,6 +6,8 @@ public class DeployEMRDto {
     private String emr_instance_count;
     private String emr_master_instance_type;
     private String emr_slave_instance_type;
+    private boolean emr_slave_instance_spot = false;
+    private Integer emr_slave_instance_spot_pct_price = 0;
     private String emr_version;
     private String notebook_name;
     
@@ -57,4 +59,19 @@ public class DeployEMRDto {
         this.notebook_name = notebook_name;
     }
 
+    public boolean isEmr_slave_instance_spot() {
+        return emr_slave_instance_spot;
+    }
+
+    public void setEmr_slave_instance_spot(boolean emr_slave_instance_spot) {
+        this.emr_slave_instance_spot = emr_slave_instance_spot;
+    }
+
+    public Integer getEmr_slave_instance_spot_pct_price() {
+        return emr_slave_instance_spot_pct_price;
+    }
+
+    public void setEmr_slave_instance_spot_pct_price(Integer emr_slave_instance_spot_pct_price) {
+        this.emr_slave_instance_spot_pct_price = emr_slave_instance_spot_pct_price;
+    }
 }

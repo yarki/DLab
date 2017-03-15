@@ -111,7 +111,6 @@ public class ConfigPropertyValue {
             FileReader fin = new FileReader(f1);
             props.load(fin);
 
-            //TODO: replace/set os_username, os_family, jenkins job name,
             if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_USER))) {
                 props.setProperty(CLUSTER_USER, System.getProperty(CLUSTER_USER));
             }

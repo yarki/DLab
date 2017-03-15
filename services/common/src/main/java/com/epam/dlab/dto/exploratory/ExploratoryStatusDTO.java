@@ -20,11 +20,11 @@ package com.epam.dlab.dto.exploratory;
 
 import java.util.List;
 
-import com.epam.dlab.dto.StatusBaseDTO;
+import com.epam.dlab.dto.StatusEnvBaseDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
-public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
+public class ExploratoryStatusDTO extends StatusEnvBaseDTO<ExploratoryStatusDTO> {
     @JsonProperty("exploratory_id")
     private String exploratoryId;
     @JsonProperty("exploratory_url")
@@ -33,11 +33,25 @@ public class ExploratoryStatusDTO extends StatusBaseDTO<ExploratoryStatusDTO> {
     private String exploratoryUser;
     @JsonProperty("exploratory_pass")
     private String exploratoryPassword;
+    @JsonProperty("private_ip")
+    private String privateIp;
+
+    public String getPrivateIp() {
+        return privateIp;
+    }
+
+    public void setPrivateIp(String privateIp) {
+        this.privateIp = privateIp;
+    }
+
+    public ExploratoryStatusDTO withPrivateIp(String privateIp) {
+        setPrivateIp(privateIp);
+        return this;
+    }
 
     public String getExploratoryId() {
         return exploratoryId;
     }
-
     public void setExploratoryId(String exploratoryId) {
         this.exploratoryId = exploratoryId;
     }

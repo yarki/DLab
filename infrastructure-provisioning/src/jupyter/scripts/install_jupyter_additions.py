@@ -33,33 +33,30 @@ parser.add_argument('--additional_config', type=str, default='{"empty":"string"}
 parser.add_argument('--os_user', type=str, default='')
 args = parser.parse_args()
 
-s3_jars_dir = '/opt/jars/'
 
-
-def add_breeze_library_local():
-    breeze_tmp_dir = '/tmp/breeze_tmp_local/'
-    sudo('mkdir -p ' + breeze_tmp_dir)
-    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze_2.11/0.12/breeze_2.11-0.12.jar -O ' +
-         breeze_tmp_dir + 'breeze_2.11-0.12.jar')
-    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-natives_2.11/0.12/breeze-natives_2.11-0.12.jar -O ' +
-         breeze_tmp_dir + 'breeze-natives_2.11-0.12.jar')
-    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-viz_2.11/0.12/breeze-viz_2.11-0.12.jar -O ' +
-         breeze_tmp_dir + 'breeze-viz_2.11-0.12.jar')
-    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-macros_2.11/0.12/breeze-macros_2.11-0.12.jar -O ' +
-         breeze_tmp_dir + 'breeze-macros_2.11-0.12.jar')
-    sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-parent_2.11/0.12/breeze-parent_2.11-0.12.jar -O ' +
-         breeze_tmp_dir + 'breeze-parent_2.11-0.12.jar')
-    sudo('mv ' + breeze_tmp_dir + '* ' + s3_jars_dir)
-
-
-def ensure_libraries_py3(os_user):
-    if not exists('/home/' + os_user + '/.ensure_dir/ensure_libraries_py3_installed'):
+def add_breeze_library_local(os_user):
+    if not exists('/home/' + os_user + '/.ensure_dir/breeze_local_ensured'):
         try:
-            sudo('pip3 install -U pip --no-cache-dir')
-            sudo('pip3 install boto boto3 --no-cache-dir')
-            sudo('pip3 install NumPy SciPy Matplotlib pandas Sympy Pillow sklearn fabvenv fabric-virtualenv --no-cache-dir')
-            sudo('jupyter-kernelspec remove -f python3')
-            sudo('touch /home/' + os_user + '/.ensure_dir/ensure_libraries_py3_installed')
+            breeze_tmp_dir = '/tmp/breeze_tmp_local/'
+            s3_jars_dir = '/opt/jars/'
+            sudo('mkdir -p ' + breeze_tmp_dir)
+            sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze_2.11/0.12/breeze_2.11-0.12.jar -O ' +
+                 breeze_tmp_dir + 'breeze_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-natives_2.11/0.12/breeze-natives_2.11-0.12.jar -O ' +
+                 breeze_tmp_dir + 'breeze-natives_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-viz_2.11/0.12/breeze-viz_2.11-0.12.jar -O ' +
+                 breeze_tmp_dir + 'breeze-viz_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-macros_2.11/0.12/breeze-macros_2.11-0.12.jar -O ' +
+                 breeze_tmp_dir + 'breeze-macros_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/scalanlp/breeze-parent_2.11/0.12/breeze-parent_2.11-0.12.jar -O ' +
+                 breeze_tmp_dir + 'breeze-parent_2.11-0.12.jar')
+            sudo('wget http://central.maven.org/maven2/org/jfree/jfreechart/1.0.19/jfreechart-1.0.19.jar -O ' +
+                 breeze_tmp_dir + 'jfreechart-1.0.19.jar')
+            sudo('wget http://central.maven.org/maven2/org/jfree/jcommon/1.0.24/jcommon-1.0.24.jar -O ' +
+                 breeze_tmp_dir + 'jcommon-1.0.24.jar')
+            sudo('wget https://brunelvis.org/jar/spark-kernel-brunel-all-2.3.jar -O ' +
+                 breeze_tmp_dir + 'spark-kernel-brunel-all-2.3.jar')
+            sudo('mv ' + breeze_tmp_dir + '* ' + s3_jars_dir)
         except:
             sys.exit(1)
 
@@ -74,11 +71,8 @@ if __name__ == "__main__":
     env.host_string = args.os_user + '@' + args.hostname
     deeper_config = json.loads(args.additional_config)
 
-    print "Installing required libraries for Python 2.7"
-    ensure_libraries_py2(args.os_user)
-
-    print "Installing required libraries for Python 3"
-    ensure_libraries_py3(args.os_user)
+    print "Installing additional Python libraries"
+    ensure_additional_python_libs(args.os_user)
 
     print "Installing notebook additions: matplotlib."
     ensure_matplot(args.os_user)
@@ -87,4 +81,5 @@ if __name__ == "__main__":
     ensure_sbt(args.os_user)
 
     print "Installing Breeze library"
-    add_breeze_library_local()
+    add_breeze_library_local(args.os_user)
+

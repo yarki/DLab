@@ -6,6 +6,9 @@ mocked: false
 minEmrInstanceCount: 2
 maxEmrInstanceCount: 14
 
+#Timeout for check the status of environment via provisioning service
+checkEnvStatusTimeout: 5m
+
 server:
   requestLog:
     appenders:
@@ -25,7 +28,9 @@ logging:
   loggers:
     com.epam: DEBUG
   appenders:
-#    - type: console
+<#if DEV_MODE == "true">
+    - type: console
+</#if>
     - type: file
       currentLogFilename: ${LOG_ROOT_DIR}/ssn/selfservice.log
       archive: true
