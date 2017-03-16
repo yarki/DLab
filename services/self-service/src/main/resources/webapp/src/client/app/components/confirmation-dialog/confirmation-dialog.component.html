@@ -53,9 +53,9 @@ limitations under the License.
       <div class="text-right" *ngIf="processError">
         <small class="danger_color">{{errorMessage}}</small>
       </div>
-      <div class="text-center">
-        <button type="button" class="btn btn-default" (click)="bindDialog.close()">No</button>
-        <button type="button" class="btn btn-success" (click)="model.confirmAction()">Yes</button>
+      <div class="text-center m-top-10">
+        <button md-raised-button type="button" class="butt" (click)="bindDialog.close()">No</button>
+        <button md-raised-button type="button" class="butt butt-success" (click)="model.confirmAction()">Yes</button>
       </div>
   </modal-content>
 </modal-dialog>

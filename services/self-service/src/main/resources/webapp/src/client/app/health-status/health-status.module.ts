@@ -21,9 +21,15 @@ import { CommonModule } from '@angular/common';
 import { NavbarModule } from './../shared/navbar/index';
 import { HealthStatusComponent } from './health-status.component';
 import { HealthStatusGridModule } from './components/health-status-grid/health-status-grid.module';
+import { MaterialModule } from '@angular/material';
 
 @NgModule({
-    imports: [CommonModule, NavbarModule, HealthStatusGridModule],
+    imports: [
+        CommonModule,
+        NavbarModule,
+        HealthStatusGridModule,
+        MaterialModule.forRoot()
+    ],
     declarations: [HealthStatusComponent],
     exports: [HealthStatusComponent]
 })

@@ -16,9 +16,16 @@ limitations under the License.
 
 ****************************************************************************/
 
-.login_page .btn {
-  padding: 7px 51px;
-  font-size: 14px;
+.butt-login.mat-raised-button {
+  color: #fff;
+  background-color: #5bc0de;
+  border-color: #46b8da;
+}
+.butt-login.mat-raised-button:disabled{
+  color: #35afd6;
+  background-color: rgba(0, 0, 0, 0.28);
+  border: 1px solid;
+  box-shadow: 0 3px 1px -2px rgba(53, 175, 213, 0.74), 0 2px 2px 0 rgba(53, 175, 213, 0.65), 0 1px 5px 0 rgba(53, 175, 213, 0.47);
 }
 
 .login_page .logo {
