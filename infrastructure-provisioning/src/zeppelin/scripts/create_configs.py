@@ -47,6 +47,7 @@ parser.add_argument('--user_name', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
 parser.add_argument('--edge_hostname', type=str, default='')
 parser.add_argument('--proxy_port', type=str, default='')
+parser.add_argument('--livy_version', type=str, default='')
 args = parser.parse_args()
 
 emr_dir = '/opt/' + args.emr_version + '/jars/'
@@ -64,17 +65,12 @@ def install_remote_livy(args):
     install_livy_dependencies_emr(args.os_user)
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R /opt/zeppelin/')
     local('sudo service zeppelin-notebook stop')
-    with lcd('/opt/' + args.emr_version + '/' + args.cluster_name + '/'):
-        local('sudo chown -R ' + args.os_user + ':' + args.os_user + ' /opt/' + args.emr_version + '/')
-        local('git init')
-        local('sudo rm -rf /opt/' + args.emr_version + '/' + args.cluster_name + '/livy/')
-        local('git clone https://github.com/cloudera/livy.git')
+    local('sudo wget http://archive.cloudera.com/beta/livy/livy-server-' + args.livy_version + '.zip -O /opt/'
+          + args.emr_version + '/' + args.cluster_name + '/')
+    local('sudo unzip /opt/livy-server-' + args.livy_verrsion + '.zip')
+    local('sudo mv /opt/' + args.emr_version + '/' + args.cluster_name + '/livy-server-' + args.livy_server +
+          '/ /opt/' + args.emr_version + '/' + args.cluster_name + '/livy/')
     livy_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/livy/'
-    with lcd(livy_path):
-        local('mvn package -DskipTests -Dspark-' + args.spark_version[:3] + ' -Dscala-' + args.scala_version[:4]
-              + ' -Dhttp.proxyHost=' + args.edge_hostname + ' -Dhttp.proxyPort=' + args.proxy_port
-              + ' -Dhttps.proxyHost=' + args.edge_hostname + ' -Dhttps.proxyPort=' + args.proxy_port)
-    local('sudo mkdir -p /var/run/livy')
     local('sudo mkdir -p ' + livy_path + '/logs')
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R ' + livy_path)
