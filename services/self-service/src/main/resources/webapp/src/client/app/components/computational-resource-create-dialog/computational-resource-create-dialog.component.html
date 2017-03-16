@@ -74,7 +74,7 @@ limitations under the License.
         <div class="spot-details" [ngClass]="{ show: spotInstancesSelect.nativeElement['checked'] }">
           <div *ngIf="spotInstancesSelect.nativeElement['checked']">
             <div class="col-xs-4">
-              <label class="control-label">Spot Instance <br/>price, <b>%</b></label>
+              <label class="control-label">Your bid for spot instance, %</label>
             </div>
             <div class="col-xs-8">
               <input type="number" class="form-control" step="5" min="{{minSpotPrice}}" max="{{maxSpotPrice}}" formControlName="instance_price" (keypress)="isNumberKey($event)">
