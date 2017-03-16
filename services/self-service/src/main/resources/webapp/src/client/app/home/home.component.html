@@ -18,7 +18,7 @@ limitations under the License.
 <sd-navbar [healthStatus]="healthStatus"></sd-navbar>
 
 <div class="sub_nav">
-  <button md-raised-button class="butt butt-create" [disabled]="userUploadAccessKeyState == 202" (click)="createNotebook_btnClick()">
+  <button md-raised-button class="butt butt-create" [disabled]="userUploadAccessKeyState == 202 || healthStatus === 'error'" (click)="createNotebook_btnClick()">
     <i class="material-icons">add</i>Create new
   </button>
   <button md-raised-button class="butt pull-right" (click)="refreshGrid()">
