@@ -72,6 +72,7 @@ def install_remote_livy(args):
           '/ /opt/' + args.emr_version + '/' + args.cluster_name + '/livy/')
     livy_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/livy/'
     local('sudo mkdir -p ' + livy_path + '/logs')
+    local('sudo mkdir -p /var/run/livy')
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R ' + livy_path)
 
