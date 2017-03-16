@@ -39,7 +39,8 @@ limitations under the License.
         <div *ngIf="error" class="alert alert-danger">{{error}}</div>
       </div>
       <div class="form-group">
-        <button [disabled]="loading || !username.valid || !password.valid" (click)="login_btnClick();" class="btn btn-info pull-right">Login</button>
+        <button md-raised-button [disabled]="loading || !username.valid || !password.valid" (click)="login_btnClick();" 
+                class="butt butt-login pull-right" [ngClass]="{'not-allowed':loading || !username.valid || !password.valid}">Login</button>
         <div *ngIf="loading" class="loader"></div>
       </div>
   </form>
