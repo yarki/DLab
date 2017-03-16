@@ -175,7 +175,7 @@ public class ComputationalDAO extends BaseDAO {
             }
         	if (dto.getComputationalId() != null) {
                 values.append(computationalFieldFilter(COMPUTATIONAL_ID), dto.getComputationalId());
-            })
+            }
             return updateOne(USER_INSTANCES, and(exploratoryCondition(dto.getUser(), dto.getExploratoryName()),
                     elemMatch(COMPUTATIONAL_RESOURCES,
                             and(eq(COMPUTATIONAL_NAME, dto.getComputationalName()),
