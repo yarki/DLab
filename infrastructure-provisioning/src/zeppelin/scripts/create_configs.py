@@ -63,7 +63,7 @@ else:
 def install_remote_livy(args):
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R /opt/zeppelin/')
     local('sudo service zeppelin-notebook stop')
-    local('sudo wget http://archive.cloudera.com/beta/livy/livy-server-' + args.livy_version + '.zip -O /opt/'
+    local('sudo -i wget http://archive.cloudera.com/beta/livy/livy-server-' + args.livy_version + '.zip -O /opt/'
           + args.emr_version + '/' + args.cluster_name + '/livy-server-' + args.livy_version + '.zip')
     local('sudo unzip /opt/'
           + args.emr_version + '/' + args.cluster_name + '/livy-server-' + args.livy_verrsion + '.zip -d /opt/'
