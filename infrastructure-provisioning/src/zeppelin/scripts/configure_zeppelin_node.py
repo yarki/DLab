@@ -129,9 +129,10 @@ def configure_local_kernels(args):
 
 def install_local_livy(args):
     if not exists('/home/' + args.os_user + '/.ensure_dir/local_livy_ensured'):
-        sudo('wget http://archive.cloudera.com/beta/livy/livy-server-' + args.livy_version + '.zip -O /opt/')
-        sudo('unzip /opt/livy-server-' + args.livy_verrsion + '.zip')
-        sudo('mv /opt/livy-server-' + args.livy_server + '/ /opt/livy/')
+        sudo('wget http://archive.cloudera.com/beta/livy/livy-server-' + args.livy_version + '.zip -O /opt/livy-server-'
+             + args.livy_version + '.zip')
+        sudo('unzip /opt/livy-server-' + args.livy_version + '.zip -d /opt/')
+        sudo('mv /opt/livy-server-' + args.livy_version + '/ /opt/livy/')
         sudo('mkdir -p /var/run/livy')
         sudo('mkdir -p /opt/livy/logs')
         sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')

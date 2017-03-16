@@ -61,14 +61,14 @@ else:
 
 
 def install_remote_livy(args):
-    install_maven_emr(args.os_user)
-    install_livy_dependencies_emr(args.os_user)
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R /opt/zeppelin/')
     local('sudo service zeppelin-notebook stop')
     local('sudo wget http://archive.cloudera.com/beta/livy/livy-server-' + args.livy_version + '.zip -O /opt/'
+          + args.emr_version + '/' + args.cluster_name + '/livy-server-' + args.livy_version + '.zip')
+    local('sudo unzip /opt/'
+          + args.emr_version + '/' + args.cluster_name + '/livy-server-' + args.livy_verrsion + '.zip -d /opt/'
           + args.emr_version + '/' + args.cluster_name + '/')
-    local('sudo unzip /opt/livy-server-' + args.livy_verrsion + '.zip')
-    local('sudo mv /opt/' + args.emr_version + '/' + args.cluster_name + '/livy-server-' + args.livy_server +
+    local('sudo mv /opt/' + args.emr_version + '/' + args.cluster_name + '/livy-server-' + args.livy_version +
           '/ /opt/' + args.emr_version + '/' + args.cluster_name + '/livy/')
     livy_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/livy/'
     local('sudo mkdir -p ' + livy_path + '/logs')
