@@ -5,9 +5,10 @@ package com.epam.dlab.backendapi.util;
  */
 public class DateRemoverUtil {
 
-    public static final String ERROR_DATE_FORMAT = "-\\d\\d\\d\\d-\\d\\d\\-\\d\\d\\ \\d\\d\\:\\d\\d\\:\\d\\d";
+    public static final String ERROR_DATE_FORMAT = "\\[Error-\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\]:";
+    public static final String ERROR_WITHOUT_DATE_FORMAT = "\\[Error\\]:";
 
-    public static String removeDateFormErrorMessage(String errorMessage, String errorDateFormat) {
-        return errorMessage.replaceAll(errorDateFormat, "");
+    public static String removeDateFormErrorMessage(String errorMessage, String errorDateFormat, String replaceWith) {
+        return errorMessage.replaceAll(errorDateFormat, replaceWith);
     }
 }
