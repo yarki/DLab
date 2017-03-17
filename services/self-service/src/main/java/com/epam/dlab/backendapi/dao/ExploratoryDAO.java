@@ -141,7 +141,7 @@ public class ExploratoryDAO extends BaseDAO {
     	}
         if (dto.getErrorMessage() != null) {
             values.append(ERROR_MESSAGE,
-                    DateRemoverUtil.removeDateFormErrorMessage(dto.getErrorMessage(), DateRemoverUtil.ERROR_DATE_FORMAT));
+                    DateRemoverUtil.removeDateFormErrorMessage(dto.getErrorMessage(), DateRemoverUtil.ERROR_DATE_FORMAT, DateRemoverUtil.ERROR_WITHOUT_DATE_FORMAT));
         }
         if (dto.getExploratoryId() != null) {
             values.append(EXPLORATORY_ID, dto.getExploratoryId());
