@@ -615,9 +615,16 @@ def get_instance_status(instance_name):
     response = client.describe_instances(Filters=[
         {'Name': 'tag:Name', 'Values': [instance_name]}]).get('Reservations')
     for i in response:
-        inst = i.get('Instances')
-        for j in inst:
-            return j.get('State').get('Name')
+        if len(response) > 1:
+            inst = i.get('Instances')
+            for j in inst:
+                if j.get('State').get('Name') == 'running':
+                    return j.get('State').get('Name')
+        else:
+            inst = i.get('Instances')
+            for j in inst:
+                return j.get('State').get('Name')
+    return 'not-running'
 
 
 def get_list_instance_statuses(instance_ids):

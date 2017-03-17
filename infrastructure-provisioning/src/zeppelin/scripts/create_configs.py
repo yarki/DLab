@@ -39,6 +39,7 @@ parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--dry_run', type=str, default='false')
 parser.add_argument('--emr_version', type=str, default='')
 parser.add_argument('--spark_version', type=str, default='')
+parser.add_argument('--scala_version', type=str, default='')
 parser.add_argument('--hadoop_version', type=str, default='')
 parser.add_argument('--region', type=str, default='')
 parser.add_argument('--excluded_lines', type=str, default='')
@@ -46,6 +47,7 @@ parser.add_argument('--user_name', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
 parser.add_argument('--edge_hostname', type=str, default='')
 parser.add_argument('--proxy_port', type=str, default='')
+parser.add_argument('--livy_version', type=str, default='')
 args = parser.parse_args()
 
 emr_dir = '/opt/' + args.emr_version + '/jars/'
@@ -59,22 +61,18 @@ else:
 
 
 def install_remote_livy(args):
-    install_maven_emr(args.os_user)
-    install_livy_dependencies_emr(args.os_user)
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R /opt/zeppelin/')
     local('sudo service zeppelin-notebook stop')
-    with lcd('/opt/' + args.emr_version + '/' + args.cluster_name + '/'):
-        local('sudo chown -R ' + args.os_user + ':' + args.os_user + ' /opt/' + args.emr_version + '/')
-        local('git init')
-        local('sudo rm -rf /opt/' + args.emr_version + '/' + args.cluster_name + '/livy/')
-        local('git clone https://github.com/cloudera/livy.git')
+    local('sudo -i wget http://archive.cloudera.com/beta/livy/livy-server-' + args.livy_version + '.zip -O /opt/'
+          + args.emr_version + '/' + args.cluster_name + '/livy-server-' + args.livy_version + '.zip')
+    local('sudo unzip /opt/'
+          + args.emr_version + '/' + args.cluster_name + '/livy-server-' + args.livy_version + '.zip -d /opt/'
+          + args.emr_version + '/' + args.cluster_name + '/')
+    local('sudo mv /opt/' + args.emr_version + '/' + args.cluster_name + '/livy-server-' + args.livy_version +
+          '/ /opt/' + args.emr_version + '/' + args.cluster_name + '/livy/')
     livy_path = '/opt/' + args.emr_version + '/' + args.cluster_name + '/livy/'
-    with lcd(livy_path):
-        local('mvn package -DskipTests -Dhttp.proxyHost=' +
-              args.edge_hostname + ' -Dhttp.proxyPort=' + args.proxy_port + ' -Dhttps.proxyHost=' +
-              args.edge_hostname + ' -Dhttps.proxyPort=' + args.proxy_port)
-    local('sudo mkdir -p /var/run/livy')
     local('sudo mkdir -p ' + livy_path + '/logs')
+    local('sudo mkdir -p /var/run/livy')
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
     local('sudo chown ' + args.os_user + ':' + args.os_user + ' -R ' + livy_path)
 

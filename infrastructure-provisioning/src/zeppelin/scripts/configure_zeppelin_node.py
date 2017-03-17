@@ -42,6 +42,7 @@ parser.add_argument('--zeppelin_version', type=str, default='')
 parser.add_argument('--edge_hostname', type=str, default='')
 parser.add_argument('--proxy_port', type=str, default='')
 parser.add_argument('--scala_version', type=str, default='')
+parser.add_argument('--livy_version', type=str, default='')
 args = parser.parse_args()
 
 spark_version = args.spark_version
@@ -120,21 +121,18 @@ def configure_local_kernels(args):
         sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
         sudo('echo "livy.server.port = ' + str(livy_port) + '" >> /opt/livy/conf/livy.conf')
         sudo('''echo "SPARK_HOME='/opt/spark/'" >> /opt/livy/conf/livy-env.sh''')
+        if exists('/opt/livy/conf/spark-blacklist.conf'):
+            sudo('sed -i "s/^/#/g" /opt/livy/conf/spark-blacklist.conf')
         sudo("systemctl start livy-server")
         sudo('touch /home/' + args.os_user + '/.ensure_dir/local_livy_kernel_ensured')
 
 
 def install_local_livy(args):
     if not exists('/home/' + args.os_user + '/.ensure_dir/local_livy_ensured'):
-        install_maven(args.os_user)
-        install_livy_dependencies(args.os_user)
-        with cd('/opt/'):
-            sudo('git init')
-            sudo('git clone https://github.com/cloudera/livy.git')
-        with cd('/opt/livy/'):
-            sudo('mvn package -DskipTests -Dhttp.proxyHost=' + args.edge_hostname + ' -Dhttp.proxyPort=' +
-                 args.proxy_port + ' -Dhttps.proxyHost=' + args.edge_hostname +
-                 ' -Dhttps.proxyPort=' + args.proxy_port)
+        sudo('wget http://archive.cloudera.com/beta/livy/livy-server-' + args.livy_version + '.zip -O /opt/livy-server-'
+             + args.livy_version + '.zip')
+        sudo('unzip /opt/livy-server-' + args.livy_version + '.zip -d /opt/')
+        sudo('mv /opt/livy-server-' + args.livy_version + '/ /opt/livy/')
         sudo('mkdir -p /var/run/livy')
         sudo('mkdir -p /opt/livy/logs')
         sudo('chown ' + args.os_user + ':' + args.os_user + ' -R /var/run/livy')
