@@ -39,9 +39,9 @@ export class UserResourceService {
       .catch((error: any) => error);
   }
 
-  public getComputationalResourcesLimits(): Observable<any> {
+  public getComputationalResourcesConfiguration(): Observable<any> {
     return this.applicationServiceFacade
-      .buildGetComputationalResourcesLimits()
+      .buildGetComputationalResourcesConfiguration()
       .map((res: Response) => res.json())
       .catch((error: any) => error);
   }

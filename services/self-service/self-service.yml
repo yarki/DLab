@@ -6,6 +6,10 @@ mocked: false
 minEmrInstanceCount: 2
 maxEmrInstanceCount: 14
 
+# Minimum and maximum percentage cost for slave EMR spot instances biding
+minEmrSpotInstanceBidPct: 20
+maxEmrSpotInstanceBidPct: 90
+
 #Timeout for check the status of environment via provisioning service
 checkEnvStatusTimeout: 5m
 

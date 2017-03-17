@@ -25,7 +25,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 /** Stores limits for creation of the computational resources.
  */
-public class ComputationalLimitsDTO {
+public class UIConfigurationDTO {
     @NotBlank
     @JsonProperty("min_emr_instance_count")
     private int minEmrInstanceCount;
@@ -33,6 +33,14 @@ public class ComputationalLimitsDTO {
     @NotBlank
     @JsonProperty("max_emr_instance_count")
     private int maxEmrInstanceCount;
+
+    @NotBlank
+    @JsonProperty("min_emr_spot_instance_bid_pct")
+    private int minEmrSpotInstanceBidPct;
+
+    @NotBlank
+    @JsonProperty("max_emr_spot_instance_bid_pct")
+    private int maxEmrSpotInstanceBidPct;
 
     /** Returns the minimum number of slave EMR instances than could be created. */
     public int getMinEmrInstanceCount() {
@@ -45,7 +53,7 @@ public class ComputationalLimitsDTO {
     }
     
     /** Sets the minimum number of EMR instances than could be created. */
-    public ComputationalLimitsDTO withMinEmrInstanceCount(int minEmrInstanceCount) {
+    public UIConfigurationDTO withMinEmrInstanceCount(int minEmrInstanceCount) {
     	this.minEmrInstanceCount = minEmrInstanceCount;
     	return this;
     }
@@ -61,9 +69,20 @@ public class ComputationalLimitsDTO {
     }
     
     /** Sets the maximum number of EMR instances than could be created. */
-    public ComputationalLimitsDTO withMaxEmrInstanceCount(int maxEmrInstanceCount) {
+    public UIConfigurationDTO withMaxEmrInstanceCount(int maxEmrInstanceCount) {
     	this.maxEmrInstanceCount = maxEmrInstanceCount;
     	return this;
+    }
+
+
+    public UIConfigurationDTO withMaxEmrSpotInstanceBidPct(int maxEmrSpotInstanceBidPct) {
+        this.maxEmrSpotInstanceBidPct = maxEmrSpotInstanceBidPct;
+        return this;
+    }
+
+    public UIConfigurationDTO withMinEmrSpotInstanceBidPct(int minEmrSpotInstanceBidPct) {
+        this.minEmrSpotInstanceBidPct = minEmrSpotInstanceBidPct;
+        return this;
     }
     
     @Override

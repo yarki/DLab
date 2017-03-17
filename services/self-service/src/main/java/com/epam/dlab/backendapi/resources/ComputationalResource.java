@@ -28,7 +28,7 @@ import com.epam.dlab.backendapi.dao.ExploratoryDAO;
 import com.epam.dlab.backendapi.dao.SettingsDAO;
 import com.epam.dlab.backendapi.domain.RequestId;
 import com.epam.dlab.backendapi.resources.dto.ComputationalCreateFormDTO;
-import com.epam.dlab.backendapi.resources.dto.ComputationalLimitsDTO;
+import com.epam.dlab.backendapi.resources.dto.UIConfigurationDTO;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.dto.computational.ComputationalCreateDTO;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
@@ -76,11 +76,13 @@ public class ComputationalResource implements ComputationalAPI {
      * @param userInfo user info.
      */
     @GET
-    @Path("/limits")
-    public ComputationalLimitsDTO getLimits(@Auth UserInfo userInfo) {
-    	ComputationalLimitsDTO limits = new ComputationalLimitsDTO()
+    @Path("/configuration")
+    public UIConfigurationDTO getUIConfiguration(@Auth UserInfo userInfo) {
+    	UIConfigurationDTO limits = new UIConfigurationDTO()
     			.withMinEmrInstanceCount(configuration.getMinEmrInstanceCount())
-    			.withMaxEmrInstanceCount(configuration.getMaxEmrInstanceCount());
+    			.withMaxEmrInstanceCount(configuration.getMaxEmrInstanceCount())
+    			.withMaxEmrSpotInstanceBidPct(configuration.getMaxEmrSpotInstanceBidPct())
+    			.withMinEmrSpotInstanceBidPct(configuration.getMinEmrSpotInstanceBidPct());
     	LOGGER.debug("Returns limits for user {}: {}", userInfo.getName(), limits.toString());
         return limits;
     }
@@ -101,6 +103,14 @@ public class ComputationalResource implements ComputationalAPI {
             		formDTO.getName(), userInfo.getName(), configuration.getMinEmrInstanceCount(), configuration.getMaxEmrInstanceCount());
             throw new DlabException("Limit exceeded to creation slave instances. Minimum is " + configuration.getMinEmrInstanceCount() +
             		", maximum is " + configuration.getMaxEmrInstanceCount() + ".");
+        }
+
+        int slaveSpotInstanceBidPct = formDTO.getSlaveInstanceSpotPctPrice();
+        if (slaveSpotInstanceBidPct < configuration.getMinEmrSpotInstanceBidPct() || slaveSpotInstanceBidPct > configuration.getMaxEmrSpotInstanceBidPct()) {
+            LOGGER.debug("Creating computational resource {} for user {} fail: Spot instances bidding percentage value out of the boundaries. Minimum is {}, maximum is {}",
+                    formDTO.getName(), userInfo.getName(), configuration.getMinEmrSpotInstanceBidPct(), configuration.getMaxEmrSpotInstanceBidPct());
+            throw new DlabException("Spot instances bidding percentage value out of the boundaries. Minimum is " + configuration.getMinEmrSpotInstanceBidPct() +
+                    ", maximum is " + configuration.getMaxEmrSpotInstanceBidPct() + ".");
         }
 
         boolean isAdded = infCompDAO.addComputational(userInfo.getName(), formDTO.getNotebookName(),
