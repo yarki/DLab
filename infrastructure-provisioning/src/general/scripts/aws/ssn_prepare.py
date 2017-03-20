@@ -90,7 +90,7 @@ if __name__ == "__main__":
                 pre_defined_subnet = True
                 logging.info('[CREATE SUBNET]')
                 print '[CREATE SUBNET]'
-                params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {} --prefix {} --ssn {} --test_var {}".format(os.environ['aws_vpc_id'], 'ssn', tag_name, service_base_name, '20', True)
+                params = "--vpc_id {} --username {} --infra_tag_name {} --infra_tag_value {} --prefix {} --ssn {}".format(os.environ['aws_vpc_id'], 'ssn', tag_name, service_base_name, '20', True)
                 try:
                     local("~/scripts/{}.py {}".format('common_create_subnet', params))
                 except:
@@ -179,7 +179,7 @@ if __name__ == "__main__":
                 sys.exit(1)
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
-        params = "--role_name {} --role_profile_name {} --policy_name {} --policy_file_name {}". \
+        params = "--role_name {} --role_profile_name {} --policy_name {} --policy_file_name {} --test_car {}". \
                 format(role_name, role_profile_name, policy_name, policy_path)
         try:
             local("~/scripts/{}.py {}".format('common_create_role_policy', params))
