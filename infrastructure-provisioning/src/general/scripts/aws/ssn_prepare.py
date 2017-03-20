@@ -179,7 +179,7 @@ if __name__ == "__main__":
                 sys.exit(1)
         logging.info('[CREATE ROLES]')
         print('[CREATE ROLES]')
-        params = "--role_name {} --role_profile_name {} --policy_name {} --policy_file_name {} --test_car {}". \
+        params = "--role_name {} --role_profile_name {} --policy_name {} --policy_file_name {}". \
                 format(role_name, role_profile_name, policy_name, policy_path)
         try:
             local("~/scripts/{}.py {}".format('common_create_role_policy', params))
