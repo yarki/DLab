@@ -664,9 +664,12 @@ def add_sg_rule(sg_id, rule):
             IpPermissions=[rule]
         )
     except Exception as err:
-        logging.info("Unable to add rule to SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-        append_result(str({"error": "Unable to add rule to SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
-        traceback.print_exc(file=sys.stdout)
+        if err.response['Error']['Code'] == 'InvalidPermission.Duplicate':
+            print "Such rule is already exist."
+        else:
+            logging.info("Unable to add rule to SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+            append_result(str({"error": "Unable to add rule to SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+            traceback.print_exc(file=sys.stdout)
 
 
 def deregister_image(scientist):
