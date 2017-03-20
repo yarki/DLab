@@ -665,7 +665,8 @@ def add_inbound_sg_rule(sg_id, rule):
         )
     except Exception as err:
         if err.response['Error']['Code'] == 'InvalidPermission.Duplicate':
-            print "Such rule is already exist."
+            print "The following inbound rule is already exist:"
+            print str(rule)
         else:
             logging.info("Unable to add inbound rule to SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
             append_result(str({"error": "Unable to add inbound rule to SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
@@ -681,7 +682,8 @@ def add_outbound_sg_rule(sg_id, rule):
         )
     except Exception as err:
         if err.response['Error']['Code'] == 'InvalidPermission.Duplicate':
-            print "Such rule is already exist."
+            print "The following outbound rule is already exist:"
+            print str(rule)
         else:
             logging.info("Unable to add outbound rule to SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
             append_result(str({"error": "Unable to add outbound rule to SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
