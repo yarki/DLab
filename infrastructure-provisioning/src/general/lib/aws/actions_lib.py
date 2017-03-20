@@ -656,7 +656,7 @@ def remove_sgroups(tag_value):
         traceback.print_exc(file=sys.stdout)
 
 
-def add_sg_rule(sg_id, rule):
+def add_inbound_sg_rule(sg_id, rule):
     try:
         client = boto3.client('ec2')
         client.authorize_security_group_ingress(
@@ -667,8 +667,24 @@ def add_sg_rule(sg_id, rule):
         if err.response['Error']['Code'] == 'InvalidPermission.Duplicate':
             print "Such rule is already exist."
         else:
-            logging.info("Unable to add rule to SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
-            append_result(str({"error": "Unable to add rule to SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+            logging.info("Unable to add inbound rule to SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+            append_result(str({"error": "Unable to add inbound rule to SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+            traceback.print_exc(file=sys.stdout)
+
+
+def add_outbound_sg_rule(sg_id, rule):
+    try:
+        client = boto3.client('ec2')
+        client.authorize_security_group_egress(
+            GroupId=sg_id,
+            IpPermissions=[rule]
+        )
+    except Exception as err:
+        if err.response['Error']['Code'] == 'InvalidPermission.Duplicate':
+            print "Such rule is already exist."
+        else:
+            logging.info("Unable to add outbound rule to SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+            append_result(str({"error": "Unable to add outbound rule to SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
             traceback.print_exc(file=sys.stdout)
 
 
