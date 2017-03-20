@@ -106,7 +106,7 @@ public class ComputationalResource implements ComputationalAPI {
         }
 
         int slaveSpotInstanceBidPct = formDTO.getSlaveInstanceSpotPctPrice();
-        if (slaveSpotInstanceBidPct < configuration.getMinEmrSpotInstanceBidPct() || slaveSpotInstanceBidPct > configuration.getMaxEmrSpotInstanceBidPct()) {
+        if (formDTO.getSlaveInstanceSpot() && (slaveSpotInstanceBidPct < configuration.getMinEmrSpotInstanceBidPct() || slaveSpotInstanceBidPct > configuration.getMaxEmrSpotInstanceBidPct())) {
             LOGGER.debug("Creating computational resource {} for user {} fail: Spot instances bidding percentage value out of the boundaries. Minimum is {}, maximum is {}",
                     formDTO.getName(), userInfo.getName(), configuration.getMinEmrSpotInstanceBidPct(), configuration.getMaxEmrSpotInstanceBidPct());
             throw new DlabException("Spot instances bidding percentage value out of the boundaries. Minimum is " + configuration.getMinEmrSpotInstanceBidPct() +
