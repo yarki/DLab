@@ -53,5 +53,5 @@ if __name__ == "__main__":
             json.dump(statuses, outfile)
     except Exception as err:
         traceback.print_exc()
-        append_result("Failed getting resources statuses. Exception: " + str(err))
+        append_result("Failed getting resources statuses.", str(err))
         sys.exit(1)

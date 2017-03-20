@@ -67,7 +67,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed installing EMR kernels. Exception: " + str(err))
+        append_result("Failed installing EMR kernels.", str(err))
         emr_id = get_emr_id_by_name(notebook_config['cluster_name'])
         terminate_emr(emr_id)
         remove_kernels(notebook_config['cluster_name'], notebook_config['tag_name'], os.environ['notebook_instance_name'],

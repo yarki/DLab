@@ -97,7 +97,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed installing apps: apt & pip. Exception: " + str(err))
+        append_result("Failed installing apps: apt & pip.", str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -121,7 +121,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed to configure zeppelin. Exception: " + str(err))
+        append_result("Failed to configure zeppelin.", str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed to install python libs. Exception: " + str(err))
+        append_result("Failed to install python libs.", str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -154,7 +154,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed installing users key. Exception: " + str(err))
+        append_result("Failed installing users key.", str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -169,7 +169,7 @@ if __name__ == "__main__":
             if image_id != '':
                 print "Image was successfully created. It's ID is " + image_id
     except Exception as err:
-        append_result("Failed installing users key. Exception: " + str(err))
+        append_result("Failed installing users key.", str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
