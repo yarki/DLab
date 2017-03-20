@@ -98,5 +98,5 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed to create instance. Exception: " + str(err))
+        append_result("Failed to create instance.", str(err))
         sys.exit(1)

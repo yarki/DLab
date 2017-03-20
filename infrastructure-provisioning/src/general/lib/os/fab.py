@@ -148,7 +148,7 @@ def configuring_notebook(emr_version):
     local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
 
 
-def append_result(error):
+def append_result(error, exception=''):
     ts = time.time()
     st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
     with open('/root/result.json', 'a+') as f:
@@ -159,7 +159,10 @@ def append_result(error):
             f.write(res)
     with open("/root/result.json") as f:
         data = json.load(f)
-    data['error'] = data['error'] + " [Error-" + st + "]:" + error
+    if exception:
+        data['error'] = data['error'] + " [Error-" + st + "]:" + error + " Exception: " + str(exception)
+    else:
+        data['error'] = data['error'] + " [Error-" + st + "]:" + error
     with open("/root/result.json", 'w') as f:
         json.dump(data, f)
     print data
