@@ -656,6 +656,19 @@ def remove_sgroups(tag_value):
         traceback.print_exc(file=sys.stdout)
 
 
+def add_sg_rule(sg_id, rule):
+    try:
+        client = boto3.client('ec2')
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpPermissions=[rule]
+        )
+    except Exception as err:
+        logging.info("Unable to add rule to SG: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        append_result(str({"error": "Unable to add rule to SG", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
+
+
 def deregister_image(scientist):
     try:
         client = boto3.client('ec2')

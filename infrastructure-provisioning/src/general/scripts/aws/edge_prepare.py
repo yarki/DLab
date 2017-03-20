@@ -209,8 +209,9 @@ if __name__ == "__main__":
             }
         ]
         params = "--name {} --vpc_id {} --security_group_rules '{}' --infra_tag_name {} --infra_tag_value {} --egress '{}' --force {} --nb_sg_name {} --resource {}".\
-            format(edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),edge_conf['service_base_name'],
-                   edge_conf['instance_name'], json.dumps(sg_rules_template_egress), True, edge_conf['notebook_instance_name'], 'edge')
+            format(edge_conf['edge_security_group_name'], edge_conf['vpc_id'], json.dumps(sg_rules_template),
+                   edge_conf['service_base_name'], edge_conf['instance_name'], json.dumps(sg_rules_template_egress),
+                   True, edge_conf['notebook_instance_name'], 'edge')
         try:
             local("~/scripts/{}.py {}".format('common_create_security_group', params))
         except Exception as err:
