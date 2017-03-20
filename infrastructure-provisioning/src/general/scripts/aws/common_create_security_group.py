@@ -56,28 +56,16 @@ if __name__ == "__main__":
                 print "Creating security group %s for vpc %s with tag %s." % (args.name, args.vpc_id, json.dumps(tag))
                 security_group_id = create_security_group(args.name, args.vpc_id, rules, egress, tag)
                 if nb_sg_id != '' and args.resource == 'edge':
-                    try:
-                        print "Updating Notebook security group " + nb_sg_id
-                        rule = {'IpProtocol': '-1', 'FromPort': -1, 'ToPort': -1,
-                                'UserIdGroupPairs': [{'GroupId': security_group_id}]}
-                        add_sg_rule(nb_sg_id, rule)
-                    except ClientError as err:
-                        if err.response['Error']['Code'] == 'InvalidPermission.Duplicate':
-                            print "Such rule is already exist."
-                        else:
-                            raise Exception
+                    print "Updating Notebook security group " + nb_sg_id
+                    rule = {'IpProtocol': '-1', 'FromPort': -1, 'ToPort': -1,
+                            'UserIdGroupPairs': [{'GroupId': security_group_id}]}
+                    add_sg_rule(nb_sg_id, rule)
             else:
                 if nb_sg_id != '' and args.resource == 'edge':
-                    try:
-                        print "Updating Notebook security group " + nb_sg_id
-                        rule = {'IpProtocol': '-1', 'FromPort': -1, 'ToPort': -1,
-                                'UserIdGroupPairs': [{'GroupId': security_group_id}]}
-                        add_sg_rule(nb_sg_id, rule)
-                    except ClientError as err:
-                        if err.response['Error']['Code'] == 'InvalidPermission.Duplicate':
-                            print "Such rule is already exist."
-                        else:
-                            raise Exception
+                    print "Updating Notebook security group " + nb_sg_id
+                    rule = {'IpProtocol': '-1', 'FromPort': -1, 'ToPort': -1,
+                            'UserIdGroupPairs': [{'GroupId': security_group_id}]}
+                    add_sg_rule(nb_sg_id, rule)
                 print "REQUESTED SECURITY GROUP WITH NAME %s ALREADY EXISTS" % args.name
             print "SECURITY_GROUP_ID " + security_group_id
             if args.ssn:
