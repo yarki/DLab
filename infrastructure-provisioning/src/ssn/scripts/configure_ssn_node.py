@@ -49,7 +49,7 @@ def cp_key(keyfile, host_string, os_user):
 def creating_service_directories(dlab_path, os_user):
     try:
         if not exists(dlab_path):
-            sudo('mkdir -p ' + dlab_path)
+            sudo('test_mkdir -p ' + dlab_path)
             sudo('mkdir -p ' + dlab_path + 'conf')
             sudo('mkdir -p ' + dlab_path + 'webapp/lib')
             sudo('mkdir -p ' + dlab_path + 'webapp/static')
