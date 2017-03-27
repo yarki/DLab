@@ -636,7 +636,7 @@ User: test
 Password: <any>
 ```
 
-##Infrastructure provisioning 
+## Infrastructure provisioning 
 
 ## DevOps components overview
 
