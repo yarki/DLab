@@ -1,13 +1,39 @@
 DLAB Overview
 =============
 
+-------
+CONTENTS
+-------
+
+![What is DLAB?](#What_is_DLAB)
+[Logical architecture](#Logical_architecture)
+[Physical architecture](#Physical_architecture)
+[DLab Deployment](#DLab_Deployment)
+&nbsp; &nbsp; &nbsp; &nbsp; [Structure of main DLab directory](#DLab_directory)
+&nbsp; &nbsp; &nbsp; &nbsp; [Structure of log directory](#log_directory)
+&nbsp; &nbsp; &nbsp; &nbsp; [Self-Service Node](#Self_Service_Node)
+&nbsp; &nbsp; &nbsp; &nbsp; [Edge Node](#Edge_Node)
+&nbsp; &nbsp; &nbsp; &nbsp; [Notebook node](#Notebook_node)
+&nbsp; &nbsp; &nbsp; &nbsp; [EMR cluster](#EMR_cluster)
+&nbsp; &nbsp; &nbsp; &nbsp; [Configuration files](#Configuration_files)
+&nbsp; &nbsp; &nbsp; &nbsp; [Starting/Stopping services](#Starting_Stopping_services)
+&nbsp; &nbsp; &nbsp; &nbsp; [Troubleshooting](#Troubleshooting)
+[Development](#Development)
+&nbsp; &nbsp; &nbsp; &nbsp; [Folder structure](#Folder_structure)
+&nbsp; &nbsp; &nbsp; &nbsp; [Pre-requisites](#Pre-requisites)
+&nbsp; &nbsp; &nbsp; &nbsp; [Java back-end services](#Java_back_end_services)
+&nbsp; &nbsp; &nbsp; &nbsp; [Front-end](#Front_end)
+&nbsp; &nbsp; &nbsp; &nbsp; [How to setup local development environment](#setup_local_environment)
+&nbsp; &nbsp; &nbsp; &nbsp; [How to run locally](#run_locally)
+&nbsp; &nbsp; &nbsp; &nbsp; [Infrastructure provisioning](#Infrastructure_provisioning)
+ 
 ---------------
-# What is DLAB?
+# What is DLAB? <a name="What_is_DLAB"></a>
 
 DLab is an essential toolset for analytics. It is a self-service Web Console, used to create and manage exploratory environments. It allows teams to spin up analytical environments with best of breed open-source tools just with a single click of the mouse. Once established, environment can be managed by an analytical team itself, leveraging simple and easy-to-use Web Interface.
 
 ----------------------------
-# Logical architecture
+# Logical architecture <a name="Logical_architecture"></a>
 
 The following diagram demonstrates high-level logical architecture of DLab.
 
@@ -36,7 +62,7 @@ Docker is an infrastructure-provisioning module based on Docker service, which p
 Database serves as a storage with description of user infrastructure, user’s settings and service information.
 
 -----------------------------
-# Physical architecture
+# Physical architecture <a name="Physical_architecture"></a>
 
 The following diagram demonstrates high-level physical architecture of DLab
 
@@ -78,9 +104,9 @@ Apache Spark is also installed for each of the analytical tools above.
 After deploying Notebook node, user can create EMR cluster for it. EMR cluster is a managed cluster platform, that simplifies running big data frameworks, such as Apache Hadoop and Apache Spark on AWS to process and analyze vast amounts of data. Adding EMR is not mandatory and is only needed in case additional computational resources are required for job execution.
 
 ----------------------
-# DLab Deployment
+# DLab Deployment <a name="DLab_Deployment"></a>
 
-## Structure of main DLab directory
+## Structure of main DLab directory <a name="DLab_directory"></a>
 
 DLab’s SSN node main directory structure is as follows:
 
@@ -101,7 +127,7 @@ DLab’s SSN node main directory structure is as follows:
 -   webapp – contains all .jar files for DLab Web UI and back-end
     services.
 
-## Structure of log directory
+## Structure of log directory <a name="log_directory"></a>
 
 SSN node structure of log directory is as follows:
 
@@ -121,13 +147,13 @@ These directories contain the log files for each template and for DLab back-end 
 -   selfservice.log – Self-Service log file;
 -   edge, notebook, emr – contains logs of Python scripts.
 
-## Self-Service Node
+## Self-Service Node <a name="Self_Service_Node"></a>
 
 ### Create
 
 To build SSN node, following steps should be executed:
 
-1.  Clone Git repository and make sure that all *pre-requisites* are installed.
+1.  Clone Git repository and make sure that all [pre-requisites](#Pre-requisites) are installed.
 2.  Go to *dlab* directory.
 3.  Execute following script:
 ```
@@ -186,7 +212,7 @@ List of parameters for SSN node termination:
 | key\_name           | Name of the uploaded SSH key file (without “.pem” extension) |
 | action              | create                                                       |
 
-## Edge Node
+## Edge Node <a name="Edge_Node"></a>
 
 Gateway node (or an Edge node) is an AWS EC2 Instance provisioned in a public subnet. It serves as an entry point for accessing user’s personal analytical environment. It is created by an end-user, whose public key will be uploaded there. Only via Edge node, DLab user can access such application resources as notebook servers and EMR clusters. Also, Edge Node is used to setup SOCKS proxy to access notebook servers via Web UI and SSH. Elastic IP address is assigned to an Edge Node. In case Edge node instance has been removed by mistake, there is an option to re-create it and Edge node IP address won’t chang.
 
@@ -220,7 +246,7 @@ List of parameters for Edge node creation:
 | aws\_iam\_user             | Name of AWS IAM user                                                              |
 | action                     | create                                                                            |
 
-### Start/Stop
+### Start/Stop <a name=""></a>
 
 To start/stop Edge node, click on the button which looks like a cycle on the top right corner, then click on the button which is located in “Action” field and in the drop-down menu click on the appropriate action.
 
@@ -234,7 +260,7 @@ List of parameters for Edge node starting/stopping:
 | aws\_region               | AWS region where infrastructure was deployed                 |
 | action                    | start/stop                                                   |
 
-### Recreate
+### Recreate <a name=""></a>
 
 In case Edge node was damaged, or terminated manually, there is an option to re-create it.
 
@@ -258,7 +284,7 @@ List of parameters for Edge node recreation:
 | edge\_elastic\_ip          | AWS Elastic IP address which was associated to Edge node                          |
 | action                     | Create                                                                            |
 
-## Notebook node
+## Notebook node <a name="Notebook_node"></a>
 
 Notebook node is an AWS EC2 instance, with preinstalled analytical software, needed dependencies and with pre-configured kernels and interpreters. It is the main part of personal analytical environment, which is setup by a data scientist. It can be Created, Stopped and Terminated. To support variety of analytical needs - Notebook node can be provisioned on any of AWS supported EC2 instance shape for your particular region. From analytical software, which is already pre-installed on a notebook node, end users can access (read/write) data stored on S3 buckets.
 
@@ -317,7 +343,7 @@ List of parameters for Notebook node start/termination:
 
 **Note:** If terminate action is called, all connected EMR clusters will be removed.
 
-## EMR cluster
+## EMR cluster <a name="EMR_cluster"></a>
 
 EMR cluster can be created if more computational resources are needed for executing analytical algorithms and models, triggered from analytical tools. Jobs execution will be scaled to a cluster mode increasing the performance and decreasing execution time.
 
@@ -363,15 +389,15 @@ List of parameters for EMR cluster termination:
 | aws\_region               | AWS region where infrastructure was deployed                 |
 | action                    | Terminate                                                    |
 
-## Configuration files
+## Configuration files <a name="Configuration_files"></a>
 
 DLab configuration files are located on SSN node by following path:
-    /opt/dlab/conf ssn.yml – basic configuration for all java services;
+-   /opt/dlab/conf ssn.yml – basic configuration for all java services;
 -   provisioning.yml – Provisioning Service configuration file;for
 -   security.yml – Security Service configuration file;
 -   self-service.yml – Self-Service configuration file.
 
-## Starting/Stopping services
+## Starting/Stopping services <a name="Starting_Stopping_services"></a>
 
 All DLab services running as OS services and have next syntax for
 starting and stopping:
@@ -386,7 +412,7 @@ sudo supervisorctl {start | stop | status} [all | provserv | secserv | ui]
 -   secserv – execute command for Security Service;
 -   ui – execute command for Self-Service.
 
-## Troubleshooting
+## Troubleshooting <a name="Troubleshooting"></a>
 
 If the parameter dlab\_path of configuration file dlab.ini wasn’t changed, the path to DLab service would default to:
 
@@ -419,11 +445,11 @@ docker build --build-arg OS=<os_family> --build-arg CLOUD=<cloud_provider> --fil
 ```
 
 ----------------
-# Development
+# Development <a name="Development"></a>
 
 DLab services could be ran in development mode. This mode emulates real work an does not create any EC2 instances in Amazon Cloud.
 
-## Folder structure
+## Folder structure <a name="Folder_structure"></a>
 
     dlab
     ├───infrastructure-provisioning
@@ -440,7 +466,7 @@ DLab services could be ran in development mode. This mode emulates real work an 
 -   security-service – Security Service;
 -   self-service – Self-Service and UI;
 
-## Pre-requisites
+## Pre-requisites <a name="Pre-requisites"></a>
 
 In order to start development of Front-end Web UI part of DLab - Git repository should be cloned and the following packages should be installed:
 
@@ -455,7 +481,7 @@ In order to start development of Front-end Web UI part of DLab - Git repository 
 -   Angular2 v2.4 – WebUI
 -   Development IDE (Eclipse or Intellij IDEA)
 
-## Java back-end services
+## Java back-end services <a name="Java_back_end_services"></a>
 
 ### Java components description
 
@@ -504,7 +530,7 @@ Security service is REST based service for user authentication over LDAP and in 
 |--------------------|-------------------------------------------------------|------------------------------------------|
 | LdapAuthentication | Gateway node (or an Edge node) is an AWS EC2 Instance | Used for authentication in LDAP and AWS. |
 
-## Front-end
+## Front-end <a name="Front_end"></a>
 
 ### Front-end components description
 
@@ -520,7 +546,7 @@ Sources are located in dlab/services/self-service/src/main/resources/webapp
 | Help pages                    | Static pages that contains information and instructions on how to access Notebook Server and generate SSH key pair. Includes only *NavbarComponent*. |
 | Error page                    | Simple static page letting users know that opened page does not exist. Includes only *NavbarComponent*. | 
 
-## How to setup local development environment
+## How to setup local development environment <a name="setup_local_environment"></a>
 
 The development environment setup description is written with assumption that user already has installed Java8 (JDK), Maven3 and set environment variables (JAVA\_HOME, M2\_HOME).­­­­­­ The description will cover Mongo installation, Mongo user creation, filling initial data into Mongo, Node.js installation
 
@@ -614,7 +640,7 @@ npm install
 npm run build.prod
 ```
 
-## How to run locally
+## How to run locally <a name="run_locally"></a>
 
 There is a possibility to run Self-Service and Provisioning Service locally. All requests from Provisioning Service to Docker are mocked and instance creation status will be persisted to Mongo (only without real impact on Docker and AWS). Security Service can\`t be running on local machine because of local LDAP mocking complexity.
 
@@ -636,13 +662,13 @@ User: test
 Password: <any>
 ```
 
-## Infrastructure provisioning 
+## Infrastructure provisioning <a name="Infrastructure_provisioning"></a>
 
-## DevOps components overview
+### DevOps components overview
 
 The following list shows common structure of scripts for deploying DLab
 
-### Folder structure
+#### Folder structure
 
     dlab
     └───infrastructure-provisioning
@@ -701,7 +727,7 @@ The following table describes mostly used scripts:
 | general/scripts/aws/\*.py    | Scripts, which are executed from fabfiles and AWS-specific. The first part of file name defines to which template this script is related to. For example:<br>common\_\*.py – can be executed from more than one template.<br>ssn\_\*.py – are used for SSN template.<br>edge\_\*.py – are used for Edge template. |
 | general/scripts/os/\*.py     | Scripts, which are OS independent and can be executed from more than one template. |
 
-### Docker actions overview
+#### Docker actions overview
 
 Available Docker images and their actions:
 
@@ -712,7 +738,7 @@ Available Docker images and their actions:
 | jupyter/rstudio/zeppelin/tensor | create, terminate, start, stop, configure        |
 | emr                             | create, terminate                                |
 
-#### Docker and python execution workflow on example of SSN node
+##### Docker and python execution workflow on example of SSN node
 
 -   Docker command for building images *docker.dlab-base* and *docker.dlab-ssn*:
 ```
@@ -780,7 +806,7 @@ docker run -i -v /root/KEYNAME.pem:/root/keys/KEYNAME.pem –v /web_app:/root/we
 
 -   If all scripts/function are executed successfully, Docker container will stop and SSN node will be created.
 
-### Example of Docker commands
+#### Example of Docker commands
 
 SSN:
 
@@ -794,7 +820,7 @@ Other images:
 docker run -i -v /home/<user>/keys:/root/keys  -v /opt/dlab/tmp/result:/response -v /var/opt/dlab/log/<image>:/logs/<image>  -e <variable1> –e <variable2> docker.dlab-<image> --action <action>
 ```
 
-### How to add a new template
+#### How to add a new template
 
 First of all, a new directory should be created in *infrastructure-provisioning/src/*.
 
