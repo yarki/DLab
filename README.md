@@ -5,26 +5,46 @@ DLAB Overview
 CONTENTS
 -------
 
-![What is DLAB?](#What_is_DLAB)
+[What is DLAB?](#What_is_DLAB)
+
 [Logical architecture](#Logical_architecture)
+
 [Physical architecture](#Physical_architecture)
+
 [DLab Deployment](#DLab_Deployment)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Structure of main DLab directory](#DLab_directory)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Structure of log directory](#log_directory)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Self-Service Node](#Self_Service_Node)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Edge Node](#Edge_Node)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Notebook node](#Notebook_node)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [EMR cluster](#EMR_cluster)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Configuration files](#Configuration_files)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Starting/Stopping services](#Starting_Stopping_services)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Troubleshooting](#Troubleshooting)
+
 [Development](#Development)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Folder structure](#Folder_structure)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Pre-requisites](#Pre-requisites)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Java back-end services](#Java_back_end_services)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Front-end](#Front_end)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [How to setup local development environment](#setup_local_environment)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [How to run locally](#run_locally)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Infrastructure provisioning](#Infrastructure_provisioning)
  
 ---------------
