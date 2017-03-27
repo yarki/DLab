@@ -525,6 +525,7 @@ Sources are located in dlab/services/self-service/src/main/resources/webapp
 The development environment setup description is written with assumption that user already has installed Java8 (JDK), Maven3 and set environment variables (JAVA\_HOME, M2\_HOME).­­­­­­ The description will cover Mongo installation, Mongo user creation, filling initial data into Mongo, Node.js installation
 
 ### Install Mongo database
+
   * Download MongoDB from [https://www.mongodb.com/download-center](https://www.mongodb.com/download-center)
   * Install database based on MongoDB instructions
   * Start DB server and create accounts
@@ -550,12 +551,15 @@ db.createUser(
 ```
 
   * Load collections form file dlab/services/mongo\_settings.json
+
 ```
 mongoimport -u admin -p <password> -d <database_name> –c settings mongo_settings.json
 ```
 
 ### Setting up environment options
+
   * Set option DEV\_MODE to **true**, mongo database name and password in configuration file dlab/infrastructure-provisioning/src/ssn/templates/ssn.yml
+
 ```
 #DEV_MODE="true"
 ...
@@ -567,33 +571,45 @@ mongo:
   * Add system environment variable DLAB\_CONF\_DIR=&lt;dlab\_root\_folder&gt;/dlab/infrastructure-provisioning/src/ssn/templates/ssn.yml or create two symlinks in dlab/services/provisioning-service and dlab/services/self-service folders for file dlab/infrastructure-provisioning/src/ssn/templates/ssn.yml.
 
 *Unix*
+
 ```
 ln -s ssn.yml ../../infrastructure-provisioning/src/ssn/templates/ssn.yml\
 ```
+
 *Windows*
+
 ```
 mklink ssn.yml ..\\..\\infrastructure-provisioning\\src\\ssn\\templates\\ssn.yml
 ```
+
   * For Unix system create two folders and grant permission for writing:
+
 ```
 /var/opt/dlab/log/ssn
 /opt/dlab/tmp/result
 ```
+
 ### Install Node.js
 
   * Download Node.js from [https://nodejs.org/en](https://nodejs.org/en)
   * Install Node.js
   * Make sure that the installation folder of Node.js has been added  to the system environment variable **PATH**
   * Install latest packages
+
 ```
 npm install npm@latest –g
 ```
+
 ### Build Web UI components
+
   * Change folder to dlab/services/self-service/src/main/resources/webapp and install the dependencies from a package.json manifest
+
 ```
 npm install
 ```
+
   * Build web application
+
 ```
 npm run build.prod
 ```
@@ -603,6 +619,7 @@ npm run build.prod
 There is a possibility to run Self-Service and Provisioning Service locally. All requests from Provisioning Service to Docker are mocked and instance creation status will be persisted to Mongo (only without real impact on Docker and AWS). Security Service can\`t be running on local machine because of local LDAP mocking complexity.
 
 Both services, Self-Service and Provisioning Service are dependent on dlab/provisioning-infrastructure/ssn/templates/ssn.yml configuration file. Both services have main functions as entry point, SelfServiceApplication for Self-Service and ProvisioningServiceApplication for Provisioning Service. Services could be started by running main methods of these classes. Both main functions require two arguments:
+
   * Run mode (“server”)
   * Configuration file name (“self-service.yml” or “provisioning.yml”  depending on the service). Both files are located in root service directory. These configuration files contain service settings and are ready to use.
 
@@ -613,6 +630,7 @@ Run application flow is following:
   * Run provisioning-service passing 2 arguments: server, self-service.yml
   * Run self-service passing 2 arguments: server, provisioning.yml
   * Try to access self-service Web UI by http://localhost:8080
+
 ```
 User: test
 Password: <any>
