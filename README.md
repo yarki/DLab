@@ -548,10 +548,12 @@ db.createUser(
    }
 )
 ```
+
   * Load collections form file dlab/services/mongo\_settings.json
 ```
 mongoimport -u admin -p <password> -d <database_name> –c settings mongo_settings.json
 ```
+
 ### Setting up environment options
   * Set option DEV\_MODE to **true**, mongo database name and password in configuration file dlab/infrastructure-provisioning/src/ssn/templates/ssn.yml
 ```
@@ -560,8 +562,8 @@ mongoimport -u admin -p <password> -d <database_name> –c settings mongo_settin
 mongo:
   database: <database_name>
   password: <password>
-
 ```
+
   * Add system environment variable DLAB\_CONF\_DIR=&lt;dlab\_root\_folder&gt;/dlab/infrastructure-provisioning/src/ssn/templates/ssn.yml or create two symlinks in dlab/services/provisioning-service and dlab/services/self-service folders for file dlab/infrastructure-provisioning/src/ssn/templates/ssn.yml.
 
 *Unix*
