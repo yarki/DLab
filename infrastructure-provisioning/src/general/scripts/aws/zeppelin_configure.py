@@ -97,7 +97,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed installing apps: apt & pip. Exception: " + str(err))
+        append_result("Failed installing apps: apt & pip.", str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -109,18 +109,19 @@ if __name__ == "__main__":
                              "backend_hostname": get_instance_hostname(notebook_config['instance_name']),
                              "backend_port": "8080",
                              "nginx_template_dir": "/root/templates/"}
-        params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --os_user {} --spark_version {} --hadoop_version {} --edge_hostname {} --proxy_port {} --zeppelin_version {} --scala_version {}" \
+        params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --os_user {} --spark_version {} --hadoop_version {} --edge_hostname {} --proxy_port {} --zeppelin_version {} --scala_version {} --livy_version {}" \
             .format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['aws_region'],
                     json.dumps(additional_config), os.environ['conf_os_user'], os.environ['notebook_spark_version'],
                     os.environ['notebook_hadoop_version'], edge_instance_hostname, '3128',
-                    os.environ['notebook_zeppelin_version'], os.environ['notebook_scala_version'])
+                    os.environ['notebook_zeppelin_version'], os.environ['notebook_scala_version'],
+                    os.environ['notebook_livy_version'])
         try:
             local("~/scripts/{}.py {}".format('configure_zeppelin_node', params))
         except:
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed to configure zeppelin. Exception: " + str(err))
+        append_result("Failed to configure zeppelin.", str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -136,7 +137,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed to install python libs. Exception: " + str(err))
+        append_result("Failed to install python libs.", str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -153,7 +154,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed installing users key. Exception: " + str(err))
+        append_result("Failed installing users key.", str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 
@@ -168,7 +169,7 @@ if __name__ == "__main__":
             if image_id != '':
                 print "Image was successfully created. It's ID is " + image_id
     except Exception as err:
-        append_result("Failed installing users key. Exception: " + str(err))
+        append_result("Failed installing users key.", str(err))
         remove_ec2(notebook_config['tag_name'], notebook_config['instance_name'])
         sys.exit(1)
 

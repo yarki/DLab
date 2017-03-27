@@ -110,7 +110,7 @@ if __name__ == "__main__":
                                 edge_conf['nb_sg'], edge_conf['edge_sg'], edge_conf['allocation_id'])
         except Exception as err:
             traceback.print_exc()
-            append_result("Failed to terminate edge. Exception: " + str(err))
+            append_result("Failed to terminate edge.", str(err))
     except:
         sys.exit(1)
 

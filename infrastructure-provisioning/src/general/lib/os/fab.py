@@ -148,7 +148,7 @@ def configuring_notebook(emr_version):
     local("""sudo bash -c "find """ + jars_path + """ -name '*netty*' | xargs rm -f" """)
 
 
-def append_result(error):
+def append_result(error, exception=''):
     ts = time.time()
     st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
     with open('/root/result.json', 'a+') as f:
@@ -159,7 +159,10 @@ def append_result(error):
             f.write(res)
     with open("/root/result.json") as f:
         data = json.load(f)
-    data['error'] = data['error'] + " [Error-" + st + "]:" + error
+    if exception:
+        data['error'] = data['error'] + " [Error-" + st + "]:" + error + " Exception: " + str(exception)
+    else:
+        data['error'] = data['error'] + " [Error-" + st + "]:" + error
     with open("/root/result.json", 'w') as f:
         json.dump(data, f)
     print data
@@ -364,6 +367,8 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
                 default_port += 1
         local('sudo echo "livy.server.port = ' + str(livy_port) + '" >> ' + livy_path + 'conf/livy.conf')
         local('sudo echo "livy.spark.master = yarn" >> ' + livy_path + 'conf/livy.conf')
+        if os.path.exists(livy_path + 'conf/spark-blacklist.conf'):
+            local('sudo sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
         local(''' sudo echo "export SPARK_HOME=''' + spark_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
         local(''' sudo echo "export HADOOP_CONF_DIR=''' + yarn_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
         local(''' sudo echo "export PYSPARK3_PYTHON=python''' + python_version[0:3] + '''" >> ''' +

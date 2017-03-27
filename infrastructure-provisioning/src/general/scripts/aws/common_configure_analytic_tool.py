@@ -55,11 +55,11 @@ if __name__ == "__main__":
     try:
         logging.info('[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]')
         print '[INSTALLING KERNELS INTO SPECIFIED NOTEBOOK]'
-        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {} --region {} --emr_excluded_spark_properties {} --edge_user_name {} --os_user {}  --edge_hostname {} --proxy_port {}" \
+        params = "--bucket {} --cluster_name {} --emr_version {} --keyfile {} --notebook_ip {} --region {} --emr_excluded_spark_properties {} --edge_user_name {} --os_user {}  --edge_hostname {} --proxy_port {} --scala_version {}" \
             .format(notebook_config['bucket_name'], notebook_config['cluster_name'], os.environ['emr_version'],
                     notebook_config['key_path'], notebook_config['notebook_ip'], os.environ['aws_region'],
                     os.environ['emr_excluded_spark_properties'], os.environ['edge_user_name'],
-                    os.environ['conf_os_user'], edge_instance_hostname, '3128')
+                    os.environ['conf_os_user'], edge_instance_hostname, '3128', os.environ['notebook_scala_version'])
         try:
             local("~/scripts/{}_{}.py {}".format(os.environ['application'], 'install_emr_kernels', params))
             remove_emr_tag(notebook_config['cluster_id'], ['State'])
@@ -67,7 +67,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed installing EMR kernels. Exception: " + str(err))
+        append_result("Failed installing EMR kernels.", str(err))
         emr_id = get_emr_id_by_name(notebook_config['cluster_name'])
         terminate_emr(emr_id)
         remove_kernels(notebook_config['cluster_name'], notebook_config['tag_name'], os.environ['notebook_instance_name'],

@@ -38,7 +38,7 @@ def status():
         local("~/scripts/{}.py".format('edge_status'))
     except Exception as err:
         traceback.print_exc()
-        append_result("Failed preparing SSN node. Exception: " + str(err))
+        append_result("Failed preparing SSN node.", str(err))
         sys.exit(1)
 
 
@@ -54,14 +54,14 @@ def run():
         local("~/scripts/{}.py".format('edge_prepare'))
     except Exception as err:
         traceback.print_exc()
-        append_result("Failed preparing Edge node. Exception: " + str(err))
+        append_result("Failed preparing Edge node.", str(err))
         sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('edge_configure'))
     except Exception as err:
         traceback.print_exc()
-        append_result("Failed configuring Edge node. Exception: " + str(err))
+        append_result("Failed configuring Edge node.", str(err))
         sys.exit(1)
 
 
@@ -76,7 +76,7 @@ def terminate():
         local("~/scripts/{}.py".format('edge_terminate'))
     except Exception as err:
         traceback.print_exc()
-        append_result("Failed terminating Edge node. Exception: " + str(err))
+        append_result("Failed terminating Edge node.", str(err))
         sys.exit(1)
 
 
@@ -91,7 +91,7 @@ def stop():
         local("~/scripts/{}.py".format('edge_stop'))
     except Exception as err:
         traceback.print_exc()
-        append_result("Failed stopping Edge node. Exception: " + str(err))
+        append_result("Failed stopping Edge node.", str(err))
         sys.exit(1)
 
 
@@ -106,7 +106,7 @@ def start():
         local("~/scripts/{}.py".format('edge_start'))
     except Exception as err:
         traceback.print_exc()
-        append_result("Failed starting Edge node. Exception: " + str(err))
+        append_result("Failed starting Edge node.", str(err))
         sys.exit(1)
 
 
@@ -122,12 +122,12 @@ def recreate():
         local("~/scripts/{}.py".format('edge_prepare'))
     except Exception as err:
         traceback.print_exc()
-        append_result("Failed preparing Edge node. Exception: " + str(err))
+        append_result("Failed preparing Edge node.", str(err))
         sys.exit(1)
 
     try:
         local("~/scripts/{}.py".format('edge_configure'))
     except Exception as err:
         traceback.print_exc()
-        append_result("Failed configuring Edge node. Exception: " + str(err))
+        append_result("Failed configuring Edge node.", str(err))
         sys.exit(1)

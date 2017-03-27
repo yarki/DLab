@@ -89,7 +89,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed installing software: pip, packages. Exception: " + str(err))
+        append_result("Failed installing software: pip, packages.", str(err))
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -119,7 +119,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed configuring ssn. Exception: " + str(err))
+        append_result("Failed configuring ssn.", str(err))
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -155,7 +155,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Unable to configure docker. Exception: " + str(err))
+        append_result("Unable to configure docker.", str(err))
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -185,7 +185,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Unable to configure UI. Exception: " + str(err))
+        append_result("Unable to configure UI.", str(err))
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)

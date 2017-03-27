@@ -44,7 +44,7 @@ if __name__ == "__main__":
     try:
         start_ec2(edge_conf['tag_name'], edge_conf['instance_name'])
     except Exception as err:
-        append_result("Failed to start edge. Exception: " + str(err))
+        append_result("Failed to start edge.", str(err))
         sys.exit(1)
 
     except:

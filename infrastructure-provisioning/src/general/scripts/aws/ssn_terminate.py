@@ -50,7 +50,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             raise Exception
     except Exception as err:
-        append_result("Failed to terminate ssn. Exception: " + str(err))
+        append_result("Failed to terminate ssn.", str(err))
         sys.exit(1)
 
     try:
