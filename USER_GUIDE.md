@@ -3,8 +3,33 @@ What is DLAB?
 
 DLab is an essential toolset for analytics. It is a self-service Web Console, used to create and manage exploratory environments. It allows teams to spin up analytical environments with best of breed open-source tools just with a single click of the mouse. Once established, environment can be managed by an analytical team itself, leveraging simple and easy-to-use Web Interface.
 
+
+------------
+## CONTENTS
+-----------
+
+[Login](#login)
+
+[Setup a Gateway/Edge node](#setup_edge_node)
+
+[Setting up analytical environment and managing computational power](#setup_environmen)
+
+&nbsp; &nbsp; &nbsp; &nbsp; [Create notebook server](#notebook_create)
+
+&nbsp; &nbsp; &nbsp; &nbsp; [Stop Notebook server](#notebook_stop)
+
+&nbsp; &nbsp; &nbsp; &nbsp; [Terminate Notebook server](#notebook_terminate)
+
+&nbsp; &nbsp; &nbsp; &nbsp; [Deploy EMR](#emr_deploy)
+
+&nbsp; &nbsp; &nbsp; &nbsp; [Terminate EMR](#emr_terminate)
+
+[DLab Health Status Page](#health_page)
+
+[Web UI filters](#filter)
+
 ---------
-# Login 
+# Login <a name="login"></a>
 
 As soon as DLab is deployed by an infrastructure provisioning team and you received DLab URL, your username and password – open DLab login page, fill in your credentials and hit Login.
 
@@ -25,8 +50,8 @@ Make sure that corresponding user has been setup by administrator for each Data 
 
 To stop working with DLab - click on Log Out link at the top right corner of DLab.
 
------------------------------------
-# Setup a Gateway/Edge node
+----------------------------------
+# Setup a Gateway/Edge node <a name="setup_edge_node"></a>
 
 When you log into DLab Web Application, the first thing you will have to setup is a Gateway Node, or an “Edge” Node.
 
@@ -44,10 +69,11 @@ As soon as an Edge node is created, Data Scientist will see a blank “List of R
 
 ![Main page](doc/main_page.png)
 
---------------------------------------------------------------------------------------
-# Setting up analytical environment and managing computational power
+---------------------------------------------------------------------------------------
+# Setting up analytical environment and managing computational power <a name="setup_environmen"></a>
 
-## Create notebook server
+----------------------
+## Create notebook server <a name="notebook_create"></a>
 
 To create new analytical environment from “List of Resources” page click on Create new button.
 
@@ -94,7 +120,7 @@ In the body of the dialog:
 To access analytical tool Web UI – you need to configure SOCKS proxy. Please follow the steps described on “Read instruction how to create the tunnel” page to configure SOCKS proxy for Windows/MAC/Linux machines.
 
 --------------------------
-## Stop Notebook server
+## Stop Notebook server <a name="notebook_stop"></a>
 
 Once you have stopped working with an analytical tool and you would like to release AWS resources for the sake of the costs, you might want to Stop the notebook. You will be able to Start the notebook again after a while and proceed with your analytics.
 
@@ -111,7 +137,7 @@ Hit OK in confirmation popup.
 After you confirm you intent to Stop the notebook - the status will be changed to Stopping and will become Stopped in a while. EMR cluster status will be changed to Terminated.
 
 --------------------------------
-## Terminate Notebook server
+## Terminate Notebook server <a name="notebook_terminate"></a>
 
 Once you have finished working with an analytical tool and you would like to release AWS resources for the sake of the costs, you might want to Terminate the notebook. You will not be able to Start the notebook which has been Terminated. Instead, you will have to create new Notebook server if you will need to proceed your analytical activities.
 
@@ -129,7 +155,7 @@ change to Terminated:
 ![Notebook terminated](doc/notebook_terminated.png)
 
 ---------------
-## Deploy EMR
+## Deploy EMR <a name="emr_deploy"></a>
 
 After deploying Notebook node, you can deploy EMR cluster and it will be automatically linked with your Notebook server. EMR cluster is a managed cluster platform, that simplifies running big data frameworks, such as Apache Hadoop and Apache Spark on AWS to process and analyze vast amounts of data. Adding EMR is not mandatory and is needed in case computational resources are required for job execution.
 
@@ -180,8 +206,8 @@ Insert following “magics” before blocks of your code to start executing your
 
 ![R-studio](doc/r-studio.png)
 
------------------
-##Terminate EMR
+------------------
+## Terminate EMR <a name="emr_terminate"></a>
 
 To release cluster computational resources click on ![cross](doc/cross_icon.png) button close to EMR cluser alias. Confirm decommissioning of EMR by hitting Yes:
 
@@ -189,8 +215,8 @@ To release cluster computational resources click on ![cross](doc/cross_icon.png)
 
 In a while EMR cluster will get **Terminated**. Corresponding EC2 instances will also removed on AWS.
 
-================================
-# DLab Health Status Page
+--------------------------------
+# DLab Health Status Page <a name="health_page"></a>
 
 Health Status page is an administration page allowing users to start/stop/recreate gateway node. This might be useful in cases when someone manually deleted corresponding Edge node instance from AWS. This would have made DLab as an application corrupted in general. If any actions are manually done to Edge node EC2 instance directly via AWS Web Console – those changes will be synchronized with DLab automatically and shortly Edge Node status will be updated in DLab.
 
@@ -214,8 +240,8 @@ Confirm you want to stop Edge node by clicking Yes:
 
 In case you Edge node is Stopped or Terminated – you will have to Start or Recreate it correspondingly to proceed working with DLab. This can done as well via context actions menu.
 
-Web UI filters
-==============
+--------------------
+# Web UI filters <a name="filters"></a>
 
 You can leverage functionality of build-in UI filter to quickly manage the analytical tools and EMR clusters, which you only want to see in your dashboard.
 
