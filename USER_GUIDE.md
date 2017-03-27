@@ -95,7 +95,7 @@ Instance shape dropdown, contains configurable list of shapes, which should be c
 
 These groups have T-Shirt based shapes (configurable), that can help Data Scientist to either save money\* and leverage not very powerful shapes (for working with relatively small datasets), or that could boost the performance of analytics by selecting more powerful instance shape.
 
-\* Please refer to official documentation from Amazon that will help you understand what ![instance shapes](https://aws.amazon.com/ec2/instance-types/) would be most preferable in your particular DLAB setup. Also, you can use ![AWS calculator](https://calculator.s3.amazonaws.com/index.html) to roughly estimate the cost of your environment. *
+\* Please refer to official documentation from Amazon that will help you understand what [instance shapes](https://aws.amazon.com/ec2/instance-types/) would be most preferable in your particular DLAB setup. Also, you can use [AWS calculator](https://calculator.s3.amazonaws.com/index.html) to roughly estimate the cost of your environment. *
 
 After you Select the template, fill in the Name and choose needed instance shape - you need to click on Create button for your instance to start creating. Corresponding record will show up in your dashboard:
 
@@ -164,7 +164,7 @@ On “Create Computational Resource” popup you will have to choose EMR version
 -   Total number of instances (min 2 and max 14, configurable);
 -   Master and Slave instance shapes (list is configurable and supports all available AWS instance shapes, supported in your AWS region);
 
-Also, if you would like to save some costs for your EMR cluster you can create EMR cluster based on ![spot instances](https://aws.amazon.com/ec2/spot/), which are often available at a discount price:
+Also, if you would like to save some costs for your EMR cluster you can create EMR cluster based on [spot instances](https://aws.amazon.com/ec2/spot/), which are often available at a discount price:
 
 -   Select Spot Instance checkbox;
 -   Specify preferable bid for your spot instance in % (between 20 and 90, configurable).
