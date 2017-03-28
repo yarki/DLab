@@ -24,6 +24,10 @@ limitations under the License.
   color: #35afd5;
 }
 
+.butt.butt-create:disabled{
+  color: #577289!important;
+}
+
 .butt.butt-filter {
   margin-right: 10px;
 }

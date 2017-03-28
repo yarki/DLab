@@ -44,6 +44,11 @@ limitations under the License.
   color: #fff;
 }
 
+.mat-raised-button.butt:disabled {
+  cursor: not-allowed;
+  opacity: .6;
+}
+
 .mat-button-focus-overlay {
   background-color: rgba(255, 0, 0, 0)!important;
 }
