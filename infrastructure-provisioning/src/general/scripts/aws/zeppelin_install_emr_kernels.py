@@ -45,7 +45,10 @@ def configure_notebook(args):
     templates_dir = '/root/templates/'
     scripts_dir = '/root/scripts/'
     files_dir = '/root/files/'
-    put(templates_dir + 'emr_interpreter.json', '/tmp/emr_interpreter.json')
+    if os.environ['notebook_multiple_emrs'] == 'true':
+        put(templates_dir + 'emr_interpreter_livy.json', '/tmp/emr_interpreter.json')
+    else:
+        put(templates_dir + 'emr_interpreter_spark.json', '/tmp/emr_interpreter.json')
     put(scripts_dir + 'create_configs.py', '/tmp/create_configs.py')
     sudo('\cp /tmp/create_configs.py /usr/local/bin/create_configs.py')
     sudo('chmod 755 /usr/local/bin/create_configs.py')
@@ -72,4 +75,5 @@ if __name__ == "__main__":
          + " --hadoop_version " + hadoop_version + " --region " + args.region + " --excluded_lines '"
          + args.emr_excluded_spark_properties + "' --user_name " + args.edge_user_name + " --os_user " + args.os_user +
          " --edge_hostname " + args.edge_hostname + " --proxy_port " + args.proxy_port + " --scala_version " +
-         args.scala_version + " --livy_version " + livy_version)
+         args.scala_version + " --livy_version " + livy_version + " --multiple_emrs " +
+         os.environ['notebook_multiple_emrs'])

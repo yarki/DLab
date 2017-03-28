@@ -48,6 +48,7 @@ parser.add_argument('--os_user', type=str, default='')
 parser.add_argument('--edge_hostname', type=str, default='')
 parser.add_argument('--proxy_port', type=str, default='')
 parser.add_argument('--livy_version', type=str, default='')
+parser.add_argument('--multiple_emrs', type=str, default='')
 args = parser.parse_args()
 
 emr_dir = '/opt/' + args.emr_version + '/jars/'
@@ -88,7 +89,8 @@ if __name__ == "__main__":
         install_emr_spark(args)
         spark_defaults(args)
         configuring_notebook(args.emr_version)
-        install_remote_livy(args)
+        if args.multiple_emrs == 'true':
+            install_remote_livy(args)
         installing_python(args.region, args.bucket, args.user_name, args.cluster_name)
         configure_zeppelin_emr_interpreter(args.emr_version, args.cluster_name, args.region, spark_dir, args.os_user,
-                                           yarn_dir, args.bucket, args.user_name, endpoint_url)
+                                           yarn_dir, args.bucket, args.user_name, endpoint_url, args.multiple_emrs)

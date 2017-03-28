@@ -316,7 +316,7 @@ def pyspark_kernel(kernels_dir, emr_version, cluster_name, spark_version, bucket
         local('sudo mv /tmp/kernel_var.json ' + kernel_path)
 
 
-def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_dir, os_user, yarn_dir, bucket, user_name, endpoint_url):
+def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_dir, os_user, yarn_dir, bucket, user_name, endpoint_url, multiple_emrs):
     try:
         port_number_found = False
         zeppelin_restarted = False
@@ -357,48 +357,71 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
                 zeppelin_restarted = True
         local('sleep 5')
         local('echo \"Configuring emr spark interpreter for Zeppelin\"')
-        while not port_number_found:
-            port_free = local('sudo bash -c "nmap -p ' + str(default_port) + ' localhost | grep closed > /dev/null" ; echo $?', capture=True)
-            port_free = port_free[:1]
-            if port_free == '0':
-                livy_port = default_port
-                port_number_found = True
-            else:
-                default_port += 1
-        local('sudo echo "livy.server.port = ' + str(livy_port) + '" >> ' + livy_path + 'conf/livy.conf')
-        local('sudo echo "livy.spark.master = yarn" >> ' + livy_path + 'conf/livy.conf')
-        if os.path.exists(livy_path + 'conf/spark-blacklist.conf'):
-            local('sudo sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
-        local(''' sudo echo "export SPARK_HOME=''' + spark_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
-        local(''' sudo echo "export HADOOP_CONF_DIR=''' + yarn_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
-        local(''' sudo echo "export PYSPARK3_PYTHON=python''' + python_version[0:3] + '''" >> ''' +
-              livy_path + '''conf/livy-env.sh''')
-        template_file = "/tmp/emr_interpreter.json"
-        fr = open(template_file, 'r+')
-        text = fr.read()
-        text = text.replace('CLUSTER_NAME', cluster_name)
-        text = text.replace('SPARK_HOME', spark_dir)
-        text = text.replace('ENDPOINTURL', endpoint_url)
-        text = text.replace('LIVY_PORT', str(livy_port))
-        fw = open(template_file, 'w')
-        fw.write(text)
-        fw.close()
-        for _ in range(5):
-            try:
-                local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d " +
-                      "@/tmp/emr_interpreter.json http://localhost:8080/api/interpreter/setting")
-                break
-            except:
-                local('sleep 5')
-                pass
-        local('sudo cp /opt/livy-server-cluster.service /etc/systemd/system/livy-server-' + str(livy_port) + '.service')
-        local("sudo sed -i 's|OS_USER|" + os_user + "|' /etc/systemd/system/livy-server-" + str(livy_port) + '.service')
-        local("sudo sed -i 's|LIVY_PATH|" + livy_path + "|' /etc/systemd/system/livy-server-" + str(livy_port)
-              + '.service')
-        local('sudo chmod 644 /etc/systemd/system/livy-server-' + str(livy_port) + '.service')
-        local("sudo systemctl daemon-reload")
-        local("sudo systemctl enable livy-server-" + str(livy_port))
-        local('sudo systemctl start livy-server-' + str(livy_port))
+        if multiple_emrs == 'true':
+            while not port_number_found:
+                port_free = local('sudo bash -c "nmap -p ' + str(default_port) + ' localhost | grep closed > /dev/null" ; echo $?', capture=True)
+                port_free = port_free[:1]
+                if port_free == '0':
+                    livy_port = default_port
+                    port_number_found = True
+                else:
+                    default_port += 1
+            local('sudo echo "livy.server.port = ' + str(livy_port) + '" >> ' + livy_path + 'conf/livy.conf')
+            local('sudo echo "livy.spark.master = yarn" >> ' + livy_path + 'conf/livy.conf')
+            if os.path.exists(livy_path + 'conf/spark-blacklist.conf'):
+                local('sudo sed -i "s/^/#/g" ' + livy_path + 'conf/spark-blacklist.conf')
+            local(''' sudo echo "export SPARK_HOME=''' + spark_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
+            local(''' sudo echo "export HADOOP_CONF_DIR=''' + yarn_dir + '''" >> ''' + livy_path + '''conf/livy-env.sh''')
+            local(''' sudo echo "export PYSPARK3_PYTHON=python''' + python_version[0:3] + '''" >> ''' +
+                  livy_path + '''conf/livy-env.sh''')
+            template_file = "/tmp/emr_interpreter.json"
+            fr = open(template_file, 'r+')
+            text = fr.read()
+            text = text.replace('CLUSTER_NAME', cluster_name)
+            text = text.replace('SPARK_HOME', spark_dir)
+            text = text.replace('ENDPOINTURL', endpoint_url)
+            text = text.replace('LIVY_PORT', str(livy_port))
+            fw = open(template_file, 'w')
+            fw.write(text)
+            fw.close()
+            for _ in range(5):
+                try:
+                    local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d " +
+                          "@/tmp/emr_interpreter.json http://localhost:8080/api/interpreter/setting")
+                    break
+                except:
+                    local('sleep 5')
+                    pass
+            local('sudo cp /opt/livy-server-cluster.service /etc/systemd/system/livy-server-' + str(livy_port) + '.service')
+            local("sudo sed -i 's|OS_USER|" + os_user + "|' /etc/systemd/system/livy-server-" + str(livy_port) + '.service')
+            local("sudo sed -i 's|LIVY_PATH|" + livy_path + "|' /etc/systemd/system/livy-server-" + str(livy_port)
+                  + '.service')
+            local('sudo chmod 644 /etc/systemd/system/livy-server-' + str(livy_port) + '.service')
+            local("sudo systemctl daemon-reload")
+            local("sudo systemctl enable livy-server-" + str(livy_port))
+            local('sudo systemctl start livy-server-' + str(livy_port))
+        else:
+            template_file = "/tmp/emr_interpreter.json"
+            p_versions = ["2", python_version[:3]]
+            for p_version in p_versions:
+                fr = open(template_file, 'r+')
+                text = fr.read()
+                text = text.replace('CLUSTERNAME', cluster_name)
+                text = text.replace('PYTHONVERSION', p_version)
+                text = text.replace('EMRVERSION', cluster_name)
+                tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
+                fw = open(tmp_file, 'w')
+                fw.write(text)
+                fw.close()
+                for _ in range(5):
+                    try:
+                        local("curl --noproxy localhost -H 'Content-Type: application/json' -X POST -d " +
+                              "@/tmp/emr_spark_py" + p_version +
+                              "_interpreter.json http://localhost:8080/api/interpreter/setting")
+                        break
+                    except:
+                        local('sleep 5')
+                        pass
         local('touch /home/' + os_user + '/.ensure_dir/emr_' + cluster_name + '_interpreter_ensured')
     except:
             sys.exit(1)
