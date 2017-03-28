@@ -2,7 +2,6 @@
 
 #Switch on/off developer mode here
 <#assign DEV_MODE="false">
-
 devMode: ${DEV_MODE}
 
 mongo:
