@@ -43,6 +43,7 @@ parser.add_argument('--edge_hostname', type=str, default='')
 parser.add_argument('--proxy_port', type=str, default='')
 parser.add_argument('--scala_version', type=str, default='')
 parser.add_argument('--livy_version', type=str, default='')
+parser.add_argument('--multiple_emrs', type=str, default='')
 args = parser.parse_args()
 
 spark_version = args.spark_version
@@ -101,12 +102,12 @@ def configure_zeppelin(os_user):
             sys.exit(1)
 
 
-def configure_local_kernels(args):
+def configure_local_livy_kernels(args):
     if not exists('/home/' + args.os_user + '/.ensure_dir/local_livy_kernel_ensured'):
         port_number_found = False
         default_port = 8998
         livy_port = ''
-        put(templates_dir + 'interpreter.json', '/tmp/interpreter.json')
+        put(templates_dir + 'interpreter_livy.json', '/tmp/interpreter.json')
         sudo('sed -i "s|ENDPOINTURL|' + endpoint_url + '|g" /tmp/interpreter.json')
         sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
         while not port_number_found:
@@ -125,6 +126,15 @@ def configure_local_kernels(args):
             sudo('sed -i "s/^/#/g" /opt/livy/conf/spark-blacklist.conf')
         sudo("systemctl start livy-server")
         sudo('touch /home/' + args.os_user + '/.ensure_dir/local_livy_kernel_ensured')
+
+
+def configure_local_spark_kernels(args):
+    if not exists('/home/' + args.os_user + '/.ensure_dir/local_spark_kernel_ensured'):
+        put(templates_dir + 'interpreter_spark.json', '/tmp/interpreter.json')
+        sudo('sed -i "s|ENDPOINTURL|' + endpoint_url + '|g" /tmp/interpreter.json')
+        sudo('sed -i "s|OS_USER|' + args.os_user + '|g" /tmp/interpreter.json')
+        sudo('cp /tmp/interpreter.json /opt/zeppelin/conf/interpreter.json')
+        sudo('touch /home/' + args.os_user + '/.ensure_dir/local_spark_kernel_ensured')
 
 
 def install_local_livy(args):
@@ -193,8 +203,11 @@ if __name__ == "__main__":
     ensure_python3_libraries(args.os_user)
     ensure_python3_specific_version(python3_version, args.os_user)
 
-    print "Installing Livy for local kernels"
-    install_local_livy(args)
-
-    print "Configuring local kernels"
-    configure_local_kernels(args)
+    if args.multiple_emrs == 'true':
+        print "Installing Livy for local kernels"
+        install_local_livy(args)
+        print "Configuring local kernels"
+        configure_local_livy_kernels(args)
+    else:
+        print "Configuring local kernels"
+        configure_local_spark_kernels(args)
