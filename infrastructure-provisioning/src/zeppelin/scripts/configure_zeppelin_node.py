@@ -158,6 +158,16 @@ def install_local_livy(args):
         sudo('touch /home/' + args.os_user + '/.ensure_dir/local_livy_ensured')
 
 
+def install_r_packages(args):
+    if not exists('/home/' + args.os_user + '/.ensure_dir/r_packages_ensured'):
+        sudo('R -e "install.packages(\'devtools\', repos = \'http://cran.us.r-project.org\')"')
+        sudo('R -e "install.packages(\'knitr\', repos = \'http://cran.us.r-project.org\')"')
+        sudo('R -e "install.packages(\'ggplot2\', repos = \'http://cran.us.r-project.org\')"')
+        sudo('R -e "install.packages(c(\'devtools\',\'mplot\', \'googleVis\'), '
+             'repos = \'http://cran.us.r-project.org\'); require(devtools); install_github(\'ramnathv/rCharts\')"')
+        sudo('touch /home/' + args.os_user + '/.ensure_dir/r_packages_ensured')
+
+
 ##############
 # Run script #
 ##############
@@ -209,5 +219,7 @@ if __name__ == "__main__":
         print "Configuring local kernels"
         configure_local_livy_kernels(args)
     else:
+        print "Installing additional R packages"
+        install_r_packages(args)
         print "Configuring local kernels"
         configure_local_spark_kernels(args)
