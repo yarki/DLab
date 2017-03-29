@@ -1,5 +1,5 @@
 {
-  "name": "EMRVERSION_spark_pyPYTHONVERSION",
+  "name": "EMRVERSION_spark_pyPYTHONVER_SHORT",
   "group": "spark",
   "properties": {
     "args": "",

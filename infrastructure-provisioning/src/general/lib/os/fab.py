@@ -408,6 +408,7 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
                 text = fr.read()
                 text = text.replace('CLUSTERNAME', cluster_name)
                 text = text.replace('PYTHONVERSION', p_version)
+                text = text.replace('PYTHONVER_SHORT', p_version[:1])
                 text = text.replace('EMRVERSION', cluster_name)
                 tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
                 fw = open(tmp_file, 'w')
