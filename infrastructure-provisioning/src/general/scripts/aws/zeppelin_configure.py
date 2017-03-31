@@ -53,8 +53,16 @@ if __name__ == "__main__":
     notebook_config['user_keyname'] = os.environ['edge_user_name']
     notebook_config['instance_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
         'edge_user_name'] + "-nb-" + notebook_config['exploratory_name'] + "-" + args.uuid
-    notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
-        'edge_user_name'] + '-' + os.environ['application'] + '-notebook-image'
+    if os.environ['application'] == 'zeppelin':
+        if os.environ['notebook_multiple_emrs'] == 'true':
+            notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
+                'edge_user_name'] + '-' + os.environ['application'] + '-livy-notebook-image'
+        else:
+            notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
+                'edge_user_name'] + '-' + os.environ['application'] + '-spark-notebook-image'
+    else:
+        notebook_config['expected_ami_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
+            'edge_user_name'] + '-' + os.environ['application'] + '-notebook-image'
     notebook_config['role_profile_name'] = os.environ['conf_service_base_name'].lower().replace('-', '_') + "-" + \
                                            os.environ['edge_user_name'] + "-nb-Profile"
     notebook_config['security_group_name'] = os.environ['conf_service_base_name'] + "-" + os.environ[
@@ -109,12 +117,12 @@ if __name__ == "__main__":
                              "backend_hostname": get_instance_hostname(notebook_config['instance_name']),
                              "backend_port": "8080",
                              "nginx_template_dir": "/root/templates/"}
-        params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --os_user {} --spark_version {} --hadoop_version {} --edge_hostname {} --proxy_port {} --zeppelin_version {} --scala_version {} --livy_version {}" \
+        params = "--hostname {} --instance_name {} --keyfile {} --region {} --additional_config '{}' --os_user {} --spark_version {} --hadoop_version {} --edge_hostname {} --proxy_port {} --zeppelin_version {} --scala_version {} --livy_version {} --multiple_emrs {}" \
             .format(instance_hostname, notebook_config['instance_name'], keyfile_name, os.environ['aws_region'],
                     json.dumps(additional_config), os.environ['conf_os_user'], os.environ['notebook_spark_version'],
                     os.environ['notebook_hadoop_version'], edge_instance_hostname, '3128',
                     os.environ['notebook_zeppelin_version'], os.environ['notebook_scala_version'],
-                    os.environ['notebook_livy_version'])
+                    os.environ['notebook_livy_version'], os.environ['notebook_multiple_emrs'])
         try:
             local("~/scripts/{}.py {}".format('configure_zeppelin_node', params))
         except:

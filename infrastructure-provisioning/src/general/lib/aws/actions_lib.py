@@ -739,15 +739,16 @@ def remove_kernels(emr_name, tag_name, nb_tag_value, ssh_user, key_path, emr_ver
                 env.host_string = env.user + "@" + env.hosts
                 sudo('rm -rf /home/{}/.local/share/jupyter/kernels/*_{}'.format(ssh_user, emr_name))
                 if exists('/home/{}/.ensure_dir/emr_{}_interpreter_ensured'.format(ssh_user, emr_name)):
-                    try:
-                        livy_port = sudo("cat /opt/" + emr_version + "/" + emr_name
-                                         + "/livy/conf/livy.conf | grep livy.server.port | tail -n 1 | awk '{printf $3}'")
-                        process_number = sudo("netstat -natp 2>/dev/null | grep ':" + livy_port +
-                                              "' | awk '{print $7}' | sed 's|/.*||g'")
-                        sudo('kill -9 ' + process_number)
-                        sudo('systemctl disable livy-server-' + livy_port)
-                    except:
-                        print "Wasn't able to find Livy server for this EMR!"
+                    if os.environ['notebook_multiple_emrs'] == 'true':
+                        try:
+                            livy_port = sudo("cat /opt/" + emr_version + "/" + emr_name
+                                             + "/livy/conf/livy.conf | grep livy.server.port | tail -n 1 | awk '{printf $3}'")
+                            process_number = sudo("netstat -natp 2>/dev/null | grep ':" + livy_port +
+                                                  "' | awk '{print $7}' | sed 's|/.*||g'")
+                            sudo('kill -9 ' + process_number)
+                            sudo('systemctl disable livy-server-' + livy_port)
+                        except:
+                            print "Wasn't able to find Livy server for this EMR!"
                     sudo('sed -i \"s/^export SPARK_HOME.*/export SPARK_HOME=\/opt\/spark/\" /opt/zeppelin/conf/zeppelin-env.sh')
                     sudo("rm -rf /home/{}/.ensure_dir/emr_interpreter_ensure".format(ssh_user))
                     zeppelin_url = 'http://' + private + ':8080/api/interpreter/setting/'
