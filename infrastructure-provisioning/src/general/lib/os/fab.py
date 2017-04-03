@@ -339,11 +339,9 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
               '/spark/conf/spark-env.sh')
         local('echo \"spark.jars $(ls ' + spark_libs + ' | tr \'\\n\' \',\')\" >> /opt/' + emr_version + '/' +
               cluster_name + '/spark/conf/spark-defaults.conf')
-        local('echo \"spark.executorEnv.PYTHONPATH pyspark.zip:py4j-src.zip\" >> /opt/' + emr_version + '/' +
-              cluster_name + '/spark/conf/spark-defaults.conf')
-        local('sed -i \'/spark.yarn.dist.files/s/$/,file:\/opt\/' + emr_version + '\/' + cluster_name +
-              '\/spark\/python\/lib\/py4j-src.zip,file:\/opt\/' + emr_version + '\/' + cluster_name +
-              '\/spark\/python\/lib\/pyspark.zip/\' /opt/' + emr_version + '/' + cluster_name +
+        local('sed -i "/spark.executorEnv.PYTHONPATH/d" /opt/' + emr_version + '/' + cluster_name +
+              '/spark/conf/spark-defaults.conf')
+        local('sed -i "/spark.yarn.dist.files/d" /opt/' + emr_version + '/' + cluster_name +
               '/spark/conf/spark-defaults.conf')
         local('sudo chown ' + os_user + ':' + os_user + ' -R /opt/zeppelin/')
         local('sudo systemctl daemon-reload')
@@ -408,9 +406,10 @@ def configure_zeppelin_emr_interpreter(emr_version, cluster_name, region, spark_
                 text = fr.read()
                 text = text.replace('CLUSTERNAME', cluster_name)
                 text = text.replace('PYTHONVERSION', p_version)
+                text = text.replace('SPARK_HOME', spark_dir)
                 text = text.replace('PYTHONVER_SHORT', p_version[:1])
                 text = text.replace('ENDPOINTURL', endpoint_url)
-                text = text.replace('EMRVERSION', cluster_name)
+                text = text.replace('EMRVERSION', emr_version)
                 tmp_file = "/tmp/emr_spark_py" + p_version + "_interpreter.json"
                 fw = open(tmp_file, 'w')
                 fw.write(text)

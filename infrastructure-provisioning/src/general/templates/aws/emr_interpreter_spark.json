@@ -1,5 +1,5 @@
 {
-  "name": "EMRVERSION_pyPYTHONVER_SHORT",
+  "name": "CLUSTERNAME_pyPYTHONVER_SHORT",
   "group": "spark",
   "properties": {
     "args": "",
@@ -14,12 +14,7 @@
     "zeppelin.pyspark.python": "pythonPYTHONVERSION",
     "zeppelin.dep.localrepo": "local-repo",
     "zeppelin.dep.additionalRemoteRepository": "spark-packages,http://dl.bintray.com/spark-packages/maven,false;",
-    "spark.home": "/opt/EMRVERSION/CLUSTERNAME/spark",
-    "spark.yarn.jar": "",
-    "spark.driver.extraClassPath": ":/usr/lib/hadoop-lzo/lib/*:/usr/lib/hadoop/hadoop-aws.jar:/usr/share/aws/aws-java-sdk/*:/usr/share/aws/emr/emrfs/conf:/usr/share/aws/emr/emrfs/lib/*:/usr/share/aws/emr/emrfs/auxlib/*:/usr/share/aws/emr/security/conf:/usr/share/aws/emr/security/lib/* ",
-    "spark.executor.extraClassPath": ":/usr/lib/hadoop-lzo/lib/*:/usr/lib/hadoop/hadoop-aws.jar:/usr/share/aws/aws-java-sdk/*:/usr/share/aws/emr/emrfs/conf:/usr/share/aws/emr/emrfs/lib/*:/usr/share/aws/emr/emrfs/auxlib/*:/usr/share/aws/emr/security/conf:/usr/share/aws/emr/security/lib/* ",
-    "spark.executor.extraLibraryPath": "/usr/lib/hadoop/lib/native:/usr/lib/hadoop-lzo/lib/native",
-    "spark.driver.extraLibraryPath": "/usr/lib/hadoop/lib/native:/usr/lib/hadoop-lzo/lib/native",
+    "spark.home": "SPARK_HOME",
     "spark.hadoop.fs.s3a.fast.upload": "true",
     "spark.hadoop.fs.s3a.endpoint": "ENDPOINTURL",
     "zeppelin.R.image.width": "100%",
