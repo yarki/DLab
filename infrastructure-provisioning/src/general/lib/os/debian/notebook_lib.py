@@ -209,13 +209,15 @@ def ensure_python3_libraries(os_user):
             sys.exit(1)
 
 
-
 def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/tensor_ensured'):
         try:
+            # install nvidia drivers
+            sudo('apt-get -y install linux-image-extra-`uname -r`')
+            sudo('wget http://us.download.nvidia.com/XFree86/Linux-x86_64/367.57/NVIDIA-Linux-x86_64-367.57.run -O /home/' + os_user + '/NVIDIA-Linux-x86_64-367.57.run')
+            sudo('/bin/bash /home/' + os_user + '/NVIDIA-Linux-x86_64-367.57.run -s --no-install-libglvnd')
+            sudo('rm -f /home/' + os_user + '/NVIDIA-Linux-x86_64-367.57.run')
             # install cuda
-            sudo('apt -y install aptitude')
-            sudo('aptitude -y install nvidia-367')
             sudo('wget -P /opt https://developer.nvidia.com/compute/cuda/8.0/prod/local_installers/cuda_8.0.44_linux-run')
             sudo('sh /opt/cuda_8.0.44_linux-run --silent --toolkit')
             sudo('mv /usr/local/cuda-8.0 /opt/')
