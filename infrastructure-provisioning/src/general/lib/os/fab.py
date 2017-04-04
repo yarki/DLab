@@ -182,7 +182,7 @@ def configure_jupyter(os_user, jupyter_conf_file, templates_dir):
         try:
             sudo('pip install jupyter --no-cache-dir')
             sudo('rm -rf ' + jupyter_conf_file)
-            sudo('jupyter notebook --generate-config --config ' + jupyter_conf_file)
+            run('jupyter notebook --generate-config --config ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
             sudo('echo c.NotebookApp.open_browser = False >> ' + jupyter_conf_file)
             sudo('echo \'c.NotebookApp.cookie_secret = b"' + id_generator() + '"\' >> ' + jupyter_conf_file)
