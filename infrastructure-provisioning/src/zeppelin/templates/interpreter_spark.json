@@ -83,7 +83,7 @@
         },
         {
           "class": "org.apache.zeppelin.spark.SparkRInterpreter",
-          "name": "sparkr"
+          "name": "r"
         }
       ],
       "dependencies": [],
