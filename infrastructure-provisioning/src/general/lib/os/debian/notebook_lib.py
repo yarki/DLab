@@ -213,6 +213,11 @@ def install_tensor(os_user, tensorflow_version, files_dir, templates_dir):
     if not exists('/home/' + os_user + '/.ensure_dir/tensor_ensured'):
         try:
             # install nvidia drivers
+            sudo('echo "blacklist nouveau" >> /etc/modprobe.d/blacklist-nouveau.conf')
+            sudo('echo "options nouveau modeset=0" >> /etc/modprobe.d/blacklist-nouveau.conf')
+            sudo('update-initramfs -u')
+            sudo('shutdown -r 1')
+            time.sleep(90)
             sudo('apt-get -y install linux-image-extra-`uname -r`')
             sudo('wget http://us.download.nvidia.com/XFree86/Linux-x86_64/367.57/NVIDIA-Linux-x86_64-367.57.run -O /home/' + os_user + '/NVIDIA-Linux-x86_64-367.57.run')
             sudo('/bin/bash /home/' + os_user + '/NVIDIA-Linux-x86_64-367.57.run -s --no-install-libglvnd')
