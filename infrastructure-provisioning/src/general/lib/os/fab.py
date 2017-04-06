@@ -177,10 +177,10 @@ def put_resource_status(resource, status, dlab_path, os_user):
     sudo('python ' + dlab_path + 'tmp/resource_status.py --resource {} --status {}'.format(resource, status))
 
 
-def configure_jupyter(os_user, jupyter_conf_file, templates_dir):
+def configure_jupyter(os_user, jupyter_conf_file, templates_dir, jupyter_version):
     if not exists('/home/' + os_user + '/.ensure_dir/jupyter_ensured'):
         try:
-            sudo('pip install jupyter --no-cache-dir')
+            sudo('pip install jupyter=={} --no-cache-dir'.format(jupyter_version))
             sudo('rm -rf ' + jupyter_conf_file)
             run('jupyter notebook --generate-config --config ' + jupyter_conf_file)
             sudo('echo "c.NotebookApp.ip = \'*\'" >> ' + jupyter_conf_file)
