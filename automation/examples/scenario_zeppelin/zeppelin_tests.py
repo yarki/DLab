@@ -74,6 +74,7 @@ def run_note(note_id, notebook_ip):
     response = local("curl -H 'Content-Type: application/json' -X POST  http://" + notebook_ip +
                      ":8080/api/notebook/job/" + note_id, capture=True)
     status = json.loads(response)
+    local('sleep 5')
     if status.get('status') == 'OK':
         get_note_status(note_id, notebook_ip)
     else:
