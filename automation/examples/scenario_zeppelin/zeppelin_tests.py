@@ -74,7 +74,6 @@ def run_note(note_id, notebook_ip):
     response = local("curl -H 'Content-Type: application/json' -X POST  http://" + notebook_ip +
                      ":8080/api/notebook/job/" + note_id, capture=True)
     status = json.loads(response)
-    local('sleep 5')
     if status.get('status') == 'OK':
         get_note_status(note_id, notebook_ip)
     else:
@@ -122,7 +121,10 @@ def run_spark():
 
 
 def run_sparkr():
-    interpreters = ['local_interpreter_python2.sparkr', args.cluster_name + "_py2.sparkr"]
+    if os.path.exists('/opt/livy/'):
+        interpreters = ['local_interpreter_python2.sparkr', args.cluster_name + "_py2.sparkr"]
+    else:
+        interpreters = ['local_interpreter_python2.r', args.cluster_name + "_py2.r"]
     for i in interpreters:
         prepare_note(i, '/home/{}/test_templates/template_preparation_sparkr.json'.format(args.os_user),
                      '/home/{}/preparation_sparkr.json'.format(args.os_user))
