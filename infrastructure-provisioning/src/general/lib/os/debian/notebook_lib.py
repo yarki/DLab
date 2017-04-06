@@ -80,12 +80,12 @@ def ensure_r(os_user, r_libs):
             sys.exit(1)
 
 
-def install_rstudio(os_user, local_spark_path, rstudio_pass):
+def install_rstudio(os_user, local_spark_path, rstudio_pass, rstudio_version):
     if not exists('/home/' + os_user + '/.ensure_dir/rstudio_ensured'):
         try:
             sudo('apt-get install -y r-base')
             sudo('apt-get install -y gdebi-core')
-            sudo('wget https://download2.rstudio.org/rstudio-server-1.0.44-amd64.deb')
+            sudo('wget https://download2.rstudio.org/rstudio-server-{}-amd64.deb'.format(rstudio_version))
             sudo('gdebi -n rstudio-server-1.0.44-amd64.deb')
             sudo('mkdir /mnt/var')
             sudo('chown ' + os_user + ':' + os_user + ' /mnt/var')
