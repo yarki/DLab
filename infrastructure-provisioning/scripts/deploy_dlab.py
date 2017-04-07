@@ -91,14 +91,14 @@ def deploy_dlab(args):
           '-e "aws_access_key={11}" -e "aws_secret_access_key={12}" docker.dlab-ssn '
           '--action {13}'.format(args.key_path, args.key_name, args.workspace_path, args.os_family, args.os_user,
                                  args.cloud_provider, args.region, args.vpc_id, args.subnet_id, args.sg_ids,
-                                 args.infrastructure_tag, args.access_key, args.secret_access_key, args.action))
+                                 args.infrastructure_tag, args.access_key_id, args.secret_access_key, args.action))
 
 
 def terminate_dlab(args):
     # Dropping Dlab environment with selected infrastructure tag
     local('sudo docker run -i -v {0}{1}.pem:/root/keys/{1}.pem -e "aws_region={2}" -e "conf_service_base_name={3}" '
-          '-e "conf_resource=ssn" -e "aws_access_key={4}" -e "aws_secret_access_key={5}" docker.dlab-ssn --action {}'.
-          format(args.key_path, args.key_name, args.region, args.infrastructure_tag, args.access_key,
+          '-e "conf_resource=ssn" -e "aws_access_key={4}" -e "aws_secret_access_key={5}" docker.dlab-ssn --action {6}'.
+          format(args.key_path, args.key_name, args.region, args.infrastructure_tag, args.access_key_id,
                  args.secret_access_key, args.action))
 
 if __name__ == "__main__":
