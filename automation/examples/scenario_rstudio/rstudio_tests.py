@@ -36,12 +36,23 @@ def prepare_rscript(template_path, rscript_name):
     with open(template_path, 'r') as f:
         text = f.read()
     text = text.replace('S3_BUCKET', args.bucket)
+    text = text.replace('MASTER', 'yarn')
     with open('/home/{}/{}.r'.format(args.os_user, rscript_name), 'w') as f:
         f.write(text)
 
 
 def enable_local_kernel():
     local('sed -i "s/^#//g" /home/{0}/.Renviron | sed -i "/emr/s/^/#/g" /home/{0}/.Renviron'.format(args.os_user))
+    local('rm -f metastore_db/db*')
+
+
+def enable_local_kernel_in_template(template_path, rscript_name):
+    with open(template_path, 'r') as f:
+        text = f.read()
+    text = text.replace('S3_BUCKET', args.bucket)
+    text = text.replace('MASTER', 'local[*]')
+    with open('/home/{}/{}.r'.format(args.os_user, rscript_name), 'w') as f:
+        f.write(text)
 
 
 def enable_remote_kernel():
@@ -61,6 +72,8 @@ prepare_rscript('/home/{}/test_rstudio/template_visualization.r'.format(args.os_
 run_rscript('visualization')
 # Running on local kernel
 enable_local_kernel()
+enable_local_kernel_in_template('/home/{}/test_rstudio/template_preparation.r'.format(args.os_user), 'preparation')
+enable_local_kernel_in_template('/home/{}/test_rstudio/template_visualization.r'.format(args.os_user), 'visualization')
 run_rscript('preparation')
 run_rscript('visualization')
 
