@@ -39,7 +39,7 @@ parser.add_argument('--sg_ids', type=str, default='', help='One of more comma-se
 parser.add_argument('--key_path', required=True, type=str, default='', help='Path to admin key (WITHOUT KEY NAME)')
 parser.add_argument('--key_name', required=True, type=str, default='', help='Admin key name (WITHOUT ".pem")')
 parser.add_argument('--workspace_path', type=str, default='', help='Admin key name (WITHOUT ".pem")')
-parser.add_argument('--tag_user_name', required=True, type=str, default='dlab', help='The name of user tag')
+parser.add_argument('--tag_resource_id', required=True, type=str, default='dlab', help='The name of user tag')
 parser.add_argument('--action', required=True, type=str, default='', choices=['build', 'deploy', 'create', 'terminate'],
                     help='Available options: build, deploy, create, terminate')
 args = parser.parse_args()
@@ -89,19 +89,20 @@ def deploy_dlab(args):
           '-e "conf_os_user={4}" -e "conf_cloud_provider={5}" -e "conf_resource=ssn" '
           '-e "aws_ssn_instance_size=t2.medium" -e "aws_region={6}" -e "aws_vpc_id={7}" -e "aws_subnet_id={8}" '
           '-e "aws_security_groups_ids={9}" -e "conf_key_name={1}" -e "conf_service_base_name={10}" '
-          '-e "aws_access_key={11}" -e "aws_secret_access_key={12}" docker.dlab-ssn '
+          '-e "aws_access_key={11}" -e "aws_secret_access_key={12}" -e "conf_tag_resource_id={14}" docker.dlab-ssn '
           '--action {13}'.format(args.key_path, args.key_name, args.workspace_path, args.os_family, args.os_user,
                                  args.cloud_provider, args.region, args.vpc_id, args.subnet_id, args.sg_ids,
-                                 args.infrastructure_tag, args.access_key_id, args.secret_access_key, args.action))
+                                 args.infrastructure_tag, args.access_key_id, args.secret_access_key, args.action,
+                                 args.tag_resource_id))
 
 
 def terminate_dlab(args):
     # Dropping Dlab environment with selected infrastructure tag
     local('sudo docker run -i -v {0}{1}.pem:/root/keys/{1}.pem -e "aws_region={2}" -e "conf_service_base_name={3}" '
-          '-e "conf_resource=ssn" -e "aws_access_key={4}" -e "aws_secret_access_key={5}" -e "conf_tag_user_name={7}" '
+          '-e "conf_resource=ssn" -e "aws_access_key={4}" -e "aws_secret_access_key={5}" '
           'docker.dlab-ssn --action {6}'.
           format(args.key_path, args.key_name, args.region, args.infrastructure_tag, args.access_key_id,
-                 args.secret_access_key, args.action, args.tag_user_name))
+                 args.secret_access_key, args.action))
 
 if __name__ == "__main__":
     if not args.workspace_path:
