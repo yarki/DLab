@@ -80,8 +80,8 @@ cp_config = "Name=CUSTOM_JAR, Args=aws s3 cp /etc/hive/conf/hive-site.xml s3://{
 
 cp_jars = "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/jars_parser.py /tmp/jars_parser.py --endpoint-url {6} --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
           "Name=CUSTOM_JAR, Args=aws s3 cp s3://{0}/key_importer.py /tmp/key_importer.py --endpoint-url {6} --region {2}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar;" \
-          "Name=CUSTOM_JAR, Args=sudo pip install fabric ; /usr/bin/python /tmp/key_importer.py --user_name {4}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
-          "Name=CUSTOM_JAR, Args=sudo pip install fabric ; /usr/bin/python /tmp/jars_parser.py --bucket {0} --emr_version {3} --region {2} --user_name {4} --cluster_name {5}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, args.edge_user_name, args.name, endpoint_url)
+          "Name=CUSTOM_JAR, Args=/usr/bin/python /tmp/key_importer.py --user_name {4}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar; " \
+          "Name=CUSTOM_JAR, Args=/usr/bin/python /tmp/jars_parser.py --bucket {0} --emr_version {3} --region {2} --user_name {4} --cluster_name {5}, ActionOnFailure=TERMINATE_CLUSTER,Jar=command-runner.jar".format(args.s3_bucket, args.release_label, args.region, args.release_label, args.edge_user_name, args.name, endpoint_url)
 
 logfile = '{}_creation.log'.format(args.name)
 logpath = '/response/' + logfile
