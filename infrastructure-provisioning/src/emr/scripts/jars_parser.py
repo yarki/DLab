@@ -35,36 +35,39 @@ if __name__ == "__main__":
     spark_def_path = "/usr/lib/spark/conf/spark-defaults.conf"
     spark_def_path_line1 = subprocess.check_output("cat " + spark_def_path +
                                                    " | grep spark.driver.extraClassPath | awk '{print $2}' | "
-                                                   "sed 's/^:// ; s~jar:~jar ~g; s~/\*:~/\* ~g; s~:~/\* ~g'")
+                                                   "sed 's/^:// ; s~jar:~jar ~g; s~/\*:~/\* ~g; s~:~/\* ~g'",
+                                                   shell=True)
     spark_def_path_line2 = subprocess.check_output("cat " + spark_def_path +
                                                    " | grep spark.driver.extraLibraryPath | awk '{print $2}' | "
-                                                   "sed 's/^:// ; s~jar:~jar ~g; s~/\*:~/\* ~g; s~:\|$~/\* ~g'")
+                                                   "sed 's/^:// ; s~jar:~jar ~g; s~/\*:~/\* ~g; s~:\|$~/\* ~g'",
+                                                   shell=True)
     if args.region == 'us-east-1':
         endpoint = "https://s3.amazonaws.com"
     else:
         endpoint = "https://s3-{}.amazonaws.com".format(args.region)
-    subprocess.Popen('touch /tmp/python_version')
-    python_ver = subprocess.check_output("python3.5 -V 2>/dev/null | awk '{print $2}'")
+    subprocess.Popen('touch /tmp/python_version', shell=True)
+    python_ver = subprocess.check_output("python3.5 -V 2>/dev/null | awk '{print $2}'", shell=True)
     if python_ver != '':
-        subprocess.Popen('echo {} > /tmp/python_version'.format(python_ver))
+        subprocess.Popen('echo {} > /tmp/python_version'.format(python_ver), shell=True)
     else:
-        python_ver = subprocess.check_output("python3.4 -V 2>/dev/null | awk '{print $2}'")
-        subprocess.Popen('echo {} > /tmp/python_version'.format(python_ver))
+        python_ver = subprocess.check_output("python3.4 -V 2>/dev/null | awk '{print $2}'", shell=True)
+        subprocess.Popen('echo {} > /tmp/python_version'.format(python_ver), shell=True)
     subprocess.Popen('/bin/tar -zhcvf /tmp/jars.tar.gz --no-recursion --absolute-names --ignore-failed-read '
                             '/usr/lib/hadoop/* {} {} /usr/lib/hadoop/client/*'.
-                            format(spark_def_path_line1, spark_def_path_line2))
-    subprocess.Popen('/bin/tar -zhcvf /tmp/spark.tar.gz -C /usr/lib/ spark')
-    subprocess.Popen('md5sum /tmp/jars.tar.gz > /tmp/jars-checksum.chk')
-    subprocess.Popen('md5sum /tmp/spark.tar.gz > /tmp/spark-checksum.chk')
+                            format(spark_def_path_line1, spark_def_path_line2), shell=True)
+    subprocess.Popen('/bin/tar -zhcvf /tmp/spark.tar.gz -C /usr/lib/ spark', shell=True)
+    subprocess.Popen('md5sum /tmp/jars.tar.gz > /tmp/jars-checksum.chk', shell=True)
+    subprocess.Popen('md5sum /tmp/spark.tar.gz > /tmp/spark-checksum.chk', shell=True)
     subprocess.Popen('aws s3 cp /tmp/jars.tar.gz s3://{}/jars/{}/ --endpoint-url {} --region {}'.
-                     format(args.bucket, args.emr_version, endpoint, args.region))
+                     format(args.bucket, args.emr_version, endpoint, args.region), shell=True)
     subprocess.Popen('aws s3 cp /tmp/jars-checksum.chk s3://{}/jars/{}/ --endpoint-url {} --region {}'.
-                     format(args.bucket, args.emr_version, endpoint, args.region))
+                     format(args.bucket, args.emr_version, endpoint, args.region), shell=True)
     subprocess.Popen('aws s3 cp {} s3://{}/{}/{}/ --endpoint-url {} --region {}'.
-                     format(spark_def_path, args.bucket, args.user_name, args.cluster_name, endpoint, args.region))
+                     format(spark_def_path, args.bucket, args.user_name, args.cluster_name, endpoint, args.region),
+                     shell=True)
     subprocess.Popen('aws s3 cp /tmp/python_version s3://{}/{}/{}/ --endpoint-url {} --region {}'.
-                     format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region))
+                     format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region), shell=True)
     subprocess.Popen('aws s3 cp /tmp/spark.tar.gz s3://{}/{}/{}/ --endpoint-url {} --region {}'.
-                     format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region))
+                     format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region), shell=True)
     subprocess.Popen('aws s3 cp /tmp/spark-checksum.chk s3://{}/{}/{}/ --endpoint-url {} --region {}'.
-                     format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region))
+                     format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region), shell=True)

@@ -27,4 +27,4 @@ parser.add_argument('--user_name', type=str, default='')
 args = parser.parse_args()
 
 if __name__ == "__main__":
-    subprocess.Popen('cat /tmp/{}.pub >> /home/hadoop/.ssh/authorized_keys'.format(args.user_name))
+    subprocess.Popen('cat /tmp/{}.pub >> /home/hadoop/.ssh/authorized_keys'.format(args.user_name), shell=True)
