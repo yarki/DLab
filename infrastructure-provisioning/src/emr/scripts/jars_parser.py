@@ -48,10 +48,12 @@ if __name__ == "__main__":
     subprocess.Popen('touch /tmp/python_version', shell=True)
     python_ver = subprocess.check_output("python3.5 -V 2>/dev/null | awk '{print $2}'", shell=True)
     if python_ver != '':
-        subprocess.Popen('echo {} > /tmp/python_version'.format(python_ver), shell=True)
+        with open('/tmp/python_version', 'w') as outfile:
+            outfile.write(python_ver)
     else:
         python_ver = subprocess.check_output("python3.4 -V 2>/dev/null | awk '{print $2}'", shell=True)
-        subprocess.Popen('echo {} > /tmp/python_version'.format(python_ver), shell=True)
+        with open('/tmp/python_version', 'w') as outfile:
+            outfile.write(python_ver)
     subprocess.Popen('/bin/tar -zhcvf /tmp/jars.tar.gz --no-recursion --absolute-names --ignore-failed-read '
                             '/usr/lib/hadoop/* {} {} /usr/lib/hadoop/client/*'.
                             format(spark_def_path_line1, spark_def_path_line2), shell=True)
