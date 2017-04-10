@@ -58,8 +58,12 @@ if __name__ == "__main__":
                             '/usr/lib/hadoop/* {} {} /usr/lib/hadoop/client/*'.
                             format(spark_def_path_line1, spark_def_path_line2), shell=True)
     subprocess.Popen('/bin/tar -zhcvf /tmp/spark.tar.gz -C /usr/lib/ spark', shell=True)
-    subprocess.Popen('md5sum /tmp/jars.tar.gz > /tmp/jars-checksum.chk', shell=True)
-    subprocess.Popen('md5sum /tmp/spark.tar.gz > /tmp/spark-checksum.chk', shell=True)
+    md5sum = subprocess.check_output('md5sum /tmp/jars.tar.gz', shell=True)
+    with open('/tmp/jars-checksum.chk', 'w') as outfile:
+        outfile.write(md5sum)
+    md5sum = subprocess.check_output('md5sum /tmp/spark.tar.gz', shell=True)
+    with open('/tmp/spark-checksum.chk', 'w') as outfile:
+        outfile.write(md5sum)
     subprocess.Popen('aws s3 cp /tmp/jars.tar.gz s3://{}/jars/{}/ --endpoint-url {} --region {}'.
                      format(args.bucket, args.emr_version, endpoint, args.region), shell=True)
     subprocess.Popen('aws s3 cp /tmp/jars-checksum.chk s3://{}/jars/{}/ --endpoint-url {} --region {}'.
