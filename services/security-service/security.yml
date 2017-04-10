@@ -34,7 +34,7 @@ ldapSearch:
       - gidNumber
     timeLimit: 0
     base: dc=example,dc=com
-    filter: "(&(objectClass=inetOrgPerson)(uid=%username%))"
+    filter: "(&(objectClass=inetOrgPerson)(mail=%username%))"
     searchResultProcessor:
       language: python
 #      path: c:\tmp\enrich.py
@@ -45,7 +45,7 @@ ldapSearch:
           userInfo=context['userInfo']
           if not key in userInfo:
             raise Exception('Python LDAP UserInfo not found for '+key)
-          uid= userInfo[key]
+          uid = userInfo[key]
           cn = context['userInfo'][key]['cn'].split(' ')
           ui.setFirstName(cn[0])
           ui.setLastName(cn[1])

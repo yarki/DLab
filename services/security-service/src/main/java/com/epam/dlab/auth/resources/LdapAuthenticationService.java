@@ -132,7 +132,8 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		threadpool.submit(()->{
 			try {
 				ldapUserDAO.getUserInfo(username,password);
-				log.debug("User Authenticated: {}",username);
+//				log.debug("User Authenticated: {}",username);
+				log.info("User Authenticated: {}",username);
 				loginConveyor.add(token,"USER LOGGED IN",LoginStep.LDAP_LOGIN);
 			} catch (Exception e) {
 				loginConveyor.cancel(token,LoginStep.LDAP_USER_INFO_ERROR,"Username or password are not valid");

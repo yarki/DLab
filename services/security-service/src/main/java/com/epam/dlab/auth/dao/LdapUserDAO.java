@@ -64,6 +64,7 @@ public class LdapUserDAO {
         try (ReturnableConnection userRCon = new ReturnableConnection(usersPool)) {
             LdapConnection userCon = userRCon.getConnection();
             // just confirm user exists
+            LOG.info("Biding with template : "  + bindTemplate + " and username: " + username);
             String bind = String.format(bindTemplate, username);
             userCon.bind(bind, password);
             userCon.unBind();
@@ -89,6 +90,7 @@ public class LdapUserDAO {
                 SearchRequest sr = req.buildSearchRequest(new HashMap<String, Object>() {
                     private static final long serialVersionUID = 1L;
                     {
+                        LOG.info("Putting username: " + username);
                         put(Pattern.quote("%username%"), username);
                     }
                 });
