@@ -19,6 +19,7 @@
 # ******************************************************************************
 
 import subprocess
+import os
 import argparse
 
 
@@ -45,7 +46,7 @@ if __name__ == "__main__":
         endpoint = "https://s3.amazonaws.com"
     else:
         endpoint = "https://s3-{}.amazonaws.com".format(args.region)
-    subprocess.Popen('touch /tmp/python_version', shell=True)
+    os.system('touch /tmp/python_version')
     python_ver = subprocess.check_output("python3.5 -V 2>/dev/null | awk '{print $2}'", shell=True)
     if python_ver != '':
         with open('/tmp/python_version', 'w') as outfile:
@@ -54,26 +55,23 @@ if __name__ == "__main__":
         python_ver = subprocess.check_output("python3.4 -V 2>/dev/null | awk '{print $2}'", shell=True)
         with open('/tmp/python_version', 'w') as outfile:
             outfile.write(python_ver)
-    subprocess.Popen('/bin/tar -zhcvf /tmp/jars.tar.gz --no-recursion --absolute-names --ignore-failed-read '
-                     '/usr/lib/hadoop/* {} {} /usr/lib/hadoop/client/*'.
-                     format(spark_def_path_line1, spark_def_path_line2), shell=True)
-    subprocess.Popen('/bin/tar -zhcvf /tmp/spark.tar.gz -C /usr/lib/spark', shell=True)
+    os.system('/bin/tar -zhcvf /tmp/jars.tar.gz --no-recursion --absolute-names --ignore-failed-read /usr/lib/hadoop/* {} {} /usr/lib/hadoop/client/*'.format(spark_def_path_line1, spark_def_path_line2))
+    os.system('/bin/tar -zhcvf /tmp/spark.tar.gz -C /usr/lib/ spark')
     md5sum = subprocess.check_output('md5sum /tmp/jars.tar.gz', shell=True)
     with open('/tmp/jars-checksum.chk', 'w') as outfile:
         outfile.write(md5sum)
     md5sum = subprocess.check_output('md5sum /tmp/spark.tar.gz', shell=True)
     with open('/tmp/spark-checksum.chk', 'w') as outfile:
         outfile.write(md5sum)
-    subprocess.Popen('aws s3 cp /tmp/jars.tar.gz s3://{}/jars/{}/ --endpoint-url {} --region {}'.
-                     format(args.bucket, args.emr_version, endpoint, args.region), shell=True)
-    subprocess.Popen('aws s3 cp /tmp/jars-checksum.chk s3://{}/jars/{}/ --endpoint-url {} --region {}'.
-                     format(args.bucket, args.emr_version, endpoint, args.region), shell=True)
-    subprocess.Popen('aws s3 cp {} s3://{}/{}/{}/ --endpoint-url {} --region {}'.
-                     format(spark_def_path, args.bucket, args.user_name, args.cluster_name, endpoint, args.region),
-                     shell=True)
-    subprocess.Popen('aws s3 cp /tmp/python_version s3://{}/{}/{}/ --endpoint-url {} --region {}'.
-                     format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region), shell=True)
-    subprocess.Popen('aws s3 cp /tmp/spark.tar.gz s3://{}/{}/{}/ --endpoint-url {} --region {}'.
-                     format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region), shell=True)
-    subprocess.Popen('aws s3 cp /tmp/spark-checksum.chk s3://{}/{}/{}/ --endpoint-url {} --region {}'.
-                     format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region), shell=True)
+    os.system('aws s3 cp /tmp/jars.tar.gz s3://{}/jars/{}/ --endpoint-url {} --region {}'.
+              format(args.bucket, args.emr_version, endpoint, args.region))
+    os.system('aws s3 cp /tmp/jars-checksum.chk s3://{}/jars/{}/ --endpoint-url {} --region {}'.
+              format(args.bucket, args.emr_version, endpoint, args.region))
+    os.system('aws s3 cp {} s3://{}/{}/{}/ --endpoint-url {} --region {}'.
+              format(spark_def_path, args.bucket, args.user_name, args.cluster_name, endpoint, args.region))
+    os.system('aws s3 cp /tmp/python_version s3://{}/{}/{}/ --endpoint-url {} --region {}'.
+              format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region))
+    os.system('aws s3 cp /tmp/spark.tar.gz s3://{}/{}/{}/ --endpoint-url {} --region {}'.
+              format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region))
+    os.system('aws s3 cp /tmp/spark-checksum.chk s3://{}/{}/{}/ --endpoint-url {} --region {}'.
+              format(args.bucket, args.user_name, args.cluster_name, endpoint, args.region))
