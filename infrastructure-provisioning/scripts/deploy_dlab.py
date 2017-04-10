@@ -39,6 +39,7 @@ parser.add_argument('--sg_ids', type=str, default='', help='One of more comma-se
 parser.add_argument('--key_path', required=True, type=str, default='', help='Path to admin key (WITHOUT KEY NAME)')
 parser.add_argument('--key_name', required=True, type=str, default='', help='Admin key name (WITHOUT ".pem")')
 parser.add_argument('--workspace_path', type=str, default='', help='Admin key name (WITHOUT ".pem")')
+parser.add_argument('--tag_user_name', required=True, type=str, default='dlab', help='The name of user tag')
 parser.add_argument('--action', required=True, type=str, default='', choices=['build', 'deploy', 'create', 'terminate'],
                     help='Available options: build, deploy, create, terminate')
 args = parser.parse_args()
@@ -97,9 +98,10 @@ def deploy_dlab(args):
 def terminate_dlab(args):
     # Dropping Dlab environment with selected infrastructure tag
     local('sudo docker run -i -v {0}{1}.pem:/root/keys/{1}.pem -e "aws_region={2}" -e "conf_service_base_name={3}" '
-          '-e "conf_resource=ssn" -e "aws_access_key={4}" -e "aws_secret_access_key={5}" docker.dlab-ssn --action {6}'.
+          '-e "conf_resource=ssn" -e "aws_access_key={4}" -e "aws_secret_access_key={5}" -e "conf_tag_user_name={7}" '
+          'docker.dlab-ssn --action {6}'.
           format(args.key_path, args.key_name, args.region, args.infrastructure_tag, args.access_key_id,
-                 args.secret_access_key, args.action))
+                 args.secret_access_key, args.action, args.tag_user_name))
 
 if __name__ == "__main__":
     if not args.workspace_path:
