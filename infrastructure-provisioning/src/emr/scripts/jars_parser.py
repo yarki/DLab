@@ -55,9 +55,9 @@ if __name__ == "__main__":
         with open('/tmp/python_version', 'w') as outfile:
             outfile.write(python_ver)
     subprocess.Popen('/bin/tar -zhcvf /tmp/jars.tar.gz --no-recursion --absolute-names --ignore-failed-read '
-                            '/usr/lib/hadoop/* {} {} /usr/lib/hadoop/client/*'.
-                            format(spark_def_path_line1, spark_def_path_line2), shell=True)
-    subprocess.Popen('/bin/tar -zhcvf /tmp/spark.tar.gz -C /usr/lib/ spark', shell=True)
+                     '/usr/lib/hadoop/* {} {} /usr/lib/hadoop/client/*'.
+                     format(spark_def_path_line1, spark_def_path_line2), shell=True)
+    subprocess.Popen('/bin/tar -zhcvf /tmp/spark.tar.gz -C /usr/lib/spark', shell=True)
     md5sum = subprocess.check_output('md5sum /tmp/jars.tar.gz', shell=True)
     with open('/tmp/jars-checksum.chk', 'w') as outfile:
         outfile.write(md5sum)
