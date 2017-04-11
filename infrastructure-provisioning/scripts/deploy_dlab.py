@@ -23,23 +23,23 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--infrastructure_tag', required=True, type=str, help='unique name for DLab environment')
-parser.add_argument('--access_key_id', required=True, type=str, default='', help='AWS Access Key ID')
-parser.add_argument('--secret_access_key', required=True, type=str, default='', help='AWS Secret Access Key')
-parser.add_argument('--region', required=True, type=str, default='', help='AWS region')
-parser.add_argument('--os_family', required=True, type=str, default='',
+parser.add_argument('--infrastructure_tag', type=str, help='unique name for DLab environment')
+parser.add_argument('--access_key_id', type=str, default='', help='AWS Access Key ID')
+parser.add_argument('--secret_access_key', type=str, default='', help='AWS Secret Access Key')
+parser.add_argument('--region', type=str, default='', help='AWS region')
+parser.add_argument('--os_family', type=str, default='',
                     help='Operating system type. Available options: debian, redhat')
-parser.add_argument('--cloud_provider', required=True, type=str, default='',
+parser.add_argument('--cloud_provider', type=str, default='',
                     help='Where DLab should be deployed. Available options: aws')
-parser.add_argument('--os_user', required=True, type=str, default='',
+parser.add_argument('--os_user', type=str, default='',
                     help='Name of OS user. By default for Debian - ubuntu, RedHat - ec2-user')
 parser.add_argument('--vpc_id', type=str, default='', help='AWS VPC ID')
 parser.add_argument('--subnet_id', type=str, default='', help='AWS Subnet ID')
 parser.add_argument('--sg_ids', type=str, default='', help='One of more comma-separated Security groups IDs for SSN')
-parser.add_argument('--key_path', required=True, type=str, default='', help='Path to admin key (WITHOUT KEY NAME)')
-parser.add_argument('--key_name', required=True, type=str, default='', help='Admin key name (WITHOUT ".pem")')
+parser.add_argument('--key_path', type=str, default='', help='Path to admin key (WITHOUT KEY NAME)')
+parser.add_argument('--key_name', type=str, default='', help='Admin key name (WITHOUT ".pem")')
 parser.add_argument('--workspace_path', type=str, default='', help='Admin key name (WITHOUT ".pem")')
-parser.add_argument('--tag_resource_id', required=True, type=str, default='dlab', help='The name of user tag')
+parser.add_argument('--tag_resource_id', type=str, default='dlab', help='The name of user tag')
 parser.add_argument('--action', required=True, type=str, default='', choices=['build', 'deploy', 'create', 'terminate'],
                     help='Available options: build, deploy, create, terminate')
 args = parser.parse_args()

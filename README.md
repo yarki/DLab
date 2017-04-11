@@ -177,7 +177,7 @@ To build SSN node, following steps should be executed:
 2.  Go to *dlab* directory.
 3.  Execute following script:
 ```
-/bin/bash infrastructure-provisioning/scripts/deploy_dlab.py --infrastructure_tag dlab_test --access_key_id XXXXXXX --secret_access_key XXXXXXXXXX --region us-west-2 --os_family debian --cloud_provider aws --os_user ubuntu --vpc_id vpc-xxxxx --subnet_id subnet-xxxxx --sg_ids sg-xxxxx,sg-xxxx --key_path /root/ --key_name Test --tag_resource_id dlab --action create
+/usr/bin/python infrastructure-provisioning/scripts/deploy_dlab.py --infrastructure_tag dlab_test --access_key_id XXXXXXX --secret_access_key XXXXXXXXXX --region us-west-2 --os_family debian --cloud_provider aws --os_user ubuntu --vpc_id vpc-xxxxx --subnet_id subnet-xxxxx --sg_ids sg-xxxxx,sg-xxxx --key_path /root/ --key_name Test --tag_resource_id dlab --action create
 ```
 
 This bash script will build front-end and back-end part of DLab, create SSN docker image and run Docker container for creating SSN node.
@@ -219,7 +219,7 @@ After SSN node deployment following AWS resources will be created:
 Terminating SSN node will also remove all nodes and components related to it. Basically, terminating Self-service node will terminate all DLab’s infrastructure.
 Example of command for terminating DLab environment:
 ```
-/bin/bash infrastructure-provisioning/scripts/deploy_dlab.sh --infrastructure_tag dlab_test --access_key_id XXXXXXX --secret_access_key XXXXXXXXXX --region us-west-2 --key_path /root/ --key_name Test --action terminate
+/usr/bin/python infrastructure-provisioning/scripts/deploy_dlab.py --infrastructure_tag dlab_test --access_key_id XXXXXXX --secret_access_key XXXXXXXXXX --region us-west-2 --key_path /root/ --key_name Test --action terminate
 ```
 List of parameters for SSN node termination:
 
@@ -789,7 +789,7 @@ Using this Docker file, all required scripts and files will be copied to Docker 
 
 -   Docker command for building SSN:
 ```
-docker run -i -v /root/KEYNAME.pem:/root/keys/KEYNAME.pem –v /web_app:/root/web_app -e "conf_os_family=debian" -e "conf_os_user=ubuntu" -e "conf_cloud_provider=aws" -e "conf_resource=ssn" -e "aws_ssn_instance_size=t2.medium" -e "aws_region=us-west-2" -e "aws_vpc_id=vpc-111111" -e "aws_subnet_id=subnet-111111" -e "aws_security_groups_ids=sg-11111,sg-22222,sg-33333" -e "conf_key_name=KEYNAME" -e "conf_service_base_name=dlab_test" -e "aws_access_key=Access_Key_ID" -e "aws_secret_access_key=Secret_Access_Key" docker.dlab-ssn --action create ;
+docker run -i -v /root/KEYNAME.pem:/root/keys/KEYNAME.pem –v /web_app:/root/web_app -e "conf_os_family=debian" -e "conf_os_user=ubuntu" -e "conf_cloud_provider=aws" -e "conf_resource=ssn" -e "aws_ssn_instance_size=t2.medium" -e "aws_region=us-west-2" -e "aws_vpc_id=vpc-111111" -e "aws_subnet_id=subnet-111111" -e "aws_security_groups_ids=sg-11111,sg-22222,sg-33333" -e "conf_key_name=KEYNAME" -e "conf_service_base_name=dlab_test" -e "aws_access_key=Access_Key_ID" -e "aws_secret_access_key=Secret_Access_Key" -e "conf_tag_resource_id=dlab" docker.dlab-ssn --action create ;
 ```
 
 -   Docker executes *entrypoint.py* script with action *create*. *Entrypoint.py* will set environment variables, which were provided from Docker and execute *general/api/create.py* script:
