@@ -497,6 +497,7 @@ In order to start development of Front-end Web UI part of DLab - Git repository 
 
 -   Git 1.7 or higher
 -   Maven 3.3 or higher
+-   Python 2.7
 -   Mongo DB 3.0 or higher
 -   Docker 1.12 - Infrastructure provisioning
 -   Java Development Kit 8 – Back-end
