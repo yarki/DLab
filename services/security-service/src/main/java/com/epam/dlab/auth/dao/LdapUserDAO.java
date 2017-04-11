@@ -63,12 +63,52 @@ public class LdapUserDAO {
     public UserInfo getUserInfo(String username, String password) throws Exception {
         try (ReturnableConnection userRCon = new ReturnableConnection(usersPool)) {
             LdapConnection userCon = userRCon.getConnection();
+            // TODO: search user by mail
+            // get searchen user CN
+            // bind by CN and password
+            // search( String baseDn, String filter, SearchScope scope, String... attributes )
+            for(Request request: requests) {
+                LOG.info("----- request: ", request.getName());
+                if (request.getName().equalsIgnoreCase("userInfo")) {
+                    Map<String, Object> conextTree = new HashMap<>();
+                    SearchRequest sr = request.buildSearchRequest(new HashMap<String, Object>() {
+                        private static final long serialVersionUID = 1L;
+
+                        {
+                            LOG.info("Putting user mail: " + username);
+                            put(Pattern.quote("%mail%"), username);
+                        }
+                    });
+                    String filter = sr.getFilter().toString();
+                    Map<String, Object> contextMap = LdapFilterCache.getInstance().getLdapFilterInfo(filter);
+                    SearchResultToDictionaryMapper mapper = new SearchResultToDictionaryMapper(request.getName(),
+                            conextTree);
+                    if (contextMap == null) {
+                        LOG.debug("Retrieving new branch {} for {}", request.getName(), filter);
+                        try (SearchCursor cursor = userCon.search(sr)) {
+                            contextMap = mapper.transformSearchResult(cursor);
+                                LOG.info("---------------");
+                            for (Map.Entry<String, Object> entry: contextMap.entrySet()) {
+                                LOG.info("----  {} = {} ---- ", entry.getKey(), entry.getValue());
+                            }
+                                LOG.info("-------------------");
+                        }
+                        if (request.isCache()) {
+                            LdapFilterCache.getInstance().save(filter, contextMap, request.getExpirationTimeMsec());
+                        }
+                    } else {
+                        LOG.debug("Restoring old branch {} for {}: {}", request.getName(), filter, contextMap);
+                        mapper.getBranch().putAll(contextMap);
+                    }
+                }
+
+            }
             // just confirm user exists
-            LOG.info("Biding with template : "  + bindTemplate + " and username: " + username);
-            String bind = String.format(bindTemplate, username);
-            userCon.bind(bind, password);
-            userCon.unBind();
-            LOG.debug("User '{}' identified.", username);
+//            LOG.info("Biding with template : "  + bindTemplate + " and username: " + username);
+//            String bind = String.format(bindTemplate, username);
+//            userCon.bind(bind, password);
+//            userCon.unBind();
+//            LOG.debug("User '{}' identified.", username);
             return new UserInfo(username, "******");
         } catch(Exception e){
             LOG.error("LDAP getUserInfo authentication error for username '{}': {}",username ,e.getMessage());
@@ -90,8 +130,8 @@ public class LdapUserDAO {
                 SearchRequest sr = req.buildSearchRequest(new HashMap<String, Object>() {
                     private static final long serialVersionUID = 1L;
                     {
-                        LOG.info("Putting username: " + username);
-                        put(Pattern.quote("%username%"), username);
+                        LOG.info("Putting user mail: " + username);
+                        put(Pattern.quote("%mail%"), username);
                     }
                 });
                 String filter = sr.getFilter().toString();

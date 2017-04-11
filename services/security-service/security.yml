@@ -23,8 +23,17 @@ ldapConnectionConfig:
   ldapPort: 389
   name: cn=admin,dc=example,dc=com
   credentials: ldap
-ldapBindTemplate: uid=%s,ou=People,dc=example,dc=com
-ldapSearch: 
+ldapBindTemplate: cn=%s,ou=People,dc=example,dc=com
+ldapSearch:
+   - name: userInfo
+      cache: true
+      expirationTimeMsec: 600000
+      scope: SUBTREE
+      attributes:
+        - cn
+      timeLimit: 0
+      base: dc=example,dc=com
+      filter: "(&(objectClass=inetOrgPerson)(mail=%mail%))"
   - name: userInfo
     cache: true
     expirationTimeMsec: 600000
@@ -34,18 +43,18 @@ ldapSearch:
       - gidNumber
     timeLimit: 0
     base: dc=example,dc=com
-    filter: "(&(objectClass=inetOrgPerson)(mail=%username%))"
+    filter: "(&(objectClass=inetOrgPerson)(mail=%mail%))"
     searchResultProcessor:
       language: python
 #      path: c:\tmp\enrich.py
       code: |
         def enrichUserInfo(ui,context):
           name = ui.getName()
-          key = ('uid='+name+',ou=People,dc=example,dc=com').lower()
+          key = ('mail='+name+',ou=People,dc=example,dc=com').lower()
           userInfo=context['userInfo']
           if not key in userInfo:
             raise Exception('Python LDAP UserInfo not found for '+key)
-          uid = userInfo[key]
+          mail = userInfo[key]
           cn = context['userInfo'][key]['cn'].split(' ')
           ui.setFirstName(cn[0])
           ui.setLastName(cn[1])
@@ -66,13 +75,13 @@ ldapSearch:
       code: |
         var enrichUserInfo = function(ui,context) {
           name = ui.getName();
-          key = ('uid='+name+',ou=People,dc=example,dc=com').toLowerCase();
+          key = ('mail='+name+',ou=People,dc=example,dc=com').toLowerCase();
           userInfo=context['userInfo'];
           if( userInfo[key] == undefined ) {
             throw 'JavaScript LDAP UserInfo not found for '+key;
           }
-          uid= userInfo[key];
-          userGid = uid['gidnumber'];
+          mail= userInfo[key];
+          userGid = mail['gidnumber'];
           groupInfo=context['groupInfo'];
           for( dn in groupInfo ) {
             group = groupInfo[dn];
@@ -123,7 +132,7 @@ server:
 -->
 
 userInfoPersistenceEnabled: true
-awsUserIdentificationEnabled: true
+awsUserIdentificationEnabled: false
 
 logging:
   level: INFO

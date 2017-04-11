@@ -99,9 +99,10 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 		String accessToken = credential.getAccessToken();
 		String remoteIp    = request.getRemoteAddr();
 
-		log.debug("validating username:{} password:****** token:{} ip:{}", username, accessToken,remoteIp);
+		log.info("validating username:{} password:****** token:{} ip:{}", username, accessToken,remoteIp);
 		String token = getRandomToken();
 		if (LoginCache.getInstance().getUserInfo(accessToken) != null) {
+			log.info("Username:{} token:{} ip:{} got from cache", username, accessToken,remoteIp);
 			return Response.ok(accessToken).build();
 		} else {
 			CompletableFuture<UserInfo> uiFuture = loginConveyor.startUserInfoBuild(token,username);
@@ -109,8 +110,11 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 
 			submitLdapLogin(username,password,token);
 			submitLdapInfo(username,token);
-			submitAwsCheck(username,token);
-			submitAwsKeys(username,token);
+
+			if(config.isAwsUserIdentificationEnabled()) {
+				submitAwsCheck(username,token);
+				submitAwsKeys(username,token);
+			}
 
 			try {
 				UserInfo userInfo = uiFuture.get(10,TimeUnit.SECONDS);
