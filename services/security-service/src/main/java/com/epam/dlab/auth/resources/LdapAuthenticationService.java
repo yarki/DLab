@@ -109,7 +109,7 @@ public class LdapAuthenticationService extends AbstractAuthenticationService<Sec
 			loginConveyor.add(token,remoteIp, LoginStep.REMOTE_IP);
 
 			submitLdapLogin(username,password,token);
-			submitLdapInfo(username,token);
+//			submitLdapInfo(username,token);
 
 			if(config.isAwsUserIdentificationEnabled()) {
 				submitAwsCheck(username,token);

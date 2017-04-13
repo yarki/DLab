@@ -61,6 +61,7 @@ public class LdapUserDAO {
     }
 
     public UserInfo getUserInfo(String username, String password) throws Exception {
+        String cn = null;
         try (ReturnableConnection userRCon = new ReturnableConnection(usersPool)) {
             LdapConnection userCon = userRCon.getConnection();
             // TODO: search user by mail
@@ -68,9 +69,9 @@ public class LdapUserDAO {
             // bind by CN and password
             // search( String baseDn, String filter, SearchScope scope, String... attributes )
             for(Request request: requests) {
-                LOG.info("----- request: ", request.getName());
+                LOG.info("----- request: {}", request.getName());
                 if (request.getName().equalsIgnoreCase("userInfo")) {
-                    Map<String, Object> conextTree = new HashMap<>();
+//                    Map<String, Object> conextTree = new HashMap<String, Object>();
                     SearchRequest sr = request.buildSearchRequest(new HashMap<String, Object>() {
                         private static final long serialVersionUID = 1L;
 
@@ -82,33 +83,36 @@ public class LdapUserDAO {
                     String filter = sr.getFilter().toString();
                     Map<String, Object> contextMap = LdapFilterCache.getInstance().getLdapFilterInfo(filter);
                     SearchResultToDictionaryMapper mapper = new SearchResultToDictionaryMapper(request.getName(),
-                            conextTree);
-                    if (contextMap == null) {
+                            new HashMap<String, Object>());
                         LOG.debug("Retrieving new branch {} for {}", request.getName(), filter);
                         try (SearchCursor cursor = userCon.search(sr)) {
                             contextMap = mapper.transformSearchResult(cursor);
-                                LOG.info("---------------");
+
+                            LOG.info("---------------");
                             for (Map.Entry<String, Object> entry: contextMap.entrySet()) {
-                                LOG.info("----  {} = {} ---- ", entry.getKey(), entry.getValue());
+                                LOG.info("----  {} =:= {} ---- ", entry.getKey(), entry.getValue());
+                                LOG.info("----  {} =:= {} ---- ", "cn" , ((Map)entry.getValue()).get("cn"));
+                                cn = ((Map)entry.getValue()).get("cn").toString();
                             }
-                                LOG.info("-------------------");
+                            LOG.info("-------------------");
+
+                            LOG.info("=================");
+                            LOG.info("CN : " + contextMap.get("cn"));
+                            LOG.info("=================");
                         }
                         if (request.isCache()) {
                             LdapFilterCache.getInstance().save(filter, contextMap, request.getExpirationTimeMsec());
                         }
-                    } else {
-                        LOG.debug("Restoring old branch {} for {}: {}", request.getName(), filter, contextMap);
-                        mapper.getBranch().putAll(contextMap);
                     }
-                }
+//
 
             }
             // just confirm user exists
-//            LOG.info("Biding with template : "  + bindTemplate + " and username: " + username);
-//            String bind = String.format(bindTemplate, username);
-//            userCon.bind(bind, password);
-//            userCon.unBind();
-//            LOG.debug("User '{}' identified.", username);
+            LOG.info("Biding with template : "  + bindTemplate + " and username: " + username);
+            String bind = String.format(bindTemplate, cn);
+            userCon.bind(bind, password);
+            userCon.unBind();
+            LOG.debug("User '{}' identified.", username);
             return new UserInfo(username, "******");
         } catch(Exception e){
             LOG.error("LDAP getUserInfo authentication error for username '{}': {}",username ,e.getMessage());

@@ -25,15 +25,15 @@ ldapConnectionConfig:
   credentials: ldap
 ldapBindTemplate: cn=%s,ou=People,dc=example,dc=com
 ldapSearch:
-   - name: userInfo
-      cache: true
-      expirationTimeMsec: 600000
-      scope: SUBTREE
-      attributes:
-        - cn
-      timeLimit: 0
-      base: dc=example,dc=com
-      filter: "(&(objectClass=inetOrgPerson)(mail=%mail%))"
+#  - name: userLookUp
+#    cache: true
+#    expirationTimeMsec: 600000
+#    scope: SUBTREE
+#    attributes:
+#      - uid
+#    timeLimit: 0
+#    base: dc=example,dc=com
+#    filter: "(&(objectClass=inetOrgPerson)(mail=%mail%))"
   - name: userInfo
     cache: true
     expirationTimeMsec: 600000
