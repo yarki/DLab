@@ -3,7 +3,7 @@
 #Switch on/off developer mode here
 <#assign DEV_MODE="false">
 #devMode: server
-#devMode: ${DEV_MODE}
+devMode: ${DEV_MODE}
 
 mongo:
   host: localhost
