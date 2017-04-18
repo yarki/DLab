@@ -45,6 +45,9 @@ import java.util.regex.Pattern;
 public class LdapUserDAO {
 
     public static final String CN = "cn";
+
+    // the request from security.yml for user look up by one of the parameters (mail or phone).
+    //  configured in the same request configuration under "filter" key: "(&(objectClass=inetOrgPerson)(mail=%mail%))"
     public static final String USER_LOOK_UP = "userLookUp";
     private final LdapConnectionConfig connConfig;
     private final List<Request> requests;
@@ -65,11 +68,12 @@ public class LdapUserDAO {
     }
 
     public UserInfo getUserInfo(String username, String password) throws Exception {
-        String cn = null;
+        Map<String, Object> contextMap = null;
         try (ReturnableConnection userRCon = new ReturnableConnection(usersPool)) {
             LdapConnection userCon = userRCon.getConnection();
 
-            cn = searchUsersCN(username, userCon);
+            contextMap = searchUsersCN(username, userCon);
+            String cn = contextMap.get(CN).toString();
             bindUser(username, password, cn, userCon);
 
             UserInfo userInfo = new UserInfo(username, "******");
@@ -89,8 +93,8 @@ public class LdapUserDAO {
         LOG.debug("User '{}' identified.", username);
     }
 
-    private String searchUsersCN(final String username, LdapConnection userCon) throws IOException, LdapException {
-        String cn = null;
+    private Map<String, Object> searchUsersCN(final String username, LdapConnection userCon, String... attributes) throws IOException, LdapException {
+        Map<String, Object> contextMap = new HashMap();
         for(Request request: requests) {
             if (request.getName().equalsIgnoreCase(USER_LOOK_UP)) {
                 LOG.info("Request: {}", request.getName());
@@ -103,24 +107,21 @@ public class LdapUserDAO {
                     }
                 });
                 String filter = sr.getFilter().toString();
-                Map<String, Object> contextMap = LdapFilterCache.getInstance().getLdapFilterInfo(filter);
+                contextMap = LdapFilterCache.getInstance().getLdapFilterInfo(filter);
                 SearchResultToDictionaryMapper mapper = new SearchResultToDictionaryMapper(request.getName(),
-                        new HashMap<String, Object>());
+                        new HashMap<>());
                     LOG.debug("Retrieving new branch {} for {}", request.getName(), filter);
                     try (SearchCursor cursor = userCon.search(sr)) {
                         contextMap = mapper.transformSearchResult(cursor);
-                        for (Map.Entry<String, Object> entry: contextMap.entrySet()) {
-                            cn = ((Map)entry.getValue()).get(CN).toString();
-                        }
                     }
                 }
         }
-        return cn;
+        return contextMap;
     }
 
     public UserInfo enrichUserInfo(final UserInfo userInfo) throws Exception {
         LOG.debug("Enriching user info for user: {}", userInfo);
-        String cn = null;
+
         String username = userInfo.getName();
         UserInfo ui = userInfo.withToken("******");
         try (ReturnableConnection searchRCon = new ReturnableConnection(searchPool)) {
@@ -130,7 +131,7 @@ public class LdapUserDAO {
                 if (req == null ) {
                     continue;
                 } else if (req.getName().equalsIgnoreCase(USER_LOOK_UP)) {
-                    cn = searchUsersCN(username, searchCon);
+                    String cn = searchUsersCN(username, searchCon).get(CN).toString();
                     if (null!=cn) {
                         ui.addKey(CN, cn);
                     }

@@ -33,7 +33,7 @@ ldapSearch:
       - cn
     timeLimit: 0
     base: dc=example,dc=com
-    filter: "(&(objectClass=inetOrgPerson)(phone=%mail%))"
+    filter: "(&(objectClass=inetOrgPerson)(mail=%mail%))"
   - name: userInfo
     cache: true
     expirationTimeMsec: 600000
