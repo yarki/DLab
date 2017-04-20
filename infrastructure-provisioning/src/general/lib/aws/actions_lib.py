@@ -116,7 +116,7 @@ def create_tag(resource, tag):
                     'Value': os.environ['conf_service_base_name']
                 }
             ]
-        )
+        )test
     except Exception as err:
         logging.info("Unable to create Tag: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         append_result(str({"error": "Unable to create Tag", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
