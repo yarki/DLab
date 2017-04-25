@@ -18,7 +18,10 @@ public class PropertiesResolver {
     //keys from application.properties(dev-application.properties)
     private static String CONF_FILE_LOCATION_PROPERTY = "conf.file.location";
     private static String KEYS_DIRECTORY_LOCATION_PROPERTY = "keys.directory.location";
-    private static String PYTHON_FILES_LOCATION_PROPERTY = "scenario.jupyter.files.location";
+    private static String NOTEBOOK_TEST_DATA_COPY_SCRIPT = "notebook.test.data.copy.script";
+    private static String JUPYTER_FILES_LOCATION_PROPERTY = "scenario.jupyter.files.location";
+    private static String RSTUDIO_FILES_LOCATION_PROPERTY = "scenario.rstudio.files.location";
+    private static String ZEPPELIN_FILES_LOCATION_PROPERTY = "scenario.zeppelin.files.location";
     private static String CLUSTER_CONFIG_FILE_LOCATION_PROPERTY = "ec2.config.files.location";
 
     private static Properties properties = new Properties();
@@ -49,7 +52,10 @@ public class PropertiesResolver {
             // get the property value and print it out
             LOGGER.info(properties.getProperty(CONF_FILE_LOCATION_PROPERTY));
             LOGGER.info(properties.getProperty(KEYS_DIRECTORY_LOCATION_PROPERTY));
-            LOGGER.info(properties.getProperty(PYTHON_FILES_LOCATION_PROPERTY));
+            LOGGER.info(properties.getProperty(NOTEBOOK_TEST_DATA_COPY_SCRIPT));
+            LOGGER.info(properties.getProperty(JUPYTER_FILES_LOCATION_PROPERTY));
+            LOGGER.info(properties.getProperty(RSTUDIO_FILES_LOCATION_PROPERTY));
+            LOGGER.info(properties.getProperty(ZEPPELIN_FILES_LOCATION_PROPERTY));
             LOGGER.info(properties.getProperty(CLUSTER_CONFIG_FILE_LOCATION_PROPERTY ));
 
         } catch (IOException ex) {
@@ -81,8 +87,20 @@ public class PropertiesResolver {
         return properties.getProperty(KEYS_DIRECTORY_LOCATION_PROPERTY);
     }
 
-    public static String getPythonFilesLocation() {
-        return properties.getProperty(PYTHON_FILES_LOCATION_PROPERTY);
+    public static String getNotebookTestDataCopyScriptLocation() {
+        return properties.getProperty(NOTEBOOK_TEST_DATA_COPY_SCRIPT);
+    }
+
+    public static String getJupyterFilesLocation() {
+        return properties.getProperty(JUPYTER_FILES_LOCATION_PROPERTY);
+    }
+
+    public static String getRstudioFilesLocation() {
+        return properties.getProperty(RSTUDIO_FILES_LOCATION_PROPERTY);
+    }
+
+    public static String getZeppelinFilesLocation() {
+        return properties.getProperty(JUPYTER_FILES_LOCATION_PROPERTY);
     }
 
     public static String getClusterConfFileLocation() {

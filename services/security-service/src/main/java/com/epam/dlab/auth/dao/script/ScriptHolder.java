@@ -42,7 +42,7 @@ public class ScriptHolder {
 	public BiFunction<UserInfo,Map<String,?>,UserInfo> evalOnce(String name, String language, String code) throws ScriptException {
 		if( ! map.containsKey(name)) {
 			ScriptEngine engine = mgr.getEngineByName( language );
-			engine.eval(code);
+			engine.getContext().getReader();
 			map.put(name, (Invocable) engine);
 		}
 		return (ui,context)->{
