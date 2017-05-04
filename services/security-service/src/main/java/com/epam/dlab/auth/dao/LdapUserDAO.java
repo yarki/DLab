@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -44,12 +45,9 @@ import java.util.regex.Pattern;
 
 public class LdapUserDAO {
 
-//    public static final String CN = "cn";
-
     // the request from security.yml for user look up by one of the parameters (mail or phone).
     //  configured in the same request configuration under "filter" key: "(&(objectClass=inetOrgPerson)(mail=%mail%))"
     public static final String USER_LOOK_UP = "userLookUp";
-//    public static final String MAIL = "%mail%";
     private final LdapConnectionConfig connConfig;
     private final List<Request> requests;
     private final String bindTemplate;
@@ -126,7 +124,10 @@ public class LdapUserDAO {
                     LOG.debug("Retrieving new branch {} for {}", request.getName(), filter);
                     try (SearchCursor cursor = userCon.search(sr)) {
                         contextMap = mapper.transformSearchResult(cursor);
-                        userAttributes = (Map)contextMap.values();
+                        Iterator<Object> iterator = contextMap.values().iterator();
+                        if(iterator.hasNext()) {
+                            userAttributes = (Map)iterator.next();
+                        }
                     }
                 }
         }
