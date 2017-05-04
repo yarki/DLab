@@ -44,14 +44,17 @@ import java.util.regex.Pattern;
 
 public class LdapUserDAO {
 
-    public static final String CN = "cn";
+//    public static final String CN = "cn";
 
     // the request from security.yml for user look up by one of the parameters (mail or phone).
     //  configured in the same request configuration under "filter" key: "(&(objectClass=inetOrgPerson)(mail=%mail%))"
     public static final String USER_LOOK_UP = "userLookUp";
+//    public static final String MAIL = "%mail%";
     private final LdapConnectionConfig connConfig;
     private final List<Request> requests;
     private final String bindTemplate;
+    private final String ldapBindAttribute;
+    private final String ldapSearchAttribute;
     private final LdapConnectionPool usersPool;
     private final LdapConnectionPool searchPool;
     private final ScriptHolder script = new ScriptHolder();
@@ -61,6 +64,8 @@ public class LdapUserDAO {
         this.connConfig = config.getLdapConnectionConfig();
         this.requests = config.getLdapSearch();
         this.bindTemplate = config.getLdapBindTemplate();
+        this.ldapBindAttribute = config.getLdapBindAttribute();
+        this.ldapSearchAttribute = "%" + config.getLdapSearchAttribute() + "%";
         PoolableObjectFactory<LdapConnection> userPoolFactory = new ValidatingPoolableLdapConnectionFactory(connConfig);
         this.usersPool = new LdapConnectionPool(userPoolFactory);
         PoolableObjectFactory<LdapConnection> searchPoolFactory = new ValidatingPoolableLdapConnectionFactory(connConfig);
@@ -68,16 +73,22 @@ public class LdapUserDAO {
     }
 
     public UserInfo getUserInfo(String username, String password) throws Exception {
-        Map<String, Object> contextMap = null;
+        Map<String, Object> userAttributes = null;
         try (ReturnableConnection userRCon = new ReturnableConnection(usersPool)) {
             LdapConnection userCon = userRCon.getConnection();
 
-            contextMap = searchUsersCN(username, userCon);
-            String cn = contextMap.get(CN).toString();
-            bindUser(username, password, cn, userCon);
+            userAttributes = searchUsersAttributes(username, userCon);
+            String bindAttribute = userAttributes.get(ldapBindAttribute).toString();
+            LOG.info("getUserInfo bindAttribute : {}", bindAttribute);
+            bindUser(username, password, bindAttribute, userCon);
 
             UserInfo userInfo = new UserInfo(username, "******");
-            userInfo.addKey(CN, cn);
+            LOG.info("getUserInfo context with attributes : {}", userAttributes);
+            for(Map.Entry<String, Object> entry: userAttributes.entrySet()) {
+                userInfo.addKey(entry.getKey().toLowerCase(), entry.getValue().toString());
+                LOG.debug("Adding attribute {} : {}", entry.getKey().toLowerCase(), entry.getValue().toString());
+            }
+
             return userInfo;
         } catch(Exception e){
             LOG.error("LDAP getUserInfo authentication error for username '{}': {}", username ,e.getMessage());
@@ -93,8 +104,9 @@ public class LdapUserDAO {
         LOG.debug("User '{}' identified.", username);
     }
 
-    private Map<String, Object> searchUsersCN(final String username, LdapConnection userCon, String... attributes) throws IOException, LdapException {
+    private Map<String, Object> searchUsersAttributes(final String username, LdapConnection userCon) throws IOException, LdapException {
         Map<String, Object> contextMap = new HashMap();
+        Map<String, Object> userAttributes = new HashMap();
         for(Request request: requests) {
             if (request.getName().equalsIgnoreCase(USER_LOOK_UP)) {
                 LOG.info("Request: {}", request.getName());
@@ -102,21 +114,24 @@ public class LdapUserDAO {
                     private static final long serialVersionUID = 1L;
 
                     {
-                        LOG.info("Putting user mail: " + username);
-                        put(Pattern.quote("%mail%"), username);
+                        LOG.info("Putting user param {} : {}", ldapSearchAttribute, username);
+                        put(Pattern.quote(ldapSearchAttribute), username);
                     }
                 });
                 String filter = sr.getFilter().toString();
                 contextMap = LdapFilterCache.getInstance().getLdapFilterInfo(filter);
+                LOG.info("searchUsersAttributes context before mapping is: {}", contextMap);
                 SearchResultToDictionaryMapper mapper = new SearchResultToDictionaryMapper(request.getName(),
                         new HashMap<>());
                     LOG.debug("Retrieving new branch {} for {}", request.getName(), filter);
                     try (SearchCursor cursor = userCon.search(sr)) {
                         contextMap = mapper.transformSearchResult(cursor);
+                        userAttributes = (Map)contextMap.values();
                     }
                 }
         }
-        return contextMap;
+        LOG.info("searchUsersAttributes context is: {}", contextMap);
+        return userAttributes;
     }
 
     public UserInfo enrichUserInfo(final UserInfo userInfo) throws Exception {
@@ -131,9 +146,13 @@ public class LdapUserDAO {
                 if (req == null ) {
                     continue;
                 } else if (req.getName().equalsIgnoreCase(USER_LOOK_UP)) {
-                    String cn = searchUsersCN(username, searchCon).get(CN).toString();
-                    if (null!=cn) {
-                        ui.addKey(CN, cn);
+                    Map<String, Object> usersAttributes = searchUsersAttributes(username, searchCon);
+                    LOG.info("enrichUserInfo context is: {}", usersAttributes);
+                    for (Map.Entry<String, Object> attribute : usersAttributes.entrySet()) {
+                        if (null != attribute.getValue()) {
+                            ui.addKey(attribute.getKey().toLowerCase(), attribute.getValue().toString());
+                            LOG.debug("Adding attribute {} : {}", attribute.getKey().toLowerCase(), attribute.getValue().toString());
+                        }
                     }
                 }
                 LOG.info("Request: {}", req.getName());
@@ -141,8 +160,8 @@ public class LdapUserDAO {
                 SearchRequest sr = req.buildSearchRequest(new HashMap<String, Object>() {
                     private static final long serialVersionUID = 1L;
                     {
-                        LOG.info("Putting user mail: {} for user info enriching", username);
-                        put(Pattern.quote("%mail%"), username);
+                        LOG.info("Putting user param {} : {} for user enriching", ldapSearchAttribute, username);
+                        put(Pattern.quote(ldapSearchAttribute), username);
                     }
                 });
                 String filter = sr.getFilter().toString();

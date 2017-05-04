@@ -64,6 +64,12 @@ public class SecurityServiceConfiguration extends ServiceConfiguration {
 
 	@JsonProperty
 	private String ldapBindTemplate;
+
+	@JsonProperty
+	private String ldapBindAttribute;
+
+	@JsonProperty
+	private String ldapSearchAttribute;
 	
 	@JsonProperty
 	private Map<String,String> ldapConnectionConfig = new HashMap<String, String>();
@@ -86,7 +92,15 @@ public class SecurityServiceConfiguration extends ServiceConfiguration {
 	public String getLdapBindTemplate() {
 		return ldapBindTemplate;
 	}
-	
+
+	public String getLdapBindAttribute() {
+		return ldapBindAttribute;
+	}
+
+	public String getLdapSearchAttribute() {
+		return ldapSearchAttribute;
+	}
+
 	public boolean isAwsUserIdentificationEnabled() {
 		return awsUserIdentificationEnabled;
 	}

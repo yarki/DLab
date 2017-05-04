@@ -24,6 +24,8 @@ ldapConnectionConfig:
   name: cn=admin,dc=example,dc=com
   credentials: ldap
 ldapBindTemplate: cn=%s,ou=People,dc=example,dc=com
+ldapBindAttribute: cn
+ldapSearchAttribute: mail
 ldapSearch:
   - name: userLookUp
     cache: true
@@ -31,6 +33,7 @@ ldapSearch:
     scope: SUBTREE
     attributes:
       - cn
+      - mail
     timeLimit: 0
     base: dc=example,dc=com
     filter: "(&(objectClass=inetOrgPerson)(mail=%mail%))"
@@ -41,6 +44,8 @@ ldapSearch:
     attributes: 
       - cn
       - gidNumber
+      - mail
+      - guid
     timeLimit: 0
     base: dc=example,dc=com
     filter: "(&(objectClass=inetOrgPerson)(mail=%mail%))"
