@@ -270,6 +270,8 @@ public class TestServices {
 //
 //        LOGGER.info("   Check bucket {}", getBucketName());
 //        AmazonHelper.printBucketGrants(getBucketName());
+        LOGGER.info("testNoteBookName {}, emrName {}, nodePrefix {}, amazonNodePrefix {}", testNoteBookName, emrName, nodePrefix, amazonNodePrefix);
+        createEMR(testNoteBookName, emrName, nodePrefix, amazonNodePrefix, token, ssnProUserResURL);
 
         // TODO: finalize this code
         copyTestDataIntoTestBucket(emrName);
@@ -400,47 +402,7 @@ public class TestServices {
 
 
             if (!emr) {
-                LOGGER.info("7. EMR will be deployed ...");
-                final String ssnCompResURL = getSnnURL(ApiPath.COMPUTATIONAL_RES);
-                LOGGER.info("   SSN computational resources URL is {}", ssnCompResURL);
-
-                DeployEMRDto deployEMR =
-                        NodeReader.readNode(
-                                Paths.get(PropertiesResolver.getClusterConfFileLocation(), "EMR.json").toString(),
-                                DeployEMRDto.class);
-
-                DeployEMRDto deployEMRSpot40 =
-                        NodeReader.readNode(
-                                Paths.get(PropertiesResolver.getClusterConfFileLocation(), "EMR_spot.json").toString(),
-                                DeployEMRDto.class);
-
-                deployEMR.setName(emrName);
-                deployEMR.setNotebook_name(testNoteBookName);
-                Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
-                        deployEMR, token);
-                LOGGER.info("   responseDeployingEMR.getBody() is {}", responseDeployingEMR.getBody().asString());
-                Assert.assertEquals(responseDeployingEMR.statusCode(), HttpStatusCode.OK);
-
-                gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, testNoteBookName, emrName, "creating", ConfigPropertyValue.getTimeoutEMRCreate());
-                if (!gettingStatus.contains("configuring"))
-                    throw new Exception("EMR " + emrName + " has not been deployed");
-                LOGGER.info("   EMR {} has been deployed", emrName);
-
-                AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + testNoteBookName + "-" + emrName, AmazonInstanceState.RUNNING.value());
-                Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", ssnIpForTest);
-
-                LOGGER.info("   Waiting until EMR has been configured ...");
-
-                gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, testNoteBookName, emrName, "configuring", ConfigPropertyValue.getTimeoutEMRCreate());
-                if (!gettingStatus.contains("running"))
-                    throw new Exception("EMR " + emrName + " has not been configured");
-                LOGGER.info("   EMR {} has been configured", emrName);
-
-                AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + testNoteBookName + "-" + emrName, AmazonInstanceState.RUNNING.value());
-                Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", ssnIpForTest);
-
-                LOGGER.info("   Check bucket {}", getBucketName());
-                AmazonHelper.printBucketGrants(getBucketName());
+//                createEMR(testNoteBookName, emrName, nodePrefix, amazonNodePrefix, token, ssnProUserResURL);
 
                 emr = true;
             }
@@ -500,6 +462,52 @@ public class TestServices {
             AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + testNoteBookName + "-" + emrName, AmazonInstanceState.TERMINATED.value());
             Docker.checkDockerStatus(nodePrefix + "_stop_exploratory_NotebookAutoTest", ssnIpForTest);
         }
+    }
+
+    private void createEMR(String testNoteBookName, String emrName, String nodePrefix, String amazonNodePrefix, String token, String ssnProUserResURL) throws Exception {
+        String gettingStatus;
+        LOGGER.info("7. EMR will be deployed ...");
+        final String ssnCompResURL = getSnnURL(ApiPath.COMPUTATIONAL_RES);
+        LOGGER.info("   SSN computational resources URL is {}", ssnCompResURL);
+
+        DeployEMRDto deployEMR =
+                NodeReader.readNode(
+                        Paths.get(PropertiesResolver.getClusterConfFileLocation(), "EMR.json").toString(),
+                        DeployEMRDto.class);
+
+        DeployEMRDto deployEMRSpot40 =
+                NodeReader.readNode(
+                        Paths.get(PropertiesResolver.getClusterConfFileLocation(), "EMR_spot.json").toString(),
+                        DeployEMRDto.class);
+
+        deployEMR.setName(emrName);
+        deployEMR.setNotebook_name(testNoteBookName);
+        LOGGER.info("EMR = {}", deployEMR);
+        Response responseDeployingEMR = new HttpRequest().webApiPut(ssnCompResURL, ContentType.JSON,
+                deployEMR, token);
+        LOGGER.info("   responseDeployingEMR.getBody() is {}", responseDeployingEMR.getBody().asString());
+        Assert.assertEquals(responseDeployingEMR.statusCode(), HttpStatusCode.OK);
+
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, testNoteBookName, emrName, "creating", ConfigPropertyValue.getTimeoutEMRCreate());
+        if (!gettingStatus.contains("configuring"))
+            throw new Exception("EMR " + emrName + " has not been deployed");
+        LOGGER.info("   EMR {} has been deployed", emrName);
+
+        AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + testNoteBookName + "-" + emrName, AmazonInstanceState.RUNNING.value());
+        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", ssnIpForTest);
+
+        LOGGER.info("   Waiting until EMR has been configured ...");
+
+        gettingStatus = waitWhileEmrStatus(ssnProUserResURL, token, testNoteBookName, emrName, "configuring", ConfigPropertyValue.getTimeoutEMRCreate());
+        if (!gettingStatus.contains("running"))
+            throw new Exception("EMR " + emrName + " has not been configured");
+        LOGGER.info("   EMR {} has been configured", emrName);
+
+        AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + testNoteBookName + "-" + emrName, AmazonInstanceState.RUNNING.value());
+        Docker.checkDockerStatus(nodePrefix + "_create_computational_EMRAutoTest", ssnIpForTest);
+
+        LOGGER.info("   Check bucket {}", getBucketName());
+        AmazonHelper.printBucketGrants(getBucketName());
     }
 
     private void copyTestDataIntoTestBucket(String emrName) throws Exception {
@@ -660,9 +668,7 @@ public class TestServices {
     private void executePythonScript2(Session ssnSession, String cluster_name, String notebookTestFile) throws JSchException, IOException, InterruptedException {
         String command;
         AckStatus status;
-//        Session notebookSession = SSHConnect.getConnect(ConfigPropertyValue.CLUSTER_OS_USERNAME, ip, 22);
 
-//        try {
             command = String.format(ScpCommands.runPythonCommand2,
                     String.format("/home/%s/%s", ConfigPropertyValue.CLUSTER_OS_USERNAME, notebookTestFile),
                     getBucketName());
@@ -674,13 +680,6 @@ public class TestServices {
             assertTrue(status.isOk(), "The python script execution wasn`t successful");
 
             LOGGER.info("Python script executed successfully ");
-//        }
-//        finally {
-//            if(notebookSession != null && notebookSession.isConnected()) {
-//                LOGGER.info("Closing ssh session");
-//                notebookSession.disconnect();
-//            }
-//        }
     }
 
 
