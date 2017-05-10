@@ -1,0 +1,7 @@
+{
+  "image" : "docker.dlab-rstudio",
+  "name" : "set the name",
+  "shape" : "r3.xlarge",
+  "version" : "R-studio-3.3.2",
+  "template_name" : "R-Studio 3.3.2"
+}
