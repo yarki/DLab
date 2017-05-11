@@ -390,7 +390,8 @@ public class TestServices {
     }
 
     private void runTestsInNotebooks(String testNoteBookName, String emrName, String nodePrefix, String amazonNodePrefix, String token, String ssnExpEnvURL, String ssnProUserResURL) throws Exception {
-        String gettingStatus;Map<String, String> notebooks = new HashMap<>();
+        String gettingStatus;
+        Map<String, String> notebooks = new HashMap<>();
         notebooks.put("jupyter-notebook.json", PropertiesResolver.getJupyterFilesLocation());
         notebooks.put("zeppelin-notebook.json",PropertiesResolver.getRstudioFilesLocation());
         notebooks.put("rstudio-notebook.json",PropertiesResolver.getZeppelinFilesLocation());

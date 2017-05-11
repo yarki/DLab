@@ -128,12 +128,14 @@ public class ComputationalCreateFormDTO {
     	return MoreObjects.toStringHelper(this)
     			.add("name", name)
     			.add("notebookName", notebookName)
+    			.add("templateName", templateName)
     			.add("version", version)
     			.add("masterInstanceType", masterInstanceType)
     	        .add("slaveInstanceType", slaveInstanceType)
                 .add("slaveInstanceSpot", slaveInstanceSpot)
                 .add("slaveInstanceSpotPctPrice", slaveInstanceSpotPctPrice)
     			.add("instanceCount", instanceCount)
+    			.add("image", image)
     	        .toString();
     }
 }

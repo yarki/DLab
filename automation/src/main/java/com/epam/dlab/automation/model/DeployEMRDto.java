@@ -1,7 +1,8 @@
 package com.epam.dlab.automation.model;
 
 public class DeployEMRDto {
-    
+    private String image;
+    private String template_name;
     private String name;
     private String emr_instance_count;
     private String emr_master_instance_type;
@@ -10,6 +11,22 @@ public class DeployEMRDto {
     private Integer emr_slave_instance_spot_pct_price = 0;
     private String emr_version;
     private String notebook_name;
+    
+    public String getImage() {
+        return image;
+    }
+    
+    public void setImage(String image) {
+        this.image = image;
+    }
+    
+    public String getTemplate_name() {
+        return template_name;
+    }
+    
+    public void setTemplate_name(String template_name) {
+        this.template_name = template_name;
+    }
     
     public String getName() {
         return name;
