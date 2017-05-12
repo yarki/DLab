@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.FileReader;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Properties;
 
@@ -28,55 +29,40 @@ public class ConfigPropertyValue {
 	private static final String PASSWORD_FOR_ACTIVATE_KEY="PASSWORD_FOR_ACTIVATE_KEY";
 	private static final String ACCESS_KEY_PRIV_FILE_NAME="ACCESS_KEY_PRIV_FILE_NAME";
 	private static final String ACCESS_KEY_PUB_FILE_NAME="ACCESS_KEY_PUB_FILE_NAME";
-    private static final String ACCESS_KEY_PRIV_FILE_NAME_SSN="ACCESS_KEY_PRIV_FILE_NAME_SSN";
     
     private static final String AWS_ACCESS_KEY_ID="AWS_ACCESS_KEY_ID";
     private static final String AWS_SECRET_ACCESS_KEY="AWS_SECRET_ACCESS_KEY";
     private static final String AWS_REGION="AWS_REGION";
     private static final String AWS_REQUEST_TIMEOUT="AWS_REQUEST_TIMEOUT";
     
-	public static final String TIMEOUT_JENKINS_AUTOTEST="TIMEOUT_JENKINS_AUTOTEST";
-	public static final String TIMEOUT_UPLOAD_KEY="TIMEOUT_UPLOAD_KEY";
-	public static final String TIMEOUT_NOTEBOOK_CREATE="TIMEOUT_NOTEBOOK_CREATE";
-	public static final String TIMEOUT_NOTEBOOK_STARTUP="TIMEOUT_NOTEBOOK_STARTUP";
-	public static final String TIMEOUT_NOTEBOOK_SHUTDOWN="TIMEOUT_NOTEBOOK_SHUTDOWN";
-	public static final String TIMEOUT_NOTEBOOK_TERMINATE="TIMEOUT_NOTEBOOK_TERMINATE";
-	public static final String TIMEOUT_EMR_CREATE="TIMEOUT_EMR_CREATE";
-	public static final String TIMEOUT_EMR_TERMINATE="TIMEOUT_EMR_TERMINATE";
+    private static final String TIMEOUT_JENKINS_AUTOTEST="TIMEOUT_JENKINS_AUTOTEST";
+    private static final String TIMEOUT_UPLOAD_KEY="TIMEOUT_UPLOAD_KEY";
+    private static final String TIMEOUT_NOTEBOOK_CREATE="TIMEOUT_NOTEBOOK_CREATE";
+    private static final String TIMEOUT_NOTEBOOK_STARTUP="TIMEOUT_NOTEBOOK_STARTUP";
+    private static final String TIMEOUT_NOTEBOOK_SHUTDOWN="TIMEOUT_NOTEBOOK_SHUTDOWN";
+    private static final String TIMEOUT_NOTEBOOK_TERMINATE="TIMEOUT_NOTEBOOK_TERMINATE";
+    private static final String TIMEOUT_EMR_CREATE="TIMEOUT_EMR_CREATE";
+    private static final String TIMEOUT_EMR_TERMINATE="TIMEOUT_EMR_TERMINATE";
+
+    private static final String CLUSTER_OS_USERNAME = "CLUSTER_OS_USERNAME";
+    private static final String CLUSTER_OS_FAMILY = "CLUSTER_OS_FAMILY";
 
     public static final String JUPYTER_SCENARIO_FILES ="JUPYTER_SCENARIO_FILES";
 
-    public static String jenkinsBuildNumber;
-    public static String CLUSTER_OS_USERNAME;
-    public static String CLUSTER_OS_FAMILY;
+    private static String jenkinsBuildNumber;
 
 
     private static final Properties props = new Properties();
 
-    public static final String CLUSTER_USER = "cluster.username";
-
-    public static final String CLUSTER_OS = "cluster.os.family";
-
     static {
         CONFIG_FILE_NAME = PropertiesResolver.getConfFileLocation();
         jenkinsBuildNumber = System.getProperty("jenkins.buildNumber", "");
-        if(StringUtils.isEmpty(jenkinsBuildNumber)) {
-            LOGGER.error(new Exception("Missed required parameter 'jenkins.buildNumber'"));
-            System.exit(0);
+        if (jenkinsBuildNumber.isEmpty()) {
+            jenkinsBuildNumber = null;
+            LOGGER.info("Jenkins build number missed");
         }
-
+        
     	loadProperties();
-
-        CLUSTER_OS_USERNAME  = System.getProperty(CLUSTER_USER, "");
-        if(StringUtils.isEmpty(CLUSTER_OS_USERNAME)) {
-            LOGGER.error(new Exception("Missed required parameter " + CLUSTER_USER));
-            System.exit(0);
-        }
-        CLUSTER_OS_FAMILY  = System.getProperty(CLUSTER_OS, "");
-        if(StringUtils.isEmpty(CLUSTER_OS_FAMILY)) {
-            LOGGER.error(new Exception("Missed required parameter " + CLUSTER_OS));
-            System.exit(0);
-        }
     }
     
     private ConfigPropertyValue() { }
@@ -105,23 +91,36 @@ public class ConfigPropertyValue {
         LOGGER.info("{} is {}", propertyName , props.getProperty(propertyName));
 	}
 	
+	private static void overlapProperty(String propertyName, boolean isOptional) {
+		String s = System.getProperty(StringUtils.replaceChars(propertyName, '_', '.').toLowerCase(), "");
+		if (!s.isEmpty()) {
+            props.setProperty(propertyName, s);
+        }
+		if(!isOptional && props.getProperty(propertyName, "").isEmpty()) {
+        	throw new IllegalArgumentException("Missed required argument or property " + propertyName);
+        }
+	}
+	
+	private static void setKeyProperty(String propertyName) {
+		String filename = props.getProperty(propertyName, "");
+		if (!filename.isEmpty()) {
+            filename = Paths.get(PropertiesResolver.getKeysLocation(), filename).toAbsolutePath().toString();
+            props.setProperty(propertyName, filename);
+        }
+	}
+	
 	private static void loadProperties() {
         try {
             File f1 = new File(CONFIG_FILE_NAME);
             FileReader fin = new FileReader(f1);
             props.load(fin);
 
-            if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_USER))) {
-                props.setProperty(CLUSTER_USER, System.getProperty(CLUSTER_USER));
-            }
-            if (StringUtils.isNotEmpty(System.getProperty(CLUSTER_OS))) {
-                props.setProperty(CLUSTER_OS, System.getProperty(CLUSTER_OS));
-            }
-            if (StringUtils.isNotEmpty(System.getProperty(AWS_REGION))) {
-                props.setProperty(AWS_REGION, System.getProperty(AWS_REGION));
-            }
-
-
+            overlapProperty(CLUSTER_OS_USERNAME, false);
+            overlapProperty(CLUSTER_OS_FAMILY, false);
+            overlapProperty(AWS_REGION, false);
+            
+            setKeyProperty(ACCESS_KEY_PRIV_FILE_NAME);
+            setKeyProperty(ACCESS_KEY_PUB_FILE_NAME);
         } catch (Exception e) {
             throw new RuntimeException("Load properties from \"" + CONFIG_FILE_NAME + "\" fails. " + e.getLocalizedMessage(), e);
         }
@@ -139,7 +138,6 @@ public class ConfigPropertyValue {
         printProperty(PASSWORD_FOR_ACTIVATE_KEY);
         printProperty(ACCESS_KEY_PRIV_FILE_NAME);
         printProperty(ACCESS_KEY_PUB_FILE_NAME);
-        printProperty(ACCESS_KEY_PRIV_FILE_NAME_SSN);
         
         printProperty(TIMEOUT_JENKINS_AUTOTEST);
         printProperty(TIMEOUT_UPLOAD_KEY);
@@ -151,8 +149,8 @@ public class ConfigPropertyValue {
         printProperty(TIMEOUT_EMR_TERMINATE);
 
         printProperty(JUPYTER_SCENARIO_FILES);
-        printProperty(CLUSTER_USER);
-        printProperty(CLUSTER_OS);
+        printProperty(CLUSTER_OS_USERNAME);
+        printProperty(CLUSTER_OS_FAMILY);
     }
     
     
@@ -224,11 +222,6 @@ public class ConfigPropertyValue {
         return file.getAbsolutePath();
     }
 
-    public static String getAccessKeyPrivFileNameSSN() {
-        File file = new File(get(ACCESS_KEY_PRIV_FILE_NAME_SSN));
-        return file.getAbsolutePath();
-    }
-
     public static String getAwsAccessKeyId() {
         return get(AWS_ACCESS_KEY_ID);
     }
@@ -238,7 +231,7 @@ public class ConfigPropertyValue {
     }
 
 	public static String getAwsRegion() {
-	    return get(AWS_REGION, System.getProperty(AWS_REGION));
+	    return get(AWS_REGION);
 	}
 
 	public static Duration getAwsRequestTimeout() {
@@ -278,4 +271,21 @@ public class ConfigPropertyValue {
     	return getDuration(get(TIMEOUT_EMR_TERMINATE, "0s"));
     }
 
+    public static String getClusterOsUser() {
+    	return get(CLUSTER_OS_USERNAME);
+    }
+
+    public static String getClusterOsFamily() {
+    	return get(CLUSTER_OS_FAMILY);
+    }
+
+    public static boolean isUseJenkins() {
+    	String s = System.getProperty("use.jenkins", "true");
+    	return Boolean.valueOf(s);
+    }
+    
+    public static boolean isRunModeLocal() {
+    	String s = System.getProperty("run.mode.local", "false");
+    	return Boolean.valueOf(s);
+    }
 }

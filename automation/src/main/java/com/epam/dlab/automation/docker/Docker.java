@@ -19,9 +19,13 @@ public class Docker {
             throws IOException, JSchException, InterruptedException {
         
         LOGGER.info("Check docker status for instance {} and image {}", ip, dockerImageName);
+        if (ConfigPropertyValue.isRunModeLocal()) {
+        	LOGGER.info("  check is skipped");
+        	return;
+        }
 
         // TODO: hardcoded port
-        Session session = SSHConnect.getConnect(ConfigPropertyValue.CLUSTER_OS_USERNAME, ip, 22);
+        Session session = SSHConnect.getConnect(ConfigPropertyValue.getClusterOsUser(), ip, 22);
         ChannelExec getResult = SSHConnect.setCommand(session, DockerCommands.GET_CONTAINERS);
         InputStream in = getResult.getInputStream();
         List<DockerContainer> dockerContainerList = SSHConnect.getDockerContainerList(in);

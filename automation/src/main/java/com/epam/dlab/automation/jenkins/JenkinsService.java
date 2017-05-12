@@ -31,6 +31,16 @@ public class JenkinsService {
     FormAuthConfig config = new FormAuthConfig(JenkinsConfigProperties.JENKINS_JOB_NAME_SEARCH, "username", "password");
     
     public JenkinsService(){
+    	if (!ConfigPropertyValue.isUseJenkins()) {
+    		ssnURL = System.getProperty("ssn.url", "");
+    		if (ssnURL.isEmpty()) {
+    			throw new IllegalArgumentException("Missed required argument ssn.url");
+    		}
+    		serviceBaseName = System.getProperty("service.base.name", "");
+    		if (serviceBaseName.isEmpty()) {
+    			throw new IllegalArgumentException("Missed required argument service.base.name");
+    		}
+    	}
         awsAccessKeyId = convertToParam(ConfigPropertyValue.getAwsAccessKeyId());
         awsSecretAccessKey = convertToParam(ConfigPropertyValue.getAwsSecretAccessKey());
     }
@@ -77,14 +87,18 @@ public class JenkinsService {
     }
 
     public String runJenkinsJob(String jenkinsJobURL) throws Exception {
+    	if (!ConfigPropertyValue.isUseJenkins()) {
+    		return ConfigPropertyValue.getJenkinsBuildNumber();
+    	}
+    	
         RestAssured.baseURI = jenkinsJobURL;
         String dateAsString = TestNamingHelper.generateRandomValue();
         Response responsePostJob = getWhen(ContentType.URLENC)
                 .body(String.format(JenkinsConfigProperties.JENKINS_JOB_START_BODY,
                         awsAccessKeyId, awsSecretAccessKey, dateAsString,
-                        ConfigPropertyValue.CLUSTER_OS_USERNAME, ConfigPropertyValue.CLUSTER_OS_FAMILY,
+                        ConfigPropertyValue.getClusterOsUser(), ConfigPropertyValue.getClusterOsFamily(),
                         awsAccessKeyId, awsSecretAccessKey, dateAsString,
-                        ConfigPropertyValue.CLUSTER_OS_USERNAME, ConfigPropertyValue.CLUSTER_OS_FAMILY))
+                        ConfigPropertyValue.getClusterOsUser(), ConfigPropertyValue.getClusterOsFamily()))
         		.post(jenkinsJobURL + "build");
         Assert.assertEquals(responsePostJob.statusCode(), HttpStatusCode.OK);
         
@@ -98,7 +112,11 @@ public class JenkinsService {
     }
 
     public String getJenkinsJob() throws Exception {
-        RestAssured.baseURI = ConfigPropertyValue.getJenkinsJobURL();
+    	if (!ConfigPropertyValue.isUseJenkins()) {
+    		return ConfigPropertyValue.getJenkinsBuildNumber();
+    	}
+    	
+    	RestAssured.baseURI = ConfigPropertyValue.getJenkinsJobURL();
 
         setBuildNumber();
         checkBuildResult();

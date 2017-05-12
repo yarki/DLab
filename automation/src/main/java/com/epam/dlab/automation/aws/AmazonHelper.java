@@ -34,7 +34,7 @@ public class AmazonHelper {
 		return Region.getRegion(Regions.fromName(ConfigPropertyValue.getAwsRegion()));
 	}
 	
-    public static List<Instance> getInstances(String instanceName) throws Exception {
+    private static List<Instance> getInstances(String instanceName) throws Exception {
             AWSCredentials credentials = getCredentials();
             AmazonEC2 ec2 = new AmazonEC2Client(credentials);
             ec2.setRegion(getRegion());
@@ -49,23 +49,37 @@ public class AmazonHelper {
             List<Reservation> reservations = describeInstanceResult.getReservations();
             
             if (reservations.size() == 0) {
-            	throw new Exception("Instance "+ instanceName + " in AmazonHelper not found");
+            	throw new Exception("Instance "+ instanceName + " in Amazon not found");
             }
             
             List<Instance> instances = reservations.get(0).getInstances();
             if (instances.size() == 0) {
-            	throw new Exception("Instance "+ instanceName + " in AmazonHelper not found");
+            	throw new Exception("Instance "+ instanceName + " in Amazon not found");
             }
             
             return instances;
     }
     
     public static Instance getInstance(String instanceName) throws Exception {
-        return getInstances(instanceName).get(0);
+    	return (ConfigPropertyValue.isRunModeLocal() ?
+    			new Instance()
+            		.withPrivateDnsName("localhost")
+            		.withPrivateIpAddress("127.0.0.1")
+            		.withPublicDnsName("localhost")
+            		.withPublicIpAddress("127.0.0.1")
+            		.withTags(new Tag()
+            					.withKey("Name")
+            					.withValue(instanceName)) :
+            	getInstances(instanceName).get(0));
     }
 
     public static void checkAmazonStatus(String instanceName, String expAmazonState) throws Exception {
-        LOGGER.info("Check status of instance {} on AmazonHelper:", instanceName);
+        LOGGER.info("Check status of instance {} on Amazon: ", instanceName);
+        if (ConfigPropertyValue.isRunModeLocal()) {
+        	LOGGER.info("Amazon instance {} fake state is {}", instanceName, expAmazonState);
+        	return;
+        }
+        
         String instanceState;
         long requestTimeout = ConfigPropertyValue.getAwsRequestTimeout().toMillis();
     	long timeout = CHECK_TIMEOUT.toMillis();
@@ -75,20 +89,24 @@ public class AmazonHelper {
             	.getState()
             	.getName()).equals("shutting-down")) {
         	if (timeout != 0 && expiredTime < System.currentTimeMillis()) {
-                LOGGER.info("AmazonHelper instance {} state is {}", instanceName, instanceState);
+                LOGGER.info("Amazon instance {} state is {}", instanceName, instanceState);
         		throw new Exception("Timeout has been expired for check amazon instance " + instanceState);
             }
             Thread.sleep(requestTimeout);
         }
         
         for (Instance instance : AmazonHelper.getInstances(instanceName)) {
-            LOGGER.info("AmazonHelper instance {} with private IP {} state is {}", instanceName ,instance.getPrivateIpAddress(), instanceState);
+            LOGGER.info("Amazon instance {} with private IP {} state is {}", instanceName, instance.getPrivateIpAddress(), instanceState);
 		}
-        Assert.assertEquals(instanceState, expAmazonState, "AmazonHelper instance " + instanceName + " state is not correct");
+        Assert.assertEquals(instanceState, expAmazonState, "Amazon instance " + instanceName + " state is not correct");
     }
 
     public static void printBucketGrants(String bucketName) throws Exception {
-        LOGGER.info("Print grants for bucket {} on AmazonHelper:" , bucketName);
+        LOGGER.info("Print grants for bucket {} on Amazon: " , bucketName);
+        if (ConfigPropertyValue.isRunModeLocal()) {
+        	LOGGER.info("  check is skipped");
+        	return;
+        }
         AWSCredentials credentials = getCredentials();
         AmazonS3 s3 = new AmazonS3Client(credentials);
         

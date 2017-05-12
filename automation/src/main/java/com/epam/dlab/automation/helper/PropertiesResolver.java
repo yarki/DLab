@@ -1,22 +1,23 @@
 package com.epam.dlab.automation.helper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 
 public class PropertiesResolver {
 
-    private final static Logger LOGGER = LogManager.getLogger(PropertiesResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger(PropertiesResolver.class);
     public static final boolean DEV_MODE;
-    private static String jenkinsBuildNumber;
-    public static final String CONFIG_FILE_NAME;
+    public static final String CONFIG_FILE_NAME = "application.properties";
 
     //keys from application.properties(dev-application.properties)
-    private static String CONF_FILE_LOCATION_PROPERTY = "conf.file.location";
+    private final static String CONF_FILE_LOCATION_PROPERTY = "conf.file.location";
     private static String KEYS_DIRECTORY_LOCATION_PROPERTY = "keys.directory.location";
     private static String NOTEBOOK_TEST_DATA_COPY_SCRIPT = "notebook.test.data.copy.script";
     private static String JUPYTER_FILES_LOCATION_PROPERTY = "scenario.jupyter.files.location";
@@ -28,15 +29,13 @@ public class PropertiesResolver {
 
     static {
         DEV_MODE = System.getProperty("run.mode", "remote").equalsIgnoreCase("dev");
-        jenkinsBuildNumber = System.getProperty("jenkins.buildNumber", "");
-        if (jenkinsBuildNumber.isEmpty()) {
-            jenkinsBuildNumber = null;
-            LOGGER.warn("Jenkins build number missed");
-        }
-        CONFIG_FILE_NAME = (DEV_MODE ? "dev-application.properties" : "application.properties");
         loadApplicationProperties();
     }
 
+    
+    public static String getConfRootPath() {
+    	return System.getProperty("conf.root.path", "/var/lib/jenkins/AutoTestData");
+    }
 
     private static void loadApplicationProperties() {
 
@@ -48,6 +47,13 @@ public class PropertiesResolver {
 
             // load a properties file
             properties.load(input);
+            String rootPath = getConfRootPath();
+            for (String key : properties.keySet().toArray(new String[0])) {
+            	String path = StringUtils.replace(properties.getProperty(key), "${CONF_ROOT_PATH}", rootPath);
+            	path = Paths.get(path).toAbsolutePath().toString();
+            	properties.setProperty(key, path);
+            }
+
 
             // get the property value and print it out
             LOGGER.info(properties.getProperty(CONF_FILE_LOCATION_PROPERTY));

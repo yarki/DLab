@@ -1,7 +1,6 @@
 package com.epam.dlab.automation.test;
 
 import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.Tag;
 import com.epam.dlab.automation.aws.AmazonHelper;
 import com.epam.dlab.automation.aws.AmazonInstanceState;
@@ -116,17 +115,15 @@ public class TestServices {
     	
     	//ssnURL = "http://ec2-35-162-89-115.us-west-2.compute.amazonaws.com";
 
-        LOGGER.info("Check status of SSN node on AmazonHelper: {}", serviceBaseName);
+        LOGGER.info("Check status of SSN node on Amazon: {}", serviceBaseName);
         Instance ssnInstance = AmazonHelper.getInstance(serviceBaseName + "-ssn");
-        InstanceState instanceState = ssnInstance.getState();
         publicSsnIp = ssnInstance.getPublicIpAddress();
         LOGGER.info("Public IP is: {}", publicSsnIp);
         privateSsnIp = ssnInstance.getPrivateIpAddress();
         LOGGER.info("Private IP is: {}", privateSsnIp);
         ssnIpForTest = PropertiesResolver.DEV_MODE ? publicSsnIp : privateSsnIp;
-        Assert.assertEquals(instanceState.getName(), AmazonInstanceState.RUNNING.value(),
-                "AmazonHelper instance state is not running");
-        LOGGER.info("AmazonHelper instance state is running");
+        AmazonHelper.checkAmazonStatus(serviceBaseName + "-ssn", AmazonInstanceState.RUNNING.value());
+        LOGGER.info("Amazon instance state is running");
         
         LOGGER.info("2. Waiting for SSN service ...");
         Assert.assertEquals(waitForSSNService(ConfigPropertyValue.getTimeoutNotebookCreate()), true, "SSN service was not started");
@@ -137,20 +134,24 @@ public class TestServices {
         final String ssnLoginURL = getSnnURL(ApiPath.LOGIN);
         LOGGER.info("   SSN login URL is {}", ssnLoginURL);
         
-        LoginDto notIAMUserRequestBody = new LoginDto(ConfigPropertyValue.getNotIAMUsername(), ConfigPropertyValue.getNotIAMPassword(), "");
-        Response responseNotIAMUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, notIAMUserRequestBody);
-        Assert.assertEquals(responseNotIAMUser.statusCode(), HttpStatusCode.Unauthorized);
-        Assert.assertEquals(responseNotIAMUser.getBody().asString(), "Please contact AWS administrator to create corresponding IAM User");
+        if (!ConfigPropertyValue.isRunModeLocal()) {
+        	LoginDto notIAMUserRequestBody = new LoginDto(ConfigPropertyValue.getNotIAMUsername(), ConfigPropertyValue.getNotIAMPassword(), "");
+        	Response responseNotIAMUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, notIAMUserRequestBody);
+        	Assert.assertEquals(responseNotIAMUser.statusCode(), HttpStatusCode.Unauthorized);
+        	Assert.assertEquals(responseNotIAMUser.getBody().asString(), "Please contact AWS administrator to create corresponding IAM User");
+        }
  		
         LoginDto notDLABUserRequestBody = new LoginDto(ConfigPropertyValue.getNotDLabUsername(), ConfigPropertyValue.getNotDLabPassword(), "");
         Response responseNotDLABUser = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, notDLABUserRequestBody);
         Assert.assertEquals(responseNotDLABUser.statusCode(), HttpStatusCode.Unauthorized);
         Assert.assertEquals(responseNotDLABUser.getBody().asString(), "Username or password are not valid");
         
-        LoginDto forActivateAccessKey = new LoginDto(ConfigPropertyValue.getUsername(), ".", "");
-        Response responseForActivateAccessKey = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, forActivateAccessKey);
-        Assert.assertEquals(responseForActivateAccessKey.statusCode(), HttpStatusCode.Unauthorized);
-        Assert.assertEquals(responseForActivateAccessKey.getBody().asString(), "Username or password are not valid");
+        if (!ConfigPropertyValue.isRunModeLocal()) {
+        	LoginDto forActivateAccessKey = new LoginDto(ConfigPropertyValue.getUsername(), ".", "");
+        	Response responseForActivateAccessKey = new HttpRequest().webApiPost(ssnLoginURL, ContentType.JSON, forActivateAccessKey);
+        	Assert.assertEquals(responseForActivateAccessKey.statusCode(), HttpStatusCode.Unauthorized);
+        	Assert.assertEquals(responseForActivateAccessKey.getBody().asString(), "Username or password are not valid");
+        }
         
         LoginDto testUserLogin = new LoginDto(ConfigPropertyValue.getUsername(), ConfigPropertyValue.getPassword(), "");
         LOGGER.info("Logging in with credentials {}:{}", ConfigPropertyValue.getUsername(), ConfigPropertyValue.getPassword());
@@ -184,7 +185,7 @@ public class TestServices {
         LoginDto testUserRequestBody = new LoginDto(ConfigPropertyValue.getUsername(), ConfigPropertyValue.getPassword(), "");
 
         
-        LOGGER.info("5. Logging user in...");
+        LOGGER.info("5. Login as {} ...", ConfigPropertyValue.getUsername());
 
         final String ssnLoginURL = getSnnURL(ApiPath.LOGIN);
         LOGGER.info("   SSN login URL is {}", ssnLoginURL);
@@ -270,6 +271,7 @@ public class TestServices {
 //
 //        LOGGER.info("   Check bucket {}", getBucketName());
 //        AmazonHelper.printBucketGrants(getBucketName());
+        
         LOGGER.info("testNoteBookName {}, emrName {}, nodePrefix {}, amazonNodePrefix {}", testNoteBookName, emrName, nodePrefix, amazonNodePrefix);
         createEMR(testNoteBookName, emrName, nodePrefix, amazonNodePrefix, token, ssnProUserResURL);
 
@@ -516,7 +518,7 @@ public class TestServices {
         ChannelSftp channelSftp = null;
         try {
             LOGGER.info("Copying test data copy scripts  to SSN {}...", ssnIpForTest);
-            ssnSession = SSHConnect.getSession(ConfigPropertyValue.CLUSTER_OS_USERNAME, ssnIpForTest, 22);
+            ssnSession = SSHConnect.getSession(ConfigPropertyValue.getClusterOsUser(), ssnIpForTest, 22);
             channelSftp = SSHConnect.getChannelSftp(ssnSession);
 
             // todo: copy test data copy script to ssn: ChannelSftp channel, String filename
@@ -559,7 +561,7 @@ public class TestServices {
 
         try {
 
-            channel.put(src, String.format("/home/%s/%s", ConfigPropertyValue.CLUSTER_OS_USERNAME, filename));
+            channel.put(src, String.format("/home/%s/%s", ConfigPropertyValue.getClusterOsUser(), filename));
 
         } catch (SftpException e) {
             LOGGER.error(e);
@@ -570,9 +572,9 @@ public class TestServices {
     private void copyFileToNotebook(Session session, String filename, String ip) throws JSchException, IOException, InterruptedException {
 
     	String command = String.format(ScpCommands.copyToNotebookCommand,
-    			"keys/"+ Paths.get(ConfigPropertyValue.getAccessKeyPrivFileNameSSN()).getFileName().toString(),
+    			"keys/"+ Paths.get(ConfigPropertyValue.getAccessKeyPrivFileName()).getFileName().toString(),
                 filename,
-                ConfigPropertyValue.CLUSTER_OS_USERNAME,
+                ConfigPropertyValue.getClusterOsUser(),
                 ip);
 
     	LOGGER.info("Copying {}...", filename);
@@ -587,6 +589,11 @@ public class TestServices {
 
     private void testPython(String ssnIP, String noteBookIp, String emrName, String cluster_name, File notebookDirectory)
             throws JSchException, IOException, InterruptedException {
+    	LOGGER.info("Python tests will be started ...");
+    	if (ConfigPropertyValue.isRunModeLocal()) {
+    		LOGGER.info("  tests are skipped");
+    		return;
+    	}
 
         assertTrue(notebookDirectory.exists());
         assertTrue(notebookDirectory.isDirectory());
@@ -601,7 +608,7 @@ public class TestServices {
         ChannelSftp channelSftp = null;
         try {
             LOGGER.info("Copying files to SSN {}...", ssnIP);
-            ssnSession = SSHConnect.getSession(ConfigPropertyValue.CLUSTER_OS_USERNAME, ssnIP, 22);
+            ssnSession = SSHConnect.getSession(ConfigPropertyValue.getClusterOsUser(), ssnIP, 22);
             channelSftp = SSHConnect.getChannelSftp(ssnSession);
 
 //            for (String filename : files) {
@@ -640,7 +647,7 @@ public class TestServices {
     private void executePythonScript(String Ip, String cluster_name, String notebookTestFile, int assignedPort) throws JSchException, IOException, InterruptedException {
         String command;
         AckStatus status;
-        Session session = SSHConnect.getForwardedConnect(ConfigPropertyValue.CLUSTER_OS_USERNAME, Ip, assignedPort);
+        Session session = SSHConnect.getForwardedConnect(ConfigPropertyValue.getClusterOsUser(), Ip, assignedPort);
 
         try {
             command = String.format(ScpCommands.runPythonCommand,
@@ -648,7 +655,7 @@ public class TestServices {
                     ConfigPropertyValue.getAwsRegion(),
                     getBucketName(),
                     cluster_name,
-                    ConfigPropertyValue.CLUSTER_OS_USERNAME);
+                    ConfigPropertyValue.getClusterOsUser());
             LOGGER.info(String.format("Executing command %s...", command));
 
             ChannelExec runScript = SSHConnect.setCommand(session, command);
@@ -671,7 +678,7 @@ public class TestServices {
         AckStatus status;
 
             command = String.format(ScpCommands.runPythonCommand2,
-                    String.format("/home/%s/%s", ConfigPropertyValue.CLUSTER_OS_USERNAME, notebookTestFile),
+                    String.format("/home/%s/%s", ConfigPropertyValue.getClusterOsUser(), notebookTestFile),
                     getBucketName());
             LOGGER.info(String.format("Executing command %s...", command));
 
