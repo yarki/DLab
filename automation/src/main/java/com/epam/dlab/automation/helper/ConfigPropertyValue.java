@@ -46,6 +46,7 @@ public class ConfigPropertyValue {
 
     private static final String CLUSTER_OS_USERNAME = "CLUSTER_OS_USERNAME";
     private static final String CLUSTER_OS_FAMILY = "CLUSTER_OS_FAMILY";
+    private static final String CONF_TAG_RESOURCE_ID = "CONF_TAG_RESOURCE_ID";
 
     public static final String JUPYTER_SCENARIO_FILES ="JUPYTER_SCENARIO_FILES";
 
@@ -115,9 +116,9 @@ public class ConfigPropertyValue {
             FileReader fin = new FileReader(f1);
             props.load(fin);
 
-            overlapProperty(CLUSTER_OS_USERNAME, false);
-            overlapProperty(CLUSTER_OS_FAMILY, false);
-            overlapProperty(AWS_REGION, false);
+            overlapProperty(CLUSTER_OS_USERNAME, true);
+            overlapProperty(CLUSTER_OS_FAMILY, true);
+            overlapProperty(AWS_REGION, true);
             
             setKeyProperty(ACCESS_KEY_PRIV_FILE_NAME);
             setKeyProperty(ACCESS_KEY_PUB_FILE_NAME);
@@ -151,6 +152,7 @@ public class ConfigPropertyValue {
         printProperty(JUPYTER_SCENARIO_FILES);
         printProperty(CLUSTER_OS_USERNAME);
         printProperty(CLUSTER_OS_FAMILY);
+        printProperty(CONF_TAG_RESOURCE_ID);
     }
     
     

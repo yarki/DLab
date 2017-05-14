@@ -9,4 +9,9 @@ public class TestNamingHelper {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYYMMddhmmss");
         return "AutoTest" + simpleDateFormat.format(new Date());
     }
+
+    public static String generateRandomValue(String notebokTemplateName){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYYMMddhmmss");
+        return "AutoTest_" + notebokTemplateName.split(" ")[0]+"_"+  simpleDateFormat.format(new Date());
+    }
 }
