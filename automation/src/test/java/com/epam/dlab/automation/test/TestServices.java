@@ -552,7 +552,7 @@ public class TestServices {
             ChannelExec runScript = SSHConnect.setCommand(session, command);
             status = SSHConnect.checkAck(runScript);
             LOGGER.info("Script execution status message {} and status code {}", status.getMessage(), status.getStatus());
-            assertTrue(status.isOk(), "The python script execution wasn`t successful");
+            assertTrue(status.isOk(), "The python script execution wasn`t successful on " + cluster_name);
 
             LOGGER.info("Python script executed successfully ");
         }
