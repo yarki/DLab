@@ -273,7 +273,7 @@ public class TestServices {
 
     private void verifyResults(List<FutureTask<Boolean>> futureTasks) throws InterruptedException, ExecutionException {
         for (FutureTask<Boolean> ft : futureTasks) {
-            assertTrue(ft.get(), "The python script execution wasn`t successful");
+            assertTrue(ft.get(), ft.get().toString());
         }
     }
 
