@@ -106,7 +106,7 @@ public class PropertiesResolver {
     }
 
     public static String getZeppelinFilesLocation() {
-        return properties.getProperty(JUPYTER_FILES_LOCATION_PROPERTY);
+        return properties.getProperty(ZEPPELIN_FILES_LOCATION_PROPERTY);
     }
 
     public static String getClusterConfFileLocation() {

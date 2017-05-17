@@ -23,6 +23,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--bucket', type=str, default='')
+parser.add_argument('--cluster_name', type=str, default='')
 parser.add_argument('--os_user', type=str, default='')
 args = parser.parse_args()
 

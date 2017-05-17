@@ -91,4 +91,21 @@ public class DeployEMRDto {
     public void setEmr_slave_instance_spot_pct_price(Integer emr_slave_instance_spot_pct_price) {
         this.emr_slave_instance_spot_pct_price = emr_slave_instance_spot_pct_price;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("DeployEMRDto{");
+        sb.append("image='").append(image).append('\'');
+        sb.append(", template_name='").append(template_name).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", emr_instance_count='").append(emr_instance_count).append('\'');
+        sb.append(", emr_master_instance_type='").append(emr_master_instance_type).append('\'');
+        sb.append(", emr_slave_instance_type='").append(emr_slave_instance_type).append('\'');
+        sb.append(", emr_slave_instance_spot=").append(emr_slave_instance_spot);
+        sb.append(", emr_slave_instance_spot_pct_price=").append(emr_slave_instance_spot_pct_price);
+        sb.append(", emr_version='").append(emr_version).append('\'');
+        sb.append(", notebook_name='").append(notebook_name).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

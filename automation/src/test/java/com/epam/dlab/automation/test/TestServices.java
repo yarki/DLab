@@ -35,9 +35,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 import static org.testng.Assert.assertTrue;
 
@@ -174,16 +176,27 @@ public class TestServices {
         //serviceBaseName = "autotest_jan11";
         //publicSsnIp = "35.164.76.52";
 
-        String gettingStatus;
-        String emrName = "eimr" + TestNamingHelper.generateRandomValue();
-        
         final String nodePrefix = ConfigPropertyValue.getUsernameSimple();
         final String amazonNodePrefix = serviceBaseName + "-" + nodePrefix;
 
         RestAssured.baseURI = ssnURL;
+        final String ssnUploadKeyURL = getSnnURL(ApiPath.UPLOAD_KEY);
+
+        String token = ssnLoginAndKeyUpload(nodePrefix, amazonNodePrefix);
+
+        final String ssnExpEnvURL = getSnnURL(ApiPath.EXP_ENVIRONMENT);
+        LOGGER.info("   SSN exploratory environment URL is {}", ssnExpEnvURL);
+        final String ssnProUserResURL = getSnnURL(ApiPath.PROVISIONED_RES);
+        LOGGER.info("   SSN provisioned user resources URL is {}", ssnProUserResURL);
+
+        runTestsInNotebooks(nodePrefix, amazonNodePrefix, token, ssnExpEnvURL, ssnProUserResURL);
+
+    }
+
+    private String ssnLoginAndKeyUpload(String nodePrefix, String amazonNodePrefix) throws Exception {
+
         LoginDto testUserRequestBody = new LoginDto(ConfigPropertyValue.getUsername(), ConfigPropertyValue.getPassword(), "");
 
-        
         LOGGER.info("5. Login as {} ...", ConfigPropertyValue.getUsername());
 
         final String ssnLoginURL = getSnnURL(ApiPath.LOGIN);
@@ -197,7 +210,7 @@ public class TestServices {
         String token = responseTestUser.getBody().asString();
         LOGGER.info("   Logged in. Obtained token: {}", token);
 
-        
+
         LOGGER.info("5.a Checking for user Key...");
         Response respCheckKey = new HttpRequest().webApiGet(ssnUploadKeyURL, token);
 
@@ -221,41 +234,109 @@ public class TestServices {
         Docker.checkDockerStatus(nodePrefix + "_create_edge_", ssnIpForTest);
         AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-edge", AmazonInstanceState.RUNNING.value());
 
-        
+
         final String ssnExpEnvURL = getSnnURL(ApiPath.EXP_ENVIRONMENT);
         LOGGER.info("   SSN exploratory environment URL is {}", ssnExpEnvURL);
         final String ssnProUserResURL = getSnnURL(ApiPath.PROVISIONED_RES);
         LOGGER.info("   SSN provisioned user resources URL is {}", ssnProUserResURL);
 
-        
-        
-
-        // TODO: finalize this code
-        if(!ConfigPropertyValue.isRunModeLocal()) {
-            copyTestDataIntoTestBucket(emrName);
-        }
-
-        // todo: finalize and check this code
-        runTestsInNotebooks(/*testNoteBookName,*/ emrName, nodePrefix, amazonNodePrefix, token, ssnExpEnvURL, ssnProUserResURL);
-
+        return token;
     }
 
-    private void runTestsInNotebooks(String emrName, String nodePrefix, String amazonNodePrefix, String token, String ssnExpEnvURL, String ssnProUserResURL) throws Exception {
-        String gettingStatus;
+    private void runTestsInNotebooks(String nodePrefix, String amazonNodePrefix, String token, String ssnExpEnvURL, String ssnProUserResURL) throws Exception {
 
         Map<String, String> notebooks = new HashMap<>();
         notebooks.put("jupyter-notebook.json", PropertiesResolver.getJupyterFilesLocation());
-        notebooks.put("zeppelin-notebook.json",PropertiesResolver.getRstudioFilesLocation());
-        notebooks.put("rstudio-notebook.json",PropertiesResolver.getZeppelinFilesLocation());
+        notebooks.put("zeppelin-notebook.json",PropertiesResolver.getZeppelinFilesLocation());
+        notebooks.put("rstudio-notebook.json",PropertiesResolver.getRstudioFilesLocation());
+        ExecutorService executor =  Executors.newFixedThreadPool(3);
+        List<FutureTask<Boolean>> futureTasks = new ArrayList();
 
         for (String notebookConfig: notebooks.keySet()) {
-            LOGGER.info("6. Notebook " +  notebookConfig + " will be created ...");
+            FutureTask runScenarioTask = new FutureTask<Boolean>(new PythonTestCallable(notebookConfig, nodePrefix, amazonNodePrefix, token, ssnExpEnvURL, ssnProUserResURL, notebooks.get(notebookConfig)));
+            futureTasks.add(runScenarioTask);
+            executor.execute(runScenarioTask);
+        }
 
-            CreateNotebookDto createNoteBookRequest =
-                    NodeReader.readNode(
-                            Paths.get(PropertiesResolver.getClusterConfFileLocation(), notebookConfig).toString(),
-                            CreateNotebookDto.class);
-            String testNoteBookName = "Notebook" + TestNamingHelper.generateRandomValue(createNoteBookRequest.getTemplateName());
+        while (true) {
+            boolean done = true;
+            done = allScenariosDone(futureTasks);
+            if (done) {
+                verifyResults(futureTasks);
+                executor.shutdown();
+                return;
+            } else {
+                Thread.sleep(1000 * 60);
+            }
+        }
+    }
+
+    private void verifyResults(List<FutureTask<Boolean>> futureTasks) throws InterruptedException, ExecutionException {
+        for (FutureTask<Boolean> ft : futureTasks) {
+            assertTrue(ft.get(), "The python script execution wasn`t successful");
+        }
+    }
+
+    private boolean allScenariosDone(List<FutureTask<Boolean>> futureTasks) {
+        boolean done = true;
+        for (FutureTask<Boolean> ft : futureTasks) {
+            if(!ft.isDone()) {
+                done = ft.isDone();
+            }
+        }
+        return done;
+    }
+
+    private void stopEnvironment(String nodePrefix, String amazonNodePrefix, String token, String ssnProUserResURL, String notebookConfig, String testNoteBookName, String emrName) throws Exception {
+        String gettingStatus;
+        LOGGER.info("8. Notebook " + notebookConfig + " will be stopped ...");
+        final String ssnStopNotebookURL = getSnnURL(ApiPath.getStopNotebookUrl(testNoteBookName));
+        LOGGER.info("   SSN stop notebook URL is {}", ssnStopNotebookURL);
+
+        Response responseStopNotebook = new HttpRequest().webApiDelete(ssnStopNotebookURL,
+                ContentType.JSON, token);
+        LOGGER.info("   responseStopNotebook.getBody() is {}", responseStopNotebook.getBody().asString());
+        Assert.assertEquals(responseStopNotebook.statusCode(), HttpStatusCode.OK);
+
+        gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, testNoteBookName, "stopping", ConfigPropertyValue.getTimeoutNotebookShutdown());
+        if (!gettingStatus.contains("stopped"))
+            throw new Exception("Notebook " + testNoteBookName + " has not been stopped");
+        LOGGER.info("   Notebook {} has been stopped", testNoteBookName);
+        gettingStatus = getEmrStatus(
+                new HttpRequest()
+                        .webApiGet(ssnProUserResURL, token)
+                        .getBody()
+                        .jsonPath(),
+                testNoteBookName, emrName);
+
+        if (!gettingStatus.contains("terminated"))
+            throw new Exception("Computational resources has not been terminated for Notebook " + testNoteBookName);
+        LOGGER.info("   Computational resources has been terminated for Notebook {}", testNoteBookName);
+
+        AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + testNoteBookName + "-" + emrName, AmazonInstanceState.TERMINATED.value());
+        Docker.checkDockerStatus(nodePrefix + "_stop_exploratory_NotebookAutoTest", ssnIpForTest);
+    }
+
+    /**
+     *
+     * @param testNoteBookName
+     * @param notebookConfig
+     * @param nodePrefix
+     * @param amazonNodePrefix
+     * @param token
+     * @param ssnExpEnvURL
+     * @param ssnProUserResURL
+     * @return notebook IP
+     * @throws Exception
+     */
+    private String  createNotebook(String testNoteBookName, String notebookConfig, String nodePrefix, String amazonNodePrefix, String token, String ssnExpEnvURL, String ssnProUserResURL) throws Exception {
+        LOGGER.info("6. Notebook " +  notebookConfig + " will be created ...");
+
+        CreateNotebookDto createNoteBookRequest =
+                NodeReader.readNode(
+                        Paths.get(PropertiesResolver.getClusterConfFileLocation(), notebookConfig).toString(),
+                        CreateNotebookDto.class);
+
             createNoteBookRequest.setName(testNoteBookName);
 
             Response responseCreateNotebook = new HttpRequest().webApiPut(ssnExpEnvURL, ContentType.JSON,
@@ -263,51 +344,21 @@ public class TestServices {
             LOGGER.info("   responseCreateNotebook.getBody() is {}", responseCreateNotebook.getBody().asString());
             Assert.assertEquals(responseCreateNotebook.statusCode(), HttpStatusCode.OK);
 
-            gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, testNoteBookName, "creating", ConfigPropertyValue.getTimeoutNotebookCreate());
-            if (!gettingStatus.contains("running")) {
-                LOGGER.error("Notebook {} is in state {}", testNoteBookName, gettingStatus);
-                throw new Exception("Notebook " + testNoteBookName + " has not been created");
-            }
-            LOGGER.info("   Notebook {} has been created", testNoteBookName);
-
-            AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-nb-" + testNoteBookName, AmazonInstanceState.RUNNING.value());
-            Docker.checkDockerStatus(nodePrefix + "_create_exploratory_NotebookAutoTest", ssnIpForTest);
-
-            //get notebook IP
-            String notebookIp = AmazonHelper.getInstance(amazonNodePrefix + "-nb-" + testNoteBookName)
-                    .getPrivateIpAddress();
-
-            createEMR(testNoteBookName, emrName, nodePrefix, amazonNodePrefix, token, ssnProUserResURL);
-
-            testPython(ssnIpForTest, notebookIp, emrName, getEmrClusterName(amazonNodePrefix + "-emr-" + testNoteBookName + "-" + emrName), new File(notebooks.get(notebookConfig)));
-
-            LOGGER.info("8. Notebook " + notebookConfig + " will be stopped ...");
-            final String ssnStopNotebookURL = getSnnURL(ApiPath.getStopNotebookUrl(testNoteBookName));
-            LOGGER.info("   SSN stop notebook URL is {}", ssnStopNotebookURL);
-
-            Response responseStopNotebook = new HttpRequest().webApiDelete(ssnStopNotebookURL,
-                    ContentType.JSON, token);
-            LOGGER.info("   responseStopNotebook.getBody() is {}", responseStopNotebook.getBody().asString());
-            Assert.assertEquals(responseStopNotebook.statusCode(), HttpStatusCode.OK);
-
-            gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, testNoteBookName, "stopping", ConfigPropertyValue.getTimeoutNotebookShutdown());
-            if (!gettingStatus.contains("stopped"))
-                throw new Exception("Notebook " + testNoteBookName + " has not been stopped");
-            LOGGER.info("   Notebook {} has been stopped", testNoteBookName);
-            gettingStatus = getEmrStatus(
-                    new HttpRequest()
-                            .webApiGet(ssnProUserResURL, token)
-                            .getBody()
-                            .jsonPath(),
-                    testNoteBookName, emrName);
-
-            if (!gettingStatus.contains("terminated"))
-                throw new Exception("Computational resources has not been terminated for Notebook " + testNoteBookName);
-            LOGGER.info("   Computational resources has been terminated for Notebook {}", testNoteBookName);
-
-            AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-emr-" + testNoteBookName + "-" + emrName, AmazonInstanceState.TERMINATED.value());
-            Docker.checkDockerStatus(nodePrefix + "_stop_exploratory_NotebookAutoTest", ssnIpForTest);
+        String gettingStatus = waitWhileNotebookStatus(ssnProUserResURL, token, testNoteBookName, "creating", ConfigPropertyValue.getTimeoutNotebookCreate());
+        if (!gettingStatus.contains("running")) {
+            LOGGER.error("Notebook {} is in state {}", testNoteBookName, gettingStatus);
+            throw new Exception("Notebook " + testNoteBookName + " has not been created");
         }
+        LOGGER.info("   Notebook {} has been created", testNoteBookName);
+
+        AmazonHelper.checkAmazonStatus(amazonNodePrefix + "-nb-" + testNoteBookName, AmazonInstanceState.RUNNING.value());
+        Docker.checkDockerStatus(nodePrefix + "_create_exploratory_NotebookAutoTest", ssnIpForTest);
+
+        //get notebook IP
+        String notebookIp = AmazonHelper.getInstance(amazonNodePrefix + "-nb-" + testNoteBookName)
+                .getPrivateIpAddress();
+
+        return notebookIp;
     }
 
     private void createEMR(String testNoteBookName, String emrName, String nodePrefix, String amazonNodePrefix, String token, String ssnProUserResURL) throws Exception {
@@ -321,6 +372,7 @@ public class TestServices {
                         Paths.get(PropertiesResolver.getClusterConfFileLocation(), "EMR.json").toString(),
                         DeployEMRDto.class);
 
+        //TODO: add parameter for switching from regular ec2 instances to spot instances
         DeployEMRDto deployEMRSpot40 =
                 NodeReader.readNode(
                         Paths.get(PropertiesResolver.getClusterConfFileLocation(), "EMR_spot.json").toString(),
@@ -359,7 +411,7 @@ public class TestServices {
         AmazonHelper.printBucketGrants(getBucketName());
     }
 
-    private void copyTestDataIntoTestBucket(String emrName) throws Exception {
+    private void copyTestDataIntoTestBucket(String emrName, String clusterName) throws Exception {
         Session ssnSession = null;
         ChannelSftp channelSftp = null;
         try {
@@ -367,13 +419,10 @@ public class TestServices {
             ssnSession = SSHConnect.getSession(ConfigPropertyValue.getClusterOsUser(), ssnIpForTest, 22);
             channelSftp = SSHConnect.getChannelSftp(ssnSession);
 
-            // todo: copy test data copy script to ssn: ChannelSftp channel, String filename
             copyFileToSSN(channelSftp, PropertiesResolver.getNotebookTestDataCopyScriptLocation());
-            //todo: execute python test data copy script
-            executePythonScript2(ssnSession, getEmrClusterName(emrName), new File(PropertiesResolver.getNotebookTestDataCopyScriptLocation()).getName());
 
-            //todo: iterate here over all available notebooks
-            //run python script
+            executePythonScript2(ssnSession, clusterName, new File(PropertiesResolver.getNotebookTestDataCopyScriptLocation()).getName());
+
         }  finally {
         if(channelSftp != null && !channelSftp.isConnected()) {
             channelSftp.disconnect();
@@ -398,16 +447,16 @@ public class TestServices {
         throw new Exception("Could not detect cluster name for EMR " + emrName);
     }
 
-    private void copyFileToSSN(ChannelSftp channel, String filename) throws IOException, InterruptedException, JSchException {
-        LOGGER.info("Copying {}...", filename);
-        File file = new File(filename);
+    private void copyFileToSSN(ChannelSftp channel, String filenameWithPath) throws IOException, InterruptedException, JSchException {
+        LOGGER.info("Copying {}...", filenameWithPath);
+        File file = new File(filenameWithPath);
         assertTrue(file.exists());
 
         FileInputStream src = new FileInputStream(file);
 
         try {
 
-            channel.put(src, String.format("/home/%s/%s", ConfigPropertyValue.getClusterOsUser(), filename));
+            channel.put(src, String.format("/home/%s/%s", ConfigPropertyValue.getClusterOsUser(), file.getName()));
 
         } catch (SftpException e) {
             LOGGER.error(e);
@@ -433,7 +482,7 @@ public class TestServices {
         assertTrue(status.isOk());
     }
 
-    private void testPython(String ssnIP, String noteBookIp, String emrName, String cluster_name, File notebookDirectory)
+    private void testPythonScripts(String ssnIP, String noteBookIp, String emrName, String clusterName, File notebookDirectory)
             throws JSchException, IOException, InterruptedException {
     	LOGGER.info("Python tests will be started ...");
     	if (ConfigPropertyValue.isRunModeLocal()) {
@@ -457,9 +506,7 @@ public class TestServices {
             ssnSession = SSHConnect.getSession(ConfigPropertyValue.getClusterOsUser(), ssnIP, 22);
             channelSftp = SSHConnect.getChannelSftp(ssnSession);
 
-//            for (String filename : files) {
-                copyFileToSSN(channelSftp, Paths.get(notebookDirectory.getAbsolutePath(), notebookTestFile).toString());
-//            }
+            copyFileToSSN(channelSftp, Paths.get(notebookDirectory.getAbsolutePath(), notebookTestFile).toString());
         } finally {
             if(channelSftp != null && !channelSftp.isConnected()) {
                 channelSftp.disconnect();
@@ -471,7 +518,6 @@ public class TestServices {
         AckStatus status;
 
         try {
-
             for (String filename : files) {
             	copyFileToNotebook(ssnSession, filename, noteBookIp);
     		}
@@ -480,7 +526,7 @@ public class TestServices {
             int assignedPort = ssnSession.setPortForwardingL(0, noteBookIp, 22);
             LOGGER.info("Port forwarded localhost:{} -> {}:22", assignedPort, noteBookIp);
 
-            executePythonScript(noteBookIp, cluster_name, notebookTestFile, assignedPort);
+            executePythonScript(noteBookIp, clusterName, notebookTestFile, assignedPort);
         }
         finally {
             if(ssnSession != null && ssnSession.isConnected()) {
@@ -498,7 +544,6 @@ public class TestServices {
         try {
             command = String.format(ScpCommands.runPythonCommand,
                     "/tmp/" +  notebookTestFile,
-                    ConfigPropertyValue.getAwsRegion(),
                     getBucketName(),
                     cluster_name,
                     ConfigPropertyValue.getClusterOsUser());
@@ -506,7 +551,7 @@ public class TestServices {
 
             ChannelExec runScript = SSHConnect.setCommand(session, command);
             status = SSHConnect.checkAck(runScript);
-            LOGGER.info(status.getMessage());
+            LOGGER.info("Script execution status message {} and status code {}", status.getMessage(), status.getStatus());
             assertTrue(status.isOk(), "The python script execution wasn`t successful");
 
             LOGGER.info("Python script executed successfully ");
@@ -519,7 +564,7 @@ public class TestServices {
         }
     }
 
-    private void executePythonScript2(Session ssnSession, String cluster_name, String notebookTestFile) throws JSchException, IOException, InterruptedException {
+    private void executePythonScript2(Session ssnSession, String clusterName, String notebookTestFile) throws JSchException, IOException, InterruptedException {
         String command;
         AckStatus status;
 
@@ -530,12 +575,11 @@ public class TestServices {
 
             ChannelExec runScript = SSHConnect.setCommand(ssnSession, command);
             status = SSHConnect.checkAck(runScript);
-            LOGGER.info(status.getMessage());
-            assertTrue(status.isOk(), "The python script execution wasn`t successful");
+            LOGGER.info("Script execution status message {} and code {}", status.getMessage(), status.getStatus());
+            assertTrue(status.isOk(), "The python script execution wasn`t successful on : " + clusterName);
 
             LOGGER.info("Python script executed successfully ");
     }
-
 
     private String getSnnURL(String path) {
         return ssnURL + path;
@@ -682,5 +726,50 @@ public class TestServices {
         
         return actualStatus;
     }
-    
+
+
+    class PythonTestCallable implements Callable<Boolean> {
+
+        private String notebookConfig, nodePrefix, amazonNodePrefix, token, ssnExpEnvURL, ssnProUserResURL, notebookFileLocation;
+
+        public PythonTestCallable(String notebookConfig, String nodePrefix, String amazonNodePrefix, String token, String ssnExpEnvURL, String ssnProUserResURL, String notebookFileLocation) {
+            this.notebookConfig = notebookConfig;
+            this.nodePrefix = nodePrefix;
+            this.amazonNodePrefix = amazonNodePrefix;
+            this.token = token;
+            this.ssnExpEnvURL = ssnExpEnvURL;
+            this.ssnProUserResURL = ssnProUserResURL;
+            this.notebookFileLocation = notebookFileLocation;
+        }
+
+        @Override
+        public Boolean call() throws Exception {
+
+            String notebookTemplateNamePrefix = notebookConfig.substring(0, notebookConfig.indexOf(".") > 0 ? notebookConfig.indexOf(".") : notebookConfig.length() - 1);
+            String notebookTemplateName = TestNamingHelper.generateRandomValue(notebookTemplateNamePrefix);
+
+//          String testNoteBookName = "NotebookAutoTest_R-Studio_20170516122058";
+//          String testNoteBookName = "NotebookAutoTest_Zeppelin_2017051633454";
+            String testNoteBookName = "Notebook" + notebookTemplateName;
+
+//          String emrName = "eimrAutoTest_R-Studio_20170516125150";
+//          String emrName = "eimrAutoTest_Zeppelin_2017051641947";
+            String emrName = "eimr" + notebookTemplateName;
+
+            String notebookIp = createNotebook(testNoteBookName, notebookConfig, nodePrefix, amazonNodePrefix, token, ssnExpEnvURL, ssnProUserResURL);
+            createEMR(testNoteBookName, emrName, nodePrefix, amazonNodePrefix, token, ssnProUserResURL);
+
+            String emrClusterName = getEmrClusterName(amazonNodePrefix + "-emr-" + testNoteBookName + "-" + emrName);
+            if(!ConfigPropertyValue.isRunModeLocal()) {
+                copyTestDataIntoTestBucket(emrName, emrClusterName);
+            }
+
+            testPythonScripts(ssnIpForTest, notebookIp, emrName, emrClusterName, new File(notebookFileLocation));
+
+            stopEnvironment(nodePrefix, amazonNodePrefix, token, ssnProUserResURL, notebookConfig, testNoteBookName, emrName);
+
+            return true;
+        }
+    }
+
 }
